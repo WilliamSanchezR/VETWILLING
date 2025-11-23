@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="public/assets/auth/css/loginStyle.css">
-    <link rel="stylesheet" href="public/assets/auth/css/globalStyles.css">
-    <link rel="icon" href="public/assets/webSite/img/FAVICON.png" type="image">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/loginStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
 </head>
 
@@ -22,7 +22,7 @@
 
             <div class="cont-left">
                 <div class="logo">
-                    <img src="public/assets/auth/img/LOGO-POSITIVO 1.png" alt="Logo VetWilling">
+                    <img src="<?= BASE_URL ?>/public/assets/auth/img/LOGO-POSITIVO 1.png" alt="Logo VetWilling">
                 </div>
 
                 <div class="form">
@@ -40,7 +40,7 @@
                             <input type="password" id="password" name="password" placeholder="Contraseña" required>
                         </div>
 
-                        <a href="recuperarContraseña.html" id="recover">¿Olvidaste Tu Contraseña?</a>
+                        <a href="/vetwilling/recoverpw" id="recover">¿Olvidaste Tu Contraseña?</a>
                         <button id="btn_ingresar" type="submit">Ingresar</button>
 
                     </form>
@@ -52,8 +52,8 @@
                 <div class="info">
                     <p>¡Bienvenido a VetWilling, el sistema de gestión veterinaria que optimiza tu tiempo y mejora el
                         cuidado de tus pacientes!</p>
-                    <img id="icon-datos" src="public/assets/auth/img/clipboard.png" alt="Icono tabla de datos">
-                    <img id="img_info" src="public/assets/auth/img/veterinaria.PNG" alt="Md veterinario">
+                    <img id="icon-datos" src="<?= BASE_URL ?>/public/assets/auth/img/clipboard.png" alt="Icono tabla de datos">
+                    <img id="img_info" src="<?= BASE_URL ?>/public/assets/auth/img/veterinaria.PNG" alt="Md veterinario">
                 </div>
             </div>
 

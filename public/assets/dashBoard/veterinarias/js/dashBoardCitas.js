@@ -297,61 +297,6 @@ $(document).ready(function() {
     });
 
     // ========================================
-    // BOTÓN "EDITAR" EN CADA FILA
-    // ========================================
-    // $(document).on('click', '.btn-editar', function(e) {
-    //     e.stopPropagation();
-    //     const fila = $(this).closest('tr');
-    //     const data = tabla.row(fila).data();
-        
-    //     // console.log('✏️ Editando cita:', data);
-        
-    //     // const mensaje = `✏️ Editar Cita\n\n` +
-    //     //                `ID: ${data[0]}\n` +
-    //     //                `Fecha: ${data[1]}\n` +
-    //     //                `Propietario: ${data[2]}\n` +
-    //     //                `Mascota: ${data[3]}\n` +
-    //     //                `Teléfono: ${data[4]}\n` +
-    //     //                `Dirección: ${data[5]}\n` +
-    //     //                `Servicio: ${data[6]}\n` +
-    //     //                `Nota: ${data[7]}\n\n` +
-    //     //                `Aquí se abriría un modal de edición.`;
-        
-    //     // alert(mensaje);
-    // });
-
-    // ========================================
-    // BOTÓN "ELIMINAR" EN CADA FILA
-    // ========================================
-    // $(document).on('click', '.btn-eliminar', function(e) {
-    //     e.stopPropagation();
-    //     const fila = $(this).closest('tr');
-    //     const data = tabla.row(fila).data();
-        
-    //     // console.log('🗑️ Intentando eliminar:', data[2]);
-        
-    //     // const confirmacion = confirm(
-    //     //     `🗑️ Eliminar Cita\n\n` +
-    //     //     `¿Estás seguro de eliminar la cita de ${data[2]}?\n\n` +
-    //     //     `ID: ${data[0]}\n` +
-    //     //     `Fecha: ${data[1]}\n` +
-    //     //     `Mascota: ${data[3]}\n\n` +
-    //     //     `⚠️ Esta acción no se puede deshacer.`
-    // //     );
-        
-    //     if (confirmacion) {
-    //         try {
-    //             tabla.row(fila).remove().draw();
-    //             alert('✅ Cita eliminada correctamente');
-    //             console.log('✅ Cita eliminada');
-    //         } catch (error) {
-    //             console.error('❌ Error al eliminar:', error);
-    //             alert('Error al eliminar la cita.');
-    //         }
-    //     }
-    // });
-
-    // ========================================
     // NAVEGACIÓN DE PÁGINAS
     // ========================================
     tabla.on('page.dt', function() {

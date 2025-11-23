@@ -36,13 +36,6 @@ body {
     --fs-texto1: 12px;
 }
 
-/* - Quinto Desktop */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    scrollbar-width: none;
-}
 
 body {
     font-family: 'Open Sans', sans-serif;
@@ -67,13 +60,12 @@ h5, h6 {
     font-size: var(--fs-titulo4);
 }
 
-.logoDas {
-    margin-left: 20px;
-}
+
 
 .row {
     width: 100%;
 }
+
 /* ============================================
    SECCIÓN DE PERFIL Y TARJETAS DE INFORMACIÓN
    ============================================ */
@@ -87,6 +79,7 @@ h5, h6 {
     margin: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
 }
 
 .foto:hover {
@@ -369,6 +362,220 @@ h5, h6 {
 }
 
 /* ============================================
+   ESTILOS DEL MODAL DE CONFIGURACIÓN
+   ============================================ */
+
+/* Botón de editar perfil (engranaje) */
+.btn-edit-profile {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: 2px solid var(--color-primario);
+    color: var(--color-primario);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.btn-edit-profile:hover {
+    background: var(--color-primario);
+    color: white;
+    transform: rotate(90deg);
+}
+
+/* Header del modal */
+.modal-header {
+    background: linear-gradient(135deg, var(--color-primario) 0%, #0a7525 100%);
+    color: white;
+    border-radius: 0;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-header .modal-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+/* Tabs laterales personalizados */
+.nav-pills-custom .nav-link {
+    color: var(--color-gris);
+    font-weight: 600;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    text-align: left;
+    padding: 12px 15px;
+}
+
+.nav-pills-custom .nav-link:hover {
+    background-color: rgba(10, 147, 44, 0.1);
+    color: var(--color-primario);
+    transform: translateX(5px);
+}
+
+.nav-pills-custom .nav-link.active {
+    background-color: var(--color-primario);
+    color: white;
+}
+
+.nav-pills-custom .nav-link i {
+    font-size: 18px;
+}
+
+/* Formularios */
+.form-label {
+    font-weight: 600;
+    color: var(--color-gris);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.form-label i {
+    font-size: 16px;
+}
+
+.form-control {
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 0.2rem rgba(10, 147, 44, 0.25);
+}
+
+.form-control::placeholder {
+    color: #999;
+    font-size: var(--fs-titulo4);
+}
+
+.form-text {
+    color: #666;
+    font-size: var(--fs-texto1);
+    margin-top: 5px;
+}
+
+/* Botón principal personalizado */
+.btn-primary-custom {
+    background: var(--color-primario);
+    border: none;
+    padding: 10px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+    background: #0a7525;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(10, 147, 44, 0.3);
+}
+
+/* Previsualización de foto */
+.foto-preview-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.foto-preview {
+    border-radius: 50%;
+    height: 150px;
+    width: 150px;
+    object-fit: cover;
+    border: 4px solid var(--color-primario);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.foto-upload-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--color-primario);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.foto-upload-overlay:hover {
+    background: #0a7525;
+    transform: scale(1.1);
+}
+
+.foto-upload-overlay i {
+    color: white;
+    font-size: 18px;
+}
+
+#fileInput {
+    display: none;
+}
+
+/* Alertas personalizadas */
+.alert-custom {
+    border-radius: 10px;
+    border: none;
+    display: flex;
+    align-items: center;
+}
+
+.alert-custom i {
+    font-size: 18px;
+}
+
+.alert-info.alert-custom {
+    background-color: rgba(147, 190, 223, 0.2);
+    color: var(--color-azul);
+}
+
+.alert-danger.alert-custom {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* Input groups para contraseñas */
+.input-group .btn-outline-secondary {
+    border: 2px solid #e0e0e0;
+    border-left: none;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.input-group .btn-outline-secondary:hover {
+    background: var(--color-primario);
+    color: white;
+    border-color: var(--color-primario);
+}
+
+.input-group .form-control {
+    border-right: none;
+}
+
+.input-group .form-control:focus + .btn-outline-secondary {
+    border-color: var(--color-primario);
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 
@@ -399,6 +606,33 @@ h5, h6 {
     .card-documentos, .card-notas {
         margin-bottom: 15px;
     }
+
+    /* Modal responsive */
+    .modal-dialog {
+        margin: 10px;
+    }
+
+    .nav-pills-custom {
+        flex-direction: row !important;
+        margin-bottom: 20px;
+    }
+
+    .nav-pills-custom .nav-link {
+        flex: 1;
+        text-align: center;
+        font-size: var(--fs-texto1);
+        padding: 8px 10px;
+    }
+
+    .foto-preview {
+        height: 120px;
+        width: 120px;
+    }
+
+    .btn-edit-profile {
+        width: 35px;
+        height: 35px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -413,6 +647,14 @@ h5, h6 {
 
     .cita-item h4 {
         font-size: var(--fs-titulo4);
+    }
+
+    .modal-header .modal-title {
+        font-size: var(--fs-titulo3);
+    }
+
+    .nav-pills-custom .nav-link span {
+        display: none;
     }
 }
 
@@ -436,29 +678,42 @@ h5, h6 {
     animation: fadeInUp 0.6s ease-out;
 }
 
+/* Animación del modal */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}
+
 /* Scrollbar personalizado para navegadores webkit */
 .citas::-webkit-scrollbar,
 .card-documentos::-webkit-scrollbar,
-.card-notas::-webkit-scrollbar {
+.card-notas::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar {
     width: 8px;
 }
 
 .citas::-webkit-scrollbar-track,
 .card-documentos::-webkit-scrollbar-track,
-.card-notas::-webkit-scrollbar-track {
+.card-notas::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
 }
 
 .citas::-webkit-scrollbar-thumb,
 .card-documentos::-webkit-scrollbar-thumb,
-.card-notas::-webkit-scrollbar-thumb {
+.card-notas::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb {
     background: var(--color-verde);
     border-radius: 10px;
 }
 
 .citas::-webkit-scrollbar-thumb:hover,
 .card-documentos::-webkit-scrollbar-thumb:hover,
-.card-notas::-webkit-scrollbar-thumb:hover {
+.card-notas::-webkit-scrollbar-thumb:hover,
+.modal-body::-webkit-scrollbar-thumb:hover {
     background: var(--color-primario);
 }

@@ -81,6 +81,7 @@ function registrarVeterinario()
     $estado = 'activo';
     $tipo_usuario = 'Veterinario';
     $id_veterinaria = '1';
+    $img_perfil = $_POST['img_perfil'];
 
     // Validamos los caampos que son obligatorios
 
@@ -96,6 +97,55 @@ function registrarVeterinario()
 
     // POO - instanciamos la clase
 
+    // Logica para cargar imagenes
+
+    $ruta_img = null;
+
+    // validamos si se envio o no la foto desde el formulario
+    // * si el usuario no registro una foto, dejar una foto definida *
+
+    if (!empty($_FILES['img_perfil'])) {
+
+        $file = $_FILES['img_perfil'];
+
+        // *Obtenemos el la extencion del archivo
+
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        // *Definimos las extenciones permitidas 
+
+        $permitidas = ['png', 'jpg', 'jpeg'];
+
+        // *validamos que la extencion de las imagenes esta dentro de las permitidas
+
+        if (!in_array($ext, $permitidas)) {
+
+            mostrarSweetAlert('error', 'Extencion no permitida', 'Recuerda que solo soporta archivos png, jpeg y jpg');
+            exit();
+        }
+
+        // * Validamos el tamaño o el peso MAX 2 mb
+
+        if ($file['size'] > 2 * 1024 * 1024) {
+
+            mostrarSweetAlert('erro', 'Error al cargar la foto', 'El tamaño de la foto supera las 2 MB');
+            exit();
+        }
+
+        // *Definimos el nombre del archivo y le concatenamos la extencion
+        $ruta_img = uniqid('user_') . '.' . $ext;
+
+        // *Definimos el destino donde moveremos el archivo
+        $destino = BASE_PATH . '/public/uploads/usuarios/' . $ruta_img;
+
+        // *Movemos el archivo al destino
+        move_uploaded_file($file['tmp_name'], $destino);
+    } else {
+        // *agregar la logica de la imagen por default
+
+        $ruta_img = 'foto_default.jpg';
+    }
+
     $objVeterinario = new Veterinario();
     $data = [
         'nombres' => $nombres,
@@ -108,7 +158,8 @@ function registrarVeterinario()
         'password_hash' => $password_hash,
         'estado' => $estado,
         'tipo_usuario' => $tipo_usuario,
-        'id_veterinaria' => $id_veterinaria
+        'id_veterinaria' => $id_veterinaria,
+        'img_perfil' => $ruta_img
     ];
 
     // Enviamos la data al metodo (registrar) de la clase instanciada anteriormente (Veterinario) y esperamos una respuesta booleana del modelo en resultados

@@ -42,6 +42,16 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/loginControllers.php';
         break;
 
+    case '/generar-clave':
+        require BASE_PATH . '/app/controllers/recoveryPassControllers.php';
+        break;
+
+    // Restablecer contraseña
+
+    case '/recoverpw':
+        require BASE_PATH . '/app/views/auth/recovery-pass.php';
+        break;
+
     // Fin rutas necesarias para el login
 
     // ---------------------------------------VETERINARIO-------------------------------------//
@@ -51,7 +61,7 @@ switch ($request) {
         break;
 
     case '/veterinario/registrar-veterinario':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/dashBoardRegVeterinario.php';
+        require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';
         break;
 
     case '/veterinario/guardar-veterinario':
@@ -59,11 +69,11 @@ switch ($request) {
         break;
 
     case '/veterinario/consultar-veterinario':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/dashBoardCitas.php';
+        require BASE_PATH . '/app/views/dashboard/veterinaria/citas.php';
         break;
 
     case '/veterinario/editar-veterinario':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/dashBoardEditVeterinario.php';
+        require BASE_PATH . '/app/views/dashboard/veterinaria/editar-veterinario.php';
         break;
 
     case '/veterinario/actualizar-veterinario':
@@ -72,6 +82,10 @@ switch ($request) {
 
     case '/veterinario/eliminar-veterinario':
         require BASE_PATH . '/app/controllers/veterinarioController.php';
+        break;
+
+    case '/veterinario/consultar-perfil':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/perfil.php';
         break;
 
     default:

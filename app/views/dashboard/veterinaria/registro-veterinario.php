@@ -72,7 +72,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 </div>
             </div>
 
-            <form id="vetForm" action="<?= BASE_URL ?>/veterinario/guardar-veterinario" method="POST">
+            <form id="vetForm" action="<?= BASE_URL ?>/veterinario/guardar-veterinario" method="POST" enctype="multipart/form-data">
 
                 <!-- Paso 1: Datos del Propietario -->
                 <div class="step active">
@@ -122,6 +122,10 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
                                 <input type="email" id="correo" name="email" required placeholder="ejemplo@correo.com">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="bi bi-envelope"></i> Foto </label>
+                                <input type="file" accept=".jpg, .png, .jpeg" id="img_perfil" name="img_perfil" required>
                             </div>
                         </div>
                     </div>

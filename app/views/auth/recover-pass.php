@@ -12,10 +12,10 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Estilos -->
-    <link rel="stylesheet" href="../assets/extras/css/estilosRecuperarContraseña.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/estilosRecuperarContraseña.css">
 
     <!-- Favicon -->
-    <link rel="icon" href="../../assets/webSite/img/FAVICON.png" type="image/png">
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 </head>
 
 <body>
@@ -24,19 +24,18 @@
             <!-- Columna izquierda -->
             <div class="cont-left">
                 <div class="logo">
-                    <img src="../assets/extras/img/LOGO-POSITIVO 1.png" alt="Logo de VetWilling">
+                    <img src="<?= BASE_URL ?>/public/assets/website/img/LOGO-PRINCIPAL.png" alt="Logo de VetWilling">
                 </div>
 
                 <div class="form">
                     <h2>Recupera tu contraseña</h2>
                     <p>Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</p>
 
-                    <form class="login" id="formRecuperar">
+                    <form class="login" id="formRecuperar" action="generar-clave" method="POST">
                         <div class="cont-input">
                             <i class="fa-regular fa-envelope"></i>
                             <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
                         </div>
-
                         <button id="btn_ingresar" type="submit">Enviar enlace</button>
                     </form>
 
@@ -53,7 +52,7 @@
         </div>
     </main>
 
-    
+
 </body>
 
 </html>

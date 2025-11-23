@@ -1,3 +1,19 @@
+<?php
+
+// enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
+
+require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+
+// asignamos el valo id del registro segun la tabla
+
+$id = $_SESSION['user']['id'];
+
+// Llamamos la funcion especifica que existe en dicho controlador y le pasamos los datos a una variable que podamos manipular en este archivo
+
+$usuario = mostrarPerfilVeteri($id);
+
+?>
+
 <div class="barra-navegacion-superior">
     <div class="navegacion-izquierda">
         <div class="d-flex align-items-center gap-2">
@@ -19,9 +35,13 @@
         <button class="boton-icono-navegacion">
             <i class="bi bi-arrow-counterclockwise"></i>
         </button>
-        <button class="boton-icono-navegacion">
-            <a href="dashBoardPerfil.html"><i class="bi bi-person-circle"></i></a>
+
+        <button class="boton-icono-navegacion btn-perfil-bar">
+            <a href="<?= BASE_URL ?>/veterinario/consultar-perfil"><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt=""></a>
+            <h4 class="btn-perfil-bar"><?= $usuario['nombres'] ?></h4>
+            <p class="btn-perfil-bar"><?= $usuario['tipo_usuario'] ?></p>
         </button>
+
         <button class="boton-icono-navegacion" onclick="alternarBarraDerecha()">
             <i class="bi bi-chevron-left"></i>
         </button>

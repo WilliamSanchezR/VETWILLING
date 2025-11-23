@@ -107,6 +107,7 @@ $datos = mostrarVeterinarios();
                 <table id="tablaCitas" class="display" style="width:100%">
                     <thead>
                         <tr>
+                            <th>Foto de perfi</th>
                             <th>ID Usuario</th>
                             <th>Tipo de documento</th>
                             <th>Numero de documeto</th>
@@ -126,6 +127,7 @@ $datos = mostrarVeterinarios();
                         <?php if (!empty($datos)): ?>
                             <?php foreach ($datos as $veterinario): ?>
                                 <tr class="fila-gris">
+                                    <td><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $veterinario['img_perfil'] ?>" alt=""></td>
                                     <td><?= $veterinario['id_usuario'] ?></td>
                                     <td><?= $veterinario['tipo_documento'] ?></td>
                                     <td><?= $veterinario['numero_documento'] ?></td>
@@ -173,7 +175,7 @@ $datos = mostrarVeterinarios();
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
 
     <!-- 5. Tu script de tabla AL FINAL -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardCitas.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/citas.js"></script>
 
     <!-- Modo dia  y noche -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
