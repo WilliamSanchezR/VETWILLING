@@ -34,12 +34,37 @@ class Login
                 return ['error' => 'Contraseña incorrecta'];
             }
 
+            // Obtenemos datos adicionales según cada rol, mediante switch case 
+
+
+            switch ($user['id_rol']) {
+                case 1: // Administrador
+                    $consultar = "SELECT nombres, apellidos, nivel_acceso, img_perfil FROM administrador WHERE id_usuario = :id";
+                    break;
+
+                case 2: // Veterinario
+                    $consultar = "SELECT nombres, apellidos, telefono, numero_licencia_profesional FROM veterinario WHERE id_usuario = :id";
+                    break;
+
+                case 3: // Propietario
+                    $consultar = "SELECT nombres, apellidos, telefono, direccion, img_perfil FROM propietario WHERE id_usuario = :id";
+                    break;
+
+                default:
+                    return ['error' => 'Rol de usuario no válido'];
+            }
+
+            $resultado = $this->conexion->prepare($consultar);
+            $resultado->bindParam(':id', $user['$id_usuario']);
+            $resultado->execute();
+            $perfil = $resultado->fetch();
+
             return [
                 'id_usuario' => $user['id_usuario'],
                 'id_rol' => $user['id_rol'],
-                'nombre' => $user['nombres'],
-                'correo' => $user['email'],
-                'id_veterinaria' => $user['id_veterinaria']
+                'email' => $user['email'],
+                'estado' => $user['estado'],
+                'perfil' => $perfil
             ];
         } catch (PDOException $e) {
             error_log("Error en el modelo login: " . $e->getMessage());

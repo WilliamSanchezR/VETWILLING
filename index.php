@@ -49,7 +49,7 @@ switch ($request) {
     // Restablecer contraseña
 
     case '/recoverpw':
-        require BASE_PATH . '/app/views/auth/recovery-pass.php';
+        require BASE_PATH . '/app/views/auth/recover-pass.php';
         break;
 
     // Fin rutas necesarias para el login
