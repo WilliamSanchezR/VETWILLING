@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
-                "Bienvenido administrador" . $resultado['perfil']['nombres'],
+                "Bienvenido administrador " . $resultado['perfil']['nombres'],
                 "/inicio-sesion-administrador"
             );
 
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
-                "Bienvenido veterinario" . $resultado['perfil']['nombres'],
+                "Bienvenido veterinario " . $resultado['perfil']['nombres'],
                 "/veterinario/dashboard"
             );
 
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
-                "Bienvenido" . $resultado['perfil']['nombres'],
+                "Bienvenido " . $resultado['perfil']['nombres'],
                 "/inicio-sesion-propietario"
             );
 
