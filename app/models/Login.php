@@ -55,7 +55,7 @@ class Login
             }
 
             $resultado = $this->conexion->prepare($consultar);
-            $resultado->bindParam(':id', $user['$id_usuario']);
+            $resultado->bindParam(':id', $user['id_usuario']);
             $resultado->execute();
             $perfil = $resultado->fetch();
 

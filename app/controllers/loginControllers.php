@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verificar si el modelo devolvio un error
 
     if (isset($resultado['error'])) {
-        mostrarSweetAlert('error', 'error de atunticacion', $resultado['error']);
+        mostrarSweetAlert('error', 'Error de autenticacion', $resultado['error']);
         exit();
     }
 
@@ -39,38 +39,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'id_rol' => $resultado['id_rol'],
         'email' => $resultado['email'],
         'estado' => $resultado['estado'],
-        'perfil' => $resultado['perfil'] // Guardamos el perfil completo
+        'perfil' => $resultado['perfil']
     ];
 
-    $user = $resultado['id_rol'];
+    $rol = $resultado['id_rol'];
 
-    switch ($user['id_rol']) {
+    switch ($rol) {
 
         case '1': //Administrador
 
-            $redirectUrl = '/inicio-sesion-administrador';
-            mostrarSweetAlert("success", "Inicio de Sesión Exitoso", "Bienvenido administrador" . $user['nombres']);
+            mostrarSweetAlert(
+                "success",
+                "Inicio de Sesión Exitoso",
+                "Bienvenido administrador " . $resultado['perfil']['nombres'],
+                "/inicio-sesion-administrador"
+            );
 
             break;
 
         case '2': //Veterinario
 
-            $redirectUrl = '/veterinario/dashboard';
-            mostrarSweetAlert("success", "Inicio de Sesión Exitoso", "Bienvenido veterinario" . $user['nombres']);
+            mostrarSweetAlert(
+                "success",
+                "Inicio de Sesión Exitoso",
+                "Bienvenido veterinario " . $resultado['perfil']['nombres'],
+                "/veterinario/dashboard"
+            );
 
             break;
 
         case '3': //Propietario
 
-            $redirectUrl = '/inicio-sesion-propietario';
-            mostrarSweetAlert("success", "Inicio de Sesión Exitoso", "Bienvenido" . $user['nombres']);
+            mostrarSweetAlert(
+                "success",
+                "Inicio de Sesión Exitoso",
+                "Bienvenido " . $resultado['perfil']['nombres'],
+                "/inicio-sesion-propietario"
+            );
 
             break;
 
         default:
 
-            $mensaje = 'Rol no reconocido. Redirigiendo al login...';
-            $redirectUrl = '/login';
+            mostrarSweetAlert("error", "Rol no reconocido", "Redirigiendo al login...", "/login");
 
             break;
     }
