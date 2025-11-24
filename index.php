@@ -88,6 +88,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/perfil.php';
         break;
 
+
     default:
         http_response_code(404);
         require BASE_PATH . '/app/views/auth/error404.html';

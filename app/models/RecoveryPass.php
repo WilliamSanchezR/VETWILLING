@@ -50,11 +50,11 @@ class RecoveryPass
 
                 $claveHash = password_hash($nuevaClave, PASSWORD_DEFAULT);
 
-                $cactualizar = "UPDATE usuario SET password_hash = :nuevaClave WHERE id_usuario = :id";
+                $actualizar = "UPDATE usuario SET password_hash = :nuevaClave WHERE id_usuario = :id";
 
                 // Preparamos la accion a ejecutar y la ejecutamos
 
-                $resultado = $this->conexion->prepare($cactualizar);
+                $resultado = $this->conexion->prepare($actualizar);
                 $resultado->bindParam(':nuevaClave', $claveHash);
                 $resultado->bindParam(':id', $user['id_usuario']);
 
