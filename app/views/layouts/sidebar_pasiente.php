@@ -1,0 +1,52 @@
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+    <!-- HEADER CON LOGO -->
+    <div class="sidebar-header">
+        <img src="<?= BASE_URL ?>/public/assets/logo/LOGO-NEGATIVO.png"
+            alt="VetWilling"
+            class="sidebar-logo-full">
+        <img src="<?= BASE_URL ?>/public/assets/logo/LOGO-VERTICAL-NEGATIVA.png"
+            alt="VW"
+            class="sidebar-logo-icon" width="100">
+    </div>
+
+    <!-- NAVEGACIÓN -->
+    <nav class="sidebar-nav">
+
+        <!-- Sección General -->
+        <div class="nav-section">
+            <span class="nav-section-title">General</span>
+
+            <a href="<?= BASE_URL ?>/Cliente/dashboard" class="nav-item" data-tooltip="Inicio">
+                <i class="bi bi-house-door"></i>
+                <span class="nav-text">Inicio</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/Cliente/mascotas" class="nav-item" data-tooltip="Mis Mascotas">
+                <i class="bi bi-bluesky"></i>
+                <span class="nav-text">Mis Mascotas</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/Cliente/citas" class="nav-item" data-tooltip="Citas">
+                <i class="bi bi-calendar-check"></i>
+                <span class="nav-text">Citas</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/Cliente/tienda" class="nav-item" data-tooltip="Tienda">
+                <i class="bi bi-bag-plus"></i>
+                <span class="nav-text">Tienda</span>
+            </a>
+        </div>
+
+
+
+    <!-- BOTÓN TOGGLE -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+
+</aside>
+
