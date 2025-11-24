@@ -6,7 +6,7 @@ require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 
 // asignamos el valo id del registro segun la tabla
 
-$id = $_SESSION['user']['id'];
+$id = $_SESSION['user']['rol'];
 
 // Llamamos la funcion especifica que existe en dicho controlador y le pasamos los datos a una variable que podamos manipular en este archivo
 

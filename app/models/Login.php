@@ -36,7 +36,6 @@ class Login
 
             // Obtenemos datos adicionales según cada rol, mediante switch case 
 
-            // $rol = $user['id_rol'];
 
             switch ($user['id_rol']) {
                 case 1: // Administrador

@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $user = $resultado['id_rol'];
 
-    switch ($user) {
+    switch ($user['id_rol']) {
 
         case '1': //Administrador
 

@@ -81,7 +81,7 @@ class RecoveryPass
                     // EMISOR Y NOMBRE DE LA PERSONA O ROL
                     $mail->setFrom('vetwillingsoporte@gmail.com', 'Personal De Soporte VetWilling');
                     // RECEPTOR, A QUIEN QUIERO QUE LE LLEGUE EL CORREO
-                    $mail->addAddress($user['email'], $user['nombres']);     //Add a recipient
+                    $mail->addAddress($user['email']);     //Add a recipient
                     // $mail->addAddress('ellen@example.com');               //Name is optional
                     // $mail->addReplyTo('info@example.com', 'Information');
                     // $mail->addCC('cc@example.com');
