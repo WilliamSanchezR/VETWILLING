@@ -98,9 +98,32 @@ switch ($request) {
 
     // ---------------------------------------PROPIETARIO-------------------------------------//
 
-    case '/cliente/dashBoard':
+    //PARA LOS CLIENTES Y SUS RUTAS
+    case '/Cliente/dashboard':
         require BASE_PATH . '/app/views/dashboard/cliente/dashBoard.php';
         break;
+    case '/Cliente/mascotas':
+        require BASE_PATH . '/app/views/dashboard/cliente/mascotas.php';
+        break;
+    case '/Cliente/citas':
+        require BASE_PATH . '/app/views/dashboard/cliente/citas.php';
+        break;
+    case '/Cliente/agenda':
+        require BASE_PATH . '/app/views/dashboard/cliente/agenda.php';
+        break;
+    case '/Cliente/historial':
+        require BASE_PATH . '/app/views/dashboard/cliente/historial.php';
+        break;
+    case '/Cliente/tienda':
+        require BASE_PATH . '/app/views/dashboard/cliente/tienda.php';
+        break;
+    case '/Cliente/perfil':
+        require BASE_PATH . '/app/views/dashboard/cliente/perfil.php';
+        break;
+    case '/Cliente/configuracion':
+        require BASE_PATH . '/app/views/dashboard/cliente/confi.php';
+        break;
+
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 

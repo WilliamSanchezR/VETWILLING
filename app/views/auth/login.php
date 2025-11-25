@@ -29,7 +29,7 @@
 
                     <form class="login" action="iniciar-sesion" method="POST">
                         <div class="cont-input"> <i class="bi bi-person"></i>
-                            <input type="text" id="correo" name="correo" placeholder="Correo" required>
+                            <input type="text" id="correo" name="email" placeholder="Correo" required>
                         </div>
 
                         <div class="cont-input"> <i class="bi bi-lock"></i>
