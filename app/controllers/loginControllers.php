@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
+    // validacion de campos vacios
 
     if (empty($email) || empty($password)) {
         mostrarSweetAlert('error', 'Campos vacio', 'Por favor complete todos los campos');
@@ -26,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verificar si el modelo devolvio un error
 
     if (isset($resultado['error'])) {
-        mostrarSweetAlert('error', 'error de atunticacion', $resultado['error']);
+        mostrarSweetAlert('error', 'Error de autenticacion', $resultado['error']);
         exit();
     }
 
@@ -34,42 +35,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     session_start();
     $_SESSION['user'] = [
-        'id' => $resultado['id_usuario'],
-        'nombres' => $resultado['nombre'],
-        'rol' => $resultado['id_rol'],
-        'id_veterinaria' => $resultado['id_veterinaria']
+        'id_usuario' => $resultado['id_usuario'],
+        'id_rol' => $resultado['id_rol'],
+        'email' => $resultado['email'],
+        'estado' => $resultado['estado'],
+        'perfil' => $resultado['perfil']
     ];
 
-    mostrarSweetAlert('success', 'Bienvenido', 'Inicio de sesion exitoso. Redirigiendo...', '/vetwilling/veterinario/dashboard');
-    exit();
+    $rol = $resultado['id_rol'];
+
+    switch ($rol) {
+        case 1: // Administrador
+            mostrarSweetAlert(
+                "success",
+                "Inicio de Sesión Exitoso",
+                "Bienvenido administrador " . $resultado['perfil']['nombres'],
+                "/vetwilling/administrador/dashBoard"
+            );
+            break;
+
+        case 2: // Veterinario
+            mostrarSweetAlert(
+                "success",
+                "Inicio de Sesión Exitoso",
+                "Bienvenido veterinario " . $resultado['perfil']['nombres'],
+                "/vetwilling/veterinaria/dashboard"
+            );
+            break;
+
+        case 3: // Propietario
+            mostrarSweetAlert(
+                "success",
+                "Inicio de Sesión Exitoso",
+                "Bienvenido " . $resultado['perfil']['nombres'],
+                "/vetwilling/cliente/dashBoard"
+            );
+            break;
+
+        default:
+            mostrarSweetAlert("error", "Rol no reconocido", "Redirigiendo al login...", "/vetwilling/login");
+            break;
+    }
 } else {
     http_response_code(405);
     echo "Metodo no permitido";
     exit();
 }
-
-// Redireccion segun el rol
-
-$redirectUrl = '/vetwilling/login';
-$mensaje = 'Rol inexistente. Redirigiendo al inicio e sesion...';
-
-switch ($resultado['id_rol']) {
-
-    case 1:
-        $redirect = '/vetwilling/veterinario/dashboard';
-        $mensaje = 'Bienvenido veterinario';
-        break;
-
-    case 2:
-        $redirect = '/vetwilling/administrador/dashboard';
-        $mensaje = 'Bienvenido administrador';
-        break;
-
-    case 3:
-        $redirect = '/vetwilling/usuario/dashboard';
-        $mensaje = 'Bienvenido usuario';
-        break;
-}
-
-mostrarSweetAlert('succes', 'Ingreso exitoso', $mensaje, $redirectUrl);
-exit();

@@ -1,13 +1,8 @@
 <?php
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../helpers/mailer_helper.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require_once __DIR__ . '/../../vendor/PHPMailer/Exception.php';
-require_once __DIR__ . '/../../vendor/PHPMailer/PHPMailer.php';
-require_once __DIR__ . '/../../vendor/PHPMailer/SMTP.php';
 
 class RecoveryPass
 {
@@ -50,11 +45,11 @@ class RecoveryPass
 
                 $claveHash = password_hash($nuevaClave, PASSWORD_DEFAULT);
 
-                $cactualizar = "UPDATE usuario SET password_hash = :nuevaClave WHERE id_usuario = :id";
+                $actualizar = "UPDATE usuario SET password_hash = :nuevaClave WHERE id_usuario = :id";
 
                 // Preparamos la accion a ejecutar y la ejecutamos
 
-                $resultado = $this->conexion->prepare($cactualizar);
+                $resultado = $this->conexion->prepare($actualizar);
                 $resultado->bindParam(':nuevaClave', $claveHash);
                 $resultado->bindParam(':id', $user['id_usuario']);
 
@@ -62,41 +57,27 @@ class RecoveryPass
 
                 //* Despues de actualizar la contraseña arreglamos el enviador de correos
 
+                $mail = mailer_init();
 
-                //Create an instance; passing `true` enables exceptions
-                $mail = new PHPMailer(true);
+                //Recipients
+                // EMISOR Y NOMBRE DE LA PERSONA O ROL
+                $mail->setFrom('vetwillingsoporte@gmail.com', 'Personal De Soporte VetWilling');
+                // RECEPTOR, A QUIEN QUIERO QUE LE LLEGUE EL CORREO
+                $mail->addAddress($user['email']);     //Add a recipient
+                // $mail->addAddress('ellen@example.com');               //Name is optional
+                // $mail->addReplyTo('info@example.com', 'Information');
+                // $mail->addCC('cc@example.com');
+                // $mail->addBCC('bcc@example.com');
 
-                try {
-                    //Server settings
-                    $mail->SMTPDebug = 0;                      //Enable verbose debug output
-                    $mail->isSMTP();                                            //Send using SMTP
-                    $mail->Host       = 'smtp.gmail.com';                     //Set the SMTP server to send through
-                    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-                    $mail->Username   = 'vetwillingsoporte@gmail.com';                     //SMTP username
-                    $mail->Password   = 'zbfpnwrnuwykjedn';                               //SMTP password
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-                    $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS
-
-                    //Recipients
-                    // EMISOR Y NOMBRE DE LA PERSONA O ROL
-                    $mail->setFrom('vetwillingsoporte@gmail.com', 'Personal De Soporte VetWilling');
-                    // RECEPTOR, A QUIEN QUIERO QUE LE LLEGUE EL CORREO
-                    $mail->addAddress($user['email'], $user['nombres']);     //Add a recipient
-                    // $mail->addAddress('ellen@example.com');               //Name is optional
-                    // $mail->addReplyTo('info@example.com', 'Information');
-                    // $mail->addCC('cc@example.com');
-                    // $mail->addBCC('bcc@example.com');
-
-                    //Attachments
-                    // $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
-                    // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
-                    // EMBEBER IMAGEN (LOGO)
-                    // -------------------------------------------
-                    // La imagen se adjunta internamente y se puede llamar con "cid:logoCorreo"
-                    $mail->isHTML(true);
-                    $mail->CharSet = "UTF-8";                                  //Set email format to HTML
-                    $mail->Subject = "VetWilling - NUEVA CLAVE GENERADA";
-                    $mail->Body    = '
+                //Attachments
+                // $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+                // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+                // EMBEBER IMAGEN (LOGO)
+                // -------------------------------------------
+                // La imagen se adjunta internamente y se puede llamar con "cid:logoCorreo"
+                //Set email format to HTML
+                $mail->Subject = "VetWilling - NUEVA CLAVE GENERADA";
+                $mail->Body    = '
             
             <div style="margin:0; padding:0; background:#f8f9fa; font-family:´Open Sans´, sans-serif;">
     
@@ -213,14 +194,11 @@ class RecoveryPass
 
 
 </div>';
-                    $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+                $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
-                    $mail->send();
+                $mail->send();
 
-                    return true;
-                } catch (Exception $e) {
-                    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-                }
+                return true;
             } else {
                 return ['error' => 'Usaurio no encontrado o inactivo'];
             };

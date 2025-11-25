@@ -180,7 +180,7 @@ function mostrarVeterinarios()
 {
 
     // session_start();
-    $id_veterinaria = $_SESSION['user']['id_veterinaria'];
+    $id_veterinaria = $_SESSION['user'];
 
     // echo $id_veterinaria;
 

@@ -93,7 +93,8 @@ $datos = mostrarVeterinarios();
                     <button class="btn-control" id="btnOrdenar">
                         <i class="bi bi-sort-down"></i> Ordenar
                     </button>
-                    <button class="btn-control" id="btnExport">
+                    <button class="btn-control" id="btnExport" href="/">
+                        <a href="<?php BASE_URL ?>/generarPDF" target="_blank"></a>
                         <i class="bi bi-download"></i> Export
                     </button>
                     <button class="btn-agregar" id="btnAgregarNuevo">

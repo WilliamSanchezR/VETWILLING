@@ -5,11 +5,11 @@
 // require __DIR__ . '/../helpers/alert_helpers.php';
 require __DIR__ . '/../models/Perfil.php';
 
-function mostrarPerfilVeteri($id)
+function mostrarPerfil($id)
 {
 
     $objPerfil = new Perfil();
-    $usuario = $objPerfil->mostrarPerfilVeteri($id);
+    $usuario = $objPerfil->mostrarPerfil($id);
 
     return $usuario;
 }

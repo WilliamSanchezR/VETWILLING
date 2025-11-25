@@ -49,14 +49,14 @@ switch ($request) {
     // Restablecer contraseña
 
     case '/recoverpw':
-        require BASE_PATH . '/app/views/auth/recovery-pass.php';
+        require BASE_PATH . '/app/views/auth/recover-pass.php';
         break;
 
     // Fin rutas necesarias para el login
 
     // ---------------------------------------VETERINARIO-------------------------------------//
 
-    case '/veterinario/dashboard':
+    case '/veterinaria/dashboard':
         require BASE_PATH . '/app/views/dashboard/veterinaria/dashBoard.php';
         break;
 
@@ -86,6 +86,26 @@ switch ($request) {
 
     case '/veterinario/consultar-perfil':
         require BASE_PATH . '/app/views/dashboard/veterinaria/perfil.php';
+        break;
+
+
+    // ---------------------------------------ADMINISTRADOR-------------------------------------//
+
+    case '/administrador/dashBoard':
+        require BASE_PATH . '/app/views/dashboard/admin/dashBoard.php';
+        break;
+
+
+    // ---------------------------------------PROPIETARIO-------------------------------------//
+
+    case '/cliente/dashBoard':
+        require BASE_PATH . '/app/views/dashboard/cliente/dashBoard.php';
+        break;
+
+    // ---------------------------------------GENERACION DE PDFS-------------------------------------//
+
+    case '/generarPDF':
+        require BASE_PATH . '/app/views/pdf/veterinarios_pdf.php';
         break;
 
     default:

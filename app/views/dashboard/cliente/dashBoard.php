@@ -1,3 +1,7 @@
+<?php
+require_once BASE_PATH . '/app/helpers/session_propietario.php';
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -234,7 +238,7 @@
 
         toggleBtn.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
-            
+
             // Guardar estado
             const isCollapsed = sidebar.classList.contains('collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed);
@@ -265,7 +269,7 @@
         // Animación de entrada
         document.addEventListener('DOMContentLoaded', function() {
             const elements = document.querySelectorAll('.mascota-card, .card, .cita-item, .recordatorio-item');
-            
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach((entry, index) => {
                     if (entry.isIntersecting) {
@@ -276,7 +280,9 @@
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.1 });
+            }, {
+                threshold: 0.1
+            });
 
             elements.forEach(el => {
                 el.style.opacity = '0';
