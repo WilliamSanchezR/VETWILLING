@@ -38,15 +38,15 @@ class Perfil
                 switch ($user['id_rol']) {
 
                     case 1:
-                        $consultar = "SELECT id_usuario, email, estado, nombres, apellidos, nivel_acceso, img_perfil FROM usuario INNER JOIN administrador ON id_usuario = id_usuario WHERE id_usuario = :id";
+                        $consultar = "SELECT u.id_usuario, u.email, u.estado, a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil FROM usuario AS u INNER JOIN administrador AS a ON u.id_usuario = a.id_usuario WHERE u.id_usuario = :id";
                         break;
 
                     case 2:
-                        $consultar = "SELECT id_usuario, email, estado, nombres, apellidos, telefono, numero_licencia_profesional, fecha_contratacion FROM usuario INNER JOIN veterinario ON id_usuario = id_usuario WHERE id_usuario = :id";
+                        $consultar = "SELECT u.id_usuario, u.email, v.nombres, v.apellidos, v.telefono, v.numero_licencia_profesional FROM usuario AS u INNER JOIN veterinario AS v ON u.id_usuario = v.id_usuario WHERE u.id_usuario = :id";
                         break;
 
                     case 3:
-                        $consultar = "SELECT id_usuario, email, estado, nombres, apellidos, telefono, direccion, img_perfil FROM usuario INNER JOIN propietario ON id_usuario = id_usuario WHERE id_usuario = :id";
+                        $consultar = "SELECT  u.id_usuario, u.email, p.nombres, p.apellidos, p.telefono, p.direccion, p.img_perfil FROM usuario AS u INNER JOIN propietario AS p ON u.id_usuario = p.id_usuario WHERE u.id_usuario = :id";
                         break;
 
                     default:

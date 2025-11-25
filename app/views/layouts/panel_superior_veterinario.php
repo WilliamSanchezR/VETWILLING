@@ -6,7 +6,7 @@ require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 
 // asignamos el valo id del registro segun la tabla
 
-$id = $_SESSION['user']['rol'];
+$id = $_SESSION['user']['id_rol'];
 
 // Llamamos la funcion especifica que existe en dicho controlador y le pasamos los datos a una variable que podamos manipular en este archivo
 
@@ -39,7 +39,7 @@ $usuario = mostrarPerfil($id);
         <button class="boton-icono-navegacion btn-perfil-bar">
             <a href="<?= BASE_URL ?>/veterinario/consultar-perfil"><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt=""></a>
             <h4 class="btn-perfil-bar"><?= $usuario['nombres'] ?></h4>
-            <p class="btn-perfil-bar"><?= $usuario['tipo_usuario'] ?></p>
+            <p class="btn-perfil-bar"><?= $usuario['id_rol'] ?></p>
         </button>
 
         <button class="boton-icono-navegacion" onclick="alternarBarraDerecha()">
