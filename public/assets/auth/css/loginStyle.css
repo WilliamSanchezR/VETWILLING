@@ -21,9 +21,10 @@ main {
 }
 
 .cont-left {
-    gap: 36px;
-    padding-bottom: 20px;
+    background: white;
+    padding: 100px 20px;
 }
+
 
 .logo {
     display: flex;
@@ -127,7 +128,6 @@ main {
 }
 
 .cont-rigth {
-    background-image: url('../img/fondoLogin.png');
     background-size: 100% 100%;
     flex-direction: column;
     justify-content: center;
@@ -160,7 +160,19 @@ main {
     position: absolute;
 }
 
-@keyframes scale-in-out { 0% {transform: scale(1);}50% { transform: scale(1.1)}100% {transform: scale(1)}}
+@keyframes scale-in-out {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1)
+    }
+
+    100% {
+        transform: scale(1)
+    }
+}
 
 #icon-datos {
     top: 75%;
@@ -233,3 +245,94 @@ main {
         display: none;
     }
 }
+ /* Contenedor derecho donde va el carrusel */
+    .cont-rigth {
+        position: relative;
+        width: 100%;
+        /* ocupa la mitad derecha */
+        height: 100vh;
+        /* altura completa */
+        overflow: hidden;
+    }
+
+    /* Carrusel dentro del contenedor derecho */
+    .bg-carousel {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+
+    }
+
+    /* Slides del carrusel */
+    .bg-slide {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        opacity: 0;
+        transform: scale(1.12);
+        transition:
+            opacity 1.8s ease-in-out,
+            transform 4s ease-in-out;
+    }
+
+    .bg-slide.active {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* Sombra leve */
+    .bg-carousel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+    }
+
+    .bg-carousel {
+        border-radius: 40px 0 0 40px;
+    }
+
+    .welcome-box {
+        position: absolute;
+        top: 40%;
+        left: 62%;
+        max-width: 450px;
+        padding: 60px 30px;
+
+        /* Glassmorphism */
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+
+        /* Sombra suave */
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+
+        color: #fff;
+        z-index: 10;
+    }
+    /* .welcome-box img{
+        position: relative;
+        left: 175px;
+        top: -20px;
+        width: 20%;
+    } */
+
+    .welcome-title {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .welcome-sub {
+        font-size: 1.1rem;
+        color: #f0f0f0;
+        line-height: 1.4;
+    }
