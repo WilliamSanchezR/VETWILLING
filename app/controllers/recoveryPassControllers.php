@@ -19,7 +19,7 @@ $resultado = $objModelo->recuperarClave($email);
 
 
 if ($resultado === true) {
-    mostrarSweetAlert('success', 'Nueva clave generada', 'Se ha enviado una nueva contraseña a tu correo', '/vetwilling/veterinario/login');
+    mostrarSweetAlert('success', 'Nueva clave generada', 'Se ha enviado una nueva contraseña a tu correo', '/vetwilling/login');
 } else {
     mostrarSweetAlert('error', 'Usuario no encontrado', 'Verifique su correo electronico e intente nuevamente');
 }

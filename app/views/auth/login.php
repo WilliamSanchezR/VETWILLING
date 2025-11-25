@@ -29,7 +29,7 @@
 
                     <form class="login" action="iniciar-sesion" method="POST">
                         <div class="cont-input"> <i class="bi bi-person"></i>
-                            <input type="text" id="correo" name="correo" placeholder="Correo" required>
+                            <input type="text" id="email" name="email" placeholder="Correo" required>
                         </div>
 
                         <div class="cont-input"> <i class="bi bi-lock"></i>
@@ -37,7 +37,7 @@
                             <input type="password" id="clave" name="password" placeholder="Contraseña" required>
                         </div>
 
-                        <a href="<?= BASE_URL ?>/recuperar" id="recover">¿Olvidaste Tu Contraseña?</a>
+                        <a href="<?= BASE_URL ?>/recoverpw" id="recover">¿Olvidaste Tu Contraseña?</a>
                         <button id="btn_ingresar" type="submit">Ingresar</button>
 
                     </form>
