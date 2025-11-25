@@ -461,33 +461,66 @@
 
 
 
-.btn-perfil img {
-    width: 32px;
-    height: 32px;
-    margin-top: 4px;
-    border-radius: 20px;
-    margin-right: 240px;
-    margin-left: 5px;
-    border: 2px solid #f0fdf4;
-}
-
 .btn-perfil {
-    width: auto !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px 6px 6px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.btn-perfil h2 {
-    margin-top: -32px;
-    width: auto;
-    font-size: 15px;
+.btn-perfil:hover {
+    background: #0092f3;
 }
 
-.btn-perfil h3 {
-    margin-top: -12px;
+/* Contenedor general */
+.contenedor-perfil {
+    position: relative; 
+}
+
+/* Botón principal */
+.btn-perfil {
+    width: 100%;
+    border: none;
+    color: #fff;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+/* Avatar */
+.avatar-usuario img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+/* Texto */
+.info-usuario {
     margin-left: 10px;
-    font-size: 15px;
-    font-weight: 400;
+    display: flex;
+    flex-direction: column;
 }
 
+.rol-usuario {
+    font-size: 12px;
+    color: #bdbdbd;
+}
+
+/* Flecha */
+.flecha-perfil {
+    transition: transform 0.3s ease;
+}
+
+.btn-perfil.active .flecha-perfil {
+    transform: rotate(180deg);
+}
 
 /* Botón para abrir menú en móvil */
 .boton-menu-movil {

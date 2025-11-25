@@ -7,7 +7,7 @@
 class Conexion
 {
     private $host = "localhost";
-    private $db = "vetwilling_antes";
+    private $db = "vetwilling1";
     private $user = "root";
     private $pass = "";
     private $conexion;
