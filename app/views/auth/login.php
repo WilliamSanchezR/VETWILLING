@@ -37,7 +37,7 @@
                             <input type="password" id="clave" name="password" placeholder="Contraseña" required>
                         </div>
 
-                        <a href="<?= BASE_URL ?>/recuperar" id="recover">¿Olvidaste Tu Contraseña?</a>
+                        <a href="<?= BASE_URL ?>/recoverpw" id="recover">¿Olvidaste Tu Contraseña?</a>
                         <button id="btn_ingresar" type="submit">Ingresar</button>
 
                     </form>
