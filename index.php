@@ -56,7 +56,7 @@ switch ($request) {
 
     // ---------------------------------------VETERINARIO-------------------------------------//
 
-    case '/veterinario/dashboard':
+    case '/veterinaria/dashboard':
         require BASE_PATH . '/app/views/dashboard/veterinaria/dashBoard.php';
         break;
 
@@ -88,6 +88,25 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/perfil.php';
         break;
 
+
+    // ---------------------------------------ADMINISTRADOR-------------------------------------//
+
+    case '/administrador/dashBoard':
+        require BASE_PATH . '/app/views/dashboard/admin/dashBoard.php';
+        break;
+
+
+    // ---------------------------------------PROPIETARIO-------------------------------------//
+
+    case '/cliente/dashBoard':
+        require BASE_PATH . '/app/views/dashboard/cliente/dashBoard.php';
+        break;
+
+    // ---------------------------------------GENERACION DE PDFS-------------------------------------//
+
+    case '/generarPDF':
+        require BASE_PATH . '/app/views/pdf/veterinarios_pdf.php';
+        break;
 
     default:
         http_response_code(404);
