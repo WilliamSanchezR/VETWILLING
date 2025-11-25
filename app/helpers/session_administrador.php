@@ -11,7 +11,7 @@ if (!isset($_SESSION['user'])) {
 
 // validamos que el rol sea el correspondiente
 
-if ($_SESSION['user']['rol'] != 1) {
+if ($_SESSION['user']['id_rol'] != 1) {
     header('Location: /vetwilling/login');
     exit();
 }

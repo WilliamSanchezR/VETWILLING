@@ -45,47 +45,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $rol = $resultado['id_rol'];
 
     switch ($rol) {
-
-        case '1': //Administrador
-
+        case 1: // Administrador
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido administrador " . $resultado['perfil']['nombres'],
-                "/inicio-sesion-administrador"
+                "/vetwilling/administrador/dashBoard"
             );
-
             break;
 
-        case '2': //Veterinario
-
+        case 2: // Veterinario
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido veterinario " . $resultado['perfil']['nombres'],
-                "/veterinario/dashboard"
+                "/vetwilling/veterinaria/dashboard"
             );
-
             break;
 
-        case '3': //Propietario
-
+        case 3: // Propietario
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido " . $resultado['perfil']['nombres'],
-                "/inicio-sesion-propietario"
+                "/vetwilling/cliente/dashBoard"
             );
-
             break;
 
         default:
-
-            mostrarSweetAlert("error", "Rol no reconocido", "Redirigiendo al login...", "/login");
-
+            mostrarSweetAlert("error", "Rol no reconocido", "Redirigiendo al login...", "/vetwilling/login");
             break;
     }
-    exit();
 } else {
     http_response_code(405);
     echo "Metodo no permitido";
