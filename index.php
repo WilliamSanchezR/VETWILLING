@@ -91,10 +91,30 @@ switch ($request) {
 
     // ---------------------------------------ADMINISTRADOR-------------------------------------//
 
-    case '/administrador/dashBoard':
+    case '/admin/dashBoard':
         require BASE_PATH . '/app/views/dashboard/administrador/dashBoard.php';
         break;
 
+    case '/admin/registro-usuario':
+        require BASE_PATH . '/app/views/dashboard/administrador/registroUsuario.php';
+        break;
+
+    case '/admin/listar-usuarios':
+        require BASE_PATH . '/app/views/dashboard/administrador/listaUsuarios.php';
+        break;
+
+    case '/admin/editar-usuario': // este es para pinatar los dato en el formulario
+        require BASE_PATH . '/app/views/dashboard/administrador/editarUsuario.php';
+        break;
+
+
+    case '/admin/guardar-usuario':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
+    case '/admin/registro-veterinaria':
+        require BASE_PATH . '/app/views/dashboard/administrador/registroVeterinaria.php';
+        break;
 
     // ---------------------------------------PROPIETARIO-------------------------------------//
 
