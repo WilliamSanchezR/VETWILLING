@@ -92,7 +92,7 @@ switch ($request) {
     // ---------------------------------------ADMINISTRADOR-------------------------------------//
 
     case '/administrador/dashBoard':
-        require BASE_PATH . '/app/views/dashboard/admin/dashBoard.php';
+        require BASE_PATH . '/app/views/dashboard/administrador/dashBoard.php';
         break;
 
 
