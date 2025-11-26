@@ -21,45 +21,28 @@ class Usuario
 
 
             $insertar = "INSERT INTO usuario(
-                    tipo_documento,
-                    numero_documento,
-                    nombres,
-                    apellidos,
-                    telefono,
+                    id_usuario,
                     email,
                     password,
                     estado,
-                    tipo_usuario,
-                    id_rol,
-                    id_veterinaria
+                    id_rol
                 )
                 VALUES(
-                    :tipo_documento,
-                    :numero_documento,
-                    :nombres,
-                    :apellidos,
-                    :telefono,
+                    :id_usuario,
                     :email,
                     :password_hash,
                     :estado,
-                    :tipo_usuario,
-                    :id_rol,
-                    :id_veterinaria
+                    :id_rol
                 )";
 
             $resultado = $this->conexion->prepare($insertar);
-            $resultado->bindParam(':tipo_documento', $data['tipo_documento']);
-            $resultado->bindParam(':numero_documento', $data['numero_documento']);
-            $resultado->bindParam(':nombres', $data['nombres']);
-            $resultado->bindParam(':apellidos', $data['apellidos']);
-            $resultado->bindParam(':telefono', $data['telefono']);
+            $resultado->bindParam(':id_usuario', $data['id_usuario']);
             $resultado->bindParam(':email', $data['email']);
             $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
             $resultado->bindParam(':password_hash', $passwordHash);
             $resultado->bindParam(':estado', $data['estado']);
-            $resultado->bindParam(':tipo_usuario', $data['tipo_usuario']);
             $resultado->bindParam(':id_rol', $data['id_rol']);
-            $resultado->bindParam(':id_veterinaria', $data['id_veterinaria']);
+         
 
             return $resultado->execute();
         } catch (PDOException $e) {
@@ -72,7 +55,7 @@ class Usuario
     public function listar()
     {
         try {
-            $listar = "SELECT id_usuario, tipo_documento, numero_documento, nombres, apellidos, telefono, email, estado, tipo_usuario, rol.id_rol AS id_rol, id_veterinaria, rol.nombre as rol FROM usuario INNER JOIN rol ON usuario.id_rol = rol.id_rol";
+            $listar = "SELECT id_usuario, email, estado, rol.id_rol AS id_rol rol.nombre as rol FROM usuario INNER JOIN rol ON usuario.id_rol = rol.id_rol";
             $resultado = $this->conexion->prepare($listar);
             $resultado->execute();
             return $resultado->fetchAll(PDO::FETCH_ASSOC);

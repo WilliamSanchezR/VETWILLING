@@ -53,20 +53,15 @@ function registrarUsuario()
 {
     //Capturamosen variables los datos enviados desde el formulario a travez de el metodo
     //POST y el  nombre de los campos
-    $tipo_documento = $_POST['tipo_documento'] ?? '';
-    $numero_documento = $_POST['numero_documento'] ?? '';
-    $nombres = $_POST['nombres'] ?? '';
-    $apellidos = $_POST['apellidos'] ?? '';
-    $telefono = $_POST['telefono'] ?? '';
+   
+    $id_usuario = $_POST['id_usuario'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = '123';
-    $tipo_usuario = 'Usuario';
     $estado = 'activo';
     $id_rol = $_POST['rol'] ?? '';
-    $id_veterinaria = $_POST['veterinaria'] ?? null;
-
+ 
     //VALIDAMOS LOS CAMPOS QUE SON OBLIGATORIOS
-    if (empty($numero_documento) || empty($tipo_documento) || empty($nombres) || empty($apellidos) || empty($telefono) || empty($email) || empty($id_rol)) {
+    if (empty($id_usuario) || empty($email) || empty($password) || empty($estado) || empty($id_rol)) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
     }
@@ -75,17 +70,10 @@ function registrarUsuario()
     //Instanciamos la clase
     $objUsuario = new Usuario();
     $data = [
-        'tipo_documento' => $tipo_documento,
-        'numero_documento' => $numero_documento,
-        'nombres' => $nombres,
-        'apellidos' => $apellidos,
-        'telefono' => $telefono,
         'email' => $email,
         'password' => $password,
-        'tipo_usuario' => $tipo_usuario,
         'estado' => $estado,
         'id_rol' => $id_rol,
-        'id_veterinaria' => $id_veterinaria,
     ];
 
     //Enviamos la data al metodo "registrar()" de la clase instanciada anteriormente "Usuario()"
