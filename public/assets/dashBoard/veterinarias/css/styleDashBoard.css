@@ -400,6 +400,13 @@
     text-decoration: none;
 }
 
+.btn-perfil-bar img {
+    width: 30px;
+    height: 30px;
+    margin-top: 6px;
+    border-radius: 14px;
+}
+
 .boton-icono-navegacion:hover {
     background: var(--color-verde);
     color: var(--color-primario);

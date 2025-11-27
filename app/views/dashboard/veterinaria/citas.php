@@ -93,10 +93,7 @@ $datos = mostrarVeterinarios();
                     <button class="btn-control" id="btnOrdenar">
                         <i class="bi bi-sort-down"></i> Ordenar
                     </button>
-                    <button class="btn-control" id="btnExport" href="/">
-                        <a href="<?php BASE_URL ?>/generarPDF" target="_blank"></a>
-                        <i class="bi bi-download"></i> Export
-                    </button>
+                    <a href="<?php BASE_URL ?>/vetwilling/generarPDF/reporte?tipo=veterinarios" target="_blank" class="btn-control" id="btnExport"><i class="bi bi-download"></i> Generar reporte</a>
                     <button class="btn-agregar" id="btnAgregarNuevo">
                         <i class="bi bi-plus-lg"></i> Agregar Nuevo
                     </button>
@@ -117,10 +114,7 @@ $datos = mostrarVeterinarios();
                             <th>Telefono</th>
                             <th>Email</th>
                             <th>Estado</th>
-                            <th>Tipo de usuario</th>
-                            <th>Rol</th>
-                            <th>Veterinaria</th>
-                            <th>Acciones</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -137,9 +131,6 @@ $datos = mostrarVeterinarios();
                                     <td><?= $veterinario['telefono'] ?></td>
                                     <td><?= $veterinario['email'] ?></td>
                                     <td><?= $veterinario['estado'] ?></td>
-                                    <td><?= $veterinario['tipo_usuario'] ?></td>
-                                    <td><?= $veterinario['id_rol'] ?></td>
-                                    <td><?= $veterinario['id_veterinaria'] ?></td>
                                     <td>
                                         <a href="<?= BASE_URL ?>/veterinario/editar-veterinario?id=<?= $veterinario['id_usuario'] ?>" class="btn-accion btn-editar" title="Editar">
                                             <i class="bi bi-pencil"></i>
