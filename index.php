@@ -104,8 +104,10 @@ switch ($request) {
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
-    case '/generarPDF':
-        require BASE_PATH . '/app/views/pdf/veterinarios_pdf.php';
+    case '/reporte':
+        require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
+                reportesPdfControllers();
+
         break;
 
     default:

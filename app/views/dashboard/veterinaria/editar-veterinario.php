@@ -98,7 +98,7 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-person"></i> Nombres</label>
-                                <input type="text" id="nombrePropietario" name="nombres" value="<?= $veterinario['nombres'] ?>" placeholder="Ej: Juan Pérez García">
+                                <input type="text" id="nombrePropietario" name="nombres" value="<?= $usuario['nombres'] ?>" placeholder="Ej: Juan Pérez García">
                             </div>
                             <div class="form-group">
                                 <label><i class="bi bi-person"></i> Apellidos</label>
