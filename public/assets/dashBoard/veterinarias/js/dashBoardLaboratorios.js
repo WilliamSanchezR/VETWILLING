@@ -211,7 +211,7 @@ $('#btn-guardar-resultados').on('click', function () {
 // Funcion para inicializar DataTable para la lista de laboratorios asociados
 function dataTableListLaboratorios() {
     try {
-        tablaLaboratoriosCargados = $('#list-laboratorios-asociados').DataTable({
+        tablaUsuarios = $('#list-laboratorios-asociados').DataTable({
             // Configuración de idioma en español
             language: {
                 "decimal": "",

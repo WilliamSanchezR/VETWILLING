@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido administrador " . $resultado['perfil']['nombres'],
-                "/vetwilling/administrador/dashBoard"
+                "/vetwilling/admin/dashBoard"
             );
             break;
 
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido " . $resultado['perfil']['nombres'],
-                "/vetwilling/cliente/dashBoard"
+                "/vetwilling/Cliente/dashboard"
             );
             break;
 

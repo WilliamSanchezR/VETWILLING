@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login VetWilling</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/loginStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
@@ -30,17 +28,16 @@
                     <p>Por favor, ingresa tu usuario y contraseña para acceder al sistema.</p>
 
                     <form class="login" action="iniciar-sesion" method="POST">
-                        <div class="cont-input">
-                            <i class="fa-regular fa-user"></i>
-                            <input type="email" id="email" name="email" placeholder="Usuario" required>
+                        <div class="cont-input"> <i class="bi bi-person"></i>
+                            <input type="text" id="correo" name="email" placeholder="Correo" required>
                         </div>
 
+                        <div class="cont-input"> <i class="bi bi-lock"></i>
 
-                        <div class="cont-input"><i class="fa-solid fa-lock"></i>
-                            <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                            <input type="password" id="clave" name="password" placeholder="Contraseña" required>
                         </div>
 
-                        <a href="/vetwilling/recoverpw" id="recover">¿Olvidaste Tu Contraseña?</a>
+                        <a href="<?= BASE_URL ?>/recoverpw" id="recover">¿Olvidaste Tu Contraseña?</a>
                         <button id="btn_ingresar" type="submit">Ingresar</button>
 
                     </form>
@@ -48,12 +45,22 @@
             </div>
 
 
+            <div class="welcome-box">
+                <!-- <img src="/assets/website/img/FAVICON.png" width="50" alt=""> -->
+                <h1 class="welcome-title">¡Bienvenido a VetWilling¡</h1>
+                <p class="welcome-sub">
+                    el sistema de gestión veterinaria que optimiza tu tiempo y mejora el
+                    cuidado de tus pacientes.
+                </p>
+            </div>
+
             <div class="cont-rigth">
-                <div class="info">
-                    <p>¡Bienvenido a VetWilling, el sistema de gestión veterinaria que optimiza tu tiempo y mejora el
-                        cuidado de tus pacientes!</p>
-                    <img id="icon-datos" src="<?= BASE_URL ?>/public/assets/auth/img/clipboard.png" alt="Icono tabla de datos">
-                    <img id="img_info" src="<?= BASE_URL ?>/public/assets/auth/img/veterinaria.PNG" alt="Md veterinario">
+                <div class="bg-carousel" aria-hidden="true">
+                    <div class="bg-slide active"
+                        style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/muuuu.jpg')"></div>
+                    <div class="bg-slide" style="back<?= BASE_URL ?>/publicground-image:url('<?= BASE_URL ?>/public/assets/auth/img/chadis.jpg')"></div>
+                    <div class="bg-slide" style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/ponejo.jpg')"></div>
+                    <div class="bg-slide" style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/macu.jpg')"></div>
                 </div>
             </div>
 
@@ -63,5 +70,20 @@
     </main>
 
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const slides = document.querySelectorAll(".bg-slide");
+        let index = 0;
+
+        setInterval(() => {
+            slides[index].classList.remove("active");
+
+            index = (index + 1) % slides.length;
+
+            slides[index].classList.add("active");
+        }, 5500); // Cambia cada 5.5 segundos
+    });
+</script>
 
 </html>

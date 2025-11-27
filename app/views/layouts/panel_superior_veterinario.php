@@ -42,6 +42,7 @@ $usuario = mostrarPerfil($id);
             <p class="btn-perfil-bar"><?= $usuario['nombre_rol'] ?></p>
         </button>
 
+
         <button class="boton-icono-navegacion" onclick="alternarBarraDerecha()">
             <i class="bi bi-chevron-left"></i>
         </button>

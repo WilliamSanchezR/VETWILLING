@@ -1,0 +1,234 @@
+.barra-lateral-izquierda {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    background: linear-gradient(180deg, var(--color-primario) 0%, #0d7a24 100%);
+    transition: width 0.3s ease;
+    width: 250px;
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.barra-lateral-izquierda.colapsada {
+    width: 80px;
+}
+
+.marca-sidebar {
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.marca-sidebar img {
+    font-size: 30px;
+    right: 10px;
+}
+
+/* Logo completo - visible por defecto */
+
+.marca-sidebar .logoDas {
+    display: block;
+    transition: all 0.3s ease;
+}
+
+/* Logo icono - oculto por defecto */
+
+.marca-sidebar .logo-icono-sidebar {
+    display: none;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* Cuando el sidebar está colapsado */
+
+.barra-lateral-izquierda.colapsada .marca-sidebar .logoDas:not(.logo-icono-sidebar) {
+    display: none;
+}
+
+.barra-lateral-izquierda.colapsada .marca-sidebar .logo-icono-sidebar {
+    display: block;
+}
+
+/* Animación suave al cambiar */
+
+.marca-sidebar span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.texto-marca-sidebar {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: var(--fs-titulo3);
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.barra-lateral-izquierda.colapsada .texto-marca-sidebar {
+    opacity: 0;
+    width: 0;
+}
+
+.menu-sidebar {
+    padding: 16px 0;
+}
+
+.item-sidebar {
+    margin: 4px 8px;
+    padding: 12px 16px;
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    position: relative;
+    font-size: var(--fs-titulo4);
+}
+
+.item-sidebar:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.item-sidebar.active {
+    background: var(--color-verde);
+    color: var(--color-primario);
+    font-weight: 600;
+}
+
+.item-sidebar i {
+    font-size: var(--fs-titulo3);
+    min-width: 24px;
+}
+
+.texto-item-sidebar {
+    white-space: nowrap;
+    overflow: hidden;
+    flex: 1;
+}
+
+.barra-lateral-izquierda.colapsada .item-sidebar {
+    justify-content: center;
+    padding: 12px;
+}
+
+.barra-lateral-izquierda.colapsada .texto-item-sidebar {
+    display: none;
+}
+
+.item-sidebar .badge {
+    margin-left: auto;
+}
+
+.barra-lateral-izquierda.colapsada .item-sidebar .badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 2px 6px;
+    font-size: 10px;
+}
+
+
+.boton-colapsar {
+    position: relative;
+    bottom: 10px;
+    left: 40%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.boton-colapsar:hover {
+    background: var(--color-verde);
+    color: var(--color-primario);
+}
+
+/* === SUBMENÚ LIMPIO === */
+.submenu {
+    display: flex;
+    flex-direction: column;
+    margin: 4px 8px;
+}
+
+/* Botón principal del submenú */
+.submenu-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    font-size: var(--fs-titulo4);
+    font-family: 'Open Sans', sans-serif;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.submenu-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Flecha animada */
+.submenu .flecha {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+/* Lista interna (invisible por defecto) */
+.submenu-items {
+    list-style: none;
+    margin: 0;
+    padding-left: 48px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+/* Ítems del submenú */
+.submenu-items li a {
+    display: block;
+    padding: 6px 0;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: var(--fs-texto1);
+    transition: color 0.3s ease;
+}
+
+.submenu-items li a:hover {
+    color: white;
+}
+
+/* Cuando el submenú está abierto */
+.submenu.open .submenu-items {
+    max-height: 200px;
+}
+
+.submenu.open .flecha {
+    transform: rotate(180deg);
+}
+
+/* .avatar-usuario img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff22;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+} */
