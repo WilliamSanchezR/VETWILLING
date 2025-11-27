@@ -1,0 +1,146 @@
+/* ========================================
+   CONTROLES DE LA TABLA
+======================================== */
+.controles-tabla {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.controles-izquierda,
+.controles-derecha {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Campo de búsqueda */
+.campo-buscar {
+    position: relative;
+    width: 280px;
+}
+
+.campo-buscar i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-gris);
+    font-size: 16px;
+}
+
+.campo-buscar input {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+.campo-buscar input:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.1);
+}
+
+/* Botones de control */
+.btn-control {
+    padding: 10px 16px;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    color: var(--color-gris);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-control:hover {
+    background-color: #f8fafc;
+    border-color: var(--color-primario);
+    color: var(--color-primario);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-control i {
+    font-size: 16px;
+}
+
+/* Botón agregar nuevo */
+.btn-agregar {
+    padding: 10px 20px;
+    background-color: var(--color-primario);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-agregar:hover {
+    background-color: #087523;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(10, 147, 44, 0.3);
+}
+
+.btn-agregar i {
+    font-size: 16px;
+}
+
+/* Tabla de laboratorio */
+.contenedor-tabla-laboratorio {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    margin-bottom: 24px;
+}
+
+.tblVeterinaria {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tblVeterinaria thead {
+    background: var(--color-verde);
+}
+
+.tblVeterinaria th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-gris);
+    font-size: var(--fs-titulo4);
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.tblVeterinaria tbody tr {
+    border-bottom: 1px solid #e0e2e4;
+}
+
+.tblVeterinaria td {
+    padding: 16px;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+}

@@ -13,7 +13,7 @@ switch ($method) {
 
         $accion = $_POST['accion'] ?? '';
         if ($accion === 'actualizar') {
-            // actualizarUsuario();
+            actualizarUsuario();
         } else {
             registrarUsuario();
         }
@@ -21,8 +21,12 @@ switch ($method) {
 
     case 'GET':
         // Esta variable captura la accion de eliminar
-        $accion = $_GET['action'] ?? '';
-        if (isset($_GET['id'])) {
+        // Se declara la variable accion para capturar la accion del boton eliminar 
+        $accion = $_GET['accion'] ?? '';
+
+        if ($accion === 'eliminar') {
+            eliminarUsuario($_GET['id']);
+        } else if (isset($_GET['id'])) {
             // Esta funcion llena la funcion de de editar un solo veterinario
             $id = $_GET['id'];
             consultarUsuarioId($id);
@@ -33,9 +37,9 @@ switch ($method) {
         break;
 
     //Estas lineas se usarian si se trabajara con apis resful
-    // case 'PUT':
-    //     actualizarUsuario();
-    //     break;
+    case 'PUT':
+        // actualizarUsuario();
+        break;
 
     // case 'DELETE':
     //     eliminarUsuario();
@@ -141,16 +145,16 @@ function actualizarUsuario()
 {
     //Capturamosen variables los datos enviados desde el formulario a travez de el metodo
     //POST y el  nombre de los campos
-    $id_usuario = $_POST['id_usuario'] ?? '';
     $id_veterinaria = $_POST['veterinaria'] ?? '';
+    $id_usuario = $_POST['id_usuario'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $email = $_POST['email'] ?? '';
-    $estado = $_POST['estado'] ?? '';
-    $id_rol = $_POST['rol'] ?? '';
+    $id_rol = $_POST['id_rol'] ?? '';
+
 
     //VALIDAMOS LOS CAMPOS QUE SON OBLIGATORIOS
     if (empty($id_usuario) || empty($numero_documento) || empty($tipo_documento) || empty($nombres) || empty($apellidos) || empty($telefono) || empty($email) || empty($id_rol)) {
@@ -162,72 +166,53 @@ function actualizarUsuario()
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
         exit();
     }
-    echo($id_veterinaria);
 
-    // $objUsuario = new Usuario();
-    // $data = [
-    //     'id_usuario' => $id_usuario,
-    //     'tipo_documento' => $tipo_documento,
-    //     'numero_documento' => $numero_documento,
-    //     'nombres' => $nombres,
-    //     'apellidos' => $apellidos,
-    //     'telefono' => $telefono,
-    //     'email' => $email,
-    //     'estado' => $estado,
-    //     'id_rol' => $id_rol,
-    //     'id_veterinaria' => $id_veterinaria
-    // ];
+    $objUsuario = new Usuario();
+    $data = [
+        'id_usuario' => $id_usuario,
+        'tipo_documento' => $tipo_documento,
+        'numero_documento' => $numero_documento,
+        'nombres' => $nombres,
+        'apellidos' => $apellidos,
+        'telefono' => $telefono,
+        'email' => $email,
+        'id_rol' => $id_rol,
+        'id_veterinaria' => $id_veterinaria
+    ];
 
-    // $resultado = $objUsuario->registrar($data);
+    $resultado = $objUsuario->actualizarUsuario($data);
 
-    // //Si la respuesta del modelo es verdadera confirmamos el registro y redireccionamos 
-    // //si es falsa notificamos y redireccionamos
-    // if ($resultado === true) {
-    //     mostrarSweetAlert(
-    //         'success',
-    //         'Registro de Usuario exitoso',
-    //         'Se ha creado un nuevo usuario',
-    //         '/vetwilling/admin/registro-usuario'
-    //     );
-    // } else {
-    //     mostrarSweetAlert('error', 'Error al registrar', 'No se pudo registrar el usuario. Intente nuevamente');
-    // }
+    //Si la respuesta del modelo es verdadera confirmamos el registro y redireccionamos 
+    //si es falsa notificamos y redireccionamos
+    if ($resultado === true) {
+        mostrarSweetAlert(
+            'success',
+            'Registro de Usuario exitoso',
+            'Se ha creado un nuevo usuario',
+            '/vetwilling/admin/listar-usuarios'
+        );
+    } else {
+        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el usuario. Intente nuevamente');
+    }
 
     exit();
 }
 
-function eliminarUsuario($id) {}
+function eliminarUsuario($id) {
+    $objUsuario = new Usuario();
+    $resultado = $objUsuario->elimimarUsuario($id);
+
+    if ($resultado === true) {
+        mostrarSweetAlert(
+            'success',
+            'Eliminación del Usuario exitoso',
+            'Se ha eliminado el usuario',
+            '/vetwilling/admin/listar-usuarios'
+        );
+    } else {
+        mostrarSweetAlert('error', 'Error al Eliminar', 'No se pudo Eliminar el usuario. Intente nuevamente');
+    }
+
+    exit();
+}
     
-
-
-
-//     //Instanciamos la clase
-//     $objUsuario = new Usuario();
-
-//     //Invocamos el metodo listar() de la clase Usuario
-//     return $objUsuario->listar();
-// }
-
-//         $listar = "SELECT id_usuario, tipo_documento, numero_documento, nombres, apellidos, telefono, email, estado, nombre_rol, nombre_veterinaria
-//             FROM usuario u
-//             LEFT JOIN rol r ON u.id_rol = r.id_rol
-//             LEFT JOIN veterinaria v ON u.id_veterinaria = v.id_veterinaria";
-
-//             $resultado = $this->conexion->prepare($listar);
-//             $resultado->execute();
-//             return $resultado->fetchAll(PDO::FETCH_ASSOC);
-//         } catch (PDOException $e) {
-//             error_log("Error en el usuario::listar " . $e->getMessage());
-//             return [];
-//         }
-//     }
-// class Usuario
-// {
-//     private $conexion;
-
-//     public function __construct()
-//     {
-//         // Conexión a la base de datos
-//         $host = 'localhost';
-//         $db = 'vetwilling';
-//         $user = 'root';
