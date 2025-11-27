@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Veterinarios</title>
+    <title>Reporte de Propietarios</title>
     <style>
         /* Márgenes generales del documento */
         @page {
@@ -123,6 +123,9 @@
                 <th>Teléfono</th>
                 <th>Email</th>
                 <th>Estado</th>
+                <th>Tipo de usuario</th>
+                <th>Rol</th>
+                <th>Veterinaria</th>
             </tr>
         </thead>
         <tbody>
@@ -144,6 +147,9 @@
                         <td><?= $veterinario['telefono'] ?></td>
                         <td><?= $veterinario['email'] ?></td>
                         <td><?= $veterinario['estado'] ?></td>
+                        <td><?= $veterinario['tipo_usuario'] ?></td>
+                        <td><?= $veterinario['id_rol'] ?></td>
+                        <td><?= $veterinario['id_veterinaria'] ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

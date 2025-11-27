@@ -21,7 +21,6 @@ class Veterinario
 
         try {
             $insertar = "INSERT INTO usuario (tipo_documento, numero_documento, nombres, apellidos, telefono, email, password_hash, estado, tipo_usuario, img_perfil, id_rol, id_veterinaria) VALUES (:tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :email, :password_hash, :estado, :tipo_usuario, :img_perfil, :id_rol, :id_veterinaria)";
-
             // Preparamos la acciona a ejecutar y la ejecutamos
 
             $resultado = $this->conexion->prepare($insertar);
@@ -51,12 +50,12 @@ class Veterinario
 
         try {
 
-            $consultar = "SELECT * FROM usuario WHERE id_veterinaria=:id_veterinaria ORDER BY id_usuario ASC";
+            $consultar = "SELECT  u.id_usuario, u.email, u.estado, u.fecha_creacion, u.ultimo_acceso, v.id_veterinario, v.tipo_documento, v.numero_documento, v.nombres, v.apellidos, v.telefono, v.img_perfil, v.numero_licencia_profesional, v.fecha_contratacion, vet.nombre AS nombre_veterinaria FROM usuario u INNER JOIN veterinario v ON u.id_usuario = v.id_usuario INNER JOIN veterinaria vet ON v.id_veterinaria = vet.id_veterinaria WHERE v.id_veterinaria = :id_veterinaria  AND u.id_rol = 2 ORDER BY u.id_usuario ASC";
 
             // preparamos la accion a ejecutar y la ejecutamos
 
             $resultado = $this->conexion->prepare($consultar);
-            $resultado->bindParam(':id_veterinaria', $id_veterinaria);
+            $resultado->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
             $resultado->execute();
 
             return $resultado->fetchALL();

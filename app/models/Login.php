@@ -17,9 +17,9 @@ class Login
     {
 
         try {
-            $consultar = "SELECT * FROM usuario WHERE email = :correo AND estado = 'activo' LIMIT 1";
+            $consultar = "SELECT * FROM usuario WHERE email = :email AND estado = 'activo' LIMIT 1";
             $resultado = $this->conexion->prepare($consultar);
-            $resultado->bindParam(':correo', $email);
+            $resultado->bindParam(':email', $email);
             $resultado->execute();
 
             $user = $resultado->fetch();
@@ -39,15 +39,15 @@ class Login
 
             switch ($user['id_rol']) {
                 case 1: // Administrador
-                    $consultar = "SELECT nombres, apellidos, nivel_acceso, img_perfil FROM administrador WHERE id_usuario = :id";
+                    $consultar = "SELECT id_veterinaria, nombres, apellidos, nivel_acceso, img_perfil FROM administrador WHERE id_usuario = :id";
                     break;
 
                 case 2: // Veterinario
-                    $consultar = "SELECT nombres, apellidos, telefono, numero_licencia_profesional FROM veterinario WHERE id_usuario = :id";
+                    $consultar = "SELECT id_veterinaria, nombres, apellidos, telefono, numero_licencia_profesional FROM veterinario WHERE id_usuario = :id";
                     break;
 
                 case 3: // Propietario
-                    $consultar = "SELECT nombres, apellidos, telefono, direccion, img_perfil FROM propietario WHERE id_usuario = :id";
+                    $consultar = "SELECT id_veterinaria, nombres, apellidos, telefono, direccion, img_perfil FROM propietario WHERE id_usuario = :id";
                     break;
 
                 default:
@@ -63,7 +63,10 @@ class Login
                 'id_usuario' => $user['id_usuario'],
                 'id_rol' => $user['id_rol'],
                 'email' => $user['email'],
+                'id_veterinaria' => $user['id_veterinaria'],
+                'password_hash' => $user['password_hash'],
                 'estado' => $user['estado'],
+
                 'perfil' => $perfil
             ];
         } catch (PDOException $e) {

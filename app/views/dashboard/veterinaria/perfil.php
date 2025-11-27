@@ -53,12 +53,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <!-- Foto y datos básicos -->
                     <div class="col-md-4">
                         <div class="foto">
-                            <img src="<?= BASE_URL ?>/public/assets/webSite/img/ejemplo.jpeg" class="fotito"
+                            <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" class="fotito"
                                 alt="Pedro Perez" width="100">
                             <h3><?= $usuario['nombres'] ?> <br> <?= $usuario['apellidos'] ?></h3>
                             <h4><span>+57</span> <?= $usuario['telefono'] ?></h4>
                             <h5><?= $usuario['email'] ?></h5>
-                            <p><span>Contraseña: </span><?= $usuario['password_hash'] ?></p>
                         </div>
                     </div>
 
