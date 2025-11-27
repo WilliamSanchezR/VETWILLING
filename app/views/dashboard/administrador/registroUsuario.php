@@ -139,7 +139,7 @@ $datosVeterinaria = listarVeterinariasRegistradas();
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i>foto *</label>
-                                <input type="file" accept=".jpg," id="img_perfil" name="img_perfil" required placeholder="ejemplo@correo.com">
+                                <input type="file" accept=".jpg," id="img_perfil" name="img_perfil" placeholder="ejemplo@correo.com">
                             </div>
                         </div>
 

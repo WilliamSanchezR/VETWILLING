@@ -18,7 +18,7 @@ class Rol
         try {
 
             //Variable que al,macena la sentencia de SQL a ejecutar
-            $consultar = "SELECT * FROM rol WHERE id_rol = 1 OR id_rol = 2 ORDER BY id_rol ASC";
+            $consultar = "SELECT * FROM rol WHERE id_rol = 1 OR id_rol = 3 ORDER BY id_rol ASC";
 
             //preparar lo necesario para ejecutar la funcion
             $resultado = $this->conexion->prepare($consultar);

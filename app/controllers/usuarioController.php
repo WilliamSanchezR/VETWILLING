@@ -53,18 +53,33 @@ function registrarUsuario()
 {
     //Capturamosen variables los datos enviados desde el formulario a travez de el metodo
     //POST y el  nombre de los campos
-   
-    $id_usuario = $_POST['id_usuario'] ?? '';
+
     $email = $_POST['email'] ?? '';
     $password = '123';
     $estado = 'activo';
     $id_rol = $_POST['rol'] ?? '';
- 
+    $tipo_documento = $_POST['tipo_documento'] ?? '';
+    $numero_documento = $_POST['numero_documento'] ?? '';
+    $nombres = $_POST['nombres'] ?? '';
+    $apellidos = $_POST['apellidos'] ?? '';
+    $telefono = $_POST['telefono'] ?? '';
+    $id_veterinaria = $_POST['veterinaria'] ?? '';
+    $img_perfil = '';
+    $nivel_acceso = 'Completo';
+
     //VALIDAMOS LOS CAMPOS QUE SON OBLIGATORIOS
-    if (empty($id_usuario) || empty($email) || empty($password) || empty($estado) || empty($id_rol)) {
+    if (
+        empty($email) || empty($password) || empty($estado) || empty($id_rol) || empty($tipo_documento) || empty($numero_documento) || empty($nombres) || empty($apellidos)
+    ) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
     }
+
+     if ($id_rol == '3' && empty($id_veterinaria)) {
+        mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
+        exit();
+    }
+    echo($id_veterinaria);
 
 
     //Instanciamos la clase
@@ -74,6 +89,14 @@ function registrarUsuario()
         'password' => $password,
         'estado' => $estado,
         'id_rol' => $id_rol,
+        'tipo_documento' => $tipo_documento,
+        'numero_documento' => $numero_documento,
+        'nombres' => $nombres,
+        'apellidos' => $apellidos,
+        'telefono' => $telefono,
+        'img_perfil' => $img_perfil,
+        'id_veterinaria' => $id_veterinaria,
+        'nivel_acceso' => $nivel_acceso,
     ];
 
     //Enviamos la data al metodo "registrar()" de la clase instanciada anteriormente "Usuario()"
@@ -119,6 +142,7 @@ function actualizarUsuario()
     //Capturamosen variables los datos enviados desde el formulario a travez de el metodo
     //POST y el  nombre de los campos
     $id_usuario = $_POST['id_usuario'] ?? '';
+    $id_veterinaria = $_POST['veterinaria'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
     $nombres = $_POST['nombres'] ?? '';
@@ -132,28 +156,47 @@ function actualizarUsuario()
     if (empty($id_usuario) || empty($numero_documento) || empty($tipo_documento) || empty($nombres) || empty($apellidos) || empty($telefono) || empty($email) || empty($id_rol)) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
-    }   
+    }
 
-    $objUsuario = new Usuario();
-    $data = [
-        'id_usuario' => $id_usuario,
-        'tipo_documento' => $tipo_documento,
-        'numero_documento' => $numero_documento,
-        'nombres' => $nombres,
-        'apellidos' => $apellidos,
-        'telefono' => $telefono,
-        'email' => $email,
-        'estado' => $estado,
-        'id_rol' => $id_rol,
-    ];
+    if ($id_rol == '3' && empty($id_veterinaria)) {
+        mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
+        exit();
+    }
+    echo($id_veterinaria);
 
-    
+    // $objUsuario = new Usuario();
+    // $data = [
+    //     'id_usuario' => $id_usuario,
+    //     'tipo_documento' => $tipo_documento,
+    //     'numero_documento' => $numero_documento,
+    //     'nombres' => $nombres,
+    //     'apellidos' => $apellidos,
+    //     'telefono' => $telefono,
+    //     'email' => $email,
+    //     'estado' => $estado,
+    //     'id_rol' => $id_rol,
+    //     'id_veterinaria' => $id_veterinaria
+    // ];
+
+    // $resultado = $objUsuario->registrar($data);
+
+    // //Si la respuesta del modelo es verdadera confirmamos el registro y redireccionamos 
+    // //si es falsa notificamos y redireccionamos
+    // if ($resultado === true) {
+    //     mostrarSweetAlert(
+    //         'success',
+    //         'Registro de Usuario exitoso',
+    //         'Se ha creado un nuevo usuario',
+    //         '/vetwilling/admin/registro-usuario'
+    //     );
+    // } else {
+    //     mostrarSweetAlert('error', 'Error al registrar', 'No se pudo registrar el usuario. Intente nuevamente');
+    // }
+
+    exit();
 }
 
-function eliminarUsuario($id)
-{
-
-}
+function eliminarUsuario($id) {}
     
 
 

@@ -113,7 +113,6 @@ $datos = listarUsuarios();
                             <th>Telefono</th>
                             <th>Email</th>
                             <th>Estado</th>
-                            <th>Tipo de usuario</th>
                             <th>Rol</th>
                             <th>Acciones</th>
                         </tr>
@@ -127,7 +126,6 @@ $datos = listarUsuarios();
                                     <td><?= $usuario['telefono'] ?></td>
                                     <td><?= $usuario['email'] ?></td>
                                     <td><?= $usuario['estado'] ?></td>
-                                    <td><?= $usuario['tipo_usuario'] ?></td>
                                     <td><?= $usuario['rol'] ?></td>
                                     <td>
                                         <button class="btn-accion btn-editar" title="Editar">
