@@ -34,7 +34,7 @@ class Perfil
                 echo "rol no encontrado";
             }
 
-            try {
+           try {
                 switch ($user['id_rol']) {
 
                     case 1: // Administrador
