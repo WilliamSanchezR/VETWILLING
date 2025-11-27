@@ -31,7 +31,7 @@ class Perfil
             $user = $resultado->fetch();
 
             if (!$user['id_rol']) {
-                return null;
+                echo "rol no encontrado";
             }
 
            try {
@@ -53,6 +53,7 @@ class Perfil
                         return null;
                         break;
                 }
+
 
                 $resultado = $this->conexion->prepare($consultar);
                 $resultado->bindParam(':id', $id);

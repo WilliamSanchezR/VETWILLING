@@ -2,37 +2,36 @@
 
 require __DIR__ . '/../helpers/pdf_helpers.php';
 require __DIR__ . '/veterinarioController.php';
-// require __DIR__ . '/app/controllers/pacienteControllers.php';
 
-// ESTA FUNCION SE ENCARGA DE VALIDAR EL TIPO DE REPORTE Y EJECUTAR LA FUNCION CORRESPONDIENTE 
-function reportesPdfControllers(){
 
-    //CAPTURAMOS EL TIPO DE REPORTE ENVIADO DESDE LA VISTA 
+
+// Esta funcion se encarga de validar el tipo de reporte y ejecutar la funcion corespondiente 
+function reportesPdfController()
+{
+
+    // capturamos el tipo de reporte enivado desde la vista
+
     $tipo = $_GET['tipo'];
-    // SEGUN EL TIPO DE REPORTE EJECUTAMOS X FUNCION
+
+    // Segun el tipo de reporte ejecutamos X funcion
 
     switch ($tipo) {
         case 'veterinarios':
-          reporteVeterinariosPDF();
+            reporteVeterinariosPDF();
             break;
 
-        // case 'paciente':
-        //   reportePacientesPDF();
+        // case 'propietarios':
+        //     reportePropietariosPDF();
         //     break;
-        
+
         default:
             exit();
             break;
     }
-
 }
-
-
-
 
 function reporteVeterinariosPDF()
 {
-
     // cargar la vista y obtenerla como HTML
 
     ob_start();
@@ -47,23 +46,18 @@ function reporteVeterinariosPDF()
     generarPDF($html, 'reporte_veterinarios.pdf', false);
 }
 
-
-// function reportePacientesPDF()
+// function reportePropietariosPDF()
 // {
+//     // cargar la vista y obtenerla como HTML
 
-    // cargar la vista y obtenerla como HTML
+//     ob_start();
+//     // asignamos los datos de la funcion en el controlador enlazado a una varible que podamos manipular en la vista del pdf
+//     $veterinarios = mostrarPropietarios();
 
-    // ob_start();
-    // asignamos los datos de la funcion en el controlador enlazado a una varible que podamos manipular en la vista del pdf
-    // $pacientes = mostrarPacientes();
+//     // archivo que tiene la interfaz diseñada en HTML
 
-    // archivo que tiene la interfaz diseñada en HTML
-
-//     require BASE_PATH . '/app/views/pdf/veterinarios_pdf.php';
+//     require BASE_PATH . '/app/views/pdf/propietarios_pdf.php';
 //     $html = ob_get_clean();
 
 //     generarPDF($html, 'reporte_veterinarios.pdf', false);
 // }
-
-
-

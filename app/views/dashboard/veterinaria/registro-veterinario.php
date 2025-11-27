@@ -132,7 +132,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
                     <div class="form-group">
                         <label><i class="bi bi-geo-alt"></i> Dirección completa *</label>
-                        <input type="text" id="direccion" required placeholder="Calle 12 # 34-56, Apto 102">
+                        <input type="text" id="direccion" name="direccion" placeholder="Calle 12 # 34-56, Apto 102">
                     </div>
 
                     <div class="row">

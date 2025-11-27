@@ -21,7 +21,6 @@ class Veterinario
 
         try {
             $insertar = "INSERT INTO usuario (tipo_documento, numero_documento, nombres, apellidos, telefono, email, password_hash, estado, tipo_usuario, img_perfil, id_rol, id_veterinaria) VALUES (:tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :email, :password_hash, :estado, :tipo_usuario, :img_perfil, :id_rol, :id_veterinaria)";
-
             // Preparamos la acciona a ejecutar y la ejecutamos
 
             $resultado = $this->conexion->prepare($insertar);

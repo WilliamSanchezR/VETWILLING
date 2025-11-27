@@ -91,16 +91,69 @@ switch ($request) {
 
     // ---------------------------------------ADMINISTRADOR-------------------------------------//
 
-    case '/administrador/dashBoard':
-        require BASE_PATH . '/app/views/dashboard/admin/dashBoard.php';
+    case '/admin/dashBoard':
+        require BASE_PATH . '/app/views/dashboard/administrador/dashBoard.php';
         break;
 
+    case '/admin/registro-usuario':
+        require BASE_PATH . '/app/views/dashboard/administrador/registroUsuario.php';
+        break;
+
+    case '/admin/listar-usuarios':
+        require BASE_PATH . '/app/views/dashboard/administrador/listaUsuarios.php';
+        break;
+
+    case '/admin/editar-usuario': // este es para pinatar los dato en el formulario
+        require BASE_PATH . '/app/views/dashboard/administrador/editarUsuario.php';
+        break;
+
+
+    case '/admin/guardar-usuario':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
+    case '/admin/actualizar-usuario':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+    
+    case '/admin/eliminar-usuario':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
+    case '/admin/registro-veterinaria':
+        require BASE_PATH . '/app/views/dashboard/administrador/registroVeterinaria.php';
+        break;
+
+    
 
     // ---------------------------------------PROPIETARIO-------------------------------------//
 
-    case '/cliente/dashBoard':
+    //PARA LOS CLIENTES Y SUS RUTAS
+    case '/Cliente/dashboard':
         require BASE_PATH . '/app/views/dashboard/cliente/dashBoard.php';
         break;
+    case '/Cliente/mascotas':
+        require BASE_PATH . '/app/views/dashboard/cliente/mascotas.php';
+        break;
+    case '/Cliente/citas':
+        require BASE_PATH . '/app/views/dashboard/cliente/citas.php';
+        break;
+    case '/Cliente/agenda':
+        require BASE_PATH . '/app/views/dashboard/cliente/agenda.php';
+        break;
+    case '/Cliente/historial':
+        require BASE_PATH . '/app/views/dashboard/cliente/historial.php';
+        break;
+    case '/Cliente/tienda':
+        require BASE_PATH . '/app/views/dashboard/cliente/tienda.php';
+        break;
+    case '/Cliente/perfil':
+        require BASE_PATH . '/app/views/dashboard/cliente/perfil.php';
+        break;
+    case '/Cliente/configuracion':
+        require BASE_PATH . '/app/views/dashboard/cliente/confi.php';
+        break;
+
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
