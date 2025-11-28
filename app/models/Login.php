@@ -39,7 +39,7 @@ class Login
 
             switch ($user['id_rol']) {
                 case 1: // Administrador
-                    $consultar = "SELECT id_veterinaria, nombres, apellidos, nivel_acceso, img_perfil FROM administrador WHERE id_usuario = :id";
+                    $consultar = "SELECT nombres, apellidos, nivel_acceso, img_perfil FROM administrador WHERE id_usuario = :id";
                     break;
 
                 case 2: // Veterinario
@@ -63,10 +63,8 @@ class Login
                 'id_usuario' => $user['id_usuario'],
                 'id_rol' => $user['id_rol'],
                 'email' => $user['email'],
-                'id_veterinaria' => $user['id_veterinaria'],
                 'password_hash' => $user['password_hash'],
                 'estado' => $user['estado'],
-
                 'perfil' => $perfil
             ];
         } catch (PDOException $e) {

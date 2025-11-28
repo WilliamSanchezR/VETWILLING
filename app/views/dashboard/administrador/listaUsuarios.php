@@ -108,6 +108,7 @@ $datos = listarUsuarios();
                 <table id="tablaListaUsuarios" class="display tabla-admin" style="width:100%">
                     <thead>
                         <tr>
+                            <th>Foto Perfil</th>
                             <th>Documento</th>
                             <th>Nombres y Apellidos</th>
                             <th>Telefono</th>
@@ -121,6 +122,7 @@ $datos = listarUsuarios();
                         <?php if (!empty($datos)) : ?>
                             <?php foreach ($datos as $usuario):  ?>
                                 <tr class="fila-blanca">
+                                    <td><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt=""></td>
                                     <td><?= $usuario['tipo_documento'] ?> - <?= $usuario['numero_documento'] ?></td>
                                     <td><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></td>
                                     <td><?= $usuario['telefono'] ?></td>
@@ -137,7 +139,7 @@ $datos = listarUsuarios();
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
-                       
+
                         <?php endif; ?>
                     </tbody>
                 </table>
