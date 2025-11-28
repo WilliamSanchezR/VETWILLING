@@ -16,35 +16,69 @@ class Veterinario
         $this->conexion = $db->getConexion();
     }
 
-    public function registrar($data)
-    {
+   public function registrar($data)
+{
+    try {
+        // Inicia transacción para asegurar que ambas inserciones se hagan correctamente
+        $this->conexion->beginTransaction();
 
-        try {
-            $insertar = "INSERT INTO usuario (tipo_documento, numero_documento, nombres, apellidos, telefono, email, password_hash, estado, tipo_usuario, img_perfil, id_rol, id_veterinaria) VALUES (:tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :email, :password_hash, :estado, :tipo_usuario, :img_perfil, :id_rol, :id_veterinaria)";
+        // 1. INSERTAR EN TABLA USUARIO
+        $insertar = "INSERT INTO usuario (
+            email, password_hash, estado, id_rol, fecha_creacion
+        ) VALUES (
+            :email, :password_hash, :estado, :id_rol, NOW()
+        )";
 
-            // Preparamos la acciona a ejecutar y la ejecutamos
+        $resultado = $this->conexion->prepare($insertar);
 
-            $resultado = $this->conexion->prepare($insertar);
-            $resultado->bindParam(':tipo_documento', $data['tipo_documento']);
-            $resultado->bindParam(':numero_documento', $data['numero_documento']);
-            $resultado->bindParam(':nombres', $data['nombres']);
-            $resultado->bindParam(':apellidos', $data['apellidos']);
-            $resultado->bindParam(':telefono', $data['telefono']);
-            $resultado->bindParam(':email', $data['email']);
-            $passwordHash = password_hash($data['password_hash'], PASSWORD_DEFAULT);
-            $resultado->bindParam(':password_hash', $passwordHash);
-            $resultado->bindParam(':estado', $data['estado']);
-            $resultado->bindParam(':tipo_usuario', $data['tipo_usuario']);
-            $resultado->bindParam(':img_perfil', $data['img_perfil']);
-            $resultado->bindParam(':id_rol', $data['id_rol']);
-            $resultado->bindParam(':id_veterinaria', $data['id_veterinaria'], '2');
+        $resultado->bindParam(':email', $data['email']);
+        $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
+        $resultado->bindParam(':password_hash', $passwordHash);
+        $resultado->bindParam(':estado', $data['estado']);
+        $resultado->bindParam(':id_rol', $data['id_rol']);
 
-            return $resultado->execute();
-        } catch (PDOException $e) {
-            error_log("Error en veterinario::registrar" . $e->getMessage());
-            return false;
-        }
+        $resultado->execute();
+
+        // 2. OBTENER EL ID DEL USUARIO RECIÉN INSERTADO
+        $idUsuario = $this->conexion->lastInsertId();
+
+        // 3. INSERTAR EN TABLA VETERINARIO (corregido: agregado id_usuario en columnas)
+        $sqlVet = "INSERT INTO veterinario (
+            id_usuario, id_veterinaria, tipo_documento, numero_documento, 
+            nombres, apellidos, telefono, img_perfil, numero_licencia_profesional, 
+            fecha_creacion
+        ) VALUES (
+            :id_usuario, :id_veterinaria, :tipo_documento, :numero_documento, 
+            :nombres, :apellidos, :telefono, :img_perfil, :numero_licencia_profesional, 
+            NOW()
+        )";
+
+        $stmtVet = $this->conexion->prepare($sqlVet);
+
+        $stmtVet->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
+        $stmtVet->bindParam(':id_veterinaria', $data['id_veterinaria'], PDO::PARAM_INT);
+        $stmtVet->bindParam(':tipo_documento', $data['tipo_documento']);
+        $stmtVet->bindParam(':numero_documento', $data['numero_documento']);
+        $stmtVet->bindParam(':nombres', $data['nombres']);
+        $stmtVet->bindParam(':apellidos', $data['apellidos']);
+        $stmtVet->bindParam(':telefono', $data['telefono']);
+        $stmtVet->bindParam(':img_perfil', $data['img_perfil']);
+        $stmtVet->bindParam(':numero_licencia_profesional', $data['numero_licencia_profesional']);
+
+        $stmtVet->execute();
+
+        // Si todo sale bien, confirmamos la transacción
+        $this->conexion->commit();
+        return true;
+
+    } catch (PDOException $e) {
+        // Si hay error, revertimos todo
+        $this->conexion->rollBack();
+        error_log("Error en registrar Veterinario: " . $e->getMessage());
+        return false;
     }
+}
+
 
     public function listar($id_veterinaria)
     {
