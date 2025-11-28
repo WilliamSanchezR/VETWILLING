@@ -93,8 +93,8 @@ $datos = mostrarVeterinarios();
                     <button class="btn-control" id="btnOrdenar">
                         <i class="bi bi-sort-down"></i> Ordenar
                     </button>
-                    <button class="btn-control" id="btnExport" >
-                        <a href="<?php BASE_URL ?>/vetwilling/reporte?tipo=veterinarios" target="_blank">generra pdf</a> 
+                    <button class="btn-control" id="btnExport" href="/">
+                        <a href="<?php BASE_URL ?>/generarPDF" target="_blank"></a>
                         <i class="bi bi-download"></i> Export
                     </button>
                     <button class="btn-agregar" id="btnAgregarNuevo">
@@ -108,13 +108,15 @@ $datos = mostrarVeterinarios();
                 <table id="tablaCitas" class="display" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Foto de perfil</th>
-                            <th>Tipo de documento</th>
+                            <th>Foto de perfi</th>
                             <th>Numero de documeto</th>
                             <th>Nombres</th>
                             <th>Apellidos</th>
                             <th>Telefono</th>
-                            <th>Fecha Contratacion</th>
+                            <th>Email</th>
+                            <th>Estado</th>
+                            <th>Rol</th>
+                            <th>Veterinaria</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -122,14 +124,16 @@ $datos = mostrarVeterinarios();
 
                         <?php if (!empty($datos)): ?>
                             <?php foreach ($datos as $veterinario): ?>
-                                <tr class="fila-gris">
+                                <tr class="fila-gris">  
                                     <td><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $veterinario['img_perfil'] ?>" alt=""></td>
-                                    <td><?= $veterinario['tipo_documento'] ?></td>
-                                    <td><?= $veterinario['numero_documento'] ?></td>
+                                    <td><?= $veterinario['tipo_documento'] ?> - <?= $veterinario['numero_documento'] ?></td>
                                     <td><?= $veterinario['nombres'] ?></td>
                                     <td><?= $veterinario['apellidos'] ?></td>
                                     <td><?= $veterinario['telefono'] ?></td>
-                                    <td><?= $veterinario['fecha_contratacion'] ?></td>
+                                    <td><?= $veterinario['email'] ?></td>
+                                    <td><?= $veterinario['estado'] ?></td>
+                                    <td><?= $veterinario['nombre_rol'] ?></td>
+                                    <td><?= $veterinario['nombre_veterinaria'] ?></td>
                                     <td>
                                         <a href="<?= BASE_URL ?>/veterinario/editar-veterinario?id=<?= $veterinario['id_usuario'] ?>" class="btn-accion btn-editar" title="Editar">
                                             <i class="bi bi-pencil"></i>

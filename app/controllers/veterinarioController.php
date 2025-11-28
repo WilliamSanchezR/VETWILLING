@@ -81,7 +81,7 @@ function registrarVeterinario()
     $estado = 'activo';
     $tipo_usuario = 'Veterinario';
     $id_veterinaria = '1';
-    $img_perfil = $_POST['img_perfil'];
+    $ruta_img = $_POST['img_perfil'];
 
     // Validamos los caampos que son obligatorios
 
@@ -201,10 +201,6 @@ function listarVeterinario($id)
 
 function actualizarVeterinario()
 {
-
-
-    // capturamos en variables los datos desde el formulario a travez del metodo POST y los name de los campos
-
     $id_usuario = $_POST['id_usuario'] ?? '';
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
@@ -212,21 +208,23 @@ function actualizarVeterinario()
     $numero_documento = $_POST['numero_documento'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $email = $_POST['email'] ?? '';
-    $id_rol = '2';
-    $password_hash = '123';
-    $estado = 'activo';
-    $tipo_usuario = 'Veterinario';
-    $id_veterinaria = '1';
+    $estado = $_POST['estado'] ?? 'activo';
+    $id_rol = $_POST['id_rol'] ?? '2';
 
-    // Validamos los caampos que son obligatorios
-
-    if (empty($numero_documento) || empty($nombres) || empty($apellidos) || empty($tipo_documento) || empty($telefono) || empty($email)) {
-        mostrarSweetAlert('error', 'Campos vacios', 'Por favor completar todos los campos');
+    // Validación
+    if (
+        empty($numero_documento) ||
+        empty($nombres) ||
+        empty($apellidos) ||
+        empty($tipo_documento) ||
+        empty($telefono) ||
+        empty($email)
+    ) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completar todos los campos');
         exit();
     }
 
-    // POO - instanciamos la clase
-
+    // Enviar solo los campos que el modelo utiliza realmente
     $objVeterinario = new Veterinario();
     $data = [
         'id_usuario' => $id_usuario,
@@ -237,22 +235,15 @@ function actualizarVeterinario()
         'telefono' => $telefono,
         'email' => $email,
         'id_rol' => $id_rol,
-        'password_hash' => $password_hash,
-        'estado' => $estado,
-        'tipo_usuario' => $tipo_usuario,
-        'id_veterinaria' => $id_veterinaria
+        'estado' => $estado
     ];
-
-    // Enviamos la data al metodo (registrar) de la clase instanciada anteriormente (Veterinario) y esperamos una respuesta booleana del modelo en resultados
 
     $resultado = $objVeterinario->actualizar($data);
 
-    // Si la respuesta del modelo es verdadera confirmamos el registro y redireccionameos, si es falsa notificamos y redireccionamos
-
     if ($resultado === true) {
-        mostrarSweetAlert('success', 'Actualizacion del veterinario exitoso', 'Se ha actualizado el veterinario', '/vetwilling/veterinario/registrar-veterinario');
+        mostrarSweetAlert('success', 'Actualización exitosa', 'El veterinario ha sido actualizado', '/vetwilling/veterinario/consultar-veterinario');
     } else {
-        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el veterinario. Intenta nuevamente');
+        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el veterinario');
     }
     exit();
 }

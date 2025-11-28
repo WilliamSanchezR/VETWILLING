@@ -21,6 +21,7 @@ class Veterinario
 
         try {
             $insertar = "INSERT INTO usuario (tipo_documento, numero_documento, nombres, apellidos, telefono, email, password_hash, estado, tipo_usuario, img_perfil, id_rol, id_veterinaria) VALUES (:tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :email, :password_hash, :estado, :tipo_usuario, :img_perfil, :id_rol, :id_veterinaria)";
+
             // Preparamos la acciona a ejecutar y la ejecutamos
 
             $resultado = $this->conexion->prepare($insertar);
@@ -50,64 +51,127 @@ class Veterinario
 
         try {
 
-            $consultar = "SELECT  u.id_usuario, u.email, u.estado, u.fecha_creacion, u.ultimo_acceso, v.id_veterinario, v.tipo_documento, v.numero_documento, v.nombres, v.apellidos, v.telefono, v.img_perfil, v.numero_licencia_profesional, v.fecha_contratacion, vet.nombre AS nombre_veterinaria FROM usuario u INNER JOIN veterinario v ON u.id_usuario = v.id_usuario INNER JOIN veterinaria vet ON v.id_veterinaria = vet.id_veterinaria WHERE v.id_veterinaria = :id_veterinaria  AND u.id_rol = 2 ORDER BY u.id_usuario ASC";
+            $sql = "SELECT 
+                    v.*,
+                    u.email,
+                    u.estado,
+                    u.id_rol,
+                    r.nombre AS nombre_rol,
+                    vet.nombre AS nombre_veterinaria
+                FROM veterinario v
+                INNER JOIN usuario u 
+                    ON v.id_usuario = u.id_usuario
+                INNER JOIN rol r
+                    ON u.id_rol = r.id_rol
+                INNER JOIN veterinaria vet
+                    ON v.id_veterinaria = vet.id_veterinaria
+                WHERE v.id_veterinaria = :id_veterinaria
+                ORDER BY v.id_veterinario ASC";
 
-            // preparamos la accion a ejecutar y la ejecutamos
+            $query = $this->conexion->prepare($sql);
+            $query->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            $query->execute();
 
-            $resultado = $this->conexion->prepare($consultar);
-            $resultado->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
-            $resultado->execute();
-
-            return $resultado->fetchALL();
+            return $query->fetchAll();
         } catch (PDOException $e) {
-            die("Error en veterinario::listar" . $e->getMessage());
-            return [];
+            die("Error en veterinario::listar " . $e->getMessage());
         }
     }
 
     public function listarVeterinario($id)
     {
-
         try {
 
-            $consultar = "SELECT * FROM usuario WHERE id_usuario = :id LIMIT 1";
+            $consultar = "
+            SELECT 
+                v.id_veterinario,
+                v.nombres,
+                v.apellidos,
+                v.tipo_documento,
+                v.numero_documento,
+                v.telefono,
+                v.id_veterinaria,
+                
+                u.id_usuario,
+                u.email,
+                u.estado,
+                u.id_rol,
 
-            // Preparamos la accion a ejecutar y la ejecutamos
+                r.nombre AS nombre_rol,
+                vet.nombre AS nombre_veterinaria
+
+            FROM veterinario v
+            INNER JOIN usuario u 
+                ON v.id_usuario = u.id_usuario
+            INNER JOIN rol r
+                ON u.id_rol = r.id_rol
+            INNER JOIN veterinaria vet
+                ON v.id_veterinaria = vet.id_veterinaria
+
+            WHERE u.id_usuario = :id
+            LIMIT 1
+        ";
 
             $resultado = $this->conexion->prepare($consultar);
-            $resultado->bindParam(':id', $id);
+            $resultado->bindParam(':id', $id, PDO::PARAM_INT);
             $resultado->execute();
 
-            return $resultado->fetch();
+            return $resultado->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            die("Error en veterinario::listar" . $e->getMessage());
+            die("Error en veterinario::listarVeterinario -> " . $e->getMessage());
         }
     }
+
 
     public function actualizar($data)
     {
         try {
-            $actualizar = "UPDATE usuario SET tipo_documento = :tipo_documento, numero_documento = :numero_documento, nombres = :nombres, apellidos = :apellidos, telefono = :telefono, email = :email, id_rol = :id_rol, estado = :estado WHERE id_usuario = :id_usuario";
 
-            // Preparamos la acciona a ejecutar y la ejecutamos
+            // 1. Actualizar tabla usuario
+            $sqlUsuario = "
+            UPDATE usuario 
+            SET 
+                email = :email,
+                estado = :estado,
+                id_rol = :id_rol
+            WHERE id_usuario = :id_usuario
+        ";
 
-            $resultado = $this->conexion->prepare($actualizar);
-            $resultado->bindParam(':id_usuario', $data['id_usuario']);
-            $resultado->bindParam(':tipo_documento', $data['tipo_documento']);
-            $resultado->bindParam(':numero_documento', $data['numero_documento']);
-            $resultado->bindParam(':nombres', $data['nombres']);
-            $resultado->bindParam(':apellidos', $data['apellidos']);
-            $resultado->bindParam(':telefono', $data['telefono']);
-            $resultado->bindParam(':id_rol', $data['id_rol']);
-            $resultado->bindParam(':estado', $data['estado']);
-            $resultado->bindParam(':email', $data['email']);
+            $queryUsuario = $this->conexion->prepare($sqlUsuario);
+            $queryUsuario->bindParam(':email', $data['email']);
+            $queryUsuario->bindParam(':estado', $data['estado']);
+            $queryUsuario->bindParam(':id_rol', $data['id_rol']);
+            $queryUsuario->bindParam(':id_usuario', $data['id_usuario']);
+            $queryUsuario->execute();
 
-            return $resultado->execute();
+            // 2. Actualizar tabla veterinario
+            $sqlVet = "
+            UPDATE veterinario 
+            SET 
+                nombres = :nombres,
+                apellidos = :apellidos,
+                tipo_documento = :tipo_documento,
+                numero_documento = :numero_documento,
+                telefono = :telefono
+            WHERE id_usuario = :id_usuario
+        ";
+
+            $queryVet = $this->conexion->prepare($sqlVet);
+            $queryVet->bindParam(':nombres', $data['nombres']);
+            $queryVet->bindParam(':apellidos', $data['apellidos']);
+            $queryVet->bindParam(':tipo_documento', $data['tipo_documento']);
+            $queryVet->bindParam(':numero_documento', $data['numero_documento']);
+            $queryVet->bindParam(':telefono', $data['telefono']);
+            $queryVet->bindParam(':id_usuario', $data['id_usuario']);
+
+            return $queryVet->execute();
         } catch (PDOException $e) {
-            error_log("Error en veterinario::actualizar" . $e->getMessage());
+            error_log("Error en veterinario::actualizar -> " . $e->getMessage());
             return false;
         }
     }
+
+
 
     public function eliminar($id)
     {
