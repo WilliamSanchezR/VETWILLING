@@ -109,15 +109,12 @@ $datos = mostrarVeterinarios();
                     <thead>
                         <tr>
                             <th>Foto de perfi</th>
-                            <th>ID Usuario</th>
-                            <th>Tipo de documento</th>
                             <th>Numero de documeto</th>
                             <th>Nombres</th>
                             <th>Apellidos</th>
                             <th>Telefono</th>
                             <th>Email</th>
                             <th>Estado</th>
-                            <th>Tipo de usuario</th>
                             <th>Rol</th>
                             <th>Veterinaria</th>
                             <th>Acciones</th>
@@ -127,19 +124,16 @@ $datos = mostrarVeterinarios();
 
                         <?php if (!empty($datos)): ?>
                             <?php foreach ($datos as $veterinario): ?>
-                                <tr class="fila-gris">
+                                <tr class="fila-gris">  
                                     <td><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $veterinario['img_perfil'] ?>" alt=""></td>
-                                    <td><?= $veterinario['id_usuario'] ?></td>
-                                    <td><?= $veterinario['tipo_documento'] ?></td>
-                                    <td><?= $veterinario['numero_documento'] ?></td>
+                                    <td><?= $veterinario['tipo_documento'] ?> - <?= $veterinario['numero_documento'] ?></td>
                                     <td><?= $veterinario['nombres'] ?></td>
                                     <td><?= $veterinario['apellidos'] ?></td>
                                     <td><?= $veterinario['telefono'] ?></td>
                                     <td><?= $veterinario['email'] ?></td>
                                     <td><?= $veterinario['estado'] ?></td>
-                                    <td><?= $veterinario['tipo_usuario'] ?></td>
-                                    <td><?= $veterinario['id_rol'] ?></td>
-                                    <td><?= $veterinario['id_veterinaria'] ?></td>
+                                    <td><?= $veterinario['nombre_rol'] ?></td>
+                                    <td><?= $veterinario['nombre_veterinaria'] ?></td>
                                     <td>
                                         <a href="<?= BASE_URL ?>/veterinario/editar-veterinario?id=<?= $veterinario['id_usuario'] ?>" class="btn-accion btn-editar" title="Editar">
                                             <i class="bi bi-pencil"></i>

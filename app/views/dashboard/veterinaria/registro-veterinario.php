@@ -74,25 +74,31 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
             <form id="vetForm" action="<?= BASE_URL ?>/veterinario/guardar-veterinario" method="POST" enctype="multipart/form-data">
 
-                <!-- Paso 1: Datos del Propietario -->
+                <!-- Paso 1: Datos del Veterinario -->
                 <div class="step active">
                     <h3><i class="bi bi-person-badge me-2"></i>Datos del Veterinario</h3>
 
+                    <!-- INFORMACIÓN PERSONAL -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-person"></i> Nombres</label>
-                                <input type="text" id="nombrePropietario" name="nombres" required placeholder="Ej: Juan Pérez García">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="bi bi-person"></i> Apellidos</label>
-                                <input type="text" id="apellidoPropietario" name="apellidos" required placeholder="Ej: García">
+                                <label><i class="bi bi-person"></i> Nombres *</label>
+                                <input type="text" name="nombres" required placeholder="Ej: Juan Carlos">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label><i class="bi bi-person"></i> Apellidos *</label>
+                                <input type="text" name="apellidos" required placeholder="Ej: Pérez García">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <label><i class="bi bi-card-text"></i> Tipo de documento *</label>
-                                <select id="tipoDocumento" name="tipo_documento" required>
+                                <select name="tipo_documento" required>
                                     <option value="">Seleccione...</option>
                                     <option value="CC">Cédula de Ciudadanía</option>
                                     <option value="CE">Cédula de Extranjería</option>
@@ -100,52 +106,47 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 </select>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-hash"></i> Número de documento *</label>
-                                <input type="number" id="documento" name="numero_documento" required placeholder="12345678">
+                                <input type="text" name="numero_documento" required placeholder="Ej: 1234567890" maxlength="20">
                             </div>
                         </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567">
+                                <input type="tel" name="telefono" required placeholder="Ej: 3001234567" maxlength="20">
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                <input type="email" id="correo" name="email" required placeholder="ejemplo@correo.com">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="bi bi-envelope"></i> Foto </label>
-                                <input type="file" accept=".jpg, .png, .jpeg" id="img_perfil" name="img_perfil" required>
+                                <input type="email" name="email" required placeholder="ejemplo@correo.com">
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label><i class="bi bi-geo-alt"></i> Dirección completa *</label>
-                        <input type="text" id="direccion" required placeholder="Calle 12 # 34-56, Apto 102">
-                    </div>
-
+                    <!-- INFORMACIÓN PROFESIONAL -->
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label><i class="bi bi-building"></i> Ciudad *</label>
-                                <input type="text" id="ciudad" required placeholder="Bogotá">
+                                <label><i class="bi bi-card-checklist"></i> Número de Licencia Profesional / Tarjeta Profesional *</label>
+                                <input type="text" name="numero_licencia_profesional" required placeholder="Ej: TP-12345" maxlength="50">
+                                <small class="form-text text-muted">Ingrese el número de tarjeta profesional del veterinario</small>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+
+                    <!-- FOTO DE PERFIL -->
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label><i class="bi bi-map"></i> Barrio</label>
-                                <input type="text" id="barrio" placeholder="Chapinero">
+                                <label><i class="bi bi-camera"></i> Foto de Perfil</label>
+                                <input type="file" accept=".jpg, .png, .jpeg" name="img_perfil">
+                                <small class="form-text text-muted">Formatos permitidos: JPG, JPEG, PNG (Máximo 2MB)</small>
                             </div>
                         </div>
                     </div>
@@ -158,291 +159,26 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                 </div>
 
-                <!-- Paso 2: Datos de la Mascota
-                <div class="step">
-                    <h3><i class="bi bi-heart me-2"></i>Datos de la Mascota</h3>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-tag"></i> Nombre de la mascota *</label>
-                                <input type="text" id="nombreMascota" required placeholder="Ej: Max">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-palette"></i> Especie *</label>
-                                <select id="especie" required>
-                                    <option value="">Seleccione...</option>
-                                    <option value="Perro">Perro</option>
-                                    <option value="Gato">Gato</option>
-                                    <option value="Ave">Ave</option>
-                                    <option value="Conejo">Conejo</option>
-                                    <option value="Hamster">Hamster</option>
-                                    <option value="Otro">Otro</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-award"></i> Raza</label>
-                                <input type="text" id="raza" placeholder="Ej: Labrador">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-palette-fill"></i> Color / Señas particulares</label>
-                                <input type="text" id="color" placeholder="Ej: Blanco con manchas negras">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label><i class="bi bi-cake2"></i> Edad (años) *</label>
-                                <input type="number" id="edad" required min="0" max="30" placeholder="3">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label><i class="bi bi-speedometer2"></i> Peso (kg) *</label>
-                                <input type="number" id="peso" required step="0.1" min="0" placeholder="15.5">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label><i class="bi bi-gender-ambiguous"></i> Sexo *</label>
-                                <select id="sexo" required>
-                                    <option value="">Seleccione...</option>
-                                    <option value="Macho">Macho</option>
-                                    <option value="Hembra">Hembra</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-scissors"></i> ¿Esterilizado/Castrado? *</label>
-                                <select id="esterilizado" required>
-                                    <option value="">Seleccione...</option>
-                                    <option value="Si">Sí</option>
-                                    <option value="No">No</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-upc-scan"></i> Microchip (si aplica)</label>
-                                <input type="text" id="microchip" placeholder="123456789012345">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="buttons">
-                        <button type="button" class="btn-prev" onclick="prevStep()">
-                            <i class="bi bi-arrow-left"></i> Anterior
-                        </button>
-                        <button type="button" class="btn-next" onclick="nextStep()">
-                            Siguiente <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <-- Paso 3: Historial Médico -->
-                <!-- <div class="step">
-                    <h3><i class="bi bi-file-medical me-2"></i>Historial Médico</h3>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-shield-check"></i> Vacunas aplicadas</label>
-                        <textarea id="vacunas" rows="3"
-                            placeholder="Ej: Rabia (2024), Parvovirus (2023), Triple Felina..."></textarea>
-                        <small class="form-text">Incluya nombre de vacuna y año de aplicación</small>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-calendar-event"></i> Última visita al veterinario</label>
-                                <input type="date" id="ultimaVisita">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-calendar-check"></i> Última desparasitación</label>
-                                <input type="date" id="ultimaDesparasitacion">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-bandaid"></i> Enfermedades previas</label>
-                        <textarea id="enfermedades" rows="3"
-                            placeholder="Ej: Otitis (2023), Parásitos intestinales (2022)..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-exclamation-triangle"></i> Alergias conocidas</label>
-                        <textarea id="alergias" rows="2"
-                            placeholder="Ej: Alérgico a penicilina, pollo, etc."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-capsule"></i> Medicamentos actuales</label>
-                        <textarea id="medicamentos" rows="3"
-                            placeholder="Ej: Antibiótico X, 1 tableta cada 12 horas..."></textarea>
-                    </div>
-
-                    <div class="buttons">
-                        <button type="button" class="btn-prev" onclick="prevStep()">
-                            <i class="bi bi-arrow-left"></i> Anterior
-                        </button>
-                        <button type="button" class="btn-next" onclick="nextStep()">
-                            Siguiente <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                </div> -->
-
-                <!-- Paso 4: Información de Atención -->
-                <!-- <div class="step">
-                    <h3><i class="bi bi-clipboard-check me-2"></i>Información de Atención</h3>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-chat-left-text"></i> Motivo de consulta *</label>
-                        <textarea id="motivoConsulta" rows="4" required
-                            placeholder="Describa el motivo principal de la visita..."></textarea>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-calendar-plus"></i> Fecha de ingreso *</label>
-                                <input type="date" id="fechaIngreso" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-alarm"></i> Hora de ingreso *</label>
-                                <input type="time" id="horaIngreso" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-person-badge-fill"></i> Veterinario asignado *</label>
-                        <select id="veterinario" required>
-                            <option value="">Seleccione un veterinario...</option>
-                            <option value="Dr. Carlos Martínez">Dr. Carlos Martínez</option>
-                            <option value="Dra. Ana López">Dra. Ana López</option>
-                            <option value="Dr. Pedro Ramírez">Dr. Pedro Ramírez</option>
-                            <option value="Dra. María González">Dra. María González</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-bar-chart-line"></i> Prioridad de atención *</label>
-                        <select id="prioridad" required>
-                            <option value="">Seleccione...</option>
-                            <option value="Baja">Baja - Control de rutina</option>
-                            <option value="Media">Media - Requiere atención pronta</option>
-                            <option value="Alta">Alta - Urgencia</option>
-                            <option value="Crítica">Crítica - Emergencia</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-thermometer-half"></i> Síntomas observados</label>
-                        <textarea id="sintomas" rows="3"
-                            placeholder="Ej: Fiebre, vómito, diarrea, inapetencia..."></textarea>
-                    </div>
-
-                    <div class="buttons">
-                        <button type="button" class="btn-prev" onclick="prevStep()">
-                            <i class="bi bi-arrow-left"></i> Anterior
-                        </button>
-                        <button type="button" class="btn-next" onclick="nextStep()">
-                            Siguiente <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                </div> -->
-
-                <!-- Paso 5: Tratamiento y Observaciones -->
-                <!-- <div class="step">
-                    <h3><i class="bi bi-clipboard2-pulse me-2"></i>Tratamiento y Observaciones</h3>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-journal-medical"></i> Diagnóstico</label>
-                        <textarea id="diagnostico" rows="3" placeholder="Diagnóstico del veterinario..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-prescription"></i> Tratamiento recomendado</label>
-                        <textarea id="tratamiento" rows="4"
-                            placeholder="Ej: Antibiótico X cada 12 horas por 7 días, reposo absoluto..."></textarea>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-calendar-heart"></i> Próxima cita</label>
-                                <input type="date" id="proximaCita">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-clock"></i> Hora de próxima cita</label>
-                                <input type="time" id="horaProximaCita">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="bi bi-cash-stack"></i> Costo del servicio</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" id="costoServicio" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-credit-card"></i> Método de pago</label>
-                        <select id="metodoPago">
-                            <option value="">Seleccione...</option>
-                            <option value="Efectivo">Efectivo</option>
-                            <option value="Tarjeta">Tarjeta de crédito/débito</option>
-                            <option value="Transferencia">Transferencia bancaria</option>
-                            <option value="PSE">PSE</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-sticky-fill"></i> Observaciones adicionales</label>
-                        <textarea id="observaciones" rows="3"
-                            placeholder="Cualquier información adicional relevante..."></textarea>
-                    </div>
-
-                    <div class="buttons">
-                        <button type="button" class="btn-prev" onclick="prevStep()">
-                            <i class="bi bi-arrow-left"></i> Anterior
-                        </button>
-                        <button type="button" class="btn-next" onclick="nextStep()">
-                            Siguiente <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                </div> -->
-
-                <!--Paso de confirmación -->
+                <!-- Paso de confirmación -->
                 <div class="step">
                     <h1>¿Deseas confirmar el envío del formulario?</h1>
                     <p>Por favor, revisa que toda la información sea correcta antes de continuar.</p>
 
+                    <!-- RESUMEN DE DATOS -->
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-info-circle"></i> Resumen de Datos</h5>
+                        <div id="resumenDatos">
+                            <!-- Se llenará dinámicamente con JavaScript -->
+                        </div>
+                    </div>
+
                     <div class="buttons">
-                        <button type="button" class="btn btn-secondary" id="btnVolver">Volver a revisar</button>
-                        <button type="submit" class="btn btn-success" id="btnConfirmar">Confirmar y enviar</button>
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="bi bi-arrow-left"></i> Volver a revisar
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Confirmar y enviar
+                        </button>
                     </div>
                 </div>
             </form>

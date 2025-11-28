@@ -8,7 +8,7 @@
 
     <div class="menu-sidebar">
         <div class="seccion-sidebar">Menu</div>
-        <a href="<?= BASE_URL ?>/veterinario/dashboard" class="item-sidebar active">
+        <a href="<?= BASE_URL ?>/veterinaria/dashboard" class="item-sidebar active">
             <i class="bi bi-speedometer2"></i>
             <span class="texto-item-sidebar">Dashboard</span>
         </a>
@@ -46,7 +46,7 @@
             <i class="bi bi-receipt"></i>
             <span class="texto-item-sidebar">Recetas</span>
         </a>
-        <a href="login" class="item-sidebar">
+        <a href="<?= BASE_URL ?>/login" class="item-sidebar">
             <i class="bi bi-box-arrow-in-left"></i>
             <span class="texto-item-sidebar">Cerrar Sesión</span>
         </a>

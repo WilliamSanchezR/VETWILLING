@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'id_usuario' => $resultado['id_usuario'],
         'id_rol' => $resultado['id_rol'],
         'email' => $resultado['email'],
+        'password_hash' => $resultado['password_hash'],
         'estado' => $resultado['estado'],
         'perfil' => $resultado['perfil']
     ];
