@@ -102,7 +102,7 @@ $veterinario = listarVeterinario($id);
                             </div>
                             <div class="form-group">
                                 <label><i class="bi bi-person"></i> Apellidos</label>
-                                <input type="text" id="apellidoPropietario" name="apellidos" value="<?= $veterinario['apellidos'] ?>" placeholder="Ej: García">
+                                <input type="text" id="apellidoPropietario" name="apellidos" value="<?= $usuario['apellidos'] ?>" placeholder="Ej: García">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -120,7 +120,7 @@ $veterinario = listarVeterinario($id);
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Rol</label>
                                 <select id="rol" name="id_rol">
-                                    <option value="<?= $veterinario['id_rol'] ?>"><?= $veterinario['id_rol'] ?></option>
+                                    <option value="<?= $usuario['id_rol'] ?>"><?= $usuario['id_rol'] ?></option>
                                     <option value="2">Administrador</option>
                                     <option value="1">Veterinario</option>
                                 </select>
@@ -149,7 +149,7 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" name="telefono" value="<?= $veterinario['telefono'] ?>" placeholder="+57 300 123 4567">
+                                <input type="tel" id="telefono" name="telefono" value="<?= $usuario['telefono'] ?>" placeholder="+57 300 123 4567">
                             </div>
                         </div>
                     </div>

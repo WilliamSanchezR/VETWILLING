@@ -68,6 +68,12 @@ switch ($method) {
 function registrarVeterinario()
 {
 
+    // capturamos el id del usuario que inicia secion para guardarlo solo si es necesario
+
+    session_start();
+    $id_veterinaria = $_SESSION['user']['id_usuario'];
+
+
     // capturamos en variables los datos desde el formulario a travez del metodo POST y los name de los campos
 
     $nombres = $_POST['nombres'] ?? '';
@@ -80,8 +86,8 @@ function registrarVeterinario()
     $password_hash = '123';
     $estado = 'activo';
     $tipo_usuario = 'Veterinario';
-    $id_veterinaria = '1';
-    $img_perfil = $_POST['img_perfil'];
+    $id_veterinaria = $id_veterinaria['user']['id_veterinaria'] ?? '';
+    $img_perfil = $_POST['img_perfil'] ?? '';
 
     // Validamos los caampos que son obligatorios
 
@@ -89,11 +95,6 @@ function registrarVeterinario()
         mostrarSweetAlert('error', 'Campos vacios', 'Por favor completar todos los campos');
         exit();
     }
-
-    // capturamos el id del usuario que inicia secion para guardarlo solo si es necesario
-
-    session_start();
-    $id_veterinaria = $_SESSION['user']['id_veterinaria'];
 
     // POO - instanciamos la clase
 

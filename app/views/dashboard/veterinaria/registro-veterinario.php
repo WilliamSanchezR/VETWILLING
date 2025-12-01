@@ -125,7 +125,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             </div>
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Foto </label>
-                                <input type="file" accept=".jpg, .png, .jpeg" id="img_perfil" name="img_perfil" required>
+                                <input type="file" accept=".jpg, .png, .jpeg" id="img_perfil" name="img_perfil">
                             </div>
                         </div>
                     </div>
