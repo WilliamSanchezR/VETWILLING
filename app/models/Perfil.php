@@ -37,7 +37,7 @@ class Perfil
             case 1: // ADMINISTRADOR
                 $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil,
+                                a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil, a.telefono,
                                 r.nombre AS rol
                               FROM usuario u
                               INNER JOIN administrador a ON u.id_usuario = a.id_usuario
@@ -48,7 +48,7 @@ class Perfil
             case 2: // VETERINARIO
                 $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                v.nombres, v.apellidos, v.telefono, v.img_perfil,
+                                v.nombres, v.apellidos, v.telefono, v.img_perfil, v.telefono,
                                 r.nombre AS rol
                               FROM usuario u
                               INNER JOIN veterinario v ON u.id_usuario = v.id_usuario
@@ -59,7 +59,7 @@ class Perfil
             case 3: // PROPIETARIO
                 $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                p.nombres, p.apellidos, p.telefono, p.direccion, p.img_perfil,
+                                p.nombres, p.apellidos, p.telefono, p.direccion, p.img_perfil, p.telefono,
                                 r.nombre AS rol
                               FROM usuario u
                               INNER JOIN propietario p ON u.id_usuario = p.id_usuario

@@ -1,5 +1,11 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_veterinario.php';
+require_once BASE_PATH . '/app/helpers/session_all.php';
+require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+
+$rol = $_SESSION['user']['id_rol'];
+$id = $_SESSION['user']['id_usuario'];
+$usuario = mostrarPerfil($id);
+
 ?>
 
 <!DOCTYPE html>
@@ -23,6 +29,8 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
+
 
 </head>
 
@@ -30,8 +38,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <?php
     // <!-- BARRA LATERAL IZQUIERDA -->
-    include_once __DIR__ . '/../../layouts/sidebar_veterinario.php';
-
+    if ($rol === '1') {
+        include_once __DIR__ . '/../../layouts/sidebar_administrador.php';
+    } else {
+        include_once __DIR__ . '/../../layouts/sidebar_veterinario.php';
+    }
     // <!-- PANEL DERECHO -->
     include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php';
     ?>
@@ -42,7 +53,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
         <!-- Aqui va el include de navbar superior -->
         <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php'
+        if ($rol === '1') {
+            include_once __DIR__ . '/../../layouts/panel_superior_administrador.php';
+        } else {
+            include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php';
+        }
         ?>
 
         <!-- ÁREA DE CONTENIDO -->
@@ -76,277 +91,281 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
 
                     <!-- Mascotas -->
-                    <div class="col-md-4">
-                        <div class="mascota">
-                            <h2>
-                                Mascotas
-                                <a href="#" aria-label="Editar mascotas"><i class="bi bi-pencil-square"></i></a>
-                            </h2>
-                            <p><span>Perro: </span>Rocky</p>
-                            <p><span>Gato: </span>Pelusa</p>
-                            <p><span>Vaca: </span>Lechera</p>
-                            <p><span>Loro: </span>Magola</p>
+                    <?php if ($rol !== '1') : ?>
+                        <div class="col-md-4">
+                            <div class="mascota">
+                                <h2>
+                                    Mascotas
+                                    <a href="#" aria-label="Editar mascotas"><i class="bi bi-pencil-square"></i></a>
+                                </h2>
+                                <p><span>Perro: </span>Rocky</p>
+                                <p><span>Gato: </span>Pelusa</p>
+                                <p><span>Vaca: </span>Lechera</p>
+                                <p><span>Loro: </span>Magola</p>
+                            </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
 
-                <!-- Sección de Citas y Notas -->
-                <div class="row g-3">
-                    <!-- Citas y Tratamientos -->
-                    <div class="col-md-6">
-                        <div class="citas">
-                            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
-                                        data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
-                                        aria-selected="true">
-                                        Citas <span>(2)</span>
-                                    </button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill"
-                                        data-bs-target="#pills-contact" type="button" role="tab"
-                                        aria-controls="pills-contact" aria-selected="false">
-                                        Plan de Tratamientos <span>(2)</span>
-                                    </button>
-                                </li>
-                            </ul>
+                <?php if ($rol !== '1') : ?>
+                    <!-- Sección de Citas y Notas -->
+                    <div class="row g-3">
+                        <!-- Citas y Tratamientos -->
+                        <div class="col-md-6">
+                            <div class="citas">
+                                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                                            data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
+                                            aria-selected="true">
+                                            Citas <span>(2)</span>
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill"
+                                            data-bs-target="#pills-contact" type="button" role="tab"
+                                            aria-controls="pills-contact" aria-selected="false">
+                                            Plan de Tratamientos <span>(2)</span>
+                                        </button>
+                                    </li>
+                                </ul>
 
-                            <div class="tab-content" id="pills-tabContent">
-                                <!-- Tab de Citas -->
-                                <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
-                                    aria-labelledby="pills-home-tab" tabindex="0">
+                                <div class="tab-content" id="pills-tabContent">
+                                    <!-- Tab de Citas -->
+                                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
+                                        aria-labelledby="pills-home-tab" tabindex="0">
 
-                                    <!-- Cita 1 -->
-                                    <div class="row mb-3 cita-item">
-                                        <div class="col-6 col-md-3">
-                                            <span>11:00 - 11:30</span>
-                                            <h4>26-Sep-2025</h4>
+                                        <!-- Cita 1 -->
+                                        <div class="row mb-3 cita-item">
+                                            <div class="col-6 col-md-3">
+                                                <span>11:00 - 11:30</span>
+                                                <h4>26-Sep-2025</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Servicio:</span>
+                                                <h4>Baño y Peluqueria</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Doctor:</span>
+                                                <h4>Chapatin</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Estado:</span>
+                                                <h4 class="estado-agendado">Agendado</h4>
+                                            </div>
                                         </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Servicio:</span>
-                                            <h4>Baño y Peluqueria</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Doctor:</span>
-                                            <h4>Chapatin</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Estado:</span>
-                                            <h4 class="estado-agendado">Agendado</h4>
+
+                                        <!-- Cita 2 -->
+                                        <div class="row mb-3 cita-item">
+                                            <div class="col-6 col-md-3">
+                                                <span>11:30 - 12:30</span>
+                                                <h4>26-Sep-2025</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Servicio:</span>
+                                                <h4>Baño y Peluqueria</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Doctor:</span>
+                                                <h4>Chapatin</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Estado:</span>
+                                                <h4 class="estado-atendido">Atendido</h4>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- Cita 2 -->
-                                    <div class="row mb-3 cita-item">
-                                        <div class="col-6 col-md-3">
-                                            <span>11:30 - 12:30</span>
-                                            <h4>26-Sep-2025</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Servicio:</span>
-                                            <h4>Baño y Peluqueria</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Doctor:</span>
-                                            <h4>Chapatin</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Estado:</span>
-                                            <h4 class="estado-atendido">Atendido</h4>
-                                        </div>
-                                    </div>
-                                </div>
+                                    <!-- Tab de Tratamientos -->
+                                    <div class="tab-pane fade" id="pills-contact" role="tabpanel"
+                                        aria-labelledby="pills-contact-tab" tabindex="0">
 
-                                <!-- Tab de Tratamientos -->
-                                <div class="tab-pane fade" id="pills-contact" role="tabpanel"
-                                    aria-labelledby="pills-contact-tab" tabindex="0">
+                                        <!-- Tratamiento 1 -->
+                                        <div class="row mb-3 cita-item">
+                                            <div class="col-6 col-md-3">
+                                                <span>11:00 - 11:30</span>
+                                                <h4>26-Sep-2025</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Servicio:</span>
+                                                <h4>Baño y Peluqueria</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Doctor:</span>
+                                                <h4>Chapatin</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Estado:</span>
+                                                <h4 class="estado-agendado">Agendado</h4>
+                                            </div>
+                                        </div>
 
-                                    <!-- Tratamiento 1 -->
-                                    <div class="row mb-3 cita-item">
-                                        <div class="col-6 col-md-3">
-                                            <span>11:00 - 11:30</span>
-                                            <h4>26-Sep-2025</h4>
+                                        <!-- Tratamiento 2 -->
+                                        <div class="row mb-3 cita-item">
+                                            <div class="col-6 col-md-3">
+                                                <span>11:30 - 12:30</span>
+                                                <h4>26-Sep-2025</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Servicio:</span>
+                                                <h4>Baño y Peluqueria</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Doctor:</span>
+                                                <h4>Chapatin</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Estado:</span>
+                                                <h4 class="estado-atendido">Atendido</h4>
+                                            </div>
                                         </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Servicio:</span>
-                                            <h4>Baño y Peluqueria</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Doctor:</span>
-                                            <h4>Chapatin</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Estado:</span>
-                                            <h4 class="estado-agendado">Agendado</h4>
-                                        </div>
-                                    </div>
 
-                                    <!-- Tratamiento 2 -->
-                                    <div class="row mb-3 cita-item">
-                                        <div class="col-6 col-md-3">
-                                            <span>11:30 - 12:30</span>
-                                            <h4>26-Sep-2025</h4>
+                                        <!-- Tratamiento 3 -->
+                                        <div class="row mb-3 cita-item">
+                                            <div class="col-6 col-md-3">
+                                                <span>11:30 - 12:30</span>
+                                                <h4>26-Sep-2025</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Servicio:</span>
+                                                <h4>Baño y Peluqueria</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Doctor:</span>
+                                                <h4>Chapatin</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Estado:</span>
+                                                <h4 class="estado-atendido">Atendido</h4>
+                                            </div>
                                         </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Servicio:</span>
-                                            <h4>Baño y Peluqueria</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Doctor:</span>
-                                            <h4>Chapatin</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Estado:</span>
-                                            <h4 class="estado-atendido">Atendido</h4>
-                                        </div>
-                                    </div>
 
-                                    <!-- Tratamiento 3 -->
-                                    <div class="row mb-3 cita-item">
-                                        <div class="col-6 col-md-3">
-                                            <span>11:30 - 12:30</span>
-                                            <h4>26-Sep-2025</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Servicio:</span>
-                                            <h4>Baño y Peluqueria</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Doctor:</span>
-                                            <h4>Chapatin</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Estado:</span>
-                                            <h4 class="estado-atendido">Atendido</h4>
-                                        </div>
-                                    </div>
-
-                                    <!-- Tratamiento 5 -->
-                                    <div class="row mb-3 cita-item">
-                                        <div class="col-6 col-md-3">
-                                            <span>11:30 - 12:30</span>
-                                            <h4>26-Sep-2025</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Servicio:</span>
-                                            <h4>Baño y Peluqueria</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Doctor:</span>
-                                            <h4>Chapatin</h4>
-                                        </div>
-                                        <div class="col-6 col-md-3">
-                                            <span>Estado:</span>
-                                            <h4 class="estado-atendido">Atendido</h4>
+                                        <!-- Tratamiento 5 -->
+                                        <div class="row mb-3 cita-item">
+                                            <div class="col-6 col-md-3">
+                                                <span>11:30 - 12:30</span>
+                                                <h4>26-Sep-2025</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Servicio:</span>
+                                                <h4>Baño y Peluqueria</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Doctor:</span>
+                                                <h4>Chapatin</h4>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <span>Estado:</span>
+                                                <h4 class="estado-atendido">Atendido</h4>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Documentos y Notas -->
-                    <div class="col-md-6">
-                        <div class="notas">
-                            <div class="row g-3">
-                                <!-- Documentos -->
-                                <div class="col-12">
-                                    <div class="card-documentos">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h5 class="fw-semibold mb-0">Documentos</h5>
-                                            <button class="btn btn-outline-success btn-sm fw-semibold">
-                                                <i class="bi bi-download me-1"></i>Descargar
-                                            </button>
-                                        </div>
-                                        <ul class="list-group list-group-flush">
-                                            <li
-                                                class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
-                                                    <span>Radiografía.pdf</span>
-                                                </div>
-                                                <small class="text-muted">123 kb</small>
-                                            </li>
-                                            <li
-                                                class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
-                                                    <span>Orden_medica_medicamentos.pdf</span>
-                                                </div>
-                                                <div class="d-flex align-items-center">
+                        <!-- Documentos y Notas -->
+                        <div class="col-md-6">
+                            <div class="notas">
+                                <div class="row g-3">
+                                    <!-- Documentos -->
+                                    <div class="col-12">
+                                        <div class="card-documentos">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="fw-semibold mb-0">Documentos</h5>
+                                                <button class="btn btn-outline-success btn-sm fw-semibold">
+                                                    <i class="bi bi-download me-1"></i>Descargar
+                                                </button>
+                                            </div>
+                                            <ul class="list-group list-group-flush">
+                                                <li
+                                                    class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
+                                                        <span>Radiografía.pdf</span>
+                                                    </div>
                                                     <small class="text-muted">123 kb</small>
-                                                </div>
-                                            </li>
-                                            <li
-                                                class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
-                                                    <span>Resumen_consulta.pdf</span>
-                                                </div>
-                                                <small class="text-muted">123 kb</small>
-                                            </li>
-                                            <li
-                                                class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
-                                                    <span>Carnet_vacunas.pdf</span>
-                                                </div>
-                                                <small class="text-muted">123 kb</small>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <!-- Notas -->
-                                <div class="col-12">
-                                    <div class="card-notas">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h5 class="fw-semibold mb-0">Notas</h5>
-                                            <button class="btn btn-outline-success btn-sm fw-semibold">
-                                                <i class="bi bi-download me-1"></i>Descargar
-                                            </button>
+                                                </li>
+                                                <li
+                                                    class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
+                                                        <span>Orden_medica_medicamentos.pdf</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <small class="text-muted">123 kb</small>
+                                                    </div>
+                                                </li>
+                                                <li
+                                                    class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
+                                                        <span>Resumen_consulta.pdf</span>
+                                                    </div>
+                                                    <small class="text-muted">123 kb</small>
+                                                </li>
+                                                <li
+                                                    class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
+                                                        <span>Carnet_vacunas.pdf</span>
+                                                    </div>
+                                                    <small class="text-muted">123 kb</small>
+                                                </li>
+                                            </ul>
                                         </div>
-                                        <ul class="list-group list-group-flush">
-                                            <li
-                                                class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
-                                                    <span>Consulta_Dic.pdf</span>
-                                                </div>
-                                                <small class="text-muted">123 kb</small>
-                                            </li>
-                                            <li
-                                                class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
-                                                    <span>Consulta_Nov.pdf</span>
-                                                </div>
-                                                <small class="text-muted">123 kb</small>
-                                            </li>
-                                            <li
-                                                class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
-                                                    <span>Alimentacion.pdf</span>
-                                                </div>
-                                                <small class="text-muted">123 kb</small>
-                                            </li>
-                                            <li
-                                                class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
-                                                    <span>Cuidado.pdf</span>
-                                                </div>
-                                                <small class="text-muted">123 kb</small>
-                                            </li>
-                                        </ul>
+                                    </div>
+
+                                    <!-- Notas -->
+                                    <div class="col-12">
+                                        <div class="card-notas">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="fw-semibold mb-0">Notas</h5>
+                                                <button class="btn btn-outline-success btn-sm fw-semibold">
+                                                    <i class="bi bi-download me-1"></i>Descargar
+                                                </button>
+                                            </div>
+                                            <ul class="list-group list-group-flush">
+                                                <li
+                                                    class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
+                                                        <span>Consulta_Dic.pdf</span>
+                                                    </div>
+                                                    <small class="text-muted">123 kb</small>
+                                                </li>
+                                                <li
+                                                    class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
+                                                        <span>Consulta_Nov.pdf</span>
+                                                    </div>
+                                                    <small class="text-muted">123 kb</small>
+                                                </li>
+                                                <li
+                                                    class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
+                                                        <span>Alimentacion.pdf</span>
+                                                    </div>
+                                                    <small class="text-muted">123 kb</small>
+                                                </li>
+                                                <li
+                                                    class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-file-earmark-pdf me-2 text-success"></i>
+                                                        <span>Cuidado.pdf</span>
+                                                    </div>
+                                                    <small class="text-muted">123 kb</small>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -360,6 +379,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
 
 </body>
