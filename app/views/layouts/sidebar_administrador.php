@@ -22,7 +22,7 @@
             </ul>
         </div>
 
-        <a href="../../index.html" class="item-sidebar">
+        <a href="<?= BASE_URL ?>/login" class="item-sidebar">
             <i class="bi bi-box-arrow-in-left"></i>
             <span class="texto-item-sidebar">Cerrar Seción</span>
         </a>

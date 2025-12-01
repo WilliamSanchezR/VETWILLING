@@ -66,6 +66,8 @@ class Veterinario
             return false;
         }
     }
+}
+
 
     public function listar($id_veterinaria)
     {
@@ -98,6 +100,7 @@ class Veterinario
             return false;
         }
     }
+
 
     public function actualizar($data)
     {
@@ -137,6 +140,8 @@ class Veterinario
             return false;
         }
     }
+
+
 
     public function eliminar($id)
     {
