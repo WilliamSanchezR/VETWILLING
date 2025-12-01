@@ -79,11 +79,11 @@ function registrarUsuario()
         exit();
     }
 
-     if ($id_rol == '3' && empty($id_veterinaria)) {
+    if ($id_rol == '3' && empty($id_veterinaria)) {
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
         exit();
     }
-    echo($id_veterinaria);
+    echo ($id_veterinaria);
 
 
     //Instanciamos la clase
@@ -198,7 +198,8 @@ function actualizarUsuario()
     exit();
 }
 
-function eliminarUsuario($id) {
+function eliminarUsuario($id)
+{
     $objUsuario = new Usuario();
     $resultado = $objUsuario->elimimarUsuario($id);
 
@@ -215,4 +216,3 @@ function eliminarUsuario($id) {
 
     exit();
 }
-    
