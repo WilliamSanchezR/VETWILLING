@@ -3,18 +3,6 @@
 // Enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 
-$ruta = '';
-
-switch ($ruta) {
-    case 'registro':
-        $ruta = (registrarUsuario());
-        break;
-
-    default:
-        # code...
-        break;
-}
-
 // asignamos el valo id del registro segun la tabla
 $id = $_SESSION['user']['id_usuario'];
 
