@@ -115,7 +115,7 @@ switch ($request) {
     case '/admin/actualizar-usuario':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
-    
+
     case '/admin/eliminar-usuario':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
@@ -124,7 +124,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/administrador/registroVeterinaria.php';
         break;
 
-    
+
 
     // ---------------------------------------PROPIETARIO-------------------------------------//
 
@@ -157,9 +157,9 @@ switch ($request) {
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
-    // case '/reporte':
-    //     require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
-    //             reportesPdfControllers();
+    case '/reporte':
+        require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
+        reportesPdfControllers();
 
     //     break;
 

@@ -78,9 +78,7 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-person"></i> Apellidos</label>
-                                <input type="text" name="apellidos" 
-                                       value="<?= $veterinario['apellidos'] ?>" 
-                                       placeholder="Ej: García">
+                                <input type="text" id="apellidoPropietario" name="apellidos" value="<?= $usuario['apellidos'] ?>" placeholder="Ej: García">
                             </div>
                         </div>
 
@@ -103,10 +101,8 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Rol</label>
-                                <select name="id_rol">
-                                    <option value="<?= $veterinario['id_rol'] ?>">
-                                        <?= $veterinario['id_rol'] ?>
-                                    </option>
+                                <select id="rol" name="id_rol">
+                                    <option value="<?= $usuario['id_rol'] ?>"><?= $usuario['id_rol'] ?></option>
                                     <option value="2">Administrador</option>
                                     <option value="1">Veterinario</option>
                                 </select>
@@ -141,9 +137,7 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" 
-                                       name="telefono" 
-                                       value="<?= $veterinario['telefono'] ?>">
+                                <input type="tel" id="telefono" name="telefono" value="<?= $usuario['telefono'] ?>" placeholder="+57 300 123 4567">
                             </div>
                         </div>
 

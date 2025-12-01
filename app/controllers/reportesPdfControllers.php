@@ -6,7 +6,7 @@ require __DIR__ . '/veterinarioController.php';
 
 
 // Esta funcion se encarga de validar el tipo de reporte y ejecutar la funcion corespondiente 
-function reportesPdfController()
+function reportesPdfControllers()
 {
 
     // capturamos el tipo de reporte enivado desde la vista
