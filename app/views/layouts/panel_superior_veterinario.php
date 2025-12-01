@@ -6,7 +6,7 @@ require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 
 // asignamos el valo id del registro segun la tabla
 
-$id = $_SESSION['user']['id_rol'];
+$id = $_SESSION['user']['id_usuario'];
 
 // Llamamos la funcion especifica que existe en dicho controlador y le pasamos los datos a una variable que podamos manipular en este archivo
 
@@ -47,7 +47,7 @@ $usuario = mostrarPerfil($id);
 
             <div class="info-usuario">
                 <h4 class="nombre-usuario"><?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?></h4>
-                <p class="rol-usuario"><?= $usuario['nombre_rol'] ?></p>
+                <p class="rol-usuario"><?= $usuario['rol'] ?></p>
             </div>
 
             <i class="bi bi-chevron-down flecha-perfil"></i>

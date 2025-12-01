@@ -20,66 +20,65 @@ class Perfil
 
         try {
 
-        // Primero obtenemos el rol
-        $consultar = "SELECT id_rol FROM usuario WHERE id_usuario = :id LIMIT 1";
+            // Primero obtenemos el rol
+            $consultar = "SELECT id_rol FROM usuario WHERE id_usuario = :id LIMIT 1";
 
-        $resultado = $this->conexion->prepare($consultar);
-        $resultado->bindParam(':id', $id);
-        $resultado->execute();
-        $user = $resultado->fetch();
+            $resultado = $this->conexion->prepare($consultar);
+            $resultado->bindParam(':id', $id);
+            $resultado->execute();
+            $user = $resultado->fetch();
 
-        if (!$user['id_rol']) {
-            return null;
-        }
+            if (!$user['id_rol']) {
+                return null;
+            }
 
-        switch ($user['id_rol']) {
+            switch ($user['id_rol']) {
 
-            case 1: // ADMINISTRADOR
-                $consultar = "SELECT 
+                case 1: // ADMINISTRADOR
+                    $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
                                 a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil, a.telefono,
                                 r.nombre AS rol
-                              FROM usuario u
-                              INNER JOIN administrador a ON u.id_usuario = a.id_usuario
-                              INNER JOIN rol r ON u.id_rol = r.id_rol
-                              WHERE u.id_usuario = :id";
-                break;
+                                FROM usuario u
+                                INNER JOIN administrador a ON u.id_usuario = a.id_usuario
+                                INNER JOIN rol r ON u.id_rol = r.id_rol
+                                WHERE u.id_usuario = :id";
+                    break;
 
-            case 2: // VETERINARIO
-                $consultar = "SELECT 
+                case 2: // VETERINARIO
+                    $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
                                 v.nombres, v.apellidos, v.telefono, v.img_perfil, v.telefono,
                                 r.nombre AS rol
-                              FROM usuario u
-                              INNER JOIN veterinario v ON u.id_usuario = v.id_usuario
-                              INNER JOIN rol r ON u.id_rol = r.id_rol
-                              WHERE u.id_usuario = :id";
-                break;
+                                FROM usuario u
+                                INNER JOIN veterinario v ON u.id_usuario = v.id_usuario
+                                INNER JOIN rol r ON u.id_rol = r.id_rol
+                                WHERE u.id_usuario = :id";
+                    break;
 
-            case 3: // PROPIETARIO
-                $consultar = "SELECT 
+                case 3: // PROPIETARIO
+                    $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
                                 p.nombres, p.apellidos, p.telefono, p.direccion, p.img_perfil, p.telefono,
                                 r.nombre AS rol
-                              FROM usuario u
-                              INNER JOIN propietario p ON u.id_usuario = p.id_usuario
-                              INNER JOIN rol r ON u.id_rol = r.id_rol
-                              WHERE u.id_usuario = :id";
-                break;
+                                FROM usuario u
+                                INNER JOIN propietario p ON u.id_usuario = p.id_usuario
+                                INNER JOIN rol r ON u.id_rol = r.id_rol
+                                WHERE u.id_usuario = :id";
+                    break;
 
-            default:
-                return null;
+                default:
+                    return null;
+            }
+
+            $resultado = $this->conexion->prepare($consultar);
+            $resultado->bindParam(':id', $id);
+            $resultado->execute();
+
+            return $resultado->fetch();
+        } catch (PDOException $e) {
+            error_log("Error en perfil::mostrarPerfil " . $e->getMessage());
+            return null;
         }
-
-        $resultado = $this->conexion->prepare($consultar);
-        $resultado->bindParam(':id', $id);
-        $resultado->execute();
-
-        return $resultado->fetch();
-
-    } catch (PDOException $e) {
-        error_log("Error en perfil::mostrarPerfil " . $e->getMessage());
-        return null;
-    }
     }
 }
