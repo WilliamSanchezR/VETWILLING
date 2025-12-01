@@ -86,9 +86,8 @@ function registrarVeterinario()
     $id_rol = '2'; // Rol de veterinario
     $password = '123'; // Considera usar un password temporal o generado
     $estado = 'activo';
-    $tipo_usuario = 'Veterinario';
     $id_veterinaria = $id_veterinaria['user']['id_veterinaria'] ?? '';
-    $img_perfil = $_POST['img_perfil'] ?? '';
+    $ruta_img = $_POST['img_perfil'] ?? '';
 
     // Validamos los campos que son obligatorios
     if (

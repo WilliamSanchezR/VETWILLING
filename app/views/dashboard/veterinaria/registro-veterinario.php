@@ -197,37 +197,15 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         </div>
                     </div>
 
-                    <!-- INFORMACIÓN PROFESIONAL -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><i class="bi bi-card-checklist"></i> Número de Licencia Profesional / Tarjeta Profesional *</label>
-                                <input type="text" name="numero_licencia_profesional" required placeholder="Ej: TP-12345" maxlength="50">
-                                <small class="form-text text-muted">Ingrese el número de tarjeta profesional del veterinario</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- FOTO DE PERFIL -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><i class="bi bi-camera"></i> Foto de Perfil</label>
-                                <input type="file" accept=".jpg, .png, .jpeg" name="img_perfil">
-                                <small class="form-text text-muted">Formatos permitidos: JPG, JPEG, PNG (Máximo 2MB)</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="buttons">
-                        <span></span>
-                        <button type="button" class="btn-next" onclick="nextStep()">
-                            Siguiente <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
+                <div class="buttons">
+                    <span></span>
+                    <button type="button" class="btn-next" onclick="nextStep()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
                 </div>
+        </div>
 
-                <!-- Paso de confirmación -->
+        <!-- Paso de confirmación -->
                 <div class="step">
                     <h1>¿Deseas confirmar el envío del formulario?</h1>
                     <p>Por favor, revisa que toda la información sea correcta antes de continuar.</p>
