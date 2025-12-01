@@ -1,10 +1,8 @@
 <?php
 
-//Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/usuario.php';
 
-//CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
@@ -20,44 +18,30 @@ switch ($method) {
         break;
 
     case 'GET':
-        // Esta variable captura la accion de eliminar
-        // Se declara la variable accion para capturar la accion del boton eliminar 
         $accion = $_GET['accion'] ?? '';
 
         if ($accion === 'eliminar') {
             eliminarUsuario($_GET['id']);
         } else if (isset($_GET['id'])) {
-            // Esta funcion llena la funcion de de editar un solo veterinario
-            $id = $_GET['id'];
-            consultarUsuarioId($id);
+            consultarUsuarioId($_GET['id']);
         } else {
-            // Esta funcio llena toda la tabla de veterinarios
             listarUsuarios();
         }
         break;
 
-    //Estas lineas se usarian si se trabajara con apis resful
-    case 'PUT':
-        // actualizarUsuario();
-        break;
-
-    // case 'DELETE':
-    //     eliminarUsuario();
-    //     break;
-
     default:
         http_response_code(405);
-        echo "Metodo no encontrado";
+        echo "Método no permitido";
         break;
 }
 
-//FUNCIONES CRUD
+
+// =========================================
+//  FUNCIONES CRUD
+// =========================================
 
 function registrarUsuario()
 {
-    //Capturamosen variables los datos enviados desde el formulario a travez de el metodo
-    //POST y el  nombre de los campos
-
     $email = $_POST['email'] ?? '';
     $password = '123';
     $estado = 'activo';
@@ -67,13 +51,14 @@ function registrarUsuario()
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
-    $id_veterinaria = $_POST['veterinaria'] ?? '';
-    $img_perfil = '';
+    $id_veterinaria = $_POST['veterinaria'] ?? null;
     $nivel_acceso = 'Completo';
+    $img_perfil = null;
 
-    //VALIDAMOS LOS CAMPOS QUE SON OBLIGATORIOS
     if (
-        empty($email) || empty($password) || empty($estado) || empty($id_rol) || empty($tipo_documento) || empty($numero_documento) || empty($nombres) || empty($apellidos)
+        empty($email) || empty($password) || empty($estado) || empty($id_rol) ||
+        empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
+        empty($apellidos)
     ) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
@@ -83,11 +68,33 @@ function registrarUsuario()
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
         exit();
     }
-    echo ($id_veterinaria);
 
+    // IMAGEN DEL PERFIL
+    if (!empty($_FILES['img_perfil']['name'])) {
 
-    //Instanciamos la clase
+        $file = $_FILES['img_perfil'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitidas = ['png', 'jpg', 'jpeg'];
+
+        if (!in_array($ext, $permitidas)) {
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
+            exit();
+        }
+
+        if ($file['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Error', 'La foto supera las 2MB');
+            exit();
+        }
+
+        $img_perfil = uniqid('user_') . '.' . $ext;
+        $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
+        move_uploaded_file($file['tmp_name'], $destino);
+    } else {
+        $img_perfil = 'foto_default.jpg';
+    }
+
     $objUsuario = new Usuario();
+
     $data = [
         'email' => $email,
         'password' => $password,
@@ -103,49 +110,36 @@ function registrarUsuario()
         'nivel_acceso' => $nivel_acceso,
     ];
 
-    //Enviamos la data al metodo "registrar()" de la clase instanciada anteriormente "Usuario()"
-    // Y esperamos una respuesta booleana del modelo en resultado
     $resultado = $objUsuario->registrar($data);
 
-    //Si la respuesta del modelo es verdadera confirmamos el registro y redireccionamos 
-    //si es falsa notificamos y redireccionamos
-    if ($resultado === true) {
+    if ($resultado) {
         mostrarSweetAlert(
             'success',
-            'Registro de Usuario exitoso',
-            'Se ha creado un nuevo usuario',
+            'Usuario registrado',
+            'El usuario ha sido creado correctamente',
             '/vetwilling/admin/registro-usuario'
         );
     } else {
-        mostrarSweetAlert('error', 'Error al registrar', 'No se pudo registrar el usuario. Intente nuevamente');
+        mostrarSweetAlert('error', 'Error', 'No se pudo registrar el usuario');
     }
 
     exit();
 }
 
-// Funcion para listar los usuarios
 function listarUsuarios()
 {
     $resultado = new Usuario();
-    $usuarios = $resultado->listar();
-
-    return $usuarios;
+    return $resultado->listar();
 }
 
 function consultarUsuarioId($id)
 {
-
     $objUsuario = new Usuario();
-    $usuario = $objUsuario->consultarUsuario($id);
-
-    return $usuario;
+    return $objUsuario->consultarUsuario($id);
 }
 
 function actualizarUsuario()
 {
-    //Capturamosen variables los datos enviados desde el formulario a travez de el metodo
-    //POST y el  nombre de los campos
-    $id_veterinaria = $_POST['veterinaria'] ?? '';
     $id_usuario = $_POST['id_usuario'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
@@ -154,11 +148,15 @@ function actualizarUsuario()
     $telefono = $_POST['telefono'] ?? '';
     $email = $_POST['email'] ?? '';
     $id_rol = $_POST['id_rol'] ?? '';
+    $id_veterinaria = $_POST['veterinaria'] ?? null;
+    $estado = $_POST['estado'] ?? 'activo';
 
-
-    //VALIDAMOS LOS CAMPOS QUE SON OBLIGATORIOS
-    if (empty($id_usuario) || empty($numero_documento) || empty($tipo_documento) || empty($nombres) || empty($apellidos) || empty($telefono) || empty($email) || empty($id_rol)) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
+    if (
+        empty($id_usuario) || empty($tipo_documento) || empty($numero_documento) ||
+        empty($nombres) || empty($apellidos) || empty($telefono) || empty($email) ||
+        empty($id_rol)
+    ) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Complete todos los campos');
         exit();
     }
 
@@ -168,6 +166,7 @@ function actualizarUsuario()
     }
 
     $objUsuario = new Usuario();
+
     $data = [
         'id_usuario' => $id_usuario,
         'tipo_documento' => $tipo_documento,
@@ -176,23 +175,22 @@ function actualizarUsuario()
         'apellidos' => $apellidos,
         'telefono' => $telefono,
         'email' => $email,
+        'estado' => $estado,
         'id_rol' => $id_rol,
         'id_veterinaria' => $id_veterinaria
     ];
 
     $resultado = $objUsuario->actualizarUsuario($data);
 
-    //Si la respuesta del modelo es verdadera confirmamos el registro y redireccionamos 
-    //si es falsa notificamos y redireccionamos
-    if ($resultado === true) {
+    if ($resultado) {
         mostrarSweetAlert(
             'success',
-            'Registro de Usuario exitoso',
-            'Se ha creado un nuevo usuario',
+            'Usuario actualizado',
+            'Los datos han sido actualizados correctamente',
             '/vetwilling/admin/listar-usuarios'
         );
     } else {
-        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el usuario. Intente nuevamente');
+        mostrarSweetAlert('error', 'Error', 'No se pudo actualizar el usuario');
     }
 
     exit();
@@ -201,17 +199,17 @@ function actualizarUsuario()
 function eliminarUsuario($id)
 {
     $objUsuario = new Usuario();
-    $resultado = $objUsuario->elimimarUsuario($id);
+    $resultado = $objUsuario->eliminarUsuario($id);
 
-    if ($resultado === true) {
+    if ($resultado) {
         mostrarSweetAlert(
             'success',
-            'Eliminación del Usuario exitoso',
-            'Se ha eliminado el usuario',
+            'Usuario Inhabilitado',
+            'El usuario ha sido Inhabilitado',
             '/vetwilling/admin/listar-usuarios'
         );
     } else {
-        mostrarSweetAlert('error', 'Error al Eliminar', 'No se pudo Eliminar el usuario. Intente nuevamente');
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el usuario');
     }
 
     exit();

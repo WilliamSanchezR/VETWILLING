@@ -161,7 +161,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
         reportesPdfControllers();
 
-        break;
+    //     break;
 
     default:
         http_response_code(404);

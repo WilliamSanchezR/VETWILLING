@@ -163,6 +163,19 @@ $usuarioData = consultarUsuarioId($id);
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-card-text"></i> Estado *</label>
+                                <select id="estado" name="estado" required>
+                                    <option value="<?= $usuarioData['estado'] ?>"><?= $usuarioData['estado'] ?></option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                    <option value="bloqueado">Bloqueado</option>
+
+                                </select>
+                            </div>
+                        </div>
+
                         <?php if ($usuarioData['id_rol'] !== '1') : ?>
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -175,6 +188,7 @@ $usuarioData = consultarUsuarioId($id);
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
+
                                 </div>
                             </div>
                         <?php endif; ?>
