@@ -157,11 +157,11 @@ switch ($request) {
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
-    case '/reporte':
-        require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
-                reportesPdfControllers();
+    // case '/reporte':
+    //     require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
+    //             reportesPdfControllers();
 
-        break;
+    //     break;
 
     default:
         http_response_code(404);
