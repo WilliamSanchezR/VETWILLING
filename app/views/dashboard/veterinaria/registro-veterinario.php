@@ -117,8 +117,76 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" name="telefono" required placeholder="Ej: 3001234567" maxlength="20">
+                                <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
+                                <input type="email" id="correo" name="email" required placeholder="ejemplo@correo.com">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="bi bi-envelope"></i> Foto </label>
+                                <input type="file" accept=".jpg, .png, .jpeg" id="img_perfil" name="img_perfil">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="bi bi-geo-alt"></i> Dirección completa *</label>
+                        <input type="text" id="direccion" name="direccion" placeholder="Calle 12 # 34-56, Apto 102">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-building"></i> Ciudad *</label>
+                                <input type="text" id="ciudad" required placeholder="Bogotá">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-map"></i> Barrio</label>
+                                <input type="text" id="barrio" placeholder="Chapinero">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="buttons">
+                        <span></span>
+                        <button type="button" class="btn-next" onclick="nextStep()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Paso 2: Datos de la Mascota
+                <div class="step">
+                    <h3><i class="bi bi-heart me-2"></i>Datos de la Mascota</h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-tag"></i> Nombre de la mascota *</label>
+                                <input type="text" id="nombreMascota" required placeholder="Ej: Max">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-palette"></i> Especie *</label>
+                                <select id="especie" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Perro">Perro</option>
+                                    <option value="Gato">Gato</option>
+                                    <option value="Ave">Ave</option>
+                                    <option value="Conejo">Conejo</option>
+                                    <option value="Hamster">Hamster</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-award"></i> Raza</label>
+                                <input type="text" id="raza" placeholder="Ej: Labrador">
                             </div>
                         </div>
                         <div class="col-md-6">
