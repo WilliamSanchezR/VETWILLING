@@ -91,8 +91,10 @@ function registrarVeterinario()
     $img_perfil = $_POST['img_perfil'] ?? '';
 
     // Validamos los campos que son obligatorios
-    if (empty($numero_documento) || empty($nombres) || empty($apellidos) || 
-        empty($tipo_documento) || empty($telefono) || empty($email)) {
+    if (
+        empty($numero_documento) || empty($nombres) || empty($apellidos) ||
+        empty($tipo_documento) || empty($telefono) || empty($email)
+    ) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completar todos los campos');
         exit();
     }
@@ -144,7 +146,7 @@ function registrarVeterinario()
 
     // Instanciamos la clase Veterinario
     $objVeterinario = new Veterinario();
-    
+
     // Preparamos los datos con TODOS los campos necesarios
     $data = [
         'nombres' => $nombres,
