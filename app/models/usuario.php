@@ -244,4 +244,8 @@ class Usuario
         return $resultado->execute();
     }
 
+<<<<<<< HEAD
+}
+=======
     }
+>>>>>>> 09009e01aa936b5ea4010cd68dc72b3335a2ce5d
