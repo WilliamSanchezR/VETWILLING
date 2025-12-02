@@ -1,3 +1,6 @@
+let rutaReporte = document.getElementById("btnRutaReporte").dataset.ruta;
+
+
 new DataTable('#tablaCitas', {
     layout: {
         topStart: {
@@ -21,13 +24,11 @@ new DataTable('#tablaCitas', {
                         columns: ':not(:last-child)' // Excluir columna de acciones
                     }
                 },
+            
                 {
-                    extend: 'pdf',
                     text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
-                    className: 'dt-button-custom',
-                    title: 'Lista de Veterinarios',
-                    exportOptions: {
-                        columns: ':not(:last-child)'
+                    action: function () {
+                        window.open(rutaReporte, "_blank");
                     }
                 },
                 {
