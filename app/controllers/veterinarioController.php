@@ -81,13 +81,12 @@ function registrarVeterinario()
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
-    $direccion = $_POST['direccion'] ?? '';
     $email = $_POST['email'] ?? '';
     $id_rol = '2';
-    $password_hash = '123';
+    $password_hash = '123456';
     $estado = 'activo';
-    $tipo_usuario = 'Veterinario';
-    $id_veterinaria = $id_veterinaria['user']['id_veterinaria'] ?? '';
+    $tipo_usuario = '2';
+    $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? '';
     $ruta_img = $_POST['img_perfil'] ?? '';
 
     // Validamos los caampos que son obligatorios
@@ -155,7 +154,6 @@ function registrarVeterinario()
         'tipo_documento' => $tipo_documento,
         'numero_documento' => $numero_documento,
         'telefono' => $telefono,
-        'direccion' => $direccion,
         'email' => $email,
         'id_rol' => $id_rol,
         'password_hash' => $password_hash,

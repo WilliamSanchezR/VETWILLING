@@ -137,22 +137,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label><i class="bi bi-geo-alt"></i> Dirección completa *</label>
-                        <input type="text" id="direccion" name="direccion" placeholder="Calle 12 # 34-56, Apto 102">
-                    </div>
-
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-building"></i> Ciudad *</label>
                                 <input type="text" id="ciudad" required placeholder="Bogotá">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-map"></i> Barrio</label>
-                                <input type="text" id="barrio" placeholder="Chapinero">
                             </div>
                         </div>
                     </div>
