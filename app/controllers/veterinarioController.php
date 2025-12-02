@@ -177,15 +177,17 @@ function registrarVeterinario()
 function mostrarVeterinarios()
 {
 
-    // session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
     $id_veterinaria = $_SESSION['user'];
 
-    // echo $id_veterinaria;
 
     $resultado = new Veterinario();
-    $veterinario = $resultado->listar($id_veterinaria);
+    $veterinarios = $resultado->listar($id_veterinaria);
 
-    return $veterinario;
+    return $veterinarios;
 }
 
 function listarVeterinario($id)

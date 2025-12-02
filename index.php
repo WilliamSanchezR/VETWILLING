@@ -84,6 +84,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/veterinarioController.php';
         break;
 
+    case '/veterinario/reporte-veterinarios': //esta ruta hace reporte de instructores en pdf
+        require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
+        break;
+
     case '/veterinario/consultar-perfil':
         require BASE_PATH . '/app/views/dashboard/veterinaria/perfil.php';
         break;
