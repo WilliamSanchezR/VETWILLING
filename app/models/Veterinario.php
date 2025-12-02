@@ -19,11 +19,9 @@ class Veterinario
     public function registrar($data)
     {
         try {
-            // Iniciamos una transacción para mantener la integridad de datos
-            $this->conexion->beginTransaction();
 
             // 1. Primero insertamos en la tabla usuario
-            $registrar = "INSERT INTO usuario (email, password_hash, estado, id_rol, img_perfil) VALUES (:email, :password_hash, :estado, :id_rol, :img_perfil)";
+            $registrar = "INSERT INTO usuario (email, password_hash, estado, id_rol) VALUES (:email, :password_hash, :estado, :id_rol)";
 
             $resultado = $this->conexion->prepare($registrar);
             $resultado->bindParam(':email', $data['email']);
@@ -56,12 +54,8 @@ class Veterinario
             $resultadoVeterinario->bindParam(':fecha_contratacion', $fecha_contratacion);
             $resultadoVeterinario->execute();
 
-            // Confirmamos la transacción
-            $this->conexion->commit();
             return true;
         } catch (PDOException $e) {
-            // Si hay error, revertimos todos los cambios
-            $this->conexion->rollBack();
             error_log("Error en veterinario::registrar - " . $e->getMessage());
             return false;
         }

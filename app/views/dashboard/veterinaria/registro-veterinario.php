@@ -125,11 +125,16 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 <input type="file" accept=".jpg, .png, .jpeg" id="img_perfil" name="img_perfil">
                             </div>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="bi bi-geo-alt"></i> Dirección completa *</label>
-                        <input type="text" id="direccion" name="direccion" placeholder="Calle 12 # 34-56, Apto 102">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-envelope"></i> Telefono *</label>
+                                <input type="number" id="telefono" name="telefono" required placeholder="313 407 2068">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="bi bi-card-checklist"></i> Número de licencia profesional</label>
+                                <input type="text" name="numero_licencia_profesional" placeholder="Ej: 12345">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -137,12 +142,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <div class="form-group">
                                 <label><i class="bi bi-building"></i> Ciudad *</label>
                                 <input type="text" id="ciudad" required placeholder="Bogotá">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-map"></i> Barrio</label>
-                                <input type="text" id="barrio" placeholder="Chapinero">
                             </div>
                         </div>
                     </div>
@@ -197,11 +196,12 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         </div>
                     </div>
 
-                <div class="buttons">
-                    <span></span>
-                    <button type="button" class="btn-next" onclick="nextStep()">
-                        Siguiente <i class="bi bi-arrow-right"></i>
-                    </button>
+                    <div class="buttons">
+                        <span></span>
+                        <button type="button" class="btn-next" onclick="nextStep()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
         </div>
 

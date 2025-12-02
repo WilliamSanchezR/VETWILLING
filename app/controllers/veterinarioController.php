@@ -82,19 +82,17 @@ function registrarVeterinario()
     $numero_documento = $_POST['numero_documento'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $email = $_POST['email'] ?? '';
-    $numero_licencia_profesional = $_POST['numero_licencia_profesional'] ?? ''; // AGREGADO
-    $id_rol = '2'; // Rol de veterinario
-    $password = '123'; // Considera usar un password temporal o generado
+    $id_rol = '2';
+    $password_hash = '123456';
     $estado = 'activo';
-    $id_veterinaria = $id_veterinaria['user']['id_veterinaria'] ?? '';
+    $tipo_usuario = '2';
+    $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? '';
     $ruta_img = $_POST['img_perfil'] ?? '';
 
-    // Validamos los campos que son obligatorios
-    if (
-        empty($numero_documento) || empty($nombres) || empty($apellidos) ||
-        empty($tipo_documento) || empty($telefono) || empty($email)
-    ) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completar todos los campos');
+    // Validamos los caampos que son obligatorios
+
+    if (empty($numero_documento) || empty($nombres) || empty($apellidos) || empty($tipo_documento) || empty($telefono) || empty($email)) {
+        mostrarSweetAlert('error', 'Campos vacios', 'Por favor completar todos los campos');
         exit();
     }
 
@@ -102,51 +100,54 @@ function registrarVeterinario()
 
     // Logica para cargar imagenes
 
-    // Lógica para cargar imágenes
     $ruta_img = null;
 
-    // Validamos si se envió o no la foto desde el formulario
-    if (!empty($_FILES['img_perfil']['name'])) {
+    // validamos si se envio o no la foto desde el formulario
+    // * si el usuario no registro una foto, dejar una foto definida *
+
+    if (!empty($_FILES['img_perfil'])) {
+
         $file = $_FILES['img_perfil'];
 
-        // Obtenemos la extensión del archivo
+        // *Obtenemos el la extencion del archivo
+
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-        // Definimos las extensiones permitidas
+        // *Definimos las extenciones permitidas 
+
         $permitidas = ['png', 'jpg', 'jpeg'];
 
-        // Validamos que la extensión esté dentro de las permitidas
+        // *validamos que la extencion de las imagenes esta dentro de las permitidas
+
         if (!in_array($ext, $permitidas)) {
-            mostrarSweetAlert('error', 'Extensión no permitida', 'Recuerda que solo soporta archivos png, jpeg y jpg');
+
+            mostrarSweetAlert('error', 'Extencion no permitida', 'Recuerda que solo soporta archivos png, jpeg y jpg');
             exit();
         }
 
-        // Validamos el tamaño o el peso MAX 2 MB
+        // * Validamos el tamaño o el peso MAX 2 mb
+
         if ($file['size'] > 2 * 1024 * 1024) {
-            mostrarSweetAlert('error', 'Error al cargar la foto', 'El tamaño de la foto supera los 2 MB');
+
+            mostrarSweetAlert('erro', 'Error al cargar la foto', 'El tamaño de la foto supera las 2 MB');
             exit();
         }
 
-        // Definimos el nombre del archivo y le concatenamos la extensión
+        // *Definimos el nombre del archivo y le concatenamos la extencion
         $ruta_img = uniqid('user_') . '.' . $ext;
 
-        // Definimos el destino donde moveremos el archivo
+        // *Definimos el destino donde moveremos el archivo
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $ruta_img;
 
-        // Movemos el archivo al destino
-        if (!move_uploaded_file($file['tmp_name'], $destino)) {
-            mostrarSweetAlert('error', 'Error', 'No se pudo guardar la imagen');
-            exit();
-        }
+        // *Movemos el archivo al destino
+        move_uploaded_file($file['tmp_name'], $destino);
     } else {
-        // Imagen por default
+        // *agregar la logica de la imagen por default
+
         $ruta_img = 'foto_default.jpg';
     }
 
-    // Instanciamos la clase Veterinario
     $objVeterinario = new Veterinario();
-
-    // Preparamos los datos con TODOS los campos necesarios
     $data = [
         'nombres' => $nombres,
         'apellidos' => $apellidos,
@@ -155,17 +156,19 @@ function registrarVeterinario()
         'telefono' => $telefono,
         'email' => $email,
         'id_rol' => $id_rol,
-        'password' => $password, // Cambiado de password_hash a password
+        'password_hash' => $password_hash,
         'estado' => $estado,
+        'tipo_usuario' => $tipo_usuario,
         'id_veterinaria' => $id_veterinaria,
-        'img_perfil' => $ruta_img,
-        'numero_licencia_profesional' => $numero_licencia_profesional // AGREGADO
+        'img_perfil' => $ruta_img
     ];
 
-    // Enviamos la data al método registrar
+    // Enviamos la data al metodo (registrar) de la clase instanciada anteriormente (Veterinario) y esperamos una respuesta booleana del modelo en resultados
+
     $resultado = $objVeterinario->registrar($data);
 
-    // Validamos el resultado
+    // Si la respuesta del modelo es verdadera confirmamos el registro y redireccionameos, si es falsa notificamos y redireccionamos
+
     if ($resultado === true) {
         mostrarSweetAlert('success', 'Registro del veterinario exitoso', 'Se ha creado un nuevo veterinario en la veterinaria', '/vetwilling/veterinario/registrar-veterinario');
     } else {
@@ -201,6 +204,10 @@ function listarVeterinario($id)
 
 function actualizarVeterinario()
 {
+
+
+    // capturamos en variables los datos desde el formulario a travez del metodo POST y los name de los campos
+
     $id_usuario = $_POST['id_usuario'] ?? '';
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
@@ -208,23 +215,21 @@ function actualizarVeterinario()
     $numero_documento = $_POST['numero_documento'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $email = $_POST['email'] ?? '';
-    $estado = $_POST['estado'] ?? 'activo';
-    $id_rol = $_POST['id_rol'] ?? '2';
+    $id_rol = '2';
+    $password_hash = '123';
+    $estado = 'activo';
+    $tipo_usuario = 'Veterinario';
+    $id_veterinaria = '1';
 
-    // Validación
-    if (
-        empty($numero_documento) ||
-        empty($nombres) ||
-        empty($apellidos) ||
-        empty($tipo_documento) ||
-        empty($telefono) ||
-        empty($email)
-    ) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completar todos los campos');
+    // Validamos los caampos que son obligatorios
+
+    if (empty($numero_documento) || empty($nombres) || empty($apellidos) || empty($tipo_documento) || empty($telefono) || empty($email)) {
+        mostrarSweetAlert('error', 'Campos vacios', 'Por favor completar todos los campos');
         exit();
     }
 
-    // Enviar solo los campos que el modelo utiliza realmente
+    // POO - instanciamos la clase
+
     $objVeterinario = new Veterinario();
     $data = [
         'id_usuario' => $id_usuario,
@@ -235,15 +240,22 @@ function actualizarVeterinario()
         'telefono' => $telefono,
         'email' => $email,
         'id_rol' => $id_rol,
-        'estado' => $estado
+        'password_hash' => $password_hash,
+        'estado' => $estado,
+        'tipo_usuario' => $tipo_usuario,
+        'id_veterinaria' => $id_veterinaria
     ];
+
+    // Enviamos la data al metodo (registrar) de la clase instanciada anteriormente (Veterinario) y esperamos una respuesta booleana del modelo en resultados
 
     $resultado = $objVeterinario->actualizar($data);
 
+    // Si la respuesta del modelo es verdadera confirmamos el registro y redireccionameos, si es falsa notificamos y redireccionamos
+
     if ($resultado === true) {
-        mostrarSweetAlert('success', 'Actualización exitosa', 'El veterinario ha sido actualizado', '/vetwilling/veterinario/consultar-veterinario');
+        mostrarSweetAlert('success', 'Actualizacion del veterinario exitoso', 'Se ha actualizado el veterinario', '/vetwilling/veterinario/registrar-veterinario');
     } else {
-        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el veterinario');
+        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el veterinario. Intenta nuevamente');
     }
     exit();
 }
