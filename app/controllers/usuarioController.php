@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/usuario.php';
@@ -89,7 +89,6 @@ function registrarUsuario()
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
         move_uploaded_file($file['tmp_name'], $destino);
-
     } else {
         $img_perfil = 'foto_default.jpg';
     }

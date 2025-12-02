@@ -38,7 +38,7 @@
     .sidebar.collapsed {
         width: var(--sidebar-collapsed-width);
     }
-    
+
     /* ================================
    HEADER / LOGO
     ================================ */
@@ -325,3 +325,7 @@
         animation-delay: 0.25s;
     }
 
+    .no-transition * {
+        transition: none !important;
+        animation: none !important;
+    }
