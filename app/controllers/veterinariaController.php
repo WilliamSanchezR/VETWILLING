@@ -11,7 +11,7 @@ switch ($method) {
 
     case 'POST':
 
-        $accion = $_POST['accion']?? '';
+        $accion = $_POST['accion'] ?? '';
         if ($accion === 'actualizar') {
             // actualizarUsuario();
         } else {
@@ -46,15 +46,4 @@ function listarVeterinariasRegistradas()
     $veterinarias = $veterinariaModel->listarVeterinariasRegistradas();
 
     return $veterinarias;
-
-  
 }
-
-
-   
-
-
-
-
-
-

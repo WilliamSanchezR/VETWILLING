@@ -46,7 +46,7 @@
             <i class="bi bi-receipt"></i>
             <span class="texto-item-sidebar">Recetas</span>
         </a>
-        <a href="<?= BASE_URL ?>/login" class="item-sidebar">
+        <a href="<?= BASE_URL ?>/logout" class="item-sidebar">
             <i class="bi bi-box-arrow-in-left"></i>
             <span class="texto-item-sidebar">Cerrar Sesión</span>
         </a>
