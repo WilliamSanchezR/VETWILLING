@@ -23,7 +23,7 @@ class Veterinario
             $this->conexion->beginTransaction();
 
             // 1. Primero insertamos en la tabla usuario
-            $registrar = "INSERT INTO usuario (email, password_hash, estado, id_rol, img_perfil) VALUES (:email, :password_hash, :estado, :id_rol, :img_perfil)";
+            $registrar = "INSERT INTO usuario (email, password_hash, estado, id_rol) VALUES (:email, :password_hash, :estado, :id_rol)";
 
             $resultado = $this->conexion->prepare($registrar);
             $resultado->bindParam(':email', $data['email']);
