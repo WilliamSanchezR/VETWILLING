@@ -34,32 +34,32 @@ $usuario = mostrarPerfil($id);
         </button>
 
         <button class="btn-perfil" onclick="togglePerfilMenu()" aria-label="Perfil">
-
             <a href="<?= BASE_URL ?>/veterinario/consultar-perfil">
+
 
                 <div class="avatar-usuario">
                     <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
                 </div>
-            </a>
 
 
-            <div class="info-usuario">
-                <h4 class="nombre-usuario"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h4>
-                <p class="rol-usuario"><?= $usuario['rol'] ?></p>
-            </div>
 
-
-            <!-- La ventana flotante (modal) -->
-            <div id="myModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <p>Contenido de la ventana flotante.</p>
+                <div class="info-usuario">
+                    <h4 class="nombre-usuario"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h4>
+                    <p class="rol-usuario"><?= $usuario['rol'] ?></p>
                 </div>
-            </div>
 
 
+                <!-- La ventana flotante (modal) -->
+                <div id="myModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p>Contenido de la ventana flotante.</p>
+                    </div>
+                </div>
+
+
+            </a>
         </button>
-
 
         <button class="boton-icono-navegacion" onclick="alternarBarraDerecha()">
             <i class="bi bi-chevron-left"></i>
