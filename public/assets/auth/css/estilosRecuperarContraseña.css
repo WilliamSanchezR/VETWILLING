@@ -72,6 +72,7 @@ main {
 .cont-left {
     gap: 36px;
     padding-bottom: 20px;
+    margin-top: 38px;
 }
 
 .logo {
@@ -81,7 +82,7 @@ main {
 }
 
 .logo img {
-    width: 85%;
+    width: 45%;
 }
 
 .form {

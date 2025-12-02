@@ -203,8 +203,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         </button>
                     </div>
                 </div>
+        </div>
 
-                <!-- Paso de confirmación -->
+        <!-- Paso de confirmación -->
                 <div class="step">
                     <h1>¿Deseas confirmar el envío del formulario?</h1>
                     <p>Por favor, revisa que toda la información sea correcta antes de continuar.</p>
