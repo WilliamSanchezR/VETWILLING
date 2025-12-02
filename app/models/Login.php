@@ -39,11 +39,11 @@ class Login
 
             switch ($user['id_rol']) {
                 case 1: // Representante
-                    $consultar = "SELECT id_veterinaria, nombres, apellidos, telefono, numero_documento, nivel_acceso, img_perfil FROM representante_legal WHERE id_usuario = :id";
+                    $consultar = "SELECT  id_veterinaria, nombres, apellidos, telefono, img_perfil, nivel_acceso FROM representante_legal WHERE id_usuario = :id";
                     break;
 
                 case 2: // Veterinario
-                    $consultar = "SELECT id_veterinaria, nombres, apellidos, telefono, numero_licencia_profesional FROM veterinario WHERE id_usuario = :id";
+                    $consultar = "SELECT id_veterinaria, nombres, apellidos, telefono, numero_licencia_profesional, img_perfil FROM veterinario WHERE id_usuario = :id";
                     break;
 
                 case 3: // Propietario
@@ -65,7 +65,9 @@ class Login
                 'email' => $user['email'],
                 'password_hash' => $user['password_hash'],
                 'estado' => $user['estado'],
-                'perfil' => $perfil
+                'id_veterinaria' => $perfil['id_veterinaria'],
+                'nombres' => $perfil['nombres'],
+                'apellidos' => $perfil['apellidos']
             ];
         } catch (PDOException $e) {
             error_log("Error en el modelo login: " . $e->getMessage());
