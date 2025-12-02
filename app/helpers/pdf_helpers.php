@@ -11,6 +11,12 @@ function generarPDF($html, $filename = "documento.pdf", $download = false)
     $options->set('isHtml5ParserEnabled', true);
     $options->set('isRemoteEnabled', true); // permite imágenes externas
 
+
+
+    if(ob_get_length()){
+        ob_clean();
+    }
+
     $dompdf = new Dompdf($options);
 
     // Cargar el HTML recibido
@@ -23,7 +29,7 @@ function generarPDF($html, $filename = "documento.pdf", $download = false)
     $dompdf->render();
 
     // Descargar o mostrar
-    $dompdf->stream($filename, [    
+    $dompdf->stream($filename, [
         "Attachment" => $download ? 1 : 0
     ]);
 }
