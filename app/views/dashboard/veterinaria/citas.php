@@ -5,6 +5,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
 require_once BASE_PATH . '/app/controllers/veterinarioController.php';
 
+
+
+
 // Llamamos la funcion especifica que existe en dicho controlador
 
 $datos = mostrarVeterinarios();
@@ -76,11 +79,14 @@ $datos = mostrarVeterinarios();
                 <h3>MÓDULO GESTIÓN DE VETERINARIOS</h3>
             </div>
 
-            <a href="<?= BASE_URL ?>/veterinario/reporte-veterinarios"
+            <!-- <a href="<?= BASE_URL ?>/veterinario/reporte-veterinarios"
                 class="btn btn-primary"
                 target="_blank">
                 Generar Reporte PDF
-            </a>
+            </a> -->
+
+            <button id="btnRutaReporte" data-ruta="<?= BASE_URL ?>/veterinario/reporte-veterinarios" hidden></button>
+
 
 
             <!-- Controles de la Tabla -->
@@ -92,14 +98,15 @@ $datos = mostrarVeterinarios();
                     </div>
                 </div>
                 <div class="controles-derecha">
-        
-                    <button class="btn-control" id="btnExport" href="/">
-                        <a href="<?php BASE_URL ?>/generarPDF" target="_blank"></a>
-                        <i class="bi bi-download"></i> Export
-                    </button>
-                    <button class="btn-agregar" id="btnAgregarNuevo">
-                        <i class="bi bi-plus-lg"></i> Agregar Nuevo
-                    </button>
+
+
+
+                    <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario">
+                        <button class="btn-agregar" id="btnAgregarNuevo">
+                            <i class="bi bi-plus-lg"></i> Agregar Nuevo
+                        </button>
+                    </a>
+
                 </div>
             </div>
 

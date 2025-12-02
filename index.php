@@ -54,6 +54,14 @@ switch ($request) {
 
     // Fin rutas necesarias para el login
 
+    // RUTA PARA CERRA SESION
+
+    case '/logout':
+    require BASE_PATH . '/app/controllers/logoutControllers.php';
+    $controller = new LoginController();
+    $controller->logout();
+    break;
+
     // ---------------------------------------VETERINARIO-------------------------------------//
 
     case '/veterinaria/dashboard':
@@ -163,7 +171,7 @@ switch ($request) {
 
     case '/reporte':
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
-        reportesPdfControllers();
+        reporteVeterinario();
 
     //     break;
 
