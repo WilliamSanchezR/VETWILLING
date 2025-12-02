@@ -67,7 +67,15 @@ switch ($method) {
 
 function registrarVeterinario()
 {
-    // Capturamos en variables los datos desde el formulario a través del método POST
+
+    // capturamos el id del usuario que inicia secion para guardarlo solo si es necesario
+
+    session_start();
+    $id_veterinaria = $_SESSION['user']['id_usuario'];
+
+
+    // capturamos en variables los datos desde el formulario a travez del metodo POST y los name de los campos
+
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
@@ -78,6 +86,8 @@ function registrarVeterinario()
     $id_rol = '2'; // Rol de veterinario
     $password = '123'; // Considera usar un password temporal o generado
     $estado = 'activo';
+    $id_veterinaria = $id_veterinaria['user']['id_veterinaria'] ?? '';
+    $ruta_img = $_POST['img_perfil'] ?? '';
 
     // Validamos los campos que son obligatorios
     if (
@@ -88,9 +98,9 @@ function registrarVeterinario()
         exit();
     }
 
-    // Capturamos el id de la veterinaria del usuario que inicia sesión
-    session_start();
-    $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? '1';
+    // POO - instanciamos la clase
+
+    // Logica para cargar imagenes
 
     // Lógica para cargar imágenes
     $ruta_img = null;

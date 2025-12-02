@@ -117,36 +117,32 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" name="telefono" required placeholder="Ej: 3001234567" maxlength="20">
+                                <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
+                                <input type="email" id="correo" name="email" required placeholder="ejemplo@correo.com">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="bi bi-envelope"></i> Foto </label>
+                                <input type="file" accept=".jpg, .png, .jpeg" id="img_perfil" name="img_perfil">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="bi bi-geo-alt"></i> Dirección completa *</label>
+                        <input type="text" id="direccion" name="direccion" placeholder="Calle 12 # 34-56, Apto 102">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-building"></i> Ciudad *</label>
+                                <input type="text" id="ciudad" required placeholder="Bogotá">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                <input type="email" name="email" required placeholder="ejemplo@correo.com">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- INFORMACIÓN PROFESIONAL -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><i class="bi bi-card-checklist"></i> Número de Licencia Profesional / Tarjeta Profesional *</label>
-                                <input type="text" name="numero_licencia_profesional" required placeholder="Ej: TP-12345" maxlength="50">
-                                <small class="form-text text-muted">Ingrese el número de tarjeta profesional del veterinario</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- FOTO DE PERFIL -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><i class="bi bi-camera"></i> Foto de Perfil</label>
-                                <input type="file" accept=".jpg, .png, .jpeg" name="img_perfil">
-                                <small class="form-text text-muted">Formatos permitidos: JPG, JPEG, PNG (Máximo 2MB)</small>
+                                <label><i class="bi bi-map"></i> Barrio</label>
+                                <input type="text" id="barrio" placeholder="Chapinero">
                             </div>
                         </div>
                     </div>
@@ -159,7 +155,57 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                 </div>
 
-                <!-- Paso de confirmación -->
+                <!-- Paso 2: Datos de la Mascota
+                <div class="step">
+                    <h3><i class="bi bi-heart me-2"></i>Datos de la Mascota</h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-tag"></i> Nombre de la mascota *</label>
+                                <input type="text" id="nombreMascota" required placeholder="Ej: Max">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-palette"></i> Especie *</label>
+                                <select id="especie" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="Perro">Perro</option>
+                                    <option value="Gato">Gato</option>
+                                    <option value="Ave">Ave</option>
+                                    <option value="Conejo">Conejo</option>
+                                    <option value="Hamster">Hamster</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-award"></i> Raza</label>
+                                <input type="text" id="raza" placeholder="Ej: Labrador">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
+                                <input type="email" name="email" required placeholder="ejemplo@correo.com">
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="buttons">
+                    <span></span>
+                    <button type="button" class="btn-next" onclick="nextStep()">
+                        Siguiente <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+        </div>
+
+        <!-- Paso de confirmación -->
                 <div class="step">
                     <h1>¿Deseas confirmar el envío del formulario?</h1>
                     <p>Por favor, revisa que toda la información sea correcta antes de continuar.</p>
