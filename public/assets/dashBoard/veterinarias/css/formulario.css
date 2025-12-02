@@ -443,6 +443,40 @@ h6 {
     color: var(--color-primario);
 }
 
+.password input{
+    position: absolute;
+    width: 90%;
+}
+
+.password .icon-view {
+    position: relative;
+    left: 98%;
+    top: 10px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+}
+
+.btn_change_password {
+    font-size: var(--fs-titulo3);
+    transition: all 0.3s ease;
+    font-family: 'Open Sans', sans-serif;
+    border-radius: 30px;
+    /* height: 30px; */
+    border: 1px solid var(--color-primario);
+    padding: 5px 15px;
+    background-color: transparent;
+}
+
+.btn_change_password:hover {
+    background-color: var(--color-primario);
+    color: var(--white-color);
+}
+
+.ver {
+    display: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .wizard-container {

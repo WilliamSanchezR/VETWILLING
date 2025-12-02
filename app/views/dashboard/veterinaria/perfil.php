@@ -30,6 +30,8 @@ $usuario = mostrarPerfil($id);
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
 
 </head>
@@ -87,6 +89,86 @@ $usuario = mostrarPerfil($id);
                             <p><span>Fecha de Registro: </span>20 - Ago - 2025</p>
                             <p><span>Correo: </span>pepitoperaz@gmail.com</p>
                             <p><span>Teléfono: </span>+57 312 405 5678</p>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta para contraseña -->
+                    <div class="col-md-4">
+                        <div class="info">
+                            <h2>
+                                Seguaridad
+                               
+                            </h2>
+                            <div class="actions">
+                                <button class="btn_change_password" data-bs-toggle="modal" data-bs-target="#exampleModal">Cambiar contraseña</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal para cambiar contraseña -->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Cambiar contraseña</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <form action="" method="post">
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group password contrasena-actual">
+                                                        <label for="contrasena-actual">Contraseña actual:</label>
+                                                        <input type="password" id="contrasena-actual" name="contrasena-actual" />
+                                                        <input type="checkbox" id="ver_contrasena-actual" class="ver" onChange="hideOrShowPassword(this)" />
+                                                        <button type="button" class="icon-view">
+                                                            <i class="bi bi-eye" id="contrasena-actual-visible"></i>
+                                                            <i class="bi bi-eye-slash" style="display: none;" id="contrasena-actual-hidden"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <div class="form-group password nueva-contrasena">
+                                                        <label for="nueva-contrasena">Nueva contraseña:</label>
+                                                        <input type="password" id="nueva-contrasena" name="nueva-contrasena" />
+
+                                                        <input type="checkbox" id="ver_nueva-contrasena" class="ver" onChange="hideOrShowPassword(this)" />
+                                                        <button type="button" class="icon-view">
+                                                            <i class="bi bi-eye" id="nueva-contrasena-visible"></i>
+                                                            <i class="bi bi-eye-slash" style="display: none;" id="nueva-contrasena-hidden"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <div class="form-group form-group password confi-contrasena">
+                                                        <label for="confi-contrasena">Confirmar contraseña:</label>
+                                                        <input type="password" id="confi-contrasena"
+                                                            name="confi-contrasena" />
+
+                                                        <input type="checkbox" id="ver_confi-contrasena" class="ver" onChange="hideOrShowPassword(this)" />
+                                                        <button type="button" class="icon-view">
+                                                            <i class="bi bi-eye" id="confi-contrasena-visible"></i>
+                                                            <i class="bi bi-eye-slash" style="display: none;" id="confi-contrasena-hidden"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary">Guardar</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -378,6 +460,7 @@ $usuario = mostrarPerfil($id);
         <!-- Propio -->
 
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/perfil.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
