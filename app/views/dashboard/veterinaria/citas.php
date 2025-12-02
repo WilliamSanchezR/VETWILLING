@@ -5,6 +5,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
 require_once BASE_PATH . '/app/controllers/veterinarioController.php';
 
+
+
+
 // Llamamos la funcion especifica que existe en dicho controlador
 
 $datos = mostrarVeterinarios();
@@ -25,7 +28,8 @@ $datos = mostrarVeterinarios();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.5/css/dataTables.dataTables.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.5/css/buttons.dataTables.css">
 
     <!-- Google Fonts -->
     <link
@@ -75,6 +79,16 @@ $datos = mostrarVeterinarios();
                 <h3>MÓDULO GESTIÓN DE VETERINARIOS</h3>
             </div>
 
+            <!-- <a href="<?= BASE_URL ?>/veterinario/reporte-veterinarios"
+                class="btn btn-primary"
+                target="_blank">
+                Generar Reporte PDF
+            </a> -->
+
+            <button id="btnRutaReporte" data-ruta="<?= BASE_URL ?>/veterinario/reporte-veterinarios" hidden></button>
+
+
+
             <!-- Controles de la Tabla -->
             <div class="controles-tabla">
                 <div class="controles-izquierda">
@@ -84,22 +98,15 @@ $datos = mostrarVeterinarios();
                     </div>
                 </div>
                 <div class="controles-derecha">
-                    <button class="btn-control" id="btnVer">
-                        <i class="bi bi-eye"></i> Ver 0/0
-                    </button>
-                    <button class="btn-control" id="btnFiltrar">
-                        <i class="bi bi-funnel"></i> Filtrar
-                    </button>
-                    <button class="btn-control" id="btnOrdenar">
-                        <i class="bi bi-sort-down"></i> Ordenar
-                    </button>
-                    <button class="btn-control" id="btnExport" href="/">
-                        <a href="<?php BASE_URL ?>/generarPDF" target="_blank"></a>
-                        <i class="bi bi-download"></i> Export
-                    </button>
-                    <button class="btn-agregar" id="btnAgregarNuevo">
-                        <i class="bi bi-plus-lg"></i> Agregar Nuevo
-                    </button>
+
+
+
+                    <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario">
+                        <button class="btn-agregar" id="btnAgregarNuevo">
+                            <i class="bi bi-plus-lg"></i> Agregar Nuevo
+                        </button>
+                    </a>
+
                 </div>
             </div>
 
@@ -110,8 +117,7 @@ $datos = mostrarVeterinarios();
                         <tr>
                             <th>Foto de perfi</th>
                             <th>Numero de documeto</th>
-                            <th>Nombres</th>
-                            <th>Apellidos</th>
+                            <th>Nombres & Apellidos</th>
                             <th>Telefono</th>
                             <th>Email</th>
                             <th>Estado</th>
@@ -124,11 +130,10 @@ $datos = mostrarVeterinarios();
 
                         <?php if (!empty($datos)): ?>
                             <?php foreach ($datos as $veterinario): ?>
-                                <tr class="fila-gris">  
+                                <tr class="fila-gris">
                                     <td><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $veterinario['img_perfil'] ?>" alt=""></td>
                                     <td><?= $veterinario['tipo_documento'] ?> - <?= $veterinario['numero_documento'] ?></td>
-                                    <td><?= $veterinario['nombres'] ?></td>
-                                    <td><?= $veterinario['apellidos'] ?></td>
+                                    <td><?= $veterinario['nombres'] ?> <br> <?= $veterinario['apellidos'] ?></td>
                                     <td><?= $veterinario['telefono'] ?></td>
                                     <td><?= $veterinario['email'] ?></td>
                                     <td><?= $veterinario['estado'] ?></td>
@@ -163,8 +168,15 @@ $datos = mostrarVeterinarios();
     <!-- 2. Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- 3. DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- DataTables y extensiones -->
+    <script src="https://cdn.datatables.net/2.3.5/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.5/js/dataTables.buttons.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.dataTables.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.print.min.js"></script>
 
     <!-- 4. Script de dashboard -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>

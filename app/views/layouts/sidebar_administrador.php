@@ -1,3 +1,13 @@
+<?php
+
+$path = $_SERVER['REQUEST_URI'];
+// Si quieres la parte del directorio
+$path_parts = explode('/', $path);
+$path_parts = array_filter($path_parts); // Elimina elementos vacíos
+$final_path = end($path_parts); // Obtiene el último elemento
+
+?>
+
 <div class="barra-lateral-izquierda" id="barraLateralIzquierda">
     <div class="marca-sidebar">
         <span class=""><img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-POSITIVO.png" alt="logo" class="logoDas" width="200">
@@ -8,7 +18,12 @@
     <div class="menu-sidebar">
         <div class="seccion-sidebar">Menu Administrador</div>
 
-        <div class="item-sidebar submenu">
+        <a href="<?= BASE_URL ?>/admin/dashBoard" class="item-sidebar <?= $final_path == 'dashBoard' ? 'active': '' ?>">
+            <i class="bi bi-speedometer2"></i>
+            <span class="texto-item-sidebar">Dashboard</span>
+        </a>
+
+        <div class="item-sidebar submenu <?= $final_path == 'registro-usuario' || $final_path == 'listar-usuarios' ? 'active': '' ?>">
 
             <a href="#" class="submenu-toggle">
                 <i class="bi bi-person-plus"></i>
@@ -17,8 +32,8 @@
             </a>
 
             <ul class="submenu-items">
-                <li><a href="<?= BASE_URL ?>/admin/registro-usuario">Registrar </a></li>
-                <li><a href="<?= BASE_URL ?>/admin/listar-usuarios">Listar</a></li>
+                <li><a class="<?= $final_path == 'registro-usuario' ? 'active': '' ?>" href="<?= BASE_URL ?>/admin/registro-usuario">Registrar </a></li>
+                <li><a class="<?= $final_path == 'listar-usuarios' ? 'active': '' ?>" href="<?= BASE_URL ?>/admin/listar-usuarios">Listar</a></li>
             </ul>
         </div>
 

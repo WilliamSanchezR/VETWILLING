@@ -17,23 +17,23 @@ $('#btnOrdenar').on('click', function () {
 
     switch (opcion) {
         case '1':
-            tabla.order([2, 'asc']).draw();
+            tablaUsuarios.order([2, 'asc']).draw();
             console.log('📅 Ordenado por fecha ascendente');
             break;
         case '2':
-            tabla.order([2, 'desc']).draw();
+            tablaUsuarios.order([2, 'desc']).draw();
             console.log('📅 Ordenado por fecha descendente');
             break;
         case '3':
-            tabla.order([3, 'asc']).draw();
+            tablaUsuarios.order([3, 'asc']).draw();
             console.log('👤 Ordenado por propietario A-Z');
             break;
         case '4':
-            tabla.order([3, 'desc']).draw();
+            tablaUsuarios.order([3, 'desc']).draw();
             console.log('👤 Ordenado por propietario Z-A');
             break;
         case '5':
-            tabla.order([4, 'asc']).draw();
+            tablaUsuarios.order([4, 'asc']).draw();
             console.log('🐾 Ordenado por mascota A-Z');
             break;
         default:
@@ -54,7 +54,7 @@ $('#btnExport').on('click', function () {
 // Función para exportar la tabla a CSV
 function exportarACSV() {
     try {
-        const data = tabla.rows({ search: 'applied' }).data();
+        const data = tablaUsuarios.rows({ search: 'applied' }).data();
         let csv = 'No.,Fecha,Propietario,Nombre Mascota,Animal,Raza,Laboratorios,Estado\n';
 
         data.each(function (fila) {
@@ -93,7 +93,7 @@ function exportarACSV() {
 $('#buscarPaciente').on('keyup change', function () {
     const valorBusqueda = this.value;
     console.log('🔍 Buscando:', valorBusqueda);
-    tabla.search(valorBusqueda).draw();
+    tablaUsuarios.search(valorBusqueda).draw();
 });
 
 // Limpiar búsqueda al hacer clic en el icono de búsqueda

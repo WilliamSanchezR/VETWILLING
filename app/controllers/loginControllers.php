@@ -39,18 +39,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'id_rol' => $resultado['id_rol'],
         'email' => $resultado['email'],
         'password_hash' => $resultado['password_hash'],
+        'id_veterinaria' => $resultado['id_veterinaria'],
+        'nombres' => $resultado['nombres'],
+        'apellidos' => $resultado['apellidos'],
         'estado' => $resultado['estado'],
-        'perfil' => $resultado['perfil']
     ];
 
     $rol = $resultado['id_rol'];
 
     switch ($rol) {
-        case 1: // Administrador
+        case 1: // Representante
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
-                "Bienvenido administrador " . $resultado['perfil']['nombres'],
+                "Bienvenido representante " . $resultado['nombres'],
                 "/vetwilling/admin/dashBoard"
             );
             break;
@@ -59,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
-                "Bienvenido veterinario " . $resultado['perfil']['nombres'],
+                "Bienvenido veterinario " . $resultado['nombres'],
                 "/vetwilling/veterinaria/dashboard"
             );
             break;
@@ -68,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
-                "Bienvenido " . $resultado['perfil']['nombres'],
+                "Bienvenido " . $resultado['nombres'],
                 "/vetwilling/Cliente/dashboard"
             );
             break;
