@@ -48,11 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $rol = $resultado['id_rol'];
 
     switch ($rol) {
-        case 1: // Representante
+        case 1: // Administrador
             mostrarSweetAlert(
                 "success",
                 "Inicio de Sesión Exitoso",
-                "Bienvenido representante " . $resultado['nombres'],
+                "Bienvenido administrador " . $resultado['nombres'],
                 "/vetwilling/admin/dashBoard"
             );
             break;
