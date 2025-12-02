@@ -248,4 +248,5 @@ class Usuario
 
         return $resultado->execute();
     }
-}
+
+    }
