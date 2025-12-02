@@ -14,9 +14,9 @@ class mascota
     }
 
 
-    /* ======================================================
+    /*
        REGISTRAR MASCOTA
-    ====================================================== */
+ */
     public function registrar($data)
     {
         try {
@@ -42,9 +42,9 @@ class mascota
         }
     }
 
-    /* ======================================================
+    /*
        LISTAR MASCOTAS POR PROPIETARIO
-    ====================================================== */
+ */
     public function listarPorPropietario($id_propietario)
     {
         try {
@@ -74,9 +74,9 @@ class mascota
         }
     }
 
-    /* ======================================================
+    /*
        CONSULTAR UNA MASCOTA POR ID
-    ====================================================== */
+ */
     public function consultar($id)
     {
         try {
@@ -95,9 +95,9 @@ class mascota
         }
     }
 
-    /* ======================================================
+    /*
        ACTUALIZAR MASCOTA
-    ====================================================== */
+ */
     public function actualizar($data)
     {
         try {
@@ -127,9 +127,9 @@ class mascota
         }
     }
 
-    /* ======================================================
+    /*
        ELIMINAR MASCOTA
-    ====================================================== */
+ */
     public function eliminar($id)
     {
         try {
