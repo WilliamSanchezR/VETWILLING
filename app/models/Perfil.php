@@ -34,7 +34,7 @@ class Perfil
 
             switch ($user['id_rol']) {
 
-                case 1: // ADMINISTRADOR
+                case 1: // REPRESENTANTE
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
                                 r.nombres, r.apellidos, r.nivel_acceso, r.img_perfil, r.telefono,
