@@ -61,8 +61,7 @@ class Perfil
                 case 3: // PROPIETARIO
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                p.nombres, p.apellidos, p.telefono, p.direccion, p.img_perfil, p.numero_documento, p.direccion, p.tipo_documento,
-                                p.fecha_nacimiento,
+                                p.tipo_documento, p.numero_documento, p.nombres, p.apellidos, p.telefono, p.direccion, p.img_perfil,
                                 r.nombre AS rol
                                 FROM usuario u
                                 INNER JOIN propietario p ON u.id_usuario = p.id_usuario
@@ -76,10 +75,10 @@ class Perfil
                                 u.id_usuario, u.email, u.estado,
                                 r.nombres, r.apellidos, r.nivel_acceso, r.img_perfil, r.telefono,
                                 r.nombre AS rol
-                            FROM usuario u
-                            INNER JOIN representante_legal r ON u.id_usuario = r.id_usuario
-                            INNER JOIN rol r ON u.id_rol = r.id_rol
-                            WHERE u.id_usuario = :id";
+                                FROM usuario u
+                                INNER JOIN representante_legal r ON u.id_usuario = r.id_usuario
+                                INNER JOIN rol r ON u.id_rol = r.id_rol
+                                WHERE u.id_usuario = :id";
                     break;
 
                 default:
