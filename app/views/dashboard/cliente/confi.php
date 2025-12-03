@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <!-- estilos propios y algunas cosas que son importantes para que se vea mas wonito -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/perfil.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/confi.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
@@ -61,279 +62,228 @@
 
                 <!-- TAB: MI CUENTA -->
                 <div class="tab-content" id="tab-cuenta">
+                    <form method="POST" action="<?= BASE_URL ?>/usuario/actualizar">
 
-                    <!-- Foto de Perfil -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-camera-fill"></i>
+                        <!-- Foto de Perfil -->
+                        <div class="config-card">
+                            <div class="config-card-header">
+                                <div class="config-icon">
+                                    <i class="bi bi-camera-fill"></i>
+                                </div>
+                                <div>
+                                    <h3>Foto de Perfil</h3>
+                                    <p>Actualiza tu imagen de perfil</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3>Foto de Perfil</h3>
-                                <p>Actualiza tu imagen de perfil</p>
-                            </div>
-                        </div>
 
-                        <div class="foto-perfil-container">
-                            <img src="https://ui-avatars.com/api/?name=Carlos+Ramirez&background=667eea&color=fff&size=120"
-                                class="foto-preview"
-                                id="fotoPreview"
-                                alt="Foto de perfil">
-                            <div class="foto-acciones">
-                                <h4>Cambiar Foto de Perfil</h4>
-                                <p>JPG, PNG o GIF. Tamaño máximo 2MB</p>
-                                <div class="foto-btns">
-                                    <input type="file" id="inputFoto" class="input-file" accept="image/*" onchange="previewFoto(event)">
-                                    <label for="inputFoto" class="btn-upload">
-                                        <i class="bi bi-upload"></i> Subir Foto
-                                    </label>
-                                    <button class="btn-remove" onclick="eliminarFoto()">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
+                            <div class="foto-perfil-container">
+                                <div class="avatar-grande">
+                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+                                </div>
+                                <div class="foto-acciones">
+                                    <h4>Cambiar Foto de Perfil</h4>
+                                    <p>JPG, PNG o GIF. Tamaño máximo 2MB</p>
+                                    <div class="foto-btns">
+                                        <input type="file" id="inputFoto" class="input-file" accept="image/*" onchange="previewFoto(event)">
+                                        <label for="inputFoto" class="btn-upload">
+                                            <i class="bi bi-upload"></i> Subir Foto
+                                        </label>
+                                        <button class="btn-remove" onclick="eliminarFoto()">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Información Personal -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-person-badge-fill"></i>
+                        <!-- Información Personal -->
+                        <div class="config-card">
+                            <div class="config-card-header">
+                                <div class="config-icon">
+                                    <i class="bi bi-person-badge-fill"></i>
+                                </div>
+                                <div>
+                                    <h3>Información Personal</h3>
+                                    <p>Actualiza tus datos personales</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3>Información Personal</h3>
-                                <p>Actualiza tus datos personales</p>
-                            </div>
-                        </div>
 
-                        <form id="formDatosPersonales">
+
+                            <input type="hidden" name="accion" value="actualizar">
+                            <input type="hidden" name="id_usuario" value="<?= $usuario['id_usuario'] ?>">
+
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Nombre(s)</label>
-                                    <input type="text" value="Carlos" placeholder="Tu nombre">
+                                    <input type="text" name="nombres" value="<?= $usuario['nombres'] ?>">
                                 </div>
 
                                 <div class="form-group-config">
                                     <label>Apellido(s)</label>
-                                    <input type="text" value="Ramírez Pérez" placeholder="Tus apellidos">
+                                    <input type="text" name="apellidos" value="<?= $usuario['apellidos'] ?>">
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Tipo de Documento</label>
-                                    <select>
-                                        <option selected>Cédula de Ciudadanía</option>
-                                        <option>Cédula de Extranjería</option>
-                                        <option>Pasaporte</option>
+                                    <select name="tipo_documento">
+                                        <option <?= $usuario['tipo_documento'] == 'Cédula de Ciudadanía' ? 'selected' : '' ?>>Cédula de Ciudadanía</option>
+                                        <option <?= $usuario['tipo_documento'] == 'Cédula de Extranjería' ? 'selected' : '' ?>>Cédula de Extranjería</option>
+                                        <option <?= $usuario['tipo_documento'] == 'Pasaporte' ? 'selected' : '' ?>>Pasaporte</option>
                                     </select>
                                 </div>
 
                                 <div class="form-group-config">
                                     <label>Número de Documento</label>
-                                    <input type="text" value="1234567890" placeholder="Número de documento">
+                                    <input type="text" name="numero_documento" value="<?= $usuario['numero_documento'] ?>">
                                 </div>
                             </div>
 
-                            <div class="form-row">
-                                <div class="form-group-config">
-                                    <label>Fecha de Nacimiento</label>
-                                    <input type="date" value="1988-03-15">
-                                </div>
+                            <button type="submit" class="btn-config btn-primary-config">
+                                Guardar Cambios
+                            </button>
 
-                                <div class="form-group-config">
-                                    <label>Género</label>
-                                    <select>
-                                        <option selected>Masculino</option>
-                                        <option>Femenino</option>
-                                        <option>Otro</option>
-                                        <option>Prefiero no decir</option>
-                                    </select>
-                                </div>
-                            </div>
 
-                            <div class="alert-config alert-success" id="alertExito" style="display: none;">
-                                <i class="bi bi-check-circle-fill" style="font-size: 20px;"></i>
+
+                        </div>
+
+
+                        <!-- Información de Contacto -->
+                        <div class="config-card">
+                            <div class="config-card-header">
+                                <div class="config-icon">
+                                    <i class="bi bi-telephone-fill"></i>
+                                </div>
                                 <div>
-                                    <strong>¡Éxito!</strong> Tus datos se han actualizado correctamente.
+                                    <h3>Información de Contacto</h3>
+                                    <p>Actualiza tu email y teléfono</p>
                                 </div>
                             </div>
 
-                            <div style="display: flex; gap: 15px; margin-top: 20px;">
-                                <button type="button" class="btn-config btn-primary-config" onclick="guardarDatosPersonales()">
-                                    <i class="bi bi-check-lg"></i>
-                                    Guardar Cambios
-                                </button>
-                                <button type="button" class="btn-config btn-secondary-config">
-                                    <i class="bi bi-x-lg"></i>
-                                    Cancelar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                            <form>
+                                <div class="form-group-config">
+                                    <label>Email Principal</label>
+                                    <input type="email" value="<?= $usuario['email'] ?>" placeholder="tu@email.com">
+                                </div>
 
-                    <!-- Información de Contacto -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-telephone-fill"></i>
-                            </div>
-                            <div>
-                                <h3>Información de Contacto</h3>
-                                <p>Actualiza tu email y teléfono</p>
-                            </div>
+                                <div class="form-row">
+                                    <div class="form-group-config">
+                                        <label>Teléfono</label>
+                                        <input type="tel" value="<?= $usuario['telefono'] ?>" placeholder="+57 300 000 0000">
+                                    </div>
+
+                                    <div class="form-group-config">
+                                        <label>Teléfono Alternativo</label>
+                                        <input type="tel" placeholder="+57 300 000 0000">
+                                    </div>
+                                </div>
+                            </form>
                         </div>
 
-                        <form>
-                            <div class="form-group-config">
-                                <label>Email Principal</label>
-                                <input type="email" value="carlos.ramirez@email.com" placeholder="tu@email.com">
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group-config">
-                                    <label>Teléfono</label>
-                                    <input type="tel" value="+57 300 123 4567" placeholder="+57 300 000 0000">
+                        <!-- Dirección -->
+                        <div class="config-card">
+                            <div class="config-card-header">
+                                <div class="config-icon">
+                                    <i class="bi bi-geo-alt-fill"></i>
                                 </div>
-
-                                <div class="form-group-config">
-                                    <label>Teléfono Alternativo</label>
-                                    <input type="tel" placeholder="+57 300 000 0000">
+                                <div>
+                                    <h3>Dirección</h3>
+                                    <p>Actualiza tu dirección de residencia</p>
                                 </div>
                             </div>
 
-                            <div style="display: flex; gap: 15px; margin-top: 20px;">
-                                <button type="button" class="btn-config btn-primary-config" onclick="guardarContacto()">
-                                    <i class="bi bi-check-lg"></i>
-                                    Guardar Cambios
-                                </button>
-                                <button type="button" class="btn-config btn-secondary-config">
-                                    <i class="bi bi-x-lg"></i>
-                                    Cancelar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                            <form>
+                                <div class="form-group-config">
+                                    <label>Dirección Completa</label>
+                                    <input type="text" value="Calle 123 #45-67" placeholder="Calle, carrera, número">
+                                </div>
 
-                    <!-- Dirección -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-geo-alt-fill"></i>
-                            </div>
-                            <div>
-                                <h3>Dirección</h3>
-                                <p>Actualiza tu dirección de residencia</p>
-                            </div>
+                                <div class="form-row">
+                                    <div class="form-group-config">
+                                        <label>Ciudad</label>
+                                        <input type="text" value="Bogotá" placeholder="Ciudad">
+                                    </div>
+
+                                    <div class="form-group-config">
+                                        <label>Departamento</label>
+                                        <select>
+                                            <option selected>Cundinamarca</option>
+                                            <option>Antioquia</option>
+                                            <option>Valle del Cauca</option>
+                                            <option>Atlántico</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group-config">
+                                        <label>Código Postal</label>
+                                        <input type="text" value="110111" placeholder="Código postal">
+                                    </div>
+
+                                    <div class="form-group-config">
+                                        <label>País</label>
+                                        <select>
+                                            <option selected>Colombia</option>
+                                            <option>Argentina</option>
+                                            <option>Chile</option>
+                                            <option>México</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-config">
+                                    <label>Información Adicional</label>
+                                    <textarea rows="3" placeholder="Apartamento, conjunto, referencia..."></textarea>
+                                </div>
+                            </form>
                         </div>
 
-                        <form>
-                            <div class="form-group-config">
-                                <label>Dirección Completa</label>
-                                <input type="text" value="Calle 123 #45-67" placeholder="Calle, carrera, número">
+                        <!-- Información Adicional -->
+                        <div class="config-card">
+                            <div class="config-card-header">
+                                <div class="config-icon">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                </div>
+                                <div>
+                                    <h3>Información Adicional</h3>
+                                    <p>Datos complementarios opcionales</p>
+                                </div>
                             </div>
 
-                            <div class="form-row">
+                            <form>
                                 <div class="form-group-config">
-                                    <label>Ciudad</label>
-                                    <input type="text" value="Bogotá" placeholder="Ciudad">
+                                    <label>Ocupación</label>
+                                    <input type="text" placeholder="Tu profesión u ocupación">
                                 </div>
 
                                 <div class="form-group-config">
-                                    <label>Departamento</label>
+                                    <label>Biografía</label>
+                                    <textarea rows="4" placeholder="Cuéntanos un poco sobre ti..."></textarea>
+                                </div>
+
+                                <div class="form-group-config">
+                                    <label>Cómo nos conociste</label>
                                     <select>
-                                        <option selected>Cundinamarca</option>
-                                        <option>Antioquia</option>
-                                        <option>Valle del Cauca</option>
-                                        <option>Atlántico</option>
+                                        <option>Selecciona una opción</option>
+                                        <option>Redes sociales</option>
+                                        <option>Recomendación</option>
+                                        <option>Búsqueda en Google</option>
+                                        <option>Publicidad</option>
+                                        <option>Otro</option>
                                     </select>
                                 </div>
-                            </div>
 
-                            <div class="form-row">
-                                <div class="form-group-config">
-                                    <label>Código Postal</label>
-                                    <input type="text" value="110111" placeholder="Código postal">
+                                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                                    <button type="button" class="btn-config btn-primary-config" onclick="guardarAdicional()">
+                                        <i class="bi bi-check-lg"></i>
+                                        Guardar Cambios
+                                    </button>
                                 </div>
-
-                                <div class="form-group-config">
-                                    <label>País</label>
-                                    <select>
-                                        <option selected>Colombia</option>
-                                        <option>Argentina</option>
-                                        <option>Chile</option>
-                                        <option>México</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group-config">
-                                <label>Información Adicional</label>
-                                <textarea rows="3" placeholder="Apartamento, conjunto, referencia..."></textarea>
-                            </div>
-
-                            <div style="display: flex; gap: 15px; margin-top: 20px;">
-                                <button type="button" class="btn-config btn-primary-config" onclick="guardarDireccion()">
-                                    <i class="bi bi-check-lg"></i>
-                                    Guardar Cambios
-                                </button>
-                                <button type="button" class="btn-config btn-secondary-config">
-                                    <i class="bi bi-x-lg"></i>
-                                    Cancelar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Información Adicional -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-info-circle-fill"></i>
-                            </div>
-                            <div>
-                                <h3>Información Adicional</h3>
-                                <p>Datos complementarios opcionales</p>
-                            </div>
+                            </form>
                         </div>
-
-                        <form>
-                            <div class="form-group-config">
-                                <label>Ocupación</label>
-                                <input type="text" placeholder="Tu profesión u ocupación">
-                            </div>
-
-                            <div class="form-group-config">
-                                <label>Biografía</label>
-                                <textarea rows="4" placeholder="Cuéntanos un poco sobre ti..."></textarea>
-                            </div>
-
-                            <div class="form-group-config">
-                                <label>Cómo nos conociste</label>
-                                <select>
-                                    <option>Selecciona una opción</option>
-                                    <option>Redes sociales</option>
-                                    <option>Recomendación</option>
-                                    <option>Búsqueda en Google</option>
-                                    <option>Publicidad</option>
-                                    <option>Otro</option>
-                                </select>
-                            </div>
-
-                            <div style="display: flex; gap: 15px; margin-top: 20px;">
-                                <button type="button" class="btn-config btn-primary-config" onclick="guardarAdicional()">
-                                    <i class="bi bi-check-lg"></i>
-                                    Guardar Cambios
-                                </button>
-                                <button type="button" class="btn-config btn-secondary-config">
-                                    <i class="bi bi-x-lg"></i>
-                                    Cancelar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
+                    </form>
                 </div>
 
                 <!-- TAB: GENERAL -->

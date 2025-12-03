@@ -57,10 +57,10 @@ switch ($request) {
     // RUTA PARA CERRA SESION
 
     case '/logout':
-    require BASE_PATH . '/app/controllers/logoutControllers.php';
-    $controller = new LoginController();
-    $controller->logout();
-    break;
+        require BASE_PATH . '/app/controllers/logoutControllers.php';
+        $controller = new LoginController();
+        $controller->logout();
+        break;
 
     // ---------------------------------------VETERINARIO-------------------------------------//
 
@@ -171,6 +171,11 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/confi.php';
         break;
 
+    //----------ACCIONES DEL PACIENTE---------//
+    case '/usuario/actualizar':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
@@ -178,7 +183,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
         reporteVeterinario();
 
-    //     break;
+        //     break;
 
     default:
         http_response_code(404);

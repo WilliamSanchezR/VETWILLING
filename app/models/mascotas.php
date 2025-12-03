@@ -53,10 +53,10 @@ class mascota
                     WHERE id_propietario = :id_propietario";
 
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_propietario', $id_propietario, PDO::PARAM_INT);
+            $stmt->bindParam(':id_propietario', $id_propietario);
             $stmt->execute();
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $stmt->fetchAll();
         } catch (PDOException $e) {
             error_log("Error en Mascota::listarPorPropietario → " . $e->getMessage());
             return [];
@@ -67,7 +67,7 @@ class mascota
         try {
             $sql = "SELECT * FROM paciente";
             $stmt = $this->conexion->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $stmt->fetchAll();
         } catch (PDOException $e) {
             error_log("Error en Mascota::listar → " . $e->getMessage());
             return [];
@@ -85,10 +85,10 @@ class mascota
                     WHERE id_paciente = :id";
 
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':id', $id);
             $stmt->execute();
 
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            return $stmt->fetch();
         } catch (PDOException $e) {
             error_log("Error en Mascota::consultar → " . $e->getMessage());
             return null;
@@ -137,7 +137,7 @@ class mascota
                     WHERE id_paciente = :id";
 
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+            $stmt->bindParam(":id", $id);
 
             return $stmt->execute();
         } catch (PDOException $e) {

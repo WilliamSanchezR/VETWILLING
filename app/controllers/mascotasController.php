@@ -74,7 +74,7 @@ function registrarMascota()
         }
 
         $img_mascota = uniqid('pet_') . ".$ext";
-        $destino = BASE_PATH . "/public/uploads/mascotas/$img_mascota";
+        $destino = BASE_PATH . '/public/uploads/mascotas/'. $img_mascota;
         move_uploaded_file($file['tmp_name'], $destino);
     }
 
@@ -143,7 +143,7 @@ function actualizarMascota()
         }
 
         $nuevaFoto = uniqid('pet_') . '.' . $ext;
-        $destino = BASE_PATH . "/public/uploads/usuarios/$nuevaFoto";
+        $destino = BASE_PATH . "/public/uploads/mascotas/$nuevaFoto";
         move_uploaded_file($file['tmp_name'], $destino);
     }
 
