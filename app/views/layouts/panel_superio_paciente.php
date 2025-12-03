@@ -1,3 +1,16 @@
+<?php
+require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+
+// 1. Validar si hay sesión activa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 2. Si sí hay sesión → obtener perfil
+$id = $_SESSION['user']['id_usuario'];
+$usuario = mostrarPerfil($id);
+?>
+
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
 
 
@@ -77,174 +90,18 @@
             <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
         </button>
 
-        <!-- Mensajes -->
-        <button class="btn-mensajes-float" onclick="toggleChat()">
-            <i class="bi bi-chat-dots-fill"></i>
-            <span class="badge-msg">3</span>
-        </button>
-
-        <!-- MODAL CHAT -->
-        <div class="modal-chat" id="modalChat">
-            <!-- HEADER -->
-            <div class="modal-header">
-                <h3>Mensajes</h3>
-                <button class="btn-cerrar-modal" onclick="toggleChat()">
-                    <i class="bi bi-x"></i>
-                </button>
-            </div>
-
-            <!-- BÚSQUEDA -->
-            <div class="chat-search">
-                <div class="search-container">
-                    <i class="bi bi-search"></i>
-                    <input type="text" class="search-input" placeholder="Buscar conversación...">
-                </div>
-            </div>
-
-            <!-- CONTENEDOR -->
-            <div class="chat-container">
-
-                <!-- LISTA DE CONVERSACIONES -->
-                <div class="conversaciones-list" id="conversacionesList">
-
-                    <div class="conversacion no-leida" onclick="abrirChat('Dr. Juan Martínez', 'martinez')">
-                        <div style="position: relative;">
-                            <img src="https://ui-avatars.com/api/?name=Dr+Martinez&background=667eea&color=fff" class="conv-avatar-chat" alt="Dr. Martínez">
-                            <span class="estado-online-chat"></span>
-                        </div>
-                        <div class="conv-info">
-                            <div class="conv-header-chat">
-                                <span class="conv-nombre-chat">Dr. Juan Martínez</span>
-                                <span class="conv-tiempo-chat">10:30</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <p class="conv-ultimo">Los resultados están listos...</p>
-                                <span class="badge-unread">2</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="conversacion no-leida" onclick="abrirChat('Recepción', 'recepcion')">
-                        <div style="position: relative;">
-                            <img src="https://ui-avatars.com/api/?name=Recepcion&background=4caf50&color=fff" class="conv-avatar-chat" alt="Recepción">
-                            <span class="estado-online-chat"></span>
-                        </div>
-                        <div class="conv-info">
-                            <div class="conv-header-chat">
-                                <span class="conv-nombre-chat">Recepción VetWilling</span>
-                                <span class="conv-tiempo-chat">Ayer</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <p class="conv-ultimo">Tu cita ha sido confirmada...</p>
-                                <span class="badge-unread">1</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="conversacion" onclick="abrirChat('Dra. Ana García', 'garcia')">
-                        <img src="https://ui-avatars.com/api/?name=Dra+Garcia&background=9c27b0&color=fff" class="conv-avatar-chat" alt="Dra. García">
-                        <div class="conv-info">
-                            <div class="conv-header-chat">
-                                <span class="conv-nombre-chat">Dra. Ana García</span>
-                                <span class="conv-tiempo-chat">15 Nov</span>
-                            </div>
-                            <p class="conv-ultimo">Recuerda traer el carnet...</p>
-                        </div>
-                    </div>
-
-                    <div class="conversacion" onclick="abrirChat('Peluquería', 'peluqueria')">
-                        <img src="https://ui-avatars.com/api/?name=Peluqueria&background=ff9800&color=fff" class="conv-avatar-chat" alt="Peluquería">
-                        <div class="conv-info">
-                            <div class="conv-header-chat">
-                                <span class="conv-nombre-chat">Peluquería Canina</span>
-                                <span class="conv-tiempo-chat">14 Nov</span>
-                            </div>
-                            <p class="conv-ultimo">¡Luna quedó hermosa!</p>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- VENTANA DE CHAT -->
-                <div class="chat-window" id="chatWindow">
-                    <!-- HEADER CONVERSACIÓN -->
-                    <div class="chat-header-conversacion">
-                        <button class="btn-volver" onclick="volverLista()">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <img src="https://ui-avatars.com/api/?name=Dr+Martinez&background=667eea&color=fff" class="chat-avatar" id="chatAvatar" alt="">
-                        <div class="chat-info">
-                            <div class="chat-nombre" id="chatNombre">Dr. Juan Martínez</div>
-                            <div class="chat-estado">En línea</div>
-                        </div>
-                    </div>
-
-                    <!-- MENSAJES -->
-                    <div class="mensajes-container" id="mensajesContainer">
-                        <div class="fecha-separador">
-                            <span>Hoy</span>
-                        </div>
-
-                        <div class="mensaje recibido">
-                            <div>
-                                <div class="mensaje-bubble">
-                                    Hola Carlos, ¿cómo está Max hoy?
-                                </div>
-                                <div class="mensaje-hora">10:15</div>
-                            </div>
-                        </div>
-
-                        <div class="mensaje enviado">
-                            <div>
-                                <div class="mensaje-bubble">
-                                    Hola Doctor, está mucho mejor. Ya no vomita.
-                                </div>
-                                <div class="mensaje-hora">10:20</div>
-                            </div>
-                        </div>
-
-                        <div class="mensaje recibido">
-                            <div>
-                                <div class="mensaje-bubble">
-                                    Excelente noticia. Los resultados de los exámenes están listos. ¿Puedes pasar mañana?
-                                </div>
-                                <div class="mensaje-hora">10:30</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- INPUT -->
-                    <div class="input-mensaje-container">
-                        <div class="input-mensaje-wrapper">
-                            <button class="btn-adjuntar">
-                                <i class="bi bi-paperclip"></i>
-                            </button>
-                            <textarea
-                                class="input-mensaje"
-                                id="inputMensaje"
-                                placeholder="Escribe un mensaje..."
-                                rows="1"></textarea>
-                            <button class="btn-enviar" onclick="enviarMensaje()">
-                                <i class="bi bi-send-fill"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
         <!-- Separador -->
         <div class="navbar-separador"></div>
 
         <!-- Perfil Usuario -->
         <button class="btn-perfil" onclick="toggleDropdown('perfil')" aria-label="Perfil">
             <div class="avatar-usuario">
-                <span>CR</span>
+                <span> <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+                </span>
             </div>
             <div class="info-usuario">
-                <span class="nombre-usuario">Carlos Ramírez</span>
-                <span class="rol-usuario">Cliente</span>
+                <span class="nombre-usuario"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></span>
+                <span class="rol-usuario"><?= $usuario['rol'] ?></span>
             </div>
             <i class="bi bi-chevron-down flecha-perfil"></i>
         </button>
@@ -253,11 +110,12 @@
         <div class="dropdown-menu dropdown-perfil" id="dropdownPerfil">
             <div class="perfil-header">
                 <div class="avatar-usuario grande">
-                    <span>CR</span>
+                    <span> <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+                    </span>
                 </div>
                 <div>
-                    <p class="nombre-completo">Carlos Ramírez</p>
-                    <p class="email-usuario">carlos.ramirez@email.com</p>
+                    <p class="nombre-completo"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></p>
+                    <p class="email-usuario"><?= $usuario['email'] ?></p>
                 </div>
             </div>
             <div class="dropdown-divider"></div>
@@ -376,87 +234,4 @@
     });
 
     console.log('✅ Navbar Superior cargado correctamente');
-</script>
-
-<!-- este es el de los mensajes -->
-<script>
-    // Toggle Modal Chat
-    function toggleChat() {
-        const modal = document.getElementById('modalChat');
-        modal.classList.toggle('show');
-    }
-
-    // Abrir Chat Específico
-    function abrirChat(nombre, id) {
-        const chatWindow = document.getElementById('chatWindow');
-        const conversacionesList = document.getElementById('conversacionesList');
-        const chatNombre = document.getElementById('chatNombre');
-
-        // Cambiar nombre
-        chatNombre.textContent = nombre;
-
-        // Mostrar ventana de chat
-        chatWindow.classList.add('show');
-        conversacionesList.style.display = 'none';
-
-        // Scroll al final de mensajes
-        const mensajesContainer = document.getElementById('mensajesContainer');
-        mensajesContainer.scrollTop = mensajesContainer.scrollHeight;
-    }
-
-    // Volver a lista
-    function volverLista() {
-        const chatWindow = document.getElementById('chatWindow');
-        const conversacionesList = document.getElementById('conversacionesList');
-
-        chatWindow.classList.remove('show');
-        conversacionesList.style.display = 'block';
-    }
-
-    // Enviar Mensaje
-    function enviarMensaje() {
-        const input = document.getElementById('inputMensaje');
-        const mensaje = input.value.trim();
-
-        if (mensaje === '') return;
-
-        const mensajesContainer = document.getElementById('mensajesContainer');
-        const now = new Date();
-        const hora = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-
-        // Crear elemento de mensaje
-        const mensajeDiv = document.createElement('div');
-        mensajeDiv.className = 'mensaje enviado';
-        mensajeDiv.innerHTML = `
-                <div>
-                    <div class="mensaje-bubble">${mensaje}</div>
-                    <div class="mensaje-hora">${hora}</div>
-                </div>
-            `;
-
-        mensajesContainer.appendChild(mensajeDiv);
-
-        // Limpiar input
-        input.value = '';
-        input.style.height = 'auto';
-
-        // Scroll al final
-        mensajesContainer.scrollTop = mensajesContainer.scrollHeight;
-    }
-
-    // Auto-resize textarea
-    document.getElementById('inputMensaje').addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
-
-    // Enter para enviar
-    document.getElementById('inputMensaje').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            enviarMensaje();
-        }
-    });
-
-    console.log('✅ Chat cargado correctamente');
 </script>

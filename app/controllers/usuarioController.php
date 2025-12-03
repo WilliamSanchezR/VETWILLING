@@ -214,5 +214,3 @@ function eliminarUsuario($id)
 
     exit();
 }
-
-
