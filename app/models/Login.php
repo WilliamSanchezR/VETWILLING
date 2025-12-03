@@ -38,8 +38,8 @@ class Login
 
 
             switch ($user['id_rol']) {
-                case 1: // Representante
-                    $consultar = "SELECT  id_veterinaria, nombres, apellidos, telefono, img_perfil, nivel_acceso FROM representante_legal WHERE id_usuario = :id";
+                case 1: // Administrador
+                    $consultar = "SELECT nombres, apellidos, telefono, img_perfil, nivel_acceso FROM administrador WHERE id_usuario = :id";
                     break;
 
                 case 2: // Veterinario
@@ -48,6 +48,10 @@ class Login
 
                 case 3: // Propietario
                     $consultar = "SELECT id_veterinaria, nombres, apellidos, telefono, direccion, img_perfil FROM propietario WHERE id_usuario = :id";
+                    break;
+
+                case 4: // Representante
+                    $consultar = "SELECT  id_veterinaria, nombres, apellidos, telefono, img_perfil, nivel_acceso FROM representante_legal WHERE id_usuario = :id";
                     break;
 
                 default:

@@ -234,6 +234,7 @@ $usuario = mostrarPerfil($id);
     });
 
     console.log('✅ Navbar Superior cargado correctamente');
+<<<<<<< HEAD
 </script> -->
 <script>
    /**
@@ -434,4 +435,6 @@ class NavbarManager {
 document.addEventListener("DOMContentLoaded", () => {
     window.navbarManager = new NavbarManager();
 });
+=======
+>>>>>>> b094d49d4f382ef250e66faccdcc2b4e2e28398a
 </script>
