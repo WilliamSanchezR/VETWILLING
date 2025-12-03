@@ -1,7 +1,6 @@
 
 /vendor/
 
-<<<<<<< HEAD
-=======
 /public/uploads/usuarios
->>>>>>> 72462584ba5d80cc8b2e52a33a98a16e54f97684
+
+/public/uploads/veterinarios
