@@ -34,37 +34,41 @@ class Perfil
 
             switch ($user['id_rol']) {
 
+              
                 case 1: // ADMINISTRADOR
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
                                 a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil, a.telefono,
-                                a.nombre AS rol
-                            FROM usuario u
-                            INNER JOIN administrador a ON u.id_usuario = r.id_usuario
-                            INNER JOIN rol r ON u.id_rol = r.id_rol
-                            WHERE u.id_usuario = :id";
+                                r.nombre AS rol
+                              FROM usuario u
+                              INNER JOIN administrador a ON u.id_usuario = a.id_usuario
+                              INNER JOIN rol r ON u.id_rol = r.id_rol
+                              WHERE u.id_usuario = :id";
+                
                     break;
 
                 case 2: // VETERINARIO
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                v.nombres, v.apellidos, v.telefono, v.img_perfil, v.telefono,
+                                v.nombres, v.apellidos, v.telefono, v.img_perfil,
                                 r.nombre AS rol
-                            FROM usuario u
-                            INNER JOIN veterinario v ON u.id_usuario = v.id_usuario
-                            INNER JOIN rol r ON u.id_rol = r.id_rol
-                            WHERE u.id_usuario = :id";
+                              FROM usuario u
+                              INNER JOIN veterinario v ON u.id_usuario = v.id_usuario
+                              INNER JOIN rol r ON u.id_rol = r.id_rol
+                              WHERE u.id_usuario = :id";
                     break;
 
                 case 3: // PROPIETARIO
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                p.nombres, p.apellidos, p.telefono, p.direccion, p.img_perfil, p.telefono,
+                                p.nombres, p.apellidos, p.telefono, p.direccion, p.img_perfil, p.numero_documento, p.direccion, p.tipo_documento,
+                                p.fecha_nacimiento,
                                 r.nombre AS rol
-                            FROM usuario u
-                            INNER JOIN propietario p ON u.id_usuario = p.id_usuario
-                            INNER JOIN rol r ON u.id_rol = r.id_rol
-                            WHERE u.id_usuario = :id";
+                              FROM usuario u
+                              INNER JOIN propietario p ON u.id_usuario = p.id_usuario
+                              INNER JOIN rol r ON u.id_rol = r.id_rol
+                              WHERE u.id_usuario = :id";
+                              
                     break;
 
                 case 4: // REPRESENTANTE

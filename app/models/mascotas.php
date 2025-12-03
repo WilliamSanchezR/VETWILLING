@@ -15,7 +15,7 @@ class mascota
 
 
     /*
-    REGISTRAR MASCOTA
+       REGISTRAR MASCOTA
  */
     public function registrar($data)
     {
