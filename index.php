@@ -57,16 +57,41 @@ switch ($request) {
     // RUTA PARA CERRA SESION
 
     case '/logout':
-    require BASE_PATH . '/app/controllers/logoutControllers.php';
-    $controller = new LoginController();
-    $controller->logout();
-    break;
+        require BASE_PATH . '/app/controllers/logoutControllers.php';
+        $controller = new LoginController();
+        $controller->logout();
+        break;
 
     // ---------------------------------------VETERINARIO-------------------------------------//
 
     case '/veterinaria/dashboard':
         require BASE_PATH . '/app/views/dashboard/veterinaria/dashBoard.php';
         break;
+
+    case '/veterinaria/seguimientos':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/seguimientos.php';
+        break;
+
+    case '/veterinaria/calendario':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/calendario.php';
+        break;
+
+    case '/veterinaria/gestion_clinica':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
+        break;
+
+    case '/veterinaria/laboratorio':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/laboratorio.php';
+        break;
+
+    case '/veterinaria/recetas':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/recetas.php';
+        break;
+
+    case '/veterinaria/reportes':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/reportes.php';
+        break;
+
 
     case '/veterinario/registrar-veterinario':
         require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';
@@ -178,7 +203,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
         reporteVeterinario();
 
-    //     break;
+        //     break;
 
     default:
         http_response_code(404);

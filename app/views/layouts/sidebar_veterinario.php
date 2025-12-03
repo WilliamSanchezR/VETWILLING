@@ -12,11 +12,11 @@
             <i class="bi bi-speedometer2"></i>
             <span class="texto-item-sidebar">Dashboard</span>
         </a>
-        <a href="views/veterinarias/dashBoardSeguimientos.html" class="item-sidebar">
+        <a href="<?= BASE_URL ?>/veterinaria/seguimientos" class="item-sidebar">
             <i class="bi bi-arrow-repeat"></i>
             <span class="texto-item-sidebar">Seguimientos</span>
         </a>
-        <a href="views/veterinarias/dashBoardCalendario.html" class="item-sidebar">
+        <a href="<?= BASE_URL ?>/veterinaria/calendario" class="item-sidebar">
             <i class="bi bi-calendar3"></i>
             <span class="texto-item-sidebar">Calendario</span>
         </a>
@@ -24,7 +24,7 @@
             <i class="bi bi-calendar-check"></i>
             <span class="texto-item-sidebar">Citas</span>
         </a>
-        <a href="views/veterinarias/dashBoardLaboratorio.html" class="item-sidebar">
+        <a href="<?= BASE_URL ?>/veterinaria/laboratorio" class="item-sidebar">
             <i class="bi bi-flask"></i>
             <span class="texto-item-sidebar">Laboratorio</span>
         </a>
@@ -34,15 +34,15 @@
             <i class="bi bi-person-plus"></i>
             <span class="texto-item-sidebar">Registro</span>
         </a>
-        <a href="views/veterinarias/dashBoardGestClinica.html" class="item-sidebar">
+        <a href="<?= BASE_URL ?>/veterinaria/gestion_clinica" class="item-sidebar">
             <i class="bi bi-hospital"></i>
             <span class="texto-item-sidebar">Gestión clínica</span>
         </a>
-        <a href="views/veterinarias/dashBoardReportes.html" class="item-sidebar">
+        <a href="<?= BASE_URL ?>/veterinaria/reportes" class="item-sidebar">
             <i class="bi bi-file-earmark-text"></i>
             <span class="texto-item-sidebar">Reportes</span>
         </a>
-        <a href="views/veterinarias/dashBoardRecetas.html" class="item-sidebar">
+        <a href="<?= BASE_URL ?>/veterinaria/recetas" class="item-sidebar">
             <i class="bi bi-receipt"></i>
             <span class="texto-item-sidebar">Recetas</span>
         </a>
