@@ -217,6 +217,7 @@ function eliminarUsuario($id)
 
     exit();
 }
+}
 
 function cambioContrasena()
 {

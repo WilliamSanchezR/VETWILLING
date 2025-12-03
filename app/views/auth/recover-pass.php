@@ -39,7 +39,7 @@
                         <button id="btn_ingresar" type="submit">Enviar enlace</button>
                     </form>
 
-                    <a id="recover" href="login.html">Volver al inicio de sesión</a>
+                    <a id="recover" href="<?= BASE_URL ?>/login">Volver al inicio de sesión</a>
                 </div>
             </div>
 

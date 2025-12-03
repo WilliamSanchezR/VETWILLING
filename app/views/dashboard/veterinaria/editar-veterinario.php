@@ -56,7 +56,7 @@ $veterinario = listarVeterinario($id);
             </div>
 
             <form id="vetForm" action="<?= BASE_URL ?>/veterinario/actualizar-veterinario" method="POST">
-                
+
                 <input type="hidden" name="id_usuario" value="<?= $veterinario['id_usuario'] ?>">
                 <input type="hidden" name="accion" value="actualizar">
 
@@ -68,9 +68,9 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-person"></i> Nombres</label>
-                                <input type="text" name="nombres" 
-                                       value="<?= $veterinario['nombres'] ?>" 
-                                       placeholder="Ej: Juan Pérez García">
+                                <input type="text" name="nombres"
+                                    value="<?= $veterinario['nombres'] ?>"
+                                    placeholder="Ej: Juan Pérez García">
                             </div>
                         </div>
 
@@ -78,9 +78,7 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-person"></i> Apellidos</label>
-                                <input type="text" name="apellidos" 
-                                       value="<?= $veterinario['apellidos'] ?>" 
-                                       placeholder="Ej: García">
+                                <input type="text" id="apellidoPropietario" name="apellidos" value="<?= $usuario['apellidos'] ?>" placeholder="Ej: García">
                             </div>
                         </div>
 
@@ -103,10 +101,8 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Rol</label>
-                                <select name="id_rol">
-                                    <option value="<?= $veterinario['id_rol'] ?>">
-                                        <?= $veterinario['id_rol'] ?>
-                                    </option>
+                                <select id="rol" name="id_rol">
+                                    <option value="<?= $usuario['rol'] ?>"><?= $usuario['rol'] ?></option>
                                     <option value="2">Administrador</option>
                                     <option value="1">Veterinario</option>
                                 </select>
@@ -131,9 +127,9 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-hash"></i> Número de documento *</label>
-                                <input type="number" 
-                                       name="numero_documento" 
-                                       value="<?= $veterinario['numero_documento'] ?>">
+                                <input type="number"
+                                    name="numero_documento"
+                                    value="<?= $veterinario['numero_documento'] ?>">
                             </div>
                         </div>
 
@@ -141,9 +137,7 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" 
-                                       name="telefono" 
-                                       value="<?= $veterinario['telefono'] ?>">
+                                <input type="tel" id="telefono" name="telefono" value="<?= $usuario['telefono'] ?>" placeholder="+57 300 123 4567">
                             </div>
                         </div>
 
@@ -151,9 +145,9 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                <input type="email" 
-                                       name="email" 
-                                       value="<?= $veterinario['email'] ?>">
+                                <input type="email"
+                                    name="email"
+                                    value="<?= $veterinario['email'] ?>">
                             </div>
                         </div>
 
@@ -174,4 +168,5 @@ $veterinario = listarVeterinario($id);
     </div>
 
 </body>
+
 </html>
