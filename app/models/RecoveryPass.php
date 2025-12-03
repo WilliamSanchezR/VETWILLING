@@ -79,121 +79,180 @@ class RecoveryPass
                 $mail->Subject = "VetWilling - NUEVA CLAVE GENERADA";
                 $mail->Body    = '
             
-            <div style="margin:0; padding:0; background:#f8f9fa; font-family:´Open Sans´, sans-serif;">
+           style="margin:0; padding:0; background-color:#f8f9fa; font-family:Arial, sans-serif;">
     
-    <div style="max-width:600px; margin:40px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(10,147,44,0.1);">
-        
-        <!-- ENCABEZADO -->
-        <div style="background:linear-gradient(135deg, #0a932c 0%, #9de795 100%); padding:40px 20px; text-align:center; color:#fff;">
-            <div style="width:240px; height:190px; background:#ffffff; border-radius:12px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 16px rgba(0,0,0,0.1);">
-                <img src="https://raw.githubusercontent.com/MaicBernal11/VetWilling-Imagenes-Correo/refs/heads/main/VETWILLING/LOGO-VERTICAL.png" style="margin:0 10px 0 5px; width:220px; height:170px;">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#17331eff"/>
-                </img>
-            </div>
-            <h1 style="margin:0; font-size:28px; font-weight:700; font-family:´Fredoka´, sans-serif;">mfms</h1>
-            <p style="margin:10px 0 0; font-size:16px; opacity:0.95;">Sistema de Gestión Veterinaria</p>
-        </div>
-
-        <!-- CONTENIDO -->
-        <div style="padding:40px 30px; color:#424b54;">
-            
-            <h2 style="text-align:center; color:#0a932c; margin-bottom:10px; font-family:´Fredoka´, sans-serif; font-size:24px;">¡GRACIAS POR<br>CONFIAR EN NOSOTROS!</h2>
-            
-            <p style="text-align:center; font-size:18px; color:#424b54; margin-bottom:30px; font-weight:600;">
-                Buen día, estimado usuario
-            </p>
-
-            <p style="font-size:15px; line-height:1.7; color:#424b54; margin-bottom:20px;">
-                Hemos recibido tu solicitud para restablecer la contraseña de tu cuenta en VetWilling. 
-                Por tu seguridad, hemos generado una contraseña temporal que podrás usar para acceder nuevamente.
-            </p>
-
-            <!-- INFORMACIÓN DE ACCESO -->
-            <div style="background:#f8f9fa; border:2px solid #9de795; border-radius:12px; padding:25px; margin:25px 0; text-align:center;">
-                <p style="margin:0 0 20px 0; font-size:14px; color:#424b54;">
-                    <strong>Correo registrado:</strong><br>
-                    <span style="color:#0a932c; font-size:16px;">' . htmlspecialchars($email) . '</span>
-                </p>
-                <p style="margin:0 0 25px 0; font-size:14px; color:#424b54;">
-                    <strong>Nueva contraseña temporal:</strong><br>
-                </p>
+    <!-- Contenedor principal -->
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f8f9fa;">
+        <tr>
+            <td align="center" style="padding:40px 20px;">
                 
-                <!-- BOTÓN DENTRO DEL CONTENEDOR -->
-                <a href="#" 
-                    style="
-                        display:inline-block;
-                        background:#0a932c;
-                        color:white;
-                        padding:16px 40px;
-                        font-size:16px;
-                        text-decoration:none;
-                        border-radius:30px;
-                        font-weight:600;
-                        box-shadow:0 4px 15px rgba(10,147,44,0.3);
-                        transition:all 0.3s ease;">
-                    🔐 ' . htmlspecialchars($nuevaClave) . '
-                </a>
-            </div>
-
-            <div style="background:#fff8e1; border-left:4px solid #93bedf; padding:15px; margin:25px 0; border-radius:6px;">
-                <p style="margin:0; font-size:14px; color:#424b54; line-height:1.6;">
-                    ⚠️ <strong>Importante:</strong> Por tu seguridad, te recomendamos cambiar esta contraseña 
-                    inmediatamente después de iniciar sesión desde tu perfil de usuario.
-                </p>
-            </div>
-
-            <p style="font-size:15px; color:#424b54; margin-bottom:30px;">
-                Utiliza esta contraseña para ingresar al sistema y luego cámbiala desde tu perfil.
-            </p>
-
-            <!-- LISTA DE CARACTERÍSTICAS -->
-            <div style="margin:25px 0;">
-                <p style="font-size:14px; color:#424b54; margin-bottom:15px;">
-                    <strong>Con tu cuenta de VetWilling podrás:</strong>
-                </p>
-                <ul style="list-style:none; padding:0; margin:0;">
-                    <li style="padding:8px 0; font-size:14px; color:#424b54;">
-                        ✓ Gestionar las citas y consultas de tus mascotas de forma sencilla
-                    </li>
-                    <li style="padding:8px 0; font-size:14px; color:#424b54;">
-                        ✓ Acceder al historial médico completo de tus compañeros peludos
-                    </li>
-                    <li style="padding:8px 0; font-size:14px; color:#424b54;">
-                        ✓ Recibir recordatorios de vacunas y tratamientos importantes
-                    </li>
-                </ul>
-            </div>
-
-            <p style="font-size:13px; color:#424b54; line-height:1.6; text-align:center; margin-top:30px;">
-                ¿Necesitas ayuda? Visita nuestra <a href="#" style="color:#93bedf; text-decoration:none;">página de soporte</a> o contáctanos directamente.
-            </p>
-
-            <p style="font-size:13px; color:#888; line-height:1.6; margin-top:20px;">
-                Si tú no solicitaste este cambio, por favor ignora este mensaje o contacta con nuestro 
-                equipo de soporte inmediatamente. Tu cuenta permanecerá segura.
-            </p>
-
-        </div>
-
-        <!-- PIE -->
-        <div style="background:#f8f9fa; padding:20px; text-align:center; font-size:12px; color:#424b54; border-top:1px solid #e0e0e0;">
-            <p style="margin:0 0 10px 0; font-weight:600;">
-                🐾 Veterinaria VetWilling – Siempre aquí para ti y tus mascotas
-            </p>
-            <p style="margin:0; color:#888;">
-                Con cariño, el equipo de VetWilling<br>
-                © 2024 VetWilling. Todos los derechos reservados<br>
-                Bogotá, Colombia • Calle 123 #45-67 • Tel: (601) 234-5678
-            </p>
-            <p style="margin:10px 0 0 0; font-size:11px; color:#999;">
-                Este correo fue enviado porque solicitaste restablecer tu contraseña
-            </p>
-        </div>
-
-    </div>
-
-
-</div>';
+                <!-- Tarjeta del correo -->
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:16px; box-shadow:0 4px 20px rgba(10,147,44,0.1);">
+                    
+                    <!-- ENCABEZADO -->
+                    <tr>
+                        <td style="background:linear-gradient(135deg, #0a932c 0%, #9de795 100%); padding:40px 20px; text-align:center; border-radius:16px 16px 0 0;">
+                            
+                            <!-- Logo -->
+                            <table role="presentation" width="240" cellspacing="0" cellpadding="0" border="0" align="center" style="margin-bottom:20px;">
+                                <tr>
+                                    <td align="center" style="background-color:#ffffff; border-radius:12px; padding:10px; box-shadow:0 8px 16px rgba(0,0,0,0.1);">
+                                        <img src="https://raw.githubusercontent.com/MaicBernal11/VetWilling-Imagenes-Correo/refs/heads/main/VETWILLING/LOGO-VERTICAL.png" alt="VetWilling" width="220" height="170" style="display:block; max-width:100%; height:auto;">
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Título principal -->
+                            <h1 style="margin:0; font-size:28px; font-weight:700; color:#ffffff; font-family:Arial, sans-serif;">
+                                VetWilling
+                            </h1>
+                            <p style="margin:10px 0 0; font-size:16px; color:#ffffff; opacity:0.95;">
+                                Sistema de Gestión Veterinaria
+                            </p>
+                            
+                        </td>
+                    </tr>
+                    
+                    <!-- CONTENIDO PRINCIPAL -->
+                    <tr>
+                        <td style="padding:40px 30px; color:#424b54;">
+                            
+                            <!-- Saludo -->
+                            <h2 style="text-align:center; color:#0a932c; margin:0 0 10px 0; font-size:24px; font-weight:700;">
+                                ¡GRACIAS POR<br>CONFIAR EN NOSOTROS!
+                            </h2>
+                            
+                            <p style="text-align:center; font-size:18px; color:#424b54; margin:0 0 30px 0; font-weight:600;">
+                                Buen día, estimado usuario
+                            </p>
+                            
+                            <!-- Texto explicativo -->
+                            <p style="font-size:15px; line-height:1.7; color:#424b54; margin:0 0 20px 0;">
+                                Hemos recibido tu solicitud para restablecer la contraseña de tu cuenta en VetWilling. 
+                                Por tu seguridad, hemos generado una contraseña temporal que podrás usar para acceder nuevamente.
+                            </p>
+                            
+                            <!-- Caja de información de acceso -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:25px 0;">
+                                <tr>
+                                    <td style="background-color:#f8f9fa; border:2px solid #9de795; border-radius:12px; padding:25px;">
+                                        
+                                        <!-- Email -->
+                                        <p style="margin:0 0 20px 0; font-size:14px; color:#424b54; text-align:center;">
+                                            <strong>Correo registrado:</strong><br>
+                                            <span style="color:#0a932c; font-size:16px; font-weight:600;">' . htmlspecialchars($email) . '</span>
+                                        </p>
+                                        
+                                        <p style="margin:0 0 20px 0; font-size:14px; color:#424b54; text-align:center;">
+                                            <strong>Nueva contraseña temporal:</strong>
+                                        </p>
+                                        
+                                        <!-- Botón con contraseña -->
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                                            <tr>
+                                                <td align="center" style="background-color:#0a932c; border-radius:30px; box-shadow:0 4px 15px rgba(10,147,44,0.3);">
+                                                    <span style="display:inline-block; padding:16px 40px; font-size:16px; color:#ffffff; font-weight:600; text-decoration:none; letter-spacing:1px;">
+                                                        🔐 ' . htmlspecialchars($nuevaClave) . '
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Advertencia de seguridad -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:25px 0;">
+                                <tr>
+                                    <td style="background-color:#fff8e1; border-left:4px solid #93bedf; border-radius:6px; padding:15px;">
+                                        <p style="margin:0; font-size:14px; color:#424b54; line-height:1.6;">
+                                            ⚠️ <strong>Importante:</strong> Por tu seguridad, te recomendamos cambiar esta contraseña 
+                                            inmediatamente después de iniciar sesión desde tu perfil de usuario.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="font-size:15px; color:#424b54; margin:0 0 30px 0;">
+                                Utiliza esta contraseña para ingresar al sistema y luego cámbiala desde tu perfil.
+                            </p>
+                            
+                            <!-- Características -->
+                            <p style="font-size:14px; color:#424b54; margin:0 0 15px 0; font-weight:600;">
+                                Con tu cuenta de VetWilling podrás:
+                            </p>
+                            
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="padding:8px 0;">
+                                        <p style="margin:0; font-size:14px; color:#424b54;">
+                                            ✓ Gestionar las citas y consultas de tus mascotas de forma sencilla
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 0;">
+                                        <p style="margin:0; font-size:14px; color:#424b54;">
+                                            ✓ Acceder al historial médico completo de tus compañeros peludos
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 0;">
+                                        <p style="margin:0; font-size:14px; color:#424b54;">
+                                            ✓ Recibir recordatorios de vacunas y tratamientos importantes
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Soporte -->
+                            <p style="font-size:13px; color:#424b54; line-height:1.6; text-align:center; margin:30px 0 0 0;">
+                                ¿Necesitas ayuda? Contáctanos directamente para asistencia.
+                            </p>
+                            
+                            <!-- Nota de seguridad -->
+                            <p style="font-size:13px; color:#888; line-height:1.6; margin:20px 0 0 0;">
+                                Si tú no solicitaste este cambio, por favor ignora este mensaje o contacta con nuestro 
+                                equipo de soporte inmediatamente. Tu cuenta permanecerá segura.
+                            </p>
+                            
+                        </td>
+                    </tr>
+                    
+                    <!-- PIE DE PÁGINA -->
+                    <tr>
+                        <td style="background-color:#f8f9fa; padding:20px; text-align:center; border-top:1px solid #e0e0e0; border-radius:0 0 16px 16px;">
+                            
+                            <p style="margin:0 0 10px 0; font-size:12px; color:#424b54; font-weight:600;">
+                                🐾 Veterinaria VetWilling – Siempre aquí para ti y tus mascotas
+                            </p>
+                            
+                            <p style="margin:0 0 10px 0; font-size:12px; color:#888;">
+                                Con cariño, el equipo de VetWilling
+                            </p>
+                            
+                            <p style="margin:0 0 10px 0; font-size:12px; color:#888;">
+                                © 2024 VetWilling. Todos los derechos reservados
+                            </p>
+                            
+                            <p style="margin:0 0 10px 0; font-size:12px; color:#888;">
+                                Bogotá, Colombia • Calle 123 #45-67 • Tel: (601) 234-5678
+                            </p>
+                            
+                            <p style="margin:10px 0 0 0; font-size:11px; color:#999;">
+                                Este correo fue enviado porque solicitaste restablecer tu contraseña
+                            </p>
+                            
+                        </td>
+                    </tr>
+                    
+                </table>
+                
+            </td>
+        </tr>
+    </table>';
                 $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
                 $mail->send();
