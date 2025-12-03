@@ -10,7 +10,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laboratorio - Registro Paciente</title>
     <!-- Icono de la página -->
-    <link rel="icon" href="../../assets/webSite/img/FAVICON.png" type="image">
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -26,238 +26,38 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
     <!-- Propio -->
-    <link rel="stylesheet" href="../../assets/dashBoard/veterinarias/css/styleDashBoard.css">
-    <link rel="stylesheet" href="../../assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
 
 
     <!-- Global Styles -->
-    <link rel="stylesheet" href="../../assets/extras/css/globalStyles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/extras/css/globalStyles.css">
 
 </head>
 
 <body>
 
     <!-- BARRA LATERAL IZQUIERDA -->
-    <div class="barra-lateral-izquierda" id="barraLateralIzquierda">
-        <div class="marca-sidebar">
-            <span class=""><img src="../../assets/webSite/img/LOGO-POSITIVO.png" alt="logo" class="logoDas" width="200">
-                <img src="../../assets/dashBoard/veterinarias/img/LOGO-VERTICAL-POSITIVA-DASHBOARD.png" alt="logo"
-                    class="logoDas logo-icono-sidebar" width="40"></span>
-        </div>
+    <!-- Aqui va el include -->
+    <?php
+    include_once __DIR__ . '/../../layouts/sidebar_veterinario.php'
+    ?>
 
-        <div class="menu-sidebar">
-            <div class="seccion-sidebar">Menu</div>
-            <a href="../veterinarias/dashBoard.html" class="item-sidebar">
-                <i class="bi bi-speedometer2"></i>
-                <span class="texto-item-sidebar">Dashboard</span>
-            </a>
-            <a href="../veterinarias/dashBoardSeguimientos.html" class="item-sidebar">
-                <i class="bi bi-arrow-repeat"></i>
-                <span class="texto-item-sidebar">Seguimientos</span>
-            </a>
-            <a href="../veterinarias/dashBoardPacientes.html" class="item-sidebar">
-                <i class="bi bi-heart"></i>
-                <span class="texto-item-sidebar">Pacientes</span>
-            </a>
-            <a href="../veterinarias/dashBoardCitas.html" class="item-sidebar">
-                <i class="bi bi-calendar-check"></i>
-                <span class="texto-item-sidebar">Citas</span>
-            </a>
-            <a href="../veterinarias/dashBoardLaboratorio.html" class="item-sidebar active">
-                <i class="bi bi-flask"></i>
-                <span class="texto-item-sidebar">Laboratorio</span>
-            </a>
-
-            <div class="seccion-sidebar">Opciones</div>
-            <a href="../veterinarias/dashBoardRegUsuario.html" class="item-sidebar">
-                <i class="bi bi-person-plus"></i>
-                <span class="texto-item-sidebar">Registro</span>
-            </a>
-            <a href="../veterinarias/dashBoardGestClinica.html" class="item-sidebar">
-                <i class="bi bi-hospital"></i>
-                <span class="texto-item-sidebar">Gestión clínica</span>
-            </a>
-            <a href="../veterinarias/dashBoardReportes.html" class="item-sidebar">
-                <i class="bi bi-file-earmark-text"></i>
-                <span class="texto-item-sidebar">Reportes</span>
-            </a>
-            <a href="../veterinarias/dashBoardRecetas.html" class="item-sidebar">
-                <i class="bi bi-receipt"></i>
-                <span class="texto-item-sidebar">Recetas</span>
-            </a>
-            <a href="../../index.html" class="item-sidebar">
-                <i class="bi bi-box-arrow-in-left"></i>
-                <span class="texto-item-sidebar">Cerrar Seción</span>
-            </a>
-        </div>
-
-        <button class="boton-colapsar" onclick="alternarBarraIzquierda()">
-            <i class="bi bi-chevron-left" id="iconoColapsar"></i>
-        </button>
-    </div>
 
     <!-- PANEL DERECHO -->
-    <div class="barra-lateral-derecha oculta" id="barraLateralDerecha">
-        <div class="encabezado-lateral-derecho">
-            <h5 class="mb-0">Panel Lateral</h5>
-            <button class="boton-cerrar-lateral" onclick="alternarBarraDerecha()">
-                <i class="bi bi-x"></i>
-            </button>
-        </div>
-
-        <div class="p-3">
-            <h6 class="mb-3 fw-bold">Notificaciones</h6>
-            <div class="item-notificacion">
-                <div class="icono-notificacion icono-notificacion-azul">
-                    <i class="bi bi-bug"></i>
-                </div>
-                <div>
-                    <div class="fw-semibold">laboratorios con pulgas</div>
-                    <small class="text-muted">Ahora</small>
-                </div>
-            </div>
-            <div class="item-notificacion">
-                <div class="icono-notificacion icono-notificacion-amarillo">
-                    <i class="bi bi-person-plus"></i>
-                </div>
-                <div>
-                    <div class="fw-semibold">Nuevo pasciente asignado</div>
-                    <small class="text-muted">Hace 52 min</small>
-                </div>
-            </div>
-            <div class="item-notificacion">
-                <div class="icono-notificacion icono-notificacion-azul">
-                    <i class="bi bi-bug-fill"></i>
-                </div>
-                <div>
-                    <div class="fw-semibold">laboratorio con parasitos</div>
-                    <small class="text-muted">Hace 12 h</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="p-3 border-top">
-            <h6 class="mb-3 fw-bold">Actividades</h6>
-            <div class="item-actividad">
-                <div class="icono-actividad icono-actividad-rojo">
-                    <i class="bi bi-heart-pulse"></i>
-                </div>
-                <div>
-                    <div class="fw-semibold">Consulta general</div>
-                    <small class="text-muted">Justo ahora</small>
-                </div>
-            </div>
-            <div class="item-actividad">
-                <div class="icono-actividad icono-actividad-azul">
-                    <i class="bi bi-syringe"></i>
-                </div>
-                <div>
-                    <div class="fw-semibold">Vacunación</div>
-                    <small class="text-muted">Hace 59 min</small>
-                </div>
-            </div>
-            <div class="item-actividad">
-                <div class="icono-actividad icono-actividad-rojo">
-                    <i class="bi bi-bandaid"></i>
-                </div>
-                <div>
-                    <div class="fw-semibold">Programación cirugía</div>
-                    <small class="text-muted">Hace 12 horas</small>
-                </div>
-            </div>
-            <div class="item-actividad">
-                <div class="icono-actividad icono-actividad-azul">
-                    <i class="bi bi-heart-pulse"></i>
-                </div>
-                <div>
-                    <div class="fw-semibold">Consulta general</div>
-                    <small class="text-muted">Ayer, 7 am</small>
-                </div>
-            </div>
-            <div class="item-actividad">
-                <div class="icono-actividad icono-actividad-verde">
-                    <i class="bi bi-capsule"></i>
-                </div>
-                <div>
-                    <div class="fw-semibold">Cirugía</div>
-                    <small class="text-muted">Feb 2, 2025</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="p-3 border-top">
-            <h6 class="mb-3 fw-bold">Dueños laboratorios</h6>
-            <div class="item-laboratorio">
-                <img src="https://i.pravatar.cc/150?img=1" alt="laboratorio" class="avatar-laboratorio">
-                <div class="flex-grow-1">
-                    <div class="fw-semibold">Natali Craig</div>
-                </div>
-            </div>
-            <div class="item-laboratorio">
-                <img src="https://i.pravatar.cc/150?img=2" alt="laboratorio" class="avatar-laboratorio">
-                <div class="flex-grow-1">
-                    <div class="fw-semibold">Drew Cano</div>
-                </div>
-            </div>
-            <div class="item-laboratorio">
-                <img src="https://i.pravatar.cc/150?img=3" alt="laboratorio" class="avatar-laboratorio">
-                <div class="flex-grow-1">
-                    <div class="fw-semibold">Andi Lane</div>
-                </div>
-            </div>
-            <div class="item-laboratorio">
-                <img src="https://i.pravatar.cc/150?img=4" alt="laboratorio" class="avatar-laboratorio">
-                <div class="flex-grow-1">
-                    <div class="fw-semibold">Koray Okumus</div>
-                </div>
-            </div>
-            <div class="item-laboratorio">
-                <img src="https://i.pravatar.cc/150?img=5" alt="laboratorio" class="avatar-laboratorio">
-                <div class="flex-grow-1">
-                    <div class="fw-semibold">Kate Morrison</div>
-                </div>
-            </div>
-            <div class="item-laboratorio">
-                <img src="https://i.pravatar.cc/150?img=6" alt="laboratorio" class="avatar-laboratorio">
-                <div class="flex-grow-1">
-                    <div class="fw-semibold">Melody Macy</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- aqui va el inclunde notifi -->
+    <?php
+    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+    ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="contenido-principal" id="contenidoPrincipal">
-
         <!-- NAVBAR SUPERIOR -->
-        <div class="barra-navegacion-superior">
-            <div class="navegacion-izquierda">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-flask"></i>
-                    <span class="fw-semibold">Laboratorio</span>
-                    <span class="text-muted">/</span>
-                    <span>Registro paciente</span>
-                </div>
-            </div>
-            <div class="buscador-navegacion">
-                <i class="bi bi-search"></i>
-                <input type="text" placeholder="Search" class="form-control">
-            </div>
-            <div class="acciones-navegacion">
-                <button class="boton-icono-navegacion">
-                    <i class="bi bi-brightness-high"></i>
-                </button>
-                <button class="boton-icono-navegacion">
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                </button>
-                <button class="boton-icono-navegacion">
-                    <a href="dashBoardPerfil.html"><i class="bi bi-person-circle"></i></a>
-                </button>
-                <button class="boton-icono-navegacion" onclick="alternarBarraDerecha()">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-            </div>
-        </div>
+
+        <!-- Aqui va el include de navbar superior -->
+        <?php
+        include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php'
+        ?>
 
         <!-- FORMULARIO DE REGISTRO -->
         <div class="wizard-container">
@@ -513,7 +313,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Propio -->
-    <script src="../../assets/dashBoard/veterinarias/js/registroPacientesLaboratorio.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/registroPacientesLaboratorio.js"></script>
 
 
 </body>

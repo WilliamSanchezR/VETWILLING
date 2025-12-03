@@ -79,7 +79,6 @@ function registrarVeterinario()
     $id_rol = '2';
     $password_hash = '123456';
     $estado = 'activo';
-    $tipo_usuario = '2';
     $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? '';
     $ruta_img = $_POST['img_perfil'] ?? '';
 
@@ -157,7 +156,6 @@ function registrarVeterinario()
         'id_rol' => $id_rol,
         'password_hash' => $password_hash,
         'estado' => $estado,
-        'tipo_usuario' => $tipo_usuario,
         'id_veterinaria' => $id_veterinaria,
         'img_perfil' => $ruta_img
     ];
@@ -169,7 +167,7 @@ function registrarVeterinario()
     // Si la respuesta del modelo es verdadera confirmamos el registro y redireccionameos, si es falsa notificamos y redireccionamos
 
     if ($resultado === true) {
-        mostrarSweetAlert('success', 'Registro del veterinario exitoso', 'Se ha creado un nuevo veterinario en la veterinaria', '/vetwilling/veterinario/registrar-veterinario');
+        mostrarSweetAlert('success', 'Registro del veterinario exitoso', 'Se ha creado un nuevo veterinario en la veterinaria', '/vetwilling/veterinario/consultar-veterinario');
     } else {
         mostrarSweetAlert('error', 'Error al registrar', 'No se pudo registrar el veterinario. Intenta nuevamente');
     }
