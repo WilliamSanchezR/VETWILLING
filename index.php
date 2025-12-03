@@ -115,16 +115,21 @@ switch ($request) {
     case '/admin/actualizar-usuario':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
-    
+
     case '/admin/eliminar-usuario':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
+
+    case '/admin/actualizar-contrasena':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
 
     case '/admin/registro-veterinaria':
         require BASE_PATH . '/app/views/dashboard/administrador/registroVeterinaria.php';
         break;
 
-    
+
 
     // ---------------------------------------PROPIETARIO-------------------------------------//
 

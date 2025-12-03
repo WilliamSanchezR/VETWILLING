@@ -44,7 +44,6 @@ class Usuario
                     ) VALUES(
                         :id_usuario, :tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :img_perfil, :nivel_acceso
                     )";
-
                 } elseif ($data['id_rol'] == '3') {
                     $sql = "INSERT INTO representante_legal(
                         id_veterinaria, id_usuario, tipo_documento, numero_documento, nombres, apellidos, telefono, img_perfil, nivel_acceso
@@ -70,7 +69,6 @@ class Usuario
 
                 return $stmt->execute();
             }
-
         } catch (PDOException $e) {
             error_log("Error en Usuario::registrar -> " . $e->getMessage());
             return false;
@@ -121,7 +119,6 @@ class Usuario
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         } catch (PDOException $e) {
             error_log("Error en Usuario::listar -> " . $e->getMessage());
             return [];
@@ -162,7 +159,6 @@ class Usuario
             $stmt2->bindParam(':id', $id);
             $stmt2->execute();
             return $stmt2->fetch();
-
         } catch (PDOException $e) {
             error_log("Error en Usuario::consultarUsuario -> " . $e->getMessage());
             return false;
@@ -225,7 +221,6 @@ class Usuario
             $stmt3->bindParam(':telefono', $data['telefono']);
 
             return $stmt3->execute();
-
         } catch (PDOException $e) {
             error_log("Error en Usuario::actualizarUsuario -> " . $e->getMessage());
             return false;
@@ -249,4 +244,42 @@ class Usuario
         return $resultado->execute();
     }
 
+    public function actualizarContrasena($data)
+    {
+        try {
+            $consultar = "SELECT *
+                FROM usuario us
+                WHERE us.id_usuario = :id LIMIT 1";
+
+            $resultado = $this->conexion->prepare($consultar);
+            $resultado->bindParam(':id', $data['id_usuario']);
+            $resultado->execute();
+
+            $user = $resultado->fetch();
+
+            if (!$user) {
+                return false;
+            }
+
+            // Verificacion de la contraseña incriptada
+
+            if (!password_verify($data['password_actual'], $user['password_hash'])) {
+                return false;
+            }
+
+            $nuevoPassword = password_hash($data['nuevo_password'], PASSWORD_DEFAULT);
+
+            $sql = "UPDATE usuario SET password_hash = :password_hash
+                    WHERE id_usuario = :id_usuario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $data['id_usuario']);
+            $stmt->bindParam(':password_hash', $nuevoPassword);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::actualizarUsuario -> " . $e->getMessage());
+            return false;
+        }
     }
+}

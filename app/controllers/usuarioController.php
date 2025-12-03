@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/usuario.php';
@@ -12,6 +12,9 @@ switch ($method) {
         $accion = $_POST['accion'] ?? '';
         if ($accion === 'actualizar') {
             actualizarUsuario();
+        } else if ($accion  === 'actualizar-constrasena') {
+            echo ('Entro al Case de Put');
+            cambioContrasena();
         } else {
             registrarUsuario();
         }
@@ -89,7 +92,6 @@ function registrarUsuario()
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
         move_uploaded_file($file['tmp_name'], $destino);
-
     } else {
         $img_perfil = 'foto_default.jpg';
     }
@@ -216,4 +218,51 @@ function eliminarUsuario($id)
     exit();
 }
 
+function cambioContrasena()
+{
+    $id_usuario = $_POST['id_usuario'] ?? '';
+    $passwordActual = $_POST['contrasena-actual'] ?? '';
+    $PasswordNuevo = $_POST['nueva-contrasena'] ?? '';
+    $PasswordConfir = $_POST['confi-contrasena'] ?? '';
 
+    if (
+        empty($id_usuario) || empty($passwordActual) || empty($PasswordNuevo) ||
+        empty($PasswordConfir)
+    ) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Complete todos los campos');
+        exit();
+    }
+
+    if ($PasswordConfir !== $PasswordNuevo) {
+        mostrarSweetAlert('error', 'Constraseña Invalida', 'La confirmación de contraseña no es igual a la constraseña nueva.');
+        exit();
+    }
+
+    if ($passwordActual === $PasswordNuevo) {
+        mostrarSweetAlert('error', 'Constraseña Invalida', 'La nueva contraseña no puede ser igual a la constraseña actual.');
+        exit();
+    }
+
+     $objUsuario = new Usuario();
+
+      $data = [
+        'id_usuario' => $id_usuario,
+        'password_actual' => $passwordActual,
+        'nuevo_password' => $PasswordNuevo
+    ];
+
+    $resultado = $objUsuario->actualizarContrasena($data);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Contraseña actualizada',
+            'La contraseña han sido actualizada correctamente',
+            '/vetwilling/veterinario/consultar-perfil'
+        );
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la contraseña');
+    }
+
+    exit();
+}

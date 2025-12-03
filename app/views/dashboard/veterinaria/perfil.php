@@ -396,7 +396,9 @@ $usuario = mostrarPerfil($id);
 
                     <div class="modal-body">
 
-                        <form action="" method="post">
+                        <form action="<?= BASE_URL ?>/admin/actualizar-contrasena" method="POST">
+                            <input type="hidden" name="id_usuario" value="<?= $id ?>">
+                            <input type="hidden" name="accion" value="actualizar-constrasena">
                             <div class="container">
                                 <div class="row">
                                     <div class="col-md-12">
@@ -441,13 +443,13 @@ $usuario = mostrarPerfil($id);
 
                             </div>
 
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success">Guardar <i class="bi bi-floppy"></i></button>
+                            </div>
                         </form>
                     </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-success">Guardar <i class="bi bi-floppy"></i></button>
-                    </div>
                 </div>
             </div>
         </div>
