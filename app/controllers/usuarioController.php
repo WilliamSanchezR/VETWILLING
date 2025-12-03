@@ -13,7 +13,6 @@ switch ($method) {
         if ($accion === 'actualizar') {
             actualizarUsuario();
         } else if ($accion  === 'actualizar-constrasena') {
-            echo ('Entro al Case de Put');
             cambioContrasena();
         } else {
             registrarUsuario();
@@ -216,7 +215,6 @@ function eliminarUsuario($id)
     }
 
     exit();
-}
 }
 
 function cambioContrasena()
