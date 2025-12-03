@@ -1,5 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_veterinario.php';
+require_once BASE_PATH . '/app/helpers/session_representante.php';
 
 // enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
 require_once BASE_PATH . '/app/controllers/veterinarioController.php';
@@ -78,7 +79,7 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-person"></i> Apellidos</label>
-                                <input type="text" id="apellidoPropietario" name="apellidos" value="<?= $usuario['apellidos'] ?>" placeholder="Ej: García">
+                                <input type="text" id="apellidoPropietario" name="apellidos" value="<?= $veterinario['apellidos'] ?>" placeholder="Ej: García">
                             </div>
                         </div>
 
@@ -137,7 +138,7 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" name="telefono" value="<?= $usuario['telefono'] ?>" placeholder="+57 300 123 4567">
+                                <input type="tel" id="telefono" name="telefono" value="<?= $veterinario['telefono'] ?>" placeholder="+57 300 123 4567">
                             </div>
                         </div>
 
