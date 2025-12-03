@@ -25,6 +25,8 @@ $mascotas = listarMascotas();
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/perfil.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
+
 </head>
 
 <body>
@@ -136,7 +138,7 @@ $mascotas = listarMascotas();
                         <?php foreach ($mascotas as $m) : ?>
                             <div class="mascota-mini-item">
                                 <div class="mascota-mini-avatar">
-                                    <img src="<?= $m['img_mascota'] ?>" alt="Mascota" style="width:50px; height:50px; border-radius:50%;">
+                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $m['img_mascota'] ?> alt="Mascota" style="width:50px; height:50px; border-radius:50%;">
                                 </div>
 
                                 <div class="mascota-mini-info">

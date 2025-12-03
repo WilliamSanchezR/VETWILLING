@@ -1,0 +1,826 @@
+/* ============================================
+   MODO NOCHE - SISTEMA COMPLETO
+   Para Dashboard VetWilling
+   ============================================ */
+
+/* ============================================
+   VARIABLES MODO OSCURO
+   ============================================ */
+[data-theme="dark"] {
+    /* Colores base */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --bg-hover: #475569;
+    
+    /* Textos */
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e0;
+    --text-muted: #94a3b8;
+    
+    /* Bordes y sombras */
+    --border-color: #334155;
+    --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.4);
+    
+    /* Acentos */
+    --accent-primary: #667eea;
+    --accent-hover: #5568d3;
+    
+    /* Estados */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+}
+
+/* ============================================
+   BASE Y BODY
+   ============================================ */
+[data-theme="dark"] body {
+    background: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+[data-theme="dark"] .sidebar {
+    background: var(--bg-secondary) !important;
+    border-right-color: var(--border-color) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+[data-theme="dark"] .sidebar-header {
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .nav-section-title {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .nav-item {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .nav-item:hover {
+    background: var(--bg-hover) !important;
+    color: var(--accent-primary) !important;
+}
+
+[data-theme="dark"] .nav-item.active {
+    background: rgba(102, 126, 234, 0.15) !important;
+    color: var(--accent-primary) !important;
+}
+
+[data-theme="dark"] .nav-logout:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #ef4444 !important;
+}
+
+/* ============================================
+   NAVBAR SUPERIOR
+   ============================================ */
+[data-theme="dark"] .navbar-superior {
+    background: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+[data-theme="dark"] .btn-navbar,
+[data-theme="dark"] .btn-perfil {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .btn-navbar:hover,
+[data-theme="dark"] .btn-perfil:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .input-buscar {
+    background: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .input-buscar::placeholder {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .nombre-usuario {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .rol-usuario {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================
+   DROPDOWNS
+   ============================================ */
+[data-theme="dark"] .dropdown-menu {
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow-hover) !important;
+}
+
+[data-theme="dark"] .dropdown-header {
+    background: var(--bg-tertiary) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .dropdown-header h6 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .dropdown-footer {
+    background: var(--bg-tertiary) !important;
+    border-top-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .notificacion-item {
+    background: var(--bg-tertiary) !important;
+    border-left-color: transparent !important;
+}
+
+[data-theme="dark"] .notificacion-item:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .notificacion-item.no-leida {
+    background: rgba(102, 126, 234, 0.1) !important;
+}
+
+[data-theme="dark"] .notif-texto {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .notif-tiempo {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .perfil-header {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: var(--bg-hover) !important;
+    color: var(--accent-primary) !important;
+}
+
+/* ============================================
+   CONTENIDO PRINCIPAL
+   ============================================ */
+[data-theme="dark"] .contenido-principal {
+    background: var(--bg-primary) !important;
+}
+
+[data-theme="dark"] .container-dashboard {
+    background: transparent !important;
+}
+
+/* ============================================
+   TARJETAS Y CARDS
+   ============================================ */
+[data-theme="dark"] .card,
+[data-theme="dark"] .card-perfil,
+[data-theme="dark"] .config-card,
+[data-theme="dark"] .mascota-card,
+[data-theme="dark"] .producto-card,
+[data-theme="dark"] .cita-card,
+[data-theme="dark"] .foto,
+[data-theme="dark"] .info,
+[data-theme="dark"] .especialidades,
+[data-theme="dark"] .estadisticas,
+[data-theme="dark"] .horarios,
+[data-theme="dark"] .citas,
+[data-theme="dark"] .consultas-notas {
+    background: var(--bg-secondary) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+[data-theme="dark"] .card:hover,
+[data-theme="dark"] .mascota-card:hover,
+[data-theme="dark"] .producto-card:hover {
+    box-shadow: var(--shadow-hover) !important;
+}
+
+[data-theme="dark"] .card-title,
+[data-theme="dark"] .card-titulo,
+[data-theme="dark"] .seccion-titulo,
+[data-theme="dark"] .header-titulo h1,
+[data-theme="dark"] .mascota-info-header h3,
+[data-theme="dark"] .producto-nombre,
+[data-theme="dark"] .cita-titulo,
+[data-theme="dark"] .info h2,
+[data-theme="dark"] .especialidades h2 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .card-action {
+    color: var(--accent-primary) !important;
+}
+
+/* ============================================
+   BIENVENIDA Y HEADERS
+   ============================================ */
+[data-theme="dark"] .bienvenida-card,
+[data-theme="dark"] .header-perfil,
+[data-theme="dark"] .header-tienda,
+[data-theme="dark"] .header-config {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* ============================================
+   ALERTAS
+   ============================================ */
+[data-theme="dark"] .alert-box {
+    background: rgba(251, 191, 36, 0.15) !important;
+    border-left-color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .alert-config {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .alert-success {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-left-color: var(--success) !important;
+}
+
+[data-theme="dark"] .alert-warning {
+    background: rgba(245, 158, 11, 0.15) !important;
+    border-left-color: var(--warning) !important;
+}
+
+[data-theme="dark"] .alert-danger {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-left-color: var(--error) !important;
+}
+
+/* ============================================
+   CITAS
+   ============================================ */
+[data-theme="dark"] .cita-item {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .cita-item:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .cita-fecha {
+    background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .cita-mascota,
+[data-theme="dark"] .cita-detalles {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .dia-fecha {
+    background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .dia-fecha h3 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .dia-fecha p {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================
+   MASCOTAS
+   ============================================ */
+[data-theme="dark"] .mascota-card-body {
+    background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .info-item {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .info-item:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .info-label {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .info-value {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .estado-section {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .estado-title {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .mascota-mini-item {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .mascota-mini-item:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .mascota-mini-nombre {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .mascota-mini-raza {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================
+   PRODUCTOS/TIENDA
+   ============================================ */
+[data-theme="dark"] .producto-imagen {
+    background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-hover)) !important;
+}
+
+[data-theme="dark"] .producto-info {
+    background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .producto-categoria {
+    color: var(--accent-primary) !important;
+}
+
+[data-theme="dark"] .producto-descripcion {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .precio-actual {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .precio-anterior {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .producto-footer {
+    border-top-color: var(--border-color) !important;
+}
+
+/* ============================================
+   CONFIGURACIÓN
+   ============================================ */
+[data-theme="dark"] .tabs-config,
+[data-theme="dark"] .tabs-perfil,
+[data-theme="dark"] .tabs-container {
+    background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .tab-config,
+[data-theme="dark"] .tab-perfil,
+[data-theme="dark"] .tab-btn {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .tab-config:hover,
+[data-theme="dark"] .tab-perfil:hover,
+[data-theme="dark"] .tab-btn:hover {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .tab-config.active,
+[data-theme="dark"] .tab-perfil.active,
+[data-theme="dark"] .tab-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: white !important;
+}
+
+[data-theme="dark"] .config-card-header h3,
+[data-theme="dark"] .config-card-header p {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .config-info h4 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .config-info p {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .config-item {
+    border-bottom-color: var(--border-color) !important;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+    background: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] textarea:focus {
+    border-color: var(--accent-primary) !important;
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .form-group label {
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   FILTROS Y BÚSQUEDA
+   ============================================ */
+[data-theme="dark"] .filtros-container,
+[data-theme="dark"] .barra-busqueda,
+[data-theme="dark"] .filtros-avanzados {
+    background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .filter-btn,
+[data-theme="dark"] .categoria-btn {
+    background: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .filter-btn:hover,
+[data-theme="dark"] .categoria-btn:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .filter-btn.active,
+[data-theme="dark"] .categoria-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: white !important;
+    border-color: #667eea !important;
+}
+
+/* ============================================
+   ESTADÍSTICAS
+   ============================================ */
+[data-theme="dark"] .stat-item {
+    background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .stat-item:hover {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .stat-content h3 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .stat-content p {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .stat-box {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .stat-numero {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .stat-label {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================
+   RECORDATORIOS Y ACTIVIDAD
+   ============================================ */
+[data-theme="dark"] .recordatorio-item,
+[data-theme="dark"] .timeline-contenido,
+[data-theme="dark"] .actividad-detalles {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .recordatorio-item:hover,
+[data-theme="dark"] .timeline-contenido:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .recordatorio-texto h4,
+[data-theme="dark"] .actividad-titulo {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .recordatorio-texto p,
+[data-theme="dark"] .actividad-subtitulo {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================
+   HISTORIAL
+   ============================================ */
+[data-theme="dark"] .historial-item {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .historial-titulo {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .historial-detalle {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .historial-dia {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .historial-mes {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================
+   FOTO PERFIL
+   ============================================ */
+[data-theme="dark"] .foto-perfil-container {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .foto-acciones h4 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .foto-acciones p {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================
+   PANEL LATERAL DERECHO
+   ============================================ */
+[data-theme="dark"] .barra-lateral-derecha {
+    background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .seccion-resumen {
+    background: var(--bg-primary) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .tarjeta-resumen {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .resumen-numero {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .resumen-label {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .seccion-panel {
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .seccion-header h6 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .item-notificacion {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .item-notificacion:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .notif-titulo {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .notif-descripcion {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .cita-card {
+    background: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .cita-info {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .btn-accion-rapida {
+    background: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .btn-accion-rapida:hover {
+    background: var(--bg-hover) !important;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+[data-theme="dark"] .btn-secondary,
+[data-theme="dark"] .btn-cancelar,
+[data-theme="dark"] .action-btn-secondary {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .btn-secondary:hover,
+[data-theme="dark"] .btn-cancelar:hover,
+[data-theme="dark"] .action-btn-secondary:hover {
+    background: var(--bg-hover) !important;
+}
+
+[data-theme="dark"] .btn-remove {
+    background: rgba(239, 68, 68, 0.15) !important;
+}
+
+[data-theme="dark"] .btn-remove:hover {
+    background: #ef4444 !important;
+}
+
+/* ============================================
+   PAGINACIÓN
+   ============================================ */
+[data-theme="dark"] .paginacion .pagina-btn {
+    background: var(--bg-tertiary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .paginacion .pagina-btn:hover,
+[data-theme="dark"] .paginacion .pagina-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: white !important;
+}
+
+/* ============================================
+   ESTADOS VACÍOS
+   ============================================ */
+[data-theme="dark"] .sin-mascotas,
+[data-theme="dark"] .sin-citas,
+[data-theme="dark"] .sin-resultados {
+    background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .sin-mascotas h3,
+[data-theme="dark"] .sin-citas h3,
+[data-theme="dark"] .sin-resultados h3 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .sin-mascotas p,
+[data-theme="dark"] .sin-citas p,
+[data-theme="dark"] .sin-resultados p {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--bg-hover);
+    border-radius: 10px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* ============================================
+   ELEMENTOS ESPECÍFICOS
+   ============================================ */
+[data-theme="dark"] .detalle-label {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .detalle-valor {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .cita-notas {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .detalle {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .card-documentos,
+[data-theme="dark"] .card-notas {
+    background: var(--bg-tertiary) !important;
+}
+
+[data-theme="dark"] .list-group-item {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   MODO NOCHE - INFO ADICIONAL
+   ============================================ */
+[data-theme="dark"] .info-item span:first-child {
+    color: var(--accent-primary) !important;
+}
+
+[data-theme="dark"] .info p span:first-child {
+    color: var(--accent-primary) !important;
+}
+
+/* ============================================
+   TRANSICIONES SUAVES
+   ============================================ */
+[data-theme="dark"] * {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease !important;
+}
+
+/* Excepciones para animaciones */
+[data-theme="dark"] .badge-notif,
+[data-theme="dark"] .carrito-badge,
+[data-theme="dark"] .mascota-card,
+[data-theme="dark"] .producto-card {
+    transition: transform 0.3s ease, 
+                box-shadow 0.3s ease,
+                background-color 0.3s ease !important;
+}
+
+/* ============================================
+   OVERLAY OSCURO
+   ============================================ */
+[data-theme="dark"] .overlay-panel-derecho {
+    background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* ============================================
+   RESPONSIVE - MANTENER MODO OSCURO
+   ============================================ */
+@media (max-width: 768px) {
+    [data-theme="dark"] .sidebar {
+        background: var(--bg-secondary) !important;
+    }
+    
+    [data-theme="dark"] .navbar-superior {
+        background: var(--bg-secondary) !important;
+    }
+}
+
+/* ============================================
+   HOVER STATES MEJORADOS
+   ============================================ */
+[data-theme="dark"] a:hover {
+    color: var(--accent-primary) !important;
+}
+
+[data-theme="dark"] button:not(.btn-primary):not(.btn-guardar):not(.btn-agregar):hover {
+    opacity: 0.9;
+}
+
+/* ============================================
+   GRADIENTES PRESERVADOS
+   ============================================ */
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .mascota-card-header,
+[data-theme="dark"] .producto-badge,
+[data-theme="dark"] .licencia-badge {
+    /* Los gradientes se mantienen igual */
+}
+
+/* ============================================
+   TOOLTIPS
+   ============================================ */
+[data-theme="dark"] .tooltip,
+[data-theme="dark"] .sidebar.collapsed .nav-item::after {
+    background: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
