@@ -44,6 +44,7 @@ class Perfil
                                 INNER JOIN administrador a ON u.id_usuario = a.id_usuario
                                 INNER JOIN rol r ON u.id_rol = r.id_rol
                                 WHERE u.id_usuario = :id";
+                    break;
 
                 case 2: // VETERINARIO
                     $consultar = "SELECT 
