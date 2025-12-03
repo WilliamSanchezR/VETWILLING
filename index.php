@@ -196,6 +196,11 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/confi.php';
         break;
 
+    //----------ACCIONES DEL PACIENTE---------//
+    case '/usuario/actualizar':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 

@@ -105,10 +105,6 @@ $mascotas = listarMascotas();
                             <span class="info-valor"><?= $usuario['tipo_documento'] ?>. <?= $usuario['numero_documento'] ?></span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Fecha de Nacimiento:</span>
-                            <span class="info-valor"> <?= $usuario['fecha_nacimiento'] ?></span>
-                        </div>
-                        <div class="info-item">
                             <span class="info-label">Email:</span>
                             <span class="info-valor"><?= $usuario['email'] ?></span>
                         </div>
@@ -138,7 +134,10 @@ $mascotas = listarMascotas();
                         <?php foreach ($mascotas as $m) : ?>
                             <div class="mascota-mini-item">
                                 <div class="mascota-mini-avatar">
-                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $m['img_mascota'] ?> alt="Mascota" style="width:50px; height:50px; border-radius:50%;">
+                                    <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= $m['img_mascota'] ?>"
+                                        alt="Mascota"
+                                        style="width:50px; height:50px; border-radius:50%;">
+
                                 </div>
 
                                 <div class="mascota-mini-info">
@@ -148,9 +147,9 @@ $mascotas = listarMascotas();
                                     </div>
                                 </div>
 
-                                <button class="btn-editar" style="padding: 8px 16px; font-size: 13px;">
+                                <a href="<?= BASE_URL ?>/Cliente/mascotas" class="btn-editar" style="padding: 8px 16px; font-size: 13px;">
                                     Ver
-                                </button>
+                                </a>
                             </div>
                         <?php endforeach; ?>
                     </div>
