@@ -1,5 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_veterinario.php';
+require_once BASE_PATH . '/app/helpers/session_representante.php';
 
 // enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
 require_once BASE_PATH . '/app/controllers/veterinarioController.php';

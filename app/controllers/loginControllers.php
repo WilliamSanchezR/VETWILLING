@@ -75,6 +75,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
             break;
 
+        case 4: // Representante
+            mostrarSweetAlert(
+                "success",
+                "Inicio de Sesión Exitoso",
+                "Bienvenido Representante " . $resultado['nombres'],
+                "/vetwilling/veterinaria/dashboard"
+            );
+            break;
+
         default:
             mostrarSweetAlert("error", "Rol no reconocido", "Redirigiendo al login...", "/vetwilling/login");
             break;
