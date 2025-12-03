@@ -97,7 +97,7 @@ $usuario = mostrarPerfil($id);
                         <div class="info">
                             <h2>
                                 Seguaridad
-                               
+
                             </h2>
                             <div class="actions">
                                 <button class="btn_change_password" data-bs-toggle="modal" data-bs-target="#exampleModal">Cambiar contraseña</button>
