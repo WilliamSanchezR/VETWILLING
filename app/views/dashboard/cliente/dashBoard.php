@@ -21,6 +21,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
     <!-- CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
 </head>
 

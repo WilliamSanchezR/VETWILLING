@@ -143,7 +143,7 @@ function actualizarMascota()
         }
 
         $nuevaFoto = uniqid('pet_') . '.' . $ext;
-        $destino = BASE_PATH . "/public/uploads/mascotas/$nuevaFoto";
+        $destino = BASE_PATH . "/public/uploads/usuarios/$nuevaFoto";
         move_uploaded_file($file['tmp_name'], $destino);
     }
 
