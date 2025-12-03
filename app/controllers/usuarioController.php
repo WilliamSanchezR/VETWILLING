@@ -242,9 +242,9 @@ function cambioContrasena()
         exit();
     }
 
-     $objUsuario = new Usuario();
+    $objUsuario = new Usuario();
 
-      $data = [
+    $data = [
         'id_usuario' => $id_usuario,
         'password_actual' => $passwordActual,
         'nuevo_password' => $PasswordNuevo
