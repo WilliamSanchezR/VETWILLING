@@ -68,6 +68,9 @@ switch ($method) {
 function registrarVeterinario()
 {
 
+
+    session_start();
+
     // capturamos en variables los datos desde el formulario a travez del metodo POST y los name de los campos
 
     $nombres = $_POST['nombres'] ?? '';
@@ -91,7 +94,6 @@ function registrarVeterinario()
 
     // capturamos el id del usuario que inicia secion para guardarlo solo si es necesario
 
-    session_start();
     $id_veterinaria = $_SESSION['user']['id_veterinaria'];
 
     // POO - instanciamos la clase
@@ -135,7 +137,7 @@ function registrarVeterinario()
         $ruta_img = uniqid('user_') . '.' . $ext;
 
         // *Definimos el destino donde moveremos el archivo
-        $destino = BASE_PATH . '/public/uploads/usuarios/' . $ruta_img;
+        $destino = BASE_PATH . '/public/uploads/veterinarios/' . $ruta_img;
 
         // *Movemos el archivo al destino
         move_uploaded_file($file['tmp_name'], $destino);
@@ -177,8 +179,13 @@ function registrarVeterinario()
 function mostrarVeterinarios()
 {
 
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    $id_veterinaria = $_SESSION['user']['id_veterinaria'];
+
     // session_start();
-    $id_veterinaria = $_SESSION['user'];
 
     // echo $id_veterinaria;
 
@@ -248,7 +255,7 @@ function actualizarVeterinario()
     // Si la respuesta del modelo es verdadera confirmamos el registro y redireccionameos, si es falsa notificamos y redireccionamos
 
     if ($resultado === true) {
-        mostrarSweetAlert('success', 'Actualizacion del veterinario exitoso', 'Se ha actualizado el veterinario', '/vetwilling/veterinario/registrar-veterinario');
+        mostrarSweetAlert('success', 'Actualizacion del veterinario exitoso', 'Se ha actualizado el veterinario', '/vetwilling/veterinario/consultar-veterinario');
     } else {
         mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el veterinario. Intenta nuevamente');
     }
@@ -262,7 +269,7 @@ function eliminarVeterinario($id)
     $respuesta = $objVeterinario->eliminar($id);
 
     if ($respuesta === true) {
-        mostrarSweetAlert('success', 'Eliminacion del veterinario exitosa', 'Se ha eliminado el veterinario de la veterinaria', '/vetwilling/veterinario/registrar-veterinario');
+        mostrarSweetAlert('success', 'Eliminacion del veterinario exitosa', 'Se ha eliminado el veterinario de la veterinaria', '/vetwilling/veterinario/consultar-veterinario');
     } else {
         mostrarSweetAlert('error', 'Error al eliminar', 'No se pudo eliminar el veterinario. Intenta nuevamente');
     }
