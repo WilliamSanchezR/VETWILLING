@@ -21,6 +21,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
     <!-- CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
 </head>
 
@@ -41,7 +42,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
                 <!-- BIENVENIDA -->
                 <div class="bienvenida-card">
-                    <h2>¡Bienvenido, Carlos! 🐾</h2>
+                    <h2>¡Bienvenido, <?= $usuario['nombres'] ?>! 🐾</h2>
                     <p>Nos alegra verte nuevamente. En VetWilling cuidamos de tus mascotas con amor, profesionalismo y dedicación.</p>
                     <p class="frase">Tu familia está en buenas patas.</p>
                 </div>
@@ -53,84 +54,6 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                         <h3>Recordatorio Importante</h3>
                         <p>Max tiene vacuna antirrábica pendiente para el 25 de noviembre</p>
                     </div>
-                </div>
-
-                <!-- MIS MASCOTAS -->
-                <h2 class="seccion-titulo">🐾 Mis Mascotas</h2>
-                <div class="mascotas-grid">
-
-                    <div class="mascota-card">
-                        <div class="mascota-header">
-                            <div class="mascota-avatar">🐕</div>
-                            <div class="mascota-info">
-                                <h3>Max</h3>
-                                <p>Golden Retriever</p>
-                            </div>
-                        </div>
-                        <div class="mascota-detalles">
-                            <div class="detalle-item">
-                                <span class="detalle-label">Edad</span>
-                                <span class="detalle-valor">3 años</span>
-                            </div>
-                            <div class="detalle-item">
-                                <span class="detalle-label">Peso</span>
-                                <span class="detalle-valor">28 kg</span>
-                            </div>
-                            <div class="detalle-item">
-                                <span class="detalle-label">Última visita</span>
-                                <span class="detalle-valor">15 Nov 2025</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mascota-card">
-                        <div class="mascota-header">
-                            <div class="mascota-avatar">🐈</div>
-                            <div class="mascota-info">
-                                <h3>Luna</h3>
-                                <p>Siamés</p>
-                            </div>
-                        </div>
-                        <div class="mascota-detalles">
-                            <div class="detalle-item">
-                                <span class="detalle-label">Edad</span>
-                                <span class="detalle-valor">2 años</span>
-                            </div>
-                            <div class="detalle-item">
-                                <span class="detalle-label">Peso</span>
-                                <span class="detalle-valor">4.5 kg</span>
-                            </div>
-                            <div class="detalle-item">
-                                <span class="detalle-label">Última visita</span>
-                                <span class="detalle-valor">10 Nov 2025</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mascota-card">
-                        <div class="mascota-header">
-                            <div class="mascota-avatar">🐕</div>
-                            <div class="mascota-info">
-                                <h3>Rocky</h3>
-                                <p>Pastor Alemán</p>
-                            </div>
-                        </div>
-                        <div class="mascota-detalles">
-                            <div class="detalle-item">
-                                <span class="detalle-label">Edad</span>
-                                <span class="detalle-valor">5 años</span>
-                            </div>
-                            <div class="detalle-item">
-                                <span class="detalle-label">Peso</span>
-                                <span class="detalle-valor">35 kg</span>
-                            </div>
-                            <div class="detalle-item">
-                                <span class="detalle-label">Última visita</span>
-                                <span class="detalle-valor">08 Nov 2025</span>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
                 <!-- CITAS Y RECORDATORIOS -->

@@ -97,11 +97,6 @@ body {
     transform: translateX(5px);
 }
 
-.menu-item.active {
-    background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
-    color: white;
-}
-
 .menu-item i {
     font-size: 20px;
     width: 20px;
@@ -126,19 +121,6 @@ body {
 
 .sidebar.collapsed~.contenido-principal {
     margin-left: var(--sidebar-width-collapsed);
-}
-
-/* ===== NAVBAR SUPERIOR ===== */
-.navbar-superior {
-    background: white;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    position: sticky;
-    top: 0;
-    z-index: 100;
 }
 
 .toggle-btn {
@@ -214,7 +196,7 @@ body {
 
 /* ===== BIENVENIDA ===== */
 .bienvenida-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #913ce0 0%, #3056a8 100%);
     border-radius: 16px;
     padding: 40px;
     color: white;
@@ -277,14 +259,6 @@ body {
     color: #2c3e50;
     margin-bottom: 20px;
     font-weight: 600;
-}
-
-/* ===== MASCOTAS GRID ===== */
-.mascotas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
-    margin-bottom: 40px;
 }
 
 .mascota-card {

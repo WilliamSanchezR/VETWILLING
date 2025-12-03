@@ -1,3 +1,9 @@
+<?php
+require_once BASE_PATH . '/app/controllers/mascotasController.php';
+
+$mascotas = listarMascotas();
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -19,6 +25,8 @@
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/perfil.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
+
 </head>
 
 <body>
@@ -39,14 +47,14 @@
                 <!-- Header Perfil -->
                 <div class="header-perfil">
                     <div class="avatar-grande">
-                        CR
+                        <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
                         <div class="avatar-edit">
                             <i class="bi bi-camera-fill" style="color: white; font-size: 16px;"></i>
                         </div>
                     </div>
                     <div class="info-perfil-header">
-                        <h1>Carlos Ramírez</h1>
-                        <p>📧 carlos.ramirez@email.com • 📱 +57 300 123 4567</p>
+                        <h1><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h1>
+                        <p><?= $usuario['email'] ?> <br> <?= $usuario['telefono'] ?></p>
                         <div class="badges-perfil">
                             <span class="badge-item">
                                 <i class="bi bi-star-fill"></i>
@@ -58,7 +66,7 @@
                             </span>
                             <span class="badge-item">
                                 <i class="bi bi-heart-fill"></i>
-                                3 Mascotas
+                                <?= count($mascotas) ?> Mascotas
                             </span>
                         </div>
                     </div>
@@ -73,14 +81,6 @@
                     <button class="tab-perfil">
                         <i class="bi bi-heart-pulse"></i>
                         Mis Mascotas
-                    </button>
-                    <button class="tab-perfil">
-                        <i class="bi bi-clock-history"></i>
-                        Historial
-                    </button>
-                    <button class="tab-perfil">
-                        <i class="bi bi-gear-fill"></i>
-                        Configuración
                     </button>
                 </div>
 
@@ -98,72 +98,27 @@
 
                         <div class="info-item">
                             <span class="info-label">Nombre Completo:</span>
-                            <span class="info-valor">Carlos Ramírez Pérez</span>
+                            <span class="info-valor"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Documento:</span>
-                            <span class="info-valor">CC 1.234.567.890</span>
+                            <span class="info-valor"><?= $usuario['tipo_documento'] ?>. <?= $usuario['numero_documento'] ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Fecha de Nacimiento:</span>
-                            <span class="info-valor">15 de Marzo, 1988</span>
+                            <span class="info-valor"> <?= $usuario['fecha_nacimiento'] ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Email:</span>
-                            <span class="info-valor">carlos.ramirez@email.com</span>
+                            <span class="info-valor"><?= $usuario['email'] ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Teléfono:</span>
-                            <span class="info-valor">+57 300 123 4567</span>
+                            <span class="info-valor">+57 <?= $usuario['telefono'] ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Dirección:</span>
-                            <span class="info-valor">Calle 123 #45-67, Bogotá</span>
-                        </div>
-                    </div>
-
-                    <!-- Estadísticas -->
-                    <div class="card-perfil">
-                        <div class="card-header-perfil">
-                            <h2 class="card-titulo">
-                                <i class="bi bi-bar-chart-fill"></i>
-                                Mis Estadísticas
-                            </h2>
-                        </div>
-
-                        <div class="stats-grid">
-                            <div class="stat-box">
-                                <div class="stat-numero">24</div>
-                                <div class="stat-label">Citas Totales</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-numero">3</div>
-                                <div class="stat-label">Mascotas</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-numero">18</div>
-                                <div class="stat-label">Vacunas</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-numero">$450K</div>
-                                <div class="stat-label">Total Gastado</div>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 25px;">
-                            <h3 style="font-size: 16px; color: #2c3e50; margin-bottom: 15px;">Próximas Citas</h3>
-                            <div class="info-item">
-                                <span class="info-label">22 Nov 2025:</span>
-                                <span class="info-valor">Max - Control</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">25 Nov 2025:</span>
-                                <span class="info-valor">Max - Vacunación</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">28 Nov 2025:</span>
-                                <span class="info-valor">Luna - Consulta</span>
-                            </div>
+                            <span class="info-valor"><?= $usuario['direccion'] ?>.</span>
                         </div>
                     </div>
 
@@ -172,7 +127,7 @@
                         <div class="card-header-perfil">
                             <h2 class="card-titulo">
                                 <i class="bi bi-heart-fill"></i>
-                                Mis Mascotas (3)
+                                Mis Mascotas (<?= count($mascotas) ?>)
                             </h2>
                             <button class="btn-editar">
                                 <i class="bi bi-plus-circle"></i>
@@ -180,80 +135,24 @@
                             </button>
                         </div>
 
-                        <div class="mascota-mini-item">
-                            <div class="mascota-mini-avatar">🐕</div>
-                            <div class="mascota-mini-info">
-                                <div class="mascota-mini-nombre">Max</div>
-                                <div class="mascota-mini-raza">Golden Retriever • 3 años</div>
-                            </div>
-                            <button class="btn-editar" style="padding: 8px 16px; font-size: 13px;">
-                                Ver
-                            </button>
-                        </div>
+                        <?php foreach ($mascotas as $m) : ?>
+                            <div class="mascota-mini-item">
+                                <div class="mascota-mini-avatar">
+                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $m['img_mascota'] ?> alt="Mascota" style="width:50px; height:50px; border-radius:50%;">
+                                </div>
 
-                        <div class="mascota-mini-item">
-                            <div class="mascota-mini-avatar">🐈</div>
-                            <div class="mascota-mini-info">
-                                <div class="mascota-mini-nombre">Luna</div>
-                                <div class="mascota-mini-raza">Siamés • 2 años</div>
-                            </div>
-                            <button class="btn-editar" style="padding: 8px 16px; font-size: 13px;">
-                                Ver
-                            </button>
-                        </div>
+                                <div class="mascota-mini-info">
+                                    <div class="mascota-mini-nombre"><?= $m['nombre'] ?></div>
+                                    <div class="mascota-mini-raza">
+                                        <?= $m['raza'] ?> • <?= $m['edad'] ?> meses
+                                    </div>
+                                </div>
 
-                        <div class="mascota-mini-item">
-                            <div class="mascota-mini-avatar">🐕</div>
-                            <div class="mascota-mini-info">
-                                <div class="mascota-mini-nombre">Rocky</div>
-                                <div class="mascota-mini-raza">Pastor Alemán • 5 años</div>
+                                <button class="btn-editar" style="padding: 8px 16px; font-size: 13px;">
+                                    Ver
+                                </button>
                             </div>
-                            <button class="btn-editar" style="padding: 8px 16px; font-size: 13px;">
-                                Ver
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Configuración -->
-                    <div class="card-perfil">
-                        <div class="card-header-perfil">
-                            <h2 class="card-titulo">
-                                <i class="bi bi-gear-fill"></i>
-                                Configuración
-                            </h2>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Notificaciones por Email</h4>
-                                <p>Recibir recordatorios de citas por correo</p>
-                            </div>
-                            <div class="toggle-switch active"></div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Notificaciones SMS</h4>
-                                <p>Recibir mensajes de texto</p>
-                            </div>
-                            <div class="toggle-switch active"></div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Promociones y Ofertas</h4>
-                                <p>Recibir información sobre descuentos</p>
-                            </div>
-                            <div class="toggle-switch"></div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Recordatorios de Vacunas</h4>
-                                <p>Alertas automáticas de vacunación</p>
-                            </div>
-                            <div class="toggle-switch active"></div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
 
                     <!-- Historial Reciente -->
