@@ -724,3 +724,12 @@ h5, h6 {
 .modal-body::-webkit-scrollbar-thumb:hover {
     background: var(--color-primario);
 }
+
+.modal-notificacion .modal-dialog .modal-content {
+    border-radius: 20px;
+    background: #e4ecf1;
+}
+
+.modal-notificacion .modal-dialog .modal-content .modal-header{
+        border-radius: 20px 20px 0px 0px;
+}
