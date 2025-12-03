@@ -136,7 +136,7 @@ $usuario = mostrarPerfil($id);
                 <span>Configuración</span>
             </a>
             <div class="dropdown-divider"></div>
-            <a href="<?= BASE_URL ?>/" class="dropdown-item text-danger">
+            <a href="<?= BASE_URL ?>/logout" class="dropdown-item text-danger">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Cerrar Sesión</span>
             </a>
