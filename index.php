@@ -202,10 +202,13 @@ switch ($request) {
     case '/Cliente/configuracion':
         require BASE_PATH . '/app/views/dashboard/cliente/confi.php';
         break;
+    case '/Cliente/registrar-mascota':
+        require BASE_PATH . '/app/views/dashboard/cliente/registro.php';
+        break;
 
     //----------ACCIONES DEL PACIENTE---------//
-    case '/usuario/actualizar':
-        require BASE_PATH . '/app/controllers/usuarioController.php';
+    case '/Cliente/actualizar':
+        require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
 
 
