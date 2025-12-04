@@ -497,39 +497,48 @@
 
                     <!-- Cambiar Contraseña -->
                     <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-lock-fill"></i>
-                            </div>
-                            <div>
-                                <h3>Cambiar Contraseña</h3>
-                                <p>Actualiza tu contraseña regularmente</p>
-                            </div>
-                        </div>
+                        <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar-contrasena">
+                            <input type="hidden" name="id_usuario" value="<?= $id ?>">
+                            <input type="hidden" name="accion" value="modificar-constrasena">
 
-                        <form>
+
+
+
                             <div class="form-group-config">
                                 <label>Contraseña Actual</label>
-                                <input type="password" placeholder="Ingresa tu contraseña actual">
+                                <input type="password" name="contrasena-actual" required placeholder="Ingresa tu contraseña actual">
                             </div>
+
+
+
 
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Nueva Contraseña</label>
-                                    <input type="password" placeholder="Mínimo 8 caracteres">
+                                    <input type="password" name="nueva-contrasena" required minlength="3" placeholder="Mínimo 8 caracteres">
                                 </div>
+
+
+
 
                                 <div class="form-group-config">
                                     <label>Confirmar Contraseña</label>
-                                    <input type="password" placeholder="Confirma tu contraseña">
+                                    <input type="password" name="confi-contrasena" required minlength="3" placeholder="Confirma tu contraseña">
                                 </div>
                             </div>
 
-                            <button type="button" class="btn-config btn-primary-config" onclick="cambiarPassword()">
+
+
+
+                            <button type="submit" class="btn-config btn-primary-config">
                                 <i class="bi bi-check-lg"></i>
                                 Actualizar Contraseña
                             </button>
 
+
+
+
+                        </form>
                     </div>
 
                     <!-- Autenticación en Dos Pasos -->
