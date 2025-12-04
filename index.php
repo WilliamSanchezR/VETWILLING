@@ -68,6 +68,31 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/dashBoard.php';
         break;
 
+    case '/veterinaria/seguimientos':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/seguimientos.php';
+        break;
+
+    case '/veterinaria/calendario':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/calendario.php';
+        break;
+
+    case '/veterinaria/gestion_clinica':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
+        break;
+
+    case '/veterinaria/laboratorio':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/laboratorio.php';
+        break;
+
+    case '/veterinaria/recetas':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/recetas.php';
+        break;
+
+    case '/veterinaria/reportes':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/reportes.php';
+        break;
+
+
     case '/veterinario/registrar-veterinario':
         require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';
         break;
@@ -176,6 +201,11 @@ switch ($request) {
         break;
     case '/Cliente/configuracion':
         require BASE_PATH . '/app/views/dashboard/cliente/confi.php';
+        break;
+
+    //----------ACCIONES DEL PACIENTE---------//
+    case '/usuario/actualizar':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
 

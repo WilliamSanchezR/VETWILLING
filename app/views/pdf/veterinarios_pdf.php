@@ -1,163 +1,181 @@
+<?php
+$id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? 1;
+$veterinarios = mostrarVeterinarios($id_veterinaria);
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <title>Reporte de Veterinarios</title>
+
     <style>
-        /* Márgenes generales del documento */
-        @page {
-            margin: 40px 50px;
+        * {
+            font-family: Arial, Helvetica, sans-serif;
+            box-sizing: border-box;
         }
 
         body {
-            font-size: 12px;
-            color: #000;
+            margin: 0;
+            padding: 0;
+            background: #f4f7f6;
         }
 
-        /* Encabezado */
+        .top-bar {
+            width: 100%;
+            background: #1b8f72;
+            padding: 10px 0;
+        }
+
         .header {
-            display: flex;
-            align-items: center;
-            border-bottom: 2px solid #0db339;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            position: relative;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
         }
 
         .header img {
-            width: 80px;
-            height: auto;
-            position: absolute;
-            right: -15px;
-            top: -25px;
-
+            width: 120px;
+            margin-bottom: 10px;
         }
 
-        .header h1 {
-            color: #0db339;
-            font-size: 22px;
-            margin: 0;
+        .titulo {
+            font-size: 28px;
+            margin: 5px 0;
+            font-weight: bold;
+            color: #1b8f72;
         }
 
-        /* Contenido */
-        .descripcion {
-            color: #000;
-            margin-bottom: 25px;
-            text-align: justify;
+        .subtitulo {
+            font-size: 15px;
+            color: #5c5c5c;
+            margin-top: -5px;
+            letter-spacing: 0.5px;
         }
 
-        /* Tabla */
+        .contenedor {
+            background: #fff;
+            margin: 20px auto 40px;
+            width: 90%;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 40px;
+            margin-top: 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        th,
-        td {
-            border: 1px solid #ccc;
-            padding: 6px 8px;
-            text-align: left;
-            vertical-align: middle;
+        thead tr {
+            background: #1b8f72;
+            color: white;
         }
 
         th {
-            background-color: #0db339;
-            color: white;
-            font-weight: bold;
+            padding: 12px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e6e6e6;
+            color: #333;
         }
 
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background: #f9f9f9;
         }
 
-        tr:hover {
-            background-color: #eef9f1;
-        }
-
-        td img {
-            width: 45px;
-            height: 45px;
+        .foto {
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid #1b8f72;
         }
 
-        /* Footer */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 40px;
+        .estado-activo {
+            color: #1b8f72;
+            font-weight: bold;
+        }
+
+        .estado-inactivo {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .footer {
             text-align: center;
-            line-height: 40px;
-            border-top: 1px solid #ccc;
+            margin-top: 35px;
             font-size: 12px;
-            color: #666;
+            color: #777;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Encabezado con logo y título -->
+    <div class="top-bar"></div>
+
     <div class="header">
-        <img src="https://raw.githubusercontent.com/MaicBernal11/VetWilling-Imagenes-Correo/refs/heads/main/VETWILLING/LOGO-VERTICAL.png"  alt="Logo">
-        <h1>Reporte de Veterinarios Inscritos</h1>
+        <img src="<?= BASE_URL ?>/public/assets/website/img/LOGO-NEGATIVO.png" alt="Logo">
+        <h1 class="titulo">Reporte de Veterinarios</h1>
+        <p class="subtitulo">Generado por el sistema Veterinaria VetWilling</p>
     </div>
 
-    <!-- Descripción -->
-    <p class="descripcion">
-        Este reporte presenta el listado completo de los veterinarios registrados en el sistema Vetwilling durante el año 2025.
-        La información es esencial para el seguimiento, control y verificación de los profesionales vinculados a las diferentes
-        veterinarias, contribuyendo a la transparencia y calidad de los servicios ofrecidos.
-    </p>
+    <div class="contenedor">
 
-    <!-- Tabla de datos -->
-    <table>
-        <thead>
-            <tr>
-                <th>Foto de perfil</th>
-                <th>Número de documento</th>
-                <th>Nombres</th>
-                <th>Apellidos</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Estado</th>
-                <th>Rol</th>
-                <th>Veterinaria</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($veterinarios)): ?>
-                <?php foreach ($veterinarios as $veterinario): ?>
-                    <tr>
-                        <td>
-                            <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $veterinario['img_perfil'] ?>" alt="">
-                        </td>
-                        <td><?= $veterinario['tipo_documento'] ?> - <?= $veterinario['numero_documento'] ?></td>
-                        <td><?= $veterinario['nombres'] ?></td>
-                        <td><?= $veterinario['apellidos'] ?></td>
-                        <td><?= $veterinario['telefono'] ?></td>
-                        <td><?= $veterinario['email'] ?></td>
-                        <td><?= $veterinario['estado'] ?></td>
-                        <td><?= $veterinario['nombre_rol'] ?></td>
-                        <td><?= $veterinario['nombre_veterinaria'] ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
+        <table>
+            <thead>
                 <tr>
-                    <td colspan="12">No hay veterinarios registrados.</td>
+                    <th>Foto</th>
+                    <th>Nombre Completo</th>
+                    <th>Documento</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Estado</th>
                 </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+            </thead>
 
-    <!-- Footer -->
-    <footer>
-        &copy; Vetwilling - 2025
-    </footer>
+            <tbody>
+                <?php if (!empty($veterinarios)) : ?>
+                    <?php foreach ($veterinarios as $veterinario) : ?>
+                        <tr>
+                            <td>
+                                <img class="foto" src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $veterinario['img_perfil'] ?>" alt="">
+                            </td>
+                            <td><?= $veterinario['nombres'] . ' ' . $veterinario['apellidos'] ?></td>
+                            <td><?= $veterinario['tipo_documento'] ?> - <?= $veterinario['numero_documento'] ?></td>
+                            <td><?= $veterinario['telefono'] ?></td>
+                            <td><?= $veterinario['email'] ?></td>
+                            <td class="<?= $veterinario['estado'] == 'Activo' ? 'estado-activo' : 'estado-inactivo' ?>">
+                                <?= $veterinario['estado'] ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding:15px;">
+                            No hay veterinarios registrados
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+
+
+        </table>
+    </div>
+
+    <div class="footer">
+        Documento generado automáticamente el <?= date("d/m/Y H:i a") ?>
+        <br>© <?= date("Y") ?> VetWilling — Todos los derechos reservados.
+    </div>
 
 </body>
 

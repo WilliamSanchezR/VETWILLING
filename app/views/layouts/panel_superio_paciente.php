@@ -144,94 +144,201 @@ $usuario = mostrarPerfil($id);
     </div>
 </nav>
 
-<!-- este es de lo que es la barra de navegacion -->
+
 <script>
-    // Toggle Dropdowns
-    function toggleDropdown(tipo) {
-        const dropdowns = {
-            'notificaciones': document.getElementById('dropdownNotificaciones'),
-            'perfil': document.getElementById('dropdownPerfil')
+
+
+class NavbarManager {
+
+    constructor() {
+        // Selector rápido
+        this.$ = (s) => document.querySelector(s);
+        this.$$ = (s) => document.querySelectorAll(s);
+
+        // DOM cacheado
+        this.navbar = this.$('.navbar-superior');
+
+        this.dropdowns = {
+            notificaciones: this.$('#dropdownNotificaciones'),
+            perfil: this.$('#dropdownPerfil')
         };
 
-        // Cerrar todos los dropdowns
-        Object.values(dropdowns).forEach(d => d.classList.remove('show'));
+        this.buttons = {
+            notificaciones: this.$('.btn-navbar.notificaciones'),
+            perfil: this.$('.btn-perfil'),
+            marcarLeidas: this.$('.btn-marcar-leidas'),
+        };
 
-        // Abrir el dropdown seleccionado
-        if (dropdowns[tipo]) {
-            dropdowns[tipo].classList.add('show');
-        }
+        this.badges = {
+            notificaciones: this.$('.badge-notif')
+        };
 
-        // Toggle flecha del perfil
-        if (tipo === 'perfil') {
-            document.querySelector('.btn-perfil').classList.toggle('active');
-        }
+        this.search = this.$('#inputBusqueda');
+        this.themeIcon = this.$('#themeIcon');
+
+        // Estado
+        this.state = {
+            activeDropdown: null,
+            notificacionesSinLeer: 0,
+            searchDebounce: null,
+            theme: localStorage.getItem('theme') || 'light'
+        };
+
+        this.init();
     }
 
-    // Cerrar dropdowns al hacer click fuera
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.navbar-derecha')) {
-            document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
-                dropdown.classList.remove('show');
-            });
-            document.querySelector('.btn-perfil').classList.remove('active');
-        }
-    });
+    /* ================= INIT ================= */
 
-    // Toggle Mobile Sidebar
-    function toggleMobileSidebar() {
-        // Aquí conectas con tu sidebar
-        console.log('Toggle sidebar móvil');
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebar) {
-            sidebar.classList.toggle('active');
-        }
+    init() {
+        this.initTheme();
+        this.initDropdowns();
+        this.initNotifications();
+        this.initSearch();
+        this.initScrollEffects();
+
+        console.log("Navbar Manager listo ✔");
     }
 
-    // Toggle Theme
-    function toggleTheme() {
-        const body = document.body;
-        const themeIcon = document.getElementById('themeIcon');
+    /* ================= DROPDOWNS ================= */
 
-        body.classList.toggle('dark-mode');
+    initDropdowns() {
+        window.toggleDropdown = (tipo) => this.toggleDropdown(tipo);
 
-        if (body.classList.contains('dark-mode')) {
-            themeIcon.classList.remove('bi-moon-stars-fill');
-            themeIcon.classList.add('bi-sun-fill');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            themeIcon.classList.remove('bi-sun-fill');
-            themeIcon.classList.add('bi-moon-stars-fill');
-            localStorage.setItem('theme', 'light');
-        }
-    }
-
-    // Restaurar tema guardado
-    window.addEventListener('load', function() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('themeIcon').classList.remove('bi-moon-stars-fill');
-            document.getElementById('themeIcon').classList.add('bi-sun-fill');
-        }
-    });
-
-    // Búsqueda
-    document.getElementById('inputBusqueda').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        console.log('Buscando:', searchTerm);
-        // Aquí implementas la lógica de búsqueda
-    });
-
-    // Marcar notificaciones como leídas
-    document.querySelector('.btn-marcar-leidas').addEventListener('click', function() {
-        document.querySelectorAll('.notificacion-item.no-leida').forEach(item => {
-            item.classList.remove('no-leida');
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".navbar-derecha")) {
+                this.closeAllDropdowns();
+            }
         });
-        // Actualizar badge
-        const badge = document.querySelector('.badge-notif');
-        badge.textContent = '0';
-        badge.style.display = 'none';
-    });
 
-    console.log('✅ Navbar Superior cargado correctamente');
+        this.$$('.dropdown').forEach(d => {
+            d.addEventListener('click', (e) => e.stopPropagation());
+        });
+    }
+
+    toggleDropdown(tipo) {
+        const dd = this.dropdowns[tipo];
+        if (!dd) return;
+
+        const open = dd.classList.contains("show");
+        this.closeAllDropdowns();
+
+        if (!open) {
+            dd.classList.add("show");
+            this.state.activeDropdown = tipo;
+        }
+    }
+
+    closeAllDropdowns() {
+        Object.values(this.dropdowns).forEach(dd => dd?.classList.remove("show"));
+        this.state.activeDropdown = null;
+    }
+
+    /* ================= THEME ================= */
+
+    initTheme() {
+        document.documentElement.setAttribute("data-theme", this.state.theme);
+        this.updateThemeIcon();
+
+        window.toggleTheme = () => {
+            this.state.theme = (this.state.theme === "dark") ? "light" : "dark";
+
+            document.documentElement.setAttribute("data-theme", this.state.theme);
+            localStorage.setItem("theme", this.state.theme);
+            this.updateThemeIcon();
+        };
+    }
+
+    updateThemeIcon() {
+        if (!this.themeIcon) return;
+
+        this.themeIcon.className =
+            (this.state.theme === "dark")
+                ? "bi bi-sun-fill"
+                : "bi bi-moon-stars-fill";
+    }
+
+    /* ================= NOTIFICACIONES ================= */
+
+    initNotifications() {
+        if (this.buttons.marcarLeidas) {
+            this.buttons.marcarLeidas.onclick = () => this.marcarTodasComoLeidas();
+        }
+
+        this.$$('.notificacion-item.no-leida').forEach(item => {
+            item.addEventListener("click", () => this.marcarComoLeida(item));
+        });
+
+        this.contarNotificaciones();
+    }
+
+    contarNotificaciones() {
+        this.state.notificacionesSinLeer =
+            this.$$('.notificacion-item.no-leida').length;
+
+        this.updateNotifBadge();
+    }
+
+    updateNotifBadge() {
+        const b = this.badges.notificaciones;
+        if (!b) return;
+
+        b.style.display = (this.state.notificacionesSinLeer > 0) ? "flex" : "none";
+        b.textContent = this.state.notificacionesSinLeer;
+    }
+
+    marcarComoLeida(item) {
+        item.classList.remove("no-leida");
+        this.state.notificacionesSinLeer--;
+        this.updateNotifBadge();
+    }
+
+    marcarTodasComoLeidas() {
+        this.$$('.notificacion-item.no-leida').forEach(item =>
+            item.classList.remove("no-leida")
+        );
+        this.state.notificacionesSinLeer = 0;
+        this.updateNotifBadge();
+    }
+
+    /* ================= BUSCADOR ================= */
+
+    initSearch() {
+        if (!this.search) return;
+
+        this.search.addEventListener("input", (e) => {
+            clearTimeout(this.state.searchDebounce);
+
+            this.state.searchDebounce = setTimeout(() => {
+                const term = e.target.value.trim().toLowerCase();
+                this.performSearch(term);
+            }, 300);
+        });
+    }
+
+    performSearch(term) {
+        const items = this.$$('[data-searchable]');
+        items.forEach(el => {
+            const match = el.textContent.toLowerCase().includes(term);
+            el.style.display = match ? "" : "none";
+        });
+    }
+
+    /* ================= SCROLL ================= */
+
+    initScrollEffects() {
+        window.addEventListener("scroll", () => {
+            if (window.pageYOffset > 50) {
+                this.navbar?.classList.add("scrolled");
+            } else {
+                this.navbar?.classList.remove("scrolled");
+            }
+        });
+    }
+}
+
+/* =============== INICIALIZACIÓN =============== */
+
+document.addEventListener("DOMContentLoaded", () => {
+    window.navbarManager = new NavbarManager();
+});
 </script>

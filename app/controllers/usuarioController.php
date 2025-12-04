@@ -153,15 +153,6 @@ function actualizarUsuario()
     $id_veterinaria = $_POST['veterinaria'] ?? null;
     $estado = $_POST['estado'] ?? 'activo';
 
-    if (
-        empty($id_usuario) || empty($tipo_documento) || empty($numero_documento) ||
-        empty($nombres) || empty($apellidos) || empty($telefono) || empty($email) ||
-        empty($id_rol)
-    ) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Complete todos los campos');
-        exit();
-    }
-
     if ($id_rol == '3' && empty($id_veterinaria)) {
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
         exit();
@@ -242,9 +233,9 @@ function cambioContrasena()
         exit();
     }
 
-     $objUsuario = new Usuario();
+    $objUsuario = new Usuario();
 
-      $data = [
+    $data = [
         'id_usuario' => $id_usuario,
         'password_actual' => $passwordActual,
         'nuevo_password' => $PasswordNuevo

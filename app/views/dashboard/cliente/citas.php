@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/citas.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
 </head>
 
 <body>

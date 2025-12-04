@@ -132,7 +132,7 @@ $datos = mostrarVeterinarios();
                         <?php if (!empty($datos)): ?>
                             <?php foreach ($datos as $veterinario): ?>
                                 <tr class="fila-gris">
-                                    <td><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $veterinario['img_perfil'] ?>" alt=""></td>
+                                    <td><img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $veterinario['img_perfil'] ?>" alt=""></td>
                                     <td><?= $veterinario['tipo_documento'] ?> - <?= $veterinario['numero_documento'] ?></td>
                                     <td><?= $veterinario['nombres'] ?> <br> <?= $veterinario['apellidos'] ?></td>
                                     <td><?= $veterinario['telefono'] ?></td>

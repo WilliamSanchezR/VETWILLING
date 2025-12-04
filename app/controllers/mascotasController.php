@@ -74,7 +74,7 @@ function registrarMascota()
         }
 
         $img_mascota = uniqid('pet_') . ".$ext";
-        $destino = BASE_PATH . "/public/uploads/mascotas/$img_mascota";
+        $destino = BASE_PATH . '/public/uploads/mascotas/'. $img_mascota;
         move_uploaded_file($file['tmp_name'], $destino);
     }
 
