@@ -79,7 +79,7 @@
 
                         <div class="foto-perfil-container">
                             <div class="avatar-grande">
-                                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= htmlspecialchars($usuario['img_perfil']) ?>" alt="">
+                                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
                             </div>
                             <div class="foto-acciones">
                                 <h4>Cambiar Foto de Perfil</h4>
@@ -112,18 +112,18 @@
 
 
                             <input type="hidden" name="accion" value="actualizar">
-                            <input type="hidden" name="id_propietario" value="<?= htmlspecialchars($usuario['id_propietario']) ?>">
+                            <input type="hidden" name="id_usuario" value="<?= $_SESSION['user']['id_usuario'] ?>">
 
 
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Nombre(s)</label>
-                                    <input type="text" name="nombres" value="<?= htmlspecialchars($usuario['nombres']) ?>">
+                                    <input type="text" name="nombres" value="<?= $usuario['nombres'] ?>">
                                 </div>
 
                                 <div class="form-group-config">
                                     <label>Apellido(s)</label>
-                                    <input type="text" name="apellidos" value="<?= htmlspecialchars($usuario['apellidos']) ?>">
+                                    <input type="text" name="apellidos" value="<?= $usuario['apellidos'] ?>">
                                 </div>
                             </div>
 
@@ -139,7 +139,7 @@
 
                                 <div class="form-group-config">
                                     <label>Número de Documento</label>
-                                    <input type="text" name="numero_documento" value="<?= htmlspecialchars($usuario['numero_documento']) ?>">
+                                    <input type="text" name="numero_documento" value="<?= $usuario['numero_documento'] ?>">
                                 </div>
                             </div>
 
@@ -163,13 +163,13 @@
 
                             <div class="form-group-config">
                                 <label>Email Principal</label>
-                                <input type="email" name="email" value="<?= htmlspecialchars($usuario['email']) ?>">
+                                <input type="email" name="email" value="<?= $usuario['email'] ?>">
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Teléfono</label>
-                                    <input type="tel" name="telefono" value="<?= htmlspecialchars($usuario['telefono']) ?>">
+                                    <input type="tel" name="telefono" value="<?= $usuario['telefono'] ?>">
                                 </div>
 
                                 <div class="form-group-config">
@@ -498,7 +498,7 @@
                     <!-- Cambiar Contraseña -->
                     <div class="config-card">
                         <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar-contrasena">
-                            <input type="hidden" name="id_usuario" value="<?= $id ?>">
+                            <input type="hidden" name="id_usuario" value="<?= $_SESSION['user']['id_usuario'] ?>">
                             <input type="hidden" name="accion" value="modificar-constrasena">
 
 

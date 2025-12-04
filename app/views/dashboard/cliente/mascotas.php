@@ -145,7 +145,7 @@ $mascotas = listarMascotas();
                                     <i class="bi bi-syringe"></i> Vacunas
                                 </button>
 
-                                <a href="<?= BASE_URL ?>/mascotas/editar/<?= $m['id_paciente'] ?>"
+                                <a href="<?= BASE_URL ?>/Cliente/editar-mascota?id=<?= $m['id_paciente'] ?>"
                                     class="action-btn action-btn-secondary">
                                     <i class="bi bi-pencil"></i> Editar
                                 </a>
