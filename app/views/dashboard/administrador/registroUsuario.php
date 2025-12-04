@@ -38,23 +38,24 @@ $datosVeterinaria = listarVeterinariasRegistradas();
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoardVeterinariaStyle.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
+    
 
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
 </head>
 
 <body>
+
     <!-- BARRA LATERAL IZQUIERDA -->
-    <!-- Aqui va el include -->
+    <!-- Include de la barra lateral izquierda -->
     <?php
     include_once __DIR__ . '/../../layouts/sidebar_administrador.php'
     ?>
 
 
-
     <!-- PANEL DERECHO -->
-    <!-- aqui va el inclunde notifi -->
+    <!-- Include de notificaciones -->
     <?php
     include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
@@ -63,7 +64,7 @@ $datosVeterinaria = listarVeterinariasRegistradas();
     <div class="contenido-principal" id="contenidoPrincipal">
 
         <!-- NAVBAR SUPERIOR -->
-        <!-- Aqui va el include de navbar superior -->
+        <!-- Include de navbar superior -->
         <?php
         include_once __DIR__ . '/../../layouts/panel_superior_administrador.php'
         ?>
@@ -78,7 +79,7 @@ $datosVeterinaria = listarVeterinariasRegistradas();
 
             <form id="vetForm" action="<?= BASE_URL ?>/admin/guardar-usuario" method="POST" enctype="multipart/form-data">
 
-                <!-- Paso 1: Datos del Propietario -->
+                <!-- Paso 1: Datos del Usuario -->
                 <div class="step active">
                     <h3><i class="bi bi-motherboard"></i>Datos del Usuario</h3>
 
