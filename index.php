@@ -57,16 +57,41 @@ switch ($request) {
     // RUTA PARA CERRA SESION
 
     case '/logout':
-    require BASE_PATH . '/app/controllers/logoutControllers.php';
-    $controller = new LoginController();
-    $controller->logout();
-    break;
+        require BASE_PATH . '/app/controllers/logoutControllers.php';
+        $controller = new LoginController();
+        $controller->logout();
+        break;
 
     // ---------------------------------------VETERINARIO-------------------------------------//
 
     case '/veterinaria/dashboard':
         require BASE_PATH . '/app/views/dashboard/veterinaria/dashBoard.php';
         break;
+
+    case '/veterinaria/seguimientos':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/seguimientos.php';
+        break;
+
+    case '/veterinaria/calendario':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/calendario.php';
+        break;
+
+    case '/veterinaria/gestion_clinica':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
+        break;
+
+    case '/veterinaria/laboratorio':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/laboratorio.php';
+        break;
+
+    case '/veterinaria/recetas':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/recetas.php';
+        break;
+
+    case '/veterinaria/reportes':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/reportes.php';
+        break;
+
 
     case '/veterinario/registrar-veterinario':
         require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';
@@ -119,7 +144,6 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/administrador/editarUsuario.php';
         break;
 
-
     case '/admin/guardar-usuario':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
@@ -136,10 +160,18 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
-
     case '/admin/registro-veterinaria':
         require BASE_PATH . '/app/views/dashboard/administrador/registroVeterinaria.php';
         break;
+
+    case '/admin/guardar-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+
+    case '/admin/perfil-administrador':
+        require BASE_PATH . '/app/views/dashboard/administrador/perfilAdministrador.php';
+        break;
+
 
 
 
@@ -170,6 +202,18 @@ switch ($request) {
     case '/Cliente/configuracion':
         require BASE_PATH . '/app/views/dashboard/cliente/confi.php';
         break;
+    case '/Cliente/registrar-mascota':
+        require BASE_PATH . '/app/views/dashboard/cliente/registro.php';
+        break;
+
+    //----------ACCIONES DEL PACIENTE---------//
+    case '/Cliente/actualizar':
+        require BASE_PATH . '/app/controllers/propetarioController.php';
+        break;
+    case '/Cliente/actualizar-contrasena':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+    
 
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
@@ -178,7 +222,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
         reporteVeterinario();
 
-    //     break;
+        //     break;
 
     default:
         http_response_code(404);

@@ -7,6 +7,7 @@ require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 $id = $_SESSION['user']['id_usuario'];
 
 // Llamamos la funcion especifica que existe en dicho controlador y le pasamos los datos a una variable que podamos manipular en este archivo
+
 $usuario = mostrarPerfil($id);
 
 ?>
@@ -34,7 +35,7 @@ $usuario = mostrarPerfil($id);
         </button>
 
         <button class="btn-perfil" onclick="togglePerfilMenu()" aria-label="Perfil">
-            <a href="<?= BASE_URL ?>/veterinario/consultar-perfil">
+            <a href="<?= BASE_URL ?>/admin/perfil-administrador">
 
 
                 <div class="avatar-usuario">

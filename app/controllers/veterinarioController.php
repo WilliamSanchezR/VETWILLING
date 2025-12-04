@@ -83,6 +83,7 @@ function registrarVeterinario()
     $password_hash = '123456';
     $estado = 'activo';
     $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? '';
+    $numero_licencia_profesional = $_POST['numero_licencia_profesional'] ?? '';
     $ruta_img = $_POST['img_perfil'] ?? '';
 
     // Validamos los caampos que son obligatorios
@@ -159,7 +160,8 @@ function registrarVeterinario()
         'password_hash' => $password_hash,
         'estado' => $estado,
         'id_veterinaria' => $id_veterinaria,
-        'img_perfil' => $ruta_img
+        'img_perfil' => $ruta_img,
+        'numero_licencia_profesional' => $numero_licencia_profesional
     ];
 
     // Enviamos la data al metodo (registrar) de la clase instanciada anteriormente (Veterinario) y esperamos una respuesta booleana del modelo en resultados
