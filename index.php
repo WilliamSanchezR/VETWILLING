@@ -197,8 +197,8 @@ switch ($request) {
         break;
 
     //----------ACCIONES DEL PACIENTE---------//
-    case '/usuario/actualizar':
-        require BASE_PATH . '/app/controllers/usuarioController.php';
+    case '/Cliente/actualizar':
+        require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
 
 

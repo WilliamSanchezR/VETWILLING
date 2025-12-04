@@ -8,6 +8,8 @@
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
+
     <!-- estilos propios y algunas cosas que son importantes para que se vea mas wonito -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/perfil.css">
@@ -62,39 +64,39 @@
 
                 <!-- TAB: MI CUENTA -->
                 <div class="tab-content" id="tab-cuenta">
-                    <form method="POST" action="<?= BASE_URL ?>/usuario/actualizar">
 
-                        <!-- Foto de Perfil -->
-                        <div class="config-card">
-                            <div class="config-card-header">
-                                <div class="config-icon">
-                                    <i class="bi bi-camera-fill"></i>
-                                </div>
-                                <div>
-                                    <h3>Foto de Perfil</h3>
-                                    <p>Actualiza tu imagen de perfil</p>
-                                </div>
+                    <!-- Foto de Perfil -->
+                    <div class="config-card">
+                        <div class="config-card-header">
+                            <div class="config-icon">
+                                <i class="bi bi-camera-fill"></i>
                             </div>
+                            <div>
+                                <h3>Foto de Perfil</h3>
+                                <p>Actualiza tu imagen de perfil</p>
+                            </div>
+                        </div>
 
-                            <div class="foto-perfil-container">
-                                <div class="avatar-grande">
-                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
-                                </div>
-                                <div class="foto-acciones">
-                                    <h4>Cambiar Foto de Perfil</h4>
-                                    <p>JPG, PNG o GIF. Tamaño máximo 2MB</p>
-                                    <div class="foto-btns">
-                                        <input type="file" id="inputFoto" class="input-file" accept="image/*" onchange="previewFoto(event)">
-                                        <label for="inputFoto" class="btn-upload">
-                                            <i class="bi bi-upload"></i> Subir Foto
-                                        </label>
-                                        <button class="btn-remove" onclick="eliminarFoto()">
-                                            <i class="bi bi-trash"></i> Eliminar
-                                        </button>
-                                    </div>
+                        <div class="foto-perfil-container">
+                            <div class="avatar-grande">
+                                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= htmlspecialchars($usuario['img_perfil']) ?>" alt="">
+                            </div>
+                            <div class="foto-acciones">
+                                <h4>Cambiar Foto de Perfil</h4>
+                                <p>JPG, PNG o GIF. Tamaño máximo 2MB</p>
+                                <div class="foto-btns">
+                                    <input type="file" name="img_perfil" id="inputFoto" class="input-file" accept="image/*" onchange="previewFoto(event)">
+                                    <label for="inputFoto" class="btn-upload">
+                                        <i class="bi bi-upload"></i> Subir Foto
+                                    </label>
+                                    <button class="btn-remove" onclick="eliminarFoto()">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar" enctype="multipart/form-data">
 
                         <!-- Información Personal -->
                         <div class="config-card">
@@ -110,17 +112,18 @@
 
 
                             <input type="hidden" name="accion" value="actualizar">
-                            <input type="hidden" name="id_usuario" value="<?= $usuario['id_usuario'] ?>">
+                            <input type="hidden" name="id_propietario" value="<?= htmlspecialchars($usuario['id_propietario']) ?>">
+
 
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Nombre(s)</label>
-                                    <input type="text" name="nombres" value="<?= $usuario['nombres'] ?>">
+                                    <input type="text" name="nombres" value="<?= htmlspecialchars($usuario['nombres']) ?>">
                                 </div>
 
                                 <div class="form-group-config">
                                     <label>Apellido(s)</label>
-                                    <input type="text" name="apellidos" value="<?= $usuario['apellidos'] ?>">
+                                    <input type="text" name="apellidos" value="<?= htmlspecialchars($usuario['apellidos']) ?>">
                                 </div>
                             </div>
 
@@ -136,18 +139,15 @@
 
                                 <div class="form-group-config">
                                     <label>Número de Documento</label>
-                                    <input type="text" name="numero_documento" value="<?= $usuario['numero_documento'] ?>">
+                                    <input type="text" name="numero_documento" value="<?= htmlspecialchars($usuario['numero_documento']) ?>">
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn-config btn-primary-config">
-                                Guardar Cambios
-                            </button>
+
 
 
 
                         </div>
-
 
                         <!-- Información de Contacto -->
                         <div class="config-card">
@@ -161,83 +161,22 @@
                                 </div>
                             </div>
 
-                            <form>
-                                <div class="form-group-config">
-                                    <label>Email Principal</label>
-                                    <input type="email" value="<?= $usuario['email'] ?>" placeholder="tu@email.com">
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group-config">
-                                        <label>Teléfono</label>
-                                        <input type="tel" value="<?= $usuario['telefono'] ?>" placeholder="+57 300 000 0000">
-                                    </div>
-
-                                    <div class="form-group-config">
-                                        <label>Teléfono Alternativo</label>
-                                        <input type="tel" placeholder="+57 300 000 0000">
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Dirección -->
-                        <div class="config-card">
-                            <div class="config-card-header">
-                                <div class="config-icon">
-                                    <i class="bi bi-geo-alt-fill"></i>
-                                </div>
-                                <div>
-                                    <h3>Dirección</h3>
-                                    <p>Actualiza tu dirección de residencia</p>
-                                </div>
+                            <div class="form-group-config">
+                                <label>Email Principal</label>
+                                <input type="email" name="email" value="<?= htmlspecialchars($usuario['email']) ?>">
                             </div>
 
-                            <form>
+                            <div class="form-row">
                                 <div class="form-group-config">
-                                    <label>Dirección Completa</label>
-                                    <input type="text" value="Calle 123 #45-67" placeholder="Calle, carrera, número">
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group-config">
-                                        <label>Ciudad</label>
-                                        <input type="text" value="Bogotá" placeholder="Ciudad">
-                                    </div>
-
-                                    <div class="form-group-config">
-                                        <label>Departamento</label>
-                                        <select>
-                                            <option selected>Cundinamarca</option>
-                                            <option>Antioquia</option>
-                                            <option>Valle del Cauca</option>
-                                            <option>Atlántico</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group-config">
-                                        <label>Código Postal</label>
-                                        <input type="text" value="110111" placeholder="Código postal">
-                                    </div>
-
-                                    <div class="form-group-config">
-                                        <label>País</label>
-                                        <select>
-                                            <option selected>Colombia</option>
-                                            <option>Argentina</option>
-                                            <option>Chile</option>
-                                            <option>México</option>
-                                        </select>
-                                    </div>
+                                    <label>Teléfono</label>
+                                    <input type="tel" name="telefono" value="<?= htmlspecialchars($usuario['telefono']) ?>">
                                 </div>
 
                                 <div class="form-group-config">
-                                    <label>Información Adicional</label>
-                                    <textarea rows="3" placeholder="Apartamento, conjunto, referencia..."></textarea>
+                                    <label>Teléfono Alternativo</label>
+                                    <input type="tel" name="telefono_alt" placeholder="+57 300 000 0000">
                                 </div>
-                            </form>
+                            </div>
                         </div>
 
                         <!-- Información Adicional -->
@@ -252,36 +191,35 @@
                                 </div>
                             </div>
 
-                            <form>
-                                <div class="form-group-config">
-                                    <label>Ocupación</label>
-                                    <input type="text" placeholder="Tu profesión u ocupación">
-                                </div>
 
-                                <div class="form-group-config">
-                                    <label>Biografía</label>
-                                    <textarea rows="4" placeholder="Cuéntanos un poco sobre ti..."></textarea>
-                                </div>
+                            <div class="form-group-config">
+                                <label>Ocupación</label>
+                                <input type="text" placeholder="Tu profesión u ocupación">
+                            </div>
 
-                                <div class="form-group-config">
-                                    <label>Cómo nos conociste</label>
-                                    <select>
-                                        <option>Selecciona una opción</option>
-                                        <option>Redes sociales</option>
-                                        <option>Recomendación</option>
-                                        <option>Búsqueda en Google</option>
-                                        <option>Publicidad</option>
-                                        <option>Otro</option>
-                                    </select>
-                                </div>
+                            <div class="form-group-config">
+                                <label>Biografía</label>
+                                <textarea rows="4" placeholder="Cuéntanos un poco sobre ti..."></textarea>
+                            </div>
 
-                                <div style="display: flex; gap: 15px; margin-top: 20px;">
-                                    <button type="button" class="btn-config btn-primary-config" onclick="guardarAdicional()">
-                                        <i class="bi bi-check-lg"></i>
-                                        Guardar Cambios
-                                    </button>
-                                </div>
-                            </form>
+                            <div class="form-group-config">
+                                <label>Cómo nos conociste</label>
+                                <select>
+                                    <option>Selecciona una opción</option>
+                                    <option>Redes sociales</option>
+                                    <option>Recomendación</option>
+                                    <option>Búsqueda en Google</option>
+                                    <option>Publicidad</option>
+                                    <option>Otro</option>
+                                </select>
+                            </div>
+
+                            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                                <button type="submit" class="btn-config btn-primary-config">
+                                    Guardar Cambios
+                                </button>
+                            </div>
+
                         </div>
                     </form>
                 </div>
@@ -591,7 +529,7 @@
                                 <i class="bi bi-check-lg"></i>
                                 Actualizar Contraseña
                             </button>
-                        </form>
+
                     </div>
 
                     <!-- Autenticación en Dos Pasos -->
