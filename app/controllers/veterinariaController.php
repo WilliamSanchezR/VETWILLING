@@ -13,9 +13,9 @@ switch ($method) {
 
         $accion = $_POST['accion'] ?? '';
         if ($accion === 'actualizar') {
-            // actualizarUsuario();
+            // actualizarVeterinaria();
         } else {
-            listarVeterinariasRegistradas();
+            registrarVeterinaria();
         }
         break;
 
@@ -40,6 +40,54 @@ switch ($method) {
 }
 
 //FUNCIONES CRUD
+// FUNCION PARA REGISTRAR UNA NUEVA VETERINARIA
+function registrarVeterinaria()
+{
+    $nit = $_POST['nit'] ?? '';
+    $nombre = $_POST['nombre'] ?? '';
+    $direccion = $_POST['direccion'] ?? '';
+    $ciudad = $_POST['ciudad'] ?? '';
+    $telefono = $_POST['telefono'] ?? '';
+    $email = $_POST['email'] ?? '';
+    
+    if (
+        empty($nit) || empty($nombre) || empty($direccion) || empty($ciudad) || empty($telefono) ||
+        empty($email)
+    ) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
+        exit();
+    }
+
+
+
+    $objVeterinaria = new Veterinaria();
+
+    $data = [
+        'nit' => $nit,
+        'nombre' => $nombre,
+        'direccion' => $direccion,
+        'ciudad' => $ciudad,
+        'telefono' => $telefono,
+        'email' => $email,
+    ];
+
+    $resultado = $objVeterinaria->registrar($data);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Veterinaria registrada',
+            'La veterinaria ha sido creada correctamente',
+            '/vetwilling/admin/registro-veterinaria'
+        );
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo registrar la veterinaria');
+    }
+
+    exit();
+}
+
+
 function listarVeterinariasRegistradas()
 {
     $veterinariaModel = new Veterinaria();
@@ -47,3 +95,5 @@ function listarVeterinariasRegistradas()
 
     return $veterinarias;
 }
+
+

@@ -29,7 +29,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoardVeterinariaStyle.css">
-    
+
 
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/extras/css/globalStyles.css">
@@ -65,7 +65,8 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
             </div>
 
 
-            <form id="vetForm">
+            <form id="vetForm" action="<?= BASE_URL ?>/admin/guardar-veterinaria" method="POST" enctype="multipart/form-data">
+>
 
                 <!-- Paso 1: Datos de la Veterinaria -->
                 <div class="step active">
@@ -76,7 +77,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-hash"></i> Nit *</label>
-                                    <input type="text" id="nit" required placeholder="000.123.456-7">
+                                    <input type="text" id="nit" name="nit" required placeholder="000.123.456-7">
                                 </div>
                             </div>
 
@@ -84,7 +85,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-person"></i> Nombre *</label>
-                                <input type="text" id="nombrePropietario" required placeholder="Ej: Juan Pérez García">
+                                <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Juan Pérez García">
                             </div>
                         </div>
                     </div>
@@ -93,14 +94,13 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-geo-alt"></i> Dirección *</label>
-                                <input type="text" id="direccion" required placeholder="Calle 12 # 34-56, Apto 102">
+                                <input type="text" id="direccion" name="direccion" required placeholder="Calle 12 # 34-56, Apto 102">
                             </div>
-
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" required placeholder="+57 300 123 4567">
+                                <label><i class="bi bi-building"></i> Ciudad *</label>
+                                <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Bogotá">
                             </div>
                         </div>
                     </div>
@@ -108,8 +108,14 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Email *</label>
-                                <input type="email" id="correo" required placeholder="ejemplo@correo.com">
+                                <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
                             </div>
                         </div>
                     </div>
