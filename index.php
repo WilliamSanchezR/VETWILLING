@@ -144,7 +144,6 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/administrador/editarUsuario.php';
         break;
 
-
     case '/admin/guardar-usuario':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
@@ -161,10 +160,18 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
-
     case '/admin/registro-veterinaria':
         require BASE_PATH . '/app/views/dashboard/administrador/registroVeterinaria.php';
         break;
+
+    case '/admin/guardar-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+
+    case '/admin/perfil-administrador':
+        require BASE_PATH . '/app/views/dashboard/administrador/perfilAdministrador.php';
+        break;
+
 
 
 
