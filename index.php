@@ -140,6 +140,10 @@ switch ($request) {
     case '/admin/registro-veterinaria':
         require BASE_PATH . '/app/views/dashboard/administrador/registroVeterinaria.php';
         break;
+        
+    case '/admin/guardar-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';           
+        break;
 
 
 
