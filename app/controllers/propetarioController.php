@@ -13,8 +13,6 @@ switch ($method) {
 
         if ($accion === 'actualizar') {
             actualizarPropietario();
-        } else {
-            registrarPropietario();
         }
         break;
 
