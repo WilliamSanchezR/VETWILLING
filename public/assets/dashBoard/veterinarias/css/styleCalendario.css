@@ -61,6 +61,62 @@
 }
 
 /* ========================================
+   CONTENEDOR DE EVENTOS EXTERNOS (Sidebar)
+======================================== */
+#external-events {
+    padding: 20px;
+    background: var(--white);
+    border: 2px solid var(--gray-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+    width: 280px;
+    transition: all 0.3s ease;
+}
+
+#external-events:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--green-light);
+}
+
+#external-events h4 {
+    font-family: var(--font-titles);
+    font-size: var(--fs-title3);
+    color: var(--gray-dark);
+    margin: 0 0 15px 0;
+    font-weight: 700;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* Eventos arrastrables en el sidebar */
+.fc-event.external-event {
+    margin: 10px 0;
+    padding: 12px 15px;
+    cursor: move;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--fs-title4);
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fc-event.external-event::before {
+    content: '⋮⋮';
+    font-size: 18px;
+    opacity: 0.5;
+}
+
+.fc-event.external-event:hover {
+    transform: translateX(5px) scale(1.02);
+    box-shadow: var(--shadow-md);
+}
+
+/* ========================================
    BARRA DE ACCIONES
 ======================================== */
 .barra-acciones-citas {
@@ -69,6 +125,11 @@
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
     margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+.barra-acciones-citas:hover {
+    box-shadow: var(--shadow-md);
 }
 
 .boton-vista {
@@ -118,6 +179,7 @@
 .select-veterinario:focus {
     border-color: var(--primary-color);
     outline: none;
+    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.1);
 }
 
 .boton-nueva-cita {
@@ -155,6 +217,24 @@
     gap: 15px;
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.tarjeta-resumen-cita::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -30%;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(10, 147, 44, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.tarjeta-resumen-cita:hover::before {
+    right: -10%;
 }
 
 .tarjeta-resumen-cita:hover {
@@ -187,6 +267,8 @@
     border-radius: var(--radius-md);
     font-size: 28px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .tarjeta-resumen-cita h3 {
@@ -196,6 +278,8 @@
     margin: 0;
     font-weight: 700;
     line-height: 1;
+    position: relative;
+    z-index: 1;
 }
 
 .tarjeta-resumen-cita p {
@@ -206,671 +290,550 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: 600;
-}
-
-/* ========================================
-   VISTA CALENDARIO - COMPACTA
-======================================== */
-.contenedor-calendario-citas {
-    background: var(--white);
-    padding: 25px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.encabezado-calendario {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid var(--gray-light);
-}
-
-.encabezado-calendario h4 {
-    font-family: var(--font-titles);
-    font-size: var(--fs-title2);
-    color: var(--gray-dark);
-    margin: 0;
-    font-weight: 700;
-}
-
-.boton-nav-mes {
-    width: 40px;
-    height: 40px;
-    border: 2px solid var(--gray-medium);
-    background: var(--white);
-    color: var(--gray-dark);
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.boton-nav-mes:hover {
-    background: var(--primary-color);
-    color: var(--white);
-    border-color: var(--primary-color);
-    transform: scale(1.1);
-}
-
-/* CALENDARIO GRID COMPACTO */
-.calendario-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.dia-semana {
-    padding: 12px 8px;
-    text-align: center;
-    font-family: var(--font-body);
-    font-size: var(--fs-text1);
-    font-weight: 700;
-    color: var(--primary-color);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    background: var(--gray-light);
-    border-radius: var(--radius-sm);
-}
-
-.celda-dia {
-    aspect-ratio: 1;
-    padding: 8px;
-    text-align: center;
-    border: 2px solid var(--gray-medium);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: var(--font-body);
-    font-size: var(--fs-title4);
-    font-weight: 600;
-    color: var(--gray-dark);
-    background: var(--white);
     position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.celda-dia:hover {
-    background: var(--green-light);
-    border-color: var(--primary-color);
-    transform: scale(1.05);
-    z-index: 10;
-}
-
-.celda-dia.otro-mes {
-    color: var(--gray-dark);
-    opacity: 0.3;
-    cursor: default;
-}
-
-.celda-dia.otro-mes:hover {
-    transform: none;
-    background: var(--white);
-    border-color: var(--gray-medium);
-}
-
-.celda-dia.hoy {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
-    color: var(--white);
-    border-color: var(--primary-color);
-    font-weight: 700;
-    box-shadow: 0 4px 12px rgba(10, 147, 44, 0.3);
-}
-
-.celda-dia.hoy:hover {
-    background: linear-gradient(135deg, #087a24 0%, var(--primary-color) 100%);
-}
-
-/* Indicadores de citas */
-.indicadores-citas {
-    display: flex;
-    gap: 3px;
-    margin-top: 4px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.indicador-cita {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.indicador-cita.consulta {
-    background: var(--consulta);
-}
-
-.indicador-cita.cirugia {
-    background: var(--cirugia);
-}
-
-.indicador-cita.vacuna {
-    background: var(--vacuna);
-}
-
-.indicador-cita.urgencia {
-    background: var(--urgencia);
-}
-
-/* Leyenda del calendario */
-.leyenda-calendario {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 15px;
-    background: var(--gray-light);
-    border-radius: var(--radius-md);
-}
-
-.item-leyenda-cal {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-body);
-    font-size: var(--fs-text1);
-    color: var(--gray-dark);
-    font-weight: 600;
-}
-
-.item-leyenda-cal .indicador-cita {
-    width: 12px;
-    height: 12px;
+    z-index: 1;
 }
 
 /* ========================================
-   VISTA DÍA - TIMELINE
+   ESTILOS FULLCALENDAR - VETWILLING
 ======================================== */
-.contenedor-vista-dia {
+
+/* Contenedor principal del calendario */
+.fc {
+    font-family: var(--font-body);
+    background-color: var(--white);
+    border: none;
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.fc:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+/* ========================================
+   TOOLBAR SUPERIOR (Header)
+======================================== */
+.fc-header-toolbar {
+    margin-bottom: 30px;
     background: var(--white);
+    color: var(--gray-dark);
     padding: 25px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-}
-
-.encabezado-vista-dia {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid var(--gray-light);
-}
-
-.navegacion-dia {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.navegacion-dia h4 {
-    font-family: var(--font-titles);
-    font-size: var(--fs-title3);
-    color: var(--gray-dark);
-    margin: 0;
-    font-weight: 700;
-}
-
-.boton-nav-dia {
-    width: 35px;
-    height: 35px;
-    border: 2px solid var(--gray-medium);
-    background: var(--white);
-    color: var(--gray-dark);
-    border-radius: 50%;
-    cursor: pointer;
+    border: 2px solid var(--green-light);
+    position: relative;
+    overflow: visible;
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.boton-nav-dia:hover {
-    background: var(--primary-color);
-    color: var(--white);
+.fc-header-toolbar:hover {
     border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
 }
 
-.boton-hoy {
-    padding: 8px 20px;
+/* Título del mes */
+.fc-toolbar-title {
+    font-family: var(--font-titles);
+    font-size: var(--fs-title1);
+    font-weight: 700;
+    color: var(--gray-dark);
+    position: relative;
+    z-index: 1;
+    text-transform: capitalize;
+}
+
+/* Botones del toolbar */
+.fc-toolbar-chunk .fc-button {
     background: var(--primary-color);
     color: var(--white);
     border: none;
-    border-radius: var(--radius-sm);
-    font-family: var(--font-body);
-    font-size: var(--fs-title4);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.boton-hoy:hover {
-    background: #087a24;
-    transform: translateY(-2px);
-}
-
-/* Timeline */
-.timeline-dia {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.linea-horario {
-    display: grid;
-    grid-template-columns: 80px 1fr;
-    gap: 20px;
-    border-bottom: 1px solid var(--gray-light);
-    padding: 15px 0;
-    min-height: 80px;
-}
-
-.hora-timeline {
-    font-family: var(--font-body);
-    font-size: var(--fs-title4);
-    font-weight: 700;
-    color: var(--gray-dark);
-    padding-top: 5px;
-}
-
-.citas-hora {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* Tarjeta de cita en timeline */
-.cita-timeline {
-    background: var(--white);
-    border-left: 4px solid var(--consulta);
     border-radius: var(--radius-md);
-    padding: 15px;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
-}
-
-.cita-timeline:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateX(5px);
-}
-
-.cita-timeline.consulta {
-    border-left-color: var(--consulta);
-    background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, var(--white) 10%);
-}
-
-.cita-timeline.cirugia {
-    border-left-color: var(--cirugia);
-    background: linear-gradient(90deg, rgba(139, 92, 246, 0.05) 0%, var(--white) 10%);
-}
-
-.cita-timeline.vacuna {
-    border-left-color: var(--vacuna);
-    background: linear-gradient(90deg, rgba(34, 197, 94, 0.05) 0%, var(--white) 10%);
-}
-
-.cita-timeline.urgencia {
-    border-left-color: var(--urgencia);
-    background: linear-gradient(90deg, rgba(239, 68, 68, 0.05) 0%, var(--white) 10%);
-}
-
-.header-cita-timeline {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.header-cita-timeline strong {
-    font-family: var(--font-titles);
+    padding: 12px 24px;
+    font-family: var(--font-body);
     font-size: var(--fs-title4);
-    color: var(--gray-dark);
     font-weight: 700;
-}
-
-.duracion-cita {
-    padding: 4px 10px;
-    background: var(--gray-light);
-    border-radius: 12px;
-    font-family: var(--font-body);
-    font-size: var(--fs-text1);
-    font-weight: 600;
-    color: var(--gray-dark);
-}
-
-.body-cita-timeline {
-    margin-bottom: 12px;
-}
-
-.body-cita-timeline p {
-    font-family: var(--font-body);
-    font-size: var(--fs-text1);
-    color: var(--gray-dark);
-    margin: 5px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.body-cita-timeline i {
-    color: var(--primary-color);
-    font-size: 14px;
-}
-
-.footer-cita-timeline {
-    display: flex;
-    gap: 8px;
-    padding-top: 12px;
-    border-top: 1px solid var(--gray-light);
-}
-
-.btn-accion-cita {
-    flex: 1;
-    padding: 8px;
-    border: 2px solid var(--gray-medium);
-    background: var(--white);
-    color: var(--gray-dark);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
+    margin: 0 5px;
     transition: all 0.3s ease;
-    font-size: 16px;
+    box-shadow: 0 3px 8px rgba(10, 147, 44, 0.25);
+    position: relative;
+    z-index: 1;
+    text-transform: capitalize;
 }
 
-.btn-accion-cita:hover {
-    transform: translateY(-2px);
+.fc-toolbar-chunk .fc-button:hover {
+    background: #087a24;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(10, 147, 44, 0.35);
 }
 
-.btn-accion-cita.btn-confirmar:hover {
+.fc-toolbar-chunk .fc-button:active,
+.fc-toolbar-chunk .fc-button-active {
+    background: var(--gray-dark) !important;
+    color: var(--white) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateY(0);
+}
+
+.fc-toolbar-chunk .fc-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--gray-medium);
+    color: var(--gray-dark);
+    box-shadow: none;
+}
+
+/* Botón "Today" con estilo destacado */
+.fc-toolbar-chunk .fc-today-button {
+    background: var(--green-light);
+    color: var(--primary-color);
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgba(157, 231, 149, 0.3);
+}
+
+.fc-toolbar-chunk .fc-today-button:hover {
     background: var(--success);
     color: var(--white);
-    border-color: var(--success);
-}
-
-.btn-accion-cita.btn-editar:hover {
-    background: var(--primary-color);
-    color: var(--white);
-    border-color: var(--primary-color);
-}
-
-.btn-accion-cita.btn-cancelar:hover {
-    background: var(--danger);
-    color: var(--white);
-    border-color: var(--danger);
 }
 
 /* ========================================
-   VISTA LISTA
+   ENCABEZADOS DE DÍAS (Dom, Lun, Mar...)
 ======================================== */
-.contenedor-vista-lista {
+.fc-col-header {
     background: var(--white);
-    padding: 25px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
 }
 
-.filtros-lista {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
-}
-
-.filtro-lista {
-    padding: 10px 16px;
-    border: 2px solid var(--gray-medium);
-    border-radius: var(--radius-sm);
+.fc-col-header-cell {
     background: var(--white);
-    color: var(--gray-dark);
-    font-family: var(--font-body);
-    font-size: var(--fs-title4);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.filtro-lista:hover,
-.filtro-lista:focus {
-    border-color: var(--primary-color);
-    outline: none;
-}
-
-/* Items de lista */
-.lista-citas {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.item-cita-lista {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-    background: var(--white);
-    border: 2px solid var(--gray-medium);
-    border-radius: var(--radius-lg);
-    transition: all 0.3s ease;
-    align-items: center;
-}
-
-.item-cita-lista:hover {
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-md);
-    transform: translateX(5px);
-}
-
-.fecha-cita-lista {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 15px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
-    border-radius: var(--radius-md);
-    color: var(--white);
-    min-width: 80px;
-    flex-shrink: 0;
-}
-
-.dia-numero {
-    font-family: var(--font-titles);
-    font-size: 32px;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.mes-nombre {
-    font-family: var(--font-body);
-    font-size: var(--fs-title4);
-    font-weight: 600;
-    text-transform: uppercase;
-    margin-top: 5px;
-}
-
-.info-cita-lista {
-    flex: 1;
-}
-
-.info-cita-lista h5 {
-    font-family: var(--font-titles);
-    font-size: var(--fs-title3);
-    color: var(--gray-dark);
-    margin: 0 0 10px 0;
-    font-weight: 700;
-}
-
-.info-cita-lista p {
-    font-family: var(--font-body);
-    font-size: var(--fs-text1);
-    color: var(--gray-dark);
-    margin: 5px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.info-cita-lista i {
     color: var(--primary-color);
-    font-size: 14px;
-}
-
-.acciones-cita-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-end;
-}
-
-.badge-estado-lista {
-    padding: 6px 16px;
-    border-radius: 20px;
     font-family: var(--font-body);
-    font-size: var(--fs-text1);
     font-weight: 700;
+    font-size: var(--fs-title4);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.badge-estado-lista.confirmada {
-    background: rgba(34, 197, 94, 0.1);
-    color: var(--success);
-}
-
-.badge-estado-lista.pendiente {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-}
-
-.badge-estado-lista.urgente {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-}
-
-.botones-accion-lista {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-lista {
-    width: 36px;
-    height: 36px;
-    border: 2px solid var(--gray-medium);
-    background: var(--white);
-    color: var(--gray-dark);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
+    letter-spacing: 1.5px;
+    padding: 16px 0;
+    border: 1px solid var(--gray-medium);
+    position: relative;
     transition: all 0.3s ease;
+}
+
+.fc-col-header-cell:hover {
+    background: var(--gray-light);
+    border-color: var(--primary-color);
+}
+
+/* ========================================
+   CELDAS DE DÍAS
+======================================== */
+.fc-daygrid-day {
+    border: 1px solid var(--gray-medium);
+    transition: all 0.3s ease;
+    background: var(--white);
+    min-height: 120px;
+    position: relative;
+}
+
+.fc-daygrid-day:hover {
+    background: linear-gradient(135deg, rgba(157, 231, 149, 0.08) 0%, rgba(10, 147, 44, 0.03) 100%);
+    cursor: pointer;
+    box-shadow: inset 0 0 0 2px var(--green-light);
+    transform: scale(1.01);
+}
+
+/* Número del día */
+.fc-daygrid-day-number {
+    font-family: var(--font-body);
+    font-size: var(--fs-title3);
+    font-weight: 700;
+    color: var(--gray-dark);
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+/* Días fuera del mes actual (difuminados) */
+.fc-day-other .fc-daygrid-day-number {
+    color: var(--gray-dark);
+    opacity: 0.2;
+}
+
+.fc-day-other {
+    background: var(--gray-light);
+}
+
+.fc-day-other:hover {
+    background: var(--gray-light);
+    transform: none;
+    box-shadow: none;
+}
+
+/* Día actual (destacado) */
+.fc-day-today {
+    background: linear-gradient(135deg, rgba(157, 231, 149, 0.2) 0%, rgba(10, 147, 44, 0.05) 100%) !important;
+    border: 3px solid var(--primary-color) !important;
+    position: relative;
+    box-shadow: 0 6px 16px rgba(10, 147, 44, 0.25);
+}
+
+.fc-day-today::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 2px solid var(--green-light);
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
+    color: var(--white);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(10, 147, 44, 0.4);
+    margin: 8px;
 }
 
-.btn-lista:hover {
-    background: var(--primary-color);
+/* ========================================
+   EVENTOS EN EL CALENDARIO
+======================================== */
+.fc-event {
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    margin: 4px 6px;
+    font-family: var(--font-body);
+    font-size: var(--fs-text1);
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+    position: relative;
+}
+
+.fc-event::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+    border-radius: var(--radius-md);
+    pointer-events: none;
+}
+
+.fc-event:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+}
+
+/* Título del evento */
+.fc-event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 700;
     color: var(--white);
-    border-color: var(--primary-color);
-    transform: scale(1.1);
+    position: relative;
+    z-index: 1;
+}
+
+/* Tiempo del evento */
+.fc-event-time {
+    font-weight: 700;
+    margin-right: 6px;
+    color: var(--white);
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+   EVENTOS POR TIPO DE CITA
+======================================== */
+
+/* Consulta - Azul */
+.fc-event.event-consulta {
+    background: linear-gradient(135deg, var(--consulta) 0%, #2563eb 100%);
+    color: var(--white);
+    border-left: 6px solid #1e40af;
+}
+
+/* Cirugía - Morado */
+.fc-event.event-cirugia {
+    background: linear-gradient(135deg, var(--cirugia) 0%, #7c3aed 100%);
+    color: var(--white);
+    border-left: 6px solid #5b21b6;
+}
+
+/* Vacuna - Verde */
+.fc-event.event-vacuna {
+    background: linear-gradient(135deg, var(--vacuna) 0%, #16a34a 100%);
+    color: var(--white);
+    border-left: 6px solid #15803d;
+}
+
+/* Urgencia - Rojo */
+.fc-event.event-urgencia {
+    background: linear-gradient(135deg, var(--urgencia) 0%, #dc2626 100%);
+    color: var(--white);
+    border-left: 6px solid #991b1b;
+    animation: pulse-urgencia 2s infinite;
+    font-weight: 900;
+}
+
+@keyframes pulse-urgencia {
+    0%, 100% {
+        box-shadow: 0 3px 8px rgba(239, 68, 68, 0.5);
+    }
+    50% {
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.8);
+        transform: scale(1.02);
+    }
+}
+
+/* Evento primario (genérico) */
+.fc-event-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
+    color: var(--white);
+    border-left: 6px solid #087a24;
+}
+
+/* ========================================
+   VISTA MES (dayGridMonth)
+======================================== */
+.fc-daygrid-day-frame {
+    padding: 10px;
+    min-height: 130px;
+}
+
+.fc-daygrid-day-events {
+    margin-top: 8px;
+}
+
+/* Indicador de "más eventos" */
+.fc-daygrid-more-link {
+    font-family: var(--font-body);
+    font-size: var(--fs-text1);
+    font-weight: 700;
+    color: var(--white);
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+    margin: 4px 6px;
+    display: inline-block;
+    box-shadow: 0 2px 6px rgba(10, 147, 44, 0.3);
+}
+
+.fc-daygrid-more-link:hover {
+    background: linear-gradient(135deg, #087a24 0%, var(--primary-color) 100%);
+    text-decoration: none;
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px rgba(10, 147, 44, 0.4);
+}
+
+/* ========================================
+   POPOVER (cuando hay muchos eventos)
+======================================== */
+.fc-popover {
+    background: var(--white);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 0;
+    overflow: hidden;
+}
+
+.fc-popover-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
+    color: var(--white);
+    font-family: var(--font-titles);
+    font-size: var(--fs-title4);
+    font-weight: 700;
+    padding: 15px 20px;
+    margin: 0;
+}
+
+.fc-popover-body {
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.fc-popover .fc-event {
+    margin: 8px 0;
+}
+
+/* ========================================
+   VISTA SEMANA Y DÍA (timeGrid)
+======================================== */
+.fc-timegrid-slot {
+    height: 70px;
+    border-color: var(--gray-light);
+}
+
+.fc-timegrid-slot-label {
+    font-family: var(--font-body);
+    font-size: var(--fs-title4);
+    font-weight: 700;
+    color: var(--gray-dark);
+    padding: 8px;
+}
+
+.fc-timegrid-event {
+    border-radius: var(--radius-md);
+    border: none;
+    box-shadow: var(--shadow-md);
+}
+
+/* Línea de tiempo actual */
+.fc-timegrid-now-indicator-line {
+    border-color: var(--danger);
+    border-width: 3px;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.fc-timegrid-now-indicator-arrow {
+    border-color: var(--danger);
+    border-width: 8px;
+}
+
+/* ========================================
+   SCROLLBAR PERSONALIZADO
+======================================== */
+.fc-scroller::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.fc-scroller::-webkit-scrollbar-track {
+    background: var(--gray-light);
+    border-radius: 10px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
+    border-radius: 10px;
+    border: 2px solid var(--gray-light);
+}
+
+.fc-scroller::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #087a24 0%, var(--primary-color) 100%);
 }
 
 /* ========================================
    RESPONSIVE
 ======================================== */
-@media (max-width: 1200px) {
-    .calendario-grid {
-        gap: 6px;
-    }
-    
-    .celda-dia {
-        font-size: 12px;
-        padding: 6px;
-    }
-}
-
 @media (max-width: 992px) {
     .contenido-principal {
         margin-left: 0;
     }
     
-    .area-contenido {
-        padding: 15px;
+    .fc {
+        padding: 20px;
     }
     
-    .contenedor-calendario-citas {
+    .fc-header-toolbar {
         padding: 20px;
+    }
+    
+    .fc-toolbar-title {
+        font-size: var(--fs-title2);
+    }
+    
+    .fc-daygrid-day-frame {
+        min-height: 80px;
+    }
+    
+    #external-events {
+        width: 100%;
+        margin-bottom: 20px;
     }
 }
 
 @media (max-width: 768px) {
-    .barra-acciones-citas .d-flex {
+    .area-contenido {
+        padding: 15px;
+    }
+    
+    .fc {
+        padding: 15px;
+    }
+    
+    .fc-header-toolbar {
         flex-direction: column;
+        gap: 15px;
+        padding: 15px;
     }
     
-    .calendario-grid {
-        gap: 4px;
-    }
-    
-    .dia-semana {
-        padding: 8px 4px;
-        font-size: 10px;
-    }
-    
-    .celda-dia {
-        font-size: 11px;
-        padding: 4px;
-    }
-    
-    .indicador-cita {
-        width: 4px;
-        height: 4px;
-    }
-    
-    .linea-horario {
-        grid-template-columns: 60px 1fr;
-        gap: 10px;
-    }
-    
-    .item-cita-lista {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .fecha-cita-lista {
-        width: 100%;
-        flex-direction: row;
+    .fc-toolbar-chunk {
+        display: flex;
         justify-content: center;
-        gap: 10px;
+        flex-wrap: wrap;
     }
     
-    .acciones-cita-lista {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-between;
+    .fc-toolbar-chunk .fc-button {
+        padding: 8px 16px;
+        font-size: var(--fs-text1);
+        margin: 4px;
+    }
+    
+    .fc-daygrid-day-number {
+        font-size: var(--fs-title4);
+        padding: 6px;
+    }
+    
+    .fc-event {
+        font-size: 11px;
+        padding: 4px 8px;
     }
 }
 
-@media (max-width: 576px) {
-    .encabezado-calendario h4,
-    .navegacion-dia h4 {
-        font-size: var(--fs-title4);
+/* ========================================
+   ANIMACIONES ADICIONALES
+======================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
     }
-    
-    .cita-timeline {
-        padding: 12px;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    
-    .footer-cita-timeline {
-        flex-wrap: wrap;
+}
+
+.fc-event {
+    animation: fadeIn 0.4s ease;
+}
+
+/* Efecto hover en celdas de día con eventos */
+.fc-daygrid-day.fc-day-today:hover {
+    box-shadow: 0 8px 20px rgba(10, 147, 44, 0.3);
+}
+
+/* Animación al cargar el calendario */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
     }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fc {
+    animation: slideInUp 0.5s ease;
 }
