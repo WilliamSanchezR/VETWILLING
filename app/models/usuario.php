@@ -12,11 +12,14 @@ class Usuario
         $this->conexion = $db->getConexion();
     }
 
-    // ================================================================
-    // REGISTRAR
-    // ================================================================
+// =========================================
+//  FUNCIONES CRUD
+// =========================================
+
+    // FUNCION PARA REGISTRAR UN NUEVO USUARIO
     public function registrar($data)
     {
+        // Insertamos los datos en la base de datos
         try {
             $insertar = "INSERT INTO usuario(email, password_hash, estado, id_rol)
                 VALUES(:email, :password_hash, :estado, :id_rol)";
@@ -29,15 +32,16 @@ class Usuario
             $resultado->bindParam(':id_rol', $data['id_rol']);
             $respCreacion = $resultado->execute();
 
+            // Si la creacion del usuario fue exitosa, insertamos en la tabla correspondiente
             if ($respCreacion) {
-
+                // Obtenemos el usuario recién creado
                 $consulta = $this->conexion->prepare("SELECT * FROM usuario WHERE email = :email LIMIT 1");
                 $consulta->bindParam(':email', $data['email']);
                 $consulta->execute();
                 $idUser = $consulta->fetch();
-
+                // Verificamos si se obtuvo el usuario
                 if (!$idUser) return false;
-
+                // Insertamos en la tabla correspondiente según el rol
                 if ($data['id_rol'] == '1') {
                     $sql = "INSERT INTO administrador(
                         id_usuario, tipo_documento, numero_documento, nombres, apellidos, telefono, img_perfil, nivel_acceso
@@ -51,13 +55,13 @@ class Usuario
                         :id_veterinaria, :id_usuario, :tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :img_perfil, :nivel_acceso
                     )";
                 }
-
+                // Preparar y ejecutar la inserción
                 $stmt = $this->conexion->prepare($sql);
-
+                // Vincular los parámetros
                 if ($data['id_rol'] == '3') {
                     $stmt->bindParam(':id_veterinaria', $data['id_veterinaria']);
                 }
-
+                // Vincular los demás parámetros
                 $stmt->bindParam(':id_usuario', $idUser['id_usuario']);
                 $stmt->bindParam(':tipo_documento', $data['tipo_documento']);
                 $stmt->bindParam(':numero_documento', $data['numero_documento']);
@@ -75,11 +79,10 @@ class Usuario
         }
     }
 
-    // ================================================================
-    // LISTAR
-    // ================================================================
+    // FUNCION PARA LISTAR LOS USUARIOS REGISTRADOS
     public function listar()
     {
+        // Listamos los usuarios registrados en la base de datos
         try {
             $sql = "SELECT 
                 adm.id_usuario,
@@ -97,7 +100,7 @@ class Usuario
             INNER JOIN rol ON us.id_rol = rol.id_rol
 
             UNION
-
+            -- REPRESENTANTE LEGAL
             SELECT 
                 rep.id_usuario,
                 rep.tipo_documento,
@@ -114,7 +117,7 @@ class Usuario
             INNER JOIN rol ON us.id_rol = rol.id_rol
 
             ORDER BY id_usuario ASC";
-
+            // Preparar y ejecutar la consulta
             $stmt = $this->conexion->prepare($sql);
             $stmt->execute();
 
@@ -125,11 +128,10 @@ class Usuario
         }
     }
 
-    // ================================================================
-    // CONSULTAR POR ID
-    // ================================================================
+    // FUNCION PARA CONSULTAR UN USUARIO POR ID
     public function consultarUsuario($id)
     {
+        // Consultamos un usuario por su ID
         try {
 
             // ADMIN
@@ -139,12 +141,12 @@ class Usuario
                 INNER JOIN administrador adm ON us.id_usuario = adm.id_usuario
                 INNER JOIN rol ON us.id_rol = rol.id_rol
                 WHERE us.id_usuario = :id LIMIT 1";
-
+            // Preparar y ejecutar la consulta
             $stmt = $this->conexion->prepare($sqlAdmin);
             $stmt->bindParam(':id', $id);
             $stmt->execute();
             $data = $stmt->fetch();
-
+            // Verificamos si se obtuvo el usuario
             if ($data) return $data;
 
             // REPRESENTANTE LEGAL
@@ -154,7 +156,7 @@ class Usuario
                 INNER JOIN representante_legal rep ON us.id_usuario = rep.id_usuario
                 INNER JOIN rol ON us.id_rol = rol.id_rol
                 WHERE us.id_usuario = :id LIMIT 1";
-
+            // Preparar y ejecutar la consulta
             $stmt2 = $this->conexion->prepare($sqlRep);
             $stmt2->bindParam(':id', $id);
             $stmt2->execute();
@@ -165,11 +167,10 @@ class Usuario
         }
     }
 
-    // ================================================================
-    // ACTUALIZAR
-    // ================================================================
+    // FUNCION PARA ACTUALIZAR LOS DATOS DEL USUARIO
     public function actualizarUsuario($data)
     {
+        // Actualizamos los datos del usuario
         try {
             $sql = "UPDATE usuario SET email = :email, estado = :estado
                     WHERE id_usuario = :id_usuario";
@@ -180,7 +181,7 @@ class Usuario
             $stmt->bindParam(':estado', $data['estado']);
 
             $ok = $stmt->execute();
-
+            // Verificamos si la actualización fue exitosa
             if (!$ok) return false;
 
             // SI ES ADMIN
@@ -190,7 +191,7 @@ class Usuario
                     SET tipo_documento = :tipo_documento, numero_documento = :numero_documento,
                     nombres = :nombres, apellidos = :apellidos, telefono = :telefono
                     WHERE id_usuario = :id_usuario";
-
+                // Preparar y ejecutar la consulta
                 $stmt2 = $this->conexion->prepare($sqlAdmin);
                 $stmt2->bindParam(':id_usuario', $data['id_usuario']);
                 $stmt2->bindParam(':tipo_documento', $data['tipo_documento']);
@@ -210,7 +211,7 @@ class Usuario
                 apellidos = :apellidos,
                 telefono = :telefono
                 WHERE id_usuario = :id_usuario";
-
+            // Preparar y ejecutar la consulta
             $stmt3 = $this->conexion->prepare($sqlRep);
             $stmt3->bindParam(':id_usuario', $data['id_usuario']);
             $stmt3->bindParam(':id_veterinaria', $data['id_veterinaria']);
@@ -227,15 +228,14 @@ class Usuario
         }
     }
 
-    // ================================================================
-    // ELIMINAR
-    // ================================================================
+    // FUNCION PARA ELIMINAR UN USUARIO
     public function eliminarUsuario($id)
     {
+        // Actualizamos el estado del usuario a 'inactivo'
         $actualizar = "UPDATE usuario SET
                         estado = :estado
                         WHERE id_usuario = :id_usuario";
-
+        // Preparar y ejecutar la consulta
         $resultado = $this->conexion->prepare($actualizar);
 
         $resultado->bindValue(':estado', 'inactivo');
@@ -244,34 +244,35 @@ class Usuario
         return $resultado->execute();
     }
 
+    // FUNCION PARA ACTUALIZAR LA CONTRASEÑA DEL USUARIO    
     public function actualizarContrasena($data)
     {
+        // Actualizamos la contraseña del usuario
         try {
             $consultar = "SELECT *
                 FROM usuario us
                 WHERE us.id_usuario = :id LIMIT 1";
-
+            // Preparar y ejecutar la consulta
             $resultado = $this->conexion->prepare($consultar);
             $resultado->bindParam(':id', $data['id_usuario']);
             $resultado->execute();
 
             $user = $resultado->fetch();
-
+            // Verificamos si se obtuvo el usuario
             if (!$user) {
                 return false;
             }
 
             // Verificacion de la contraseña incriptada
-
             if (!password_verify($data['password_actual'], $user['password_hash'])) {
                 return false;
             }
 
             $nuevoPassword = password_hash($data['nuevo_password'], PASSWORD_DEFAULT);
-
+            // Actualizar la contraseña
             $sql = "UPDATE usuario SET password_hash = :password_hash
                     WHERE id_usuario = :id_usuario";
-
+            // Preparar y ejecutar la consulta
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $data['id_usuario']);
             $stmt->bindParam(':password_hash', $nuevoPassword);

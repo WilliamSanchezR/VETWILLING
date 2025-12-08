@@ -42,8 +42,10 @@ switch ($method) {
 //  FUNCIONES CRUD
 // =========================================
 
+// FUNCION PARA REGISTRAR UN NUEVO USUARIO
 function registrarUsuario()
-{
+{   
+    // Capturamos los datos enviados por el formulario
     $email = $_POST['email'] ?? '';
     $password = '123';
     $estado = 'activo';
@@ -56,47 +58,49 @@ function registrarUsuario()
     $id_veterinaria = $_POST['veterinaria'] ?? null;
     $nivel_acceso = 'Completo';
     $img_perfil = null;
-
+    
+    // Validamos que los campos no esten vacios
     if (
         empty($email) || empty($password) || empty($estado) || empty($id_rol) ||
         empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
         empty($apellidos)
     ) {
+        // Mostrar alerta de error si hay campos vacíos
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
     }
-
+    // Validamos que si el rol es veterinario, se seleccione una veterinaria
     if ($id_rol == '3' && empty($id_veterinaria)) {
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
         exit();
     }
 
-    // IMAGEN DEL PERFIL
+    // Imagen de perfil
     if (!empty($_FILES['img_perfil']['name'])) {
 
         $file = $_FILES['img_perfil'];
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $permitidas = ['png', 'jpg', 'jpeg'];
-
+        // Validar extensión y tamaño
         if (!in_array($ext, $permitidas)) {
             mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
             exit();
         }
-
+        // Validar tamaño
         if ($file['size'] > 2 * 1024 * 1024) {
             mostrarSweetAlert('error', 'Error', 'La foto supera las 2MB');
             exit();
         }
-
+        // Generar un nombre único para la imagen
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
         move_uploaded_file($file['tmp_name'], $destino);
     } else {
         $img_perfil = 'foto_default.jpg';
     }
-
+    // Creamos el objeto de la clase Usuario
     $objUsuario = new Usuario();
-
+    // Preparamos los datos para el registro
     $data = [
         'email' => $email,
         'password' => $password,
@@ -111,9 +115,9 @@ function registrarUsuario()
         'id_veterinaria' => $id_veterinaria,
         'nivel_acceso' => $nivel_acceso,
     ];
-
+    // Registramos el usuario
     $resultado = $objUsuario->registrar($data);
-
+    // Verificamos el resultado y mostramos una alerta
     if ($resultado) {
         mostrarSweetAlert(
             'success',
@@ -128,18 +132,21 @@ function registrarUsuario()
     exit();
 }
 
+// FUNCION PARA LISTAR LOS USUARIOS REGISTRADOS
 function listarUsuarios()
 {
     $resultado = new Usuario();
     return $resultado->listar();
 }
 
+// FUNCION PARA CONSULTAR UN USUARIO POR ID
 function consultarUsuarioId($id)
 {
     $objUsuario = new Usuario();
     return $objUsuario->consultarUsuario($id);
 }
 
+// FUNCION PARA ACTUALIZAR LOS DATOS DEL USUARIO
 function actualizarUsuario()
 {
     $id_usuario = $_POST['id_usuario'] ?? '';
@@ -189,6 +196,7 @@ function actualizarUsuario()
     exit();
 }
 
+// FUNCION PARA ELIMINAR UN USUARIO
 function eliminarUsuario($id)
 {
     $objUsuario = new Usuario();
@@ -208,6 +216,7 @@ function eliminarUsuario($id)
     exit();
 }
 
+// FUNCION PARA CAMBIAR LA CONTRASEÑA DEL USUARIO
 function cambioContrasena()
 {
     $id_usuario = $_POST['id_usuario'] ?? '';
