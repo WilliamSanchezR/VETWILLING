@@ -85,12 +85,12 @@ $usuario = mostrarPerfil($id);
                         <div class="info">
                             <h2>
                                 Información General
-                                <a href="#" aria-label="Editar información"><i class="bi bi-pencil-square"></i></a>
+                                <a href="editar-usuario?id=<?= $id ?>" aria-label="Editar información"><i class="bi bi-pencil-square"></i></a>
                             </h2>
-                            <p><span>Dirección: </span>Calle 6 # 23-34</p>
-                            <p><span>Fecha de Registro: </span>20 - Ago - 2025</p>
-                            <p><span>Correo: </span>pepitoperaz@gmail.com</p>
-                            <p><span>Teléfono: </span>+57 312 405 5678</p>
+                            <p><span>Dirección: </span><?= $usuario['direccion'] ?></p>
+                            <p><span>Fecha de Registro: </span><?= $usuario['fecha_creacion'] ?></p>
+                            <p><span>Correo: </span><?= $usuario['email'] ?></p>
+                            <p><span>Teléfono: </span><?= $usuario['telefono'] ?></p>
                         </div>
                     </div>
 
