@@ -156,6 +156,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
+    case '/admin/cambiar-foto':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
     case '/admin/perfil-administrador':
         require BASE_PATH . '/app/views/dashboard/administrador/perfilAdministrador.php';
         break;
@@ -181,7 +185,7 @@ switch ($request) {
         break;
 
     case '/admin/actualizar-veterinaria':
-        require BASE_PATH . '/app/controllers/veterinariaController.php';   
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
         break;
 
     case '/admin/eliminar-veterinaria':
@@ -235,7 +239,7 @@ switch ($request) {
     case '/Cliente/actualizar-contrasena':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
-    
+
 
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//

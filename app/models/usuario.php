@@ -283,4 +283,37 @@ class Usuario
             return false;
         }
     }
+
+    // FUNCION PARA ACTUALIZAR LA FOTO DE PERFIL DEL USUARIO    
+    public function actualizarFotoPerfil($data) 
+    {
+        // Actualizamos la foto de perfil del usuario
+        try {
+            $sql = "UPDATE administrador SET img_perfil = :img_perfil
+                    WHERE id_usuario = :id_usuario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $data['id_usuario']);
+            $stmt->bindParam(':img_perfil', $data['img_perfil']);
+
+            $ok = $stmt->execute();
+            // Verificamos si la actualización fue exitosa
+            if ($ok) {
+                return true;
+            }
+
+            // SI NO ES ADMIN, INTENTAMOS CON REPRESENTANTE LEGAL
+            $sqlRep = "UPDATE representante_legal SET img_perfil = :img_perfil
+                    WHERE id_usuario = :id_usuario";
+
+            $stmt2 = $this->conexion->prepare($sqlRep);
+            $stmt2->bindParam(':id_usuario', $data['id_usuario']);
+            $stmt2->bindParam(':img_perfil', $data['img_perfil']);
+
+            return $stmt2->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::actualizarFotoPerfil -> " . $e->getMessage());
+            return false;
+        }
+    }
 }

@@ -8,11 +8,24 @@
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
 
 /* - Tercero estilos generales */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: "Fredoka", sans-serif;
 }
 
-p, a, button, li, label, input, select, textarea, span {
+p,
+a,
+button,
+li,
+label,
+input,
+select,
+textarea,
+span {
     font-family: "Open sans", sans-serif;
 }
 
@@ -52,11 +65,13 @@ h2 {
     font-size: var(--fs-titulo2);
 }
 
-h3, h4 {
+h3,
+h4 {
     font-size: var(--fs-titulo3);
 }
 
-h5, h6 {
+h5,
+h6 {
     font-size: var(--fs-titulo4);
 }
 
@@ -121,7 +136,8 @@ h5, h6 {
 }
 
 /* Tarjetas de Información General y Mascotas */
-.info, .mascota {
+.info,
+.mascota {
     background: linear-gradient(135deg, #93bedf40 0%, #93bedf20 100%);
     padding: 25px;
     border-radius: 20px;
@@ -130,12 +146,14 @@ h5, h6 {
     height: 100%;
 }
 
-.info:hover, .mascota:hover {
+.info:hover,
+.mascota:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
 }
 
-.info h2, .mascota h2 {
+.info h2,
+.mascota h2 {
     font-size: var(--fs-titulo2);
     padding-bottom: 15px;
     margin-bottom: 20px;
@@ -146,27 +164,32 @@ h5, h6 {
     color: var(--color-gris);
 }
 
-.info h2 a, .mascota h2 a {
+.info h2 a,
+.mascota h2 a {
     color: var(--color-gris);
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
-.info h2 a:hover, .mascota h2 a:hover {
+.info h2 a:hover,
+.mascota h2 a:hover {
     color: var(--color-primario);
 }
 
-.info h2 .bi, .mascota h2 .bi {
+.info h2 .bi,
+.mascota h2 .bi {
     font-size: var(--fs-titulo3);
 }
 
-.info span, .mascota span {
+.info span,
+.mascota span {
     color: var(--color-gris);
     font-weight: 600;
     font-size: var(--fs-titulo4);
 }
 
-.info p, .mascota p {
+.info p,
+.mascota p {
     font-size: var(--fs-titulo3);
     border-bottom: 1px solid rgba(66, 75, 84, 0.2);
     padding-bottom: 10px;
@@ -175,12 +198,14 @@ h5, h6 {
     transition: border-color 0.3s ease;
 }
 
-.info p:last-child, .mascota p:last-child {
+.info p:last-child,
+.mascota p:last-child {
     border-bottom: none;
     margin-bottom: 0;
 }
 
-.info p:hover, .mascota p:hover {
+.info p:hover,
+.mascota p:hover {
     border-color: var(--color-primario);
 }
 
@@ -298,7 +323,8 @@ h5, h6 {
     height: 100%;
 }
 
-.card-documentos, .card-notas {
+.card-documentos,
+.card-notas {
     background: linear-gradient(135deg, #9de79540 0%, #9de79520 100%);
     padding: 25px;
     border-radius: 20px;
@@ -307,18 +333,21 @@ h5, h6 {
     margin-bottom: 20px;
 }
 
-.card-documentos:hover, .card-notas:hover {
+.card-documentos:hover,
+.card-notas:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
 }
 
-.card-documentos h5, .card-notas h5 {
+.card-documentos h5,
+.card-notas h5 {
     color: var(--color-gris);
     font-weight: 700;
     font-size: var(--fs-titulo2);
 }
 
-.card-documentos .btn, .card-notas .btn {
+.card-documentos .btn,
+.card-notas .btn {
     border: 2px solid var(--color-primario);
     color: var(--color-primario);
     font-weight: 600;
@@ -328,30 +357,35 @@ h5, h6 {
     font-size: var(--fs-titulo4);
 }
 
-.card-documentos .btn:hover, .card-notas .btn:hover {
+.card-documentos .btn:hover,
+.card-notas .btn:hover {
     background-color: var(--color-primario);
     color: #fff;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(10, 147, 44, 0.3);
 }
 
-.card-documentos .list-group-item, .card-notas .list-group-item {
+.card-documentos .list-group-item,
+.card-notas .list-group-item {
     padding: 12px 0;
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
-.card-documentos .list-group-item:hover, .card-notas .list-group-item:hover {
+.card-documentos .list-group-item:hover,
+.card-notas .list-group-item:hover {
     background-color: rgba(255, 255, 255, 0.5) !important;
     padding-left: 10px;
 }
 
-.card-documentos .bi-file-earmark-pdf, .card-notas .bi-file-earmark-pdf {
+.card-documentos .bi-file-earmark-pdf,
+.card-notas .bi-file-earmark-pdf {
     color: var(--color-primario);
     font-size: 18px;
 }
 
-.card-documentos .text-muted, .card-notas .text-muted {
+.card-documentos .text-muted,
+.card-notas .text-muted {
     font-size: var(--fs-texto1);
     color: #999 !important;
 }
@@ -578,7 +612,7 @@ h5, h6 {
     border-right: none;
 }
 
-.input-group .form-control:focus + .btn-outline-secondary {
+.input-group .form-control:focus+.btn-outline-secondary {
     border-color: var(--color-primario);
 }
 
@@ -587,7 +621,10 @@ h5, h6 {
    ============================================ */
 
 @media (max-width: 768px) {
-    .foto, .info, .mascota {
+
+    .foto,
+    .info,
+    .mascota {
         margin: 10px 0;
     }
 
@@ -610,7 +647,8 @@ h5, h6 {
         padding: 8px 15px;
     }
 
-    .card-documentos, .card-notas {
+    .card-documentos,
+    .card-notas {
         margin-bottom: 15px;
     }
 
@@ -643,7 +681,9 @@ h5, h6 {
 }
 
 @media (max-width: 576px) {
-    .info h2, .mascota h2 {
+
+    .info h2,
+    .mascota h2 {
         font-size: var(--fs-titulo3);
     }
 
@@ -675,13 +715,19 @@ h5, h6 {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.foto, .info, .mascota, .citas, .card-documentos, .card-notas {
+.foto,
+.info,
+.mascota,
+.citas,
+.card-documentos,
+.card-notas {
     animation: fadeInUp 0.6s ease-out;
 }
 
@@ -730,6 +776,37 @@ h5, h6 {
     background: #e4ecf1;
 }
 
-.modal-notificacion .modal-dialog .modal-content .modal-header{
-        border-radius: 20px 20px 0px 0px;
+.modal-notificacion .modal-dialog .modal-content .modal-header {
+    border-radius: 20px 20px 0px 0px;
+}
+
+/* Estilos para el icono de camara en editar la foto de perfil */
+.contenedor-foto .avatar-icon {
+    position: absolute;
+    right: 150px;
+    top: 118px;
+    width: 35px;
+    height: 35px;
+    background: #667eea;
+    border: 3px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.contenedor-foto #upload-logo{
+    display: none;
+}
+
+.avatar-icon i {
+    color: white;
+    font-size: 16px;
+}
+
+.avatar-icon:hover {
+    transform: scale(1.1);
+    background: #5568d3;
 }

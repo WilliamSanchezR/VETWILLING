@@ -17,6 +17,8 @@ switch ($method) {
         }
         else if ($accion  === 'modificar-constrasena') {
             modiContrasena();
+        } else if ($accion === 'cambiar-foto') {
+            actualizarFotoPerfil();
         } else {
             registrarUsuario();
         }
@@ -322,6 +324,61 @@ function modiContrasena()
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la contraseña');
+    }
+
+    exit();
+}
+
+// FUNCION PARA CAMBIAR LA FOTO DE PERFIL 
+function actualizarFotoPerfil()
+{
+    $id_usuario = $_POST['id_usuario'] ?? '';
+
+    if (empty($id_usuario)) {
+        mostrarSweetAlert('error', 'Error', 'ID de usuario no proporcionado');
+        exit();
+    }
+
+    if (!empty($_FILES['img_perfil']['name'])) {
+
+        $file = $_FILES['img_perfil'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitidas = ['png', 'jpg', 'jpeg'];
+        // Validar extensión y tamaño
+        if (!in_array($ext, $permitidas)) {
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
+            exit();
+        }
+        // Validar tamaño
+        if ($file['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Error', 'La foto supera las 2MB');
+            exit();
+        }
+        // Generar un nombre único para la imagen
+        $img_perfil = uniqid('user_') . '.' . $ext;
+        $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
+        move_uploaded_file($file['tmp_name'], $destino);
+
+        // Actualizar en la base de datos
+        $objUsuario = new Usuario();
+        $data = [
+            'id_usuario' => $id_usuario,
+            'img_perfil' => $img_perfil
+        ];
+        $resultado = $objUsuario->actualizarFotoPerfil($data);
+
+        if ($resultado) {
+            mostrarSweetAlert(
+                'success',
+                'Imagen actualizada',
+                'La imagen de perfil ha sido actualizada correctamente',
+                '/vetwilling/admin/perfil-administrador'
+            );
+        } else {
+            mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la imagen de perfil');
+        }
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se ha seleccionado ninguna imagen');
     }
 
     exit();
