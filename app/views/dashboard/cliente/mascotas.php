@@ -43,10 +43,10 @@ $mascotas = listarMascotas();
                     <h1>🐾 Mis Mascotas</h1>
                     <span class="badge-count"> <?= count($mascotas) ?> Mascota</span>
                 </div>
-                <button class="btn-agregar">
+                <a href="<?= BASE_URL ?>/Cliente/registrar-mascota" class="btn-agregar">
                     <i class="bi bi-plus-lg"></i>
                     Agregar Mascota
-                </button>
+                </a>
             </div>
 
             <!-- Filtros -->

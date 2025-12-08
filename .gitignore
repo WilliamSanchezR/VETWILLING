@@ -1,6 +1,8 @@
 
 /vendor/
 
-/public/uploads/usuarios
+/public/uploads/usuarios/
 
-/public/uploads/veterinarios
+/public/uploads/veterinarios/
+
+/public/uploads/mascotas/

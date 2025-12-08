@@ -58,6 +58,7 @@ body {
     align-items: center;
     gap: 8px;
     transition: all 0.3s ease;
+    text-decoration: none;
 }
 
 .btn-agregar:hover {

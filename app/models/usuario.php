@@ -185,7 +185,7 @@ class Usuario
             if (!$ok) return false;
 
             // SI ES ADMIN
-            if ($data['id_rol'] == '1') {
+            if ($data['id_rol'] == '3') {
 
                 $sqlAdmin = "UPDATE administrador
                     SET tipo_documento = :tipo_documento, numero_documento = :numero_documento,

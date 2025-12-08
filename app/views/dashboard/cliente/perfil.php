@@ -125,10 +125,10 @@ $mascotas = listarMascotas();
                                 <i class="bi bi-heart-fill"></i>
                                 Mis Mascotas (<?= count($mascotas) ?>)
                             </h2>
-                            <button class="btn-editar">
+                            <a href="<?= BASE_URL ?>/Cliente/registrar-mascota" class="btn-editar">
                                 <i class="bi bi-plus-circle"></i>
                                 Agregar
-                            </button>
+                            </a>
                         </div>
 
                         <?php foreach ($mascotas as $m) : ?>

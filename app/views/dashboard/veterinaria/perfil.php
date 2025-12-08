@@ -64,7 +64,7 @@ $usuario = mostrarPerfil($id);
                     <!-- Foto y datos básicos -->
                     <div class="col-md-4">
                         <div class="foto">
-                            <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" class="fotito"
+                            <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>" class="fotito"
                                 alt="Pedro Perez" width="100">
                             <h3><?= $usuario['nombres'] ?> <br> <?= $usuario['apellidos'] ?></h3>
                             <h4><span>+57</span> <?= $usuario['telefono'] ?></h4>

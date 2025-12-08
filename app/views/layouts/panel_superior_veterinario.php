@@ -39,7 +39,7 @@ $usuario = mostrarPerfil($id);
         <button class="btn-perfil" onclick="togglePerfilMenu()" aria-label="Perfil">
             <a href="<?= BASE_URL ?>/veterinario/consultar-perfil">
                 <div class="avatar-usuario">
-                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+                    <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>" alt="">
                 </div>
 
                 <div class="info-usuario">
