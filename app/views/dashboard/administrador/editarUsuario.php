@@ -78,8 +78,8 @@
             <div class="wizard-container">
                 <div class="wizard-header">
                     <i class="bi bi-person-vcard"></i>
-                    <h2>Registro de usuario</h2>
-                    <p class="text-muted">Complete todos los campos requeridos para registrar el usuario</p>
+                    <h2>Editar usuario</h2>
+                    <p class="text-muted">Complete todos los campos requeridos para editar el usuario</p>
                 </div>
 
 
