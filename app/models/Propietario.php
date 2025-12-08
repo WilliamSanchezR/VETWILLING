@@ -13,38 +13,6 @@ class Propietario
     }
 
     /* ===============================
-                REGISTRAR
-       =============================== */
-    public function registrar($data)
-    {
-        try {
-
-            $sql = "INSERT INTO propietario 
-                    (id_usuario, id_veterinaria, tipo_documento, numero_documento, nombres, apellidos, telefono, direccion, img_perfil, fecha_nacimiento)
-                    VALUES 
-                    (:id_usuario, :id_veterinaria, :tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :direccion, :img_perfil, :fecha_nacimiento)";
-
-            $query = $this->conexion->prepare($sql);
-
-            $query->bindParam(':id_usuario',       $data['id_usuario']);
-            $query->bindParam(':id_veterinaria',   $data['id_veterinaria']);
-            $query->bindParam(':tipo_documento',   $data['tipo_documento']);
-            $query->bindParam(':numero_documento', $data['numero_documento']);
-            $query->bindParam(':nombres',          $data['nombres']);
-            $query->bindParam(':apellidos',        $data['apellidos']);
-            $query->bindParam(':telefono',         $data['telefono']);
-            $query->bindParam(':direccion',        $data['direccion']);
-            $query->bindParam(':img_perfil',       $data['img_perfil']);
-            $query->bindParam(':fecha_nacimiento', $data['fecha_nacimiento']);
-
-            return $query->execute();
-        } catch (PDOException $e) {
-            error_log("Error en Propietario::registrar → " . $e->getMessage());
-            return false;
-        }
-    }
-
-    /* ===============================
                     LISTAR
        =============================== */
     public function listar()
@@ -69,10 +37,10 @@ class Propietario
         try {
             $sql = "SELECT * FROM propietario WHERE id_propietario = :id LIMIT 1";
             $query = $this->conexion->prepare($sql);
-            $query->bindParam(':id', $id, PDO::PARAM_INT);
+            $query->bindParam(':id', $id);
             $query->execute();
 
-            return $query->fetch(PDO::FETCH_ASSOC);
+            return $query->fetch();
         } catch (PDOException $e) {
             error_log("Error en Propietario::consultarPropietario → " . $e->getMessage());
             return null;
@@ -85,34 +53,33 @@ class Propietario
     public function actualizar($data, $actualizarImagen = false)
     {
         try {
+            // 1. Construir la consulta base
+            $sql = "UPDATE propietario SET
+            tipo_documento   = :tipo_documento,
+            numero_documento = :numero_documento,
+            nombres          = :nombres,
+            apellidos        = :apellidos,
+            telefono         = :telefono,
+            direccion        = :direccion,
+            id_veterinaria   = :id_veterinaria,";
 
-            if ($actualizarImagen) {
-                $sql = "UPDATE propietario SET
-                tipo_documento   = :tipo_documento,
-                numero_documento = :numero_documento,
-                nombres          = :nombres,
-                apellidos        = :apellidos,
-                telefono         = :telefono,
-                direccion        = :direccion,
-                id_veterinaria   = :id_veterinaria,
-                fecha_nacimiento = :fecha_nacimiento,
-                img_perfil       = :img_perfil
-                WHERE id_propietario = :id_propietario";
-            } else {
-                $sql = "UPDATE propietario SET
-                tipo_documento   = :tipo_documento,
-                numero_documento = :numero_documento,
-                nombres          = :nombres,
-                apellidos        = :apellidos,
-                telefono         = :telefono,
-                direccion        = :direccion,
-                id_veterinaria   = :id_veterinaria,
-                fecha_nacimiento = :fecha_nacimiento
-                WHERE id_propietario = :id_propietario";
+            // 2. Agregar la imagen SOLO si se envió una nueva
+            if ($actualizarImagen === true) {
+                $sql .= " img_perfil = :img_perfil,";
             }
 
+            // El último campo siempre tendrá una coma al final en este punto.
+            // La eliminamos (ej. de 'veterinaria,' a 'veterinaria')
+            $sql = rtrim($sql, ',');
+
+            // 3. Agregar la cláusula WHERE
+            $sql .= " WHERE id_propietario = :id_propietario";
+
+
+            // Preparación de la consulta
             $query = $this->conexion->prepare($sql);
 
+            // Bind de parámetros (obligatorios)
             $query->bindParam(':tipo_documento',   $data['tipo_documento']);
             $query->bindParam(':numero_documento', $data['numero_documento']);
             $query->bindParam(':nombres',          $data['nombres']);
@@ -120,19 +87,19 @@ class Propietario
             $query->bindParam(':telefono',         $data['telefono']);
             $query->bindParam(':direccion',        $data['direccion']);
             $query->bindParam(':id_veterinaria',   $data['id_veterinaria']);
-            $query->bindParam(':fecha_nacimiento', $data['fecha_nacimiento']);
             $query->bindParam(':id_propietario',   $data['id_propietario']);
 
-            if ($actualizarImagen) {
+            // Bind de la imagen (condicional)
+            if ($actualizarImagen === true) {
                 $query->bindParam(':img_perfil', $data['img_perfil']);
             }
 
             return $query->execute();
         } catch (PDOException $e) {
+            // Aquí puedes usar un logger en lugar de die() en producción
             die("Error en Propietario::actualizar → " . $e->getMessage());
         }
     }
-
 
     /* ===============================
                 ELIMINAR

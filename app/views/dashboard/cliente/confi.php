@@ -1,3 +1,13 @@
+<?php
+// enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
+require_once BASE_PATH . '/app/controllers/propetarioController.php';
+
+// asignamos el valor id del registro según la tabla
+$id = $_SESSION['user']['id_propietario'] ?? '';
+
+// Llamamos la funcion del controlador
+$usuario = consultarPropietarioId($id);
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -64,39 +74,41 @@
 
                 <!-- TAB: MI CUENTA -->
                 <div class="tab-content" id="tab-cuenta">
+                    <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar" enctype="multipart/form-data">
+                        <input type="hidden" name="accion" value="actualizar">
+                        <input type="hidden" name="id_propetario" value="<?= $_SESSION['user']['id_usuario'] ?>">
 
-                    <!-- Foto de Perfil -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-camera-fill"></i>
+                        <!-- Foto de Perfil -->
+                        <div class="config-card">
+                            <div class="config-card-header">
+                                <div class="config-icon">
+                                    <i class="bi bi-camera-fill"></i>
+                                </div>
+                                <div>
+                                    <h3>Foto de Perfil</h3>
+                                    <p>Actualiza tu imagen de perfil</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3>Foto de Perfil</h3>
-                                <p>Actualiza tu imagen de perfil</p>
-                            </div>
-                        </div>
 
-                        <div class="foto-perfil-container">
-                            <div class="avatar-grande">
-                                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
-                            </div>
-                            <div class="foto-acciones">
-                                <h4>Cambiar Foto de Perfil</h4>
-                                <p>JPG, PNG o GIF. Tamaño máximo 2MB</p>
-                                <div class="foto-btns">
-                                    <input type="file" name="img_perfil" id="inputFoto" class="input-file" accept="image/*" onchange="previewFoto(event)">
-                                    <label for="inputFoto" class="btn-upload">
-                                        <i class="bi bi-upload"></i> Subir Foto
-                                    </label>
-                                    <button class="btn-remove" onclick="eliminarFoto()">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
+                            <div class="foto-perfil-container">
+                                <div class="avatar-grande">
+                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+                                </div>
+                                <div class="foto-acciones">
+                                    <h4>Cambiar Foto de Perfil</h4>
+                                    <p>JPG, PNG o GIF. Tamaño máximo 2MB</p>
+                                    <div class="foto-btns">
+                                        <input type="file" name="img_perfil" id="inputFoto" class="input-file" accept="image/*" onchange="previewFoto(event)">
+                                        <label for="inputFoto" class="btn-upload">
+                                            <i class="bi bi-upload"></i> Subir Foto
+                                        </label>
+                                        <button class="btn-remove" onclick="eliminarFoto()">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar" enctype="multipart/form-data">
 
                         <!-- Información Personal -->
                         <div class="config-card">
@@ -109,11 +121,6 @@
                                     <p>Actualiza tus datos personales</p>
                                 </div>
                             </div>
-
-
-                            <input type="hidden" name="accion" value="actualizar">
-                            <input type="hidden" name="id_usuario" value="<?= $_SESSION['user']['id_usuario'] ?>">
-
 
                             <div class="form-row">
                                 <div class="form-group-config">
@@ -193,8 +200,8 @@
 
 
                             <div class="form-group-config">
-                                <label>Ocupación</label>
-                                <input type="text" placeholder="Tu profesión u ocupación">
+                                <label>Dirección</label>
+                                <input type="text" name="direccion" value="<?= $usuario['direccion'] ?>">
                             </div>
 
                             <div class="form-group-config">
@@ -501,16 +508,10 @@
                             <input type="hidden" name="id_usuario" value="<?= $_SESSION['user']['id_usuario'] ?>">
                             <input type="hidden" name="accion" value="modificar-constrasena">
 
-
-
-
                             <div class="form-group-config">
                                 <label>Contraseña Actual</label>
                                 <input type="password" name="contrasena-actual" required placeholder="Ingresa tu contraseña actual">
                             </div>
-
-
-
 
                             <div class="form-row">
                                 <div class="form-group-config">
@@ -518,25 +519,16 @@
                                     <input type="password" name="nueva-contrasena" required minlength="3" placeholder="Mínimo 8 caracteres">
                                 </div>
 
-
-
-
                                 <div class="form-group-config">
                                     <label>Confirmar Contraseña</label>
                                     <input type="password" name="confi-contrasena" required minlength="3" placeholder="Confirma tu contraseña">
                                 </div>
                             </div>
 
-
-
-
                             <button type="submit" class="btn-config btn-primary-config">
                                 <i class="bi bi-check-lg"></i>
                                 Actualizar Contraseña
                             </button>
-
-
-
 
                         </form>
                     </div>

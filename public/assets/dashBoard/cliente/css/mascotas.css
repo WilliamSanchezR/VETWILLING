@@ -160,8 +160,6 @@ body {
 }
 
 .mascota-avatar-grande {
-    width: 90px;
-    height: 90px;
     border-radius: 50%;
     background: white;
     display: flex;
@@ -170,6 +168,15 @@ body {
     font-size: 45px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
+}
+
+.mascota-avatar-grande img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    image-rendering: smooth;
+
 }
 
 .mascota-info-header {
@@ -352,6 +359,69 @@ body {
     gap: 10px;
 }
 
+/* Contenedor */
+.mascota-menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* Botón de 3 puntos */
+.menu-btn {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: 0.2s ease;
+}
+
+.menu-btn:hover {
+    background: rgba(0, 0, 0, 0.07);
+}
+
+/* Menú flotante */
+.menu-flotante {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    background: #fff;
+    width: 160px;
+    padding: 8px 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+    display: none;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 0.20s ease;
+}
+
+/* Activación */
+.menu-flotante.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Items */
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    gap: 8px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.menu-item:hover {
+    background: #f0f0f0;
+}
+
+
 .action-btn {
     padding: 12px;
     border: none;
@@ -465,6 +535,7 @@ body {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -475,9 +546,11 @@ body {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.05);
     }
+
     100% {
         transform: scale(1);
     }
