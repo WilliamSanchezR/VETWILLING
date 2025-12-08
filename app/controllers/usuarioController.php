@@ -60,6 +60,7 @@ function registrarUsuario()
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
+    $direccion = $_POST['direccion'] ?? '';
     $id_veterinaria = $_POST['veterinaria'] ?? null;
     $nivel_acceso = 'Completo';
     $img_perfil = null;
@@ -68,7 +69,7 @@ function registrarUsuario()
     if (
         empty($email) || empty($password) || empty($estado) || empty($id_rol) ||
         empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
-        empty($apellidos)
+        empty($apellidos) || empty($telefono) || empty($direccion)
     ) {
         // Mostrar alerta de error si hay campos vacíos
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
@@ -116,6 +117,7 @@ function registrarUsuario()
         'nombres' => $nombres,
         'apellidos' => $apellidos,
         'telefono' => $telefono,
+        'direccion' => $direccion,
         'img_perfil' => $img_perfil,
         'id_veterinaria' => $id_veterinaria,
         'nivel_acceso' => $nivel_acceso,
@@ -163,12 +165,13 @@ function actualizarUsuario()
     $email = $_POST['email'] ?? '';
     $id_rol = $_POST['id_rol'] ?? '';
     $id_veterinaria = $_POST['veterinaria'] ?? null;
+    $direccion = $_POST['direccion'] ?? null;
     $estado = $_POST['estado'] ?? 'activo';
 
     if (
         empty($id_usuario) || empty($tipo_documento) || empty($numero_documento) ||
         empty($nombres) || empty($apellidos) || empty($telefono) || empty($email) ||
-        empty($id_rol)
+        empty($id_rol) || empty($direccion)
     ) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Complete todos los campos');
         exit();
@@ -191,7 +194,8 @@ function actualizarUsuario()
         'email' => $email,
         'estado' => $estado,
         'id_rol' => $id_rol,
-        'id_veterinaria' => $id_veterinaria
+        'id_veterinaria' => $id_veterinaria,
+        'direccion' => $direccion
     ];
 
     $resultado = $objUsuario->actualizarUsuario($data);

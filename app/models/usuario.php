@@ -19,6 +19,7 @@ class Usuario
     // FUNCION PARA REGISTRAR UN NUEVO USUARIO
     public function registrar($data)
     {
+
         // Insertamos los datos en la base de datos
         try {
             $insertar = "INSERT INTO usuario(email, password_hash, estado, id_rol)
@@ -44,9 +45,9 @@ class Usuario
                 // Insertamos en la tabla correspondiente según el rol
                 if ($data['id_rol'] == '1') {
                     $sql = "INSERT INTO administrador(
-                        id_usuario, tipo_documento, numero_documento, nombres, apellidos, telefono, img_perfil, nivel_acceso
+                        id_usuario, tipo_documento, numero_documento, nombres, apellidos, telefono, img_perfil, nivel_acceso, direccion
                     ) VALUES(
-                        :id_usuario, :tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :img_perfil, :nivel_acceso
+                        :id_usuario, :tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :img_perfil, :nivel_acceso, :direccion
                     )";
                 } elseif ($data['id_rol'] == '3') {
                     $sql = "INSERT INTO representante_legal(
@@ -67,9 +68,13 @@ class Usuario
                 $stmt->bindParam(':numero_documento', $data['numero_documento']);
                 $stmt->bindParam(':nombres', $data['nombres']);
                 $stmt->bindParam(':apellidos', $data['apellidos']);
-                $stmt->bindParam(':telefono', $data['telefono']);
+                $stmt->bindParam(':telefono', $data['telefono']);                
                 $stmt->bindParam(':img_perfil', $data['img_perfil']);
                 $stmt->bindParam(':nivel_acceso', $data['nivel_acceso']);
+
+                if ($data['id_rol'] == '1') {
+                    $stmt->bindParam(':direccion', $data['direccion']);
+                }
 
                 return $stmt->execute();
             }
@@ -136,7 +141,7 @@ class Usuario
 
             // ADMIN
             $sqlAdmin = "SELECT adm.id_usuario, adm.tipo_documento, adm.numero_documento,
-                adm.nombres, adm.apellidos, adm.telefono, us.email, us.estado, rol.id_rol
+                adm.nombres, adm.apellidos, adm.telefono, us.email, us.estado, rol.id_rol, adm.direccion
                 FROM usuario us
                 INNER JOIN administrador adm ON us.id_usuario = adm.id_usuario
                 INNER JOIN rol ON us.id_rol = rol.id_rol
@@ -185,11 +190,11 @@ class Usuario
             if (!$ok) return false;
 
             // SI ES ADMIN
-            if ($data['id_rol'] == '3') {
+            if ($data['id_rol'] == '1') {
 
                 $sqlAdmin = "UPDATE administrador
                     SET tipo_documento = :tipo_documento, numero_documento = :numero_documento,
-                    nombres = :nombres, apellidos = :apellidos, telefono = :telefono
+                    nombres = :nombres, apellidos = :apellidos, telefono = :telefono, direccion = :direccion
                     WHERE id_usuario = :id_usuario";
                 // Preparar y ejecutar la consulta
                 $stmt2 = $this->conexion->prepare($sqlAdmin);
@@ -199,6 +204,7 @@ class Usuario
                 $stmt2->bindParam(':nombres', $data['nombres']);
                 $stmt2->bindParam(':apellidos', $data['apellidos']);
                 $stmt2->bindParam(':telefono', $data['telefono']);
+                $stmt2->bindParam(':direccion', $data['direccion']);
                 return $stmt2->execute();
             }
 
