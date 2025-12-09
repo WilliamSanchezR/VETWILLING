@@ -108,6 +108,7 @@ $datos = listarVeterinariasRegistradas();
                 <table id="tablaListaVeterinarias" class="display tabla-admin" style="width:100%">
                     <thead>
                         <tr>
+                            <th>Foto</th>
                             <th>nit</th>
                             <th>Nombre</th>
                             <th>Direccion</th>
@@ -122,6 +123,7 @@ $datos = listarVeterinariasRegistradas();
                         <?php if (!empty($datos)) : ?>
                             <?php foreach ($datos as $veterinaria):  ?>
                                 <tr class="fila-blanca">
+                                    <td class="tb_foto"><?php if (!empty($veterinaria['foto'])): ?><img src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
                                     <td><?= $veterinaria['nit'] ?></td>
                                     <td><?= $veterinaria['nombre'] ?></td>
                                     <td><?= $veterinaria['direccion'] ?></td>

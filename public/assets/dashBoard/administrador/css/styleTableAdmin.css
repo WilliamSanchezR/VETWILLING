@@ -324,6 +324,15 @@
     display: none;
 }
 
+.tb_foto {
+    text-align: center;
+}
+
+.tb_foto i {
+   font-size: 25px;
+   color: var(--color-primario);
+}
+
 /* ========================================
    9. RESPONSIVE - MEDIA QUERIES
 ======================================== */

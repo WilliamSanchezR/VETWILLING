@@ -54,6 +54,7 @@ class Veterinaria
                             ciudad, 
                             telefono, 
                             email, 
+                            foto,
                             fecha_creacion, 
                             estado
                          FROM veterinaria";
