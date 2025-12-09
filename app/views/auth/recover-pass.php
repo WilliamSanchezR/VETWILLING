@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
 
     <!-- Estilos -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/estilosRecuperarContraseña.css">
@@ -19,40 +21,72 @@
 </head>
 
 <body>
-    <main>
-        <div class="container">
-            <!-- Columna izquierda -->
-            <div class="cont-left">
-                <div class="logo">
-                    <img src="<?= BASE_URL ?>/public/assets/website/img/LOGO-PRINCIPAL.png" alt="Logo de VetWilling">
-                </div>
-
-                <div class="form">
-                    <h2>Recupera tu contraseña</h2>
-                    <p>Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</p>
-
-                    <form class="login" id="formRecuperar" action="generar-clave" method="POST">
-                        <div class="cont-input">
-                            <i class="fa-regular fa-envelope"></i>
-                            <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
-                        </div>
-                        <button id="btn_ingresar" type="submit">Enviar enlace</button>
-                    </form>
-
-                    <a id="recover" href="<?= BASE_URL ?>/login">Volver al inicio de sesión</a>
-                </div>
+    <div class="container">
+        <!-- Columna izquierda -->
+        <div class="cont-left">
+            <div class="logo">
+                <img src="<?= BASE_URL ?>/public/assets/auth/img/LOGO-POSITIVO 1.png" alt="Logo VetWilling">
             </div>
 
-            <!-- Columna derecha -->
-            <div class="cont-rigth">
-                <div class="info">
-                    <p>“En VetWilling te ayudamos a recuperar el acceso a tu cuenta para que sigas brindando bienestar a tus pacientes.”</p>
+            <div class="form-header">
+                <div class="icon-container">
+                    <i class="bi bi-key-fill"></i>
+                </div>
+                <h2>Recupera tu contraseña</h2>
+                <p>Ingresa tu correo electrónico y te enviaremos una contraseña nueva.</p>
+            </div>
+
+            <div class="form">
+                <form id="formRecuperar" action="generar-clave" method="POST">
+                    <div class="cont-input">
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Correo electrónico"
+                            required>
+                        <i class="bi bi-envelope-fill"></i>
+                    </div>
+
+                    <button class="btn-submit" type="submit" id="btnEnviar">
+                        <i class="bi bi-send-fill"></i>
+                        Enviar contraseña de recuperación
+                    </button>
+                </form>
+
+                <div class="link-volver">
+                    <a href="<?= BASE_URL ?>/login">
+                        <i class="bi bi-arrow-left"></i>
+                        Volver al inicio de sesión
+                    </a>
                 </div>
             </div>
         </div>
-    </main>
 
+        <!-- Columna derecha -->
+        <div class="cont-right">
+            <div class="info">
+                <div class="info-icon">🔐</div>
+                <h3>¿Olvidaste tu contraseña?</h3>
+                <p>No te preocupes, es normal. Te ayudaremos a recuperar el acceso a tu cuenta de forma rápida y segura.</p>
 
+                <div class="info-features">
+                    <div class="feature-item">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Proceso seguro y encriptado</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-clock"></i>
+                        <span>Recuperación en minutos</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-envelope-check"></i>
+                        <span>Enlace enviado a tu correo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

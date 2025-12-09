@@ -71,7 +71,15 @@ $mascotas = listarMascotas();
 
                             <!-- MENU SUPERIOR -->
                             <div class="mascota-menu">
-                                <button class="menu-btn"><i class="bi bi-three-dots-vertical"></i></button>
+                                <button class="menu-btn">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+
+                                <div class="menu-flotante">
+                                    <a href="#" class="menu-item">
+                                        <i class="bi bi-trash-fill"></i> Eliminar
+                                    </a>
+                                </div>
                             </div>
 
                             <!-- FOTO -->
@@ -145,7 +153,7 @@ $mascotas = listarMascotas();
                                     <i class="bi bi-syringe"></i> Vacunas
                                 </button>
 
-                                <a href="<?= BASE_URL ?>/mascotas/editar/<?= $m['id_paciente'] ?>"
+                                <a href="<?= BASE_URL ?>/Cliente/editar-mascota?id=<?= $m['id_paciente'] ?>"
                                     class="action-btn action-btn-secondary">
                                     <i class="bi bi-pencil"></i> Editar
                                 </a>
@@ -192,6 +200,31 @@ $mascotas = listarMascotas();
             document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.mascota-card').forEach((card, index) => {
                     card.style.animationDelay = `${index * 0.1}s`;
+                });
+            });
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const botones = document.querySelectorAll(".mascota-menu .menu-btn");
+
+                botones.forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+
+                        const menu = btn.nextElementSibling;
+
+                        // Cierra otros menús abiertos
+                        document.querySelectorAll(".menu-flotante.active")
+                            .forEach(m => m !== menu && m.classList.remove("active"));
+
+                        // Alterna el menú actual
+                        menu.classList.toggle("active");
+                    });
+                });
+
+                // Cerrar al hacer click fuera
+                document.addEventListener("click", () => {
+                    document.querySelectorAll(".menu-flotante.active")
+                        .forEach(m => m.classList.remove("active"));
                 });
             });
 

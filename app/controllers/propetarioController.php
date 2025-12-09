@@ -35,57 +35,9 @@ switch ($method) {
 }
 
 
-// =========================================
+// ==========
 //  FUNCIONES CRUD
-// =========================================
-
-function registrarPropietario()
-{
-    $tipo_documento = $_POST['tipo_documento'] ?? '';
-    $numero_documento = $_POST['numero_documento'] ?? '';
-    $nombres = $_POST['nombres'] ?? '';
-    $apellidos = $_POST['apellidos'] ?? '';
-    $telefono = $_POST['telefono'] ?? '';
-    $direccion = $_POST['direccion'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $estado = 'activo';
-    $id_veterinaria = $_POST['id_veterinaria'] ?? null;
-
-    if (
-        empty($tipo_documento) || empty($numero_documento) ||
-        empty($nombres) || empty($apellidos) || empty($telefono)
-    ) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos obligatorios');
-        exit();
-    }
-
-    $obj = new Propietario();
-
-    $data = [
-        'tipo_documento' => $tipo_documento,
-        'numero_documento' => $numero_documento,
-        'nombres' => $nombres,
-        'apellidos' => $apellidos,
-        'telefono' => $telefono,
-        'direccion' => $direccion,
-        'id_veterinaria' => $id_veterinaria
-    ];
-
-    $resultado = $obj->registrar($data);
-
-    if ($resultado) {
-        mostrarSweetAlert(
-            'success',
-            'Propietario registrado',
-            'El propietario ha sido agregado correctamente',
-            '/vetwilling/admin/listar-propietarios'
-        );
-    } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo registrar el propietario');
-    }
-
-    exit();
-}
+// ==========
 
 function listarPropietarios()
 {
@@ -101,28 +53,28 @@ function consultarPropietarioId($id)
 
 function actualizarPropietario()
 {
-    if (!isset($_POST['id_propietario'])) {
-        mostrarSweetAlert("error", "Error", "ID no recibido");
-        return;
+    // Capturamos los datos del formulario (Asegúrate de que el ID del propietario esté en el formulario)
+    $id_propietario   = $_POST['id_propietario'] ?? ''; // Asumimos que viene desde un campo oculto del form
+    $tipo_documento   = $_POST['tipo_documento'] ?? '';
+    $numero_documento = $_POST['numero_documento'] ?? '';
+    $nombres          = $_POST['nombres'] ?? '';
+    $apellidos        = $_POST['apellidos'] ?? '';
+    $telefono         = $_POST['telefono'] ?? '';
+    $direccion        = $_POST['direccion'] ?? ''; // Asegúrate de que este campo exista en el HTML
+    $email            = $_POST['email'] ?? '';
+    $id_veterinaria   = $_POST['id_veterinaria'] ?? ''; // Asegúrate de que este campo exista en el HTML
+
+    // Validamos los campos obligatorios
+    if (empty($numero_documento) || empty($nombres) || empty($apellidos) || empty($tipo_documento) || empty($telefono) || empty($email)) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor, completar todos los campos');
+        exit();
     }
 
-    $id_propietario   = $_POST['id_propietario'];
-    $tipo_documento   = $_POST['tipo_documento'] ?? null;
-    $numero_documento = $_POST['numero_documento'] ?? null;
-    $nombres          = $_POST['nombres'] ?? null;
-    $apellidos        = $_POST['apellidos'] ?? null;
-    $telefono         = $_POST['telefono'] ?? null;
-    $direccion        = $_POST['direccion'] ?? null;
-    $id_veterinaria   = $_POST['id_veterinaria'] ?? null;
-    $fecha_nacimiento = $_POST['fecha_nacimiento'] ?? null;
-
-    /* ===============================
-       PROCESAR IMAGEN (solo si llega)
-       =============================== */
+    /* PROCESAR IMAGEN (solo si llega un nuevo archivo) */
     $img_perfil = null;
+    $actualizarImagen = false;
 
     if (isset($_FILES['img_perfil']) && $_FILES['img_perfil']['error'] === 0) {
-
         $ruta = __DIR__ . "/../../public/uploads/usuarios/";
         if (!is_dir($ruta)) {
             mkdir($ruta, 0777, true);
@@ -132,40 +84,36 @@ function actualizarPropietario()
         $destino = $ruta . $nombreArchivo;
 
         if (move_uploaded_file($_FILES['img_perfil']['tmp_name'], $destino)) {
-            // Guardamos solo el nombre del archivo
             $img_perfil = $nombreArchivo;
+            $actualizarImagen = true; // Indicamos que SÍ se debe actualizar la columna de imagen
         }
     }
 
-    /* ===============================
-       PREPARAR DATA
-       =============================== */
+    // POO - Instanciamos la clase
+    $prop = new Propietario();
     $data = [
-        'id_propietario'  => $id_propietario,
+        'id_propietario'   => $id_propietario,
         'tipo_documento'   => $tipo_documento,
         'numero_documento' => $numero_documento,
         'nombres'          => $nombres,
         'apellidos'        => $apellidos,
         'telefono'         => $telefono,
         'direccion'        => $direccion,
+        'email'            => $email,
         'id_veterinaria'   => $id_veterinaria,
-        'fecha_nacimiento' => $fecha_nacimiento,
-        'img_perfil'       => $img_perfil  // puede ser null
+        'img_perfil'       => $img_perfil    // Valor: null si no se subió, o el nombre del archivo si se subió
     ];
 
-    /* ===============================
-       LLAMAR AL MODELO
-       =============================== */
-    $prop = new Propietario();
+    // Enviamos la data y la bandera $actualizarImagen al método actualizar del Modelo
+    $resultado = $prop->actualizar($data, $actualizarImagen);
 
-    // Si NO se envió imagen → que el modelo no la modifique
-    $resultado = $prop->actualizar($data, $img_perfil ? true : false);
-
-    if ($resultado) {
-        mostrarSweetAlert("success", "Actualizado", "Datos actualizados correctamente", "/vetwilling/Cliente/perfil");
+    // Si la respuesta del modelo es verdadera confirmamos la actualización
+    if ($resultado === true) {
+        mostrarSweetAlert('success', 'Actualización exitosa', 'Datos actualizados correctamente', '/vetwilling/Cliente/perfil');
     } else {
-        mostrarSweetAlert("error", "Error", "No se pudo actualizar");
+        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el propietario. Intenta nuevamente');
     }
+    exit();
 }
 
 function eliminarPropietario($id)

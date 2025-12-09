@@ -1,3 +1,13 @@
+<?php
+// enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
+require_once BASE_PATH . '/app/controllers/propetarioController.php';
+
+// asignamos el valor id del registro según la tabla
+$id = $_SESSION['user']['id_propietario'] ?? '';
+
+// Llamamos la funcion del controlador
+$usuario = consultarPropietarioId($id);
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -52,10 +62,6 @@
                         <i class="bi bi-bell-fill"></i>
                         Notificaciones
                     </button>
-                    <button class="tab-config" onclick="cambiarTab('privacidad')">
-                        <i class="bi bi-shield-lock-fill"></i>
-                        Privacidad
-                    </button>
                     <button class="tab-config" onclick="cambiarTab('seguridad')">
                         <i class="bi bi-key-fill"></i>
                         Seguridad
@@ -64,39 +70,41 @@
 
                 <!-- TAB: MI CUENTA -->
                 <div class="tab-content" id="tab-cuenta">
+                    <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar" enctype="multipart/form-data">
+                        <input type="hidden" name="accion" value="actualizar">
+                        <input type="hidden" name="id_propetario" value="<?= $_SESSION['user']['id_usuario'] ?>">
 
-                    <!-- Foto de Perfil -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-camera-fill"></i>
+                        <!-- Foto de Perfil -->
+                        <div class="config-card">
+                            <div class="config-card-header">
+                                <div class="config-icon">
+                                    <i class="bi bi-camera-fill"></i>
+                                </div>
+                                <div>
+                                    <h3>Foto de Perfil</h3>
+                                    <p>Actualiza tu imagen de perfil</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3>Foto de Perfil</h3>
-                                <p>Actualiza tu imagen de perfil</p>
-                            </div>
-                        </div>
 
-                        <div class="foto-perfil-container">
-                            <div class="avatar-grande">
-                                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= htmlspecialchars($usuario['img_perfil']) ?>" alt="">
-                            </div>
-                            <div class="foto-acciones">
-                                <h4>Cambiar Foto de Perfil</h4>
-                                <p>JPG, PNG o GIF. Tamaño máximo 2MB</p>
-                                <div class="foto-btns">
-                                    <input type="file" name="img_perfil" id="inputFoto" class="input-file" accept="image/*" onchange="previewFoto(event)">
-                                    <label for="inputFoto" class="btn-upload">
-                                        <i class="bi bi-upload"></i> Subir Foto
-                                    </label>
-                                    <button class="btn-remove" onclick="eliminarFoto()">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
+                            <div class="foto-perfil-container">
+                                <div class="avatar-grande">
+                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="Foto de perfil">
+                                </div>
+                                <div class="foto-acciones">
+                                    <h4>Cambiar Foto de Perfil</h4>
+                                    <p>JPG, PNG o GIF. Tamaño máximo 2MB</p>
+                                    <div class="foto-btns">
+                                        <input type="file" name="img_perfil" id="inputFoto" class="input-file" accept="image/*" onchange="previewFoto(event)">
+                                        <label for="inputFoto" class="btn-upload">
+                                            <i class="bi bi-upload"></i> Subir Foto
+                                        </label>
+                                        <button type="button" class="btn-remove" onclick="event.preventDefault(); eliminarFoto();">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar" enctype="multipart/form-data">
 
                         <!-- Información Personal -->
                         <div class="config-card">
@@ -110,27 +118,22 @@
                                 </div>
                             </div>
 
-
-                            <input type="hidden" name="accion" value="actualizar">
-                            <input type="hidden" name="id_propietario" value="<?= htmlspecialchars($usuario['id_propietario']) ?>">
-
-
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Nombre(s)</label>
-                                    <input type="text" name="nombres" value="<?= htmlspecialchars($usuario['nombres']) ?>">
+                                    <input type="text" name="nombres" value="<?= $usuario['nombres'] ?>" required>
                                 </div>
 
                                 <div class="form-group-config">
                                     <label>Apellido(s)</label>
-                                    <input type="text" name="apellidos" value="<?= htmlspecialchars($usuario['apellidos']) ?>">
+                                    <input type="text" name="apellidos" value="<?= $usuario['apellidos'] ?>" required>
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Tipo de Documento</label>
-                                    <select name="tipo_documento">
+                                    <select name="tipo_documento" required>
                                         <option <?= $usuario['tipo_documento'] == 'Cédula de Ciudadanía' ? 'selected' : '' ?>>Cédula de Ciudadanía</option>
                                         <option <?= $usuario['tipo_documento'] == 'Cédula de Extranjería' ? 'selected' : '' ?>>Cédula de Extranjería</option>
                                         <option <?= $usuario['tipo_documento'] == 'Pasaporte' ? 'selected' : '' ?>>Pasaporte</option>
@@ -139,14 +142,9 @@
 
                                 <div class="form-group-config">
                                     <label>Número de Documento</label>
-                                    <input type="text" name="numero_documento" value="<?= htmlspecialchars($usuario['numero_documento']) ?>">
+                                    <input type="text" name="numero_documento" value="<?= $usuario['numero_documento'] ?>" required>
                                 </div>
                             </div>
-
-
-
-
-
                         </div>
 
                         <!-- Información de Contacto -->
@@ -163,13 +161,13 @@
 
                             <div class="form-group-config">
                                 <label>Email Principal</label>
-                                <input type="email" name="email" value="<?= htmlspecialchars($usuario['email']) ?>">
+                                <input type="email" name="email" value="<?= $usuario['email'] ?>" required>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Teléfono</label>
-                                    <input type="tel" name="telefono" value="<?= htmlspecialchars($usuario['telefono']) ?>">
+                                    <input type="tel" name="telefono" value="<?= $usuario['telefono'] ?>" required>
                                 </div>
 
                                 <div class="form-group-config">
@@ -191,20 +189,19 @@
                                 </div>
                             </div>
 
-
                             <div class="form-group-config">
-                                <label>Ocupación</label>
-                                <input type="text" placeholder="Tu profesión u ocupación">
+                                <label>Dirección</label>
+                                <input type="text" name="direccion" value="<?= $usuario['direccion'] ?>">
                             </div>
 
                             <div class="form-group-config">
                                 <label>Biografía</label>
-                                <textarea rows="4" placeholder="Cuéntanos un poco sobre ti..."></textarea>
+                                <textarea name="biografia" rows="4" placeholder="Cuéntanos un poco sobre ti..."></textarea>
                             </div>
 
                             <div class="form-group-config">
                                 <label>Cómo nos conociste</label>
-                                <select>
+                                <select name="como_conociste">
                                     <option>Selecciona una opción</option>
                                     <option>Redes sociales</option>
                                     <option>Recomendación</option>
@@ -216,17 +213,16 @@
 
                             <div style="display: flex; gap: 15px; margin-top: 20px;">
                                 <button type="submit" class="btn-config btn-primary-config">
+                                    <i class="bi bi-check-lg"></i>
                                     Guardar Cambios
                                 </button>
                             </div>
-
                         </div>
                     </form>
                 </div>
 
                 <!-- TAB: GENERAL -->
                 <div class="tab-content" id="tab-general" style="display: none;">
-
                     <!-- Idioma y Región -->
                     <div class="config-card">
                         <div class="config-card-header">
@@ -234,32 +230,40 @@
                                 <i class="bi bi-globe2"></i>
                             </div>
                             <div>
-                                <h3>Idioma y Región</h3>
-                                <p>Configura tu idioma y zona horaria</p>
+                                <h3 data-translate="language_region">Idioma y Región</h3>
+                                <p data-translate="language_region_desc">Configura tu idioma y zona horaria</p>
                             </div>
                         </div>
 
                         <div class="config-item">
                             <div class="config-info">
-                                <h4>Idioma</h4>
-                                <p>Selecciona el idioma de la aplicación</p>
+                                <h4 data-translate="language">Idioma</h4>
+                                <p data-translate="language_desc">Selecciona el idioma de la aplicación</p>
                             </div>
-                            <select class="config-select">
-                                <option selected>Español</option>
-                                <option>English</option>
-                                <option>Português</option>
+                            <select class="config-select" id="selectIdioma">
+                                <option value="es">Español</option>
+                                <option value="en">English</option>
+                                <option value="pt">Português</option>
                             </select>
                         </div>
 
+                        <div class="language-info" id="languageInfo" style="display: none;">
+                            <i class="bi bi-info-circle"></i>
+                            <span data-translate="language_changed">Idioma cambiado exitosamente</span>
+                        </div>
+
                         <div class="config-item">
                             <div class="config-info">
-                                <h4>Zona Horaria</h4>
-                                <p>Tu zona horaria local</p>
+                                <h4 data-translate="timezone">Zona Horaria</h4>
+                                <p data-translate="timezone_desc">Tu zona horaria local</p>
                             </div>
-                            <select class="config-select">
-                                <option selected>GMT-5 (Bogotá)</option>
-                                <option>GMT-4 (Santiago)</option>
-                                <option>GMT-3 (Buenos Aires)</option>
+                            <select class="config-select" id="selectZonaHoraria">
+                                <option value="gmt-5">GMT-5 (Bogotá)</option>
+                                <option value="gmt-4">GMT-4 (Santiago)</option>
+                                <option value="gmt-3">GMT-3 (Buenos Aires)</option>
+                                <option value="gmt-6">GMT-6 (Ciudad de México)</option>
+                                <option value="gmt-0">GMT+0 (Londres)</option>
+                                <option value="gmt+1">GMT+1 (Madrid)</option>
                             </select>
                         </div>
                     </div>
@@ -271,41 +275,39 @@
                                 <i class="bi bi-palette-fill"></i>
                             </div>
                             <div>
-                                <h3>Apariencia</h3>
-                                <p>Personaliza el aspecto de la aplicación</p>
+                                <h3 data-translate="appearance">Apariencia</h3>
+                                <p data-translate="appearance_desc">Personaliza el aspecto de la aplicación</p>
                             </div>
                         </div>
 
                         <div class="config-item">
                             <div class="config-info">
-                                <h4>Tema</h4>
-                                <p>Elige entre tema claro u oscuro</p>
+                                <h4 data-translate="theme">Tema</h4>
+                                <p data-translate="theme_desc">Elige entre tema claro u oscuro</p>
                             </div>
                             <select class="config-select" id="selectTema">
-                                <option value="light" selected>Claro</option>
-                                <option value="dark">Oscuro</option>
-                                <option value="auto">Automático</option>
+                                <option value="light" data-translate="light">Claro</option>
+                                <option value="dark" data-translate="dark">Oscuro</option>
+                                <option value="auto" data-translate="auto">Automático</option>
                             </select>
                         </div>
 
                         <div class="config-item">
                             <div class="config-info">
-                                <h4>Tamaño de Texto</h4>
-                                <p>Ajusta el tamaño del texto</p>
+                                <h4 data-translate="text_size">Tamaño de Texto</h4>
+                                <p data-translate="text_size_desc">Ajusta el tamaño del texto</p>
                             </div>
-                            <select class="config-select">
-                                <option>Pequeño</option>
-                                <option selected>Normal</option>
-                                <option>Grande</option>
+                            <select class="config-select" id="selectTamanoTexto">
+                                <option value="14" data-translate="small">Pequeño</option>
+                                <option value="16" data-translate="normal">Normal</option>
+                                <option value="18" data-translate="large">Grande</option>
                             </select>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- TAB: NOTIFICACIONES -->
                 <div class="tab-content" id="tab-notificaciones" style="display: none;">
-
                     <!-- Notificaciones Push -->
                     <div class="config-card">
                         <div class="config-card-header">
@@ -320,10 +322,13 @@
 
                         <div class="config-item">
                             <div class="config-info">
-                                <h4>Activar Notificaciones</h4>
+                                <h4>
+                                    Activar Notificaciones
+                                    <span class="badge badge-new">Principal</span>
+                                </h4>
                                 <p>Recibir notificaciones en el navegador</p>
                             </div>
-                            <div class="toggle-switch active"></div>
+                            <div class="toggle-switch" data-setting="push-enabled"></div>
                         </div>
 
                         <div class="config-item">
@@ -331,7 +336,7 @@
                                 <h4>Citas Próximas</h4>
                                 <p>Recordatorios de citas programadas</p>
                             </div>
-                            <div class="toggle-switch active"></div>
+                            <div class="toggle-switch" data-setting="push-appointments"></div>
                         </div>
 
                         <div class="config-item">
@@ -339,7 +344,7 @@
                                 <h4>Vacunas Pendientes</h4>
                                 <p>Alertas de vacunación de tus mascotas</p>
                             </div>
-                            <div class="toggle-switch active"></div>
+                            <div class="toggle-switch" data-setting="push-vaccines"></div>
                         </div>
 
                         <div class="config-item">
@@ -347,7 +352,7 @@
                                 <h4>Mensajes Nuevos</h4>
                                 <p>Notificación de mensajes del veterinario</p>
                             </div>
-                            <div class="toggle-switch active"></div>
+                            <div class="toggle-switch" data-setting="push-messages"></div>
                         </div>
                     </div>
 
@@ -368,7 +373,7 @@
                                 <h4>Recordatorios de Citas</h4>
                                 <p>Recibir emails antes de cada cita</p>
                             </div>
-                            <div class="toggle-switch active"></div>
+                            <div class="toggle-switch" data-setting="email-appointments"></div>
                         </div>
 
                         <div class="config-item">
@@ -376,7 +381,7 @@
                                 <h4>Promociones y Ofertas</h4>
                                 <p>Recibir información sobre descuentos</p>
                             </div>
-                            <div class="toggle-switch"></div>
+                            <div class="toggle-switch" data-setting="email-promotions"></div>
                         </div>
 
                         <div class="config-item">
@@ -384,7 +389,7 @@
                                 <h4>Newsletter Mensual</h4>
                                 <p>Consejos de cuidado para mascotas</p>
                             </div>
-                            <div class="toggle-switch active"></div>
+                            <div class="toggle-switch" data-setting="email-newsletter"></div>
                         </div>
                     </div>
 
@@ -405,7 +410,7 @@
                                 <h4>Activar SMS</h4>
                                 <p>Recibir mensajes de texto importantes</p>
                             </div>
-                            <div class="toggle-switch active"></div>
+                            <div class="toggle-switch" data-setting="sms-enabled"></div>
                         </div>
 
                         <div class="config-item">
@@ -413,260 +418,123 @@
                                 <h4>Confirmaciones de Citas</h4>
                                 <p>SMS de confirmación de citas</p>
                             </div>
-                            <div class="toggle-switch active"></div>
+                            <div class="toggle-switch" data-setting="sms-confirmations"></div>
+                        </div>
+
+                        <!-- Estadísticas de notificaciones -->
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalNotifications">0</div>
+                                <div class="stat-label">Notificaciones Activas</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="pushCount">0</div>
+                                <div class="stat-label">Push Activas</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="emailCount">0</div>
+                                <div class="stat-label">Email Activos</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="smsCount">0</div>
+                                <div class="stat-label">SMS Activos</div>
+                            </div>
                         </div>
                     </div>
-
-                </div>
-
-                <!-- TAB: PRIVACIDAD -->
-                <div class="tab-content" id="tab-privacidad" style="display: none;">
-
-                    <!-- Privacidad de Datos -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-shield-check"></i>
-                            </div>
-                            <div>
-                                <h3>Privacidad de Datos</h3>
-                                <p>Controla quién puede ver tu información</p>
-                            </div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Perfil Público</h4>
-                                <p>Permitir que otros usuarios vean tu perfil</p>
-                            </div>
-                            <div class="toggle-switch"></div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Compartir Historial Médico</h4>
-                                <p>Permitir compartir historial con otros veterinarios</p>
-                            </div>
-                            <div class="toggle-switch active"></div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Uso de Datos para Mejorar Servicio</h4>
-                                <p>Ayúdanos a mejorar usando datos anónimos</p>
-                            </div>
-                            <div class="toggle-switch active"></div>
-                        </div>
-                    </div>
-
-                    <!-- Descargar Datos -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-download"></i>
-                            </div>
-                            <div>
-                                <h3>Tus Datos</h3>
-                                <p>Descarga o elimina tu información</p>
-                            </div>
-                        </div>
-
-                        <div class="alert-config alert-warning">
-                            <i class="bi bi-exclamation-triangle-fill" style="font-size: 20px;"></i>
-                            <div>
-                                <strong>Información importante:</strong> Puedes descargar una copia de todos tus datos en cualquier momento.
-                            </div>
-                        </div>
-
-                        <div style="display: flex; gap: 15px; margin-top: 20px;">
-                            <button class="btn-config btn-primary-config">
-                                <i class="bi bi-download"></i>
-                                Descargar Mis Datos
-                            </button>
-                            <button class="btn-config btn-secondary-config">
-                                <i class="bi bi-file-earmark-pdf"></i>
-                                Exportar PDF
-                            </button>
-                        </div>
-                    </div>
-
                 </div>
 
                 <!-- TAB: SEGURIDAD -->
                 <div class="tab-content" id="tab-seguridad" style="display: none;">
-
                     <!-- Cambiar Contraseña -->
                     <div class="config-card">
-                        <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar-contrasena">
-                            <input type="hidden" name="id_usuario" value="<?= $id ?>">
+                        <div class="card-header">
+                            <h2>Cambiar Contraseña</h2>
+                            <p>Actualiza tu contraseña para mantener tu cuenta segura</p>
+                        </div>
+
+                        <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar-contrasena" id="passwordForm">
+                            <input type="hidden" name="id_usuario" value="<?= $_SESSION['user']['id_usuario'] ?>">
                             <input type="hidden" name="accion" value="modificar-constrasena">
-
-
-
 
                             <div class="form-group-config">
                                 <label>Contraseña Actual</label>
-                                <input type="password" name="contrasena-actual" required placeholder="Ingresa tu contraseña actual">
+                                <div class="password-input-wrapper">
+                                    <input type="password" name="contrasena-actual" id="currentPassword" required placeholder="Ingresa tu contraseña actual">
+                                    <button type="button" class="toggle-password" onclick="togglePassword('currentPassword', this)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
                             </div>
-
-
-
 
                             <div class="form-row">
                                 <div class="form-group-config">
                                     <label>Nueva Contraseña</label>
-                                    <input type="password" name="nueva-contrasena" required minlength="3" placeholder="Mínimo 8 caracteres">
+                                    <div class="password-input-wrapper">
+                                        <input type="password" name="nueva-contrasena" id="newPassword" required minlength="8" placeholder="Mínimo 8 caracteres" oninput="checkPasswordStrength()">
+                                        <button type="button" class="toggle-password" onclick="togglePassword('newPassword', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="password-strength" id="strengthIndicator" style="display: none;">
+                                        <div class="strength-bar">
+                                            <div class="strength-fill" id="strengthFill"></div>
+                                        </div>
+                                        <span class="strength-text" id="strengthText"></span>
+                                    </div>
                                 </div>
-
-
-
 
                                 <div class="form-group-config">
                                     <label>Confirmar Contraseña</label>
-                                    <input type="password" name="confi-contrasena" required minlength="3" placeholder="Confirma tu contraseña">
+                                    <div class="password-input-wrapper">
+                                        <input type="password" name="confi-contrasena" id="confirmPassword" required minlength="8" placeholder="Confirma tu contraseña" oninput="checkPasswordMatch()">
+                                        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword', this)">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div id="matchIndicator" style="margin-top: 8px; font-size: 12px;"></div>
                                 </div>
                             </div>
 
-
-
+                            <div class="requirements">
+                                <div class="requirements-title">
+                                    <i class="bi bi-shield-check"></i>
+                                    Requisitos de la contraseña
+                                </div>
+                                <div class="requirement-item" id="req-length">
+                                    <i class="bi bi-circle"></i>
+                                    Mínimo 8 caracteres
+                                </div>
+                                <div class="requirement-item" id="req-uppercase">
+                                    <i class="bi bi-circle"></i>
+                                    Al menos una letra mayúscula
+                                </div>
+                                <div class="requirement-item" id="req-number">
+                                    <i class="bi bi-circle"></i>
+                                    Al menos un número
+                                </div>
+                            </div>
 
                             <button type="submit" class="btn-config btn-primary-config">
                                 <i class="bi bi-check-lg"></i>
                                 Actualizar Contraseña
                             </button>
-
-
-
-
                         </form>
                     </div>
+                </div>
 
-                    <!-- Autenticación en Dos Pasos -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-shield-fill-check"></i>
-                            </div>
-                            <div>
-                                <h3>Autenticación en Dos Pasos</h3>
-                                <p>Añade una capa extra de seguridad</p>
-                            </div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Activar 2FA</h4>
-                                <p>Verificación en dos pasos para mayor seguridad</p>
-                            </div>
-                            <div class="toggle-switch"></div>
-                        </div>
-
-                        <div class="alert-config alert-success">
-                            <i class="bi bi-check-circle-fill" style="font-size: 20px;"></i>
-                            <div>
-                                Tu cuenta está protegida. Última actividad: Hoy a las 10:30 AM
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sesiones Activas -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-laptop"></i>
-                            </div>
-                            <div>
-                                <h3>Sesiones Activas</h3>
-                                <p>Dispositivos con acceso a tu cuenta</p>
-                            </div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Chrome - Windows</h4>
-                                <p>Bogotá, Colombia • Última actividad: Ahora</p>
-                            </div>
-                            <button class="btn-config btn-secondary-config">
-                                <i class="bi bi-check-circle-fill"></i>
-                                Actual
-                            </button>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Safari - iPhone</h4>
-                                <p>Bogotá, Colombia • Hace 2 horas</p>
-                            </div>
-                            <button class="btn-config btn-danger-config">
-                                <i class="bi bi-x-circle"></i>
-                                Cerrar Sesión
-                            </button>
-                        </div>
-
-                        <div style="margin-top: 20px;">
-                            <button class="btn-config btn-danger-config">
-                                <i class="bi bi-x-octagon"></i>
-                                Cerrar Todas las Sesiones
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Eliminar Cuenta -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon" style="background: linear-gradient(135deg, #f44336, #e91e63);">
-                                <i class="bi bi-trash-fill"></i>
-                            </div>
-                            <div>
-                                <h3>Zona de Peligro</h3>
-                                <p>Acciones irreversibles</p>
-                            </div>
-                        </div>
-
-                        <div class="alert-config alert-danger">
-                            <i class="bi bi-exclamation-octagon-fill" style="font-size: 20px;"></i>
-                            <div>
-                                <strong>¡Atención!</strong> Eliminar tu cuenta es permanente y no se puede deshacer.
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 20px;">
-                            <button class="btn-config btn-danger-config" onclick="confirmarEliminar()">
-                                <i class="bi bi-trash"></i>
-                                Eliminar Mi Cuenta
-                            </button>
-                        </div>
-                    </div>
-
+                <!-- Notificación de guardado GLOBAL -->
+                <div class="save-notification" id="saveNotification">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span id="notificationText">Configuración guardada</span>
                 </div>
 
             </div>
-
         </div>
     </main>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
-    <!-- este es el js de la confi -->
-    <script>
-        // Cambiar Tab
-        function cambiarTab(tab) {
-            // Ocultar todos los tabs
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
-
-            // Remover active de todos los botones
-            document.querySelectorAll('.tab-config').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            // Mostrar tab seleccionado
-            document.getElementById(`tab-${tab}`).style.display = 'block';
-
-            // Activar botón correspondiente
-            event.target.closest('.tab-config').classList.add('active');
-        }
-    </script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/confi.js"></script>
 </body>
 
 </html>
