@@ -135,6 +135,7 @@ function consultarVeterinariasRegistradas($id)
 function actualizarVeterinaria()
 {
     // Capturamos los datos enviados por el formulario
+    $foto = $_POST['foto_actual'] ?? null;
     $nit = $_POST['nit'] ?? '';
     $nombre = $_POST['nombre'] ?? '';
     $direccion = $_POST['direccion'] ?? '';
@@ -153,6 +154,28 @@ function actualizarVeterinaria()
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
     }
+
+
+    // Validamos y procesamos la foto de la veterinaria si se ha enviado
+    if (!empty($_FILES['foto']['name'])) {
+        $file = $_FILES['foto'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitidas = ['png', 'jpg', 'jpeg'];
+        // Validar extensión y tamaño
+        if (!in_array($ext, $permitidas)) {
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
+            exit();
+        }
+        // Validar tamaño
+        if ($file['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Error', 'La foto supera las 2MB');
+            exit();
+        }
+        // Generar un nombre único para la imagen
+        $foto = uniqid('veterinaria_') . '.' . $ext;
+        $destino = BASE_PATH . '/public/uploads/veterinaria/' . $foto;
+        move_uploaded_file($file['tmp_name'], $destino);
+    }
     // Creamos el objeto de la clase Veterinaria
     $objVeterinaria = new Veterinaria();
     // Preparamos los datos para la actualización
@@ -164,6 +187,7 @@ function actualizarVeterinaria()
         'telefono' => $telefono,
         'email' => $email,
         'estado' => $estado,
+        'foto' => $foto,
         'id_veterinaria' => $_POST['id_veterinaria'] ?? ''
     ];
     // Llamamos a la funcion actualizar del modelo Veterinaria

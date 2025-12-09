@@ -80,9 +80,10 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
             </div>
 
 
-            <form id="vetForm" action="<?= BASE_URL ?>/admin/actualizar-veterinaria" method="POST">
+            <form id="vetForm" action="<?= BASE_URL ?>/admin/actualizar-veterinaria" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id_veterinaria" value="<?= $veterinariaData['id_veterinaria'] ?>">
                 <input type="hidden" name="accion" value="actualizar">
+                <input type="hidden" name="foto_actual" value="<?= $veterinariaData['foto'] ?>">
 
                 <!-- Paso 1: Datos del Veterinaria -->
                 <div class="step active">
@@ -150,6 +151,17 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                             </div>
                         </div>
 
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label><i class="bi bi-envelope"></i> Foto </label>
+                                    <input type="file" accept=".jpg, .png, .jpeg" id="foto" name="foto">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
 
