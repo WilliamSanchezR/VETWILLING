@@ -76,7 +76,7 @@ function registrarUsuario()
         exit();
     }
     // Validamos que si el rol es veterinario, se seleccione una veterinaria
-    if ($id_rol == '3' && empty($id_veterinaria)) {
+    if ($id_rol == '4' && empty($id_veterinaria)) {
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
         exit();
     }
@@ -177,7 +177,7 @@ function actualizarUsuario()
         exit();
     }
 
-    if ($id_rol == '3' && empty($id_veterinaria)) {
+    if ($id_rol == '4' && empty($id_veterinaria)) {
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
         exit();
     }

@@ -49,7 +49,7 @@ class Usuario
                     ) VALUES(
                         :id_usuario, :tipo_documento, :numero_documento, :nombres, :apellidos, :telefono, :img_perfil, :nivel_acceso, :direccion
                     )";
-                } elseif ($data['id_rol'] == '3') {
+                } elseif ($data['id_rol'] == '4') {
                     $sql = "INSERT INTO representante_legal(
                         id_veterinaria, id_usuario, tipo_documento, numero_documento, nombres, apellidos, telefono, img_perfil, nivel_acceso
                     ) VALUES(
@@ -59,7 +59,7 @@ class Usuario
                 // Preparar y ejecutar la inserción
                 $stmt = $this->conexion->prepare($sql);
                 // Vincular los parámetros
-                if ($data['id_rol'] == '3') {
+                if ($data['id_rol'] == '4') {
                     $stmt->bindParam(':id_veterinaria', $data['id_veterinaria']);
                 }
                 // Vincular los demás parámetros
