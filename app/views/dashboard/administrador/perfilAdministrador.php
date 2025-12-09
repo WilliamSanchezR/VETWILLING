@@ -64,8 +64,16 @@ $usuario = mostrarPerfil($id);
                     <!-- Foto y datos básicos -->
                     <div class="col-md-4">
                         <div class="foto">
-                            <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" class="fotito"
-                                alt="Pedro Perez" width="100">
+                            <form class="contenedor-foto" id="form_cambio_imagen" action="<?= BASE_URL ?>/admin/cambiar-foto" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="id_usuario" value="<?= $id ?>">
+                                <input type="hidden" name="accion" value="cambiar-foto">
+                                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" class="fotito"
+                                    alt="Pedro Perez" width="100">
+                                <div class="avatar-icon">
+                                    <i class="bi bi-camera-fill"></i>
+                                </div>
+                                <input type="file" id="upload-logo" accept="image/*" name="img_perfil">
+                            </form>
                             <h3><?= $usuario['nombres'] ?> <br> <?= $usuario['apellidos'] ?></h3>
                             <h4><span>+57</span> <?= $usuario['telefono'] ?></h4>
                             <h5><?= $usuario['email'] ?></h5>
@@ -77,12 +85,12 @@ $usuario = mostrarPerfil($id);
                         <div class="info">
                             <h2>
                                 Información General
-                                <a href="#" aria-label="Editar información"><i class="bi bi-pencil-square"></i></a>
+                                <a href="editar-usuario?id=<?= $id ?>" aria-label="Editar información"><i class="bi bi-pencil-square"></i></a>
                             </h2>
-                            <p><span>Dirección: </span>Calle 6 # 23-34</p>
-                            <p><span>Fecha de Registro: </span>20 - Ago - 2025</p>
-                            <p><span>Correo: </span>pepitoperaz@gmail.com</p>
-                            <p><span>Teléfono: </span>+57 312 405 5678</p>
+                            <p><span>Dirección: </span><?= $usuario['direccion'] ?></p>
+                            <p><span>Fecha de Registro: </span><?= $usuario['fecha_creacion'] ?></p>
+                            <p><span>Correo: </span><?= $usuario['email'] ?></p>
+                            <p><span>Teléfono: </span><?= $usuario['telefono'] ?></p>
                         </div>
                     </div>
 
@@ -184,6 +192,7 @@ $usuario = mostrarPerfil($id);
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/perfil.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/perfilAdministrado.js"></script>
 
 
 </body>

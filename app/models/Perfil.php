@@ -38,7 +38,7 @@ class Perfil
                 case 1: // ADMINISTRADOR
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil, a.telefono,
+                                a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil, a.telefono, a.direccion, a.fecha_creacion,
                                 r.nombre AS rol
                                 FROM usuario u
                                 INNER JOIN administrador a ON u.id_usuario = a.id_usuario
