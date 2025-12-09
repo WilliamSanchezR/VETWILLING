@@ -22,10 +22,11 @@ class Veterinaria
     {
         // Insertamos los datos en la base de datos
         try {
-            $consulta = "INSERT INTO veterinaria (nombre, direccion, ciudad, telefono, email, fecha_creacion, nit, estado) 
-                         VALUES (:nombre, :direccion, :ciudad, :telefono, :email, NOW(), :nit, 1)";
+            $consulta = "INSERT INTO veterinaria (nombre, direccion, ciudad, telefono, email, fecha_creacion, nit, estado, foto) 
+                         VALUES (:nombre, :direccion, :ciudad, :telefono, :email, NOW(), :nit, 1, :foto)";
 
             $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':foto', $data['foto']);
             $resultado->bindParam(':nit', $data['nit']);
             $resultado->bindParam(':nombre', $data['nombre']);
             $resultado->bindParam(':direccion', $data['direccion']);

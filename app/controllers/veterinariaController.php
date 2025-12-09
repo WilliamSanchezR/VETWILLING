@@ -23,7 +23,7 @@ switch ($method) {
     case 'GET':
         // Esta variable captura la accion de eliminar
         $accion = $_GET['action'] ?? '';
-         if ($accion === 'eliminar') {
+        if ($accion === 'eliminar') {
             eliminarVeterinaria($_GET['id']);
         }
         break;
@@ -48,6 +48,7 @@ function registrarVeterinaria()
     $ciudad = $_POST['ciudad'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $email = $_POST['email'] ?? '';
+    $foto = null;
 
     // Validamos que los campos no esten vacios
     if (
@@ -58,6 +59,29 @@ function registrarVeterinaria()
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
     }
+
+    // Validamos y procesamos la foto de la veterinaria si se ha enviado
+    if (!empty($_FILES['foto']['name'])) {
+
+        $file = $_FILES['foto'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitidas = ['png', 'jpg', 'jpeg'];
+        // Validar extensión y tamaño
+        if (!in_array($ext, $permitidas)) {
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
+            exit();
+        }
+        // Validar tamaño
+        if ($file['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Error', 'La foto supera las 2MB');
+            exit();
+        }
+        // Generar un nombre único para la imagen
+        $foto = uniqid('veterinaria_') . '.' . $ext;
+        $destino = BASE_PATH . '/public/uploads/veterinaria/' . $foto;
+        move_uploaded_file($file['tmp_name'], $destino);
+    }
+
     // Creamos el objeto de la clase Veterinaria
     $objVeterinaria = new Veterinaria();
 
@@ -69,6 +93,7 @@ function registrarVeterinaria()
         'ciudad' => $ciudad,
         'telefono' => $telefono,
         'email' => $email,
+        'foto' => $foto
     ];
     // Llamamos a la funcion registrar del modelo Veterinaria
     $resultado = $objVeterinaria->registrar($data);
