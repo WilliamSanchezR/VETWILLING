@@ -6,3 +6,6 @@
 /public/uploads/veterinarios/
 
 /public/uploads/mascotas/
+
+/public/uploads/*
+

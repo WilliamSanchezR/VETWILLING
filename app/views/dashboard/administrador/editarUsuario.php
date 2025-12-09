@@ -78,8 +78,8 @@
             <div class="wizard-container">
                 <div class="wizard-header">
                     <i class="bi bi-person-vcard"></i>
-                    <h2>Registro de usuario</h2>
-                    <p class="text-muted">Complete todos los campos requeridos para registrar el usuario</p>
+                    <h2>Editar usuario</h2>
+                    <p class="text-muted">Complete todos los campos requeridos para editar el usuario</p>
                 </div>
 
 
@@ -141,8 +141,8 @@
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $usuarioData['email'] ?>">
+                                    <label><i class="bi bi-telephone"></i> Dirección *</label>
+                                    <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67" required value="<?= $usuarioData['direccion'] ?>">
                                 </div>
                             </div>
 
@@ -150,6 +150,14 @@
 
                         <div class="row">
 
+                            <div class="col-md-6">
+
+
+                                <div class="form-group">
+                                    <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
+                                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $usuarioData['email'] ?>">
+                                </div>
+                            </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-person-rolodex"></i> Rol *</label>

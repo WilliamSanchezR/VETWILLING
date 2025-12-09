@@ -69,7 +69,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         </div>
                         <div>
                             <h3 classs="mb-0">248</h3>
-                            <p class="text-muted mb-0">Total Pacientes</p>
+                            <p class="text-muted mb-0">Total Usuarios</p>
                         </div>
                     </div>
                 </div>
@@ -80,7 +80,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         </div>
                         <div>
                             <h3 class="mb-0">32</h3>
-                            <p class="text-muted mb-0">Citas Hoy</p>
+                            <p class="text-muted mb-0">Total Veterinarias</p>
                         </div>
                     </div>
                 </div>
@@ -91,7 +91,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         </div>
                         <div>
                             <h3 class="mb-0">8</h3>
-                            <p class="text-muted mb-0">Urgencias</p>
+                            <p class="text-muted mb-0">Productos</p>
                         </div>
                     </div>
                 </div>
