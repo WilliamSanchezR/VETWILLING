@@ -21,9 +21,9 @@ class mascota
     {
         try {
             $sql = "INSERT INTO paciente 
-                    (nombre, especie, raza, edad, sexo, img_mascota, id_propietario)
+                    (nombre, especie, raza, edad, sexo)
                     VALUES 
-                    (:nombre, :especie, :raza, :edad, :sexo, :img_mascota, :id_propietario)";
+                    (:nombre, :especie, :raza, :edad, :sexo";
 
             $stmt = $this->conexion->prepare($sql);
 
@@ -32,9 +32,7 @@ class mascota
                 ":especie"       => $data['especie'],
                 ":raza"          => $data['raza'],
                 ":edad"          => $data['edad'],
-                ":sexo"          => $data['sexo'],
-                ":img_mascota"   => $data['img_mascota'],
-                ":id_propietario" => $data['id_propietario']
+                ":sexo"          => $data['sexo']
             ]);
         } catch (PDOException $e) {
             error_log("Error en Mascota::registrar → " . $e->getMessage());

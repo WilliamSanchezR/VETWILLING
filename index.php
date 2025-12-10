@@ -210,6 +210,9 @@ switch ($request) {
     case '/Cliente/actualizar':
         require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
+    case '/cliente/guardar-mascota':
+        require BASE_PATH . '/app/controllers/mascotasController.php';
+        break;
     case '/Cliente/actualizar-contrasena':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;

@@ -66,25 +66,28 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                         </div>
                     </div>
 
-                    <!-- FOTO -->
-                    <div class="foto-upload-section">
-                        <div class="foto-preview-container">
-                            <div class="foto-preview" id="fotoPreview">
-                                🐕
-                            </div>
-                            <label for="inputFotoMascota" class="btn-cambiar-foto">
-                                <i class="bi bi-camera-fill"></i>
-                            </label>
-                            <input type="file" id="inputFotoMascota" class="input-foto" accept="image/*" onchange="previewFoto(event)">
-                        </div>
-                        <p class="foto-info">
-                            <strong>Foto de tu mascota</strong><br>
-                            JPG, PNG o GIF (máx. 5MB)
-                        </p>
-                    </div>
+
 
                     <!-- FORMULARIO -->
-                    <form id="formRegistroMascota">
+                    <form id="formRegistroMascota" action="<?= BASE_URL ?>/cliente/guardar-mascota" method="POST" enctype="multipart/form-data">
+
+                    <!-- FOTO -->
+
+                        <div class="foto-upload-section">
+                            <div class="foto-preview-container">
+                                <div class="foto-preview" id="fotoPreview">
+                                    🐕
+                                </div>
+                                <label for="inputFotoMascota" class="btn-cambiar-foto">
+                                    <i class="bi bi-camera-fill"></i>
+                                </label>
+                                <input type="file" id="inputFotoMascota" class="input-foto" accept="image/*" onchange="previewFoto(event)">
+                            </div>
+                            <p class="foto-info">
+                                <strong>Foto de tu mascota</strong><br>
+                                JPG, PNG o GIF (máx. 5MB)
+                            </p>
+                        </div>
 
                         <!-- NOMBRE -->
                         <div class="form-group">
@@ -210,7 +213,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                                 <i class="bi bi-x-lg"></i>
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-primary" onclick="guardarMascota()">
+                            <button type="submit" class="btn btn-primary" onclick="guardarMascota()">
                                 <i class="bi bi-check-lg"></i>
                                 Registrar Mascota
                             </button>

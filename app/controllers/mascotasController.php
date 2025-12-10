@@ -43,14 +43,14 @@ switch ($method) {
 
 function registrarMascota()
 {
-    $id_propietario = $_POST['id_propietario'] ?? '';
     $nombre = $_POST['nombre'] ?? '';
     $especie = $_POST['especie'] ?? '';
     $raza = $_POST['raza'] ?? '';
     $edad = $_POST['edad'] ?? '';
     $sexo = $_POST['sexo'] ?? '';
+    $id_propietario = $_SESSION['user']['id_propietario'] ?? '';
 
-    if (empty($id_propietario) || empty($nombre) || empty($especie)) {
+    if (empty($nombre) || empty($especie) || empty($raza) || empty($edad) || empty($sexo)) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Complete como mínimo: propietario, nombre y especie');
         exit();
     }
