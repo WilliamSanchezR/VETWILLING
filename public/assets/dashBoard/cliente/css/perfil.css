@@ -17,7 +17,7 @@
 
  /* Header Perfil */
  .header-perfil {
-     background: linear-gradient(135deg, #9DE795 0%, #0A932C 100%);
+     background: linear-gradient(135deg, #0A932C, #9DE795);
      border-radius: 20px;
      padding: 40px;
      color: white;
@@ -131,7 +131,7 @@
  }
 
  .tab-perfil.active {
-     background: linear-gradient(135deg, #9DE795, #0A932C);
+     background: #0A932C;
      color: white;
  }
 
