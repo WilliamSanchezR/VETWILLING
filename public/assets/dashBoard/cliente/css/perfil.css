@@ -17,7 +17,7 @@
 
  /* Header Perfil */
  .header-perfil {
-     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+     background: linear-gradient(135deg, #0A932C, #9DE795);
      border-radius: 20px;
      padding: 40px;
      color: white;
@@ -38,7 +38,7 @@
      justify-content: center;
      font-size: 50px;
      font-weight: 700;
-     color: #667eea;
+     color: #9DE795;
      position: relative;
      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
  }
@@ -55,7 +55,7 @@
      right: 0;
      width: 35px;
      height: 35px;
-     background: #667eea;
+     background: #9DE795;
      border: 3px solid white;
      border-radius: 50%;
      display: flex;
@@ -67,7 +67,7 @@
 
  .avatar-edit:hover {
      transform: scale(1.1);
-     background: #5568d3;
+     background: #0A932C;
  }
 
  .info-perfil-header h1 {
@@ -131,7 +131,7 @@
  }
 
  .tab-perfil.active {
-     background: linear-gradient(135deg, #667eea, #764ba2);
+     background: #0A932C;
      color: white;
  }
 
@@ -176,7 +176,7 @@
  .btn-editar {
     text-decoration: none;
      padding: 10px 20px;
-     background: #667eea;
+     background: #9DE795;
      color: white;
      border: none;
      border-radius: 10px;
@@ -190,7 +190,7 @@
  }
 
  .btn-editar:hover {
-     background: #5568d3;
+     background: #0A932C;
      transform: translateY(-2px);
  }
 
@@ -222,7 +222,7 @@
  .form-group select:focus,
  .form-group textarea:focus {
      outline: none;
-     border-color: #667eea;
+     border-color: #9DE795;
  }
 
  .form-group textarea {
@@ -276,7 +276,7 @@
  }
 
  .stat-box:hover {
-     background: linear-gradient(135deg, #667eea, #764ba2);
+     background: linear-gradient(135deg, #9DE795, #0A932C);
      color: white;
      transform: translateY(-5px);
  }
@@ -381,7 +381,7 @@
  }
 
  .toggle-switch.active {
-     background: #667eea;
+     background: #9DE795;
  }
 
  .toggle-switch::after {
@@ -410,7 +410,7 @@
  .btn-guardar {
      flex: 1;
      padding: 14px 24px;
-     background: linear-gradient(135deg, #667eea, #764ba2);
+     background: linear-gradient(135deg, #9DE795, #0A932C);
      color: white;
      border: none;
      border-radius: 12px;
@@ -449,7 +449,7 @@
      background: #f8f9fa;
      border-radius: 12px;
      margin-bottom: 15px;
-     border-left: 4px solid #667eea;
+     border-left: 4px solid #9DE795;
  }
 
  .historial-fecha {
