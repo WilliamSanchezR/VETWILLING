@@ -66,7 +66,6 @@
         <!-- Columna derecha -->
         <div class="cont-right">
             <div class="info">
-                <div class="info-icon">🔐</div>
                 <h3>¿Olvidaste tu contraseña?</h3>
                 <p>No te preocupes, es normal. Te ayudaremos a recuperar el acceso a tu cuenta de forma rápida y segura.</p>
 

@@ -41,7 +41,7 @@
  }
 
  .btn-nueva-cita {
- background: linear-gradient(135deg, #667eea, #764ba2);
+ background: linear-gradient(135deg, #0A932C, #087a24);
  color: white;
  padding: 14px 28px;
  border: none;
@@ -142,7 +142,7 @@
  }
 
  .tab-btn.active {
- background: linear-gradient(135deg, #667eea, #764ba2);
+ background: linear-gradient(135deg, #0A932C, #087a24);
  color: white;
  }
 
@@ -182,7 +182,7 @@
  }
 
  .dia-badge {
- background: linear-gradient(135deg, #667eea, #764ba2);
+ background: linear-gradient(135deg, #0A932C, #087a24);
  color: white;
  padding: 6px 14px;
  border-radius: 20px;
@@ -197,7 +197,7 @@
  padding: 25px;
  margin-bottom: 15px;
  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
- border-left: 5px solid #667eea;
+ border-left: 5px solid #0A932C;
  transition: all 0.3s;
  display: flex;
  gap: 20px;
@@ -253,7 +253,7 @@
  width: 70px;
  height: 70px;
  border-radius: 50%;
- background: linear-gradient(135deg, #667eea, #764ba2);
+ background: linear-gradient(135deg, #0A932C, #087a24);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -307,7 +307,7 @@
  }
 
  .detalle i {
- color: #667eea;
+ color: #0A932C;
  font-size: 16px;
  }
 
@@ -342,7 +342,7 @@
  }
 
  .btn-ver {
- background: #667eea;
+ background: #0A932C;
  color: white;
  }
 
@@ -435,7 +435,7 @@
  .filtro-grupo select:focus,
  .filtro-grupo input:focus {
  outline: none;
- border-color: #667eea;
+ border-color: #0A932C;
  }
 
  /* Responsive */
