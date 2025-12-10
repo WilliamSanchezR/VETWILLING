@@ -55,7 +55,7 @@ body {
 }
 
 .btn-menu-mobile:hover {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #9DE795);
     color: white;
     transform: scale(1.05);
 }
@@ -74,7 +74,7 @@ body {
 }
 
 .ubicacion-actual i {
-    color: #667eea;
+    color: #0A932C;
     font-size: 18px;
 }
 
@@ -108,7 +108,7 @@ body {
     top: 50%;
     transform: translateY(-50%);
     font-size: 18px;
-    color: #667eea;
+    color: #0A932C;
     pointer-events: none;
     z-index: 1;
 }
@@ -125,7 +125,7 @@ body {
 
 .input-buscar:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #0A932C;
     background: white;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
@@ -165,7 +165,7 @@ body {
 
 .btn-navbar:hover {
     background: #e9ecef;
-    color: #667eea;
+    color: #0A932C;
     transform: scale(1.05);
 }
 
@@ -238,7 +238,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #9DE795);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -355,7 +355,7 @@ body {
 .btn-marcar-leidas {
     background: none;
     border: none;
-    color: #667eea;
+    color: #0A932C;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -401,7 +401,7 @@ body {
 
 .notificacion-item:hover {
     background: #f8f9fa;
-    border-left-color: #667eea;
+    border-left-color: #0A932C;
 }
 
 .notificacion-item.no-leida {
@@ -465,7 +465,7 @@ body {
 }
 
 .btn-ver-todas {
-    color: #667eea;
+    color: #0A932C;
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
@@ -490,7 +490,7 @@ body {
     display: flex;
     gap: 15px;
     align-items: center;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #9DE795);
     color: white;
 }
 
@@ -527,7 +527,7 @@ body {
 
 .dropdown-item:hover {
     background: #f8f9fa;
-    color: #667eea;
+    color: #0A932C;
 }
 
 .dropdown-item i {
@@ -648,7 +648,7 @@ body {
     right: 30px;
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #9DE795);
     border: none;
     border-radius: 50%;
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
