@@ -1,61 +1,55 @@
+// calendar.js - Lógica de FullCalendar y manejo de Agendamiento (MVC)
 
-// Definimos la URL base para las peticiones al backend.
-// *** ¡Importante! Asegúrate de que estas rutas son correctas en tu servidor. ***
+// --- DEFINICIÓN DE RUTAS LÓGICAS ---
+// Basado en tu archivo 'calendarioController.php', las rutas deben apuntar a ese controlador.
+// Si tu framework usa la estructura 'Controlador/Metodo', esto sería lo más común:
 
-
-
-
-// POR AHORA LAS RUTAS NO SE HAN CREADO POR LO TANTO AUN NO LAS VOY AGREGAR
-
-
-
+const URLS = {
+    // 1. CARGAR EVENTOS (GET): Llama al método que trae todos los agendamientos.
+    LOAD:   './calendario/loadEvents', 
+    
+    // 2. CREAR EVENTO (POST): Llama al método para insertar un nuevo agendamiento.
+    CREATE: './calendario/storeEvent', 
+    
+    // 3. MODIFICAR EVENTO (POST): Llama al método para actualizar fechas/horas.
+    UPDATE: './calendario/updateEvent',
+    
+    // Nota: Debes configurar estas rutas en tu archivo de ruteo de PHP.
+};
 
 
 // Esperamos a que todo el contenido HTML de la página se haya cargado.
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- Función de Utilidad para Peticiones AJAX (Fetch) ---
-    // Esta función maneja la comunicación con el servidor (backend).
-    // Es centralizada para evitar repetir código en cada evento del calendario.
+    // ESTA FUNCIÓN SE MANTIENE IGUAL, ES GENÉRICA Y ESTÁ BIEN.
     function sendEventData(url, data, successCallback, errorCallback) {
-        // Hacemos una petición POST al servidor usando Fetch API.
+        // ... (Tu código actual para sendEventData, sin cambios) ...
         fetch(url, {
-            method: 'POST', // Usamos POST para enviar datos al servidor
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json', // Le decimos al servidor que enviamos JSON
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data), // Convertimos el objeto JavaScript 'data' a una cadena JSON
+            body: JSON.stringify(data),
         })
         .then(response => {
-            // Verificamos si la respuesta del servidor es OK (código 200-299)
             if (!response.ok) {
                 throw new Error('La respuesta del servidor no fue exitosa: ' + response.statusText);
             }
-            // Parseamos la respuesta del servidor como JSON
             return response.json(); 
         })
         .then(result => {
-            // Si el servidor responde con un status 'success' (definido en tu PHP)
             if (result.status === 'success') {
                 console.log('Operación exitosa:', result.message);
-                if (successCallback) {
-                    // Llamamos a la función de éxito, pasando el resultado
-                    successCallback(result); 
-                }
+                if (successCallback) { successCallback(result); }
             } else {
-                // Si el servidor respondió, pero hubo un error en la lógica (ej: error SQL)
                 console.error('Error lógico en el servidor:', result.message);
-                if (errorCallback) {
-                    errorCallback(result.message);
-                }
+                if (errorCallback) { errorCallback(result.message); }
             }
         })
         .catch(error => {
-            // Manejamos errores de red o errores al parsear el JSON
             console.error('Error de comunicación AJAX:', error);
-            if (errorCallback) {
-                errorCallback(error.message);
-            }
+            if (errorCallback) { errorCallback(error.message); }
         });
     }
 
@@ -70,8 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 eventData: function(eventEl) {
                     return {
                         title: eventEl.innerText.trim(),
-                        // Duración necesaria para que FullCalendar calcule el fin
                         duration: eventEl.getAttribute('data-duration') 
+                        // Nota: Aquí podrías añadir otros atributos como data-id-servicio
                     };
                 }
             });
@@ -96,43 +90,43 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         
         // --- CARGA DE EVENTOS ---
-        // FullCalendar hará una petición GET a 'cargar_eventos.php' al iniciar y al cambiar de mes.
-        events: './cargar_eventos.php', // *** ¡Ruta importante! ***
+        // Apunta a la URL de carga de tu controlador
+        events: URLS.LOAD, 
         
         // --- INTERACCIÓN Y CREACIÓN DE EVENTOS (Selectable) ---
         selectable: true, 
         
         select: function(info) {
             // Se ejecuta cuando el usuario selecciona un rango de fechas.
-            var title = prompt('Ingresa el título del nuevo evento:');
+            var title = prompt('Ingresa el TIPO de Agendamiento:');
 
             if (title) {
-                // 1. Preparamos los datos a enviar al servidor
+                // 1. Preparamos los datos a enviar al servidor, usando los nombres de tu DB.
                 var newEventData = {
-                    title: title,
-                    start: info.startStr,
-                    end: info.endStr, // El servidor recibirá la fecha de fin
-                    allDay: info.allDay ? 1 : 0 // Enviamos 1 o 0 para la base de datos
+                    tipo: title, // Se mapea a la columna 'tipo'
+                    fecha_hora: info.startStr, // Se mapea a la columna 'fecha_hora' (start)
+                    fecha_hora_fin: info.endStr || null, // Se mapea a 'fecha_hora_fin' (end)
+                    allDay: info.allDay ? 1 : 0
+                    // NOTA: Podrías añadir campos faltantes como id_usuario, id_paciente, etc.
                 };
 
                 // 2. Llamada AJAX para guardar en la base de datos
-                sendEventData(CREATE_URL, newEventData, 
-                    // Función de Éxito (si el servidor responde correctamente)
+                sendEventData(URLS.CREATE, newEventData, 
+                    // Función de Éxito
                     function(result) {
-                        // El servidor debe devolver el ID que le asignó la DB (ej: result.id)
-                        // Esto es clave para poder actualizarlo después.
+                        // El servidor debe devolver el id_agendamiento generado (result.id)
                         calendar.addEvent({
-                            id: result.id, // Asignamos el ID retornado
+                            id: result.id, // CRUCIAL: Asignamos el id_agendamiento retornado
                             title: title,
                             start: info.startStr,
                             end: info.endStr,
                             allDay: info.allDay
                         });
-                        alert('Evento creado con éxito en la DB con ID: ' + result.id);
+                        alert('Agendamiento creado con éxito. ID: ' + result.id);
                     },
-                    // Función de Error (si falla la comunicación o la lógica del servidor)
+                    // Función de Error
                     function(errorMessage) {
-                        alert('Error al guardar el evento: ' + errorMessage);
+                        alert('Error al guardar el agendamiento: ' + errorMessage);
                     }
                 );
             }
@@ -146,104 +140,94 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 1. Se ejecuta cuando un evento ya existente es MOVIDO.
         eventDrop: function(info) {
-            // El evento vuelve a su lugar si la confirmación es rechazada
-            if (!confirm("¿Estás seguro de mover el evento a esta nueva fecha?")) {
+            if (!confirm("¿Estás seguro de mover el agendamiento?")) {
                 info.revert(); 
                 return;
             } 
             
             // 1. Preparamos los datos para la actualización
             var eventUpdateData = {
-                id: info.event.id,
-                // Usamos toISOString() para tener un formato de fecha estándar que la DB entienda
-                new_start: info.event.start.toISOString(),
-                // Se verifica si existe hora de fin (puede ser nulo en eventos de día completo)
-                new_end: info.event.end ? info.event.end.toISOString() : null, 
-                action: 'move' // Indicamos qué acción se realizó
+                id_agendamiento: info.event.id, // Mapeado a id_agendamiento
+                // Enviamos las nuevas fechas con los nombres de la DB
+                new_fecha_hora: info.event.start.toISOString(), 
+                new_fecha_hora_fin: info.event.end ? info.event.end.toISOString() : null, 
+                action: 'move' 
             };
 
             // 2. Llamada AJAX para actualizar el evento en la base de datos
-            sendEventData(UPDATE_URL, eventUpdateData, 
+            sendEventData(URLS.UPDATE, eventUpdateData, 
                 function() {
-                    console.log('Movimiento de evento guardado.');
+                    console.log('Movimiento de agendamiento guardado.');
                 },
                 function(errorMessage) {
-                    alert('Error al mover el evento: ' + errorMessage);
-                    info.revert(); // Revertimos el movimiento si falla el guardado
+                    alert('Error al mover el agendamiento: ' + errorMessage);
+                    info.revert(); 
                 }
             );
         },
         
         // 2. Se ejecuta cuando un evento ya existente es REDIMENSIONADO.
         eventResize: function(info) {
-            // ¡Esta función es nueva y crucial para guardar cambios de duración!
-            if (!confirm("¿Estás seguro de cambiar la duración del evento?")) {
+            if (!confirm("¿Estás seguro de cambiar la duración del agendamiento?")) {
                 info.revert(); 
                 return;
             } 
 
             // 1. Preparamos los datos para la actualización
             var eventUpdateData = {
-                id: info.event.id,
-                new_start: info.event.start.toISOString(),
-                new_end: info.event.end ? info.event.end.toISOString() : null,
-                action: 'resize' // Indicamos qué acción se realizó
+                id_agendamiento: info.event.id,
+                new_fecha_hora: info.event.start.toISOString(),
+                new_fecha_hora_fin: info.event.end ? info.event.end.toISOString() : null,
+                action: 'resize'
             };
 
             // 2. Llamada AJAX para actualizar el evento en la base de datos
-            sendEventData(UPDATE_URL, eventUpdateData, 
+            sendEventData(URLS.UPDATE, eventUpdateData, 
                 function() {
-                    console.log('Redimensión de evento guardada.');
+                    console.log('Redimensión de agendamiento guardada.');
                 },
                 function(errorMessage) {
-                    alert('Error al redimensionar el evento: ' + errorMessage);
-                    info.revert(); // Revertimos si falla el guardado
+                    alert('Error al redimensionar el agendamiento: ' + errorMessage);
+                    info.revert(); 
                 }
             );
         },
 
         // 3. Se ejecuta cuando un evento EXTERNO es soltado en el calendario.
         drop: function(info) {
-            // info.draggedEl contiene el elemento HTML que fue soltado.
-            
             var title = info.draggedEl.innerText.trim();
+            
+            // Aquí debes obtener el id_servicio/id_especialidad/etc. del elemento arrastrado.
             
             // 1. Preparamos los datos para crear un nuevo evento
             var newExternalEventData = {
-                title: title,
-                start: info.dateStr, // Fecha y hora donde se soltó
+                tipo: title,
+                fecha_hora: info.dateStr, 
                 allDay: info.allDay,
-                // Si el evento tiene duración (definida en initializeExternalEvents), 
-                // FullCalendar calcula el 'end' automáticamente, no es necesario enviarlo aquí, 
-                // pero si quieres, lo podrías calcular y enviar.
+                // Si el elemento externo tiene una duración predefinida, FullCalendar calcula el end.
+                // Puedes forzar el end si quieres: fecha_hora_fin: info.endStr || null
             };
 
             // 2. Llamada AJAX para crear el evento en la base de datos
-            sendEventData(CREATE_URL, newExternalEventData, 
+            sendEventData(URLS.CREATE, newExternalEventData, 
                 function(result) {
-                    // Si el servidor es exitoso, FullCalendar necesita un ID para poder moverlo después.
-                    // ¡Agregamos el evento al calendario con el ID que viene de la DB!
+                    // Si el servidor es exitoso, FullCalendar necesita el ID.
                     calendar.addEvent({
                         id: result.id, 
                         title: title,
                         start: info.date,
                         allDay: info.allDay
                     });
-                    alert('Evento externo creado con ID: ' + result.id);
+                    alert('Agendamiento externo creado con ID: ' + result.id);
                     
-                    // Si el elemento externo debe desaparecer después de soltarse
                     if (document.getElementById('drop-remove').checked) {
                         info.draggedEl.remove();
                     }
                 },
                 function(errorMessage) {
-                    alert('Error al crear el evento externo: ' + errorMessage);
+                    alert('Error al crear el agendamiento externo: ' + errorMessage);
                 }
             );
-            
-            // Nota: FullCalendar crea un evento temporal automáticamente. La lógica anterior
-            // lo elimina y añade el evento con el ID real de la DB para que sea editable.
-            
         }
         
     });
