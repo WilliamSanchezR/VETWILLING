@@ -1,50 +1,94 @@
 <?php
+require_once __DIR__ . '/../../config/database.php';
 
-// app/Models/EventModel.php (Ejemplo simplificado)
-
-class EventModel
+class Eventos
 {
 
-    private $db; // Objeto de conexión a la base de datos
+    private $conexion; // Propiedad que guarda la conexión (PDO o mysqli)
 
     public function __construct()
     {
-        // Inicializar la conexión a la base de datos aquí (Ej: $this->db = new PDO(...))
-        // Por simplicidad, asumimos que $this->db ya está configurado.
+        // 1. Instanciamos tu clase de conexión
+        $db = new conexion();
+        // 2. Asignamos el objeto de conexión devuelto por getConexion() a la propiedad interna
+        $this->conexion = $db->getConexion();
     }
 
-    // --- Lógica para cargar todos los eventos (usada por EventController::load) ---
-    public function getAllEvents()
+    // ----------------------------------------------------------------------
+    // 1. OBTENER TODOS LOS AGENDAMIENTOS (Usado por calendarioController::loadEvents)
+    // ----------------------------------------------------------------------
+    public function getAllAgendamientos()
     {
-        // CONSULTA: SELECT id, title, start_date, end_date FROM events
-        // Ejecutar la consulta...
-        // Devolver un array de eventos
-        // return $result; 
-        return []; // Retorna un array vacío o el resultado de la DB
+        $sql = "SELECT id_agendamiento, tipo, fecha_hora, fecha_hora_fin, estado, id_paciente, id_servicio, id_especialidad 
+                FROM agendamiento";
+
+        // CORRECCIÓN: Usar $this->conexion en lugar de $this->db
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute();
+
+        // Asumiendo que $this->conexion es un objeto PDO:
+        // Si usas mysqli, la sintaxis de fetch cambiaría (ej: $stmt->get_result()->fetch_all(MYSQLI_ASSOC))
+        return $stmt->fetchAll();
     }
 
-    // --- Lógica para crear un nuevo evento (usada por EventController::store) ---
-    public function createEvent($title, $start, $end)
+    // ----------------------------------------------------------------------
+    // 2. CREAR UN NUEVO AGENDAMIENTO (Usado por calendarioController::storeEvent)
+    // ----------------------------------------------------------------------
+    public function createAgendamiento(array $data)
     {
-        // Preparamos la consulta INSERT (¡Usar Prepared Statements!)
-        // QUERY: INSERT INTO events (title, start_date, end_date) VALUES (?, ?, ?)
+        $sql = "INSERT INTO agendamiento (tipo, fecha_hora, fecha_hora_fin, estado, id_usuario, id_paciente, id_servicio, id_especialidad) 
+                VALUES (:tipo, :fecha_hora, :fecha_hora_fin, :estado, :id_usuario, :id_paciente, :id_servicio, :id_especialidad)";
 
-        // Ejecutar la inserción...
+        // CORRECCIÓN: Usar $this->conexion
+        $stmt = $this->conexion->prepare($sql);
 
-        // Devolvemos el ID que generó la base de datos (Ej: $this->db->lastInsertId())
-        $fake_id = rand(100, 999); // Simulación de un ID generado
-        return $fake_id;
+        // Asignación de valores
+        $stmt->bindValue(':tipo', $data['tipo'] ?? 'Desconocido');
+        $stmt->bindValue(':fecha_hora', $data['fecha_hora']);
+        $stmt->bindValue(':fecha_hora_fin', $data['fecha_hora_fin'] ?? null);
+        $stmt->bindValue(':estado', $data['estado'] ?? 'Pendiente');
+        $stmt->bindValue(':id_usuario', $data['id_usuario'] ?? null);
+        $stmt->bindValue(':id_paciente', $data['id_paciente'] ?? null);
+        $stmt->bindValue(':id_servicio', $data['id_servicio'] ?? null);
+        $stmt->bindValue(':id_especialidad', $data['id_especialidad'] ?? null);
+
+        if ($stmt->execute()) {
+            // CORRECCIÓN: Usar $this->conexion para obtener el último ID insertado
+            // Nota: lastInsertId() es un método de PDO
+            return $this->conexion->lastInsertId();
+        } else {
+            return false;
+        }
     }
 
-    // --- Lógica para actualizar las fechas (usada por EventController::update) ---
-    public function updateEventDates($id, $start, $end)
+    // ----------------------------------------------------------------------
+    // 3. ACTUALIZAR FECHAS DE AGENDAMIENTO (Usado por calendarioController::updateEvent)
+    // ----------------------------------------------------------------------
+    public function updateAgendamientoDates(array $data)
     {
-        // Preparamos la consulta UPDATE (¡Usar Prepared Statements!)
-        // QUERY: UPDATE events SET start_date = ?, end_date = ? WHERE id = ?
+        $sql = "UPDATE agendamiento 
+                SET fecha_hora = :start, 
+                    fecha_hora_fin = :end
+                WHERE id_agendamiento = :id";
 
-        // Ejecutar la actualización...
+        // CORRECCIÓN: Usar $this->conexion
+        $stmt = $this->conexion->prepare($sql);
 
-        // Devolvemos TRUE si se actualizó una fila, FALSE si hubo error
-        return true;
+        // Asignación de valores del array de datos
+        // Nota: Los placeholders en el SQL son ':start' y ':end', pero los datos vienen como 'fecha_hora' y 'fecha_hora_fin'
+        $stmt->bindValue(':start', $data['fecha_hora']); // Mapeo de $data['fecha_hora'] a :start
+        $stmt->bindValue(':end', $data['fecha_hora_fin'] ?? null); // Mapeo de $data['fecha_hora_fin'] a :end
+        $stmt->bindValue(':id', $data['id_agendamiento']);
+
+        return $stmt->execute(); // Devuelve TRUE o FALSE
+    }
+
+    // Opcional: Función para debugging si usas PDO
+    public function getError()
+    {
+        if (isset($this->conexion) && method_exists($this->conexion, 'errorInfo')) {
+            return $this->conexion->errorInfo();
+        }
+        return ['No hay conexión PDO o error desconocido.'];
     }
 }
