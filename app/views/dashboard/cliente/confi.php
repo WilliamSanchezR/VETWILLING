@@ -1,13 +1,3 @@
-<?php
-// enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
-require_once BASE_PATH . '/app/controllers/propetarioController.php';
-
-// asignamos el valor id del registro según la tabla
-$id = $_SESSION['user']['id_propietario'] ?? '';
-
-// Llamamos la funcion del controlador
-$usuario = consultarPropietarioId($id);
-?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -72,7 +62,7 @@ $usuario = consultarPropietarioId($id);
                 <div class="tab-content" id="tab-cuenta">
                     <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar" enctype="multipart/form-data">
                         <input type="hidden" name="accion" value="actualizar">
-                        <input type="hidden" name="id_propetario" value="<?= $_SESSION['user']['id_usuario'] ?>">
+                        <input type="hidden" name="id_propietario" value="<?= $_SESSION['user']['id'] ?>">
 
                         <!-- Foto de Perfil -->
                         <div class="config-card">
@@ -531,7 +521,7 @@ $usuario = consultarPropietarioId($id);
             </div>
         </div>
     </main>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/confi.js"></script>
