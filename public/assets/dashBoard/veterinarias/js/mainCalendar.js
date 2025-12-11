@@ -1,30 +1,76 @@
-// =======================================================
-// Archivo: js/main_calendar.js
-// Propósito: Inicializar el calendario FullCalendar y todas sus interacciones.
-// =======================================================
 
-// 1. Esperamos a que todo el contenido HTML de la página se haya cargado
-// antes de intentar buscar el calendario o los eventos externos.
+// Definimos la URL base para las peticiones al backend.
+// *** ¡Importante! Asegúrate de que estas rutas son correctas en tu servidor. ***
+
+
+
+
+// POR AHORA LAS RUTAS NO SE HAN CREADO POR LO TANTO AUN NO LAS VOY AGREGAR
+
+
+
+
+
+// Esperamos a que todo el contenido HTML de la página se haya cargado.
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- Parte de Arrastre de Eventos Externos (Opcional C.2) ---
-    // Esta sección hace que los elementos con la clase 'fc-event' fuera del calendario
-    // puedan ser arrastrados.
+    // --- Función de Utilidad para Peticiones AJAX (Fetch) ---
+    // Esta función maneja la comunicación con el servidor (backend).
+    // Es centralizada para evitar repetir código en cada evento del calendario.
+    function sendEventData(url, data, successCallback, errorCallback) {
+        // Hacemos una petición POST al servidor usando Fetch API.
+        fetch(url, {
+            method: 'POST', // Usamos POST para enviar datos al servidor
+            headers: {
+                'Content-Type': 'application/json', // Le decimos al servidor que enviamos JSON
+            },
+            body: JSON.stringify(data), // Convertimos el objeto JavaScript 'data' a una cadena JSON
+        })
+        .then(response => {
+            // Verificamos si la respuesta del servidor es OK (código 200-299)
+            if (!response.ok) {
+                throw new Error('La respuesta del servidor no fue exitosa: ' + response.statusText);
+            }
+            // Parseamos la respuesta del servidor como JSON
+            return response.json(); 
+        })
+        .then(result => {
+            // Si el servidor responde con un status 'success' (definido en tu PHP)
+            if (result.status === 'success') {
+                console.log('Operación exitosa:', result.message);
+                if (successCallback) {
+                    // Llamamos a la función de éxito, pasando el resultado
+                    successCallback(result); 
+                }
+            } else {
+                // Si el servidor respondió, pero hubo un error en la lógica (ej: error SQL)
+                console.error('Error lógico en el servidor:', result.message);
+                if (errorCallback) {
+                    errorCallback(result.message);
+                }
+            }
+        })
+        .catch(error => {
+            // Manejamos errores de red o errores al parsear el JSON
+            console.error('Error de comunicación AJAX:', error);
+            if (errorCallback) {
+                errorCallback(error.message);
+            }
+        });
+    }
+
+
+    // --- Parte de Arrastre de Eventos Externos (Draggable) ---
     function initializeExternalEvents() {
-        // Obtenemos el contenedor de los eventos externos (debe tener el ID 'external-events' en el HTML).
         var containerEl = document.getElementById('external-events');
         
         if (containerEl) {
-            // Creamos una nueva instancia de Draggable de FullCalendar.
             new FullCalendar.Draggable(containerEl, {
-                // Indicamos qué elementos dentro del contenedor son arrastrables.
                 itemSelector: '.fc-event',
-                
-                // Definimos los datos del evento que se crearán cuando se suelte en el calendario.
                 eventData: function(eventEl) {
                     return {
                         title: eventEl.innerText.trim(),
-                        // Si el elemento HTML tiene un atributo 'data-duration', FullCalendar lo usa para la duración.
+                        // Duración necesaria para que FullCalendar calcule el fin
                         duration: eventEl.getAttribute('data-duration') 
                     };
                 }
@@ -32,95 +78,176 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Llamamos a la función para habilitar el arrastre de eventos externos.
     initializeExternalEvents();
 
     // --- Inicialización Principal del Calendario ---
-    
-    // Obtenemos la referencia al elemento <div> donde se dibujará el calendario.
     var calendarEl = document.getElementById('calendar');
 
-    // Creamos la instancia principal del calendario con todas sus opciones.
     var calendar = new FullCalendar.Calendar(calendarEl, {
         
         // --- CONFIGURACIÓN DE APARIENCIA Y VISTA ---
-        locale: 'es', // Idioma en español
-        themeSystem: 'bootstrap5', // Usamos el tema de Bootstrap para un mejor estilo
-        initialView: 'dayGridMonth', // Vista de mes al inicio
-
-        // Define los botones y el título en la parte superior del calendario.
+        locale: 'es', 
+        themeSystem: 'bootstrap5', 
+        initialView: 'dayGridMonth', 
         headerToolbar: {
-            left: 'prev,next today', // Botones de navegación
-            center: 'title', // Título del mes/año
-            right: 'dayGridMonth,timeGridWeek,timeGridDay' // Vistas disponibles
+            left: 'prev,next today', 
+            center: 'title', 
+            right: 'dayGridMonth,timeGridWeek,timeGridDay' 
         },
         
-        // --- CARGA DE EVENTOS (Opcional B) ---
-        // Aquí le indicamos a FullCalendar que cargue los eventos desde tu servidor.
-        // Debe ser la ruta donde tienes tu archivo 'events.php' (o similar) que devuelve JSON.
-        events: './events.php', // ¡CAMBIA ESTA RUTA SI ES NECESARIO!
+        // --- CARGA DE EVENTOS ---
+        // FullCalendar hará una petición GET a 'cargar_eventos.php' al iniciar y al cambiar de mes.
+        events: './cargar_eventos.php', // *** ¡Ruta importante! ***
         
         // --- INTERACCIÓN Y CREACIÓN DE EVENTOS (Selectable) ---
-        selectable: true, // Permite seleccionar rangos de fechas arrastrando el ratón.
+        selectable: true, 
         
         select: function(info) {
             // Se ejecuta cuando el usuario selecciona un rango de fechas.
             var title = prompt('Ingresa el título del nuevo evento:');
 
             if (title) {
-                // Si se introduce un título, agregamos el evento al calendario.
-                calendar.addEvent({
+                // 1. Preparamos los datos a enviar al servidor
+                var newEventData = {
                     title: title,
                     start: info.startStr,
-                    end: info.endStr,
-                    allDay: info.allDay
-                });
-                // NOTA: Aquí DEBES hacer una llamada AJAX para guardar el evento
-                // en tu base de datos del lado del servidor.
+                    end: info.endStr, // El servidor recibirá la fecha de fin
+                    allDay: info.allDay ? 1 : 0 // Enviamos 1 o 0 para la base de datos
+                };
+
+                // 2. Llamada AJAX para guardar en la base de datos
+                sendEventData(CREATE_URL, newEventData, 
+                    // Función de Éxito (si el servidor responde correctamente)
+                    function(result) {
+                        // El servidor debe devolver el ID que le asignó la DB (ej: result.id)
+                        // Esto es clave para poder actualizarlo después.
+                        calendar.addEvent({
+                            id: result.id, // Asignamos el ID retornado
+                            title: title,
+                            start: info.startStr,
+                            end: info.endStr,
+                            allDay: info.allDay
+                        });
+                        alert('Evento creado con éxito en la DB con ID: ' + result.id);
+                    },
+                    // Función de Error (si falla la comunicación o la lógica del servidor)
+                    function(errorMessage) {
+                        alert('Error al guardar el evento: ' + errorMessage);
+                    }
+                );
             }
-            // Limpiamos la selección.
             calendar.unselect();
         },
         
-        // --- ARRASTRAR Y MODIFICAR EVENTOS (Opcional C.1 y C.2) ---
+        // --- MODIFICACIÓN DE EVENTOS (editable) ---
         
-        editable: true, // Permite que los eventos se puedan arrastrar y redimensionar.
-        droppable: true, // Permite que se suelten eventos EXTERNOS en el calendario.
+        editable: true, 
+        droppable: true, 
 
-        // Se ejecuta cuando un evento ya existente es movido a una nueva fecha/hora.
+        // 1. Se ejecuta cuando un evento ya existente es MOVIDO.
         eventDrop: function(info) {
-            // info.event contiene el evento movido y sus nuevas fechas/horas.
-            
-            // Pedimos confirmación antes de guardar el cambio.
+            // El evento vuelve a su lugar si la confirmación es rechazada
             if (!confirm("¿Estás seguro de mover el evento a esta nueva fecha?")) {
-                info.revert(); // Si cancela, el evento vuelve a su posición original.
-            } else {
-                // PASO CRUCIAL: Debes enviar una petición AJAX a tu backend (ej: update_event.php)
-                // para actualizar el registro del evento en tu base de datos con:
-                // - ID del evento: info.event.id
-                // - Nueva fecha de inicio: info.event.start.toISOString()
-                // - Nueva fecha de fin: info.event.end ? info.event.end.toISOString() : null
-                
-                alert('¡Felicidades! Aquí guardarías el cambio en el servidor para el evento con ID: ' + info.event.id);
-            }
+                info.revert(); 
+                return;
+            } 
+            
+            // 1. Preparamos los datos para la actualización
+            var eventUpdateData = {
+                id: info.event.id,
+                // Usamos toISOString() para tener un formato de fecha estándar que la DB entienda
+                new_start: info.event.start.toISOString(),
+                // Se verifica si existe hora de fin (puede ser nulo en eventos de día completo)
+                new_end: info.event.end ? info.event.end.toISOString() : null, 
+                action: 'move' // Indicamos qué acción se realizó
+            };
+
+            // 2. Llamada AJAX para actualizar el evento en la base de datos
+            sendEventData(UPDATE_URL, eventUpdateData, 
+                function() {
+                    console.log('Movimiento de evento guardado.');
+                },
+                function(errorMessage) {
+                    alert('Error al mover el evento: ' + errorMessage);
+                    info.revert(); // Revertimos el movimiento si falla el guardado
+                }
+            );
+        },
+        
+        // 2. Se ejecuta cuando un evento ya existente es REDIMENSIONADO.
+        eventResize: function(info) {
+            // ¡Esta función es nueva y crucial para guardar cambios de duración!
+            if (!confirm("¿Estás seguro de cambiar la duración del evento?")) {
+                info.revert(); 
+                return;
+            } 
+
+            // 1. Preparamos los datos para la actualización
+            var eventUpdateData = {
+                id: info.event.id,
+                new_start: info.event.start.toISOString(),
+                new_end: info.event.end ? info.event.end.toISOString() : null,
+                action: 'resize' // Indicamos qué acción se realizó
+            };
+
+            // 2. Llamada AJAX para actualizar el evento en la base de datos
+            sendEventData(UPDATE_URL, eventUpdateData, 
+                function() {
+                    console.log('Redimensión de evento guardada.');
+                },
+                function(errorMessage) {
+                    alert('Error al redimensionar el evento: ' + errorMessage);
+                    info.revert(); // Revertimos si falla el guardado
+                }
+            );
         },
 
-        // Se ejecuta cuando un evento EXTERNO (de la barra lateral) es soltado.
+        // 3. Se ejecuta cuando un evento EXTERNO es soltado en el calendario.
         drop: function(info) {
             // info.draggedEl contiene el elemento HTML que fue soltado.
-            // info.dateStr contiene la fecha donde fue soltado.
             
-            // PASO CRUCIAL: Debes enviar una petición AJAX a tu backend (ej: create_event.php)
-            // para crear un NUEVO registro en tu base de datos.
+            var title = info.draggedEl.innerText.trim();
             
-            alert('Evento externo soltado y listo para crear en el servidor en la fecha: ' + info.dateStr);
+            // 1. Preparamos los datos para crear un nuevo evento
+            var newExternalEventData = {
+                title: title,
+                start: info.dateStr, // Fecha y hora donde se soltó
+                allDay: info.allDay,
+                // Si el evento tiene duración (definida en initializeExternalEvents), 
+                // FullCalendar calcula el 'end' automáticamente, no es necesario enviarlo aquí, 
+                // pero si quieres, lo podrías calcular y enviar.
+            };
 
-            // Si el elemento externo debe desaparecer después de soltarse, se usa:
-            // info.draggedEl.remove();
+            // 2. Llamada AJAX para crear el evento en la base de datos
+            sendEventData(CREATE_URL, newExternalEventData, 
+                function(result) {
+                    // Si el servidor es exitoso, FullCalendar necesita un ID para poder moverlo después.
+                    // ¡Agregamos el evento al calendario con el ID que viene de la DB!
+                    calendar.addEvent({
+                        id: result.id, 
+                        title: title,
+                        start: info.date,
+                        allDay: info.allDay
+                    });
+                    alert('Evento externo creado con ID: ' + result.id);
+                    
+                    // Si el elemento externo debe desaparecer después de soltarse
+                    if (document.getElementById('drop-remove').checked) {
+                        info.draggedEl.remove();
+                    }
+                },
+                function(errorMessage) {
+                    alert('Error al crear el evento externo: ' + errorMessage);
+                }
+            );
+            
+            // Nota: FullCalendar crea un evento temporal automáticamente. La lógica anterior
+            // lo elimina y añade el evento con el ID real de la DB para que sea editable.
+            
         }
         
     });
 
-    // 2. Dibujar el calendario en el <div>
+    // Dibujar el calendario
     calendar.render();
 });
