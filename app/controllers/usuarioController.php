@@ -14,14 +14,11 @@ switch ($method) {
             actualizarUsuario();
         } else if ($accion  === 'actualizar-constrasena') {
             cambioContrasena();
-        }
-        else if ($accion  === 'modificar-constrasena') {
+        } else if ($accion  === 'modificar-constrasena') {
             modiContrasena();
-        }
-        else if ($accion  === 'vet-constrasena') {
+        } else if ($accion  === 'vet-constrasena') {
             vetContrasena();
-        } 
-        else if ($accion === 'cambiar-foto') {
+        } else if ($accion === 'cambiar-foto') {
             actualizarFotoPerfil();
         } else {
             registrarUsuario();
@@ -53,7 +50,7 @@ switch ($method) {
 
 // FUNCION PARA REGISTRAR UN NUEVO USUARIO
 function registrarUsuario()
-{   
+{
     // Capturamos los datos enviados por el formulario
     $email = $_POST['email'] ?? '';
     $password = '123';
@@ -68,7 +65,7 @@ function registrarUsuario()
     $id_veterinaria = $_POST['veterinaria'] ?? null;
     $nivel_acceso = 'Completo';
     $img_perfil = null;
-    
+
     // Validamos que los campos no esten vacios
     if (
         empty($email) || empty($password) || empty($estado) || empty($id_rol) ||
@@ -336,7 +333,6 @@ function vetContrasena()
     exit();
 }
 
-
 function modiContrasena()
 {
     $id_usuario = $_POST['id_usuario'] ?? '';
@@ -440,4 +436,3 @@ function actualizarFotoPerfil()
 
     exit();
 }
-

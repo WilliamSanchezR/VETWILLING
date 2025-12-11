@@ -1,3 +1,13 @@
+<?php
+// enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
+require_once BASE_PATH . '/app/controllers/propetarioController.php';
+
+// asignamos el valor id del registro según la tabla
+$id = $_SESSION['user']['id_propietario'] ?? '';
+
+// Llamamos la funcion del controlador
+$usuario = consultarPropietarioId($id);
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -521,10 +531,10 @@
             </div>
         </div>
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/confi.js"></script>
+    
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/confi.js"></script>
 </body>
 
 </html>
