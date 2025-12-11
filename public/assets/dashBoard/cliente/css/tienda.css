@@ -17,7 +17,7 @@
 
  /* Header Tienda */
  .header-tienda {
- background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
  border-radius: 20px;
  padding: 40px;
  color: white;
@@ -42,7 +42,7 @@
  .carrito-float {
  position: relative;
  background: white;
- color: #667eea;
+ color: #9DE795;
  width: 60px;
  height: 60px;
  border-radius: 50%;
@@ -106,7 +106,7 @@
 
  .search-box input:focus {
  outline: none;
- border-color: #667eea;
+ border-color: #9DE795;
  }
 
  .search-box i {
@@ -115,12 +115,12 @@
  top: 50%;
  transform: translateY(-50%);
  font-size: 20px;
- color: #667eea;
+ color: #9DE795;
  }
 
  .btn-buscar {
  padding: 14px 28px;
- background: linear-gradient(135deg, #667eea, #764ba2);
+ background: linear-gradient(135deg, #9DE795, #0A932C);
  color: white;
  border: none;
  border-radius: 12px;
@@ -148,7 +148,7 @@
  }
 
  .categorias-scroll::-webkit-scrollbar-thumb {
- background: #667eea;
+ background: #9DE795;
  border-radius: 10px;
  }
 
@@ -170,9 +170,9 @@
 
  .categoria-btn:hover,
  .categoria-btn.active {
- background: linear-gradient(135deg, #667eea, #764ba2);
+ background: linear-gradient(135deg, #9DE795, #0A932C);
  color: white;
- border-color: #667eea;
+ border-color: #9DE795;
  transform: translateY(-2px);
  }
 
@@ -266,7 +266,7 @@
 
  .producto-categoria {
  font-size: 12px;
- color: #667eea;
+ color: #9DE795;
  font-weight: 600;
  text-transform: uppercase;
  margin-bottom: 8px;
@@ -331,7 +331,7 @@
 
  .btn-agregar {
  padding: 12px 20px;
- background: linear-gradient(135deg, #667eea, #764ba2);
+ background: linear-gradient(135deg, #9DE795, #0A932C);
  color: white;
  border: none;
  border-radius: 10px;
@@ -415,9 +415,9 @@
 
  .pagina-btn:hover,
  .pagina-btn.active {
- background: linear-gradient(135deg, #667eea, #764ba2);
+ background: linear-gradient(135deg, #9DE795, #0A932C);
  color: white;
- border-color: #667eea;
+ border-color: #9DE795;
  }
 
  /* Responsive */

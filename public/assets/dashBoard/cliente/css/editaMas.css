@@ -5,7 +5,7 @@
 
 /* HEADER */
 .header-editar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0A932C 0%, #0A932C 100%);
     border-radius: 20px;
     top: 10px;
     padding: 35px 40px;
@@ -86,12 +86,12 @@
 }
 
 .tab-btn:hover {
-    color: #667eea;
+    color: #0A932C;
 }
 
 .tab-btn.active {
-    color: #667eea;
-    border-bottom-color: #667eea;
+    color: #0A932C;
+    border-bottom-color: #0A932C;
 }
 
 .tab-content {
@@ -145,7 +145,7 @@
     right: 0;
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #0A932C);
     border: 3px solid white;
     border-radius: 50%;
     display: flex;
@@ -202,7 +202,7 @@
 }
 
 .btn-foto-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #0A932C);
     color: white;
 }
 
@@ -255,7 +255,7 @@
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #0A932C;
     box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 }
 
@@ -321,8 +321,8 @@
 }
 
 .radio-option input[type="radio"]:checked+.radio-label {
-    border-color: #667eea;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: #0A932C;
+    background: linear-gradient(135deg, #0A932C, #0A932C);
     color: white;
 }
 
@@ -384,7 +384,7 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #0A932C);
     color: white;
 }
 
