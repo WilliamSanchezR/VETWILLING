@@ -196,7 +196,9 @@
 ================================ */
     .sidebar.collapsed .nav-item {
         justify-content: center;
-        padding: 12px 8px;
+        padding: 12px 18px;
+        position: relative;
+        right: 15px;
     }
 
     .sidebar.collapsed .nav-item i {
