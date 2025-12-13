@@ -29,784 +29,1082 @@ span {
     font-family: "Open sans", sans-serif;
 }
 
-body {
-    overflow-x: hidden;
-}
-
-/* - Cuarto variables */
+/* ============================================
+   VARIABLES CSS - SISTEMA DE DISEÑO
+   ============================================ */
 :root {
+    /* Colores principales */
     --color-primario: #0a932c;
     --color-verde: #9de795;
     --color-gris: #424b54;
     --color-azul: #93bedf;
     --color-fondo: #f8f9fa;
-
+    
+    /* Colores complementarios */
+    --color-blanco: #ffffff;
+    --color-texto-oscuro: #2c3e50;
+    --color-texto-medio: #6c757d;
+    --color-texto-claro: #999999;
+    --color-borde: #e0e0e0;
+    --color-sombra: rgba(0, 0, 0, 0.1);
+    
+    /* Estados */
+    --color-success: #0a932c;
+    --color-warning: #ffc107;
+    --color-danger: #dc3545;
+    --color-info: #93bedf;
+    --color-completado: #28a745;
+    --color-confirmado: #17a2b8;
+    --color-pendiente: #ffc107;
+    
+    /* Tamaños de fuente */
     --fs-titulo1: 32px;
     --fs-titulo2: 24px;
     --fs-titulo3: 16px;
     --fs-titulo4: 14px;
     --fs-texto: 20px;
     --fs-texto1: 12px;
+    
+    /* Espaciado */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
+    
+    /* Bordes */
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-circle: 50%;
+    
+    /* Sombras */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-hover: 0 6px 20px rgba(10, 147, 44, 0.15);
+    
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
 }
 
 
+/* ============================================
+   ESTILOS GENERALES
+   ============================================ */
 body {
-    font-family: 'Open Sans', sans-serif;
-    overflow-x: hidden;
-    background-color: #f5f5f5;
-    font-size: var(--fs-texto);
-}
-
-h1 {
-    font-size: var(--fs-titulo1);
-}
-
-h2 {
-    font-size: var(--fs-titulo2);
-}
-
-h3,
-h4 {
-    font-size: var(--fs-titulo3);
-}
-
-h5,
-h6 {
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--color-fondo);
+    color: var(--color-texto-oscuro);
+    line-height: 1.6;
     font-size: var(--fs-titulo4);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-
-
-.row {
-    width: 100%;
-}
-
-/* ============================================
-   SECCIÓN DE PERFIL Y TARJETAS DE INFORMACIÓN
-   ============================================ */
-
-/* Tarjeta de foto/perfil */
-.foto {
-    background: linear-gradient(135deg, #93bedf85 0%, #93bedf60 100%);
-    text-align: center;
-    padding: 30px 20px;
-    border-radius: 20px;
-    margin: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-}
-
-.foto:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.fotito {
-    border-radius: 50%;
-    height: 120px;
-    width: 120px !important;
-    object-fit: cover;
-    border: 4px solid #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 15px;
-}
-
-.foto h3 {
-    font-weight: 600;
-    margin: 15px 0 10px;
-    color: var(--color-gris);
-}
-
-.foto h4 {
-    font-size: var(--fs-titulo3);
-    color: var(--color-gris);
-    margin: 5px 0;
-}
-
-.foto h4 span {
-    color: var(--color-primario);
-    font-weight: 600;
-}
-
-.foto h5 {
-    font-size: var(--fs-titulo4);
-    color: #666;
-    margin-top: 5px;
-}
-
-/* Tarjetas de Información General y Mascotas */
-.info,
-.mascota {
-    background: linear-gradient(135deg, #93bedf40 0%, #93bedf20 100%);
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 100%;
-}
-
-.info:hover,
-.mascota:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
-}
-
-.info h2,
-.mascota h2 {
-    font-size: var(--fs-titulo2);
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-    border-bottom: 3px solid var(--color-primario);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--color-gris);
-}
-
-.info h2 a,
-.mascota h2 a {
-    color: var(--color-gris);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.info h2 a:hover,
-.mascota h2 a:hover {
-    color: var(--color-primario);
-}
-
-.info h2 .bi,
-.mascota h2 .bi {
-    font-size: var(--fs-titulo3);
-}
-
-.info span,
-.mascota span {
-    color: var(--color-gris);
-    font-weight: 600;
-    font-size: var(--fs-titulo4);
-}
-
-.info p,
-.mascota p {
-    font-size: var(--fs-titulo3);
-    border-bottom: 1px solid rgba(66, 75, 84, 0.2);
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-    color: var(--color-gris);
-    transition: border-color 0.3s ease;
-}
-
-.info p:last-child,
-.mascota p:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.info p:hover,
-.mascota p:hover {
-    border-color: var(--color-primario);
-}
-
-.info .actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-/* ============================================
-   SECCIÓN DE CITAS Y TRATAMIENTOS
-   ============================================ */
-
-.citas {
-    background: #fff;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-}
-
-/* Tabs de navegación */
-.citas .nav-pills {
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
-}
-
-.citas .nav-link {
-    color: var(--color-gris);
-    font-weight: 600;
-    font-size: var(--fs-titulo4);
-    padding: 10px 20px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    margin-right: 10px;
-}
-
-.citas .nav-link:hover {
-    background-color: rgba(147, 190, 223, 0.2);
-    color: var(--color-azul);
-}
-
-.citas .nav-link.active {
-    background-color: var(--color-primario);
-    color: #fff;
-}
-
-.citas .nav-link span {
-    background-color: rgba(255, 255, 255, 0.3);
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: var(--fs-texto1);
-    margin-left: 5px;
-}
-
-.citas .nav-link.active span {
-    background-color: rgba(255, 255, 255, 0.4);
-}
-
-/* Items de citas */
-.cita-item {
-    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
-    padding: 20px;
-    border-radius: 15px;
-    border: 2px solid #e8e8e8;
-    margin-bottom: 15px;
-    transition: all 0.3s ease;
-}
-
-.cita-item:hover {
-    border-color: var(--color-azul);
-    box-shadow: 0 4px 12px rgba(147, 190, 223, 0.2);
-    transform: translateX(5px);
-}
-
-.cita-item span {
-    color: #999;
-    font-size: var(--fs-texto1);
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.cita-item h4 {
+* {
     margin: 0;
-    font-size: var(--fs-titulo3);
-    color: var(--color-gris);
-    font-weight: 600;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Estados de las citas */
-.estado-agendado {
-    color: var(--color-primario) !important;
-    background: rgba(10, 147, 44, 0.1);
-    padding: 5px 12px;
-    border-radius: 8px;
-    display: inline-block;
-}
-
-.estado-atendido {
-    color: var(--color-azul) !important;
-    background: rgba(147, 190, 223, 0.2);
-    padding: 5px 12px;
-    border-radius: 8px;
-    display: inline-block;
-}
 
 /* ============================================
-   SECCIÓN DE DOCUMENTOS Y NOTAS
+   CONTENEDOR PRINCIPAL
    ============================================ */
-
-.notas {
-    height: 100%;
+.area-contenido {
+    padding: var(--spacing-xl) 0;
+    min-height: 100vh;
 }
 
-.card-documentos,
-.card-notas {
-    background: linear-gradient(135deg, #9de79540 0%, #9de79520 100%);
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 20px;
+/* ================================
+   ESTILOS GENERALES DE LOS CAMPOS
+   ================================ */
+.container.clave {
+    background: #ffffff;
+    padding: 25px 30px;
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    margin-top: 20px;
 }
 
-.card-documentos:hover,
-.card-notas:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
-}
-
-.card-documentos h5,
-.card-notas h5 {
-    color: var(--color-gris);
-    font-weight: 700;
-    font-size: var(--fs-titulo2);
-}
-
-.card-documentos .btn,
-.card-notas .btn {
-    border: 2px solid var(--color-primario);
-    color: var(--color-primario);
+/* LABELS */
+.container.clave label {
     font-weight: 600;
-    padding: 8px 20px;
+    color: #333;
+    margin-bottom: 6px;
+    display: block;
+    font-size: 0.95rem;
+}
+
+/* INPUTS */
+.container.clave input[type="password"] {
+    width: 100%;
+    border: 1.7px solid #d5d9e0;
+    padding: 10px 40px 10px 12px;
     border-radius: 10px;
-    transition: all 0.3s ease;
-    font-size: var(--fs-titulo4);
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
 }
 
-.card-documentos .btn:hover,
-.card-notas .btn:hover {
-    background-color: var(--color-primario);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(10, 147, 44, 0.3);
+.container.clave input[type="password"]:focus {
+    border-color: #0ea5a4;
+    box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.17);
+    outline: none;
 }
 
-.card-documentos .list-group-item,
-.card-notas .list-group-item {
-    padding: 12px 0;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.card-documentos .list-group-item:hover,
-.card-notas .list-group-item:hover {
-    background-color: rgba(255, 255, 255, 0.5) !important;
-    padding-left: 10px;
-}
-
-.card-documentos .bi-file-earmark-pdf,
-.card-notas .bi-file-earmark-pdf {
-    color: var(--color-primario);
-    font-size: 18px;
-}
-
-.card-documentos .text-muted,
-.card-notas .text-muted {
-    font-size: var(--fs-texto1);
-    color: #999 !important;
-}
-
-.card-documentos .bi-download {
-    color: var(--color-primario);
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.card-documentos .bi-download:hover {
-    color: var(--color-verde);
-    transform: scale(1.2);
-}
-
-/* ============================================
-   ESTILOS DEL MODAL DE CONFIGURACIÓN
-   ============================================ */
-
-/* Botón de editar perfil (engranaje) */
-.btn-edit-profile {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: white;
-    border: 2px solid var(--color-primario);
-    color: var(--color-primario);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-}
-
-.btn-edit-profile:hover {
-    background: var(--color-primario);
-    color: white;
-    transform: rotate(90deg);
-}
-
-/* Header del modal */
-.modal-header {
-    background: linear-gradient(135deg, var(--color-primario) 0%, #0a7525 100%);
-    color: white;
-    border-radius: 0;
-}
-
-.modal-header .btn-close {
-    filter: brightness(0) invert(1);
-}
-
-.modal-header .modal-title {
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-}
-
-/* Tabs laterales personalizados */
-.nav-pills-custom .nav-link {
-    color: var(--color-gris);
-    font-weight: 600;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-    text-align: left;
-    padding: 12px 15px;
-}
-
-.nav-pills-custom .nav-link:hover {
-    background-color: rgba(10, 147, 44, 0.1);
-    color: var(--color-primario);
-    transform: translateX(5px);
-}
-
-.nav-pills-custom .nav-link.active {
-    background-color: var(--color-primario);
-    color: white;
-}
-
-.nav-pills-custom .nav-link i {
-    font-size: 18px;
-}
-
-/* Formularios */
-.form-label {
-    font-weight: 600;
-    color: var(--color-gris);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-}
-
-.form-label i {
-    font-size: 16px;
-}
-
-.form-control {
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 10px 15px;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: var(--color-primario);
-    box-shadow: 0 0 0 0.2rem rgba(10, 147, 44, 0.25);
-}
-
-.form-control::placeholder {
-    color: #999;
-    font-size: var(--fs-titulo4);
-}
-
-.form-text {
-    color: #666;
-    font-size: var(--fs-texto1);
-    margin-top: 5px;
-}
-
-/* Botón principal personalizado */
-.btn-primary-custom {
-    background: var(--color-primario);
-    border: none;
-    padding: 10px 30px;
-    border-radius: 10px;
-    font-weight: 600;
-    color: white;
-    transition: all 0.3s ease;
-}
-
-.btn-primary-custom:hover {
-    background: #0a7525;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(10, 147, 44, 0.3);
-}
-
-/* Previsualización de foto */
-.foto-preview-container {
+/* ================================
+   CONTENEDOR DEL INPUT + ICONO
+   ================================ */
+.form-group.password {
     position: relative;
-    display: inline-block;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
-.foto-preview {
-    border-radius: 50%;
-    height: 150px;
-    width: 150px;
-    object-fit: cover;
-    border: 4px solid var(--color-primario);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.foto-upload-overlay {
+/* Check de mostrar contraseña */
+.form-group.password .ver {
     position: absolute;
-    bottom: 0;
-    right: 0;
-    background: var(--color-primario);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    right: 45px;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
-    transition: all 0.3s ease;
+    width: 18px;
+    height: 18px;
+    opacity: 0;
+    margin: 0;
+    z-index: 3;
 }
 
-.foto-upload-overlay:hover {
-    background: #0a7525;
-    transform: scale(1.1);
-}
-
-.foto-upload-overlay i {
-    color: white;
-    font-size: 18px;
-}
-
-#fileInput {
-    display: none;
-}
-
-/* Alertas personalizadas */
-.alert-custom {
-    border-radius: 10px;
+/* ================================
+   BOTÓN DEL OJO (VER / OCULTAR)
+   ================================ */
+.icon-view {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
     border: none;
-    display: flex;
-    align-items: center;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 2;
 }
 
-.alert-custom i {
-    font-size: 18px;
+.icon-view i {
+    font-size: 1.12rem;
+    color: #6a6f77;
+    transition: 0.25s ease;
 }
 
-.alert-info.alert-custom {
-    background-color: rgba(147, 190, 223, 0.2);
-    color: var(--color-azul);
+.icon-view:hover i {
+    color: #0ea5a4;
 }
 
-.alert-danger.alert-custom {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
+/* ================================
+   EFECTO DE ERROR / VALIDACIÓN
+   ================================ */
+input.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2) !important;
 }
 
-/* Input groups para contraseñas */
-.input-group .btn-outline-secondary {
-    border: 2px solid #e0e0e0;
-    border-left: none;
-    background: white;
-    transition: all 0.3s ease;
+input.is-valid {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2) !important;
 }
 
-.input-group .btn-outline-secondary:hover {
-    background: var(--color-primario);
-    color: white;
-    border-color: var(--color-primario);
+/* ================================
+   SECCIÓN DE ANIMACIÓN SUAVE
+   ================================ */
+.form-group.password {
+    animation: fadeIn 0.6s ease;
 }
 
-.input-group .form-control {
-    border-right: none;
-}
-
-.input-group .form-control:focus+.btn-outline-secondary {
-    border-color: var(--color-primario);
-}
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-
-@media (max-width: 768px) {
-
-    .foto,
-    .info,
-    .mascota {
-        margin: 10px 0;
-    }
-
-    .fotito {
-        height: 100px;
-        width: 100px !important;
-    }
-
-    .cita-item {
-        text-align: center;
-        padding: 15px;
-    }
-
-    .cita-item .col-6 {
-        margin-bottom: 15px;
-    }
-
-    .citas .nav-link {
-        font-size: var(--fs-texto1);
-        padding: 8px 15px;
-    }
-
-    .card-documentos,
-    .card-notas {
-        margin-bottom: 15px;
-    }
-
-    /* Modal responsive */
-    .modal-dialog {
-        margin: 10px;
-    }
-
-    .nav-pills-custom {
-        flex-direction: row !important;
-        margin-bottom: 20px;
-    }
-
-    .nav-pills-custom .nav-link {
-        flex: 1;
-        text-align: center;
-        font-size: var(--fs-texto1);
-        padding: 8px 10px;
-    }
-
-    .foto-preview {
-        height: 120px;
-        width: 120px;
-    }
-
-    .btn-edit-profile {
-        width: 35px;
-        height: 35px;
-    }
-}
-
-@media (max-width: 576px) {
-
-    .info h2,
-    .mascota h2 {
-        font-size: var(--fs-titulo3);
-    }
-
-    .citas .nav-link {
-        padding: 6px 10px;
-        margin-right: 5px;
-    }
-
-    .cita-item h4 {
-        font-size: var(--fs-titulo4);
-    }
-
-    .modal-header .modal-title {
-        font-size: var(--fs-titulo3);
-    }
-
-    .nav-pills-custom .nav-link span {
-        display: none;
-    }
-}
-
-/* ============================================
-   ANIMACIONES Y EFECTOS ADICIONALES
-   ============================================ */
-
-/* Animación de entrada */
-@keyframes fadeInUp {
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(8px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
+/* ================================
+   RESPONSIVE
+   ================================ */
+@media (max-width: 480px) {
+    .container.clave {
+        padding: 20px;
+    }
+    .icon-view i {
+        font-size: 1rem;
+    }
+}
+
+
+
+/* ============================================
+   TARJETAS BASE
+   ============================================ */
 .foto,
 .info,
-.mascota,
+.especialidades,
+.estadisticas,
+.horarios,
 .citas,
-.card-documentos,
-.card-notas {
-    animation: fadeInUp 0.6s ease-out;
+.consultas-notas {
+    background: var(--color-blanco);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    height: 100%;
+    transition: all var(--transition-normal);
+    border: 1px solid transparent;
 }
 
-/* Animación del modal */
-.modal.fade .modal-dialog {
-    transition: transform 0.3s ease-out;
+.foto:hover,
+.info:hover,
+.especialidades:hover,
+.estadisticas:hover,
+.horarios:hover,
+.citas:hover,
+.consultas-notas:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    border-color: rgba(157, 231, 149, 0.3);
 }
 
-.modal.show .modal-dialog {
-    transform: none;
+
+/* ============================================
+   SECCIÓN: FOTO Y DATOS BÁSICOS
+   ============================================ */
+.foto {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    background: linear-gradient(135deg, var(--color-blanco) 0%, #f8fcfa 100%);
 }
 
-/* Scrollbar personalizado para navegadores webkit */
-.citas::-webkit-scrollbar,
-.card-documentos::-webkit-scrollbar,
-.card-notas::-webkit-scrollbar,
-.modal-body::-webkit-scrollbar {
-    width: 8px;
+.foto .fotito {
+    width: 140px;
+    height: 140px;
+    border-radius: var(--border-radius-circle);
+    object-fit: cover;
+    border: 5px solid var(--color-primario);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-lg);
+    transition: all var(--transition-normal);
 }
 
-.citas::-webkit-scrollbar-track,
-.card-documentos::-webkit-scrollbar-track,
-.card-notas::-webkit-scrollbar-track,
-.modal-body::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
+.foto .fotito:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--color-verde);
 }
 
-.citas::-webkit-scrollbar-thumb,
-.card-documentos::-webkit-scrollbar-thumb,
-.card-notas::-webkit-scrollbar-thumb,
-.modal-body::-webkit-scrollbar-thumb {
-    background: var(--color-verde);
-    border-radius: 10px;
+.foto h3 {
+    font-size: var(--fs-titulo2);
+    font-weight: 700;
+    color: var(--color-texto-oscuro);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.3;
+    text-align: center;
 }
 
-.citas::-webkit-scrollbar-thumb:hover,
-.card-documentos::-webkit-scrollbar-thumb:hover,
-.card-notas::-webkit-scrollbar-thumb:hover,
-.modal-body::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primario);
-}
-
-.modal-notificacion .modal-dialog .modal-content {
-    border-radius: 20px;
-    background: #e4ecf1;
-}
-
-.modal-notificacion .modal-dialog .modal-content .modal-header {
-    border-radius: 20px 20px 0px 0px;
-}
-
-/* Estilos para el icono de camara en editar la foto de perfil */
-.contenedor-foto .avatar-icon {
-    position: absolute;
-    right: 150px;
-    top: 118px;
-    width: 35px;
-    height: 35px;
-    background: #667eea;
-    border: 3px solid white;
-    border-radius: 50%;
+.foto h4 {
+    font-size: var(--fs-titulo3);
+    font-weight: 500;
+    color: var(--color-texto-medio);
+    margin-bottom: var(--spacing-xs);
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s;
+    gap: var(--spacing-xs);
 }
 
-.contenedor-foto #upload-logo{
+.foto h4 span {
+    font-weight: 600;
+    color: var(--color-gris);
+}
+
+.foto h5 {
+    font-size: var(--fs-titulo4);
+    font-weight: 400;
+    color: var(--color-texto-claro);
+    word-break: break-word;
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Botón en la foto */
+.foto .actions {
+    width: 100%;
+    margin-top: var(--spacing-md);
+}
+
+.foto .btn_change_password {
+    width: 100%;
+}
+
+
+/* ============================================
+   SECCIÓN: INFORMACIÓN GENERAL Y HORARIOS
+   ============================================ */
+.info,
+.horarios {
+    display: flex;
+    flex-direction: column;
+}
+
+.info h2,
+.horarios h2,
+.especialidades h2,
+.estadisticas h2 {
+    font-size: var(--fs-titulo3);
+    font-weight: 700;
+    color: var(--color-texto-oscuro);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 3px solid var(--color-primario);
+    position: relative;
+}
+
+.info h2::after,
+.horarios h2::after,
+.especialidades h2::after,
+.estadisticas h2::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--color-verde);
+}
+
+.info h2 a,
+.horarios h2 a,
+.especialidades h2 a {
+    color: var(--color-primario);
+    font-size: var(--fs-titulo3);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.info h2 a:hover,
+.horarios h2 a:hover,
+.especialidades h2 a:hover {
+    color: var(--color-verde);
+    transform: rotate(15deg) scale(1.1);
+}
+
+.info p,
+.horarios p {
+    font-size: var(--fs-titulo4);
+    margin-bottom: var(--spacing-md);
+    color: var(--color-texto-medio);
+    line-height: 1.8;
+    transition: color var(--transition-fast);
+}
+
+.info p:hover,
+.horarios p:hover {
+    color: var(--color-texto-oscuro);
+}
+
+.info p span,
+.horarios p span {
+    font-weight: 600;
+    color: var(--color-texto-oscuro);
+    margin-right: var(--spacing-xs);
+}
+
+
+/* ============================================
+   SECCIÓN: ESPECIALIDADES
+   ============================================ */
+.especialidades {
+    background: linear-gradient(135deg, var(--color-blanco) 0%, #f0f9f4 100%);
+}
+
+.especialidad-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(10, 147, 44, 0.08) 0%, rgba(157, 231, 149, 0.15) 100%);
+    color: var(--color-primario);
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    font-size: var(--fs-texto1);
+    font-weight: 600;
+    margin: 0.3rem;
+    border: 2px solid rgba(10, 147, 44, 0.2);
+    transition: all var(--transition-normal);
+    cursor: pointer;
+}
+
+.especialidad-tag:hover {
+    background: linear-gradient(135deg, rgba(10, 147, 44, 0.15) 0%, rgba(157, 231, 149, 0.25) 100%);
+    border-color: var(--color-primario);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.especialidad-tag i {
+    color: var(--color-primario);
+}
+
+
+/* ============================================
+   SECCIÓN: ESTADÍSTICAS
+   ============================================ */
+.estadisticas {
+    background: linear-gradient(135deg, var(--color-blanco) 0%, #f5f9ff 100%);
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--color-blanco) 0%, #f8fcfa 100%);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-lg);
+    text-align: center;
+    border: 2px solid var(--color-borde);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primario), var(--color-verde));
+    transform: scaleX(0);
+    transition: transform var(--transition-normal);
+}
+
+.stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-card:hover {
+    border-color: var(--color-verde);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    margin-bottom: var(--spacing-xs);
+    transition: all var(--transition-fast);
+}
+
+.stat-card:hover h3 {
+    transform: scale(1.1);
+}
+
+.stat-card p {
+    font-size: var(--fs-titulo4);
+    color: var(--color-texto-medio);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+
+/* ============================================
+   BOTÓN CAMBIAR CONTRASEÑA
+   ============================================ */
+.btn_change_password {
+    width: 100%;
+    background: linear-gradient(135deg, var(--color-primario) 0%, #087d24 100%);
+    color: var(--color-blanco);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: var(--fs-titulo4);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn_change_password::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn_change_password:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn_change_password:hover {
+    background: linear-gradient(135deg, #087d24 0%, var(--color-primario) 100%);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn_change_password:active {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+
+/* ============================================
+   SECCIÓN: CITAS Y AGENDA
+   ============================================ */
+.citas {
+    padding: var(--spacing-xl);
+}
+
+/* Pestañas */
+.nav-pills {
+    background: var(--color-fondo);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.nav-pills .nav-item {
+    flex: 1;
+}
+
+.nav-pills .nav-link {
+    color: var(--color-texto-medio);
+    background: transparent;
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-weight: 600;
+    font-size: var(--fs-titulo4);
+    transition: all var(--transition-normal);
+    border: 2px solid transparent;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-pills .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(157, 231, 149, 0.3), transparent);
+    transition: left var(--transition-slow);
+}
+
+.nav-pills .nav-link:hover::before {
+    left: 100%;
+}
+
+.nav-pills .nav-link:hover {
+    color: var(--color-primario);
+    background: rgba(157, 231, 149, 0.1);
+    border-color: var(--color-verde);
+    transform: translateY(-2px);
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, var(--color-primario) 0%, #087d24 100%);
+    color: var(--color-blanco);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primario);
+}
+
+.nav-pills .nav-link span {
+    background: rgba(0, 0, 0, 0.15);
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    margin-left: var(--spacing-xs);
+    font-size: var(--fs-texto1);
+    font-weight: 700;
+}
+
+.nav-pills .nav-link.active span {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Contenido de las pestañas */
+.tab-content {
+    margin-top: var(--spacing-lg);
+}
+
+/* Items de citas */
+.cita-item {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-sm);
+    border-left: 4px solid var(--color-primario);
+    margin-bottom: var(--spacing-md);
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.cita-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--color-primario), var(--color-verde));
+    transition: width var(--transition-normal);
+}
+
+.cita-item:hover {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9f4 100%);
+    transform: translateX(8px);
+    box-shadow: var(--shadow-md);
+    border-left-color: var(--color-verde);
+}
+
+.cita-item:hover::before {
+    width: 100%;
+    opacity: 0.05;
+}
+
+.cita-item span {
+    font-size: var(--fs-texto1);
+    color: var(--color-texto-claro);
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.cita-item h4 {
+    font-size: var(--fs-titulo4);
+    font-weight: 600;
+    color: var(--color-texto-oscuro);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Estados de citas */
+.estado-completado,
+.estado-confirmado,
+.estado-pendiente {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    display: inline-block;
+    font-size: var(--fs-texto1) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+}
+
+.estado-completado {
+    color: var(--color-completado);
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.15) 0%, rgba(40, 167, 69, 0.25) 100%);
+    border: 2px solid rgba(40, 167, 69, 0.3);
+}
+
+.estado-completado:hover {
+    background: rgba(40, 167, 69, 0.3);
+    transform: scale(1.05);
+}
+
+.estado-confirmado {
+    color: var(--color-confirmado);
+    background: linear-gradient(135deg, rgba(23, 162, 184, 0.15) 0%, rgba(23, 162, 184, 0.25) 100%);
+    border: 2px solid rgba(23, 162, 184, 0.3);
+}
+
+.estado-confirmado:hover {
+    background: rgba(23, 162, 184, 0.3);
+    transform: scale(1.05);
+}
+
+.estado-pendiente {
+    color: #d39e00;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 193, 7, 0.25) 100%);
+    border: 2px solid rgba(255, 193, 7, 0.3);
+}
+
+.estado-pendiente:hover {
+    background: rgba(255, 193, 7, 0.3);
+    transform: scale(1.05);
+}
+
+
+/* ============================================
+   SECCIÓN: DOCUMENTOS Y CERTIFICACIONES
+   ============================================ */
+.consultas-notas {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.consultas-notas:hover {
+    transform: none;
+}
+
+.card-documentos,
+.card-notas {
+    background: var(--color-blanco);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    border: 1px solid transparent;
+}
+
+.card-documentos:hover,
+.card-notas:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(157, 231, 149, 0.5);
+    transform: translateY(-2px);
+}
+
+.card-documentos h5,
+.card-notas h5 {
+    color: var(--color-texto-oscuro);
+    font-size: var(--fs-titulo3);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.card-documentos h5 i,
+.card-notas h5 i {
+    color: var(--color-primario);
+}
+
+.card-documentos .btn-outline-success,
+.card-notas .btn-outline-success {
+    border: 2px solid var(--color-primario);
+    color: var(--color-primario);
+    background: transparent;
+    font-weight: 600;
+    font-size: var(--fs-texto1);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-sm);
+    transition: all var(--transition-normal);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-documentos .btn-outline-success:hover,
+.card-notas .btn-outline-success:hover {
+    background: var(--color-primario);
+    border-color: var(--color-primario);
+    color: var(--color-blanco);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Lista de documentos */
+.list-group-item {
+    padding: var(--spacing-md) 0;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-borde) !important;
+}
+
+.list-group-item:last-child {
+    border-bottom: none !important;
+}
+
+.list-group-item:hover {
+    background: var(--color-fondo) !important;
+    padding-left: var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+}
+
+.list-group-item i {
+    font-size: 1.4rem;
+    transition: all var(--transition-fast);
+}
+
+.list-group-item:hover i {
+    transform: scale(1.1);
+    color: var(--color-primario) !important;
+}
+
+.list-group-item span {
+    font-size: var(--fs-titulo4);
+    color: var(--color-texto-oscuro);
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.list-group-item:hover span {
+    color: var(--color-primario);
+}
+
+.list-group-item small {
+    font-size: var(--fs-texto1);
+    color: var(--color-texto-claro);
+    font-weight: 500;
+}
+
+
+/* ============================================
+   MODAL: CAMBIAR CONTRASEÑA
+   ============================================ */
+.modal-notificacion .modal-content {
+    border-radius: var(--border-radius-md);
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.modal-notificacion .modal-header {
+    background: linear-gradient(135deg, var(--color-primario) 0%, #087d24 100%);
+    color: var(--color-blanco);
+    border: none;
+    padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.modal-notificacion .modal-title {
+    font-size: var(--fs-titulo2);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.modal-notificacion .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+    transition: all var(--transition-fast);
+}
+
+.modal-notificacion .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+.modal-notificacion .modal-body {
+    padding: var(--spacing-xl);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fcfa 100%);
+}
+
+/* Formulario de contraseña */
+.form-group {
+    margin-bottom: var(--spacing-xl);
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: var(--fs-titulo4);
+    color: var(--color-texto-oscuro);
+    margin-bottom: var(--spacing-sm);
+    letter-spacing: 0.3px;
+}
+
+.form-group.password {
+    position: relative;
+}
+
+.form-group.password input[type="password"],
+.form-group.password input[type="text"] {
+    width: 100%;
+    padding: var(--spacing-md) 3.5rem var(--spacing-md) var(--spacing-md);
+    border: 2px solid var(--color-borde);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--fs-titulo4);
+    transition: all var(--transition-normal);
+    background: var(--color-blanco);
+    color: var(--color-texto-oscuro);
+    font-weight: 500;
+}
+
+.form-group.password input::placeholder {
+    color: var(--color-texto-claro);
+    font-weight: 400;
+}
+
+.form-group.password input:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1);
+    background: var(--color-blanco);
+}
+
+.form-group.password input:hover {
+    border-color: var(--color-verde);
+}
+
+/* Checkbox oculto para ver contraseña */
+.form-group.password input[type="checkbox"].ver {
     display: none;
 }
 
-.avatar-icon i {
-    color: white;
-    font-size: 16px;
+/* Botón de mostrar/ocultar contraseña */
+.form-group.password .icon-view {
+    position: absolute;
+    right: var(--spacing-md);
+    top: 38px;
+    background: transparent;
+    border: none;
+    color: var(--color-texto-medio);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    transition: all var(--transition-fast);
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
 }
 
-.avatar-icon:hover {
-    transform: scale(1.1);
-    background: #5568d3;
+.form-group.password .icon-view:hover {
+    color: var(--color-primario);
+    transform: scale(1.15);
+}
+
+.form-group.password .icon-view:active {
+    transform: scale(0.95);
+}
+
+.form-group.password .icon-view i {
+    display: block;
+}
+
+/* Footer del modal */
+.modal-footer {
+    background: var(--color-blanco);
+    border: none;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    gap: var(--spacing-md);
+}
+
+.modal-footer .btn {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-weight: 600;
+    font-size: var(--fs-titulo4);
+    border-radius: var(--border-radius-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all var(--transition-normal);
+}
+
+.modal-footer .btn-secondary {
+    background: var(--color-gris);
+    border: none;
+    color: var(--color-blanco);
+}
+
+.modal-footer .btn-secondary:hover {
+    background: #353d45;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.modal-footer .btn-success {
+    background: linear-gradient(135deg, var(--color-primario) 0%, #087d24 100%);
+    border: none;
+    color: var(--color-blanco);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.modal-footer .btn-success:hover {
+    background: linear-gradient(135deg, #087d24 0%, var(--color-primario) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.modal-footer .btn-success i {
+    font-size: 1rem;
+}
+
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1200px) {
+    :root {
+        --fs-titulo1: 28px;
+        --fs-titulo2: 22px;
+        --fs-titulo3: 15px;
+        --fs-titulo4: 13px;
+        --fs-texto: 18px;
+    }
+}
+
+@media (max-width: 992px) {
+    .area-contenido {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .foto,
+    .info,
+    .especialidades,
+    .estadisticas,
+    .horarios,
+    .citas,
+    .consultas-notas {
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .foto .fotito {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .nav-pills {
+        flex-direction: column;
+    }
+    
+    .nav-pills .nav-item {
+        width: 100%;
+    }
+    
+    .stat-card {
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --fs-titulo1: 24px;
+        --fs-titulo2: 20px;
+        --fs-titulo3: 14px;
+        --fs-titulo4: 12px;
+        --fs-texto: 16px;
+    }
+    
+    .foto .fotito {
+        width: 100px;
+        height: 100px;
+    }
 }

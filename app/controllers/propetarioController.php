@@ -8,7 +8,6 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
 
     case 'POST':
-
         $accion = $_POST['accion'] ?? '';
 
         if ($accion === 'actualizar') {
@@ -17,27 +16,39 @@ switch ($method) {
         break;
 
     case 'GET':
+
         $accion = $_GET['accion'] ?? '';
 
-        if ($accion === 'eliminar') {
+        // --- ELIMINAR ---
+        if ($accion === 'eliminar' && isset($_GET['id'])) {
             eliminarPropietario($_GET['id']);
-        } else if (isset($_GET['id'])) {
-            consultarPropietarioId($_GET['id']);
-        } else {
-            listarPropietarios();
+            exit();
         }
+
+        // --- CONSULTAR UN PROPIETARIO ---
+        if ($accion === 'consultar' && isset($_GET['id'])) {
+            $data = consultarPropietarioId($_GET['id']);
+            echo json_encode($data);
+            exit();
+        }
+
+        // --- SI HAY ID PERO SIN ACCION, CONSULTA DIRECTA ---
+        if (isset($_GET['id'])) {
+            echo json_encode(consultarPropietarioId($_GET['id']));
+            exit();
+        }
+
+        // --- LISTAR TODOS ---
+        echo json_encode(listarPropietarios());
         break;
 
     default:
         http_response_code(405);
-        echo "Método no permitido";
-        break;
+        echo json_encode(['error' => 'Método no permitido']);
 }
 
 
-// ==========
-//  FUNCIONES CRUD
-// ==========
+// ==================== CRUD ====================
 
 function listarPropietarios()
 {
@@ -53,24 +64,21 @@ function consultarPropietarioId($id)
 
 function actualizarPropietario()
 {
-    // Capturamos los datos del formulario (Asegúrate de que el ID del propietario esté en el formulario)
-    $id_propietario   = $_POST['id_propietario'] ?? ''; // Asumimos que viene desde un campo oculto del form
+    $id_propietario   = $_POST['id_propietario'] ?? '';
     $tipo_documento   = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
     $nombres          = $_POST['nombres'] ?? '';
     $apellidos        = $_POST['apellidos'] ?? '';
     $telefono         = $_POST['telefono'] ?? '';
-    $direccion        = $_POST['direccion'] ?? ''; // Asegúrate de que este campo exista en el HTML
+    $direccion        = $_POST['direccion'] ?? '';
     $email            = $_POST['email'] ?? '';
-    $id_veterinaria   = $_POST['id_veterinaria'] ?? ''; // Asegúrate de que este campo exista en el HTML
+    $id_veterinaria   = $_POST['id_veterinaria'] ?? '';
 
-    // Validamos los campos obligatorios
     if (empty($numero_documento) || empty($nombres) || empty($apellidos) || empty($tipo_documento) || empty($telefono) || empty($email)) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor, completar todos los campos');
         exit();
     }
 
-    /* PROCESAR IMAGEN (solo si llega un nuevo archivo) */
     $img_perfil = null;
     $actualizarImagen = false;
 
@@ -85,11 +93,10 @@ function actualizarPropietario()
 
         if (move_uploaded_file($_FILES['img_perfil']['tmp_name'], $destino)) {
             $img_perfil = $nombreArchivo;
-            $actualizarImagen = true; // Indicamos que SÍ se debe actualizar la columna de imagen
+            $actualizarImagen = true;
         }
     }
 
-    // POO - Instanciamos la clase
     $prop = new Propietario();
     $data = [
         'id_propietario'   => $id_propietario,
@@ -101,13 +108,11 @@ function actualizarPropietario()
         'direccion'        => $direccion,
         'email'            => $email,
         'id_veterinaria'   => $id_veterinaria,
-        'img_perfil'       => $img_perfil    // Valor: null si no se subió, o el nombre del archivo si se subió
+        'img_perfil'       => $img_perfil
     ];
 
-    // Enviamos la data y la bandera $actualizarImagen al método actualizar del Modelo
     $resultado = $prop->actualizar($data, $actualizarImagen);
 
-    // Si la respuesta del modelo es verdadera confirmamos la actualización
     if ($resultado === true) {
         mostrarSweetAlert('success', 'Actualización exitosa', 'Datos actualizados correctamente', '/vetwilling/Cliente/perfil');
     } else {
