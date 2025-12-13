@@ -1,59 +1,114 @@
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/sidebar.css">
+
+<!-- Overlay para móvil -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="cerrarSidebarMovil()"></div>
+
+<!-- Sidebar -->
 <div class="barra-lateral-izquierda" id="barraLateralIzquierda">
-    <div class="marca-sidebar">
-        <span class=""><img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-POSITIVO.png" alt="logo" class="logoDas" width="200">
-            <img src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/img/LOGO-VERTICAL-POSITIVA-DASHBOARD.png" alt="logo"
-                class="logoDas logo-icono-sidebar" width="40"></span>
-    </div>
 
-
-    <div class="menu-sidebar">
-        <div class="seccion-sidebar">Menu</div>
-        <a href="<?= BASE_URL ?>/veterinaria/dashboard" class="item-sidebar active">
-            <i class="bi bi-speedometer2"></i>
-            <span class="texto-item-sidebar">Dashboard</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/seguimientos" class="item-sidebar">
-            <i class="bi bi-arrow-repeat"></i>
-            <span class="texto-item-sidebar">Seguimientos</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/calendario" class="item-sidebar">
-            <i class="bi bi-calendar3"></i>
-            <span class="texto-item-sidebar">Calendario</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinario/consultar-veterinario" class="item-sidebar">
-            <i class="bi bi-calendar-check"></i>
-            <span class="texto-item-sidebar">Citas</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/laboratorio" class="item-sidebar">
-            <i class="bi bi-flask"></i>
-            <span class="texto-item-sidebar">Laboratorio</span>
-        </a>
-
-        <div class="seccion-sidebar">Opciones</div>
-        <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario" class="item-sidebar">
-            <i class="bi bi-person-plus"></i>
-            <span class="texto-item-sidebar">Registro</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/gestion_clinica" class="item-sidebar">
-            <i class="bi bi-hospital"></i>
-            <span class="texto-item-sidebar">Gestión clínica</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/reportes" class="item-sidebar">
-            <i class="bi bi-file-earmark-text"></i>
-            <span class="texto-item-sidebar">Reportes</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/recetas" class="item-sidebar">
-            <i class="bi bi-receipt"></i>
-            <span class="texto-item-sidebar">Recetas</span>
-        </a>
-        <a href="<?= BASE_URL ?>/logout" class="item-sidebar">
-            <i class="bi bi-box-arrow-in-left"></i>
-            <span class="texto-item-sidebar">Cerrar Sesión</span>
-        </a>
-    </div>
-
-    <button class="boton-colapsar" onclick="alternarBarraIzquierda()">
-        <i class="bi bi-chevron-left" id="iconoColapsar"></i>
+    <button class="boton-toggle-flotante" onclick="alternarBarraIzquierda()" aria-label="Contraer/Expandir menú">
+        <i class="bi bi-chevron-left" id="iconoToggleFlotante"></i>
     </button>
-        
+    <!-- Logo / Marca -->
+    <div class="sidebar-header">
+        <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-NEGATIVO.png"
+            alt="VetWilling"
+            class="sidebar-logo-full">
+
+        <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-VERTICAL-NEGATIVA.png"
+            alt="VW"
+            class="sidebar-logo-icon">
+    </div>
+
+    <!-- Toggle Button - Estilo Flotante (Recomendado) -->
+
+
+    <!-- Menú de navegación -->
+    <nav class="menu-sidebar">
+
+        <!-- Sección Principal -->
+        <div class="menu-seccion">
+            <div class="seccion-titulo">
+                <i class="bi bi-grid-fill"></i>
+                <span class="texto-seccion">Principal</span>
+            </div>
+
+            <a href="<?= BASE_URL ?>/veterinaria/dashboard" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-speedometer2"></i>
+                </div>
+                <span class="item-texto">Dashboard</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/veterinaria/seguimientos" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+                <span class="item-texto">Seguimientos</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/veterinaria/calendario" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-calendar3"></i>
+                </div>
+                <span class="item-texto">Calendario</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/veterinario/consultar-veterinario" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <span class="item-texto">Citas</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/veterinaria/laboratorio" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-flask"></i>
+                </div>
+                <span class="item-texto">Laboratorio</span>
+            </a>
+        </div>
+
+        <!-- Divisor -->
+        <div class="menu-divider"></div>
+
+        <!-- Sección Gestión -->
+        <div class="menu-seccion">
+            <div class="seccion-titulo">
+                <i class="bi bi-gear-fill"></i>
+                <span class="texto-seccion">Gestión</span>
+            </div>
+
+            <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <span class="item-texto">Registro</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/veterinaria/gestion_clinica" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-hospital"></i>
+                </div>
+                <span class="item-texto">Gestión Clínica</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/veterinaria/reportes" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <span class="item-texto">Reportes</span>
+            </a>
+
+            <a href="<?= BASE_URL ?>/veterinaria/recetas" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <span class="item-texto">Recetas</span>
+            </a>
+        </div>
+
+    </nav>
 </div>
+
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/sidebar.js"></script>

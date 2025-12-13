@@ -23,11 +23,11 @@ class DashboardManager {
     // CACHE DE ELEMENTOS
     // =====================================================
     cacheDom() {
-        this.sidebar       = document.getElementById("sidebar");
+        this.sidebar = document.getElementById("sidebar");
         this.sidebarToggle = document.getElementById("sidebarToggle");
-        this.content       = document.getElementById("contenidoPrincipal");
+        this.content = document.getElementById("contenidoPrincipal");
         this.inputBusqueda = document.getElementById("inputBusqueda");
-        this.themeIcon     = document.getElementById("themeIcon");
+        this.themeIcon = document.getElementById("themeIcon");
     }
 
     // =====================================================
@@ -247,13 +247,25 @@ class DashboardManager {
     // MARCAR ELEMENTO ACTIVO
     // =====================================================
     marcarItemActivo() {
-        const actual = window.location.pathname;
+        const actual = window.location.pathname.toLowerCase();
 
-        document.querySelectorAll(".item-sidebar").forEach(item => {
-            const url = new URL(item.href).pathname;
-            item.classList.toggle("active", url === actual);
+        document.querySelectorAll(".nav-item").forEach(item => {
+            let href = item.getAttribute("href");
+
+            if (!href) return;
+
+            // Normaliza rutas
+            href = new URL(href, window.location.origin).pathname.toLowerCase();
+
+            // Si la ruta actual contiene la del item → activo
+            if (actual.startsWith(href)) {
+                item.classList.add("active");
+            } else {
+                item.classList.remove("active");
+            }
         });
     }
+
 }
 
 // Inicializar

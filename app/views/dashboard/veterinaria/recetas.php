@@ -39,7 +39,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <!-- PANEL DERECHO -->
     <!-- aqui va el inclunde notifi -->
     <?php
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->
