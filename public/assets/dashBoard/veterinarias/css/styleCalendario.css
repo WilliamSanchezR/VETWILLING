@@ -89,21 +89,7 @@
     border-bottom: 2px solid var(--primary-color);
 }
 
-/* Eventos arrastrables en el sidebar */
-.fc-event.external-event {
-    margin: 10px 0;
-    padding: 12px 15px;
-    cursor: move;
-    border-radius: var(--radius-md);
-    font-family: var(--font-body);
-    font-size: var(--fs-title4);
-    font-weight: 700;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+
 
 .fc-event.external-event::before {
     content: '⋮⋮';

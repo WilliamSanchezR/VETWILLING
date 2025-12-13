@@ -43,7 +43,7 @@ $usuario = mostrarPerfil($id);
     include_once __DIR__ . '/../../layouts/sidebar_veterinario.php';
 
     // <!-- PANEL DERECHO -->
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php';
+    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php';
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->

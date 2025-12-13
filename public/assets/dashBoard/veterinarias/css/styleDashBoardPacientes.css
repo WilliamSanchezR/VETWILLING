@@ -634,23 +634,4 @@ h5, h6 { font-size: var(--fs-titulo4); }
     display: block;
 }
 
-/* Mejoras de scroll en móvil */
-@media (max-width: 768px) {
-    .barra-lateral-izquierda,
-    .barra-lateral-derecha {
-        -webkit-overflow-scrolling: touch;
-    }
-}
-
-/* Optimización de tipografía en móvil */
-@media (max-width: 576px) {
-    :root {
-        --fs-titulo1: 24px;
-        --fs-titulo2: 20px;
-        --fs-titulo3: 14px;
-        --fs-titulo4: 12px;
-        --fs-texto: 14px;
-        --fs-texto1: 11px;
-    }
-}
 
