@@ -69,7 +69,7 @@ class Login
                 'email' => $user['email'],
                 'password_hash' => $user['password_hash'],
                 'estado' => $user['estado'],
-                'id_veterinaria' => $perfil['id_veterinaria'],
+                'id_veterinaria' => $user['id_rol'] == 1 ? null : $perfil['id_veterinaria'],
                 'nombres' => $perfil['nombres'],
                 'apellidos' => $perfil['apellidos']
             ];
