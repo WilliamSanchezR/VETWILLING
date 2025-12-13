@@ -156,7 +156,7 @@ class Usuario
 
             // REPRESENTANTE LEGAL
             $sqlRep = "SELECT rep.id_usuario, rep.tipo_documento, rep.numero_documento,
-                rep.nombres, rep.apellidos, rep.telefono, us.email, us.estado, rol.id_rol, rep.id_veterinaria
+                rep.nombres, rep.apellidos, rep.telefono, us.email, us.estado, rol.id_rol, rep.id_veterinaria, rep.direccion
                 FROM usuario us
                 INNER JOIN representante_legal rep ON us.id_usuario = rep.id_usuario
                 INNER JOIN rol ON us.id_rol = rol.id_rol
@@ -215,7 +215,8 @@ class Usuario
                 numero_documento = :numero_documento,
                 nombres = :nombres,
                 apellidos = :apellidos,
-                telefono = :telefono
+                telefono = :telefono,
+                direccion = :direccion
                 WHERE id_usuario = :id_usuario";
             // Preparar y ejecutar la consulta
             $stmt3 = $this->conexion->prepare($sqlRep);
@@ -226,6 +227,7 @@ class Usuario
             $stmt3->bindParam(':nombres', $data['nombres']);
             $stmt3->bindParam(':apellidos', $data['apellidos']);
             $stmt3->bindParam(':telefono', $data['telefono']);
+            $stmt3->bindParam(':direccion', $data['direccion']);
 
             return $stmt3->execute();
         } catch (PDOException $e) {
