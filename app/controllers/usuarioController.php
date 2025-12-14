@@ -102,8 +102,6 @@ function registrarUsuario()
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
         move_uploaded_file($file['tmp_name'], $destino);
-    } else {
-        $img_perfil = 'foto_default.jpg';
     }
     // Creamos el objeto de la clase Usuario
     $objUsuario = new Usuario();
