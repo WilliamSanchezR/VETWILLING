@@ -191,7 +191,7 @@ class panelSuperiorAdmin {
         const routes = path.split('/');
         let titlePage = '';
         const routePage = routes[routes.length - 1];
-    
+
         switch (routePage) {
             case 'registro-usuario':
             case 'listar-usuarios':
@@ -202,6 +202,9 @@ class panelSuperiorAdmin {
             case 'listar-veterinarias':
             case 'editar-veterinaria':
                 titlePage = 'Veterinaria';
+                break;
+            case 'perfil-administrador':
+                titlePage = 'Perfil';
                 break;
             default:
                 titlePage = 'Dashboards';
