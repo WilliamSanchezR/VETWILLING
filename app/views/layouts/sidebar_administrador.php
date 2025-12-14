@@ -8,60 +8,71 @@ $final_path = end($path_parts); // Obtiene el último elemento
 
 ?>
 
-<div class="barra-lateral-izquierda" id="barraLateralIzquierda">
-    <div class="marca-sidebar">
-        <span class=""><img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-POSITIVO.png" alt="logo" class="logoDas" width="200">
-            <img src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/img/LOGO-VERTICAL-POSITIVA-DASHBOARD.png" alt="logo"
-                class="logoDas logo-icono-sidebar" width="40"></span>
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+    <!-- HEADER CON LOGO -->
+    <div class="sidebar-header">
+        <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-NEGATIVO.png"
+            alt="VetWilling"
+            class="sidebar-logo-full">
+
+        <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-VERTICAL-NEGATIVA.png"
+            alt="VW"
+            class="sidebar-logo-icon">
     </div>
 
-    <div class="menu-sidebar">
-        <div class="seccion-sidebar">Menu Administrador</div>
+    <!-- NAVEGACIÓN -->
+    <nav class="sidebar-nav">
 
-        <a href="<?= BASE_URL ?>/admin/dashBoard" class="item-sidebar <?= $final_path == 'dashBoard' ? 'active' : '' ?>">
-            <i class="bi bi-speedometer2"></i>
-            <span class="texto-item-sidebar">Dashboard</span>
-        </a>
-        
-        <!-- Menu Usuario -->
-        <div class="item-sidebar submenu <?= $final_path == 'registro-usuario' || $final_path == 'listar-usuarios' ? 'active' : '' ?>">
+        <div class="nav-section">
+            <span class="nav-section-title">General</span>
+            <a href="<?= BASE_URL ?>/admin/dashBoard"
+                class="nav-item"
+                data-section="dashboard">
+                <i class="bi bi-house-door"></i>
+                <span class="nav-text">Inicio</span>
+            </a>
+            <hr>
+            <span class="nav-section-title">Reguisto Usuarios</span>
 
-            <a href="#" class="submenu-toggle">
-                <i class="bi bi-person-plus"></i>
-                <span class="texto-item-sidebar">Usuario</span>
-                <i class="bi bi-chevron-down flecha"></i>
+            <a href="<?= BASE_URL ?>/admin/registro-usuario"
+                class="nav-item"
+                data-section="dashboard">
+                <i class="bi bi-clipboard-plus"></i>
+                <span class="nav-text">Reguistrar Usuario</span>
             </a>
 
-            <ul class="submenu-items">
-                <li><a class="<?= $final_path == 'registro-usuario' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/registro-usuario">Registrar </a></li>
-                <li><a class="<?= $final_path == 'listar-usuarios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/listar-usuarios">Listar</a></li>
-            </ul>
-        </div>
-        
-        <!-- Menu Veterinaria -->
-        <div class="item-sidebar submenu <?= $final_path == 'registro-veterinaria' || $final_path == 'listar-veterinarias' ? 'active' : '' ?>">
-
-            <a href="#" class="submenu-toggle">
-                <i class="bi bi-person-plus"></i>
-                <span class="texto-item-sidebar">Veterinaria</span>
-                <i class="bi bi-chevron-down flecha"></i>
+            <a href="<?= BASE_URL ?>/admin/listar-usuarios"
+                class="nav-item"
+                data-section="mascotas">
+                <i class="bi bi-file-text-fill"></i>
+                <span class="nav-text">Listar Usuario</span>
+            </a>
+            <hr>
+            <span class="nav-section-title">Reguisto Veterinarias</span>
+            <a href="<?= BASE_URL ?>/admin/registro-veterinaria"
+                class="nav-item"
+                data-section="citas">
+                <i class="bi bi-clipboard-plus"></i>
+                <span class="nav-text">Reguistrar Veterinaria</span>
             </a>
 
-            <ul class="submenu-items">
-                <li><a class="<?= $final_path == 'registro-veterinaria' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/registro-veterinaria">Registrar </a></li>
-                <li><a class="<?= $final_path == 'listar-veterinarias' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/listar-veterinarias">Listar</a></li>
-            </ul>
+            <a href="<?= BASE_URL ?>/admin/listar-veterinarias"
+                class="nav-item"
+                data-section="tienda">
+                <i class="bi bi-file-text-fill"></i>
+                <span class="nav-text">Listar Veterinaria</span>
+            </a>
         </div>
+    </nav>
 
-
-
-        <a href="<?= BASE_URL ?>/logout" class="item-sidebar">
-            <i class="bi bi-box-arrow-in-left"></i>
-            <span class="texto-item-sidebar">Cerrar Seción</span>
-        </a>
-    </div>
-
-    <button class="boton-colapsar" onclick="alternarBarraIzquierda()">
-        <i class="bi bi-chevron-left" id="iconoColapsar"></i>
+    <!-- BOTÓN TOGGLE -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="bi bi-chevron-left"></i>
     </button>
-</div>
+
+</aside>
+<script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>

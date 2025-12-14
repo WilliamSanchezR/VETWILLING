@@ -12,58 +12,172 @@ $usuario = mostrarPerfil($id);
 
 ?>
 
-<div class="barra-navegacion-superior">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
+
+<!-- Navbar Superior -->
+<div class="navbar-superior" id="navbarSuperior">
+    
+    <!-- Sección Izquierda - Breadcrumb -->
     <div class="navegacion-izquierda">
-        <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-heart text-danger"></i>
-            <span class="fw-semibold">Dashboards</span>
-            <span class="text-muted">/</span>
-            <span>Por defecto</span>
+        <button class="btn-menu-movil" onclick="abrirSidebarMovil()" aria-label="Abrir menú">
+            <i class="bi bi-list"></i>
+        </button>
+        
+        <nav class="breadcrumb-container" aria-label="breadcrumb">
+            <ol class="breadcrumb-custom">
+                <li class="breadcrumb-item">
+                    <i class="bi bi-house-door-fill"></i>
+                    <span>Inicio</span>
+                </li>
+                <li class="breadcrumb-divider">
+                    <i class="bi bi-chevron-right"></i>
+                </li>
+                <li class="breadcrumb-item active">
+                    <span id="paginaActual">Dashboard</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Sección Centro - Buscador -->
+    <div class="buscador-navegacion">
+        <div class="search-wrapper">
+            <i class="bi bi-search search-icon"></i>
+            <input 
+                type="text" 
+                id="searchInput"
+                class="search-input" 
+                placeholder="Buscar pacientes, citas, registros..."
+                autocomplete="off">
+            <button class="btn-clear-search" id="btnClearSearch" style="display: none;">
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+        
+        <!-- Resultados de búsqueda -->
+        <div class="search-results" id="searchResults" style="display: none;">
+            <div class="search-section">
+                <div class="search-section-title">Sugerencias</div>
+                <div class="search-items" id="searchItems">
+                    <!-- Se llenarán dinámicamente -->
+                </div>
+            </div>
         </div>
     </div>
-    <div class="buscador-navegacion">
-        <i class="bi bi-search"></i>
-        <input type="text" placeholder="Search" class="form-control">
-    </div>
+
+    <!-- Sección Derecha - Acciones -->
     <div class="acciones-navegacion">
-        <!-- Dentro de .acciones-navegacion -->
-        <button class="boton-icono-navegacion" onclick="toggleTheme()">
-            <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-        </button>
-        <button class="boton-icono-navegacion">
-            <i class="bi bi-arrow-counterclockwise"></i>
-        </button>
+        
+        <!-- Tema (Modo oscuro/claro) -->
+        <div class="action-item" data-tooltip="Cambiar tema">
+            <button class="btn-action" onclick="toggleTheme()" aria-label="Cambiar tema">
+                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+            </button>
+        </div>
 
-        <button class="btn-perfil" onclick="togglePerfilMenu()" aria-label="Perfil">
-            <a href="<?= BASE_URL ?>/admin/perfil-administrador">
+        <!-- Notificaciones -->
+        <div class="action-item" data-tooltip="Notificaciones">
+            <button class="btn-action" onclick="toggleNotificaciones()" aria-label="Notificaciones">
+                <i class="bi bi-bell-fill"></i>
+                <span class="notification-badge">3</span>
+            </button>
+        </div>
 
-
-                <div class="avatar-usuario">
-                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+        <!-- Panel de notificaciones -->
+        <div class="notifications-panel" id="notificationsPanel" style="display: none;">
+            <div class="panel-header">
+                <h4>Notificaciones</h4>
+                <button class="btn-mark-read">Marcar todas como leídas</button>
+            </div>
+            <div class="panel-body">
+                <div class="notification-item unread">
+                    <div class="notification-icon bg-success">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div class="notification-content">
+                        <p class="notification-title">Nueva cita agendada</p>
+                        <p class="notification-text">Max - Consulta general</p>
+                        <span class="notification-time">Hace 5 min</span>
+                    </div>
                 </div>
+                <div class="notification-item">
+                    <div class="notification-icon bg-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="notification-content">
+                        <p class="notification-title">Recordatorio de vacuna</p>
+                        <p class="notification-text">Luna - Vacuna antirrábica</p>
+                        <span class="notification-time">Hace 1 hora</span>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-icon bg-info">
+                        <i class="bi bi-file-medical"></i>
+                    </div>
+                    <div class="notification-content">
+                        <p class="notification-title">Resultados de laboratorio</p>
+                        <p class="notification-text">Rocky - Análisis de sangre</p>
+                        <span class="notification-time">Hace 2 horas</span>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <a href="#" class="btn-view-all">Ver todas las notificaciones</a>
+            </div>
+        </div>
 
-
-
+        <!-- Perfil de usuario -->
+        <div class="user-profile-container">
+            <button class="btn-perfil" onclick="togglePerfilMenu()" aria-label="Menú de perfil">
+                <div class="avatar-usuario">
+                    <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>" 
+                         alt="<?= $usuario['nombres'] ?>"
+                         onerror="this.src='<?= BASE_URL ?>/public/assets/auth/img/default-avatar.png'">
+                    <span class="status-indicator online"></span>
+                </div>
                 <div class="info-usuario">
                     <h4 class="nombre-usuario"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h4>
                     <p class="rol-usuario"><?= $usuario['rol'] ?></p>
                 </div>
+                <i class="bi bi-chevron-down arrow-icon"></i>
+            </button>
 
-
-                <!-- La ventana flotante (modal) -->
-                <div id="myModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <p>Contenido de la ventana flotante.</p>
+            <!-- Menú desplegable de perfil -->
+            <div class="perfil-dropdown" id="perfilDropdown" style="display: none;">
+                <div class="dropdown-header">
+                    <div class="avatar-large">
+                        <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>" 
+                             alt="<?= $usuario['nombres'] ?>">
+                    </div>
+                    <div class="user-info-dropdown">
+                        <h4><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h4>
+                        <p><?= $usuario['email'] ?></p>
                     </div>
                 </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-body">
+                    <a href="<?= BASE_URL ?>/admin/perfil-administrador" class="dropdown-item">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Mi Perfil</span>
+                    </a>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-footer">
+                    <a href="<?= BASE_URL ?>/logout" class="dropdown-item logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </div>
+            </div>
+        </div>
 
-
-            </a>
-        </button>
-
-        <button class="boton-icono-navegacion" onclick="alternarBarraDerecha()">
-            <i class="bi bi-chevron-left"></i>
-        </button>
+        <!-- Panel lateral derecho (toggle)
+        <div class="action-item" data-tooltip="Panel lateral">
+            <button class="btn-action" onclick="alternarBarraDerecha()" aria-label="Panel lateral">
+                <i class="bi bi-layout-sidebar-inset-reverse"></i>
+            </button>
+        </div> -->
     </div>
 </div>
+
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/navbar-superior.js"></script>

@@ -1,12 +1,30 @@
-
-/* ========================================
-   2. ÁREA DE CONTENIDO
-======================================== */
-.area-contenido {
-    padding: 32px;
-    background-color: #f5f5f5;
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    background-color: var(--color-fondo);
+    transition: margin-left var(--transition-normal);
+    position: relative;
+    padding: 50px 20px 20px 20px;
+    position: relative;
+    top: 40px;
 }
 
+/* Cuando el sidebar está colapsado */
+#sidebar.collapsed~.contenido-principal {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+/* Área de contenido interna */
+.area-contenido {
+    /* padding: var(--spacing-xl); */
+    width: 100%;
+    max-width: auto;
+}
+
+/* Clase auxiliar para compatibilidad (si existe en tu código) */
+.contenido-expandido {
+    margin-left: var(--sidebar-collapsed-width) !important;
+}
 /* ========================================
    3. ENCABEZADO DEL MÓDULO
 ======================================== */
@@ -188,7 +206,7 @@
     vertical-align: middle;
 }
 
-.tabla-admin tbody img{
+.tabla-admin tbody img {
     width: 50px;
     height: 50px;
     border-radius: 20px;
@@ -329,8 +347,8 @@
 }
 
 .tb_foto i {
-   font-size: 25px;
-   color: var(--color-primario);
+    font-size: 25px;
+    color: var(--color-primario);
 }
 
 /* ========================================
@@ -449,7 +467,8 @@
 
     .btn-control span,
     .btn-agregar span {
-        display: none; /* Ocultar texto, solo mostrar iconos */
+        display: none;
+        /* Ocultar texto, solo mostrar iconos */
     }
 
     .btn-control,
@@ -526,6 +545,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -540,6 +560,7 @@
    12. PRINT STYLES
 ======================================== */
 @media print {
+
     .controles-tabla,
     .btn-accion,
     .dataTables_paginate,
