@@ -16,7 +16,7 @@ $final_path = end($path_parts); // Obtiene el último elemento
 <aside class="sidebar" id="sidebar">
 
     <!-- HEADER CON LOGO -->
-    <a class="sidebar-header" href="<?= BASE_URL ?>/admin/dashBoard">
+    <div class="sidebar-header">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-NEGATIVO.png"
             alt="VetWilling"
             class="sidebar-logo-full">
@@ -24,7 +24,7 @@ $final_path = end($path_parts); // Obtiene el último elemento
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-VERTICAL-NEGATIVA.png"
             alt="VW"
             class="sidebar-logo-icon">
-    </a>
+    </div>
 
     <!-- NAVEGACIÓN -->
     <nav class="sidebar-nav">
@@ -68,12 +68,11 @@ $final_path = end($path_parts); // Obtiene el último elemento
                 </ul>
             </div>
 
-            <a href="<?= BASE_URL ?>/admin/listar-tickets"
+            <a href="#"
                 class="nav-item <?= $final_path == '' ? 'active' : '' ?>"
                 data-tooltip="Ticket de Soporte">
                 <i class="bi bi-ticket-perforated"></i>
                 <span class="nav-text">Ticket de Soporte</span>
-
             </a>
         </div>
 
