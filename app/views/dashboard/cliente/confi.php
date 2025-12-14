@@ -1,3 +1,13 @@
+<?php
+// enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
+require_once BASE_PATH . '/app/controllers/propetarioController.php';
+
+// asignamos el valor id del registro según la tabla
+$id = $_SESSION['user']['id_propietario'] ?? '';
+
+// Llamamos la funcion del controlador
+$usuario = consultarPropietarioId($id);
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -11,11 +21,11 @@
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
     <!-- estilos propios y algunas cosas que son importantes para que se vea mas wonito -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/perfil.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/confi.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/perfil.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/confi.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
 
 </head>
 
@@ -523,8 +533,8 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/confi.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/confi.js"></script>
 </body>
 
 </html>
