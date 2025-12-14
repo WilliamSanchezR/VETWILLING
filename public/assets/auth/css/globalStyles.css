@@ -11,11 +11,18 @@
 /* 2. Colores */
 :root {
     --primary-color: #0A932C; /* Color principal de la marca.*/
+    --primary-green: #0a9b42;
+    --text-primary: #333333;
+    --active-bg: #f0f9f4;
+    --primary-hover: #087726;
     --white-color: #FFFFFF; /*Color blanco*/
     --green-background: #9DE795; /* Ideal para fondos, detalles secundarios y refuerzos visuales.*/
     --neutral-color: #424B54; /* Color neutro, utilizado en tipografías y elementos secundarios.*/
     --light-color: #93BEDF; /* Se recomienda para destacar elementos sin perder armonía.*/
     --color-hover: #d7d8da; /* Color para efectos hover y estados activos.*/
+    --hover-bg: #f8f9fa;
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 80px;
 }
 
 /* 3. Botones */
