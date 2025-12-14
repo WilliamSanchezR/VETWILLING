@@ -115,20 +115,6 @@ $datosVeterinaria = listarVeterinariasRegistradas();
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Dirección *</label>
-                                <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
                                 <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
                             </div>
@@ -136,11 +122,24 @@ $datosVeterinaria = listarVeterinariasRegistradas();
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-envelope"></i>foto *</label>
+                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-camera"></i>foto *</label>
                                 <input type="file" accept=".jpg," id="img_perfil" name="img_perfil" placeholder="ejemplo@correo.com">
                             </div>
                         </div>
 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-geo-alt"></i> Dirección *</label>
+                                <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -163,7 +162,7 @@ $datosVeterinaria = listarVeterinariasRegistradas();
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-envelope"></i> Veterinaria </label>
+                                <label><i class="bi bi-hospital"></i> Veterinaria </label>
                                 <select id="veterinaria" name="veterinaria">
                                     <option value="" disabled selected>Seleccione una veterinaria</option>
                                     <?php if (!empty($datosVeterinaria)) : ?>
