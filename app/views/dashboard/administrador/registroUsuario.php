@@ -160,7 +160,7 @@ $datosVeterinaria = listarVeterinariasRegistradas();
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="input-veterinaria" style="display: none;">
                             <div class="form-group">
                                 <label><i class="bi bi-hospital"></i> Veterinaria </label>
                                 <select id="veterinaria" name="veterinaria">
@@ -199,8 +199,8 @@ $datosVeterinaria = listarVeterinariasRegistradas();
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <!-- JS Propio -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardVeterinaria.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/registroUsuario.js"></script>
 
 </body>
 
