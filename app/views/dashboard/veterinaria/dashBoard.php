@@ -22,8 +22,8 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/master-styles.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/sidebar.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
 </head>
 
 <body>
@@ -82,18 +82,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <div>
                             <h3 class="mb-0">8</h3>
                             <p class="text-muted mb-0">Urgencias</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-3">
-                    <div class="tarjeta-estadistica">
-                        <div class="icono-estadistica bg-info-soft">
-                            <i class="bi bi-person-plus-fill text-info"></i>
-                        </div>
-                        <div>
-                            <h3 class="mb-0">15</h3>
-                            <p class="text-muted mb-0">Nuevos Este Mes</p>
                         </div>
                     </div>
                 </div>
@@ -368,6 +356,8 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/master-handler.js"></script>
+
 </body>
 
 </html>

@@ -1,6 +1,18 @@
-.area-contenido h2{
-    margin-bottom: 10px;
-    color: var(--neutral-color);
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    top: 20px;
+    background-color: var(--color-fondo);
+    transition: margin-left var(--transition-normal);
+}
+
+#sidebar.collapsed ~ .contenido-principal {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+.area-contenido {
+    padding: var(--spacing-xl);
+    padding-top: calc(70px + var(--spacing-xl));
 }
 
 /* ========================================

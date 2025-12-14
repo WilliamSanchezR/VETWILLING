@@ -22,6 +22,22 @@
 }
 
 
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    top: 20px;
+    background-color: var(--color-fondo);
+    transition: margin-left var(--transition-normal);
+}
+
+#sidebar.collapsed ~ .contenido-principal {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+.area-contenido {
+    padding: var(--spacing-xl);
+    padding-top: calc(70px + var(--spacing-xl));
+}
 
 dataTables_wrapper,
 .dataTables_wrapper *,

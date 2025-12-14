@@ -44,14 +44,20 @@ VARIABLES GLOBALES
 CONTENIDO PRINCIPAL
 ======================================== */
 .contenido-principal {
-    margin-left: 250px;
-    padding: 0;
-    background-color: var(--gray-light);
+    margin-left: var(--sidebar-width);
     min-height: 100vh;
+    top: 20px;
+    background-color: var(--color-fondo);
+    transition: margin-left var(--transition-normal);
+}
+
+#sidebar.collapsed ~ .contenido-principal {
+    margin-left: var(--sidebar-collapsed-width);
 }
 
 .area-contenido {
-    padding: 30px;
+    padding: var(--spacing-xl);
+    padding-top: calc(70px + var(--spacing-xl));
 }
 
 /* ========================================

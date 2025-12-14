@@ -8,7 +8,7 @@ $usuario = mostrarPerfil($id);
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
 
 <!-- Navbar Superior -->
-<div class="barra-navegacion-superior" id="navbarSuperior">
+<div class="navbar-superior" id="navbarSuperior">
     
     <!-- Sección Izquierda - Breadcrumb -->
     <div class="navegacion-izquierda">
@@ -153,13 +153,9 @@ $usuario = mostrarPerfil($id);
                         <i class="bi bi-person-circle"></i>
                         <span>Mi Perfil</span>
                     </a>
-                    <a href="<?= BASE_URL ?>/veterinario/configuracion" class="dropdown-item">
-                        <i class="bi bi-gear"></i>
-                        <span>Configuración</span>
-                    </a>
-                    <a href="<?= BASE_URL ?>/veterinario/ayuda" class="dropdown-item">
+                    <a href="<?= BASE_URL ?>#" class="dropdown-item">
                         <i class="bi bi-question-circle"></i>
-                        <span>Ayuda</span>
+                        <span>Soporte</span>
                     </a>
                 </div>
                 <div class="dropdown-divider"></div>
@@ -172,12 +168,13 @@ $usuario = mostrarPerfil($id);
             </div>
         </div>
 
-        <!-- Panel lateral derecho (toggle) -->
+        <!-- Panel lateral derecho (toggle)
         <div class="action-item" data-tooltip="Panel lateral">
             <button class="btn-action" onclick="alternarBarraDerecha()" aria-label="Panel lateral">
                 <i class="bi bi-layout-sidebar-inset-reverse"></i>
             </button>
-        </div>
+        </div> -->
     </div>
 </div>
+
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/navbar-superior.js"></script>
