@@ -134,11 +134,7 @@ $usuario = mostrarPerfil($id);
                 <i class="bi bi-person-fill"></i>
                 <span>Mi Perfil</span>
             </a>
-            <a href="<?= BASE_URL ?>/Cliente/citas" class="dropdown-item">
-                <i class="bi bi-calendar-check-fill"></i>
-                <span>Mis Citas</span>
-            </a>
-            <a href="<?= BASE_URL ?>/Cliente/configuracion" class="dropdown-item">
+            <a href="#" class="dropdown-item">
                 <i class="bi bi-gear-fill"></i>
                 <span>Configuración</span>
             </a>
