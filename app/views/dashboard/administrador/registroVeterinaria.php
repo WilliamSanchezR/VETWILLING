@@ -64,69 +64,72 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                     <h3><i class="bi bi-motherboard"></i>Datos de la Veterinaria</h3>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label><i class="bi bi-hash"></i> Nit *</label>
-                                    <input type="text" id="nit" name="nit" required placeholder="000.123.456-7">
-                                </div>
-                            </div>
 
-                        </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-person"></i> Nombre *</label>
-                                <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Juan Pérez García">
+                                <label><i class="bi bi-hash"></i> Nit *</label>
+                                <input type="text" id="nit" name="nit" required placeholder="000.123.456-7">
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-clipboard2-data"></i> Razón Social *</label>
+                                <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Mundo Patitas S.A.S">
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-geo-alt"></i> Dirección *</label>
-                                <input type="text" id="direccion" name="direccion" required placeholder="Calle 12 # 34-56, Apto 102">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-building"></i> Ciudad *</label>
-                                <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Bogotá">
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567">
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Email *</label>
                                 <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567">
+                            </div>
+                        </div>
+
                     </div>
 
 
                     <div class="row">
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <div class="form-group">
-                                    <label><i class="bi bi-envelope"></i> Foto </label>
+                                    <label><i class="bi bi-camera"></i> Foto </label>
                                     <input type="file" accept=".jpg, .png, .jpeg" id="foto" name="foto">
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-pin-map"></i> Ciudad *</label>
+                                <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Bogotá">
+                            </div>
+                        </div>
+
                     </div>
 
+                    <div class="row">
 
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label><i class="bi bi-geo-alt"></i> Dirección *</label>
+                                <input type="text" id="direccion" name="direccion" required placeholder="Calle 12 # 34-56, Barrio Centro">
+                            </div>
+                        </div>
 
-
-
+                    </div>
 
                     <div class="buttons">
                         <span></span>
