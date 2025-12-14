@@ -18,7 +18,7 @@
     font-family: 'Fredoka', sans-serif;
     font-size: 24px;
     font-weight: 700;
-    color: var(--color-gris);
+    color: var(--neutral-color);
     margin: 0;
 }
 
@@ -53,7 +53,7 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--color-gris);
+    color: var(--neutral-color);
     font-size: 16px;
 }
 
@@ -70,7 +70,7 @@
 
 .campo-buscar input:focus {
     outline: none;
-    border-color: var(--color-primario);
+    border-color: var(--primary-color);
     background-color: white;
     box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.1);
 }
@@ -84,7 +84,7 @@
     font-size: 14px;
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
-    color: var(--color-gris);
+    color: var(--neutral-color);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -94,8 +94,8 @@
 
 .btn-control:hover {
     background-color: #f8fafc;
-    border-color: var(--color-primario);
-    color: var(--color-primario);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -107,7 +107,7 @@
 /* Botón agregar nuevo */
 .btn-agregar {
     padding: 10px 20px;
-    background-color: var(--color-primario);
+    background-color: var(--primary-color);
     border: none;
     border-radius: 10px;
     font-size: 14px;
@@ -154,7 +154,7 @@
 /* Encabezado de tabla */
 .tabla-admin thead th {
     background-color: #f8fafc;
-    color: var(--color-gris);
+    color: var(--neutral-color);
     font-family: 'Fredoka', sans-serif;
     font-weight: 700;
     font-size: 12px;
@@ -183,7 +183,7 @@
     padding: 16px;
     font-size: 14px;
     font-family: 'Open Sans', sans-serif;
-    color: var(--color-gris);
+    color: var(--neutral-color);
     border: none;
     vertical-align: middle;
 }
@@ -239,7 +239,7 @@
 }
 
 .btn-editar {
-    color: var(--color-primario);
+    color: var(--primary-color);
 }
 
 .btn-editar:hover {
@@ -269,7 +269,7 @@
 .dataTables_wrapper .dataTables_info {
     padding: 16px 0 0 0;
     font-size: 14px;
-    color: var(--color-gris);
+    color: var(--neutral-color);
     font-family: 'Open Sans', sans-serif;
 }
 
@@ -285,7 +285,7 @@
     border-radius: 8px !important;
     border: 1px solid #e2e8f0 !important;
     background-color: white !important;
-    color: var(--color-gris) !important;
+    color: var(--neutral-color) !important;
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
     font-size: 14px;
@@ -295,15 +295,15 @@
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
     background-color: #e74c3c !important;
-    border-color: var(--color-primario) !important;
-    color: var(--color-primario) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
     transform: translateY(-2px);
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background-color: var(--color-primario) !important;
+    background-color: var(--primary-color) !important;
     color: white !important;
-    border-color: var(--color-primario) !important;
+    border-color: var(--primary-color) !important;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
@@ -314,7 +314,7 @@
 .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
     background-color: white !important;
     border-color: #e2e8f0 !important;
-    color: var(--color-gris) !important;
+    color: var(--neutral-color) !important;
     transform: none;
 }
 
@@ -326,11 +326,14 @@
 
 .tb_foto {
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .tb_foto i {
    font-size: 25px;
-   color: var(--color-primario);
+   color: var(--primary-color);
 }
 
 /* ========================================
@@ -483,7 +486,7 @@
     }
 
     .contenedor-tabla::-webkit-scrollbar-thumb {
-        background: var(--color-primario);
+        background: var(--primary-color);
         border-radius: 10px;
     }
 
@@ -501,7 +504,7 @@
 /* Fila seleccionada */
 .tabla-admin tbody tr.selected {
     background-color: rgba(10, 147, 44, 0.1) !important;
-    border-left: 3px solid var(--color-primario);
+    border-left: 3px solid var(--primary-color);
 }
 
 /* Loading state */
@@ -514,7 +517,7 @@
 .dataTables_empty {
     padding: 40px !important;
     text-align: center;
-    color: var(--color-gris);
+    color: var(--neutral-color);
     font-size: 16px;
 }
 

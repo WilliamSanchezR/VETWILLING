@@ -33,7 +33,7 @@ $usuario = mostrarPerfil($id);
             <i class="bi bi-search icono-buscar"></i>
             <input
                 type="text"
-                placeholder="Buscar mascotas, citas, servicios..."
+                placeholder="Buscar ..."
                 class="input-buscar"
                 id="inputBusqueda">
         </div>
