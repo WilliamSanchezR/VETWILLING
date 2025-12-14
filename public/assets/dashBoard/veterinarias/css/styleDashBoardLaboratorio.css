@@ -1,3 +1,6 @@
+*{
+    scrollbar-width: none;
+}
 .contenido-principal {
     margin-left: var(--sidebar-width);
     min-height: 100vh;

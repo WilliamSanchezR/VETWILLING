@@ -9,26 +9,26 @@
     --color-gris: #424b54;
     --color-azul: #93bedf;
     --color-fondo: #f8f9fa;
-    
+
     /* Colores complementarios */
     --color-blanco: #ffffff;
     --color-texto-oscuro: #2c3e50;
     --color-texto-medio: #6c757d;
     --color-texto-claro: #999999;
     --color-borde: #e0e0e0;
-    
+
     /* Estados */
     --color-success: #28a745;
     --color-warning: #ffc107;
     --color-danger: #dc3545;
     --color-info: #17a2b8;
-    
+
     /* Prioridades */
     --color-critico: #dc3545;
     --color-alta: #ff6b6b;
     --color-media: #ffa726;
     --color-baja: #66bb6a;
-    
+
     /* Tamaños de fuente */
     --fs-titulo1: 32px;
     --fs-titulo2: 24px;
@@ -36,23 +36,23 @@
     --fs-titulo4: 14px;
     --fs-texto: 20px;
     --fs-texto1: 12px;
-    
+
     /* Espaciado */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
-    
+
     /* Sombras */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-    
+
     /* Transiciones */
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
-    
+
     /* Sidebar */
     --sidebar-width: 280px;
     --sidebar-collapsed-width: 80px;
@@ -62,6 +62,10 @@
 /* ============================================
    CONTENIDO PRINCIPAL - ADAPTACIÓN SIDEBAR
    ============================================ */
+* {
+    scrollbar-width: none;
+}
+
 .contenido-principal {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
@@ -69,7 +73,7 @@
     transition: margin-left var(--transition-normal);
 }
 
-#sidebar.collapsed ~ .contenido-principal {
+#sidebar.collapsed~.contenido-principal {
     margin-left: var(--sidebar-collapsed-width);
 }
 
@@ -82,7 +86,7 @@
     .contenido-principal {
         margin-left: 0 !important;
     }
-    
+
     .area-contenido {
         padding: var(--spacing-md);
         padding-top: calc(60px + var(--spacing-md));
@@ -541,9 +545,12 @@
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 0 0 rgba(10, 147, 44, 0.7);
     }
+
     50% {
         box-shadow: 0 0 0 8px rgba(10, 147, 44, 0);
     }
@@ -727,13 +734,13 @@
     .tarjeta-stat-seguimiento {
         padding: var(--spacing-md);
     }
-    
+
     .icono-stat-seg {
         width: 50px;
         height: 50px;
         font-size: 1.5rem;
     }
-    
+
     .info-stat-seg h3 {
         font-size: 1.5rem;
     }
@@ -744,32 +751,32 @@
         flex-direction: column;
         width: 100%;
     }
-    
+
     .boton-filtro-seg,
     .boton-nuevo-seguimiento {
         width: 100%;
         justify-content: center;
     }
-    
+
     .encabezado-tabla-seg {
         flex-direction: column;
         gap: var(--spacing-md);
         align-items: flex-start;
     }
-    
+
     .select-ordenar {
         width: 100%;
     }
-    
+
     .header-seguimiento {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .footer-seguimiento {
         flex-direction: column;
     }
-    
+
     .btn-accion-seg {
         width: 100%;
     }
@@ -779,20 +786,20 @@
     .lista-seguimientos {
         padding: var(--spacing-md);
     }
-    
+
     .card-seguimiento {
         padding: var(--spacing-md);
     }
-    
+
     .body-seguimiento {
         padding: var(--spacing-md);
     }
-    
+
     .avatar-seg {
         width: 45px;
         height: 45px;
     }
-    
+
     .tarjeta-stat-seguimiento {
         margin-bottom: var(--spacing-md);
     }
@@ -807,6 +814,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -818,10 +826,21 @@
     animation: fadeIn 0.5s ease-out;
 }
 
-.tarjeta-stat-seguimiento:nth-child(1) { animation-delay: 0.1s; }
-.tarjeta-stat-seguimiento:nth-child(2) { animation-delay: 0.2s; }
-.tarjeta-stat-seguimiento:nth-child(3) { animation-delay: 0.3s; }
-.tarjeta-stat-seguimiento:nth-child(4) { animation-delay: 0.4s; }
+.tarjeta-stat-seguimiento:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.tarjeta-stat-seguimiento:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.tarjeta-stat-seguimiento:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.tarjeta-stat-seguimiento:nth-child(4) {
+    animation-delay: 0.4s;
+}
 
 
 /* ============================================

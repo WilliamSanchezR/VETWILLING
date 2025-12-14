@@ -94,18 +94,24 @@ h6 {
 .contenido-principal {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
-    top: 20px;
     background-color: var(--color-fondo);
     transition: margin-left var(--transition-normal);
+    position: relative;
+    padding: 20px 20px 20px 20px;
+    position: relative;
+    top: 40px;
 }
 
-#sidebar.collapsed ~ .contenido-principal {
+/* Cuando el sidebar está colapsado */
+#sidebar.collapsed~.contenido-principal {
     margin-left: var(--sidebar-collapsed-width);
 }
 
+/* Área de contenido interna */
 .area-contenido {
-    padding: var(--spacing-xl);
-    padding-top: calc(70px + var(--spacing-xl));
+    /* padding: var(--spacing-xl); */
+    width: 100%;
+    max-width: auto;
 }
 
 .wizard-container {

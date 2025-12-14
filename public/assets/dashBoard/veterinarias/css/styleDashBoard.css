@@ -56,26 +56,31 @@
 /* ============================================
    CONTENIDO PRINCIPAL - ADAPTABLE AL SIDEBAR
    ============================================ */
+*{
+    scrollbar-width: none;
+}
 .contenido-principal {
-    /* margin-left: var(--sidebar-width); */
+    margin-left: var(--sidebar-width);
     min-height: 100vh;
-    background-color: var(--color-fondo);
+    /* background-color: var(--color-fondo); */
     transition: margin-left var(--transition-normal);
     position: relative;
-    padding: 50px 20px 20px 20px;
-    width: 100%;
+    padding: 20px 10px 10px 20px;
+    position: relative;
+    top: 40px;
 }
 
 /* Cuando el sidebar está colapsado */
-/* #sidebar.collapsed ~ .contenido-principal {
+#sidebar.collapsed~.contenido-principal {
     margin-left: var(--sidebar-collapsed-width);
-} */
+}
 
 /* Área de contenido interna */
 .area-contenido {
     padding: var(--spacing-xl);
-    width: 100%;
-    max-width: 100%;
+    width: 95%;
+    max-width: 95%;
+    margin-left: 5px !important;
 }
 
 /* Clase auxiliar para compatibilidad (si existe en tu código) */

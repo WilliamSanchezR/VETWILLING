@@ -20,7 +20,9 @@
     --fs-texto: 20px;
     --fs-texto1: 12px;
 }
-
+*{
+    scrollbar-width: none;
+}
 
 .contenido-principal {
     margin-left: var(--sidebar-width);
