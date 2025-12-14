@@ -195,18 +195,18 @@ class panelSuperiorAdmin {
         switch (routePage) {
             case 'registro-usuario':
             case 'listar-usuarios':
+            case 'editar-usuario':
                 titlePage = 'Usuario';
                 break;
             case 'registro-veterinaria':
             case 'listar-veterinarias':
+            case 'editar-veterinaria':
                 titlePage = 'Veterinaria';
                 break;
             default:
                 titlePage = 'Dashboards';
                 break;
         }
-
-        console.log(titlePage);
 
         document.querySelector('.fw-semibold').textContent = titlePage;
     }
