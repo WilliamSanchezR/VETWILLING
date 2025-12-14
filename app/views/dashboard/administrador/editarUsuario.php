@@ -82,7 +82,6 @@
                     <p class="text-muted">Complete todos los campos requeridos para editar el usuario</p>
                 </div>
 
-
                 <form id="vetForm" action="<?= BASE_URL ?>/admin/actualizar-usuario" method="POST">
                     <input type="hidden" name="id_usuario" value="<?= $usuarioData['id_usuario'] ?>">
                     <input type="hidden" name="id_rol" value="<?= $usuarioData['id_rol'] ?>">

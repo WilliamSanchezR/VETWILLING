@@ -24,7 +24,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
     <!-- Global Styles -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/extras/css/globalStyles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
     <!-- Propio -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">

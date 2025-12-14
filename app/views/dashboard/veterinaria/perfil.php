@@ -38,7 +38,6 @@ $usuario = mostrarPerfil($id);
 <body>
 
     <?php
-
     // <!-- BARRA LATERAL IZQUIERDA -->
     include_once __DIR__ . '/../../layouts/sidebar_veterinario.php';
 
