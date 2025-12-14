@@ -55,7 +55,7 @@
         include_once __DIR__ . '/../../layouts/sidebar_administrador.php'
         ?>
 
-       
+
         <!-- CONTENIDO PRINCIPAL -->
         <!-- CONTENIDO PRINCIPAL -->
         <div class="contenido-principal" id="contenidoPrincipal">
@@ -124,30 +124,32 @@
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                    <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567" required value="<?= $usuarioData['telefono'] ?>">
+                                    <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
+                                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $usuarioData['email'] ?>">
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label><i class="bi bi-telephone"></i> Dirección *</label>
-                                    <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67" required value="<?= $usuarioData['direccion'] ?>">
+                                    <label><i class="bi bi-telephone"></i> Teléfono *</label>
+                                    <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567" required value="<?= $usuarioData['telefono'] ?>">
                                 </div>
                             </div>
+
+
 
                         </div>
 
                         <div class="row">
 
                             <div class="col-md-6">
-
-
                                 <div class="form-group">
-                                    <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $usuarioData['email'] ?>">
+                                    <label><i class="bi bi-geo-alt"></i> Dirección *</label>
+                                    <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67" required value="<?= $usuarioData['direccion'] ?>">
                                 </div>
                             </div>
+
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-person-rolodex"></i> Rol *</label>
