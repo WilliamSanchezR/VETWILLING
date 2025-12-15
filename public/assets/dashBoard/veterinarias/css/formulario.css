@@ -91,6 +91,28 @@ h6 {
 }
 
 /* desde aca son los estilos de lo demas */
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    background-color: var(--color-fondo);
+    transition: margin-left var(--transition-normal);
+    position: relative;
+    padding: 20px 20px 20px 20px;
+    position: relative;
+    top: 40px;
+}
+
+/* Cuando el sidebar está colapsado */
+#sidebar.collapsed~.contenido-principal {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+/* Área de contenido interna */
+.area-contenido {
+    /* padding: var(--spacing-xl); */
+    width: 100%;
+    max-width: auto;
+}
 
 .wizard-container {
     width: 95%;

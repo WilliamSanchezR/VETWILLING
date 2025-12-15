@@ -39,23 +39,41 @@
     --radius-md: 12px;
     --radius-lg: 16px;
 }
-
+*{
+    scrollbar-width: none;
+}
 /* ========================================
    CONTENIDO PRINCIPAL
 ======================================== */
 .contenido-principal {
-    margin-left: 250px;
-    padding: 0;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    margin-left: var(--sidebar-width);
     min-height: 100vh;
+    background-color: var(--color-fondo);
+    transition: margin-left var(--transition-normal);
+    position: relative;
+    padding: 20px 1 0px 20px 20px;
+    position: relative;
+    top: 40px;
 }
+
+/* Cuando el sidebar está colapsado */
+#sidebar.collapsed~.contenido-principal {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+/* Área de contenido interna */
+.area-contenido {
+    padding: var(--spacing-xl);
+    width: 100%;
+    max-width: 90%;
+}
+
 
 /* ========================================
    CONTENEDOR DE RECETAS
 ======================================== */
 .cont-receta {
     padding: 30px;
-    max-width: 1200px;
     margin: 0 auto;
 }
 

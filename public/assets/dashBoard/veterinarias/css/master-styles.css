@@ -1,0 +1,340 @@
+/* ============================================================
+   ARCHIVO MAESTRO: master-styles.css
+   ORDEN DE IMPORTACIÓN CORRECTO
+   ============================================================ */
+
+/* ========== 1. RESET Y FUENTES (SIEMPRE PRIMERO) ========== */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+
+/* ========== 2. VARIABLES GLOBALES ========== */
+:root {
+    /* === COLORES PRINCIPALES === */
+    --color-primario: #0a932c;
+    --color-verde: #9de795;
+    --color-gris: #424b54;
+    --color-azul: #93bedf;
+    --color-fondo: #f8f9fa;
+    
+    /* === TAMAÑOS DE FUENTE === */
+    --fs-titulo1: 32px;
+    --fs-titulo2: 24px;
+    --fs-titulo3: 16px;
+    --fs-titulo4: 14px;
+    --fs-texto: 20px;
+    --fs-texto1: 12px;
+    
+    /* === SIDEBAR === */
+    --sidebar-width: 260px;
+    --sidebar-width-collapsed: 80px;
+    
+    /* === COLORES DE TEMA === */
+    --bg-body: #f5f5f5;
+    --bg-card: #ffffff;
+    --bg-sidebar: #ffffff;
+    --bg-navbar: #ffffff;
+    --bg-hover: #f0f0f0;
+    --bg-input: #ffffff;
+    
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+    
+    --border-color: #dee2e6;
+    --border-light: #e9ecef;
+    --shadow-sm: rgba(0, 0, 0, 0.075);
+    --shadow-md: rgba(0, 0, 0, 0.1);
+    --shadow-lg: rgba(0, 0, 0, 0.15);
+    
+    --transition-speed: 0.3s;
+}
+
+/* ========== 3. MODO OSCURO ========== */
+[data-theme="dark"] {
+    --bg-body: #1a1d1f;
+    --bg-card: #242729;
+    --bg-sidebar: #242729;
+    --bg-navbar: #2d3135;
+    --bg-hover: #313539;
+    --bg-input: #2d3135;
+    
+    --text-primary: #e9ecef;
+    --text-secondary: #adb5bd;
+    --text-muted: #6c757d;
+    
+    --border-color: #3a3d41;
+    --border-light: #2d3135;
+    --shadow-sm: rgba(0, 0, 0, 0.2);
+    --shadow-md: rgba(0, 0, 0, 0.3);
+    --shadow-lg: rgba(0, 0, 0, 0.4);
+    
+    --color-primario: #0db339;
+    --color-verde: #7bc473;
+    --color-azul: #7aa8c9;
+}
+
+/* ========== 4. RESET BÁSICO ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Quitar scroll personalizado global */
+    scrollbar-width: auto;
+}
+
+/* ========== 5. TIPOGRAFÍAS ========== */
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Fredoka", sans-serif;
+    color: var(--text-primary);
+}
+
+p, a, button, li, label, input, select, textarea, span {
+    font-family: "Open Sans", sans-serif;
+    color: var(--text-primary);
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    overflow-x: hidden;
+    background-color: var(--bg-body);
+    font-size: var(--fs-texto);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ========== 6. TRANSICIONES GLOBALES ========== */
+button, a, input, select, textarea {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+}
+
+/* ========== 7. UTILIDADES GLOBALES ========== */
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+.g-3 { gap: 1rem; }
+
+/* ========== 8. SOBRESCRITURA ESPECÍFICA DE CONFLICTOS ========== */
+
+/* Asegurar que el body siempre use las variables correctas */
+body,
+.area-contenido,
+.contenido-principal {
+    background-color: var(--bg-body) !important;
+}
+
+/* Tarjetas - Usar !important solo donde sea necesario */
+.tarjeta-estadistica,
+.tarjeta-bienvenida,
+.seccion-calendario,
+.seccion-linea-tiempo,
+.tarjeta-reporte,
+.tarjeta-grafico,
+.tarjeta-estadisticas,
+.foto,
+.info,
+.mascota,
+.citas,
+.notas,
+.card-documentos,
+.card-notas,
+.contenedor-tabla-pacientes,
+.contenedor-tabla-laboratorio,
+.wizard-container,
+.code-box,
+.barra-acciones-pacientes,
+.paginacion-contenedor,
+.item-linea-tiempo,
+.contenedor-tabla,
+.item-estadistica-especie,
+.tarjeta-tabla-financiera,
+.tabla-financiera .fila-total,
+.card-personal,
+.card-sala {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-sm);
+}
+
+/* Tablas */
+.tabla-pacientes,
+.tabla-laboratorio,
+.tabla-citas,
+.tabla-financiera,
+.display,
+#tablaCitas {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+}
+
+.tabla-pacientes th,
+.tabla-pacientes td,
+.tabla-laboratorio th,
+.tabla-laboratorio td,
+.tabla-citas th,
+.tabla-citas td,
+.tabla-financiera th,
+.tabla-financiera td,
+.display th,
+.display td,
+#tablaCitas th,
+#tablaCitas td {
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.tabla-pacientes thead,
+.tabla-laboratorio thead,
+.tabla-citas thead,
+.tabla-financiera thead,
+.display thead,
+#tablaCitas thead {
+    background: var(--bg-hover) !important;
+}
+
+/* Inputs y formularios */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="password"],
+textarea,
+select,
+.form-control,
+.filtro-select {
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Botones primarios */
+.boton-accion-primario,
+.btn-guardar,
+.btn-agregar,
+.boton-nuevo-seguimiento,
+.boton-nueva-cita {
+    background: var(--color-primario) !important;
+    color: white !important;
+}
+
+/* Barra de navegación */
+.barra-navegacion-superior {
+    background: var(--bg-navbar) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 4px var(--shadow-sm) !important;
+}
+
+/* Sidebar */
+.barra-lateral-izquierda {
+    background: var(--bg-sidebar) !important;
+}
+
+/* ========== 9. CORRECCIONES ESPECÍFICAS ========== */
+
+/* Corregir conflicto de colores en modo oscuro */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] label {
+    color: var(--text-primary) !important;
+}
+
+/* Corregir filas de tablas */
+.fila-gris {
+    background: var(--bg-hover) !important;
+}
+
+.fila-blanca,
+.fila-verde {
+    background: var(--bg-card) !important;
+}
+
+/* Modales */
+.modal-content {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ========== 10. RESPONSIVE GLOBAL ========== */
+@media (max-width: 768px) {
+    :root {
+        --fs-titulo1: 24px;
+        --fs-titulo2: 20px;
+        --fs-titulo3: 14px;
+        --fs-titulo4: 12px;
+        --fs-texto: 16px;
+    }
+}
+
+/* ========== 11. CLASES DE UTILIDAD ADICIONALES ========== */
+.no-transition {
+    transition: none !important;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ========== 12. ANIMACIONES GLOBALES ========== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* ========== 13. MODO DEBUG (OPCIONAL) ========== */
+/* Descomentar para ver qué elementos tienen problemas */
+/*
+[style*="background"] {
+    outline: 2px solid red !important;
+}
+*/

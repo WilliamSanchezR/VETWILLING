@@ -78,7 +78,7 @@
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
-        padding: 20px 12px;
+        padding: 20px 20px;
     }
 
     /* Scroll personalizado */
@@ -196,7 +196,7 @@
 ================================ */
     .sidebar.collapsed .nav-item {
         justify-content: center;
-        padding: 12px 18px;
+        padding: 12px 28px;
         position: relative;
         right: 15px;
     }
