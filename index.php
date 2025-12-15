@@ -76,6 +76,31 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/calendario.php';
         break;
 
+    // RUTAS DEL CONTROLADOR DE CALENDARIO
+    case '/calendario/cargar':
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
+    case '/calendario/storeEvent':
+        $_POST['accion'] = 'crear';
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
+    case '/calendario/updateEvent':
+        $_POST['accion'] = 'actualizar';
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
+    case '/calendario/deleteEvent':
+        $_GET['accion'] = 'eliminar';
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
+    case '/calendario/loadEvents':
+        $_GET['accion'] = 'cargar';
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
     case '/veterinaria/gestion_clinica':
         require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
         break;
@@ -93,8 +118,8 @@ switch ($request) {
         break;
 
 
-    case '/veterinario/registrar-veterinario':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';
+    case '/veterinario/registrar-pacientes':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/registro-pacientes-laboratorio.php';
         break;
 
     case '/veterinario/guardar-veterinario':
@@ -180,7 +205,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/administrador/listaVeterinarias.php';
         break;
 
-    case '/admin/editar-veterinaria': // este es para pinatar los dato en el formulario
+    case '/admin/editar-veterinaria':
         require BASE_PATH . '/app/views/dashboard/administrador/editarVeterinaria.php';
         break;
 
@@ -192,12 +217,13 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/veterinariaController.php';
         break;
 
+    case '/admin/listar-tickets':
+        require BASE_PATH . '/app/views/dashboard/administrador/listaTicket.php';
+        break;
 
-
-
-
-
-
+    case '/admin/gestion-tickets':
+        require BASE_PATH . '/app/views/dashboard/administrador/gestionTicket.php';
+        break;
 
 
 
