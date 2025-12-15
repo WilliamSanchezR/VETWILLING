@@ -106,7 +106,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <div class="form-group">
-                                    <label><i class="bi bi-camera"></i> Foto </label>
+                                    <label><i class="bi bi-card-image"></i> Logo </label>
                                     <input type="file" accept=".jpg, .png, .jpeg" id="foto" name="foto">
                                 </div>
                             </div>
