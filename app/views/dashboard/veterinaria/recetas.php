@@ -39,7 +39,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <!-- PANEL DERECHO -->
     <!-- aqui va el inclunde notifi -->
     <?php
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -91,12 +91,12 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 <div class="modal-body">
                     <div id="cont-imprimir">
                         <div class="modal-fondo">
-                            <img src="<?= BASE_URL ?>/public/assets/extras/img/fondo-marca.png" />
+                            <img src="<?= BASE_URL ?>/public/assets/auth/img/fondo-marca.png" />
                         </div>
 
                         <div class="cont-header">
                             <div class="logo">
-                                <img src="<?= BASE_URL ?>/public/assets/extras/img/LOGO-POSITIVO 1.png" alt="">
+                                <img src="<?= BASE_URL ?>/public/assets/auth/img/LOGO-POSITIVO 1.png" alt="">
                             </div>
                             <div class="info-medico">
                                 <span>DR. Chapatin Pepito Perez</span>
@@ -150,8 +150,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <!-- Script personalizado -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardRecetas.js"></script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/dashBoard.js">
-    </script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
 
     <!-- 5. Tu script de tabla AL FINAL -->

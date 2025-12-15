@@ -19,7 +19,7 @@ $mascotas = listarMascotas();
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/editaMas.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
 
 </head>
 
@@ -208,18 +208,18 @@ $mascotas = listarMascotas();
                                         <input
                                             type="text"
                                             id="color"
-                                            value="<?= $m['color']?? ''  ?>"
+                                            value="<?= $m['color'] ?? ''  ?>"
                                             placeholder="Color del pelaje">
                                     </div>
 
 
-                                <!-- OBSERVACIONES -->
-                                <div class="form-group">
-                                    <label>Observaciones</label>
-                                    <textarea
-                                        id="observaciones"
-                                        placeholder="Información adicional, comportamiento, características especiales...">Mascota muy juguetona y sociable con niños.</textarea>
-                                </div>
+                                    <!-- OBSERVACIONES -->
+                                    <div class="form-group">
+                                        <label>Observaciones</label>
+                                        <textarea
+                                            id="observaciones"
+                                            placeholder="Información adicional, comportamiento, características especiales...">Mascota muy juguetona y sociable con niños.</textarea>
+                                    </div>
 
 
                             </form>
@@ -247,7 +247,7 @@ $mascotas = listarMascotas();
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
 
     <script>
         // Cambiar Tab
