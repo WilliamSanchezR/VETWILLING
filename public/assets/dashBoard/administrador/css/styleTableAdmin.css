@@ -249,11 +249,12 @@
 
 .btn-eliminar {
     color: #e74c3c;
+    background-color: transparent !important;
 }
 
 .btn-eliminar:hover {
-    background-color: rgba(231, 76, 60, 0.1);
-    transform: scale(1.1);
+    background-color: rgba(10, 147, 44, 0.1) !important;
+    transform: scale(1.1) !important;
 }
 
 /* ========================================
