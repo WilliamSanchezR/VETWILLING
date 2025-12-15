@@ -152,6 +152,13 @@ function consultarUsuarioId($id)
     return $objUsuario->consultarUsuario($id);
 }
 
+// FUNCION PARA CONSULTAR UN USUARIO POR ID para ticket
+function consultarUsuarioTicketId($id)
+{
+    $objUsuario = new Usuario();
+    return $objUsuario->consultarUsuarioTicket($id);
+}
+
 // FUNCION PARA ACTUALIZAR LOS DATOS DEL USUARIO
 function actualizarUsuario()
 {
