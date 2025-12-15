@@ -59,8 +59,8 @@ $usuario = mostrarPerfil($id);
                         <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="notif-contenido">
-                        <p class="notif-texto">Recordatorio de vacuna para Max</p>
-                        <span class="notif-tiempo">Hace 5 min</span>
+                        <p class="notif-texto"></p>
+                        <span class="notif-tiempo">Nuevo ticket</span>
                     </div>
                 </a>
                 <a href="#" class="notificacion-item">
@@ -68,7 +68,7 @@ $usuario = mostrarPerfil($id);
                         <i class="bi bi-check-circle-fill"></i>
                     </div>
                     <div class="notif-contenido">
-                        <p class="notif-texto">Cita confirmada para mañana</p>
+                        <p class="notif-texto">Se ha registrado un usuario</p>
                         <span class="notif-tiempo">Hace 1 hora</span>
                     </div>
                 </a>
@@ -77,7 +77,7 @@ $usuario = mostrarPerfil($id);
                         <i class="bi bi-chat-dots-fill"></i>
                     </div>
                     <div class="notif-contenido">
-                        <p class="notif-texto">Nuevo mensaje del veterinario</p>
+                        <p class="notif-texto">Se ha generado un nuevo ticket</p>
                         <span class="notif-tiempo">Hace 3 horas</span>
                     </div>
                 </a>
@@ -86,7 +86,7 @@ $usuario = mostrarPerfil($id);
                         <i class="bi bi-exclamation-triangle-fill"></i>
                     </div>
                     <div class="notif-contenido">
-                        <p class="notif-texto">Cita pendiente de confirmación</p>
+                        <p class="notif-texto">Se ha bloqueado una veterinaria</p>
                         <span class="notif-tiempo">Hace 5 horas</span>
                     </div>
                 </a>
