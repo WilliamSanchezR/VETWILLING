@@ -92,9 +92,12 @@ $datos = listarVeterinariasRegistradas();
                     <button class="btn-control" id="btnExport">
                         <i class="bi bi-download"></i> Export
                     </button>
+
+                    <a href="<?= BASE_URL ?>/admin/registro-veterinaria">
                     <button class="btn-agregar" id="btnAgregarNuevo">
                         <i class="bi bi-plus-lg"></i> Agregar Nuevo
                     </button>
+                    </a>
                 </div>
             </div>
 
