@@ -56,14 +56,14 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                     <p>Panel de control principal - Gestiona todo el sistema VetWilling</p>
                 </div>
                 <div class="header-acciones">
-                    <button class="btn-header" onclick="exportarReporte()">
+                    <!-- <button class="btn-header" onclick="exportarReporte()">
                         <i class="bi bi-download"></i>
                         Exportar Reporte
                     </button>
                     <button class="btn-header" onclick="abrirConfiguracion()">
                         <i class="bi bi-gear"></i>
                         Configuración
-                    </button>
+                    </button> -->
                 </div>
             </div>
 

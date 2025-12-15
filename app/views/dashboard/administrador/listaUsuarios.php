@@ -90,9 +90,12 @@ $datos = listarUsuarios();
                     <button class="btn-control" id="btnExport">
                         <i class="bi bi-download"></i> Export
                     </button>
+
+                    <a href="<?= BASE_URL ?>/admin/registro-usuario">
                     <button class="btn-agregar" id="btnAgregarNuevo">
                         <i class="bi bi-plus-lg"></i> Agregar Nuevo
                     </button>
+                    </a>
                 </div>
             </div>
 
@@ -122,7 +125,7 @@ $datos = listarUsuarios();
                                     <td><?= $usuario['email'] ?></td>
                                     <td><?= $usuario['estado'] ?></td>
                                     <td><?= $usuario['rol'] ?></td>
-                                    <td>
+                                    <td class="content-action">
                                         <button class="btn-accion btn-editar" title="Editar">
                                             <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
