@@ -7,7 +7,6 @@
     <title>Login VetWilling</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/loginStyle.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
 </head>
@@ -20,28 +19,27 @@
 
             <div class="cont-left">
                 <div class="logo">
-                    <img src="<?= BASE_URL ?>/public/assets/auth/img/LOGO-POSITIVO 1.png" alt="Logo VetWilling">
+                    <a href="<?= BASE_URL ?>/"><img src="<?= BASE_URL ?>/public/assets/auth/img/LOGO-POSITIVO 1.png" alt="Logo VetWilling"></a>
                 </div>
 
-                <div class="form">
-                    <h2>INICIAR SESIÓN</h2>
-                    <p>Por favor, ingresa tu usuario y contraseña para acceder al sistema.</p>
 
-                    <form class="login" action="iniciar-sesion" method="POST">
-                        <div class="cont-input"> <i class="bi bi-person"></i>
-                            <input type="text" id="correo" name="email" placeholder="Correo" required>
-                        </div>
+                <h2>INICIAR SESIÓN</h2>
+                <p>Por favor, ingresa tu usuario y contraseña para acceder al sistema.</p>
 
-                        <div class="cont-input"> <i class="bi bi-lock"></i>
+                <form class="login" action="iniciar-sesion" method="POST">
+                    <div class="cont-input"> <i class="bi bi-person"></i>
+                        <input type="text" id="correo" name="email" placeholder="Correo" required>
+                    </div>
 
-                            <input type="password" id="clave" name="password" placeholder="Contraseña" required>
-                        </div>
+                    <div class="cont-input"> <i class="bi bi-lock"></i>
 
-                        <a href="<?= BASE_URL ?>/recoverpw" id="recover">¿Olvidaste Tu Contraseña?</a>
-                        <button id="btn_ingresar" type="submit">Ingresar</button>
+                        <input type="password" id="clave" name="password" placeholder="Contraseña" required>
+                    </div>
 
-                    </form>
-                </div>
+                    <a href="<?= BASE_URL ?>/recoverpw" id="recover">¿Olvidaste Tu Contraseña?</a>
+                    <button id="btn_ingresar" type="submit">Ingresar</button>
+
+                </form>
             </div>
 
 
