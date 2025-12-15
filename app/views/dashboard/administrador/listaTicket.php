@@ -1,12 +1,13 @@
 <?php
 // Enlazamos la ruta para tomar la session del administrador
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
-// Enlazamos el controlador de veterinaria para listar las veterinarias
-require_once BASE_PATH . '/app/controllers/veterinariaController.php';
-// Llamamos la función para listar las veterinarias
-$datos = listarVeterinariasRegistradas();
+// Enlazamos el controlador de usuario para listar los usuarios
+require_once BASE_PATH . '/app/controllers/ticketController.php';
+// // Llamamos la función para listar los usuarios
+$datos = listarTickets();
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,8 +15,7 @@ $datos = listarVeterinariasRegistradas();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Veterinarias</title>
-
+    <title>Lista de tickets</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -30,18 +30,15 @@ $datos = listarVeterinariasRegistradas();
         href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Open+Sans:wght@300..800&display=swap"
         rel="stylesheet">
 
-        <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
     <!-- Tus CSS -->
-     
-       
-    
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
+
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/styleTableAdmin.css">
-   
-   <!-- Global Styles -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 </head>
 
 <body>
@@ -62,13 +59,13 @@ $datos = listarVeterinariasRegistradas();
         ?>
 
 
-        <!-- ÁREA DE CONTENIDO - MÓDULO GESTIÓN DE VETERINARIAS -->
+        <!-- ÁREA DE CONTENIDO - MÓDULO GESTIÓN DE TICKETS -->
 
         <div class="area-contenido">
 
             <!-- Encabezado del Módulo -->
             <div class="encabezado-modulo">
-                <h3>Lista Veterinarias Registradas</h3>
+                <h3>Lista de Tickets</h3>
             </div>
 
             <!-- Controles de la Tabla -->
@@ -76,7 +73,7 @@ $datos = listarVeterinariasRegistradas();
                 <div class="controles-izquierda">
                     <div class="campo-buscar">
                         <i class="bi bi-search"></i>
-                        <input type="text" id="buscarVeterinaria" placeholder="Buscar Veterinaria...">
+                        <input type="text" id="buscarCitas" placeholder="Buscar Usuarios...">
                     </div>
                 </div>
                 <div class="controles-derecha">
@@ -98,42 +95,35 @@ $datos = listarVeterinariasRegistradas();
                 </div>
             </div>
 
-            <!-- Tabla de Citas -->
+            <!-- Tabla de Tickets -->
             <div class="contenedor-tabla">
-                <table id="tablaListaVeterinarias" class="display tabla-admin" style="width:100%">
+                <table id="tablaListaTickets" class="display tabla-admin" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Foto</th>
-                            <th>nit</th>
-                            <th>Nombre</th>
-                            <th>Direccion</th>
-                            <th>Ciudad</th>
-                            <th>Telefono</th>
-                            <th>Email</th>
+                            <th>Id</th>
+                            <th>Titulo</th>
+                            <th>Categoria</th>
+                            <th>prioridad</th>
                             <th>Estado</th>
-                            <th>Acciones</th>
+                            <th>Usuario</th>
+                            <th>fecha creación</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (!empty($datos)) : ?>
-                            <?php foreach ($datos as $veterinaria):  ?>
+                            <?php foreach ($datos as $ticket):  ?>
                                 <tr class="fila-blanca">
-                                    <td class="tb_foto"><?php if (!empty($veterinaria['foto'])): ?><img src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
-                                    <td><?= $veterinaria['nit'] ?></td>
-                                    <td><?= $veterinaria['nombre'] ?></td>
-                                    <td><?= $veterinaria['direccion'] ?></td>
-                                    <td><?= $veterinaria['ciudad'] ?></td>
-                                    <td><?= $veterinaria['telefono'] ?></td>
-                                    <td><?= $veterinaria['email'] ?></td>
-                                    <td><?= $veterinaria['estado'] ?></td>
-                                    
-                                    
+                                    <td><?= $ticket['id'] ?></td>
+                                    <td><?= $ticket['titulo'] ?></td>
+                                    <td><?= $ticket['categoria'] ?></td>
+                                    <td><?= $ticket['prioridad'] ?></td>
+                                    <td><?= $ticket['estado'] ?></td>
+                                    <td><?= $ticket['nombres'] ?> <?= $ticket['apellidos'] ?></td>
+                                    <td><?= $ticket['fecha_creacion'] ?></td>
                                     <td>
                                         <button class="btn-accion btn-editar" title="Editar">
-                                            <a href="<?= BASE_URL ?>/admin/editar-veterinaria?id=<?= $veterinaria['id_veterinaria'] ?>"><i class="bi bi-pencil"></i></a>
-                                        </button>
-                                        <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/admin/eliminar-veterinaria?action=eliminar&id=<?= $veterinaria['id_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
+                                            <a href="<?= BASE_URL ?>/admin/gestion-tickets?id=<?= $ticket['id'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
                                     </td>
                                 </tr>
@@ -156,12 +146,10 @@ $datos = listarVeterinariasRegistradas();
         <!-- 3. DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-        
-        <!-- 5. Script de lista de veterinarias -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
-        <!-- Modo dia  y noche -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
+
+        <!-- 5. Tu script de tabla AL FINAL -->
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaUsuarios.js"></script>
 
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 

@@ -3,11 +3,10 @@ let tablaUsuarios;
 // Botón "ordenar" - ordenar la tabla
 $('#btnOrdenar').on('click', function () {
     const opciones = [
-        '📅 Fecha (más antigua primero)',
-        '📅 Fecha (más reciente primero)',
-        '👤 Propietario (A-Z)',
-        '👤 Propietario (Z-A)',
-        '🐾 Mascota (A-Z)'
+        '👤 Nombre y Apellidos (A-Z)',
+        '👤 Nombre y apellidos (Z-A)',
+        '# Documento (Ascendente)',
+        '# Documento (Descendente)'
     ];
 
     const mensaje = '⬆️⬇️ Selecciona el ordenamiento:\n\n' +
@@ -18,24 +17,20 @@ $('#btnOrdenar').on('click', function () {
     switch (opcion) {
         case '1':
             tablaUsuarios.order([2, 'asc']).draw();
-            console.log('📅 Ordenado por fecha ascendente');
+            console.log('👤 Ordenado por Nombre y Apellidos ascendente');
             break;
         case '2':
             tablaUsuarios.order([2, 'desc']).draw();
-            console.log('📅 Ordenado por fecha descendente');
+            console.log('👤 Ordenado por Nombre y Apellidos descendente');
             break;
         case '3':
-            tablaUsuarios.order([3, 'asc']).draw();
-            console.log('👤 Ordenado por propietario A-Z');
+            tablaUsuarios.order([1, 'asc']).draw();
+            console.log('# Ordenado por número de documento ascendente');
             break;
         case '4':
-            tablaUsuarios.order([3, 'desc']).draw();
-            console.log('👤 Ordenado por propietario Z-A');
-            break;
-        case '5':
-            tablaUsuarios.order([4, 'asc']).draw();
-            console.log('🐾 Ordenado por mascota A-Z');
-            break;
+            tablaUsuarios.order([1, 'desc']).draw();
+            console.log('# Ordenado por número de documento descendente');
+            break;        
         default:
             if (opcion !== null) {
                 alert('❌ Opción no válida');

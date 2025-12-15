@@ -24,16 +24,13 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Propio -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoardVeterinariaStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
 
 
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
 </head>
 
 <body>
@@ -41,11 +38,6 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
     <!-- Include de la barra lateral izquierda -->
     <?php
     include_once __DIR__ . '/../../layouts/sidebar_administrador.php'
-    ?>
-    <!-- PANEL DERECHO -->
-    <!-- Include de notificaciones -->
-    <?php
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -66,76 +58,78 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
 
             <form id="vetForm" action="<?= BASE_URL ?>/admin/guardar-veterinaria" method="POST" enctype="multipart/form-data">
-                >
 
                 <!-- Paso 1: Datos de la Veterinaria -->
                 <div class="step active">
                     <h3><i class="bi bi-motherboard"></i>Datos de la Veterinaria</h3>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label><i class="bi bi-hash"></i> Nit *</label>
-                                    <input type="text" id="nit" name="nit" required placeholder="000.123.456-7">
-                                </div>
-                            </div>
 
-                        </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-person"></i> Nombre *</label>
-                                <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Juan Pérez García">
+                                <label><i class="bi bi-hash"></i> Nit *</label>
+                                <input type="text" id="nit" name="nit" required placeholder="000.123.456-7">
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-clipboard2-data"></i> Razón Social *</label>
+                                <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Mundo Patitas S.A.S">
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-geo-alt"></i> Dirección *</label>
-                                <input type="text" id="direccion" name="direccion" required placeholder="Calle 12 # 34-56, Apto 102">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-building"></i> Ciudad *</label>
-                                <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Bogotá">
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567">
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Email *</label>
                                 <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567">
+                            </div>
+                        </div>
+
                     </div>
 
 
                     <div class="row">
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <div class="form-group">
-                                    <label><i class="bi bi-envelope"></i> Foto </label>
+                                    <label><i class="bi bi-camera"></i> Foto </label>
                                     <input type="file" accept=".jpg, .png, .jpeg" id="foto" name="foto">
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-pin-map"></i> Ciudad *</label>
+                                <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Bogotá">
+                            </div>
+                        </div>
+
                     </div>
 
+                    <div class="row">
 
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label><i class="bi bi-geo-alt"></i> Dirección *</label>
+                                <input type="text" id="direccion" name="direccion" required placeholder="Calle 12 # 34-56, Barrio Centro">
+                            </div>
+                        </div>
 
-
-
+                    </div>
 
                     <div class="buttons">
                         <span></span>
@@ -158,7 +152,6 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <!-- JS Propio -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardVeterinaria.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
 </body>

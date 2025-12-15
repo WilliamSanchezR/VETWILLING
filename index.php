@@ -180,7 +180,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/administrador/listaVeterinarias.php';
         break;
 
-    case '/admin/editar-veterinaria': // este es para pinatar los dato en el formulario
+    case '/admin/editar-veterinaria':
         require BASE_PATH . '/app/views/dashboard/administrador/editarVeterinaria.php';
         break;
 
@@ -192,12 +192,13 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/veterinariaController.php';
         break;
 
+    case '/admin/listar-tickets':
+        require BASE_PATH . '/app/views/dashboard/administrador/listaTicket.php';
+        break;
 
-
-
-
-
-
+    case '/admin/gestion-tickets':
+        require BASE_PATH . '/app/views/dashboard/administrador/gestionTicket.php';
+        break;
 
 
 

@@ -1,5 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -21,15 +22,9 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/nodoNoche.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
-
-
-    <!-- CSS global -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
 
 </head>
 
@@ -39,14 +34,6 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
     <!-- Include de la barra lateral izquierda -->
     <?php
     include_once __DIR__ . '/../../layouts/sidebar_administrador.php'
-    ?>
-
-
-
-    <!-- PANEL DERECHO -->
-    <!-- aqui va el inclunde notifi -->
-    <?php
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -286,9 +273,6 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
         crossorigin="anonymous"></script>
 
     <!-- Propio -->
-
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 
     <!-- Global Script -->
     <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>

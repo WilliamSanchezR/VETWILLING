@@ -1,161 +1,377 @@
-.marca-sidebar {
-    color: white;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+   /* ================================
+   VARIABLES
+    ================================ */
+   :root {
+       --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+   }
 
-.marca-sidebar img {
-    font-size: 30px;
-    right: 10px;
-}
+   /* ================================
+   SIDEBAR BASE
+    ================================ */
+   .sidebar {
+       position: fixed;
+       left: 0;
+       top: 0;
+       width: var(--sidebar-width);
+       height: 100vh;
+       background: var(--bg-sidebar);
+       border-right: 1px solid var(--border-color);
+       display: flex;
+       flex-direction: column;
+       transition: var(--transition);
+       z-index: 1000;
+       box-shadow: var(--shadow);
+   }
 
-/* Logo completo - visible por defecto */
+   .sidebar.collapsed {
+       width: var(--sidebar-collapsed-width);
+   }
 
-.marca-sidebar .logoDas {
-    display: block;
-    transition: all 0.3s ease;
-}
+   /* ================================
+   HEADER / LOGO
+    ================================ */
+   .sidebar-header {
+       padding: 24px 20px;
+       border-bottom: 1px solid var(--border-color);
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       min-height: 80px;
+   }
 
-/* Logo icono - oculto por defecto */
+   .sidebar-logo-full {
+       max-width: 180px;
+       height: auto;
+       transition: var(--transition);
+   }
 
-.marca-sidebar .logo-icono-sidebar {
-    display: none;
-    transition: all 0.3s ease;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
+   .sidebar-logo-icon {
+       display: none;
+       width: 40px;
+       height: auto;
+   }
 
-/* Cuando el sidebar está colapsado */
+   .sidebar.collapsed .sidebar-logo-full {
+       display: none;
+   }
 
+   .sidebar.collapsed .sidebar-logo-icon {
+       display: block;
+   }
 
-/* Animación suave al cambiar */
+   /* ================================
+   NAVEGACIÓN
+    ================================ */
+   .sidebar-nav {
+       flex: 1;
+       overflow-y: auto;
+       overflow-x: hidden;
+       padding: 20px 12px;
+   }
 
-.marca-sidebar span {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
+   /* Scroll personalizado */
+   .sidebar-nav::-webkit-scrollbar {
+       width: 6px;
+   }
 
-.texto-marca-sidebar {
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    font-size: var(--fs-titulo3);
-    white-space: nowrap;
-    opacity: 1;
-    transition: opacity 0.3s;
-}
+   .sidebar-nav::-webkit-scrollbar-track {
+       background: transparent;
+   }
 
+   .sidebar-nav::-webkit-scrollbar-thumb {
+       background: #d0d0d0;
+       border-radius: 10px;
+   }
 
-.menu-sidebar {
-    padding: 16px 0;
-}
+   .sidebar-nav::-webkit-scrollbar-thumb:hover {
+       background: #b0b0b0;
+   }
 
-.item-sidebar {
-    margin: 4px 8px;
-    padding: 12px 16px;
-    color: rgba(255, 255, 255, 0.85);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-decoration: none;
-    position: relative;
-    font-size: var(--fs-titulo4);
-}
+   /* ================================
+   SECCIONES
+    ================================ */
+   .nav-section {
+       margin-bottom: 25px;
+   }
 
-.item-sidebar:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-}
+   .nav-section-title {
+       display: block;
+       font-size: 11px;
+       font-weight: 600;
+       text-transform: uppercase;
+       color: var(--text-muted);
+       padding: 8px 16px;
+       letter-spacing: 0.5px;
+       transition: var(--transition);
+   }
 
-.item-sidebar.active {
-    background: var(--color-verde);
-    color: var(--color-primario);
-    font-weight: 600;
-}
+   .sidebar.collapsed .nav-section-title {
+       opacity: 0;
+       height: 0;
+       padding: 0;
+       margin: 0;
+       overflow: hidden;
+   }
 
-.item-sidebar i {
-    font-size: var(--fs-titulo3);
-    min-width: 24px;
-}
+   /* ================================
+   ITEMS DE NAVEGACIÓN
+================================ */
+   .nav-item,
+   .submenu-toggle {
+       display: flex;
+       align-items: center;
+       padding: 12px 16px;
+       margin-bottom: 4px;
+       border-radius: 10px;
+       color: var(--text-primary);
+       text-decoration: none;
+       font-size: 15px;
+       font-weight: 500;
+       transition: var(--transition);
+       cursor: pointer;
+   }
 
-.texto-item-sidebar {
-    white-space: nowrap;
-    overflow: hidden;
-    flex: 1;
-}
+   .nav-item i {
+       font-size: 20px;
+       min-width: 24px;
+       margin-right: 12px;
+       transition: var(--transition);
+   }
 
+   .nav-text {
+       white-space: nowrap;
+       opacity: 1;
+       transition: var(--transition);
+   }
 
-/* === SUBMENÚ LIMPIO === */
-.submenu {
-    display: flex;
-    flex-direction: column;
-    margin: 4px 8px;
-}
+   /* Estados del item */
+   .nav-item:hover,
+   .submenu-toggle:hover {
+       background: var(--hover-bg);
+       color: var(--primary-green);
+       /* transform: translateX(3px); */
+   }
 
-/* Botón principal del submenú */
-.submenu-toggle {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    color: rgba(255, 255, 255, 0.85);
-    text-decoration: none;
-    font-size: var(--fs-titulo4);
-    font-family: 'Open Sans', sans-serif;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
+   .nav-item.active,
+   .submenu-toggle.active {
+       background: var(--active-bg);
+       color: var(--primary-green);
+       font-weight: 600;
+   }
 
-.submenu-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-}
+   .nav-item.active::before,
+   .submenu-toggle.active::before {
+       content: '';
+       position: absolute;
+       left: 0;
+       top: 50%;
+       transform: translateY(-50%);
+       width: 4px;
+       height: 70%;
+       background: var(--primary-green);
+       border-radius: 0 4px 4px 0;
+   }
 
-/* Flecha animada */
-.submenu .flecha {
-    margin-left: auto;
-    transition: transform 0.3s ease;
-}
+   .submenu-toggle i {
+       margin-right: 2px;
+       font-size: 20px;
+   }
 
-/* Lista interna (invisible por defecto) */
-.submenu-items {
-    list-style: none;
-    margin: 0;
-    padding-left: 48px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-}
+   /* Logout especial */
+   .nav-logout {
+       color: #dc3545;
+   }
 
-/* Ítems del submenú */
-.submenu-items li a {
-    display: block;
-    padding: 6px 0;
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
-    font-size: var(--fs-texto1);
-    transition: color 0.3s ease;
-}
+   .nav-logout:hover {
+       background: #fff5f5;
+       color: #c82333;
+   }
 
-.submenu-items li a:hover {
-    color: white;
-}
+   /* ================================
+   SIDEBAR COLAPSADO
+================================ */
+   .sidebar.collapsed .nav-item {
+       justify-content: center;
+       padding: 12px 8px;
+   }
 
-/* Cuando el submenú está abierto */
-.submenu.open .submenu-items {
-    max-height: 200px;
-}
+   .sidebar.collapsed .nav-item i {
+       margin-right: 0;
+       font-size: 22px;
+   }
 
-.submenu.open .flecha {
-    transform: rotate(180deg);
-}
+   .sidebar.collapsed .nav-text {
+       opacity: 0;
+       width: 0;
+       display: none;
+   }
 
-/* .avatar-usuario img {
+   /* Tooltips para modo colapsado */
+   .sidebar.collapsed .nav-item::after,
+   .sidebar.collapsed .submenu-toggle::after {
+       content: attr(data-tooltip);
+       position: absolute;
+       left: 60px;
+       margin-top: 20px;
+       transform: translateY(-50%);
+       background: var(--text-primary);
+       color: white;
+       padding: 8px 12px;
+       border-radius: 6px;
+       font-size: 13px;
+       white-space: nowrap;
+       opacity: 0;
+       pointer-events: none;
+       transition: opacity 0.2s ease;
+       z-index: 1002; 
+   }
+
+   .sidebar.collapsed .nav-item:hover::after,
+   .sidebar.collapsed .submenu-toggle:hover::after {
+       opacity: 1;
+   }
+
+   /* ================================
+   BOTÓN TOGGLE
+================================ */
+   .sidebar-toggle {
+       position: absolute;
+       right: -15px;
+       top: 85px;
+       width: 30px;
+       height: 30px;
+       background: var(--primary-green);
+       border: none;
+       border-radius: 50%;
+       color: white;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       cursor: pointer;
+       transition: var(--transition);
+       box-shadow: 0 2px 8px rgba(10, 155, 66, 0.3);
+   }
+
+   .sidebar-toggle:hover {
+       background: var(--primary-hover);
+       transform: scale(1.1);
+   }
+
+   .sidebar-toggle i {
+       transition: var(--transition);
+       font-size: 14px;
+   }
+
+   .sidebar.collapsed .sidebar-toggle i {
+       transform: rotate(180deg);
+   }
+
+   /* ================================
+   RESPONSIVE
+================================ */
+   @media (max-width: 768px) {
+       .sidebar {
+           transform: translateX(-100%);
+       }
+
+       .sidebar.show {
+           transform: translateX(0);
+       }
+
+       .sidebar-toggle {
+           display: none;
+       }
+   }
+
+   /* ================================
+   ANIMACIONES
+================================ */
+   @keyframes slideIn {
+       from {
+           opacity: 0;
+           transform: translateX(-10px);
+       }
+
+       to {
+           opacity: 1;
+           transform: translateX(0);
+       }
+   }
+
+   .nav-item {
+       animation: slideIn 0.3s ease forwards;
+   }
+
+   .nav-item:nth-child(1) {
+       animation-delay: 0.05s;
+   }
+
+   .nav-item:nth-child(2) {
+       animation-delay: 0.1s;
+   }
+
+   .nav-item:nth-child(3) {
+       animation-delay: 0.15s;
+   }
+
+   .nav-item:nth-child(4) {
+       animation-delay: 0.2s;
+   }
+
+   .nav-item:nth-child(5) {
+       animation-delay: 0.25s;
+   }
+
+   .no-transition * {
+       transition: none !important;
+       animation: none !important;
+   }
+
+   /* ================================
+     SUBMENÚS  
+
+  /* Flecha animada */
+   .submenu .flecha {
+       margin-left: auto;
+       transition: transform 0.3s ease;
+   }
+
+   .collapsed .submenu .flecha {
+       display: none;
+   }
+
+   /* Lista interna (invisible por defecto) */
+   .submenu-items {
+       list-style: none;
+       margin: 0;
+       max-height: 0;
+       overflow: hidden;
+       transition: max-height 0.3s ease;
+   }
+
+   /* Ítems del submenú */
+   .submenu-items li a {
+       display: block;
+       color: var(--text-primary);
+       text-decoration: none;
+       transition: color 0.3s ease;
+   }
+
+   .submenu-items li a:hover {
+       color: var(--text-primary);
+   }
+
+   /* Cuando el submenú está abierto */
+   .submenu.open .submenu-items {
+       max-height: 200px;
+   }
+
+   .submenu.open .flecha {
+       transform: rotate(180deg);
+   }
+
+   /* .avatar-usuario img {
     width: 45px;
     height: 45px;
     border-radius: 50%;
@@ -163,3 +379,40 @@
     border: 2px solid #ffffff22;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
 } */
+
+   .submenu-toggle {
+       display: flex;
+       flex-direction: row;
+       gap: 10px;
+   }
+
+   .submenu.active .submenu-toggle {
+       background: var(--active-bg);
+       color: var(--primary-green);
+       font-weight: 600;
+
+   }
+
+   .view-modal-menu .submenu-items {
+       position: absolute;
+       display: block;
+       width: 150px;
+       height: 50px;
+       z-index: 1;
+       overflow: visible;
+       left: 79px;
+       background: #ffffffd0;
+       max-height: 500px;
+       margin-top: -50px;
+       max-height: max-content !important;
+       height: 100%;
+       padding-left: 0px;
+   }
+
+   .collapsed .submenu.open .submenu-items {
+       max-height: 0px;
+   }
+
+     .collapsed .submenu-toggle .texto-item-sidebar {
+        display: none;
+     }

@@ -38,16 +38,13 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
         <!-- Propio -->
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoardVeterinariaStyle.css">
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
+
 
         <!-- Global Styles -->
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
     </head>
 
     <body>
@@ -58,12 +55,6 @@
         include_once __DIR__ . '/../../layouts/sidebar_administrador.php'
         ?>
 
-
-        <!-- PANEL DERECHO -->
-        <!-- Include de notificaciones -->
-        <?php
-        include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
-        ?>
 
         <!-- CONTENIDO PRINCIPAL -->
         <!-- CONTENIDO PRINCIPAL -->
@@ -133,30 +124,32 @@
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                    <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567" required value="<?= $usuarioData['telefono'] ?>">
+                                    <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
+                                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $usuarioData['email'] ?>">
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label><i class="bi bi-telephone"></i> Dirección *</label>
-                                    <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67" required value="<?= $usuarioData['direccion'] ?>">
+                                    <label><i class="bi bi-telephone"></i> Teléfono *</label>
+                                    <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567" required value="<?= $usuarioData['telefono'] ?>">
                                 </div>
                             </div>
+
+
 
                         </div>
 
                         <div class="row">
 
                             <div class="col-md-6">
-
-
                                 <div class="form-group">
-                                    <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $usuarioData['email'] ?>">
+                                    <label><i class="bi bi-geo-alt"></i> Dirección *</label>
+                                    <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67" required value="<?= $usuarioData['direccion'] ?>">
                                 </div>
                             </div>
+
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-person-rolodex"></i> Rol *</label>
@@ -183,7 +176,7 @@
                                 </div>
                             </div>
 
-                            <?php if ($usuarioData['id_rol'] !== '1') : ?>
+                            <?php if ($usuarioData['id_rol'] !== 1 && $usuarioData['id_rol'] !== '1') : ?>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-envelope"></i> Veterinaria </label>
@@ -224,7 +217,6 @@
             crossorigin="anonymous"></script>
 
         <!-- Propio -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
