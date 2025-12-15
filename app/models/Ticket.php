@@ -38,4 +38,25 @@ class Ticket
             return [];
         }
     }
+
+    // FUNCIÓN PARA OBTENER LOS DETALLES DE UN TICKET POR ID
+    public function obtenerTicketPorId($id)
+    {
+        try {
+            $sql = "SELECT  tk.id, tk.titulo, tk.fecha_creacion, tk.categoria, tk.prioridad, tk.estado, rp.nombres as nombre_asignado, rp.apellidos as apellido_asignado, tk.descripcion, tk.usuario_id as id_usuario
+            FROM tickets TK
+            LEFT JOIN usuario us ON tk.asignado_a = us.id_usuario
+            LEFT JOIN representante_legal rp ON rp.id_usuario = us.id_usuario
+            WHERE tk.id = :id";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $ticket;
+        } catch (PDOException $e) {
+            echo "Error al obtener el ticket: " . $e->getMessage();
+            return null;
+        }
+    }
 }

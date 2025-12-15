@@ -45,3 +45,11 @@ function listarTickets()
     $tickets = $ticketModel->listarTickets();
     return $tickets;
 }
+
+// FUNCIÓN PARA CONSULTAR UN TICKET POR ID
+function consultarTicket($id)
+{
+    $ticketModel = new Ticket();
+    $ticket = $ticketModel->obtenerTicketPorId($id);
+    return $ticket;
+}

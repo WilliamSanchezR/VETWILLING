@@ -123,7 +123,7 @@ $datos = listarTickets();
                                     <td><?= $ticket['fecha_creacion'] ?></td>
                                     <td>
                                         <button class="btn-accion btn-editar" title="Editar">
-                                            <a href=""><i class="bi bi-pencil"></i></a>
+                                            <a href="<?= BASE_URL ?>/admin/gestion-tickets?id=<?= $ticket['id'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
                                     </td>
                                 </tr>
