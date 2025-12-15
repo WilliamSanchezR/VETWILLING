@@ -55,7 +55,7 @@
                 class="nav-item"
                 data-section="tienda">
                 <i class="bi bi-journal-text"></i>
-                <span class="nav-text">Resetas</span>
+                <span class="nav-text">Recetas</span>
             </a>
             <a href="<?= BASE_URL ?>/veterinaria/reportes"
                 class="nav-item"
