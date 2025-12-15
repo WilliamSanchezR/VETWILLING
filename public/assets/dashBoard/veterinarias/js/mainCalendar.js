@@ -2,19 +2,15 @@
 
 // --- DEFINICIÓN DE RUTAS LÓGICAS ---
 // Basado en tu archivo 'calendarioController.php', las rutas deben apuntar a ese controlador.
-// Si tu framework usa la estructura 'Controlador/Metodo', esto sería lo más común:
-
 const URLS = {
     // 1. CARGAR EVENTOS (GET): Llama al método que trae todos los agendamientos.
-    LOAD:   './calendario/loadEvents', 
+    LOAD:   '/vetwilling/calendario/loadEvents', 
     
     // 2. CREAR EVENTO (POST): Llama al método para insertar un nuevo agendamiento.
-    CREATE: './calendario/storeEvent', 
+    CREATE: '/vetwilling/calendario/storeEvent', 
     
     // 3. MODIFICAR EVENTO (POST): Llama al método para actualizar fechas/horas.
-    UPDATE: './calendario/updateEvent',
-    
-    // Nota: Debes configurar estas rutas en tu archivo de ruteo de PHP.
+    UPDATE: '/vetwilling/calendario/updateEvent',
 };
 
 
@@ -22,9 +18,7 @@ const URLS = {
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- Función de Utilidad para Peticiones AJAX (Fetch) ---
-    // ESTA FUNCIÓN SE MANTIENE IGUAL, ES GENÉRICA Y ESTÁ BIEN.
     function sendEventData(url, data, successCallback, errorCallback) {
-        // ... (Tu código actual para sendEventData, sin cambios) ...
         fetch(url, {
             method: 'POST',
             headers: {
@@ -33,12 +27,19 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify(data),
         })
         .then(response => {
+            // Log para debugging
+            console.log('Response status:', response.status);
+            console.log('Response statusText:', response.statusText);
+            
             if (!response.ok) {
-                throw new Error('La respuesta del servidor no fue exitosa: ' + response.statusText);
+                return response.text().then(text => {
+                    throw new Error('Status ' + response.status + ': ' + response.statusText + ' - ' + text);
+                });
             }
             return response.json(); 
         })
         .then(result => {
+            console.log('Result:', result);
             if (result.status === 'success') {
                 console.log('Operación exitosa:', result.message);
                 if (successCallback) { successCallback(result); }
@@ -65,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     return {
                         title: eventEl.innerText.trim(),
                         duration: eventEl.getAttribute('data-duration') 
-                        // Nota: Aquí podrías añadir otros atributos como data-id-servicio
                     };
                 }
             });
@@ -90,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         
         // --- CARGA DE EVENTOS ---
-        // Apunta a la URL de carga de tu controlador
         events: URLS.LOAD, 
         
         // --- INTERACCIÓN Y CREACIÓN DE EVENTOS (Selectable) ---
@@ -101,22 +100,20 @@ document.addEventListener('DOMContentLoaded', function() {
             var title = prompt('Ingresa el TIPO de Agendamiento:');
 
             if (title) {
-                // 1. Preparamos los datos a enviar al servidor, usando los nombres de tu DB.
+                // 1. Preparamos los datos a enviar al servidor
                 var newEventData = {
-                    tipo: title, // Se mapea a la columna 'tipo'
-                    fecha_hora: info.startStr, // Se mapea a la columna 'fecha_hora' (start)
-                    fecha_hora_fin: info.endStr || null, // Se mapea a 'fecha_hora_fin' (end)
+                    tipo: title,
+                    fecha_hora: info.startStr,
+                    fecha_hora_fin: info.endStr || null,
                     allDay: info.allDay ? 1 : 0
-                    // NOTA: Podrías añadir campos faltantes como id_usuario, id_paciente, etc.
                 };
 
                 // 2. Llamada AJAX para guardar en la base de datos
                 sendEventData(URLS.CREATE, newEventData, 
                     // Función de Éxito
                     function(result) {
-                        // El servidor debe devolver el id_agendamiento generado (result.id)
                         calendar.addEvent({
-                            id: result.id, // CRUCIAL: Asignamos el id_agendamiento retornado
+                            id: result.id,
                             title: title,
                             start: info.startStr,
                             end: info.endStr,
@@ -134,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         
         // --- MODIFICACIÓN DE EVENTOS (editable) ---
-        
         editable: true, 
         droppable: true, 
 
@@ -147,8 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 1. Preparamos los datos para la actualización
             var eventUpdateData = {
-                id_agendamiento: info.event.id, // Mapeado a id_agendamiento
-                // Enviamos las nuevas fechas con los nombres de la DB
+                id_agendamiento: info.event.id,
                 new_fecha_hora: info.event.start.toISOString(), 
                 new_fecha_hora_fin: info.event.end ? info.event.end.toISOString() : null, 
                 action: 'move' 
@@ -197,21 +192,16 @@ document.addEventListener('DOMContentLoaded', function() {
         drop: function(info) {
             var title = info.draggedEl.innerText.trim();
             
-            // Aquí debes obtener el id_servicio/id_especialidad/etc. del elemento arrastrado.
-            
             // 1. Preparamos los datos para crear un nuevo evento
             var newExternalEventData = {
                 tipo: title,
                 fecha_hora: info.dateStr, 
-                allDay: info.allDay,
-                // Si el elemento externo tiene una duración predefinida, FullCalendar calcula el end.
-                // Puedes forzar el end si quieres: fecha_hora_fin: info.endStr || null
+                allDay: info.allDay
             };
 
             // 2. Llamada AJAX para crear el evento en la base de datos
             sendEventData(URLS.CREATE, newExternalEventData, 
                 function(result) {
-                    // Si el servidor es exitoso, FullCalendar necesita el ID.
                     calendar.addEvent({
                         id: result.id, 
                         title: title,
@@ -220,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     alert('Agendamiento externo creado con ID: ' + result.id);
                     
-                    if (document.getElementById('drop-remove').checked) {
+                    if (document.getElementById('drop-remove') && document.getElementById('drop-remove').checked) {
                         info.draggedEl.remove();
                     }
                 },

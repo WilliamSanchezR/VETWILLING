@@ -3,11 +3,12 @@ let tablaVeterinarias;
 // Botón "ordenar" - ordenar la tabla
 $('#btnOrdenar').on('click', function () {
     const opciones = [
-        '📅 Fecha (más antigua primero)',
-        '📅 Fecha (más reciente primero)',
-        '👤 Propietario (A-Z)',
-        '👤 Propietario (Z-A)',
-        '🐾 Mascota (A-Z)'
+        '# NIT (Ascendente)',
+        '# NIT (Descendente)',
+        '👤 Nombre (A-Z)',
+        '👤 Nombre (Z-A)',
+        ' Ciudad (A-Z)',
+        ' Ciudad (Z-A)'
     ];
 
     const mensaje = '⬆️⬇️ Selecciona el ordenamiento:\n\n' +
@@ -17,24 +18,28 @@ $('#btnOrdenar').on('click', function () {
 
     switch (opcion) {
         case '1':
-            tablaVeterinarias.order([2, 'asc']).draw();
-            console.log('📅 Ordenado por fecha ascendente');
+            tablaVeterinarias.order([1, 'asc']).draw();
+            console.log('# Ordenado por NIT ascendente');
             break;
         case '2':
-            tablaVeterinarias.order([2, 'desc']).draw();
-            console.log('📅 Ordenado por fecha descendente');
+            tablaVeterinarias.order([1, 'desc']).draw();
+            console.log('# Ordenado por NIT descendente');
             break;
         case '3':
-            tablaVeterinarias.order([3, 'asc']).draw();
-            console.log('👤 Ordenado por propietario A-Z');
+            tablaVeterinarias.order([2, 'asc']).draw();
+            console.log('👤 Ordenado por Nombre A-Z');
             break;
         case '4':
-            tablaVeterinarias.order([3, 'desc']).draw();
-            console.log('👤 Ordenado por propietario Z-A');
+            tablaVeterinarias.order([2, 'desc']).draw();
+            console.log('👤 Ordenado por Nombre Z-A');
             break;
         case '5':
             tablaVeterinarias.order([4, 'asc']).draw();
-            console.log('🐾 Ordenado por mascota A-Z');
+            console.log('Ordenado por Ciudad A-Z');
+            break;
+        case '6':
+            tablaVeterinarias.order([4, 'desc']).draw();
+            console.log('Ordenado por Ciudad Z-A');
             break;
         default:
             if (opcion !== null) {
@@ -90,7 +95,7 @@ function exportarACSV() {
 
 
 // Búsqueda en la tabla
-$('#buscarPaciente').on('keyup change', function () {
+$('#buscarVeterinaria').on('keyup change', function () {
     const valorBusqueda = this.value;
     console.log('🔍 Buscando:', valorBusqueda);
     tablaVeterinarias.search(valorBusqueda).draw();
@@ -98,7 +103,7 @@ $('#buscarPaciente').on('keyup change', function () {
 
 // Limpiar búsqueda al hacer clic en el icono de búsqueda
 $('.campo-buscar i').on('click', function () {
-    $('#buscarPaciente').val('').trigger('keyup');
+    $('#buscarVeterinaria').val('').trigger('keyup');
 });
 
 

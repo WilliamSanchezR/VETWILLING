@@ -1,0 +1,22 @@
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+    background: var(--color-fondo);
+}
+
+.sidebar.collapsed~.contenido-principal {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+.barra-navegacion-superior {
+    background: white;
+    padding: 16px 32px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 998;
+}

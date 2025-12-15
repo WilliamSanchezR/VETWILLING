@@ -62,7 +62,25 @@
                 data-section="tienda">
                 <i class="bi bi-bar-chart"></i>
                 <span class="nav-text">Reportes</span>
+        </div>
+
+        <!-- Divisor -->
+        <div class="menu-divider"></div>
+
+        <!-- Sección Gestión -->
+        <div class="menu-seccion">
+            <div class="seccion-titulo">
+                <i class="bi bi-gear-fill"></i>
+                <span class="texto-seccion">Gestión</span>
+            </div>
+
+            <a href="<?= BASE_URL ?>/veterinario/registrar-pacientes" class="item-sidebar">
+                <div class="item-icono">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <span class="item-texto">Registro</span>
             </a>
+            
             <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario"
                 class="nav-item"
                 data-section="tienda">
