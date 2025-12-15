@@ -1,453 +1,353 @@
-// ========================================
-// CONFIGURACIÓN DE RUTAS Y BREADCRUMBS
-// ========================================
+// ========== FUNCIONALIDAD DEL NAVBAR SUPERIOR ==========
 
-const rutasBreadcrumb = {
-    '/veterinaria/dashboard': {
-        titulo: 'Dashboard',
-        icono: 'bi-speedometer2'
-    },
-    '/veterinaria/seguimientos': {
-        titulo: 'Seguimientos',
-        icono: 'bi-arrow-repeat'
-    },
-    '/veterinaria/calendario': {
-        titulo: 'Calendario',
-        icono: 'bi-calendar3'
-    },
-    '/veterinario/consultar-veterinario': {
-        titulo: 'Citas',
-        icono: 'bi-calendar-check'
-    },
-    '/veterinaria/laboratorio': {
-        titulo: 'Laboratorio',
-        icono: 'bi-flask'
-    },
-    '/veterinario/registrar-veterinario': {
-        titulo: 'Registro',
-        icono: 'bi-person-plus'
-    },
-    '/veterinaria/gestion_clinica': {
-        titulo: 'Gestión Clínica',
-        icono: 'bi-hospital'
-    },
-    '/veterinaria/reportes': {
-        titulo: 'Reportes',
-        icono: 'bi-file-earmark-text'
-    },
-    '/veterinaria/recetas': {
-        titulo: 'Recetas',
-        icono: 'bi-receipt'
-    },
-    '/veterinario/consultar-perfil': {
-        titulo: 'Mi Perfil',
-        icono: 'bi-person-circle'
-    },
-    '/veterinario/configuracion': {
-        titulo: 'Configuración',
-        icono: 'bi-gear'
-    },
-    '/veterinario/ayuda': {
-        titulo: 'Ayuda',
-        icono: 'bi-question-circle'
-    }
-};
-
-// ========================================
-// ESTADO DE LA APLICACIÓN
-// ========================================
-
-let estadoUI = {
-    sidebarColapsado: false,
-    panelDerechoAbierto: false,
-    menuPerfilAbierto: false,
-    notificacionesAbiertas: false
-};
-
-// ========================================
-// INICIALIZACIÓN
-// ========================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    inicializarNavegacion();
-    restaurarEstadoSidebar();
-    configurarEventosNavegacion();
-    actualizarBreadcrumbActual();
-});
-
-// ========================================
-// FUNCIONES DE INICIALIZACIÓN
-// ========================================
-
-function inicializarNavegacion() {
-    const itemsSidebar = document.querySelectorAll('.item-sidebar:not(.item-logout)');
+(function() {
+    'use strict';
     
-    itemsSidebar.forEach(item => {
-        item.addEventListener('click', function(e) {
-            // Remover active de todos
-            itemsSidebar.forEach(i => i.classList.remove('active'));
-            
-            // Agregar active al clickeado
-            this.classList.add('active');
-            
-            // Actualizar breadcrumb
-            const href = this.getAttribute('href');
-            if (href) {
-                actualizarBreadcrumb(href);
-            }
-        });
-    });
-}
-
-function restaurarEstadoSidebar() {
-    const sidebarColapsado = localStorage.getItem('sidebarColapsado') === 'true';
-    const sidebar = document.getElementById('barraLateralIzquierda');
-    const navbar = document.getElementById('navbarSuperior');
+    // ========== ELEMENTOS DEL DOM ==========
+    const elements = {
+        searchInput: document.getElementById('searchInput'),
+        btnClearSearch: document.getElementById('btnClearSearch'),
+        searchResults: document.getElementById('searchResults'),
+        searchItems: document.getElementById('searchItems'),
+        notificationsPanel: document.getElementById('notificationsPanel'),
+        perfilDropdown: document.getElementById('perfilDropdown'),
+        themeIcon: document.getElementById('themeIcon')
+    };
     
-    if (sidebarColapsado) {
-        sidebar.classList.add('colapsado');
-        navbar.classList.add('sidebar-colapsado');
-        estadoUI.sidebarColapsado = true;
-        actualizarIconoColapsar();
-    }
-}
-
-function configurarEventosNavegacion() {
-    // Cerrar dropdowns al hacer click fuera
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.user-profile-container')) {
-            cerrarPerfilMenu();
-        }
-        if (!e.target.closest('.action-item[data-tooltip="Notificaciones"]')) {
-            cerrarNotificaciones();
-        }
-        if (!e.target.closest('.buscador-navegacion')) {
-            cerrarBuscador();
-        }
+    // ========== INICIALIZACIÓN ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSearch();
+        initializeTheme();
+        setupClickOutside();
+        updateThemeIcon();
     });
     
-    // Prevenir que los clicks dentro de los dropdowns los cierren
-    document.querySelectorAll('.perfil-dropdown, .notifications-panel').forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-    });
-}
-
-// ========================================
-// FUNCIONES DE BREADCRUMB
-// ========================================
-
-function actualizarBreadcrumbActual() {
-    const rutaActual = window.location.pathname;
-    actualizarBreadcrumb(rutaActual);
-}
-
-function actualizarBreadcrumb(ruta) {
-    const paginaActual = document.getElementById('paginaActual');
-    const breadcrumbItem = paginaActual.closest('.breadcrumb-item');
-    
-    if (!paginaActual) return;
-    
-    // Buscar coincidencia exacta o parcial
-    let infoRuta = rutasBreadcrumb[ruta];
-    
-    if (!infoRuta) {
-        // Buscar coincidencia parcial
-        for (let key in rutasBreadcrumb) {
-            if (ruta.includes(key)) {
-                infoRuta = rutasBreadcrumb[key];
-                break;
-            }
+    // ========== BÚSQUEDA ========== 
+    function initializeSearch() {
+        if (!elements.searchInput) return;
+        
+        elements.searchInput.addEventListener('input', handleSearchInput);
+        elements.searchInput.addEventListener('focus', handleSearchFocus);
+        
+        if (elements.btnClearSearch) {
+            elements.btnClearSearch.addEventListener('click', clearSearch);
         }
     }
     
-    if (infoRuta) {
-        // Actualizar el texto
-        paginaActual.textContent = infoRuta.titulo;
-        
-        // Actualizar título de la página
-        document.title = `${infoRuta.titulo} | VetCare`;
-        
-        // Animación suave
-        breadcrumbItem.style.opacity = '0';
-        setTimeout(() => {
-            breadcrumbItem.style.opacity = '1';
-        }, 150);
-    }
-}
-
-// ========================================
-// FUNCIONES DE SIDEBAR
-// ========================================
-
-function alternarBarraIzquierda() {
-    const sidebar = document.getElementById('barraLateralIzquierda');
-    const navbar = document.getElementById('navbarSuperior');
-    const contenidoPrincipal = document.querySelector('.contenido-principal');
-    
-    estadoUI.sidebarColapsado = !estadoUI.sidebarColapsado;
-    
-    sidebar.classList.toggle('colapsado');
-    navbar.classList.toggle('sidebar-colapsado');
-    
-    if (contenidoPrincipal) {
-        contenidoPrincipal.classList.toggle('sidebar-colapsado');
-    }
-    
-    // Guardar estado
-    localStorage.setItem('sidebarColapsado', estadoUI.sidebarColapsado);
-    
-    // Actualizar icono
-    actualizarIconoColapsar();
-    
-    // Cerrar menú de perfil y notificaciones si están abiertos
-    if (estadoUI.sidebarColapsado) {
-        cerrarPerfilMenu();
-        cerrarNotificaciones();
-    }
-}
-
-function actualizarIconoColapsar() {
-    const icono = document.getElementById('iconoColapsar');
-    if (icono) {
-        icono.className = estadoUI.sidebarColapsado ? 'bi bi-chevron-right' : 'bi bi-chevron-left';
-    }
-}
-
-// ========================================
-// FUNCIONES DE SIDEBAR MÓVIL
-// ========================================
-
-function abrirSidebarMovil() {
-    const sidebar = document.getElementById('barraLateralIzquierda');
-    const overlay = document.getElementById('sidebarOverlay');
-    
-    sidebar.classList.add('abierto');
-    overlay.classList.add('activo');
-    document.body.style.overflow = 'hidden';
-}
-
-function cerrarSidebarMovil() {
-    const sidebar = document.getElementById('barraLateralIzquierda');
-    const overlay = document.getElementById('sidebarOverlay');
-    
-    sidebar.classList.remove('abierto');
-    overlay.classList.remove('activo');
-    document.body.style.overflow = '';
-}
-
-// ========================================
-// FUNCIONES DE MENÚ DE PERFIL
-// ========================================
-
-function togglePerfilMenu() {
-    const dropdown = document.getElementById('perfilDropdown');
-    const boton = document.querySelector('.btn-perfil');
-    
-    estadoUI.menuPerfilAbierto = !estadoUI.menuPerfilAbierto;
-    
-    if (estadoUI.menuPerfilAbierto) {
-        dropdown.style.display = 'block';
-        boton.classList.add('activo');
-        cerrarNotificaciones();
-        
-        // Animación de entrada
-        setTimeout(() => {
-            dropdown.classList.add('mostrar');
-        }, 10);
-    } else {
-        cerrarPerfilMenu();
-    }
-}
-
-function cerrarPerfilMenu() {
-    const dropdown = document.getElementById('perfilDropdown');
-    const boton = document.querySelector('.btn-perfil');
-    
-    if (dropdown && estadoUI.menuPerfilAbierto) {
-        dropdown.classList.remove('mostrar');
-        boton.classList.remove('activo');
-        
-        setTimeout(() => {
-            dropdown.style.display = 'none';
-        }, 300);
-        
-        estadoUI.menuPerfilAbierto = false;
-    }
-}
-
-// ========================================
-// FUNCIONES DE NOTIFICACIONES
-// ========================================
-
-function toggleNotificaciones() {
-    const panel = document.getElementById('notificationsPanel');
-    
-    estadoUI.notificacionesAbiertas = !estadoUI.notificacionesAbiertas;
-    
-    if (estadoUI.notificacionesAbiertas) {
-        panel.style.display = 'block';
-        cerrarPerfilMenu();
-        
-        // Animación de entrada
-        setTimeout(() => {
-            panel.classList.add('mostrar');
-        }, 10);
-    } else {
-        cerrarNotificaciones();
-    }
-}
-
-function cerrarNotificaciones() {
-    const panel = document.getElementById('notificationsPanel');
-    
-    if (panel && estadoUI.notificacionesAbiertas) {
-        panel.classList.remove('mostrar');
-        
-        setTimeout(() => {
-            panel.style.display = 'none';
-        }, 300);
-        
-        estadoUI.notificacionesAbiertas = false;
-    }
-}
-
-// ========================================
-// FUNCIONES DE PANEL DERECHO
-// ========================================
-
-function alternarBarraDerecha() {
-    const panelDerecho = document.getElementById('panelLateralDerecho');
-    
-    if (panelDerecho) {
-        estadoUI.panelDerechoAbierto = !estadoUI.panelDerechoAbierto;
-        panelDerecho.classList.toggle('abierto');
-    }
-}
-
-// ========================================
-// FUNCIONES DE BÚSQUEDA
-// ========================================
-
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
-const btnClearSearch = document.getElementById('btnClearSearch');
-
-if (searchInput) {
-    searchInput.addEventListener('input', function(e) {
+    function handleSearchInput(e) {
         const query = e.target.value.trim();
         
         if (query.length > 0) {
-            btnClearSearch.style.display = 'block';
-            mostrarResultadosBusqueda(query);
+            elements.btnClearSearch.style.display = 'flex';
+            performSearch(query);
         } else {
-            btnClearSearch.style.display = 'none';
-            cerrarBuscador();
+            elements.btnClearSearch.style.display = 'none';
+            elements.searchResults.style.display = 'none';
         }
+    }
+    
+    function handleSearchFocus() {
+        const query = elements.searchInput.value.trim();
+        if (query.length > 0) {
+            elements.searchResults.style.display = 'block';
+        }
+    }
+    
+    function performSearch(query) {
+        // Datos de ejemplo - reemplazar con búsqueda real
+        const resultados = [
+            {
+                icon: 'bi-heart-fill',
+                title: 'Luna',
+                description: 'Paciente - Golden Retriever',
+                link: '#'
+            },
+            {
+                icon: 'bi-calendar-check',
+                title: 'Cita con Max',
+                description: 'Hoy 15:00 - Consulta general',
+                link: '#'
+            },
+            {
+                icon: 'bi-file-medical',
+                title: 'Historia clínica',
+                description: 'Rocky - Última actualización',
+                link: '#'
+            }
+        ];
+        
+        displaySearchResults(resultados);
+    }
+    
+    function displaySearchResults(resultados) {
+        if (!elements.searchItems) return;
+        
+        elements.searchItems.innerHTML = '';
+        
+        if (resultados.length === 0) {
+            elements.searchItems.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+                    <i class="bi bi-search" style="font-size: 32px; margin-bottom: 8px;"></i>
+                    <p>No se encontraron resultados</p>
+                </div>
+            `;
+        } else {
+            resultados.forEach(resultado => {
+                const item = document.createElement('div');
+                item.className = 'search-item';
+                item.innerHTML = `
+                    <div class="search-item-icon">
+                        <i class="bi ${resultado.icon}"></i>
+                    </div>
+                    <div class="search-item-content">
+                        <h5>${resultado.title}</h5>
+                        <p>${resultado.description}</p>
+                    </div>
+                `;
+                item.addEventListener('click', () => {
+                    window.location.href = resultado.link;
+                });
+                elements.searchItems.appendChild(item);
+            });
+        }
+        
+        elements.searchResults.style.display = 'block';
+    }
+    
+    function clearSearch() {
+        elements.searchInput.value = '';
+        elements.btnClearSearch.style.display = 'none';
+        elements.searchResults.style.display = 'none';
+        elements.searchInput.focus();
+    }
+    
+    // ========== TOGGLE TEMA ========== 
+    window.toggleTheme = function() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        if (newTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+        }
+        
+        updateThemeIcon();
+        
+        // Disparar evento personalizado
+        window.dispatchEvent(new CustomEvent('themeChange', {
+            detail: { theme: newTheme }
+        }));
+    };
+    
+    function initializeTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        updateThemeIcon();
+    }
+    
+    function updateThemeIcon() {
+        if (!elements.themeIcon) return;
+        
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            elements.themeIcon.className = 'bi bi-sun-fill';
+        } else {
+            elements.themeIcon.className = 'bi bi-moon-stars-fill';
+        }
+    }
+    
+    // ========== TOGGLE NOTIFICACIONES ========== 
+    window.toggleNotificaciones = function() {
+        if (!elements.notificationsPanel) return;
+        
+        const isVisible = elements.notificationsPanel.style.display === 'block';
+        
+        // Cerrar otros paneles
+        if (elements.perfilDropdown) {
+            elements.perfilDropdown.style.display = 'none';
+        }
+        
+        elements.notificationsPanel.style.display = isVisible ? 'none' : 'block';
+    };
+    
+    // ========== TOGGLE PERFIL ========== 
+    window.togglePerfilMenu = function() {
+        if (!elements.perfilDropdown) return;
+        
+        const isVisible = elements.perfilDropdown.style.display === 'block';
+        
+        // Cerrar otros paneles
+        if (elements.notificationsPanel) {
+            elements.notificationsPanel.style.display = 'none';
+        }
+        
+        elements.perfilDropdown.style.display = isVisible ? 'none' : 'block';
+    };
+    
+    // ========== MARCAR TODAS COMO LEÍDAS ========== 
+    document.querySelector('.btn-mark-read')?.addEventListener('click', function() {
+        const unreadItems = document.querySelectorAll('.notification-item.unread');
+        unreadItems.forEach(item => {
+            item.classList.remove('unread');
+        });
+        
+        // Actualizar badge
+        const badge = document.querySelector('.notification-badge');
+        if (badge) {
+            badge.style.display = 'none';
+        }
+        
+        console.log('Todas las notificaciones marcadas como leídas');
     });
     
-    searchInput.addEventListener('focus', function() {
-        if (this.value.trim().length > 0) {
-            searchResults.style.display = 'block';
+    // ========== CERRAR AL HACER CLICK FUERA ========== 
+    function setupClickOutside() {
+        document.addEventListener('click', function(e) {
+            // Cerrar búsqueda
+            if (elements.searchResults && 
+                !elements.searchResults.contains(e.target) && 
+                !elements.searchInput.contains(e.target)) {
+                elements.searchResults.style.display = 'none';
+            }
+            
+            // Cerrar notificaciones
+            if (elements.notificationsPanel && 
+                !elements.notificationsPanel.contains(e.target) && 
+                !e.target.closest('.btn-action')) {
+                elements.notificationsPanel.style.display = 'none';
+            }
+            
+            // Cerrar perfil
+            if (elements.perfilDropdown && 
+                !elements.perfilDropdown.contains(e.target) && 
+                !e.target.closest('.btn-perfil')) {
+                elements.perfilDropdown.style.display = 'none';
+            }
+        });
+        
+        // Cerrar con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (elements.searchResults) elements.searchResults.style.display = 'none';
+                if (elements.notificationsPanel) elements.notificationsPanel.style.display = 'none';
+                if (elements.perfilDropdown) elements.perfilDropdown.style.display = 'none';
+            }
+        });
+    }
+    
+    // ========== ABRIR SIDEBAR EN MÓVIL ========== 
+    window.abrirSidebarMovil = function() {
+        const sidebar = document.getElementById('barraLateralIzquierda');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        if (sidebar) {
+            sidebar.classList.add('mobile-open');
         }
+        if (overlay) {
+            overlay.classList.add('active');
+        }
+        
+        document.body.style.overflow = 'hidden';
+    };
+    
+    // ========== ACTUALIZAR BREADCRUMB ========== 
+    function updateBreadcrumb() {
+        const paginaActual = document.getElementById('paginaActual');
+        if (!paginaActual) return;
+        
+        // Obtener de la URL o título de la página
+        const path = window.location.pathname;
+        const segments = path.split('/').filter(Boolean);
+        
+        if (segments.length > 0) {
+            const ultimoSegmento = segments[segments.length - 1];
+            const nombrePagina = ultimoSegmento
+                .replace(/-/g, ' ')
+                .replace(/_/g, ' ')
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+            
+            paginaActual.textContent = nombrePagina || 'Dashboard';
+        }
+    }
+    
+    // Actualizar breadcrumb al cargar
+    updateBreadcrumb();
+    
+    // ========== ANIMACIÓN DE SCROLL ========== 
+    let lastScroll = 0;
+    window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.navbar-superior');
+        if (!navbar) return;
+        
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll > lastScroll && currentScroll > 100) {
+            // Scroll hacia abajo
+            navbar.style.transform = 'translateY(-100%)';
+        } else {
+            // Scroll hacia arriba
+            navbar.style.transform = 'translateY(0)';
+        }
+        
+        lastScroll = currentScroll;
     });
-}
-
-if (btnClearSearch) {
-    btnClearSearch.addEventListener('click', function() {
-        searchInput.value = '';
-        this.style.display = 'none';
-        cerrarBuscador();
-        searchInput.focus();
-    });
-}
-
-function mostrarResultadosBusqueda(query) {
-    const searchItems = document.getElementById('searchItems');
-    searchResults.style.display = 'block';
     
-    // Aquí puedes agregar lógica real de búsqueda
-    searchItems.innerHTML = `
-        <div class="search-item">
-            <i class="bi bi-search"></i>
-            <span>Buscando: "${query}"</span>
-        </div>
-        <div class="search-item">
-            <i class="bi bi-clock-history"></i>
-            <span>No hay resultados recientes</span>
-        </div>
-    `;
-}
-
-function cerrarBuscador() {
-    if (searchResults) {
-        searchResults.style.display = 'none';
-    }
-}
-
-// ========================================
-// FUNCIONES DE TEMA
-// ========================================
-
-function toggleTheme() {
-    const body = document.body;
-    const themeIcon = document.getElementById('themeIcon');
-    const isDark = body.classList.toggle('dark-theme');
+    // ========== FUNCIONES DE UTILIDAD ========== 
     
-    // Actualizar icono
-    if (themeIcon) {
-        themeIcon.className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
-    }
-    
-    // Guardar preferencia
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-}
-
-// Restaurar tema al cargar
-document.addEventListener('DOMContentLoaded', function() {
-    const savedTheme = localStorage.getItem('theme');
-    const themeIcon = document.getElementById('themeIcon');
-    
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-        if (themeIcon) {
-            themeIcon.className = 'bi bi-sun-fill';
+    // Agregar notificación programáticamente
+    window.agregarNotificacion = function(tipo, titulo, texto) {
+        const panelBody = document.querySelector('.notifications-panel .panel-body');
+        if (!panelBody) return;
+        
+        const iconos = {
+            success: { icon: 'bi-check-circle', bg: 'bg-success' },
+            warning: { icon: 'bi-exclamation-triangle', bg: 'bg-warning' },
+            info: { icon: 'bi-info-circle', bg: 'bg-info' }
+        };
+        
+        const config = iconos[tipo] || iconos.info;
+        
+        const item = document.createElement('div');
+        item.className = 'notification-item unread';
+        item.innerHTML = `
+            <div class="notification-icon ${config.bg}">
+                <i class="bi ${config.icon}"></i>
+            </div>
+            <div class="notification-content">
+                <p class="notification-title">${titulo}</p>
+                <p class="notification-text">${texto}</p>
+                <span class="notification-time">Ahora</span>
+            </div>
+        `;
+        
+        panelBody.insertBefore(item, panelBody.firstChild);
+        
+        // Actualizar badge
+        const badge = document.querySelector('.notification-badge');
+        if (badge) {
+            const count = parseInt(badge.textContent) || 0;
+            badge.textContent = count + 1;
+            badge.style.display = 'flex';
         }
-    }
-});
-
-// ========================================
-// RESPONSIVE - MANEJO DE VENTANA
-// ========================================
-
-let resizeTimeout;
-window.addEventListener('resize', function() {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(function() {
-        // Si es móvil y el sidebar está abierto, cerrarlo
-        if (window.innerWidth <= 768) {
-            cerrarSidebarMovil();
-        }
-    }, 250);
-});
-
-// ========================================
-// SCROLL NAVBAR
-// ========================================
-
-let lastScroll = 0;
-window.addEventListener('scroll', function() {
-    const navbar = document.getElementById('navbarSuperior');
-    const currentScroll = window.pageYOffset;
+    };
     
-    if (currentScroll > lastScroll && currentScroll > 100) {
-        // Scroll hacia abajo
-        navbar.style.transform = 'translateY(-100%)';
-    } else {
-        // Scroll hacia arriba
-        navbar.style.transform = 'translateY(0)';
-    }
+    // Ejemplo de uso:
+    // agregarNotificacion('success', 'Nueva cita', 'Max - Consulta general');
     
-    lastScroll = currentScroll;
-});
+})();
+
+// ========== EXPORTAR FUNCIONES GLOBALES ========== 
+window.NavbarSuperior = {
+    toggleTheme: window.toggleTheme,
+    toggleNotificaciones: window.toggleNotificaciones,
+    togglePerfilMenu: window.togglePerfilMenu,
+    abrirSidebarMovil: window.abrirSidebarMovil,
+    agregarNotificacion: window.agregarNotificacion
+};
