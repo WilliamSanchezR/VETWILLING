@@ -32,7 +32,10 @@ $datos = listarVeterinariasRegistradas();
 
     <!-- Tus CSS -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/styleTableAdmin.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
 
     <!-- CSS global -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
@@ -51,7 +54,7 @@ $datos = listarVeterinariasRegistradas();
     <!-- PANEL DERECHO -->
     <!-- Include de notificaciones -->
     <?php
-    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->

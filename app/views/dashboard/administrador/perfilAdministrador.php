@@ -27,8 +27,11 @@ $usuario = mostrarPerfil($id);
 
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/Perfil.css">
-
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
 
 </head>
@@ -40,7 +43,7 @@ $usuario = mostrarPerfil($id);
     include_once __DIR__ . '/../../layouts/sidebar_administrador.php';
 
     // <!-- PANEL DERECHO -->
-    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php';
+    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php';
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->

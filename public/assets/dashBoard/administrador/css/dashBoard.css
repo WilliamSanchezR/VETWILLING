@@ -20,43 +20,21 @@ body {
     background: var(--color-fondo);
 }
 
-.contenido-principal {
-    margin-left: var(--sidebar-width);
-    min-height: 100vh;
-    background-color: var(--color-fondo);
-    transition: margin-left var(--transition-normal);
-    position: relative;
-    padding: 50px 20px 20px 20px;
-    position: relative;
-    top: 40px;
-}
-
-/* Cuando el sidebar está colapsado */
-#sidebar.collapsed~.contenido-principal {
-    margin-left: var(--sidebar-collapsed-width);
-}
-
-/* Área de contenido interna */
 .area-contenido {
-    /* padding: var(--spacing-xl); */
-    width: 100%;
-    max-width: auto;
+    padding: 30px;
+    max-width: 1600px;
+    margin: 0 auto;
 }
-
-/* Clase auxiliar para compatibilidad (si existe en tu código) */
-.contenido-expandido {
-    margin-left: var(--sidebar-collapsed-width) !important;
-}
-
 
 /* BIENVENIDA ADMIN */
 .header-admin {
     background: linear-gradient(135deg, var(--color-principal) 0%, var(--color-principal-hover) 100%);
     border-radius: var(--radio-borde);
-    padding: 35px 10px;
+    padding: 35px 40px;
     color: white;
     margin-bottom: 30px;
     box-shadow: 0 8px 25px rgba(10, 147, 44, 0.3);
+    display: flex;
     justify-content: space-between;
     align-items: center;
 }
@@ -395,14 +373,10 @@ body {
     font-size: 14px;
     color: var(--color-texto);
 }
-
 .tabla-admin img {
-    width: 45px;
-    /* tamaño fijo para evitar que la celda crezca rara */
-    height: 45px;
-    /* mantiene la forma redonda */
-    object-fit: cover;
-    /* evita deformaciones */
+    width: 45px;       /* tamaño fijo para evitar que la celda crezca rara */
+    height: 45px;      /* mantiene la forma redonda */
+    object-fit: cover; /* evita deformaciones */
     border-radius: 50%;
     display: block;
 }

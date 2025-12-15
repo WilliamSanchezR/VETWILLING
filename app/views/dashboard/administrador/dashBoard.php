@@ -21,8 +21,13 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/nodoNoche.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/sidebar.css">
+
+
     <!-- CSS global -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
 
@@ -41,7 +46,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
     <!-- PANEL DERECHO -->
     <!-- aqui va el inclunde notifi -->
     <?php
-    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->

@@ -38,9 +38,12 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
         <!-- Propio -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
-
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoardVeterinariaStyle.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoardVeterinariaStyle.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
 
         <!-- Global Styles -->
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
@@ -59,7 +62,7 @@
         <!-- PANEL DERECHO -->
         <!-- Include de notificaciones -->
         <?php
-        // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+        include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
         ?>
 
         <!-- CONTENIDO PRINCIPAL -->
