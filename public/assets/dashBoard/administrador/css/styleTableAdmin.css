@@ -224,6 +224,10 @@
 /* ========================================
    7. BOTONES DE ACCIÓN
 ======================================== */
+.content-action{
+    width: 100px;
+}
+
 .btn-accion {
     background: none;
     border: none;

@@ -122,7 +122,7 @@ $datos = listarUsuarios();
                                     <td><?= $usuario['email'] ?></td>
                                     <td><?= $usuario['estado'] ?></td>
                                     <td><?= $usuario['rol'] ?></td>
-                                    <td>
+                                    <td class="content-action">
                                         <button class="btn-accion btn-editar" title="Editar">
                                             <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
