@@ -79,7 +79,7 @@
                 <span class="texto-seccion">Gestión</span>
             </div>
 
-            <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario" class="item-sidebar">
+            <a href="<?= BASE_URL ?>/veterinario/registrar-pacientes" class="item-sidebar">
                 <div class="item-icono">
                     <i class="bi bi-person-plus"></i>
                 </div>

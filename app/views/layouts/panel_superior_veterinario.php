@@ -9,13 +9,13 @@ $usuario = mostrarPerfil($id);
 
 <!-- Navbar Superior -->
 <div class="barra-navegacion-superior" id="navbarSuperior">
-    
+
     <!-- Sección Izquierda - Breadcrumb -->
     <div class="navegacion-izquierda">
         <button class="btn-menu-movil" onclick="abrirSidebarMovil()" aria-label="Abrir menú">
             <i class="bi bi-list"></i>
         </button>
-        
+
         <nav class="breadcrumb-container" aria-label="breadcrumb">
             <ol class="breadcrumb-custom">
                 <li class="breadcrumb-item">
@@ -36,17 +36,17 @@ $usuario = mostrarPerfil($id);
     <div class="buscador-navegacion">
         <div class="search-wrapper">
             <i class="bi bi-search search-icon"></i>
-            <input 
-                type="text" 
+            <input
+                type="text"
                 id="searchInput"
-                class="search-input" 
+                class="search-input"
                 placeholder="Buscar pacientes, citas, registros..."
                 autocomplete="off">
             <button class="btn-clear-search" id="btnClearSearch" style="display: none;">
                 <i class="bi bi-x-circle-fill"></i>
             </button>
         </div>
-        
+
         <!-- Resultados de búsqueda -->
         <div class="search-results" id="searchResults" style="display: none;">
             <div class="search-section">
@@ -60,7 +60,7 @@ $usuario = mostrarPerfil($id);
 
     <!-- Sección Derecha - Acciones -->
     <div class="acciones-navegacion">
-        
+
         <!-- Tema (Modo oscuro/claro) -->
         <div class="action-item" data-tooltip="Cambiar tema">
             <button class="btn-action" onclick="toggleTheme()" aria-label="Cambiar tema">
@@ -123,9 +123,8 @@ $usuario = mostrarPerfil($id);
         <div class="user-profile-container">
             <button class="btn-perfil" onclick="togglePerfilMenu()" aria-label="Menú de perfil">
                 <div class="avatar-usuario">
-                    <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>" 
-                         alt="<?= $usuario['nombres'] ?>"
-                         onerror="this.src='<?= BASE_URL ?>/public/assets/auth/img/default-avatar.png'">
+                    <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
+                        alt="<?= $usuario['nombres'] ?>">
                     <span class="status-indicator online"></span>
                 </div>
                 <div class="info-usuario">
@@ -139,8 +138,8 @@ $usuario = mostrarPerfil($id);
             <div class="perfil-dropdown" id="perfilDropdown" style="display: none;">
                 <div class="dropdown-header">
                     <div class="avatar-large">
-                        <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>" 
-                             alt="<?= $usuario['nombres'] ?>">
+                        <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
+                            alt="<?= $usuario['nombres'] ?>">
                     </div>
                     <div class="user-info-dropdown">
                         <h4><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h4>

@@ -31,6 +31,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+  
 </head>
 
 <body>
