@@ -286,10 +286,9 @@ switch ($request) {
         reporteVeterinario();
 
 
-    case '/reporte-mascotas':
-        require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
-        reporteMascotas();
-
+        // case '/reporte-mascotas':
+        //     require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
+        //     reporteMascotas();
         //     break;
 
     default:
@@ -298,9 +297,8 @@ switch ($request) {
         break;
 
 
-
-        // ---------------------------------------REPRESENTANTE-------------------------------------//
+    // ---------------------------------------REPRESENTANTE-------------------------------------//
     case '/representante/dashboard':
-        require BASE_PATH . '/app/views/dashboard/representante/dashboardRepresentante.php';    
+        require BASE_PATH . '/app/views/dashboard/representante/dashboardRepresentante.php';
         break;
 }
