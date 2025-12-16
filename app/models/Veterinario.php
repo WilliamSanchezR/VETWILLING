@@ -48,7 +48,7 @@ class Veterinario
             $resultadoVeterinario->bindParam(':nombres', $data['nombres']);
             $resultadoVeterinario->bindParam(':apellidos', $data['apellidos']);
             $resultadoVeterinario->bindParam(':telefono', $data['telefono']);
-            $img_perfil = $data['img_perfil'] ?? 'foto_default.png';
+            $img_perfil = $data['img_perfil'] ?? 'foto_default.jpg';
             $resultadoVeterinario->bindParam(':img_perfil', $img_perfil);
             $resultadoVeterinario->bindParam(':numero_licencia_profesional', $data['numero_licencia_profesional']);
             $resultadoVeterinario->bindParam(':id_veterinaria', $data['id_veterinaria'], PDO::PARAM_INT);
