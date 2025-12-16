@@ -1,59 +1,88 @@
-<div class="barra-lateral-izquierda" id="barraLateralIzquierda">
-    <div class="marca-sidebar">
-        <span class=""><img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-POSITIVO.png" alt="logo" class="logoDas" width="200">
-            <img src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/img/LOGO-VERTICAL-POSITIVA-DASHBOARD.png" alt="logo"
-                class="logoDas logo-icono-sidebar" width="40"></span>
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+    <!-- HEADER CON LOGO -->
+    <div class="sidebar-header">
+        <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-NEGATIVO.png"
+            alt="VetWilling"
+            class="sidebar-logo-full">
+
+        <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-VERTICAL-NEGATIVA.png"
+            alt="VW"
+            class="sidebar-logo-icon">
     </div>
 
+    <!-- NAVEGACIÓN -->
+    <nav class="sidebar-nav">
 
-    <div class="menu-sidebar">
-        <div class="seccion-sidebar">Menu</div>
-        <a href="<?= BASE_URL ?>/veterinaria/dashboard" class="item-sidebar active">
-            <i class="bi bi-speedometer2"></i>
-            <span class="texto-item-sidebar">Dashboard</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/seguimientos" class="item-sidebar">
-            <i class="bi bi-arrow-repeat"></i>
-            <span class="texto-item-sidebar">Seguimientos</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/calendario" class="item-sidebar">
-            <i class="bi bi-calendar3"></i>
-            <span class="texto-item-sidebar">Calendario</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinario/consultar-veterinario" class="item-sidebar">
-            <i class="bi bi-calendar-check"></i>
-            <span class="texto-item-sidebar">Citas</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/laboratorio" class="item-sidebar">
-            <i class="bi bi-flask"></i>
-            <span class="texto-item-sidebar">Laboratorio</span>
-        </a>
+        <div class="nav-section">
+            <span class="nav-section-title">General</span>
 
-        <div class="seccion-sidebar">Opciones</div>
-        <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario" class="item-sidebar">
-            <i class="bi bi-person-plus"></i>
-            <span class="texto-item-sidebar">Registro</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/gestion_clinica" class="item-sidebar">
-            <i class="bi bi-hospital"></i>
-            <span class="texto-item-sidebar">Gestión clínica</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/reportes" class="item-sidebar">
-            <i class="bi bi-file-earmark-text"></i>
-            <span class="texto-item-sidebar">Reportes</span>
-        </a>
-        <a href="<?= BASE_URL ?>/veterinaria/recetas" class="item-sidebar">
-            <i class="bi bi-receipt"></i>
-            <span class="texto-item-sidebar">Recetas</span>
-        </a>
-        <a href="<?= BASE_URL ?>/logout" class="item-sidebar">
-            <i class="bi bi-box-arrow-in-left"></i>
-            <span class="texto-item-sidebar">Cerrar Sesión</span>
-        </a>
-    </div>
+            <a href="<?= BASE_URL ?>/veterinaria/dashboard"
+                class="nav-item"
+                data-section="dashboard">
+                <i class="bi bi-house-door"></i>
+                <span class="nav-text">Inicio</span>
+            </a>
+            <a href="<?= BASE_URL ?>/veterinaria/seguimientos"
+                class="nav-item"
+                data-section="citas">
+                <i class="bi bi-card-checklist"></i>
+                <span class="nav-text">Seguimineto</span>
+            </a>
 
-    <button class="boton-colapsar" onclick="alternarBarraIzquierda()">
-        <i class="bi bi-chevron-left" id="iconoColapsar"></i>
+            <a href="<?= BASE_URL ?>/veterinaria/calendario"
+                class="nav-item"
+                data-section="tienda">
+                <i class="bi bi-calendar-week"></i>
+                <span class="nav-text">Calendario</span>
+            </a>
+            <a href="<?= BASE_URL ?>/veterinaria/gestion_clinica"
+                class="nav-item"
+                data-section="tienda">
+                <i class="bi bi-hospital"></i>
+                <span class="nav-text">Gestion Clinicas</span>
+            </a>
+            <a href="<?= BASE_URL ?>/veterinaria/laboratorio"
+                class="nav-item"
+                data-section="tienda">
+                <i class="bi bi-beaker"></i>
+                <span class="nav-text">Laboratorio</span>
+            </a>
+            <a href="<?= BASE_URL ?>/veterinaria/recetas"
+                class="nav-item"
+                data-section="tienda">
+                <i class="bi bi-journal-text"></i>
+                <span class="nav-text">Recetas</span>
+            </a>
+            <a href="<?= BASE_URL ?>/veterinaria/reportes"
+                class="nav-item"
+                data-section="tienda">
+                <i class="bi bi-bar-chart"></i>
+                <span class="nav-text">Reportes</span>
+            </a>
+            <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario"
+                class="nav-item"
+                data-section="tienda">
+                <i class="bi bi-clipboard-plus"></i>
+                <span class="nav-text">Registrar Veterinario</span>
+            </a>
+            <a href="<?= BASE_URL ?>/veterinario/consultar-veterinario"
+                class="nav-item"
+                data-section="tienda">
+                <i class="bi bi-search"></i>
+                <span class="nav-text">Consultar Veterinario</span>
+            </a>
+        </div>
+
+    </nav>
+
+    <!-- BOTÓN TOGGLE -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="bi bi-chevron-left"></i>
     </button>
-        
-</div>
+
+</aside>
+<script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>

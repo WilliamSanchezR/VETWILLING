@@ -27,7 +27,12 @@ $mascota = consultarMascotaId($id_mascota);
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/editaMas.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
+<<<<<<< HEAD
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
+=======
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
+
+>>>>>>> 16633142215270c74cab9e0c178b4c442d37b5eb
 </head>
 
 <body>
@@ -111,6 +116,131 @@ $mascota = consultarMascotaId($id_mascota);
                                     </label>
                                 </div>
                             </div>
+<<<<<<< HEAD
+=======
+
+
+                            <form id="formEditarBasico">
+
+                                <!-- NOMBRE -->
+                                <div class="form-group">
+                                    <label>
+                                        Nombre de la Mascota
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="nombre"
+                                        value="<?= $m['nombre'] ?>"
+                                        placeholder="Nombre de tu mascota"
+                                        required>
+                                </div>
+
+
+                                <!-- ESPECIE Y RAZA -->
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>
+                                            Especie
+                                            <span class="required">*</span>
+                                        </label>
+                                        <select id="especie" required>
+                                            <option value="perro" selected>🐕 Perro</option>
+                                            <option value="gato">🐈 Gato</option>
+                                            <option value="ave">🦜 Ave</option>
+                                            <option value="conejo">🐰 Conejo</option>
+                                            <option value="otro">🐾 Otro</option>
+                                        </select>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label>
+                                            Raza
+                                            <span class="required">*</span>
+                                        </label>
+                                        <select id="raza" required>
+                                            <option value="golden" selected>Golden Retriever</option>
+                                            <option value="labrador">Labrador</option>
+                                            <option value="pastor">Pastor Alemán</option>
+                                            <option value="bulldog">Bulldog</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <!-- EDAD Y SEXO -->
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>
+                                            Edad
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div style="display: flex; gap: 10px;">
+                                            <input
+                                                type="number"
+                                                id="edad"
+                                                value="<?= $m['edad'] ?>"
+                                                min="0"
+                                                max="50"
+                                                style="flex: 2;"
+                                                required>
+                                            <select id="edadUnidad" style="flex: 1;">
+                                                <option value="meses">Meses</option>
+                                                <option value="años" selected>Años</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label>
+                                            Sexo
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="radio-group">
+                                            <div class="radio-option">
+                                                <input type="radio" name="<?= $m['sexo'] ?>" id="macho" value="macho" checked>
+                                                <label for="macho" class="radio-label">
+                                                    <i class="bi bi-gender-male"></i>
+                                                    Macho
+                                                </label>
+                                            </div>
+                                            <div class="radio-option">
+                                                <input type="radio" name="<?= $m['sexo'] ?>" id="hembra" value="hembra">
+                                                <label for="hembra" class="radio-label">
+                                                    <i class="bi bi-gender-female"></i>
+                                                    Hembra
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- COLOR Y PESO -->
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Color</label>
+                                        <input
+                                            type="text"
+                                            id="color"
+                                            value="<?= $m['color'] ?? ''  ?>"
+                                            placeholder="Color del pelaje">
+                                    </div>
+
+
+                                    <!-- OBSERVACIONES -->
+                                    <div class="form-group">
+                                        <label>Observaciones</label>
+                                        <textarea
+                                            id="observaciones"
+                                            placeholder="Información adicional, comportamiento, características especiales...">Mascota muy juguetona y sociable con niños.</textarea>
+                                    </div>
+
+
+                            </form>
+>>>>>>> 16633142215270c74cab9e0c178b4c442d37b5eb
                         </div>
 
                         <!-- NOMBRE -->
@@ -468,7 +598,7 @@ $mascota = consultarMascotaId($id_mascota);
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
 
     <script>
         // Preview Foto

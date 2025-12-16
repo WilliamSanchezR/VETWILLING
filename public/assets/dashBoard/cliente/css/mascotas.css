@@ -37,7 +37,7 @@ body {
 }
 
 .header-titulo .badge-count {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #087a24);
     color: white;
     padding: 8px 16px;
     border-radius: 20px;
@@ -46,7 +46,7 @@ body {
 }
 
 .btn-agregar {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #087a24);
     color: white;
     padding: 12px 24px;
     border: none;
@@ -96,7 +96,7 @@ body {
 
 .search-box input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #0A932C;
 }
 
 .search-box i {
@@ -120,8 +120,8 @@ body {
 
 .filter-btn:hover,
 .filter-btn.active {
-    border-color: #667eea;
-    background: #667eea;
+    border-color: #0A932C;
+    background: #0A932C;
     color: white;
 }
 
@@ -151,7 +151,7 @@ body {
 
 /* HEADER DE TARJETA */
 .mascota-card-header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #087a24);
     padding: 30px 25px;
     position: relative;
     display: flex;
@@ -260,7 +260,7 @@ body {
 .info-icon {
     width: 35px;
     height: 35px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #087a24);
     color: white;
     border-radius: 8px;
     display: flex;
@@ -438,7 +438,7 @@ body {
 }
 
 .action-btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #087a24);
     color: white;
 }
 

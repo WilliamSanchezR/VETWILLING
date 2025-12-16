@@ -20,11 +20,11 @@ function reporteVeterinario()
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_veterinarios.pdf', false);
-
+    reporteVeterinario();
 
 }
 
-    reporteVeterinario();
+
 
 
 // function reportePropietariosPDF()
@@ -87,6 +87,6 @@ function reporteMascotas()
 
     generarPDF($html, 'reporte_mascotas.pdf', false);
 
- reporteMascotas();
+
 }
-   
+    reporteMascotas();

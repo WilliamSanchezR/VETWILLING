@@ -91,12 +91,12 @@ class Veterinaria
         try {
             $consulta = "UPDATE veterinaria 
                          SET foto = :foto,
-                             nit = :nit, 
                              nombre = :nombre, 
                              direccion = :direccion, 
-                             ciudad = :ciudad, 
                              telefono = :telefono, 
                              email = :email, 
+                             nit = :nit, 
+                             ciudad = :ciudad, 
                              estado = :estado
                          WHERE id_veterinaria = :id_veterinaria";
 

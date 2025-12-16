@@ -1,45 +1,65 @@
-// JavaScript para el funcionamiento del submenú desplegable de usuario
-document.querySelectorAll('.submenu-toggle').forEach(toggle => {
-    toggle.addEventListener('click', e => {
-        e.preventDefault();
-        const parent = toggle.closest('.submenu');
-        parent.classList.toggle('open');
-    });
-});
+
+class MenuAdministrador {
+    constructor() {
+        document.addEventListener('DOMContentLoaded', () => this.init());
+    }
+
+    init() {
+        this.cacheDom();
+        this.bindEvents();
+        this.restoreSidebarState();
+    }
+
+    cacheDom() {
+        this.sidebar = document.getElementById("sidebar");
+        this.sidebarToggle = document.getElementById("sidebarToggle");
+        this.subMenu = document.querySelectorAll('.submenu-toggle');
+    }
 
 
-// Resaltar el item activo basado en la URL
-document.addEventListener('DOMContentLoaded', function () {
-    // Seleccionar todos los submenús
-    const submenus = document.querySelectorAll('.submenu');
 
-    submenus.forEach(submenu => {
-        const toggle = submenu.querySelector('.submenu-toggle');
 
-        toggle.addEventListener('click', function (e) {
-            e.preventDefault();
+    bindEvents() {
 
-            // Cerrar otros submenús (opcional, comenta estas líneas si quieres múltiples abiertos)
-            submenus.forEach(otroSubmenu => {
-                if (otroSubmenu !== submenu) {
-                    otroSubmenu.classList.remove('activo');
-                }
+        // Toggle sidebar
+        if (this.sidebarToggle)
+            this.sidebarToggle.addEventListener("click", () => this.toggleSidebar());
+
+        if (this.subMenu) {
+            this.subMenu.forEach(toggle => {
+                toggle.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (document.getElementById("sidebar").classList.contains("collapsed")) {
+                        document.querySelectorAll('.view-modal-menu').forEach(menu => {
+                            menu.classList.remove('view-modal-menu');
+                        });
+
+                         const parent = toggle.closest('.submenu');
+                        parent.classList.toggle('view-modal-menu');
+                    } else {
+                        const parent = toggle.closest('.submenu');
+                        parent.classList.toggle('open');
+                    }
+                });
             });
-
-            // Alternar el submenú actual
-            submenu.classList.toggle('activo');
-        });
-    });
-
-    // Marcar el item activo según la URL actual
-    const urlActual = window.location.href;
-    const enlacesSubmenu = document.querySelectorAll('.submenu-items a');
-
-    enlacesSubmenu.forEach(enlace => {
-        if (urlActual.includes(enlace.getAttribute('href'))) {
-            enlace.classList.add('activo');
-            // Abrir el submenú padre
-            enlace.closest('.submenu').classList.add('activo');
         }
-    });
-});
+    }
+
+    toggleSidebar() {
+        this.sidebar.classList.toggle("collapsed");
+        this.content?.classList.toggle("contenido-expandido");
+
+        // guardar en localStorage
+        localStorage.setItem("sidebarCollapsed", this.sidebar.classList.contains("collapsed"));
+    }
+
+    restoreSidebarState() {
+        const collapsed = localStorage.getItem("sidebarCollapsed") === "true";
+        if (collapsed) {
+            this.sidebar.classList.add("collapsed");
+            this.content?.classList.add("contenido-expandido");
+        }
+    }
+}
+
+new MenuAdministrador();

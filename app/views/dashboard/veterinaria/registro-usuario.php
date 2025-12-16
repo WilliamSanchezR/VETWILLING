@@ -43,7 +43,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
         <!-- NAVBAR SUPERIOR -->
         <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php';
+        // include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php';
         ?>
 
         <!-- ÁREA DE CONTENIDO -->

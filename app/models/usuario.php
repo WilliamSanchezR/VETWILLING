@@ -12,9 +12,9 @@ class Usuario
         $this->conexion = $db->getConexion();
     }
 
-// =========================================
-//  FUNCIONES CRUD
-// =========================================
+    // =========================================
+    //  FUNCIONES CRUD
+    // =========================================
 
     // FUNCION PARA REGISTRAR UN NUEVO USUARIO
     public function registrar($data)
@@ -68,7 +68,7 @@ class Usuario
                 $stmt->bindParam(':numero_documento', $data['numero_documento']);
                 $stmt->bindParam(':nombres', $data['nombres']);
                 $stmt->bindParam(':apellidos', $data['apellidos']);
-                $stmt->bindParam(':telefono', $data['telefono']);                
+                $stmt->bindParam(':telefono', $data['telefono']);
                 $stmt->bindParam(':img_perfil', $data['img_perfil']);
                 $stmt->bindParam(':nivel_acceso', $data['nivel_acceso']);
 
@@ -141,7 +141,7 @@ class Usuario
 
             // ADMIN
             $sqlAdmin = "SELECT adm.id_usuario, adm.tipo_documento, adm.numero_documento,
-                adm.nombres, adm.apellidos, adm.telefono, us.email, us.estado, rol.id_rol, adm.direccion
+                adm.nombres, adm.apellidos, adm.telefono, us.email, us.estado, rol.id_rol, rol.nombre as rol_name, adm.direccion
                 FROM usuario us
                 INNER JOIN administrador adm ON us.id_usuario = adm.id_usuario
                 INNER JOIN rol ON us.id_rol = rol.id_rol
@@ -156,7 +156,7 @@ class Usuario
 
             // REPRESENTANTE LEGAL
             $sqlRep = "SELECT rep.id_usuario, rep.tipo_documento, rep.numero_documento,
-                rep.nombres, rep.apellidos, rep.telefono, us.email, us.estado, rol.id_rol, rep.id_veterinaria
+                rep.nombres, rep.apellidos, rep.telefono, us.email, us.estado, rol.id_rol, rol.nombre as rol_name, rep.id_veterinaria, rep.direccion
                 FROM usuario us
                 INNER JOIN representante_legal rep ON us.id_usuario = rep.id_usuario
                 INNER JOIN rol ON us.id_rol = rol.id_rol
@@ -215,7 +215,8 @@ class Usuario
                 numero_documento = :numero_documento,
                 nombres = :nombres,
                 apellidos = :apellidos,
-                telefono = :telefono
+                telefono = :telefono,
+                direccion = :direccion
                 WHERE id_usuario = :id_usuario";
             // Preparar y ejecutar la consulta
             $stmt3 = $this->conexion->prepare($sqlRep);
@@ -226,6 +227,7 @@ class Usuario
             $stmt3->bindParam(':nombres', $data['nombres']);
             $stmt3->bindParam(':apellidos', $data['apellidos']);
             $stmt3->bindParam(':telefono', $data['telefono']);
+            $stmt3->bindParam(':direccion', $data['direccion']);
 
             return $stmt3->execute();
         } catch (PDOException $e) {
@@ -291,7 +293,7 @@ class Usuario
     }
 
     // FUNCION PARA ACTUALIZAR LA FOTO DE PERFIL DEL USUARIO    
-    public function actualizarFotoPerfil($data) 
+    public function actualizarFotoPerfil($data)
     {
         // Actualizamos la foto de perfil del usuario
         try {
@@ -319,6 +321,46 @@ class Usuario
             return $stmt2->execute();
         } catch (PDOException $e) {
             error_log("Error en Usuario::actualizarFotoPerfil -> " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function consultarUsuarioTicket($id)
+    {
+        // Consultamos un usuario por su ID
+        try {
+
+            // ADMIN
+            $sqlAdmin = "SELECT adm.id_usuario, adm.tipo_documento, adm.numero_documento,
+                adm.nombres, adm.apellidos, adm.telefono, us.email, us.estado, rol.id_rol, rol.nombre as rol_name, adm.direccion
+                FROM usuario us
+                INNER JOIN administrador adm ON us.id_usuario = adm.id_usuario
+                INNER JOIN rol ON us.id_rol = rol.id_rol
+                WHERE us.id_usuario = :id LIMIT 1";
+            // Preparar y ejecutar la consulta
+            $stmt = $this->conexion->prepare($sqlAdmin);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            $data = $stmt->fetch();
+            // Verificamos si se obtuvo el usuario
+            if ($data) return $data;
+
+            // REPRESENTANTE LEGAL
+            $sqlRep = "SELECT rep.id_usuario, rep.tipo_documento, rep.numero_documento,
+                rep.nombres, rep.apellidos, rep.telefono, us.email, us.estado, rol.id_rol, rol.nombre as rol_name, rep.id_veterinaria, rep.direccion, vet.nombre as nombre_veterinaria
+                FROM usuario us
+                INNER JOIN representante_legal rep ON us.id_usuario = rep.id_usuario
+                INNER JOIN rol ON us.id_rol = rol.id_rol
+                INNER JOIN veterinaria vet on rep.id_veterinaria = vet.id_veterinaria
+                WHERE us.id_usuario = :id LIMIT 1";
+
+            // Preparar y ejecutar la consulta
+            $stmt2 = $this->conexion->prepare($sqlRep);
+            $stmt2->bindParam(':id', $id);
+            $stmt2->execute();
+            return $stmt2->fetch();
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::consultarUsuario -> " . $e->getMessage());
             return false;
         }
     }

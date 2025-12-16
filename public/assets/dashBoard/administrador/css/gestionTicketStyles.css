@@ -1,0 +1,41 @@
+.infoTicket {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+   
+}
+
+.infoTicket .card {
+     padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.content-ticket {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    font-size: 15px;
+}
+
+.label-ticket {
+    font-weight: bold;
+    color: #333;
+}
+
+.ticket-description {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ticket-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-user-info .content-ticket {
+    padding-top: 25px;
+}

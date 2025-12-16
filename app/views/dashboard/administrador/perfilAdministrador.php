@@ -27,10 +27,10 @@ $usuario = mostrarPerfil($id);
 
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/perfilAdminStyles.css">
+    
+    
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
 
@@ -41,9 +41,6 @@ $usuario = mostrarPerfil($id);
     <?php
     // <!-- BARRA LATERAL IZQUIERDA -->
     include_once __DIR__ . '/../../layouts/sidebar_administrador.php';
-
-    // <!-- PANEL DERECHO -->
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php';
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -187,9 +184,6 @@ $usuario = mostrarPerfil($id);
             crossorigin="anonymous"></script>
 
         <!-- Propio -->
-
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/perfil.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/perfilAdministrado.js"></script>

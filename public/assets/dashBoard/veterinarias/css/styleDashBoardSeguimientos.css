@@ -1,716 +1,895 @@
- /* ========================================
-           ESTILOS ESPECÍFICOS PARA SEGUIMIENTOS
-           ======================================== */
-
-        /* Barra de filtros */
-        .barra-filtros-seguimiento {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .boton-filtro-seg {
-            padding: 10px 20px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            border-radius: 8px;
-            font-size: var(--fs-titulo4);
-            color: var(--color-gris);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .boton-filtro-seg:hover {
-            background: #f8fafc;
-        }
-
-        .boton-filtro-seg.active {
-            background: var(--color-primario);
-            color: white;
-            border-color: var(--color-primario);
-        }
-
-        .boton-nuevo-seguimiento {
-            padding: 10px 20px;
-            background: var(--color-primario);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: var(--fs-titulo4);
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .boton-nuevo-seguimiento:hover {
-            background: #0d7a24;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(10, 147, 44, 0.3);
-        }
-
-        /* Tarjetas de estadísticas */
-        .tarjeta-stat-seguimiento {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-        }
-
-        .tarjeta-stat-seguimiento:hover {
-            transform: translateY(-4px);
-        }
-
-        .icono-stat-seg {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--fs-titulo2);
-        }
-
-        .info-stat-seg h3 {
-            font-size: var(--fs-titulo1);
-            color: var(--color-gris);
-            margin: 0;
-        }
-
-        .info-stat-seg p {
-            font-size: var(--fs-titulo4);
-            color: #94a3b8;
-            margin: 0;
-        }
-
-        /* Contenedor tabla seguimientos */
-        .contenedor-tabla-seguimientos {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .encabezado-tabla-seg {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .encabezado-tabla-seg h5 {
-            font-size: var(--fs-titulo3);
-            color: var(--color-gris);
-            margin: 0;
-        }
-
-        .select-ordenar {
-            padding: 8px 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: var(--fs-titulo4);
-            color: var(--color-gris);
-            cursor: pointer;
-        }
-
-        /* Lista de seguimientos */
-        .lista-seguimientos {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        /* Card de seguimiento */
-        .card-seguimiento {
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .card-seguimiento:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-
-        .card-seguimiento.critico {
-            border-left: 6px solid #ef4444;
-            background: linear-gradient(to right, #fef2f2, white);
-        }
-
-        .card-seguimiento.activo {
-            border-left: 6px solid #22c55e;
-        }
-
-        /* Header del seguimiento */
-        .header-seguimiento {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .info-paciente-seg {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .avatar-seg {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px solid var(--color-verde);
-        }
-
-        .info-paciente-seg h6 {
-            font-size: var(--fs-titulo3);
-            color: var(--color-gris);
-            margin: 0;
-        }
-
-        .tipo-paciente {
-            font-size: var(--fs-texto1);
-            color: #94a3b8;
-        }
-
-        .badges-seguimiento {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .badge-prioridad {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: var(--fs-texto1);
-            font-weight: 600;
-        }
-
-        .badge-prioridad.critica {
-            background: #fee2e2;
-            color: #ef4444;
-        }
-
-        .badge-prioridad.media {
-            background: #fef3c7;
-            color: #f59e0b;
-        }
-
-        .badge-prioridad.baja {
-            background: #dbeafe;
-            color: #3b82f6;
-        }
-
-        .badge-tipo {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: var(--fs-texto1);
-            font-weight: 600;
-            background: #f1f5f9;
-            color: var(--color-gris);
-        }
-
-        .badge-tipo.post-operatorio {
-            background: #fef3c7;
-            color: #f59e0b;
-        }
-
-        .badge-tipo.tratamiento {
-            background: #dbeafe;
-            color: #3b82f6;
-        }
-
-        .badge-tipo.preventivo {
-            background: #dcfce7;
-            color: #22c55e;
-        }
-
-        /* Body del seguimiento */
-        .body-seguimiento {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .diagnostico-seg,
-        .tratamiento-seg,
-        .doctor-seg {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: var(--fs-titulo4);
-            color: var(--color-gris);
-        }
-
-        .diagnostico-seg i,
-        .tratamiento-seg i,
-        .doctor-seg i {
-            color: var(--color-primario);
-            font-size: var(--fs-titulo3);
-        }
-
-        /* Progreso del seguimiento */
-        .progreso-seguimiento {
-            margin-bottom: 20px;
-        }
-
-        .label-progreso {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            font-size: var(--fs-titulo4);
-            color: var(--color-gris);
-        }
-
-        .porcentaje-prog {
-            font-weight: 700;
-            color: var(--color-primario);
-        }
-
-        .barra-progreso-seg {
-            height: 12px;
-            background: #f1f5f9;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .fill-progreso {
-            height: 100%;
-            background: linear-gradient(90deg, var(--color-primario), var(--color-verde));
-            border-radius: 6px;
-            transition: width 0.5s ease;
-        }
-
-        /* Timeline del seguimiento */
-        .timeline-seguimiento {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 20px;
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 8px;
-        }
-
-        .evento-timeline {
-            display: flex;
-            gap: 12px;
-            align-items: start;
-        }
-
-        .punto-evento {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            margin-top: 4px;
-        }
-
-        .punto-evento.completado {
-            background: #22c55e;
-            box-shadow: 0 0 0 4px #dcfce7;
-        }
-
-        .punto-evento.activo {
-            background: #f59e0b;
-            box-shadow: 0 0 0 4px #fef3c7;
-            animation: pulse 2s infinite;
-        }
-
-        .punto-evento.pendiente {
-            background: #cbd5e1;
-            border: 3px solid white;
-            box-shadow: 0 0 0 2px #cbd5e1;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .info-evento {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .info-evento strong {
-            font-size: var(--fs-titulo4);
-            color: var(--color-gris);
-        }
-
-        .info-evento span {
-            font-size: var(--fs-texto1);
-            color: #94a3b8;
-        }
-
-        /* Medicaciones activas */
-        .medicaciones-activas {
-            margin-bottom: 20px;
-            padding: 16px;
-            background: #f0fdf4;
-            border-radius: 8px;
-            border-left: 4px solid var(--color-primario);
-        }
-
-        .titulo-medicaciones {
-            font-size: var(--fs-titulo4);
-            font-weight: 600;
-            color: var(--color-gris);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .lista-medicaciones {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .item-medicacion {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .nombre-med {
-            font-size: var(--fs-titulo4);
-            font-weight: 600;
-            color: var(--color-gris);
-        }
-
-        .dosis-med {
-            font-size: var(--fs-texto1);
-            color: #64748b;
-        }
-
-        .proxima-dosis {
-            font-size: var(--fs-texto1);
-            color: var(--color-primario);
-            font-weight: 600;
-        }
-
-        /* Próximas acciones */
-        .proximas-acciones {
-            margin-bottom: 20px;
-            padding: 16px;
-            background: #eff6ff;
-            border-radius: 8px;
-            border-left: 4px solid #3b82f6;
-        }
-
-        .titulo-acciones {
-            font-size: var(--fs-titulo4);
-            font-weight: 600;
-            color: var(--color-gris);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .lista-acciones {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .item-accion {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: var(--fs-titulo4);
-            color: var(--color-gris);
-        }
-
-        .item-accion i {
-            font-size: 8px;
-        }
-
-        /* Footer del seguimiento */
-        .footer-seguimiento {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .btn-accion-seg {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: var(--fs-titulo4);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-actualizar {
-            background: #dbeafe;
-            color: #3b82f6;
-        }
-
-        .btn-actualizar:hover {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-detalles {
-            background: #f1f5f9;
-            color: var(--color-gris);
-        }
-
-        .btn-detalles:hover {
-            background: var(--color-gris);
-            color: white;
-        }
-
-        .btn-nota {
-            background: #fef3c7;
-            color: #f59e0b;
-        }
-
-        .btn-nota:hover {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .btn-completar {
-            background: #dcfce7;
-            color: #22c55e;
-        }
-
-        .btn-completar:hover {
-            background: #22c55e;
-            color: white;
-        }
-
-        /* Panel derecho - Alertas */
-        .alerta-seguimiento {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .alerta-seguimiento:hover {
-            transform: translateX(4px);
-        }
-
-        .alerta-seguimiento.urgente {
-            background: #fef2f2;
-            border-left: 4px solid #ef4444;
-        }
-
-        .alerta-seguimiento.advertencia {
-            background: #fffbeb;
-            border-left: 4px solid #f59e0b;
-        }
-
-        .alerta-seguimiento.normal {
-            background: #f0fdf4;
-            border-left: 4px solid #22c55e;
-        }
-
-        .icono-alerta {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--fs-titulo4);
-        }
-
-        .alerta-seguimiento.urgente .icono-alerta {
-            background: white;
-            color: #ef4444;
-        }
-
-        .alerta-seguimiento.advertencia .icono-alerta {
-            background: white;
-            color: #f59e0b;
-        }
-
-        .alerta-seguimiento.normal .icono-alerta {
-            background: white;
-            color: #22c55e;
-        }
-
-        .titulo-alerta {
-            font-size: var(--fs-titulo4);
-            font-weight: 600;
-            color: var(--color-gris);
-        }
-
-        .detalle-alerta {
-            font-size: var(--fs-texto1);
-            color: #64748b;
-        }
-
-        /* Pacientes críticos */
-        .paciente-critico {
-            display: flex;
-            gap: 12px;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        .avatar-critico {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid var(--color-primario);
-        }
-
-        .info-critico {
-            flex: 1;
-        }
-
-        .nombre-critico {
-            font-size: var(--fs-titulo4);
-            font-weight: 600;
-            color: var(--color-gris);
-        }
-
-        .estado-critico {
-            font-size: var(--fs-texto1);
-            color: #64748b;
-            margin-bottom: 8px;
-        }
-
-        .progreso-critico {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .barra-progreso-critico {
-            flex: 1;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progreso-fill {
-            height: 100%;
-            background: var(--color-primario);
-            border-radius: 3px;
-        }
-
-        .porcentaje-critico {
-            font-size: var(--fs-texto1);
-            font-weight: 600;
-            color: var(--color-primario);
-            min-width: 35px;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .barra-filtros-seguimiento {
-                padding: 16px;
-            }
-
-            .boton-filtro-seg,
-            .boton-nuevo-seguimiento {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .tarjeta-stat-seguimiento {
-                padding: 16px;
-            }
-
-            .icono-stat-seg {
-                width: 50px;
-                height: 50px;
-                font-size: var(--fs-titulo3);
-            }
-
-            .info-stat-seg h3 {
-                font-size: var(--fs-titulo2);
-            }
-
-            .card-seguimiento {
-                padding: 16px;
-            }
-
-            .header-seguimiento {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .timeline-seguimiento {
-                padding: 12px;
-            }
-
-            .footer-seguimiento {
-                flex-direction: column;
-            }
-
-            .btn-accion-seg {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .avatar-seg {
-                width: 50px;
-                height: 50px;
-            }
-
-            .info-paciente-seg h6 {
-                font-size: var(--fs-titulo4);
-            }
-
-            .body-seguimiento {
-                font-size: var(--fs-texto1);
-            }
-
-            .item-medicacion {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .evento-timeline {
-                gap: 8px;
-            }
-
-            .punto-evento {
-                width: 12px;
-                height: 12px;
-            }
-        }
+/* ============================================
+   CSS SEGUIMIENTOS - SISTEMA VETERINARIO
+   ============================================ */
+
+:root {
+    /* Colores principales */
+    --color-primario: #0a932c;
+    --color-verde: #9de795;
+    --color-gris: #424b54;
+    --color-azul: #93bedf;
+    --color-fondo: #f8f9fa;
+
+    /* Colores complementarios */
+    --color-blanco: #ffffff;
+    --color-texto-oscuro: #2c3e50;
+    --color-texto-medio: #6c757d;
+    --color-texto-claro: #999999;
+    --color-borde: #e0e0e0;
+
+    /* Estados */
+    --color-success: #28a745;
+    --color-warning: #ffc107;
+    --color-danger: #dc3545;
+    --color-info: #17a2b8;
+
+    /* Prioridades */
+    --color-critico: #dc3545;
+    --color-alta: #ff6b6b;
+    --color-media: #ffa726;
+    --color-baja: #66bb6a;
+
+    /* Tamaños de fuente */
+    --fs-titulo1: 32px;
+    --fs-titulo2: 24px;
+    --fs-titulo3: 16px;
+    --fs-titulo4: 14px;
+    --fs-texto: 20px;
+    --fs-texto1: 12px;
+
+    /* Espaciado */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+
+    /* Sombras */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+
+    /* Sidebar */
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 80px;
+}
+
+
+/* ============================================
+   CONTENIDO PRINCIPAL - ADAPTACIÓN SIDEBAR
+   ============================================ */
+* {
+    scrollbar-width: none;
+}
+
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    background-color: var(--color-fondo);
+    transition: margin-left var(--transition-normal);
+}
+
+#sidebar.collapsed~.contenido-principal {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+.area-contenido {
+    padding: var(--spacing-xl);
+    padding-top: calc(70px + var(--spacing-xl));
+}
+
+@media (max-width: 768px) {
+    .contenido-principal {
+        margin-left: 0 !important;
+    }
+
+    .area-contenido {
+        padding: var(--spacing-md);
+        padding-top: calc(60px + var(--spacing-md));
+    }
+}
+
+
+/* ============================================
+   BARRA DE FILTROS
+   ============================================ */
+.barra-filtros-seguimiento {
+    background: var(--color-blanco);
+    border-radius: 12px;
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.boton-filtro-seg {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    background: var(--color-blanco);
+    color: var(--color-texto-oscuro);
+    font-weight: 600;
+    font-size: var(--fs-titulo4);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    transition: all var(--transition-normal);
+}
+
+.boton-filtro-seg:hover {
+    border-color: var(--color-verde);
+    background: rgba(157, 231, 149, 0.1);
+    transform: translateY(-2px);
+}
+
+.boton-filtro-seg.active {
+    background: linear-gradient(135deg, var(--color-primario) 0%, #087d24 100%);
+    border-color: var(--color-primario);
+    color: var(--color-blanco);
+    box-shadow: var(--shadow-sm);
+}
+
+.boton-nuevo-seguimiento {
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, var(--color-primario) 0%, #087d24 100%);
+    color: var(--color-blanco);
+    font-weight: 600;
+    font-size: var(--fs-titulo4);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+}
+
+.boton-nuevo-seguimiento:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(10, 147, 44, 0.3);
+}
+
+
+/* ============================================
+   TARJETAS DE ESTADÍSTICAS
+   ============================================ */
+.tarjeta-stat-seguimiento {
+    background: var(--color-blanco);
+    border-radius: 12px;
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: all var(--transition-normal);
+    border: 1px solid transparent;
+    height: 100%;
+}
+
+.tarjeta-stat-seguimiento:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-verde);
+}
+
+.icono-stat-seg {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.bg-primary-soft {
+    background: rgba(13, 110, 253, 0.1);
+}
+
+.bg-danger-soft {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.bg-warning-soft {
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.bg-success-soft {
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.info-stat-seg h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-texto-oscuro);
+    margin: 0;
+}
+
+.info-stat-seg p {
+    font-size: var(--fs-titulo4);
+    color: var(--color-texto-medio);
+    margin: 0;
+}
+
+
+/* ============================================
+   CONTENEDOR DE TABLA
+   ============================================ */
+.contenedor-tabla-seguimientos {
+    background: var(--color-blanco);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.encabezado-tabla-seg {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-bottom: 2px solid var(--color-borde);
+}
+
+.encabezado-tabla-seg h5 {
+    margin: 0;
+    font-size: var(--fs-titulo2);
+    font-weight: 700;
+    color: var(--color-texto-oscuro);
+}
+
+.select-ordenar {
+    padding: 0.6rem 1rem;
+    border: 2px solid var(--color-borde);
+    border-radius: 8px;
+    font-size: var(--fs-titulo4);
+    color: var(--color-texto-oscuro);
+    background: var(--color-blanco);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.select-ordenar:hover {
+    border-color: var(--color-verde);
+}
+
+.select-ordenar:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.1);
+}
+
+
+/* ============================================
+   LISTA DE SEGUIMIENTOS
+   ============================================ */
+.lista-seguimientos {
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+
+/* ============================================
+   CARD DE SEGUIMIENTO
+   ============================================ */
+.card-seguimiento {
+    background: var(--color-blanco);
+    border: 2px solid var(--color-borde);
+    border-radius: 12px;
+    padding: var(--spacing-lg);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-seguimiento::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    transition: all var(--transition-normal);
+}
+
+.card-seguimiento.critico::before {
+    background: var(--color-critico);
+}
+
+.card-seguimiento.activo::before {
+    background: var(--color-primario);
+}
+
+.card-seguimiento.completado::before {
+    background: var(--color-success);
+}
+
+.card-seguimiento:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-verde);
+}
+
+
+/* ============================================
+   HEADER DEL SEGUIMIENTO
+   ============================================ */
+.header-seguimiento {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.info-paciente-seg {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.avatar-seg {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 3px solid var(--color-verde);
+    box-shadow: var(--shadow-sm);
+}
+
+.info-paciente-seg h6 {
+    margin: 0;
+    font-size: var(--fs-titulo3);
+    font-weight: 700;
+    color: var(--color-texto-oscuro);
+}
+
+.tipo-paciente {
+    font-size: var(--fs-texto1);
+    color: var(--color-texto-medio);
+    display: block;
+    margin-top: var(--spacing-xs);
+}
+
+.badges-seguimiento {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+
+/* ============================================
+   BADGES
+   ============================================ */
+.badge-prioridad,
+.badge-tipo {
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: var(--fs-texto1);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Badges de Prioridad */
+.badge-prioridad.critica {
+    background: rgba(220, 53, 69, 0.15);
+    color: var(--color-critico);
+    border: 2px solid rgba(220, 53, 69, 0.3);
+}
+
+.badge-prioridad.alta {
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--color-alta);
+    border: 2px solid rgba(255, 107, 107, 0.3);
+}
+
+.badge-prioridad.media {
+    background: rgba(255, 167, 38, 0.15);
+    color: var(--color-media);
+    border: 2px solid rgba(255, 167, 38, 0.3);
+}
+
+.badge-prioridad.baja {
+    background: rgba(102, 187, 106, 0.15);
+    color: var(--color-baja);
+    border: 2px solid rgba(102, 187, 106, 0.3);
+}
+
+/* Badges de Tipo */
+.badge-tipo {
+    background: rgba(10, 147, 44, 0.1);
+    color: var(--color-primario);
+    border: 2px solid rgba(10, 147, 44, 0.2);
+}
+
+.badge-tipo.post-operatorio {
+    background: rgba(220, 53, 69, 0.1);
+    color: var(--color-danger);
+    border: 2px solid rgba(220, 53, 69, 0.2);
+}
+
+.badge-tipo.preventivo {
+    background: rgba(23, 162, 184, 0.1);
+    color: var(--color-info);
+    border: 2px solid rgba(23, 162, 184, 0.2);
+}
+
+
+/* ============================================
+   BODY DEL SEGUIMIENTO
+   ============================================ */
+.body-seguimiento {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--color-fondo);
+    border-radius: 8px;
+}
+
+.diagnostico-seg,
+.tratamiento-seg,
+.doctor-seg {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--fs-titulo4);
+    color: var(--color-texto-oscuro);
+}
+
+.diagnostico-seg i,
+.tratamiento-seg i,
+.doctor-seg i {
+    color: var(--color-primario);
+    font-size: 1.1rem;
+}
+
+.diagnostico-seg strong,
+.tratamiento-seg strong,
+.doctor-seg strong {
+    margin-right: var(--spacing-xs);
+}
+
+
+/* ============================================
+   PROGRESO DEL TRATAMIENTO
+   ============================================ */
+.progreso-seguimiento {
+    margin-bottom: var(--spacing-lg);
+}
+
+.label-progreso {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--fs-titulo4);
+    font-weight: 600;
+    color: var(--color-texto-oscuro);
+}
+
+.porcentaje-prog {
+    color: var(--color-primario);
+    font-size: var(--fs-titulo3);
+    font-weight: 700;
+}
+
+.barra-progreso-seg {
+    width: 100%;
+    height: 12px;
+    background: var(--color-fondo);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fill-progreso {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primario), var(--color-verde));
+    border-radius: 20px;
+    transition: width 0.6s ease;
+    box-shadow: 0 2px 4px rgba(10, 147, 44, 0.3);
+}
+
+
+/* ============================================
+   TIMELINE
+   ============================================ */
+.timeline-seguimiento {
+    margin-bottom: var(--spacing-lg);
+    padding-left: var(--spacing-md);
+    border-left: 3px solid var(--color-borde);
+}
+
+.evento-timeline {
+    position: relative;
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.evento-timeline:last-child {
+    margin-bottom: 0;
+}
+
+.punto-evento {
+    position: absolute;
+    left: -1.35rem;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid var(--color-blanco);
+    box-shadow: var(--shadow-sm);
+}
+
+.punto-evento.completado {
+    background: var(--color-success);
+}
+
+.punto-evento.activo {
+    background: var(--color-primario);
+    animation: pulse 2s infinite;
+}
+
+.punto-evento.pendiente {
+    background: var(--color-borde);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(10, 147, 44, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(10, 147, 44, 0);
+    }
+}
+
+.info-evento {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.info-evento strong {
+    font-size: var(--fs-titulo4);
+    color: var(--color-texto-oscuro);
+}
+
+.info-evento span {
+    font-size: var(--fs-texto1);
+    color: var(--color-texto-medio);
+}
+
+
+/* ============================================
+   MEDICACIONES ACTIVAS
+   ============================================ */
+.medicaciones-activas {
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: rgba(10, 147, 44, 0.03);
+    border-radius: 8px;
+    border: 2px solid rgba(10, 147, 44, 0.1);
+}
+
+.titulo-medicaciones {
+    font-weight: 700;
+    font-size: var(--fs-titulo4);
+    color: var(--color-primario);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.lista-medicaciones {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.item-medicacion {
+    padding: var(--spacing-md);
+    background: var(--color-blanco);
+    border-radius: 8px;
+    border-left: 4px solid var(--color-primario);
+    box-shadow: var(--shadow-sm);
+}
+
+.nombre-med {
+    font-weight: 700;
+    font-size: var(--fs-titulo4);
+    color: var(--color-texto-oscuro);
+    margin-bottom: var(--spacing-xs);
+}
+
+.dosis-med {
+    font-size: var(--fs-texto1);
+    color: var(--color-texto-medio);
+    margin-bottom: var(--spacing-xs);
+}
+
+.proxima-dosis {
+    font-size: var(--fs-texto1);
+    color: var(--color-primario);
+    font-weight: 600;
+}
+
+
+/* ============================================
+   PRÓXIMAS ACCIONES
+   ============================================ */
+.proximas-acciones {
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: rgba(23, 162, 184, 0.03);
+    border-radius: 8px;
+    border: 2px solid rgba(23, 162, 184, 0.1);
+}
+
+.titulo-acciones {
+    font-weight: 700;
+    font-size: var(--fs-titulo4);
+    color: var(--color-info);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.lista-acciones {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.item-accion {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--fs-titulo4);
+    color: var(--color-texto-oscuro);
+}
+
+.item-accion i {
+    font-size: 0.6rem;
+}
+
+
+/* ============================================
+   FOOTER DEL SEGUIMIENTO
+   ============================================ */
+.footer-seguimiento {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--color-borde);
+    flex-wrap: wrap;
+}
+
+.btn-accion-seg {
+    flex: 1;
+    min-width: 150px;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    background: var(--color-blanco);
+    color: var(--color-texto-oscuro);
+    font-weight: 600;
+    font-size: var(--fs-texto1);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    transition: all var(--transition-normal);
+}
+
+.btn-accion-seg:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-accion-seg.btn-actualizar:hover {
+    background: var(--color-primario);
+    border-color: var(--color-primario);
+    color: var(--color-blanco);
+}
+
+.btn-accion-seg.btn-detalles:hover {
+    background: var(--color-info);
+    border-color: var(--color-info);
+    color: var(--color-blanco);
+}
+
+.btn-accion-seg.btn-nota:hover {
+    background: var(--color-warning);
+    border-color: var(--color-warning);
+    color: var(--color-blanco);
+}
+
+.btn-accion-seg.btn-completar:hover {
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: var(--color-blanco);
+}
+
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 992px) {
+    .tarjeta-stat-seguimiento {
+        padding: var(--spacing-md);
+    }
+
+    .icono-stat-seg {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .info-stat-seg h3 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .barra-filtros-seguimiento .d-flex {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .boton-filtro-seg,
+    .boton-nuevo-seguimiento {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .encabezado-tabla-seg {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: flex-start;
+    }
+
+    .select-ordenar {
+        width: 100%;
+    }
+
+    .header-seguimiento {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .footer-seguimiento {
+        flex-direction: column;
+    }
+
+    .btn-accion-seg {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .lista-seguimientos {
+        padding: var(--spacing-md);
+    }
+
+    .card-seguimiento {
+        padding: var(--spacing-md);
+    }
+
+    .body-seguimiento {
+        padding: var(--spacing-md);
+    }
+
+    .avatar-seg {
+        width: 45px;
+        height: 45px;
+    }
+
+    .tarjeta-stat-seguimiento {
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tarjeta-stat-seguimiento,
+.card-seguimiento {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.tarjeta-stat-seguimiento:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.tarjeta-stat-seguimiento:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.tarjeta-stat-seguimiento:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.tarjeta-stat-seguimiento:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+body.dark-mode .barra-filtros-seguimiento,
+body.dark-mode .contenedor-tabla-seguimientos,
+body.dark-mode .card-seguimiento,
+body.dark-mode .tarjeta-stat-seguimiento {
+    background: #16213e;
+    border-color: #2d3748;
+}
+
+body.dark-mode .boton-filtro-seg {
+    background: #1a1a2e;
+    color: #eee;
+    border-color: #2d3748;
+}
+
+body.dark-mode .body-seguimiento {
+    background: #1a1a2e;
+}
+
+body.dark-mode .barra-progreso-seg {
+    background: #1a1a2e;
+}
+
+body.dark-mode .timeline-seguimiento {
+    border-left-color: #2d3748;
+}
+
+
+/* ============================================
+   SCROLL PERSONALIZADO
+   ============================================ */
+.lista-seguimientos::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lista-seguimientos::-webkit-scrollbar-track {
+    background: var(--color-fondo);
+    border-radius: 10px;
+}
+
+.lista-seguimientos::-webkit-scrollbar-thumb {
+    background: var(--color-verde);
+    border-radius: 10px;
+}
+
+.lista-seguimientos::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primario);
+}
