@@ -10,8 +10,6 @@ $usuario = mostrarPerfil($id);
 <!-- Navbar Superior -->
 <div class="navbar-superior" id="navbarSuperior">
     
-<div class="barra-navegacion-superior" id="navbarSuperior">
-
     <!-- Sección Izquierda - Breadcrumb -->
     <div class="navegacion-izquierda">
         <button class="btn-menu-movil" onclick="abrirSidebarMovil()" aria-label="Abrir menú">
