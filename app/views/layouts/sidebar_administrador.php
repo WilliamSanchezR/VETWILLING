@@ -16,7 +16,7 @@ $final_path = end($path_parts); // Obtiene el último elemento
 <aside class="sidebar" id="sidebar">
 
     <!-- HEADER CON LOGO -->
-    <div class="sidebar-header">
+    <a href="<?= BASE_URL ?>/admin/dashBoard" class="sidebar-header">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-NEGATIVO.png"
             alt="VetWilling"
             class="sidebar-logo-full">
@@ -24,7 +24,7 @@ $final_path = end($path_parts); // Obtiene el último elemento
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-VERTICAL-NEGATIVA.png"
             alt="VW"
             class="sidebar-logo-icon">
-    </div>
+    </a>
 
     <!-- NAVEGACIÓN -->
     <nav class="sidebar-nav">
