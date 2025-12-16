@@ -20,13 +20,16 @@ function reporteVeterinario()
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_veterinarios.pdf', false);
-
+    reporteVeterinario();
 
 }
 
+<<<<<<< HEAD
+=======
     reporteVeterinario();
 }
 
+>>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
 
 
 
@@ -102,8 +105,12 @@ function reporteMascotas()
 
     generarPDF($html, 'reporte_mascotas.pdf', false);
 
- reporteMascotas();
+
 }
+<<<<<<< HEAD
+    reporteMascotas();
+=======
    
     generarPDF($html, 'reporte_veterinarias.pdf', false);
 }
+>>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
