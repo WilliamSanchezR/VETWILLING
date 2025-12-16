@@ -1,21 +1,36 @@
 <?php
-require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 
-// 1. Validar si hay sesión activa
+// 1. Iniciar sesión solo si no está iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 2. Si sí hay sesión → obtener perfil
+// 2. Validar que el usuario esté logueado ANTES de cargar controlador
+if (!isset($_SESSION['user'])) {
+    // No hay usuario → redirigir al login
+    header('Location: /vetwilling/login');
+    exit();
+}
+
+// 3. Cargar controlador SOLO si existe sesión activa
+require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+
+// 4. Obtener datos del usuario
 $id = $_SESSION['user']['id_usuario'];
 $usuario = mostrarPerfil($id);
 ?>
+
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
 
 
 <!-- NAVBAR SUPERIOR -->
 <nav class="navbar-superior">
+    <div class="info-veterinaria">
+        <i class="bi bi-hospital"></i>
+        <span class="nombre-veterinaria"><?= $usuario['nombre_veterinaria'] ?></span>
+    </div>
+
     <!-- Sección Centro - Buscador -->
     <div class="navbar-centro">
         <div class="buscador-avanzado">
@@ -123,15 +138,15 @@ $usuario = mostrarPerfil($id);
                 <i class="bi bi-person-fill"></i>
                 <span>Mi Perfil</span>
             </a>
-            <a href="<?= BASE_URL ?>/Cliente/mascotas" class="dropdown-item">
+            <a href="<?= BASE_URL ?>/cliente/mascotas" class="dropdown-item">
                 <i class="bi bi-heart-pulse-fill"></i>
                 <span>Mis Mascotas</span>
             </a>
-            <a href="<?= BASE_URL ?>/Cliente/citas" class="dropdown-item">
+            <a href="<?= BASE_URL ?>/cliente/citas" class="dropdown-item">
                 <i class="bi bi-calendar-check-fill"></i>
                 <span>Mis Citas</span>
             </a>
-            <a href="<?= BASE_URL ?>/Cliente/configuracion" class="dropdown-item">
+            <a href="<?= BASE_URL ?>/cliente/configuracion" class="dropdown-item">
                 <i class="bi bi-gear-fill"></i>
                 <span>Configuración</span>
             </a>
@@ -146,199 +161,197 @@ $usuario = mostrarPerfil($id);
 
 
 <script>
+    class NavbarManager {
 
+        constructor() {
+            // Selector rápido
+            this.$ = (s) => document.querySelector(s);
+            this.$$ = (s) => document.querySelectorAll(s);
 
-class NavbarManager {
+            // DOM cacheado
+            this.navbar = this.$('.navbar-superior');
 
-    constructor() {
-        // Selector rápido
-        this.$ = (s) => document.querySelector(s);
-        this.$$ = (s) => document.querySelectorAll(s);
+            this.dropdowns = {
+                notificaciones: this.$('#dropdownNotificaciones'),
+                perfil: this.$('#dropdownPerfil')
+            };
 
-        // DOM cacheado
-        this.navbar = this.$('.navbar-superior');
+            this.buttons = {
+                notificaciones: this.$('.btn-navbar.notificaciones'),
+                perfil: this.$('.btn-perfil'),
+                marcarLeidas: this.$('.btn-marcar-leidas'),
+            };
 
-        this.dropdowns = {
-            notificaciones: this.$('#dropdownNotificaciones'),
-            perfil: this.$('#dropdownPerfil')
-        };
+            this.badges = {
+                notificaciones: this.$('.badge-notif')
+            };
 
-        this.buttons = {
-            notificaciones: this.$('.btn-navbar.notificaciones'),
-            perfil: this.$('.btn-perfil'),
-            marcarLeidas: this.$('.btn-marcar-leidas'),
-        };
+            this.search = this.$('#inputBusqueda');
+            this.themeIcon = this.$('#themeIcon');
 
-        this.badges = {
-            notificaciones: this.$('.badge-notif')
-        };
+            // Estado
+            this.state = {
+                activeDropdown: null,
+                notificacionesSinLeer: 0,
+                searchDebounce: null,
+                theme: localStorage.getItem('theme') || 'light'
+            };
 
-        this.search = this.$('#inputBusqueda');
-        this.themeIcon = this.$('#themeIcon');
-
-        // Estado
-        this.state = {
-            activeDropdown: null,
-            notificacionesSinLeer: 0,
-            searchDebounce: null,
-            theme: localStorage.getItem('theme') || 'light'
-        };
-
-        this.init();
-    }
-
-    /* ================= INIT ================= */
-
-    init() {
-        this.initTheme();
-        this.initDropdowns();
-        this.initNotifications();
-        this.initSearch();
-        this.initScrollEffects();
-
-        console.log("Navbar Manager listo ✔");
-    }
-
-    /* ================= DROPDOWNS ================= */
-
-    initDropdowns() {
-        window.toggleDropdown = (tipo) => this.toggleDropdown(tipo);
-
-        document.addEventListener("click", (e) => {
-            if (!e.target.closest(".navbar-derecha")) {
-                this.closeAllDropdowns();
-            }
-        });
-
-        this.$$('.dropdown').forEach(d => {
-            d.addEventListener('click', (e) => e.stopPropagation());
-        });
-    }
-
-    toggleDropdown(tipo) {
-        const dd = this.dropdowns[tipo];
-        if (!dd) return;
-
-        const open = dd.classList.contains("show");
-        this.closeAllDropdowns();
-
-        if (!open) {
-            dd.classList.add("show");
-            this.state.activeDropdown = tipo;
+            this.init();
         }
-    }
 
-    closeAllDropdowns() {
-        Object.values(this.dropdowns).forEach(dd => dd?.classList.remove("show"));
-        this.state.activeDropdown = null;
-    }
+        /* ================= INIT ================= */
 
-    /* ================= THEME ================= */
+        init() {
+            this.initTheme();
+            this.initDropdowns();
+            this.initNotifications();
+            this.initSearch();
+            this.initScrollEffects();
 
-    initTheme() {
-        document.documentElement.setAttribute("data-theme", this.state.theme);
-        this.updateThemeIcon();
+            console.log("Navbar Manager listo ✔");
+        }
 
-        window.toggleTheme = () => {
-            this.state.theme = (this.state.theme === "dark") ? "light" : "dark";
+        /* ================= DROPDOWNS ================= */
 
+        initDropdowns() {
+            window.toggleDropdown = (tipo) => this.toggleDropdown(tipo);
+
+            document.addEventListener("click", (e) => {
+                if (!e.target.closest(".navbar-derecha")) {
+                    this.closeAllDropdowns();
+                }
+            });
+
+            this.$$('.dropdown').forEach(d => {
+                d.addEventListener('click', (e) => e.stopPropagation());
+            });
+        }
+
+        toggleDropdown(tipo) {
+            const dd = this.dropdowns[tipo];
+            if (!dd) return;
+
+            const open = dd.classList.contains("show");
+            this.closeAllDropdowns();
+
+            if (!open) {
+                dd.classList.add("show");
+                this.state.activeDropdown = tipo;
+            }
+        }
+
+        closeAllDropdowns() {
+            Object.values(this.dropdowns).forEach(dd => dd?.classList.remove("show"));
+            this.state.activeDropdown = null;
+        }
+
+        /* ================= THEME ================= */
+
+        initTheme() {
             document.documentElement.setAttribute("data-theme", this.state.theme);
-            localStorage.setItem("theme", this.state.theme);
             this.updateThemeIcon();
-        };
-    }
 
-    updateThemeIcon() {
-        if (!this.themeIcon) return;
+            window.toggleTheme = () => {
+                this.state.theme = (this.state.theme === "dark") ? "light" : "dark";
 
-        this.themeIcon.className =
-            (this.state.theme === "dark")
-                ? "bi bi-sun-fill"
-                : "bi bi-moon-stars-fill";
-    }
-
-    /* ================= NOTIFICACIONES ================= */
-
-    initNotifications() {
-        if (this.buttons.marcarLeidas) {
-            this.buttons.marcarLeidas.onclick = () => this.marcarTodasComoLeidas();
+                document.documentElement.setAttribute("data-theme", this.state.theme);
+                localStorage.setItem("theme", this.state.theme);
+                this.updateThemeIcon();
+            };
         }
 
-        this.$$('.notificacion-item.no-leida').forEach(item => {
-            item.addEventListener("click", () => this.marcarComoLeida(item));
-        });
+        updateThemeIcon() {
+            if (!this.themeIcon) return;
 
-        this.contarNotificaciones();
-    }
+            this.themeIcon.className =
+                (this.state.theme === "dark") ?
+                "bi bi-sun-fill" :
+                "bi bi-moon-stars-fill";
+        }
 
-    contarNotificaciones() {
-        this.state.notificacionesSinLeer =
-            this.$$('.notificacion-item.no-leida').length;
+        /* ================= NOTIFICACIONES ================= */
 
-        this.updateNotifBadge();
-    }
-
-    updateNotifBadge() {
-        const b = this.badges.notificaciones;
-        if (!b) return;
-
-        b.style.display = (this.state.notificacionesSinLeer > 0) ? "flex" : "none";
-        b.textContent = this.state.notificacionesSinLeer;
-    }
-
-    marcarComoLeida(item) {
-        item.classList.remove("no-leida");
-        this.state.notificacionesSinLeer--;
-        this.updateNotifBadge();
-    }
-
-    marcarTodasComoLeidas() {
-        this.$$('.notificacion-item.no-leida').forEach(item =>
-            item.classList.remove("no-leida")
-        );
-        this.state.notificacionesSinLeer = 0;
-        this.updateNotifBadge();
-    }
-
-    /* ================= BUSCADOR ================= */
-
-    initSearch() {
-        if (!this.search) return;
-
-        this.search.addEventListener("input", (e) => {
-            clearTimeout(this.state.searchDebounce);
-
-            this.state.searchDebounce = setTimeout(() => {
-                const term = e.target.value.trim().toLowerCase();
-                this.performSearch(term);
-            }, 300);
-        });
-    }
-
-    performSearch(term) {
-        const items = this.$$('[data-searchable]');
-        items.forEach(el => {
-            const match = el.textContent.toLowerCase().includes(term);
-            el.style.display = match ? "" : "none";
-        });
-    }
-
-    /* ================= SCROLL ================= */
-
-    initScrollEffects() {
-        window.addEventListener("scroll", () => {
-            if (window.pageYOffset > 50) {
-                this.navbar?.classList.add("scrolled");
-            } else {
-                this.navbar?.classList.remove("scrolled");
+        initNotifications() {
+            if (this.buttons.marcarLeidas) {
+                this.buttons.marcarLeidas.onclick = () => this.marcarTodasComoLeidas();
             }
-        });
+
+            this.$$('.notificacion-item.no-leida').forEach(item => {
+                item.addEventListener("click", () => this.marcarComoLeida(item));
+            });
+
+            this.contarNotificaciones();
+        }
+
+        contarNotificaciones() {
+            this.state.notificacionesSinLeer =
+                this.$$('.notificacion-item.no-leida').length;
+
+            this.updateNotifBadge();
+        }
+
+        updateNotifBadge() {
+            const b = this.badges.notificaciones;
+            if (!b) return;
+
+            b.style.display = (this.state.notificacionesSinLeer > 0) ? "flex" : "none";
+            b.textContent = this.state.notificacionesSinLeer;
+        }
+
+        marcarComoLeida(item) {
+            item.classList.remove("no-leida");
+            this.state.notificacionesSinLeer--;
+            this.updateNotifBadge();
+        }
+
+        marcarTodasComoLeidas() {
+            this.$$('.notificacion-item.no-leida').forEach(item =>
+                item.classList.remove("no-leida")
+            );
+            this.state.notificacionesSinLeer = 0;
+            this.updateNotifBadge();
+        }
+
+        /* ================= BUSCADOR ================= */
+
+        initSearch() {
+            if (!this.search) return;
+
+            this.search.addEventListener("input", (e) => {
+                clearTimeout(this.state.searchDebounce);
+
+                this.state.searchDebounce = setTimeout(() => {
+                    const term = e.target.value.trim().toLowerCase();
+                    this.performSearch(term);
+                }, 300);
+            });
+        }
+
+        performSearch(term) {
+            const items = this.$$('[data-searchable]');
+            items.forEach(el => {
+                const match = el.textContent.toLowerCase().includes(term);
+                el.style.display = match ? "" : "none";
+            });
+        }
+
+        /* ================= SCROLL ================= */
+
+        initScrollEffects() {
+            window.addEventListener("scroll", () => {
+                if (window.pageYOffset > 50) {
+                    this.navbar?.classList.add("scrolled");
+                } else {
+                    this.navbar?.classList.remove("scrolled");
+                }
+            });
+        }
     }
-}
 
-/* =============== INICIALIZACIÓN =============== */
+    /* =============== INICIALIZACIÓN =============== */
 
-document.addEventListener("DOMContentLoaded", () => {
-    window.navbarManager = new NavbarManager();
-});
+    document.addEventListener("DOMContentLoaded", () => {
+        window.navbarManager = new NavbarManager();
+    });
 </script>

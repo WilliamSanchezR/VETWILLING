@@ -733,3 +733,14 @@ body {
     background: #d1ecf1;
     color: #0c5460;
 }
+.info-veterinaria {
+    padding: 8px 0;
+    border-left: 4px solid #2b9b7f;
+    padding-left: 12px;
+}
+
+.nombre-veterinaria {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2b9b7f;
+}

@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido " . $resultado['nombres'],
-                "/vetwilling/Cliente/dashboard"
+                "/vetwilling/cliente/dashboard"
             );
             break;
 

@@ -66,7 +66,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
 
             <form id="vetForm" action="<?= BASE_URL ?>/admin/guardar-veterinaria" method="POST" enctype="multipart/form-data">
->
+                >
 
                 <!-- Paso 1: Datos de la Veterinaria -->
                 <div class="step active">
@@ -119,6 +119,23 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                             </div>
                         </div>
                     </div>
+
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label><i class="bi bi-envelope"></i> Foto </label>
+                                    <input type="file" accept=".jpg, .png, .jpeg" id="foto" name="foto">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
 
                     <div class="buttons">
                         <span></span>

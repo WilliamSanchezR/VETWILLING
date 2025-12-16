@@ -20,28 +20,28 @@
         <div class="nav-section">
             <span class="nav-section-title">General</span>
 
-            <a href="<?= BASE_URL ?>/Cliente/dashboard"
+            <a href="<?= BASE_URL ?>/cliente/dashboard"
                 class="nav-item"
                 data-section="dashboard">
                 <i class="bi bi-house-door"></i>
                 <span class="nav-text">Inicio</span>
             </a>
 
-            <a href="<?= BASE_URL ?>/Cliente/mascotas"
+            <a href="<?= BASE_URL ?>/cliente/mascotas"
                 class="nav-item"
                 data-section="mascotas">
                 <i class="bi bi-bluesky"></i>
                 <span class="nav-text">Mis Mascotas</span>
             </a>
 
-            <a href="<?= BASE_URL ?>/Cliente/citas"
+            <a href="<?= BASE_URL ?>/cliente/citas"
                 class="nav-item"
                 data-section="citas">
                 <i class="bi bi-calendar-check"></i>
                 <span class="nav-text">Citas</span>
             </a>
 
-            <a href="<?= BASE_URL ?>/Cliente/tienda"
+            <a href="<?= BASE_URL ?>/cliente/tienda"
                 class="nav-item"
                 data-section="tienda">
                 <i class="bi bi-bag-plus"></i>

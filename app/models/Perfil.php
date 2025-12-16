@@ -15,6 +15,9 @@ class Perfil
 
     // *Esta funcion se duplica por cada rol
 
+
+    
+
     public function mostrarPerfil($id)
     {
 
@@ -38,7 +41,7 @@ class Perfil
                 case 1: // ADMINISTRADOR
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil, a.telefono,
+                                a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil, a.telefono, a.direccion, a.fecha_creacion,
                                 r.nombre AS rol
                                 FROM usuario u
                                 INNER JOIN administrador a ON u.id_usuario = a.id_usuario
@@ -58,14 +61,20 @@ class Perfil
                     break;
 
                 case 3: // PROPIETARIO
-                    $consultar = "SELECT 
-                                u.id_usuario, u.email, u.estado,
-                                p.nombres, p.apellidos, p.telefono, p.direccion, p.img_perfil, p.numero_documento, p.direccion, p.tipo_documento,
-                                r.nombre AS rol
-                                FROM usuario u
-                                INNER JOIN propietario p ON u.id_usuario = p.id_usuario
-                                INNER JOIN rol r ON u.id_rol = r.id_rol
-                                WHERE u.id_usuario = :id";
+                            $consultar = "SELECT 
+                            u.id_usuario, u.email, u.estado,
+                            p.nombres, p.apellidos, p.telefono, p.direccion,
+                            p.img_perfil, p.numero_documento, p.tipo_documento,
+                            r.nombre AS rol,
+
+                            v.id_veterinaria,
+                            v.nombre AS nombre_veterinaria
+
+                        FROM usuario u
+                        INNER JOIN propietario p ON u.id_usuario = p.id_usuario
+                        INNER JOIN rol r ON u.id_rol = r.id_rol 
+                        INNER JOIN veterinaria v ON p.id_veterinaria = v.id_veterinaria
+                        WHERE u.id_usuario = :id";
                     break;
 
                 case 4: // REPRESENTANTE

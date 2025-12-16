@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "nombre": "Consulta",
+        "descipcion": "Chequeos generales y evaluación de la salud del animal.",
+        "costo": 50000
+    },
+     {
+        "id": 2,
+        "nombre": "Cirugía",
+        "descipcion": "Procedimientos de tejidos blandos y ortopédicos, así como otras intervenciones quirúrgicas",
+        "costo": "Depende de la cirugia"
+    },
+     {
+        "id": 3,
+        "nombre": "Medicina preventiva",
+        "descipcion": " Vacunación, desparasitación interna y externa, y otros programas de salud.",
+        "costo": "Depende de lo requerido"
+    },
+     {
+        "id":4,
+        "nombre": "Diagnóstico por imagen",
+        "descipcion": "Uso de rayos X y ultrasonido para visualizar el interior del cuerpo.",
+        "costo": 200000
+    },
+     {
+        "id": 5,
+        "nombre": "Laboratorio clínico:",
+        "descipcion": "Análisis de sangre, orina y otros fluidos para diagnosticar enfermedades.",
+        "costo": "Depende el examen"
+    }
+]
