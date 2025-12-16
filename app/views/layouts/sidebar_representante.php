@@ -15,7 +15,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 <aside class="sidebar" id="sidebar">
 
     <!-- HEADER CON LOGO -->
-    <a class="sidebar-header" href="<?= BASE_URL ?>/admin/dashBoard">
+    <a class="sidebar-header" href="<?= BASE_URL ?>/representante/dashboard">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-NEGATIVO.png"
             alt="VetWilling"
             class="sidebar-logo-full">
