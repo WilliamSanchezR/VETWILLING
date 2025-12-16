@@ -51,7 +51,7 @@ $mascotas = listarMascotas();
                     <h1>🐾 Mis Mascotas</h1>
                     <span class="badge-count"><?= count($mascotas) ?> Mascota<?= count($mascotas) != 1 ? 's' : '' ?></span>
                 </div>
-                <a href="<?= BASE_URL ?>/reporte-mascotas" class="btn-agregar" target="_blank" style="background: #dc3545;">
+                <a href="<?= BASE_URL ?>/reporte-mascotas?action=reporteMascotas" class="btn-agregar" target="_blank" style="background: #dc3545;">
                     <i class="bi bi-file-pdf"></i>
                     Exportar PDF
                 </a>

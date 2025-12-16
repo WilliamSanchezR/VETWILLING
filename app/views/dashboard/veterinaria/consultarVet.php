@@ -88,7 +88,7 @@ $datos = mostrarVeterinarios();
                 Generar Reporte PDF
             </a> -->
 
-            <button id="btnRutaReporte" data-ruta="<?= BASE_URL ?>/veterinario/reporte-veterinarios" hidden></button>
+            <button id="btnRutaReporte" data-ruta="<?= BASE_URL ?>/reporte-veterinarios" hidden></button>
 
 
 
@@ -104,7 +104,7 @@ $datos = mostrarVeterinarios();
 
 
 
-                    <a href="<?= BASE_URL ?>/veterinario/registrar-pacientes">
+                    <a href="<?= BASE_URL ?>/veterinario/registrar-veterinarios">
                         <button class="btn-agregar" id="btnAgregarNuevo">
                             <i class="bi bi-plus-lg"></i> Agregar Nuevo
                         </button>

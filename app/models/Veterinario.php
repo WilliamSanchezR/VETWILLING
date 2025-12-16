@@ -16,6 +16,8 @@ class Veterinario
         $this->conexion = $db->getConexion();
     }
 
+
+
     public function registrar($data)
     {
         try {
@@ -60,6 +62,7 @@ class Veterinario
             return false;
         }
     }
+
 
     public function listar($id_veterinaria)
     {

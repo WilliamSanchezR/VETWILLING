@@ -65,6 +65,8 @@ switch ($method) {
 
 // Funciones del crud
 
+
+
 function registrarVeterinario()
 {
 
