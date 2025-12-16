@@ -60,15 +60,15 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div id="bar3" class="progress-bar"></div>
                     <div id="bar4" class="progress-bar"></div>
                     <div id="bar5" class="progress-bar"></div> -->
-                    <div id="bar6" class="progress-bar"></div>
+                    <!-- <div id="bar6" class="progress-bar"></div> -->
                 </div>
                 <div class="progress-labels">
-                    <span class="active">Propietario</span>
+                    <span class="active">Veterinario</span>
                     <!-- <span>Mascota</span>
                     <span>Historial</span>
                     <span>Atención</span>
                     <span>Tratamiento</span> -->
-                    <span>Confirmar</span>
+                    <!-- <span>Confirmar</span> -->
                 </div>
             </div>
 
@@ -148,8 +148,8 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
                     <div class="buttons">
                         <span></span>
-                        <button type="button" class="btn-next" onclick="nextStep()">
-                            Siguiente <i class="bi bi-arrow-right"></i>
+                        <button type="submit" class="btn-next" onclick="nextStep()">
+                            Registrar <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -205,28 +205,8 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 </div>
         </div>
 
-        <!-- Paso de confirmación -->
-                <div class="step">
-                    <h1>¿Deseas confirmar el envío del formulario?</h1>
-                    <p>Por favor, revisa que toda la información sea correcta antes de continuar.</p>
-
-                    <!-- RESUMEN DE DATOS -->
-                    <div class="alert alert-info">
-                        <h5><i class="bi bi-info-circle"></i> Resumen de Datos</h5>
-                        <div id="resumenDatos">
-                            <!-- Se llenará dinámicamente con JavaScript -->
-                        </div>
-                    </div>
-
-                    <div class="buttons">
-                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
-                            <i class="bi bi-arrow-left"></i> Volver a revisar
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Confirmar y enviar
-                        </button>
-                    </div>
-                </div>
+        
+               
             </form>
         </div>
     </div>

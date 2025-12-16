@@ -27,7 +27,7 @@
 .contenido-principal {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
-    top: 20px;
+    top: 50px;
     background-color: var(--color-fondo);
     transition: margin-left var(--transition-normal);
 }

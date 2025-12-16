@@ -118,8 +118,11 @@ switch ($request) {
         break;
 
 
+    case '/veterinario/registrar-veterinarios':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';
+        break;
     case '/veterinario/registrar-pacientes':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/registro-usuario.php';
+        require BASE_PATH . '/app/views/dashboard/veterinaria/registro-pacientes-laboratorio.php';
         break;
 
     case '/veterinario/guardar-veterinario':
@@ -129,7 +132,9 @@ switch ($request) {
     case '/veterinario/consultar-citas':
         require BASE_PATH . '/app/views/dashboard/veterinaria/citas.php';
         break;
-
+case '/veterinario/consultar-veterinarios':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/consultarVet.php';
+        break;
     case '/veterinario/editar-veterinario':
         require BASE_PATH . '/app/views/dashboard/veterinaria/editar-veterinario.php';
         break;

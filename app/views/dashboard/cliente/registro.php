@@ -23,24 +23,20 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
 
     <!-- CSS -->
-<<<<<<< HEAD
-<<<<<<< HEAD
+
+
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/registro.css">
-=======
-=======
->>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
+
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/registro.css">
 
-<<<<<<< HEAD
->>>>>>> 16633142215270c74cab9e0c178b4c442d37b5eb
-=======
->>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
+
+
 </head>
 
 <body>
@@ -458,16 +454,16 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-<<<<<<< HEAD
-<<<<<<< HEAD
+
+
     <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
 
     <!-- Preview de imagen -->
-=======
+
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
     <!-- JavaScript -->
->>>>>>> 16633142215270c74cab9e0c178b4c442d37b5eb
-=======
+
+
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
     <!-- JavaScript -->
     <script>
@@ -573,9 +569,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
             }
         }
 
-    <!-- Preview de imagen -->
->>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
-    <script>
+        
         // Preview de foto
         document.getElementById('inputFotoMascota').addEventListener('change', function(e) {
             const file = e.target.files[0];

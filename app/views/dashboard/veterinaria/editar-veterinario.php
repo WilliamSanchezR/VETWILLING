@@ -29,16 +29,15 @@ $veterinario = listarVeterinario($id);
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
     <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css"> -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
-    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/nodoNoche.css"> -->
+     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
+
 </head>
 
 <body>
 
     <?php
     include_once __DIR__ . '/../../layouts/sidebar_veterinario.php';
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php';
+    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php';
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->

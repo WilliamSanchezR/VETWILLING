@@ -70,9 +70,9 @@ $usuario = consultarPropietarioId($id);
 
                 <!-- TAB: MI CUENTA -->
                 <div class="tab-content" id="tab-cuenta">
-                    <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar" enctype="multipart/form-data">
+                    <form method="POST" action="<?= BASE_URL ?>/cliente/actualizar" enctype="multipart/form-data">
                         <input type="hidden" name="accion" value="actualizar">
-                        <input type="hidden" name="id_propietario" value="<?= $_SESSION['user']['id'] ?>">
+                        <input type="hidden" name="id_propietario" value="<?= $_SESSION['user']['id_usuario'] ?>">
 
                         <!-- Foto de Perfil -->
                         <div class="config-card">
@@ -452,7 +452,7 @@ $usuario = consultarPropietarioId($id);
                             <p>Actualiza tu contraseña para mantener tu cuenta segura</p>
                         </div>
 
-                        <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar-contrasena" id="passwordForm">
+                        <form method="POST" action="<?= BASE_URL ?>/cliente/actualizar-contrasena" id="passwordForm">
                             <input type="hidden" name="id_usuario" value="<?= $_SESSION['user']['id_usuario'] ?>">
                             <input type="hidden" name="accion" value="modificar-constrasena">
 
