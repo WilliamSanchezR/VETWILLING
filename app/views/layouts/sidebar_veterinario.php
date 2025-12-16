@@ -78,13 +78,13 @@
                 class="nav-item"
                 data-section="tienda">
                 <i class="bi bi-clipboard-plus"></i>
-                <span class="nav-text">Registrar Veterinario</span>
+                <span class="nav-text">Registro pacientes</span>
             </a>
-            <a href="<?= BASE_URL ?>/veterinario/consultar-veterinario"
+            <a href="<?= BASE_URL ?>/veterinario/consultar-citas"
                 class="nav-item"
                 data-section="tienda">
                 <i class="bi bi-search"></i>
-                <span class="nav-text">Consultar Veterinario</span>
+                <span class="nav-text">Citas</span>
             </a>
         </div>
 
