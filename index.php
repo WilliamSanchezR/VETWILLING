@@ -296,4 +296,11 @@ switch ($request) {
         http_response_code(404);
         require BASE_PATH . '/app/views/auth/error404.html';
         break;
+
+
+
+        // ---------------------------------------REPRESENTANTE-------------------------------------//
+    case '/representante/dashboard':
+        require BASE_PATH . '/app/views/dashboard/representante/dashboardRepresentante.php';    
+        break;
 }
