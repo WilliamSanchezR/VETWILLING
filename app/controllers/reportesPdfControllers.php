@@ -16,8 +16,10 @@ switch ($method) {
 
         if ($accion === 'reporteVeterinariasPDF') {
             reporteVeterinariasPDF();
-        } else {
+        } else if ($accion === 'reporteVeterinario') {
             reporteVeterinario();
+        } else if ($accion === 'reporteMascotas') {
+            reporteMascotas();
         }
 
 
@@ -69,4 +71,20 @@ reporteVeterinario();
 
 
     generarPDF($html, 'reporte_veterinarias.pdf', false);
+}
+
+function reporteMascotas()
+{
+
+    //cargar la vista y obtenerla como HTML 
+    ob_start();
+    //aignamos los datos de la funcion en el controlador enlazado
+    // a una variableque podamos manipular en la vista del pdf
+    $mascotas = listarMascotas();
+
+    //archivo que tiene la interfaz diseniada en html 
+    require BASE_PATH . '/app/views/pdf/mascotas_pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_mascotas.pdf', false);
 }
