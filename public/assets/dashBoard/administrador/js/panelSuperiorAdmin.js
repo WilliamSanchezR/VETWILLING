@@ -193,15 +193,15 @@ class panelSuperiorAdmin {
         const routePage = routes[routes.length - 1];
 
         switch (routePage) {
-            case 'registro-usuario':
+            case 'registro-usuario':                
             case 'listar-usuarios':
             case 'editar-usuario':
-                titlePage = 'Usuario';
+                titlePage = 'Usuarios';
                 break;
             case 'registro-veterinaria':
             case 'listar-veterinarias':
             case 'editar-veterinaria':
-                titlePage = 'Veterinaria';
+                titlePage = 'Veterinarias';
                 break;
             case 'perfil-administrador':
                 titlePage = 'Perfil';
