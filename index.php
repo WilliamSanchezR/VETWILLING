@@ -225,7 +225,9 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/administrador/gestionTicket.php';
         break;
 
-
+    case '/admin/pdf-veterinarias':
+        require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
+        break;
 
     // ---------------------------------------PROPIETARIO-------------------------------------//
 

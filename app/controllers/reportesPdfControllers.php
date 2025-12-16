@@ -2,8 +2,36 @@
 
 require_once BASE_PATH . '/app/helpers/pdf_helpers.php';
 require_once BASE_PATH . '/app/controllers/veterinarioController.php';
+require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 
-function reporteVeterinario() {
+//CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
+$method = $_SERVER['REQUEST_METHOD'];
+
+switch ($method) {
+
+
+    case 'GET':
+        // Esta variable captura la accion de eliminar
+        $accion = $_GET['action'] ?? '';
+
+        if ($accion === 'reporteVeterinariasPDF') {
+            reporteVeterinariasPDF();
+        } else {
+            reporteVeterinario();
+        }
+
+
+        break;
+
+
+    default:
+        http_response_code(405);
+        echo "Metodo no encontrado";
+        break;
+}
+
+function reporteVeterinario()
+{
 
     //cargar la vista y obtenerla como HTML 
     ob_start();
@@ -16,10 +44,9 @@ function reporteVeterinario() {
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_veterinarios.pdf', false);
-
 }
 
-reporteVeterinario();
+
 
 
 // function reportePropietariosPDF()
@@ -38,6 +65,19 @@ reporteVeterinario();
 //     generarPDF($html, 'reporte_veterinarios.pdf', false);
 // }
 
-?>
+// funcion para reporte de veterinarias
+function reporteVeterinariasPDF()
+{
+    // cargar la vista y obtenerla como HTML
 
+    ob_start();
+    // asignamos los datos de la funcion en el controlador enlazado a una varible que podamos manipular en la vista del pdf
+    $veterinarias = listarVeterinariasRegistradas();
 
+    // archivo que tiene la interfaz diseñada en HTML
+
+    require BASE_PATH . '/app/views/pdf/veterinarias_pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_veterinarias.pdf', false);
+}
