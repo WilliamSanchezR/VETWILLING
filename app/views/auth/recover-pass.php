@@ -25,7 +25,7 @@
         <!-- Columna izquierda -->
         <div class="cont-left">
             <div class="logo">
-                <img src="<?= BASE_URL ?>/public/assets/auth/img/LOGO-POSITIVO 1.png" alt="Logo VetWilling">
+                <a href="<?= BASE_URL ?>/"><img src="<?= BASE_URL ?>/public/assets/auth/img/LOGO-POSITIVO 1.png" alt="Logo VetWilling"></a>
             </div>
 
             <div class="form-header">
