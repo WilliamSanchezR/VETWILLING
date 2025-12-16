@@ -142,7 +142,7 @@ function actualizarVeterinaria()
     $ciudad = $_POST['ciudad'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $email = $_POST['email'] ?? '';
-    $estado = $_POST['estado'] ?? 'activo';
+    $estado = $_POST['estado'] ?? 'Activo';
 
 
     // Validamos que los campos no esten vacios
