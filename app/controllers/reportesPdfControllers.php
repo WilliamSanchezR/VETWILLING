@@ -3,6 +3,7 @@
 require_once BASE_PATH . '/app/helpers/pdf_helpers.php';
 require_once BASE_PATH . '/app/controllers/veterinarioController.php';
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
+require_once BASE_PATH . '/app/controllers/mascotasController.php';
 
 //CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
 $method = $_SERVER['REQUEST_METHOD'];
@@ -50,7 +51,6 @@ function reporteVeterinario()
 
 
 
-reporteVeterinario();
 
 // function reportePropietariosPDF()
 // {

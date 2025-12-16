@@ -77,7 +77,7 @@ $veterinarios = mostrarVeterinarios($id_veterinaria);
         }
 
         th {
-            padding: 12px;
+            padding: 8px;
             font-size: 14px;
             text-align: left;
         }
@@ -135,8 +135,8 @@ $veterinarios = mostrarVeterinarios($id_veterinaria);
             <thead>
                 <tr>
                     <th>Foto</th>
-                    <th>Nombre Completo</th>
                     <th>Documento</th>
+                    <th>Nombre Completo</th>
                     <th>Teléfono</th>
                     <th>Email</th>
                     <th>Estado</th>
@@ -157,6 +157,7 @@ $veterinarios = mostrarVeterinarios($id_veterinaria);
                             <td class="<?= $veterinario['estado'] == 'Activo' ? 'estado-activo' : 'estado-inactivo' ?>">
                                 <?= $veterinario['estado'] ?>
                             </td>
+
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>

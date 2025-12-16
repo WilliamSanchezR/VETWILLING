@@ -132,7 +132,7 @@ switch ($request) {
     case '/veterinario/consultar-citas':
         require BASE_PATH . '/app/views/dashboard/veterinaria/citas.php';
         break;
-case '/veterinario/consultar-veterinarios':
+    case '/veterinario/consultar-veterinarios':
         require BASE_PATH . '/app/views/dashboard/veterinaria/consultarVet.php';
         break;
     case '/veterinario/editar-veterinario':
@@ -286,15 +286,15 @@ case '/veterinario/consultar-veterinarios':
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
-    case '/reporte':
+    case '/reporte-veterinarios':
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
         reporteVeterinario();
+        break;
 
-
-        // case '/reporte-mascotas':
-        //     require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
-        //     reporteMascotas();
-        //     break;
+    case '/reporte-mascotas':
+        require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
+        reporteMascotas();
+        break;
 
     default:
         http_response_code(404);

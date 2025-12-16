@@ -68,7 +68,7 @@ $final_path = end($path_parts); // Obtiene el último elemento
                 </ul>
             </div>
 
-            <a href="#"
+            <a href="<?= BASE_URL ?>/admin/listar-tickets"
                 class="nav-item <?= $final_path == '' ? 'active' : '' ?>"
                 data-tooltip="Ticket de Soporte">
                 <i class="bi bi-ticket-perforated"></i>
