@@ -27,11 +27,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <!-- Propio -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
 
 
     <!-- Global Styles -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/extras/css/globalStyles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
 </head>
 
@@ -47,7 +47,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <!-- PANEL DERECHO -->
     <!-- aqui va el inclunde notifi -->
     <?php
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->

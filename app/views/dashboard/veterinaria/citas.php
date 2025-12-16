@@ -41,8 +41,7 @@ $datos = mostrarVeterinarios();
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleTableCitas.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleCitas.css">
 
 
 </head>
@@ -59,7 +58,7 @@ $datos = mostrarVeterinarios();
     <!-- PANEL DERECHO -->
     <!-- aqui va el inclunde notifi -->
     <?php
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -71,96 +70,325 @@ $datos = mostrarVeterinarios();
         include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php'
         ?>
 
+        <!-- HEADER -->
+        <div class="header-citas">
+            <h2>
+                <i class="bi bi-calendar-check"></i>
+                Gestión de Citas
+            </h2>
+            <button class="btn-nueva-cita" onclick="nuevaCita()">
+                <i class="bi bi-plus-circle"></i>
+                Nueva Cita
+            </button>
+        </div>
 
-        <!-- ÁREA DE CONTENIDO - MÓDULO GESTIÓN DE CITAS -->
-        <div class="area-contenido">
-
-            <!-- Encabezado del Módulo -->
-            <div class="encabezado-modulo">
-                <h3>MÓDULO GESTIÓN DE VETERINARIOS</h3>
+        <!-- ESTADÍSTICAS -->
+        <div class="stats-container">
+            <div class="stat-card pendientes">
+                <div class="stat-icon pendientes">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>24</h3>
+                    <p>Pendientes</p>
+                </div>
             </div>
 
-            <!-- <a href="<?= BASE_URL ?>/veterinario/reporte-veterinarios"
-                class="btn btn-primary"
-                target="_blank">
-                Generar Reporte PDF
-            </a> -->
+            <div class="stat-card confirmadas">
+                <div class="stat-icon confirmadas">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>18</h3>
+                    <p>Confirmadas</p>
+                </div>
+            </div>
 
-            <button id="btnRutaReporte" data-ruta="<?= BASE_URL ?>/veterinario/reporte-veterinarios" hidden></button>
+            <div class="stat-card completadas">
+                <div class="stat-icon completadas">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>142</h3>
+                    <p>Completadas</p>
+                </div>
+            </div>
 
+            <div class="stat-card canceladas">
+                <div class="stat-icon canceladas">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>8</h3>
+                    <p>Canceladas</p>
+                </div>
+            </div>
+        </div>
 
+        <!-- FILTROS -->
+        <div class="filtros-container">
+            <div class="filtros-row">
+                <div class="campo-busqueda">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Buscar por paciente, propietario o mascota..." id="buscarCita">
+                </div>
 
-            <!-- Controles de la Tabla -->
-            <div class="controles-tabla">
-                <div class="controles-izquierda">
-                    <div class="campo-buscar">
-                        <i class="bi bi-search"></i>
-                        <input type="text" id="buscarCitas" placeholder="Buscar citas...">
+                <select class="filtro-select" id="filtroVeterinario">
+                    <option value="">Todos los veterinarios</option>
+                    <option value="1">Dr. Juan Pérez</option>
+                    <option value="2">Dra. María García</option>
+                    <option value="3">Dr. Carlos López</option>
+                </select>
+
+                <select class="filtro-select" id="filtroFecha">
+                    <option value="hoy">Hoy</option>
+                    <option value="manana">Mañana</option>
+                    <option value="semana">Esta Semana</option>
+                    <option value="mes">Este Mes</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="todas">
+                <i class="bi bi-grid-3x3-gap"></i>
+                Todas
+            </button>
+            <button class="tab-btn" data-tab="pendientes">
+                <i class="bi bi-clock-history"></i>
+                Pendientes
+            </button>
+            <button class="tab-btn" data-tab="confirmadas">
+                <i class="bi bi-check-circle"></i>
+                Confirmadas
+            </button>
+            <button class="tab-btn" data-tab="completadas">
+                <i class="bi bi-check-circle-fill"></i>
+                Completadas
+            </button>
+        </div>
+
+        <!-- LISTA DE CITAS -->
+        <div class="citas-lista" id="citasLista">
+            <!-- Cita 1 - Urgente -->
+            <div class="cita-card urgente" data-estado="pendiente">
+                <div class="cita-hora">
+                    <div class="hora">09:00</div>
+                    <div class="fecha">14 Dic 2025</div>
+                </div>
+
+                <div class="cita-info">
+                    <div class="cita-header">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=luna" alt="Luna" class="paciente-avatar">
+                        <div>
+                            <h4 class="paciente-nombre">Luna - Golden Retriever</h4>
+                            <span class="tipo-mascota">
+                                <i class="bi bi-heart-fill"></i>
+                                Perro
+                            </span>
+                            <span class="estado-badge pendiente">Pendiente</span>
+                        </div>
+                    </div>
+
+                    <div class="cita-detalles">
+                        <div class="detalle-item">
+                            <i class="bi bi-person"></i>
+                            <span>María González</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-telephone"></i>
+                            <span>+57 300 123 4567</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Dr. Juan Pérez</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-clipboard-pulse"></i>
+                            <span>Control Post-Operatorio</span>
+                        </div>
                     </div>
                 </div>
-                <div class="controles-derecha">
 
-
-
-                    <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario">
-                        <button class="btn-agregar" id="btnAgregarNuevo">
-                            <i class="bi bi-plus-lg"></i> Agregar Nuevo
-                        </button>
-                    </a>
-
+                <div class="cita-acciones">
+                    <button class="btn-accion btn-confirmar">
+                        <i class="bi bi-check"></i>
+                        Confirmar
+                    </button>
+                    <button class="btn-accion btn-editar">
+                        <i class="bi bi-pencil"></i>
+                        Editar
+                    </button>
+                    <button class="btn-accion btn-cancelar">
+                        <i class="bi bi-x"></i>
+                        Cancelar
+                    </button>
                 </div>
             </div>
 
-            <!-- Tabla de Citas -->
-            <div class="contenedor-tabla">
-                <table id="tablaCitas" class="display" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Foto de perfi</th>
-                            <th>Numero de documeto</th>
-                            <th>Nombres & Apellidos</th>
-                            <th>Telefono</th>
-                            <th>Email</th>
-                            <th>Estado</th>
-                            <th>Rol</th>
-                            <th>Veterinaria</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <!-- Cita 2 - Confirmada -->
+            <div class="cita-card" data-estado="confirmada">
+                <div class="cita-hora">
+                    <div class="hora">10:30</div>
+                    <div class="fecha">14 Dic 2025</div>
+                </div>
 
-                        <?php if (!empty($datos)): ?>
-                            <?php foreach ($datos as $veterinario): ?>
-                                <tr class="fila-gris">
-                                    <td><img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $veterinario['img_perfil'] ?>" alt=""></td>
-                                    <td><?= $veterinario['tipo_documento'] ?> - <?= $veterinario['numero_documento'] ?></td>
-                                    <td><?= $veterinario['nombres'] ?> <br> <?= $veterinario['apellidos'] ?></td>
-                                    <td><?= $veterinario['telefono'] ?></td>
-                                    <td><?= $veterinario['email'] ?></td>
-                                    <td><?= $veterinario['estado'] ?></td>
-                                    <td><?= $veterinario['nombre_rol'] ?></td>
-                                    <td><?= $veterinario['nombre_veterinaria'] ?></td>
-                                    <td>
-                                        <a href="<?= BASE_URL ?>/veterinario/editar-veterinario?id=<?= $veterinario['id_usuario'] ?>" class="btn-accion btn-editar" title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <a href="<?= BASE_URL ?>/veterinario/eliminar-veterinario?accion=eliminar&id=<?= $veterinario['id_usuario'] ?>" class="btn-accion btn-eliminar" title="Eliminar">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td>No hay veterinarios registrados</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                <div class="cita-info">
+                    <div class="cita-header">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=max" alt="Max" class="paciente-avatar">
+                        <div>
+                            <h4 class="paciente-nombre">Max - Labrador</h4>
+                            <span class="tipo-mascota">
+                                <i class="bi bi-heart-fill"></i>
+                                Perro
+                            </span>
+                            <span class="estado-badge confirmada">Confirmada</span>
+                        </div>
+                    </div>
+
+                    <div class="cita-detalles">
+                        <div class="detalle-item">
+                            <i class="bi bi-person"></i>
+                            <span>Carlos Pérez</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-telephone"></i>
+                            <span>+57 310 456 7890</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Dra. María García</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-clipboard-pulse"></i>
+                            <span>Vacunación Antirrábica</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cita-acciones">
+                    <button class="btn-accion btn-completar">
+                        <i class="bi bi-check-circle"></i>
+                        Completar
+                    </button>
+                    <button class="btn-accion btn-editar">
+                        <i class="bi bi-pencil"></i>
+                        Editar
+                    </button>
+                    <button class="btn-accion btn-cancelar">
+                        <i class="bi bi-x"></i>
+                        Cancelar
+                    </button>
+                </div>
             </div>
 
+            <!-- Cita 3 - Pendiente -->
+            <div class="cita-card" data-estado="pendiente">
+                <div class="cita-hora">
+                    <div class="hora">11:45</div>
+                    <div class="fecha">14 Dic 2025</div>
+                </div>
+
+                <div class="cita-info">
+                    <div class="cita-header">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=miau" alt="Miau" class="paciente-avatar">
+                        <div>
+                            <h4 class="paciente-nombre">Miau - Persa</h4>
+                            <span class="tipo-mascota">
+                                <i class="bi bi-heart-fill"></i>
+                                Gato
+                            </span>
+                            <span class="estado-badge pendiente">Pendiente</span>
+                        </div>
+                    </div>
+
+                    <div class="cita-detalles">
+                        <div class="detalle-item">
+                            <i class="bi bi-person"></i>
+                            <span>Ana Martínez</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-telephone"></i>
+                            <span>+57 320 789 1234</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Dr. Carlos López</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-clipboard-pulse"></i>
+                            <span>Consulta General</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cita-acciones">
+                    <button class="btn-accion btn-confirmar">
+                        <i class="bi bi-check"></i>
+                        Confirmar
+                    </button>
+                    <button class="btn-accion btn-editar">
+                        <i class="bi bi-pencil"></i>
+                        Editar
+                    </button>
+                    <button class="btn-accion btn-cancelar">
+                        <i class="bi bi-x"></i>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cita 4 - Completada -->
+            <div class="cita-card" data-estado="completada">
+                <div class="cita-hora">
+                    <div class="hora">14:00</div>
+                    <div class="fecha">13 Dic 2025</div>
+                </div>
+
+                <div class="cita-info">
+                    <div class="cita-header">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=rocky" alt="Rocky" class="paciente-avatar">
+                        <div>
+                            <h4 class="paciente-nombre">Rocky - Bulldog</h4>
+                            <span class="tipo-mascota">
+                                <i class="bi bi-heart-fill"></i>
+                                Perro
+                            </span>
+                            <span class="estado-badge completada">Completada</span>
+                        </div>
+                    </div>
+
+                    <div class="cita-detalles">
+                        <div class="detalle-item">
+                            <i class="bi bi-person"></i>
+                            <span>Luis Rodríguez</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-telephone"></i>
+                            <span>+57 315 234 5678</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Dr. Juan Pérez</span>
+                        </div>
+                        <div class="detalle-item">
+                            <i class="bi bi-clipboard-pulse"></i>
+                            <span>Limpieza Dental</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cita-acciones">
+                    <button class="btn-accion btn-editar" style="background: #6c757d;">
+                        <i class="bi bi-eye"></i>
+                        Ver Detalles
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
 
     <!-- SCRIPTS -->
     <!-- 1. jQuery PRIMERO -->
@@ -185,8 +413,6 @@ $datos = mostrarVeterinarios();
     <!-- 5. Tu script de tabla AL FINAL -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/citas.js"></script>
 
-    <!-- Modo dia  y noche -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 
 </body>
 

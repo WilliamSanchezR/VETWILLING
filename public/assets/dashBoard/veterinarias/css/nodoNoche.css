@@ -249,12 +249,7 @@ p, span, label {
     background: var(--bg-card);
 }
 
-/* PANEL DERECHO */
-.barra-lateral-derecha {
-    background: var(--bg-sidebar);
-    border-left: 1px solid var(--border-color);
-    box-shadow: -2px 0 10px var(--shadow-sm);
-}
+
 
 .encabezado-lateral-derecho {
     border-bottom: 1px solid var(--border-color);
@@ -438,8 +433,4 @@ hr {
 .border-top,
 .border-bottom {
     border-color: var(--border-color) !important;
-}
-
-.texto-item-sidebar{
-    color: #fff !important;
 }

@@ -25,6 +25,9 @@ function reporteVeterinario()
 }
 
     reporteVeterinario();
+}
+
+
 
 
 // function reportePropietariosPDF()
@@ -43,7 +46,19 @@ function reporteVeterinario()
 //     generarPDF($html, 'reporte_veterinarios.pdf', false);
 // }
 
+// funcion para reporte de veterinarias
+function reporteVeterinariasPDF()
+{
+    // cargar la vista y obtenerla como HTML
 
+    ob_start();
+    // asignamos los datos de la funcion en el controlador enlazado a una varible que podamos manipular en la vista del pdf
+    $veterinarias = listarVeterinariasRegistradas();
+
+    // archivo que tiene la interfaz diseñada en HTML
+
+    require BASE_PATH . '/app/views/pdf/veterinarias_pdf.php';
+    $html = ob_get_clean();
 
 
 
@@ -90,3 +105,5 @@ function reporteMascotas()
  reporteMascotas();
 }
    
+    generarPDF($html, 'reporte_veterinarias.pdf', false);
+}

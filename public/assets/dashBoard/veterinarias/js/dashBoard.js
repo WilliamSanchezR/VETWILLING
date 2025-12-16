@@ -1,510 +1,433 @@
-function alternarBarraIzquierda() {
-    const barraLateral = document.getElementById('barraLateralIzquierda');
-    const contenidoPrincipal = document.getElementById('contenidoPrincipal');
-    const icono = document.getElementById('iconoColapsar');
-    
-    barraLateral.classList.toggle('colapsada');
-    contenidoPrincipal.classList.toggle('sidebar-colapsado');
-    
-    if (barraLateral.classList.contains('colapsada')) {
-        icono.className = 'bi bi-chevron-right';
+// ========== INICIALIZACIÓN ==========
+document.addEventListener('DOMContentLoaded', function () {
+    inicializarDashboard();
+    configurarEventListeners();
+    sincronizarConSidebar();
+});
+
+// ========== FUNCIÓN PRINCIPAL DE INICIALIZACIÓN ==========
+function inicializarDashboard() {
+    // Animar tarjetas de estadísticas
+    animarEstadisticas();
+
+    // Configurar filtros
+    configurarFiltros();
+
+    // Configurar checkbox maestro
+    configurarCheckboxMaestro();
+
+    // Cargar datos (si es necesario)
+    // cargarDatosPacientes();
+}
+
+// ========== SINCRONIZACIÓN CON SIDEBAR ==========
+function sincronizarConSidebar() {
+    const sidebar = document.getElementById('barraLateralIzquierda');
+    const areaContenido = document.querySelector('.area-contenido');
+
+    if (!sidebar || !areaContenido) return;
+
+    // Escuchar cambios en el sidebar
+    window.addEventListener('sidebarToggled', function (e) {
+        // Agregar clase al body para mejor control
+        if (e.detail.colapsado) {
+            document.body.classList.add('sidebar-collapsed');
+        } else {
+            document.body.classList.remove('sidebar-collapsed');
+        }
+
+        // Opcional: ajustar gráficos o tablas si es necesario
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 300);
+    });
+
+    // Verificar estado inicial
+    if (sidebar.classList.contains('collapsed')) {
+        document.body.classList.add('sidebar-collapsed');
+    }
+}
+
+// ========== ANIMACIÓN DE ESTADÍSTICAS ==========
+function animarEstadisticas() {
+    const tarjetas = document.querySelectorAll('.tarjeta-estadistica');
+
+    tarjetas.forEach((tarjeta, index) => {
+        const h3 = tarjeta.querySelector('h3');
+        if (!h3) return;
+
+        const valorFinal = parseInt(h3.textContent);
+        let valorActual = 0;
+        const duracion = 1500; // ms
+        const incremento = Math.ceil(valorFinal / (duracion / 16));
+
+        // Iniciar en 0
+        h3.textContent = '0';
+
+        // Animar después de un delay
+        setTimeout(() => {
+            const intervalo = setInterval(() => {
+                valorActual += incremento;
+
+                if (valorActual >= valorFinal) {
+                    valorActual = valorFinal;
+                    clearInterval(intervalo);
+                }
+
+                h3.textContent = valorActual.toLocaleString();
+            }, 16);
+        }, index * 100);
+    });
+}
+
+// ========== CONFIGURAR EVENT LISTENERS ==========
+function configurarEventListeners() {
+    // Botones de acción
+    const btnNuevoPaciente = document.querySelector('[onclick*="abrirModalNuevoPaciente"]');
+    if (btnNuevoPaciente) {
+        btnNuevoPaciente.addEventListener('click', function (e) {
+            e.preventDefault();
+            abrirModalNuevoPaciente();
+        });
+    }
+
+    // Botón exportar
+    const btnExportar = document.querySelector('.boton-accion-secundario');
+    if (btnExportar) {
+        btnExportar.addEventListener('click', exportarDatos);
+    }
+
+    // Checkboxes de selección
+    configurarCheckboxes();
+
+    // Botones de acciones en tabla
+    configurarBotonesTabla();
+
+    // Paginación
+    configurarPaginacion();
+}
+
+// ========== FILTROS ==========
+function configurarFiltros() {
+    const filtroEspecie = document.getElementById('filtroEspecie');
+    const filtroEstado = document.getElementById('filtroEstado');
+
+    if (filtroEspecie) {
+        filtroEspecie.addEventListener('change', function () {
+            aplicarFiltros();
+        });
+    }
+
+    if (filtroEstado) {
+        filtroEstado.addEventListener('change', function () {
+            aplicarFiltros();
+        });
+    }
+}
+
+function aplicarFiltros() {
+    const filtroEspecie = document.getElementById('filtroEspecie')?.value.toLowerCase();
+    const filtroEstado = document.getElementById('filtroEstado')?.value.toLowerCase();
+    const filas = document.querySelectorAll('.tabla-pacientes tbody tr');
+
+    let visibles = 0;
+
+    filas.forEach(fila => {
+        const especieTexto = fila.querySelector('.badge-especie')?.textContent.toLowerCase().trim() || '';
+        const estadoTexto = fila.querySelector('.badge-estado')?.textContent.toLowerCase().trim() || '';
+
+        let mostrar = true;
+
+        if (filtroEspecie && !especieTexto.includes(filtroEspecie)) {
+            mostrar = false;
+        }
+
+        if (filtroEstado) {
+            if (filtroEstado === 'activo' && !estadoTexto.includes('activo')) {
+                mostrar = false;
+            } else if (filtroEstado === 'tratamiento' && !estadoTexto.includes('tratamiento')) {
+                mostrar = false;
+            } else if (filtroEstado === 'alta' && !estadoTexto.includes('alta')) {
+                mostrar = false;
+            }
+        }
+
+        if (mostrar) {
+            fila.style.display = '';
+            visibles++;
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+
+    // Actualizar contador de paginación
+    actualizarContadorPaginacion(visibles, filas.length);
+
+    // Mostrar mensaje si no hay resultados
+    mostrarMensajeNoResultados(visibles);
+}
+
+// ========== CHECKBOX MAESTRO ==========
+function configurarCheckboxMaestro() {
+    const checkboxMaestro = document.querySelector('.tabla-pacientes thead input[type="checkbox"]');
+
+    if (checkboxMaestro) {
+        checkboxMaestro.addEventListener('change', function () {
+            const checkboxesFilas = document.querySelectorAll('.tabla-pacientes tbody input[type="checkbox"]');
+
+            checkboxesFilas.forEach(checkbox => {
+                checkbox.checked = this.checked;
+                actualizarFilaSeleccionada(checkbox);
+            });
+
+            actualizarBarraAccionesMasivas();
+        });
+    }
+}
+
+function configurarCheckboxes() {
+    const checkboxes = document.querySelectorAll('.tabla-pacientes tbody input[type="checkbox"]');
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            actualizarFilaSeleccionada(this);
+            actualizarCheckboxMaestro();
+            actualizarBarraAccionesMasivas();
+        });
+    });
+}
+
+function actualizarFilaSeleccionada(checkbox) {
+    const fila = checkbox.closest('tr');
+    if (checkbox.checked) {
+        fila.style.background = 'rgba(10, 147, 44, 0.05)';
     } else {
-        icono.className = 'bi bi-chevron-left';
+        fila.style.background = '';
     }
 }
 
-function alternarBarraDerecha() {
-    const barraLateral = document.getElementById('barraLateralDerecha');
-    const contenidoPrincipal = document.getElementById('contenidoPrincipal');
-    
-    barraLateral.classList.toggle('oculta');
-    contenidoPrincipal.classList.toggle('panel-derecho-abierto');
-}
+function actualizarCheckboxMaestro() {
+    const checkboxMaestro = document.querySelector('.tabla-pacientes thead input[type="checkbox"]');
+    const checkboxesFilas = document.querySelectorAll('.tabla-pacientes tbody input[type="checkbox"]');
+    const checkboxesMarcados = document.querySelectorAll('.tabla-pacientes tbody input[type="checkbox"]:checked');
 
-// ========================================
-// FUNCIONES PRINCIPALES DEL DASHBOARD
-// ========================================
-
-function alternarBarraIzquierda() {
-    const barraLateral = document.getElementById('barraLateralIzquierda');
-    const contenidoPrincipal = document.getElementById('contenidoPrincipal');
-    const icono = document.getElementById('iconoColapsar');
-    const overlay = document.getElementById('overlayMovil');
-    
-    // En escritorio: colapsar/expandir normal
-    if (window.innerWidth > 768) {
-        barraLateral.classList.toggle('colapsada');
-        contenidoPrincipal.classList.toggle('sidebar-colapsado');
-        
-        if (barraLateral.classList.contains('colapsada')) {
-            icono.className = 'bi bi-chevron-right';
-        } else {
-            icono.className = 'bi bi-chevron-left';
-        }
-    } 
-    // En móvil: mostrar/ocultar sidebar
-    else {
-        barraLateral.classList.toggle('expandida');
-        
-        if (barraLateral.classList.contains('expandida')) {
-            overlay.classList.add('activo');
-            document.body.style.overflow = 'hidden';
-        } else {
-            overlay.classList.remove('activo');
-            document.body.style.overflow = '';
-        }
+    if (checkboxMaestro) {
+        checkboxMaestro.checked = checkboxesFilas.length === checkboxesMarcados.length && checkboxesFilas.length > 0;
+        checkboxMaestro.indeterminate = checkboxesMarcados.length > 0 && checkboxesFilas.length !== checkboxesMarcados.length;
     }
 }
 
-function alternarBarraDerecha() {
-    const barraLateral = document.getElementById('barraLateralDerecha');
-    const contenidoPrincipal = document.getElementById('contenidoPrincipal');
-    const overlay = document.getElementById('overlayMovil');
-    
-    barraLateral.classList.toggle('oculta');
-    
-    // Solo ajustar margen en desktop
-    if (window.innerWidth > 768) {
-        contenidoPrincipal.classList.toggle('panel-derecho-abierto');
-    }
-    
-    // En móvil, mostrar overlay
-    if (window.innerWidth <= 768) {
-        if (!barraLateral.classList.contains('oculta')) {
-            overlay.classList.add('activo');
-            document.body.style.overflow = 'hidden';
-        } else {
-            overlay.classList.remove('activo');
-            document.body.style.overflow = '';
-        }
+function actualizarBarraAccionesMasivas() {
+    const seleccionados = document.querySelectorAll('.tabla-pacientes tbody input[type="checkbox"]:checked').length;
+
+    // Aquí podrías mostrar una barra de acciones masivas
+    if (seleccionados > 0) {
+        console.log(`${seleccionados} paciente(s) seleccionado(s)`);
+        // Mostrar barra de acciones masivas
     }
 }
 
-function cerrarSidebars() {
-    const barraIzquierda = document.getElementById('barraLateralIzquierda');
-    const barraDerecha = document.getElementById('barraLateralDerecha');
-    const overlay = document.getElementById('overlayMovil');
-    
-    barraIzquierda.classList.remove('expandida');
-    barraDerecha.classList.add('oculta');
-    overlay.classList.remove('activo');
-    document.body.style.overflow = '';
-}
+// ========== BOTONES DE TABLA ==========
+function configurarBotonesTabla() {
+    const botonesVer = document.querySelectorAll('.boton-accion-tabla[title="Ver detalles"]');
+    const botonesEditar = document.querySelectorAll('.boton-accion-tabla[title="Editar"]');
+    const botonesHistoria = document.querySelectorAll('.boton-accion-tabla[title="Historia clínica"]');
 
-// ========================================
-// MANEJO DE RESIZE
-// ========================================
-
-let resizeTimer;
-window.addEventListener('resize', function() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function() {
-        
-        const barraIzquierda = document.getElementById('barraLateralIzquierda');
-        const barraDerecha = document.getElementById('barraLateralDerecha');
-        const contenidoPrincipal = document.getElementById('contenidoPrincipal');
-        const overlay = document.getElementById('overlayMovil');
-        
-        // Al cambiar a desktop, resetear estados móviles
-        if (window.innerWidth > 768) {
-            overlay.classList.remove('activo');
-            document.body.style.overflow = '';
-            barraIzquierda.classList.remove('expandida');
-            
-            // Restaurar comportamiento normal en desktop
-            if (barraIzquierda.classList.contains('colapsada')) {
-                contenidoPrincipal.classList.add('sidebar-colapsado');
-            } else {
-                contenidoPrincipal.classList.remove('sidebar-colapsado');
-            }
-        }
-        // Al cambiar a móvil, ocultar sidebars
-        else {
-            barraIzquierda.classList.remove('expandida');
-            barraDerecha.classList.add('oculta');
-            contenidoPrincipal.classList.remove('panel-derecho-abierto');
-            contenidoPrincipal.classList.remove('sidebar-colapsado');
-        }
-        
-    }, 250);
-});
-
-// ========================================
-// INICIALIZACIÓN
-// ========================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // Crear overlay si no existe
-    if (!document.getElementById('overlayMovil')) {
-        const overlay = document.createElement('div');
-        overlay.id = 'overlayMovil';
-        overlay.className = 'overlay-movil';
-        overlay.addEventListener('click', cerrarSidebars);
-        document.body.appendChild(overlay);
-    }
-    
-    // Crear botón de menú móvil si no existe
-    const navegacionIzq = document.querySelector('.navegacion-izquierda');
-    if (navegacionIzq && !document.getElementById('botonMenuMovil')) {
-        const botonMenu = document.createElement('button');
-        botonMenu.id = 'botonMenuMovil';
-        botonMenu.className = 'boton-menu-movil';
-        botonMenu.innerHTML = '<i class="bi bi-list"></i>';
-        botonMenu.addEventListener('click', alternarBarraIzquierda);
-        navegacionIzq.insertBefore(botonMenu, navegacionIzq.firstChild);
-    }
-    
-    // Cerrar sidebars al hacer click en enlaces (en móvil)
-    const itemsSidebar = document.querySelectorAll('.item-sidebar');
-    itemsSidebar.forEach(item => {
-        item.addEventListener('click', function() {
-            if (window.innerWidth <= 768) {
-                cerrarSidebars();
-            }
+    botonesVer.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const fila = this.closest('tr');
+            verDetallesPaciente(fila);
         });
     });
-    
-    // Prevenir scroll del body cuando sidebars están abiertos en móvil
-    const barraIzquierda = document.getElementById('barraLateralIzquierda');
-    const barraDerecha = document.getElementById('barraLateralDerecha');
-    
-    [barraIzquierda, barraDerecha].forEach(barra => {
-        if (barra) {
-            let startY;
-            barra.addEventListener('touchstart', function(e) {
-                startY = e.touches[0].pageY;
-            }, { passive: true });
-            
-            barra.addEventListener('touchmove', function(e) {
-                const scrollTop = barra.scrollTop;
-                const scrollHeight = barra.scrollHeight;
-                const height = barra.clientHeight;
-                const deltaY = e.touches[0].pageY - startY;
-                
-                // Prevenir bounce solo cuando estamos en los límites
-                if ((scrollTop === 0 && deltaY > 0) || 
-                    (scrollTop + height >= scrollHeight && deltaY < 0)) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-        }
+
+    botonesEditar.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const fila = this.closest('tr');
+            editarPaciente(fila);
+        });
     });
-    
-    // Configuración inicial según el tamaño de pantalla
-    if (window.innerWidth <= 768) {
-        const barraDerecha = document.getElementById('barraLateralDerecha');
-        if (barraDerecha) {
-            barraDerecha.classList.add('oculta');
-        }
-    }
-});
 
-// ========================================
-// TOUCH SWIPE PARA CERRAR SIDEBARS
-// ========================================
+    botonesHistoria.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const fila = this.closest('tr');
+            verHistoriaClinica(fila);
+        });
+    });
+}
 
-let touchStartX = 0;
-let touchEndX = 0;
+// ========== ACCIONES DE PACIENTES ==========
+function abrirModalNuevoPaciente() {
+    // Implementar modal de nuevo paciente
+    console.log('Abrir modal nuevo paciente');
 
-document.addEventListener('touchstart', function(e) {
-    touchStartX = e.changedTouches[0].screenX;
-}, { passive: true });
+    // Ejemplo: mostrar alerta
+    mostrarNotificacion('Abriendo formulario de nuevo paciente...', 'info');
+}
 
-document.addEventListener('touchend', function(e) {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-}, { passive: true });
+function verDetallesPaciente(fila) {
+    const nombre = fila.querySelector('.nombre-paciente')?.textContent;
+    console.log('Ver detalles de:', nombre);
+    mostrarNotificacion(`Viendo detalles de ${nombre}`, 'info');
+}
 
-function handleSwipe() {
-    const barraIzquierda = document.getElementById('barraLateralIzquierda');
-    const barraDerecha = document.getElementById('barraLateralDerecha');
-    
-    // Swipe hacia la izquierda para cerrar sidebar izquierdo
-    if (touchEndX < touchStartX - 50 && 
-        barraIzquierda && 
-        barraIzquierda.classList.contains('expandida')) {
-        cerrarSidebars();
-    }
-    
-    // Swipe hacia la derecha para cerrar sidebar derecho
-    if (touchEndX > touchStartX + 50 && 
-        barraDerecha && 
-        !barraDerecha.classList.contains('oculta')) {
-        cerrarSidebars();
+function editarPaciente(fila) {
+    const nombre = fila.querySelector('.nombre-paciente')?.textContent;
+    console.log('Editar paciente:', nombre);
+    mostrarNotificacion(`Editando ${nombre}`, 'info');
+}
+
+function verHistoriaClinica(fila) {
+    const nombre = fila.querySelector('.nombre-paciente')?.textContent;
+    console.log('Ver historia clínica de:', nombre);
+    mostrarNotificacion(`Abriendo historia clínica de ${nombre}`, 'info');
+}
+
+// ========== EXPORTAR DATOS ==========
+function exportarDatos() {
+    mostrarNotificacion('Exportando datos...', 'info');
+
+    // Simular exportación
+    setTimeout(() => {
+        mostrarNotificacion('Datos exportados exitosamente', 'success');
+    }, 1000);
+}
+
+// ========== PAGINACIÓN ==========
+function configurarPaginacion() {
+    const enlaces = document.querySelectorAll('.page-link');
+
+    enlaces.forEach(enlace => {
+        enlace.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            if (this.closest('.page-item').classList.contains('disabled') ||
+                this.closest('.page-item').classList.contains('active')) {
+                return;
+            }
+
+            const pagina = this.textContent.trim();
+            cambiarPagina(pagina);
+        });
+    });
+}
+
+function cambiarPagina(pagina) {
+    console.log('Cambiar a página:', pagina);
+
+    // Añadir efecto de carga
+    const tabla = document.querySelector('.contenedor-tabla-pacientes');
+    tabla.classList.add('loading-state');
+
+    setTimeout(() => {
+        tabla.classList.remove('loading-state');
+
+        // Actualizar clase active en paginación
+        document.querySelectorAll('.page-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        // Scroll al inicio de la tabla
+        tabla.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        mostrarNotificacion(`Página ${pagina} cargada`, 'success');
+    }, 500);
+}
+
+// ========== UTILIDADES ==========
+function actualizarContadorPaginacion(visibles, total) {
+    const infoPaginacion = document.querySelector('.info-paginacion');
+    if (infoPaginacion) {
+        infoPaginacion.innerHTML = `Mostrando <strong>1-${visibles}</strong> de <strong>${total}</strong> pacientes`;
     }
 }
 
-// ========================================
-// DETECCIÓN DE ORIENTACIÓN
-// ========================================
+function mostrarMensajeNoResultados(visibles) {
+    let mensajeExistente = document.querySelector('.mensaje-no-resultados');
 
-window.addEventListener('orientationchange', function() {
-    // Esperar a que complete el cambio de orientación
-    setTimeout(function() {
-        cerrarSidebars();
-    }, 300);
-});
-
-// ========================================
-// PREVENIR ZOOM EN INPUTS EN iOS
-// ========================================
-
-if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    const inputs = document.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        const fontSize = window.getComputedStyle(input).fontSize;
-        if (parseFloat(fontSize) < 16) {
-            input.style.fontSize = '16px';
+    if (visibles === 0) {
+        if (!mensajeExistente) {
+            const tbody = document.querySelector('.tabla-pacientes tbody');
+            const mensaje = document.createElement('tr');
+            mensaje.className = 'mensaje-no-resultados';
+            mensaje.innerHTML = `
+                <td colspan="9" style="text-align: center; padding: 40px; color: var(--color-texto-secondary);">
+                    <i class="bi bi-search" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+                    <strong>No se encontraron resultados</strong>
+                    <p style="margin-top: 8px;">Intenta cambiar los filtros</p>
+                </td>
+            `;
+            tbody.appendChild(mensaje);
         }
-    });
+    } else {
+        if (mensajeExistente) {
+            mensajeExistente.remove();
+        }
+    }
 }
-// esto es lo del registro
-        let currentStep = 0;
-        const steps = document.querySelectorAll('.step');
-        const bars = document.querySelectorAll('.progress-bar');
-        const labels = document.querySelectorAll('.progress-labels span');
 
-        function showStep(index) {
-            steps.forEach((s, i) => s.classList.toggle('active', i === index));
-            bars.forEach((b, i) => b.classList.toggle('active', i <= index));
-            labels.forEach((l, i) => l.classList.toggle('active', i === index));
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    // Crear notificación
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion notificacion-${tipo}`;
+    notificacion.style.cssText = `
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        background: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 300px;
+        animation: slideInRight 0.3s ease;
+    `;
 
-            // Scroll al inicio del formulario
-            document.querySelector('.wizard-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const icono = tipo === 'success' ? 'check-circle-fill' : tipo === 'error' ? 'x-circle-fill' : 'info-circle-fill';
+    const color = tipo === 'success' ? '#0A932C' : tipo === 'error' ? '#dc2626' : '#3b82f6';
 
-            // Si estamos en el paso de confirmación, actualizar resumen
-            if (index === 5) {
-                mostrarResumenConfirmacion();
-            }
+    notificacion.innerHTML = `
+        <i class="bi bi-${icono}" style="font-size: 24px; color: ${color};"></i>
+        <span style="flex: 1;">${mensaje}</span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; color: #6b7280;">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    `;
+
+    document.body.appendChild(notificacion);
+
+    // Auto-remover después de 3 segundos
+    setTimeout(() => {
+        notificacion.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => notificacion.remove(), 300);
+    }, 3000);
+}
+
+// ========== ANIMACIONES CSS ADICIONALES ==========
+const estilosAnimacion = document.createElement('style');
+estilosAnimacion.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
         }
-
-        function nextStep() {
-            // Validar campos requeridos del paso actual
-            const currentStepElement = steps[currentStep];
-            const requiredInputs = currentStepElement.querySelectorAll('[required]');
-            let isValid = true;
-            let camposVacios = [];
-
-            requiredInputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('error');
-
-                    // Obtener el nombre del campo
-                    const label = input.previousElementSibling?.textContent || 'Campo';
-                    camposVacios.push(label);
-
-                    // Remover clase de error después de 3 segundos
-                    setTimeout(() => {
-                        input.classList.remove('error');
-                    }, 3000);
-                } else {
-                    input.classList.remove('error');
-                }
-            });
-
-            if (!isValid) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Campos incompletos',
-                    html: `Por favor complete los siguientes campos:<br><br><strong>${camposVacios.join('<br>')}</strong>`,
-                    confirmButtonColor: '#0a932c',
-                    confirmButtonText: 'Entendido'
-                });
-                return; // ← ESTO ES CRÍTICO
-            }
-
-            if (currentStep < steps.length - 1) {
-                currentStep++;
-                showStep(currentStep);
-            }
+        to {
+            transform: translateX(0);
+            opacity: 1;
         }
-
-        function prevStep() {
-            if (currentStep > 0) {
-                currentStep--;
-                showStep(currentStep);
-            }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
         }
-
-        // Función para mostrar resumen en el paso de confirmación
-        function mostrarResumenConfirmacion() {
-            const resumenHTML = `
-            <div class="resumen-final">
-                <div class="resumen-card">
-                    <h4><i class="bi bi-person-check text-success"></i> Datos del Propietario</h4>
-                    <ul>
-                        <li><strong>Nombre:</strong> ${document.getElementById('nombrePropietario').value}</li>
-                        <li><strong>Documento:</strong> ${document.getElementById('tipoDocumento').value} ${document.getElementById('documento').value}</li>
-                        <li><strong>Teléfono:</strong> ${document.getElementById('telefono').value}</li>
-                        <li><strong>Correo:</strong> ${document.getElementById('correo').value}</li>
-                        <li><strong>Dirección:</strong> ${document.getElementById('direccion').value}, ${document.getElementById('ciudad').value}</li>
-                    </ul>
-                </div>
-
-                <div class="resumen-card">
-                    <h4><i class="bi bi-heart text-danger"></i> Datos de la Mascota</h4>
-                    <ul>
-                        <li><strong>Nombre:</strong> ${document.getElementById('nombreMascota').value}</li>
-                        <li><strong>Especie:</strong> ${document.getElementById('especie').value}</li>
-                        <li><strong>Raza:</strong> ${document.getElementById('raza').value || 'No especificada'}</li>
-                        <li><strong>Edad:</strong> ${document.getElementById('edad').value} años</li>
-                        <li><strong>Peso:</strong> ${document.getElementById('peso').value} kg</li>
-                        <li><strong>Sexo:</strong> ${document.getElementById('sexo').value}</li>
-                        <li><strong>Esterilizado:</strong> ${document.getElementById('esterilizado').value}</li>
-                    </ul>
-                </div>
-
-                <div class="resumen-card">
-                    <h4><i class="bi bi-clipboard-pulse text-primary"></i> Información de Atención</h4>
-                    <ul>
-                        <li><strong>Motivo:</strong> ${document.getElementById('motivoConsulta').value}</li>
-                        <li><strong>Fecha:</strong> ${document.getElementById('fechaIngreso').value}</li>
-                        <li><strong>Hora:</strong> ${document.getElementById('horaIngreso').value}</li>
-                        <li><strong>Veterinario:</strong> ${document.getElementById('veterinario').value}</li>
-                        <li><strong>Prioridad:</strong> ${document.getElementById('prioridad').value}</li>
-                    </ul>
-                </div>
-            </div>
-        `;
-
-            // Insertar el resumen antes de los botones
-            const confirmStep = steps[5];
-            const existingResumen = confirmStep.querySelector('.resumen-final');
-
-            if (!existingResumen) {
-                const buttonsDiv = confirmStep.querySelector('.buttons');
-                buttonsDiv.insertAdjacentHTML('beforebegin', resumenHTML);
-            }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
         }
-
-        // Inicializar fecha actual en campos de fecha
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('fechaIngreso').value = today;
-
-        // Evento del botón "Volver a revisar"
-        document.getElementById('btnVolver')?.addEventListener('click', function () {
-            prevStep();
-        });
-
-        // Manejar el envío del formulario
-        document.getElementById('vetForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            Swal.fire({
-                title: '¿Deseas enviar el formulario?',
-                html: `
-                <p>Estás a punto de registrar a <strong>${document.getElementById('nombreMascota').value}</strong></p>
-                <p class="text-muted">Una vez confirmado, no podrás realizar más cambios.</p>
-            `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#0a932c',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: '<i class="bi bi-check-circle"></i> Sí, enviar',
-                cancelButtonText: '<i class="bi bi-x-circle"></i> Cancelar',
-                background: '#f9fafb',
-                color: '#333',
-                customClass: {
-                    popup: 'rounded-4 shadow-lg'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Mostrar loading
-                    Swal.fire({
-                        title: 'Enviando formulario...',
-                        html: 'Por favor espera un momento',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-
-                    // Simular envío (aquí irá tu petición al backend)
-                    setTimeout(() => {
-                        Swal.fire({
-                            title: '¡Registro exitoso!',
-                            html: `
-                            <i class="bi bi-check-circle-fill text-success" style="font-size: 60px;"></i>
-                            <p class="mt-3">El paciente <strong>${document.getElementById('nombreMascota').value}</strong> ha sido registrado correctamente.</p>
-                            <p class="text-muted">Recibirás un correo de confirmación en breve.</p>
-                        `,
-                            icon: 'success',
-                            confirmButtonColor: '#0a932c',
-                            confirmButtonText: 'Aceptar'
-                        }).then(() => {
-                            // Preguntar si desea registrar otro paciente
-                            Swal.fire({
-                                title: '¿Deseas registrar otro paciente?',
-                                icon: 'question',
-                                showCancelButton: true,
-                                confirmButtonColor: '#0a932c',
-                                cancelButtonColor: '#6c757d',
-                                confirmButtonText: 'Sí, nuevo registro',
-                                cancelButtonText: 'No, volver al dashboard'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    // Resetear formulario
-                                    document.getElementById('vetForm').reset();
-                                    currentStep = 0;
-                                    showStep(0);
-                                    document.getElementById('fechaIngreso').value = today;
-                                } else {
-                                    // Redirigir al dashboard
-                                    window.location.href = 'dashBoard.html';
-                                }
-                            });
-                        });
-                    }, 2000);
-                }
-            });
-        });
-
-        // Validación en tiempo real
-        document.querySelectorAll('input[required], select[required], textarea[required]').forEach(input => {
-            input.addEventListener('blur', function () {
-                if (!this.value.trim()) {
-                    this.classList.add('error');
-                } else {
-                    this.classList.remove('error');
-                }
-            });
-
-            input.addEventListener('input', function () {
-                if (this.value.trim()) {
-                    this.classList.remove('error');
-                }
-            });
-        });
-
-        // Validar formato de email
-        document.getElementById('correo').addEventListener('blur', function () {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (this.value && !emailRegex.test(this.value)) {
-                this.classList.add('error');
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Correo inválido',
-                    text: 'Por favor ingresa un correo electrónico válido',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
-            }
-        });
-
-        // Formatear teléfono automáticamente
-        document.getElementById('telefono').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 10) value = value.slice(0, 10);
-
-            if (value.length > 6) {
-                e.target.value = `+57 ${value.slice(0, 3)} ${value.slice(3, 6)} ${value.slice(6)}`;
-            } else if (value.length > 3) {
-                e.target.value = `+57 ${value.slice(0, 3)} ${value.slice(3)}`;
-            } else if (value.length > 0) {
-                e.target.value = `+57 ${value}`;
-            }
-        });
+    }
+`;
+document.head.appendChild(estilosAnimacion);

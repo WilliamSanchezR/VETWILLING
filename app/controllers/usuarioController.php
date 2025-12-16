@@ -14,9 +14,10 @@ switch ($method) {
             actualizarUsuario();
         } else if ($accion  === 'actualizar-constrasena') {
             cambioContrasena();
-        }
-        else if ($accion  === 'modificar-constrasena') {
+        } else if ($accion  === 'modificar-constrasena') {
             modiContrasena();
+        } else if ($accion  === 'vet-constrasena') {
+            vetContrasena();
         } else if ($accion === 'cambiar-foto') {
             actualizarFotoPerfil();
         } else {
@@ -49,7 +50,7 @@ switch ($method) {
 
 // FUNCION PARA REGISTRAR UN NUEVO USUARIO
 function registrarUsuario()
-{   
+{
     // Capturamos los datos enviados por el formulario
     $email = $_POST['email'] ?? '';
     $password = '123';
@@ -64,7 +65,7 @@ function registrarUsuario()
     $id_veterinaria = $_POST['veterinaria'] ?? null;
     $nivel_acceso = 'Completo';
     $img_perfil = null;
-    
+
     // Validamos que los campos no esten vacios
     if (
         empty($email) || empty($password) || empty($estado) || empty($id_rol) ||
@@ -101,8 +102,6 @@ function registrarUsuario()
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
         move_uploaded_file($file['tmp_name'], $destino);
-    } else {
-        $img_perfil = 'foto_default.jpg';
     }
     // Creamos el objeto de la clase Usuario
     $objUsuario = new Usuario();
@@ -151,6 +150,13 @@ function consultarUsuarioId($id)
 {
     $objUsuario = new Usuario();
     return $objUsuario->consultarUsuario($id);
+}
+
+// FUNCION PARA CONSULTAR UN USUARIO POR ID para ticket
+function consultarUsuarioTicketId($id)
+{
+    $objUsuario = new Usuario();
+    return $objUsuario->consultarUsuarioTicket($id);
 }
 
 // FUNCION PARA ACTUALIZAR LOS DATOS DEL USUARIO
@@ -236,6 +242,54 @@ function eliminarUsuario($id)
 
 // FUNCION PARA CAMBIAR LA CONTRASEÑA DEL USUARIO
 function cambioContrasena()
+{
+    $id_usuario = $_POST['id_usuario'] ?? '';
+    $passwordActual = $_POST['contrasena-actual'] ?? '';
+    $PasswordNuevo = $_POST['nueva-contrasena'] ?? '';
+    $PasswordConfir = $_POST['confi-contrasena'] ?? '';
+
+    if (
+        empty($id_usuario) || empty($passwordActual) || empty($PasswordNuevo) ||
+        empty($PasswordConfir)
+    ) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Complete todos los campos');
+        exit();
+    }
+
+    if ($PasswordConfir !== $PasswordNuevo) {
+        mostrarSweetAlert('error', 'Constraseña Invalida', 'La confirmación de contraseña no es igual a la constraseña nueva.');
+        exit();
+    }
+
+    if ($passwordActual === $PasswordNuevo) {
+        mostrarSweetAlert('error', 'Constraseña Invalida', 'La nueva contraseña no puede ser igual a la constraseña actual.');
+        exit();
+    }
+
+    $objUsuario = new Usuario();
+
+    $data = [
+        'id_usuario' => $id_usuario,
+        'password_actual' => $passwordActual,
+        'nuevo_password' => $PasswordNuevo
+    ];
+
+    $resultado = $objUsuario->actualizarContrasena($data);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Contraseña actualizada',
+            'La contraseña han sido actualizada correctamente',
+            '/vetwilling/admin/perfil-administrador'
+        );
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la contraseña');
+    }
+
+    exit();
+}
+function vetContrasena()
 {
     $id_usuario = $_POST['id_usuario'] ?? '';
     $passwordActual = $_POST['contrasena-actual'] ?? '';
@@ -387,4 +441,3 @@ function actualizarFotoPerfil()
 
     exit();
 }
-

@@ -35,16 +35,13 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Propio -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoardVeterinariaStyle.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
+
 
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
 </head>
 
 <body>
@@ -53,13 +50,6 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
     <!-- Include de la barra lateral izquierda -->
     <?php
     include_once __DIR__ . '/../../layouts/sidebar_administrador.php'
-    ?>
-
-
-    <!-- PANEL DERECHO -->
-    <!-- Include de notificaciones -->
-    <?php
-    include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -75,7 +65,7 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
         <div class="wizard-container">
             <div class="wizard-header">
                 <i class="bi bi-person-vcard"></i>
-                <h2>Registro de veterinaria</h2>
+                <h2>Editar veterinaria</h2>
                 <p class="text-muted">Complete todos los campos requeridos para registrar la veterinaria</p>
             </div>
 
@@ -91,56 +81,122 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
 
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label><i class="bi bi-hash"></i> Nit *</label>
-                                    <input type="text" id="nit" name="nit" required placeholder="000.123.456-7" value="<?= $veterinariaData['nit'] ?>">
-                                </div>
+                            <div class="form-group">
+                                <label><i class="bi bi-hash"></i> Nit *</label>
+                                <input type="text" id="nit" name="nit" required placeholder="000.123.456-7" value="<?= $veterinariaData['nit'] ?>">
                             </div>
-
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-person"></i> Nombre *</label>
+                                <label><i class="bi bi-clipboard2-data"></i> Razón Social *</label>
                                 <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Juan Pérez García" value="<?= $veterinariaData['nombre'] ?>">
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-geo-alt"></i> Ciudad *</label>
-                                <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Bogotá" value="<?= $veterinariaData['ciudad'] ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-building"></i> Dirección *</label>
-                                <input type="text" id="direccion" name="direccion" required placeholder="Ej: Calle 12 # 34-56" value="<?= $veterinariaData['direccion'] ?>">
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567" value="<?= $veterinariaData['telefono'] ?>">
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Email *</label>
                                 <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $veterinariaData['email'] ?>">
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567" value="<?= $veterinariaData['telefono'] ?>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label><i class="bi bi-envelope"></i> Foto </label>
+                                    <input type="file" accept=".jpg, .png, .jpeg" id="foto" name="foto">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-pin-map"></i>Ciudad *</label>
+                                <select name="ciudad" id="ciudad" required>
+                                    <option value="<?= $veterinariaData['ciudad'] ?>"><?= $veterinariaData['ciudad'] ?></option>
+
+                                    <!-- Principales ciudades -->
+                                    <option value="Bogotá">Bogotá</option>
+                                    <option value="Medellín">Medellín</option>
+                                    <option value="Cali">Cali</option>
+                                    <option value="Barranquilla">Barranquilla</option>
+                                    <option value="Cartagena">Cartagena</option>
+                                    <option value="Bucaramanga">Bucaramanga</option>
+                                    <option value="Cúcuta">Cúcuta</option>
+                                    <option value="Pereira">Pereira</option>
+                                    <option value="Manizales">Manizales</option>
+                                    <option value="Armenia">Armenia</option>
+                                    <option value="Ibagué">Ibagué</option>
+                                    <option value="Villavicencio">Villavicencio</option>
+                                    <option value="Neiva">Neiva</option>
+                                    <option value="Pasto">Pasto</option>
+                                    <option value="Popayán">Popayán</option>
+                                    <option value="Tunja">Tunja</option>
+                                    <option value="Montería">Montería</option>
+                                    <option value="Sincelejo">Sincelejo</option>
+                                    <option value="Valledupar">Valledupar</option>
+                                    <option value="Riohacha">Riohacha</option>
+                                    <option value="Santa Marta">Santa Marta</option>
+                                    <option value="San Andrés">San Andrés</option>
+                                    <option value="Leticia">Leticia</option>
+                                    <option value="Mocoa">Mocoa</option>
+                                    <option value="Yopal">Yopal</option>
+                                    <option value="Arauca">Arauca</option>
+                                    <option value="Florencia">Florencia</option>
+                                    <option value="Quibdó">Quibdó</option>
+                                    <option value="Inírida">Inírida</option>
+                                    <option value="Mitú">Mitú</option>
+                                    <option value="Puerto Carreño">Puerto Carreño</option>
+
+                                    <!-- Área metropolitana y ciudades comunes -->
+                                    <option value="Soacha">Soacha</option>
+                                    <option value="Chía">Chía</option>
+                                    <option value="Zipaquirá">Zipaquirá</option>
+                                    <option value="Girardot">Girardot</option>
+                                    <option value="Facatativá">Facatativá</option>
+                                    <option value="Fusagasugá">Fusagasugá</option>
+
+                                    <option value="Envigado">Envigado</option>
+                                    <option value="Itagüí">Itagüí</option>
+                                    <option value="Bello">Bello</option>
+                                    <option value="Rionegro">Rionegro</option>
+
+                                    <option value="Palmira">Palmira</option>
+                                    <option value="Tuluá">Tuluá</option>
+                                    <option value="Buenaventura">Buenaventura</option>
+
+                                    <option value="Dosquebradas">Dosquebradas</option>
+                                    <option value="La Dorada">La Dorada</option>
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Estado *</label>
+                                <label><i class="bi bi-geo-alt"></i> Dirección *</label>
+                                <input type="text" id="direccion" name="direccion" required placeholder="Ej: Calle 12 # 34-56" value="<?= $veterinariaData['direccion'] ?>">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-card-text"></i> Estado *</label>
                                 <select id="estado" name="estado" required>
                                     <option value="<?= $veterinariaData['estado'] ?>"><?= $veterinariaData['estado'] ?></option>
                                     <option value="Activo">Activo</option>
@@ -153,25 +209,12 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
 
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <div class="form-group">
-                                    <label><i class="bi bi-envelope"></i> Foto </label>
-                                    <input type="file" accept=".jpg, .png, .jpeg" id="foto" name="foto">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
                     <div class="buttons">
                         <span></span>
                         <button type="submit" class="btn btn-success" id="btnGuardarVeterinaria">
                             Guardar <i class="bi bi-floppy"></i>
                         </button>
                     </div>
-                </div>
             </form>
 
         </div>
@@ -188,7 +231,6 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
         crossorigin="anonymous"></script>
 
     <!-- Propio -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 

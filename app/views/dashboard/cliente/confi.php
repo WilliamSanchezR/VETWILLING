@@ -21,11 +21,11 @@ $usuario = consultarPropietarioId($id);
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
     <!-- estilos propios y algunas cosas que son importantes para que se vea mas wonito -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/perfil.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/confi.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/perfil.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/confi.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
 
 </head>
 
@@ -72,7 +72,7 @@ $usuario = consultarPropietarioId($id);
                 <div class="tab-content" id="tab-cuenta">
                     <form method="POST" action="<?= BASE_URL ?>/Cliente/actualizar" enctype="multipart/form-data">
                         <input type="hidden" name="accion" value="actualizar">
-                        <input type="hidden" name="id_propetario" value="<?= $_SESSION['user']['id_usuario'] ?>">
+                        <input type="hidden" name="id_propietario" value="<?= $_SESSION['user']['id'] ?>">
 
                         <!-- Foto de Perfil -->
                         <div class="config-card">
@@ -531,10 +531,10 @@ $usuario = consultarPropietarioId($id);
             </div>
         </div>
     </main>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/confi.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/confi.js"></script>
 </body>
 
 </html>

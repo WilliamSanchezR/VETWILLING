@@ -1,6 +1,4 @@
-/* ========================================
-   RESET Y BASE
-======================================== */
+/* RESET Y BASE*/
 * {
     margin: 0;
     padding: 0;
@@ -12,9 +10,7 @@ body {
     background: #f5f7fb;
 }
 
-/* ========================================
-   NAVBAR SUPERIOR
-======================================== */
+/* NAVBAR SUPERIOR*/
 .navbar-superior {
     background: white;
     height: 70px;
@@ -30,9 +26,7 @@ body {
     transition: all 0.3s ease;
 }
 
-/* ========================================
-   SECCIÓN IZQUIERDA (OPCIONAL)
-======================================== */
+/* SECCIÓN IZQUIERDA (OPCIONAL)*/
 .navbar-izquierda {
     display: flex;
     align-items: center;
@@ -55,7 +49,7 @@ body {
 }
 
 .btn-menu-mobile:hover {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #9DE795);
     color: white;
     transform: scale(1.05);
 }
@@ -74,7 +68,7 @@ body {
 }
 
 .ubicacion-actual i {
-    color: #667eea;
+    color: #0A932C;
     font-size: 18px;
 }
 
@@ -88,9 +82,7 @@ body {
     color: #2c3e50;
 }
 
-/* ========================================
-   SECCIÓN CENTRO - BUSCADOR
-======================================== */
+/* SECCIÓN CENTRO - BUSCADOR*/
 .navbar-centro {
     flex: 1;
     max-width: 600px;
@@ -108,7 +100,7 @@ body {
     top: 50%;
     transform: translateY(-50%);
     font-size: 18px;
-    color: #667eea;
+    color: #0A932C;
     pointer-events: none;
     z-index: 1;
 }
@@ -125,7 +117,7 @@ body {
 
 .input-buscar:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #0A932C;
     background: white;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
@@ -134,9 +126,7 @@ body {
     color: #adb5bd;
 }
 
-/* ========================================
-   SECCIÓN DERECHA - ACCIONES
-======================================== */
+/* SECCIÓN DERECHA - ACCIONES*/
 .navbar-derecha {
     display: flex;
     align-items: center;
@@ -144,9 +134,7 @@ body {
     position: relative;
 }
 
-/* ========================================
-   BOTONES NAVBAR
-======================================== */
+/* BOTONES NAVBAR*/
 .btn-navbar {
     width: 40px;
     height: 40px;
@@ -165,7 +153,7 @@ body {
 
 .btn-navbar:hover {
     background: #e9ecef;
-    color: #667eea;
+    color: #0A932C;
     transform: scale(1.05);
 }
 
@@ -201,18 +189,14 @@ body {
     }
 }
 
-/* ========================================
-   SEPARADOR
-======================================== */
+/* SEPARADOR*/
 .navbar-separador {
     width: 1px;
     height: 35px;
     background: #e9ecef;
 }
 
-/* ========================================
-   BOTÓN PERFIL
-======================================== */
+/* BOTÓN PERFIL*/
 .btn-perfil {
     display: flex;
     align-items: center;
@@ -238,7 +222,6 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -253,6 +236,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 10px;
 }
 
 .avatar-usuario.grande {
@@ -292,9 +276,7 @@ body {
     transform: rotate(180deg);
 }
 
-/* ========================================
-   DROPDOWNS
-======================================== */
+/* DROPDOWNS*/
 .dropdown-menu {
     position: absolute;
     top: calc(100% + 10px);
@@ -329,9 +311,7 @@ body {
     }
 }
 
-/* ========================================
-   DROPDOWN NOTIFICACIONES
-======================================== */
+/* DROPDOWN NOTIFICACIONES*/
 .dropdown-notificaciones {
     max-width: 380px;
 }
@@ -355,7 +335,7 @@ body {
 .btn-marcar-leidas {
     background: none;
     border: none;
-    color: #667eea;
+    color: #0A932C;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -401,7 +381,7 @@ body {
 
 .notificacion-item:hover {
     background: #f8f9fa;
-    border-left-color: #667eea;
+    border-left-color: #0A932C;
 }
 
 .notificacion-item.no-leida {
@@ -465,7 +445,7 @@ body {
 }
 
 .btn-ver-todas {
-    color: #667eea;
+    color: #0A932C;
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
@@ -477,10 +457,94 @@ body {
     color: #5568d3;
     text-decoration: underline;
 }
+/* coso del carrito */
+.carrito-sidebar {
+    position: fixed;
+    top: 0;
+    right: -350px;
+    width: 350px;
+    height: 100%;
+    background: #fff;
+    border-left: 2px solid #ddd;
+    box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+    padding: 20px;
+    transition: right .3s ease;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
 
-/* ========================================
-   DROPDOWN PERFIL
-======================================== */
+.carrito-sidebar.open {
+    right: 0;
+}
+
+.carrito-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cerrar-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.carrito-items {
+    margin-top: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.carrito-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.carrito-item h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.btn-eliminar {
+    background: #ff4747;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.carrito-footer {
+    border-top: 2px solid #eee;
+    padding-top: 10px;
+}
+
+.btn-pagar {
+    width: 100%;
+    padding: 10px;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.contador {
+    background: red;
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 50%;
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+
+/* DROPDOWN PERFIL*/
 .dropdown-perfil {
     min-width: 280px;
 }
@@ -490,7 +554,7 @@ body {
     display: flex;
     gap: 15px;
     align-items: center;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #9DE795);
     color: white;
 }
 
@@ -527,7 +591,7 @@ body {
 
 .dropdown-item:hover {
     background: #f8f9fa;
-    color: #667eea;
+    color: #0A932C;
 }
 
 .dropdown-item i {
@@ -545,9 +609,7 @@ body {
     color: #d32f2f;
 }
 
-/* ========================================
-   RESPONSIVE
-======================================== */
+/* RESPONSIVE*/
 @media (max-width: 992px) {
     .navbar-centro {
         max-width: 400px;
@@ -618,9 +680,7 @@ body {
     }
 }
 
-/* ========================================
-   ESTADOS Y ANIMACIONES
-======================================== */
+/* ESTADOS Y ANIMACIONES*/
 .navbar-superior.scrolled {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -648,7 +708,7 @@ body {
     right: 30px;
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #0A932C, #9DE795);
     border: none;
     border-radius: 50%;
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
@@ -684,9 +744,7 @@ body {
     border: 3px solid white;
 }
 
-/* ========================================
-   UTILIDADES
-======================================== */
+/* UTILIDADES*/
 .hidden {
     display: none !important;
 }

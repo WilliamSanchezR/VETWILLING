@@ -25,7 +25,7 @@
         <!-- Columna izquierda -->
         <div class="cont-left">
             <div class="logo">
-                <img src="<?= BASE_URL ?>/public/assets/auth/img/LOGO-POSITIVO 1.png" alt="Logo VetWilling">
+                <a href="<?= BASE_URL ?>/"><img src="<?= BASE_URL ?>/public/assets/auth/img/LOGO-POSITIVO 1.png" alt="Logo VetWilling"></a>
             </div>
 
             <div class="form-header">
@@ -66,7 +66,6 @@
         <!-- Columna derecha -->
         <div class="cont-right">
             <div class="info">
-                <div class="info-icon">🔐</div>
                 <h3>¿Olvidaste tu contraseña?</h3>
                 <p>No te preocupes, es normal. Te ayudaremos a recuperar el acceso a tu cuenta de forma rápida y segura.</p>
 
