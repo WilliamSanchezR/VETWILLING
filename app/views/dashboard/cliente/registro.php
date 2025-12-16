@@ -19,6 +19,9 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
     <!-- Favicon -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
     <!-- CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
@@ -44,47 +47,39 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
                 <!-- HEADER -->
                 <div class="header-registro">
-                    <h1>🐾 Registrar Nueva Mascota</h1>
+                    <h1><i class="fa-solid fa-shield-dog"></i> Registrar Nueva Mascota</h1>
                     <p>Completa la información de tu nueva mascota</p>
                 </div>
 
                 <!-- FORMULARIO -->
                 <div class="form-card">
 
-                    <!-- ALERT -->
-                    <div class="alert alert-success" id="alertSuccess">
-                        <i class="bi bi-check-circle-fill" style="font-size: 24px;"></i>
-                        <div>
-                            <strong>¡Éxito!</strong> Tu mascota ha sido registrada correctamente.
-                        </div>
-                    </div>
-
-                    <div class="alert alert-error" id="alertError">
-                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 24px;"></i>
-                        <div>
-                            <strong>Error:</strong> Por favor completa todos los campos obligatorios.
-                        </div>
-                    </div>
-
-                    <!-- FOTO -->
-                    <div class="foto-upload-section">
-                        <div class="foto-preview-container">
-                            <div class="foto-preview" id="fotoPreview">
-                                🐕
-                            </div>
-                            <label for="inputFotoMascota" class="btn-cambiar-foto">
-                                <i class="bi bi-camera-fill"></i>
-                            </label>
-                            <input type="file" id="inputFotoMascota" class="input-foto" accept="image/*" onchange="previewFoto(event)">
-                        </div>
-                        <p class="foto-info">
-                            <strong>Foto de tu mascota</strong><br>
-                            JPG, PNG o GIF (máx. 5MB)
-                        </p>
-                    </div>
-
                     <!-- FORMULARIO -->
-                    <form id="formRegistroMascota">
+                    <form id="formRegistroMascota"
+                        action="<?= BASE_URL ?>/cliente/guardar-mascota"
+                        method="POST"
+                        enctype="multipart/form-data">
+
+                        <!-- FOTO -->
+                        <div class="foto-upload-section">
+                            <div class="foto-preview-container">
+                                <div class="foto-preview" id="fotoPreview">
+                                    <i class="fa-solid fa-dog"></i>
+                                </div>
+                                <label for="inputFotoMascota" class="btn-cambiar-foto">
+                                    <i class="bi bi-camera-fill"></i>
+                                </label>
+                                <input type="file"
+                                    id="inputFotoMascota"
+                                    class="input-foto"
+                                    name="img_mascota"
+                                    accept="image/jpeg,image/jpg,image/png">
+                            </div>
+                            <p class="foto-info">
+                                <strong>Foto de tu mascota (opcional)</strong><br>
+                                JPG, PNG (máx. 5MB)
+                            </p>
+                        </div>
 
                         <!-- NOMBRE -->
                         <div class="form-group">
@@ -92,63 +87,296 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                                 Nombre de la Mascota
                                 <span class="required">*</span>
                             </label>
-                            <input
-                                type="text"
+                            <input type="text"
                                 id="nombre"
+                                name="nombre"
                                 placeholder="Ej: Max, Luna, Rocky..."
                                 required>
                         </div>
 
                         <!-- ESPECIE Y RAZA -->
+                        <!-- ESPECIE Y RAZA DINÁMICOS -->
                         <div class="form-row">
+                            <!-- ESPECIE -->
                             <div class="form-group">
                                 <label>
                                     Especie
                                     <span class="required">*</span>
                                 </label>
-                                <select id="especie" required onchange="actualizarRazas()">
+                                <select id="especie" name="especie" class="form-control" required>
                                     <option value="">Selecciona una especie</option>
-                                    <option value="perro">🐕 Perro</option>
-                                    <option value="gato">🐈 Gato</option>
-                                    <option value="ave">🦜 Ave</option>
-                                    <option value="conejo">🐰 Conejo</option>
-                                    <option value="hamster">🐹 Hámster</option>
-                                    <option value="otro">🐾 Otro</option>
+                                    <option value="Perro" data-icon="bi-dog">Perro</option>
+                                    <option value="Gato" data-icon="bi-cat">Gato</option>
+                                    <option value="Ave" data-icon="bi-feather">Ave</option>
+                                    <option value="Conejo" data-icon="bi-rabbit">Conejo</option>
+                                    <option value="Hamster" data-icon="bi-circle">Hámster</option>
+                                    <option value="Otro" data-icon="bi-paw">Otro</option>
                                 </select>
                             </div>
 
+                            <!-- RAZA (SE FILTRA SEGÚN ESPECIE) -->
                             <div class="form-group">
                                 <label>
                                     Raza
                                     <span class="required">*</span>
                                 </label>
-                                <select id="raza" required disabled>
-                                    <option value="">Selecciona primero una especie</option>
+                                <select id="raza" name="raza" required disabled>
+                                    <option value="">Primero selecciona una especie</option>
                                 </select>
                             </div>
                         </div>
 
+                        <script>
+                            // 🎯 SISTEMA DE RAZAS DINÁMICAS
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const especieSelect = document.getElementById('especie');
+                                const razaSelect = document.getElementById('raza');
+
+                                // 📋 Base de datos de razas por especie
+                                const razasPorEspecie = {
+                                    'Perro': [
+                                        'Labrador Retriever',
+                                        'Golden Retriever',
+                                        'Pastor Alemán',
+                                        'Bulldog Francés',
+                                        'Bulldog Inglés',
+                                        'Beagle',
+                                        'Poodle',
+                                        'Chihuahua',
+                                        'Yorkshire Terrier',
+                                        'Boxer',
+                                        'Dachshund (Salchicha)',
+                                        'Husky Siberiano',
+                                        'Shih Tzu',
+                                        'Rottweiler',
+                                        'Doberman',
+                                        'Pomerania',
+                                        'Border Collie',
+                                        'Cocker Spaniel',
+                                        'Schnauzer',
+                                        'Pitbull',
+                                        'Mestizo'
+                                    ],
+                                    'Gato': [
+                                        'Siamés',
+                                        'Persa',
+                                        'Maine Coon',
+                                        'Bengalí',
+                                        'Ragdoll',
+                                        'Sphynx (Sin pelo)',
+                                        'British Shorthair',
+                                        'Abisinio',
+                                        'Scottish Fold',
+                                        'Angora',
+                                        'Exótico',
+                                        'Birmano',
+                                        'Mestizo'
+                                    ],
+                                    'Ave': [
+                                        'Canario',
+                                        'Periquito',
+                                        'Loro',
+                                        'Cacatúa',
+                                        'Agapornis (Inseparable)',
+                                        'Ninfa (Cockatiel)',
+                                        'Guacamayo',
+                                        'Papagayo',
+                                        'Diamante mandarín',
+                                        'Perico australiano'
+                                    ],
+                                    'Conejo': [
+                                        'Mini Rex',
+                                        'Holandés',
+                                        'Cabeza de León',
+                                        'Angora',
+                                        'Belier',
+                                        'Toy',
+                                        'Californiano',
+                                        'Gigante de Flandes',
+                                        'Mini Lop'
+                                    ],
+                                    'Hamster': [
+                                        'Sirio (Dorado)',
+                                        'Ruso',
+                                        'Roborovski',
+                                        'Chino',
+                                        'Campbell'
+                                    ],
+                                    'Otro': [
+                                        'No aplica',
+                                        'Otra raza'
+                                    ]
+                                };
+
+                                // 🎨 Evento cuando se cambia la especie
+                                especieSelect.addEventListener('change', function() {
+                                    const especieSeleccionada = this.value;
+
+                                    // Limpiar opciones anteriores
+                                    razaSelect.innerHTML = '<option value="">Selecciona una raza</option>';
+
+                                    if (especieSeleccionada && razasPorEspecie[especieSeleccionada]) {
+                                        // Habilitar el select de raza
+                                        razaSelect.disabled = false;
+
+                                        // Agregar las razas correspondientes
+                                        razasPorEspecie[especieSeleccionada].forEach(function(raza) {
+                                            const option = document.createElement('option');
+                                            option.value = raza;
+                                            option.textContent = raza;
+                                            razaSelect.appendChild(option);
+                                        });
+
+                                        // Animación suave
+                                        razaSelect.style.opacity = '0.5';
+                                        setTimeout(() => {
+                                            razaSelect.style.opacity = '1';
+                                        }, 100);
+
+                                    } else {
+                                        // Deshabilitar si no hay especie seleccionada
+                                        razaSelect.disabled = true;
+                                        razaSelect.innerHTML = '<option value="">Primero selecciona una especie</option>';
+                                    }
+                                });
+
+                                // 💡 Mensaje de ayuda cuando el campo está deshabilitado
+                                razaSelect.addEventListener('click', function() {
+                                    if (this.disabled) {
+                                        const especieInput = document.getElementById('especie');
+                                        especieInput.focus();
+                                        especieInput.style.borderColor = '#ff6b6b';
+                                        setTimeout(() => {
+                                            especieInput.style.borderColor = '';
+                                        }, 1000);
+                                    }
+                                });
+                            });
+                        </script>
+
+                        <style>
+                            /* Estilos para transición suave */
+                            #raza {
+                                transition: opacity 0.3s ease, border-color 0.3s ease;
+                            }
+
+                            #raza:disabled {
+                                background-color: #f5f5f5;
+                                cursor: not-allowed;
+                                opacity: 0.6;
+                            }
+
+                            #especie:focus {
+                                border-color: #1b8f72 !important;
+                                box-shadow: 0 0 0 0.2rem rgba(27, 143, 114, 0.25);
+                            }
+                        </style>
+
                         <!-- EDAD -->
+                        <!-- EDAD CON UNIDAD DE TIEMPO -->
                         <div class="form-group">
                             <label>
-                                Edad
+                                Edad de la Mascota
                                 <span class="required">*</span>
                             </label>
-                            <div class="edad-container">
-                                <input
-                                    type="number"
-                                    id="edadNumero"
-                                    class="edad-input"
-                                    placeholder="Ej: 3"
-                                    min="0"
-                                    max="50"
-                                    required>
-                                <select id="edadUnidad" class="edad-unidad" required>
-                                    <option value="meses">Meses</option>
-                                    <option value="años" selected>Años</option>
-                                </select>
+
+                            <div class="edad-container" style="display: flex; gap: 10px; align-items: flex-start;">
+                                <!-- Campo numérico -->
+                                <div style="flex: 1;">
+                                    <input type="number"
+                                        id="edad_numero"
+                                        name="edad_numero"
+                                        placeholder="Ej: 3"
+                                        min="1"
+                                        max="999"
+                                        class="form-control"
+                                        style="height: 54px; border: 2px solid #e0e0e0; border-radius: 8px;"
+                                        required>
+                                </div>
+
+                                <!-- Selector de unidad -->
+                                <div style="flex: 1;">
+                                    <select id="edad_unidad"
+                                        name="edad_unidad"
+                                        class="form-control"
+                                        style=" border: 2px solid #e0e0e0; border-radius: 8px;"
+                                        required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Dias">Días</option>
+                                        <option value="Semanas">Semanas</option>
+                                        <option value="Meses">Meses</option>
+                                        <option value="Años" selected>Años</option>
+                                    </select>
+                                </div>
                             </div>
+
+                            <!-- Mensaje de ayuda -->
+                            <small class="text-muted" style="display: block; margin-top: 8px;">
+                                <i class="bi bi-info-circle"></i>
+                                Ejemplo: Para un cachorro de 3 meses, ingresa "3" y selecciona "Meses"
+                            </small>
                         </div>
+
+                        <!-- <style>
+                            .edad-container .form-control:focus {
+                                border-color: #1b8f72;
+                                box-shadow: 0 0 0 0.2rem rgba(17, 137, 107, 0.25);
+                            }
+                        </style> -->
+
+                        <script>
+                            // Agregar este script al final de tu página (después del script de preview de imagen)
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const edadNumero = document.getElementById('edad_numero');
+                                const edadUnidad = document.getElementById('edad_unidad');
+
+                                // Validación al cambiar la unidad
+                                if (edadUnidad) {
+                                    edadUnidad.addEventListener('change', function() {
+                                        const unidad = this.value;
+                                        const numero = parseInt(edadNumero.value) || 0;
+
+                                        // Ajustar el máximo según la unidad
+                                        switch (unidad) {
+                                            case 'dias':
+                                                edadNumero.max = 365;
+                                                edadNumero.placeholder = "Máx. 365 días";
+                                                if (numero > 365) edadNumero.value = 365;
+                                                break;
+                                            case 'semanas':
+                                                edadNumero.max = 208;
+                                                edadNumero.placeholder = "Máx. 208 semanas";
+                                                if (numero > 208) edadNumero.value = 208;
+                                                break;
+                                            case 'meses':
+                                                edadNumero.max = 240;
+                                                edadNumero.placeholder = "Máx. 240 meses";
+                                                if (numero > 240) edadNumero.value = 240;
+                                                break;
+                                            case 'años':
+                                                edadNumero.max = 30;
+                                                edadNumero.placeholder = "Máx. 30 años";
+                                                if (numero > 30) edadNumero.value = 30;
+                                                break;
+                                        }
+                                    });
+                                }
+
+                                // Validación en tiempo real del número
+                                if (edadNumero) {
+                                    edadNumero.addEventListener('input', function() {
+                                        const valor = parseInt(this.value);
+                                        const max = parseInt(this.max);
+
+                                        if (valor < 1) {
+                                            this.value = 1;
+                                        } else if (valor > max) {
+                                            this.value = max;
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
 
                         <!-- SEXO -->
                         <div class="form-group">
@@ -158,14 +386,14 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                             </label>
                             <div class="radio-group">
                                 <div class="radio-option">
-                                    <input type="radio" name="sexo" id="macho" value="macho" required>
+                                    <input type="radio" name="sexo" id="macho" value="Macho" required>
                                     <label for="macho" class="radio-label">
                                         <i class="bi bi-gender-male"></i>
                                         Macho
                                     </label>
                                 </div>
                                 <div class="radio-option">
-                                    <input type="radio" name="sexo" id="hembra" value="hembra" required>
+                                    <input type="radio" name="sexo" id="hembra" value="Hembra" required>
                                     <label for="hembra" class="radio-label">
                                         <i class="bi bi-gender-female"></i>
                                         Hembra
@@ -174,43 +402,13 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                             </div>
                         </div>
 
-                        <!-- CAMPOS OPCIONALES -->
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Color</label>
-                                <input
-                                    type="text"
-                                    id="color"
-                                    placeholder="Ej: Blanco, Negro, Dorado...">
-                            </div>
-
-                            <div class="form-group">
-                                <label>Peso (kg)</label>
-                                <input
-                                    type="number"
-                                    id="peso"
-                                    placeholder="Ej: 15.5"
-                                    step="0.1"
-                                    min="0">
-                            </div>
-                        </div>
-
-                        <!-- INFORMACIÓN ADICIONAL -->
-                        <div class="form-group">
-                            <label>Información Adicional</label>
-                            <input
-                                type="text"
-                                id="infoAdicional"
-                                placeholder="Alergias, comportamiento, características especiales...">
-                        </div>
-
                         <!-- BOTONES -->
                         <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" onclick="cancelarRegistro()">
+                            <a href="<?= BASE_URL ?>/cliente/perfil" class="btn btn-secondary">
                                 <i class="bi bi-x-lg"></i>
                                 Cancelar
-                            </button>
-                            <button type="button" class="btn btn-primary" onclick="guardarMascota()">
+                            </a>
+                            <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check-lg"></i>
                                 Registrar Mascota
                             </button>
@@ -352,95 +550,35 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
             }
         }
 
+    <!-- Preview de imagen -->
+    <script>
         // Preview de foto
-        function previewFoto(event) {
-            const file = event.target.files[0];
+        document.getElementById('inputFotoMascota').addEventListener('change', function(e) {
+            const file = e.target.files[0];
             if (file) {
                 // Validar tamaño (5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     alert('La imagen es demasiado grande. Máximo 5MB');
+                    this.value = '';
+                    return;
+                }
+
+                // Validar tipo
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Solo se permiten archivos JPG, JPEG y PNG');
+                    this.value = '';
                     return;
                 }
 
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('fotoPreview');
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Foto mascota">`;
+                reader.onload = function(event) {
+                    document.getElementById('fotoPreview').innerHTML =
+                        `<img src="${event.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
                 }
                 reader.readAsDataURL(file);
             }
-        }
-
-        // Guardar mascota
-        function guardarMascota() {
-            const form = document.getElementById('formRegistroMascota');
-
-            // Validar campos requeridos
-            const nombre = document.getElementById('nombre').value.trim();
-            const especie = document.getElementById('especie').value;
-            const raza = document.getElementById('raza').value;
-            const edad = document.getElementById('edadNumero').value;
-            const sexo = document.querySelector('input[name="sexo"]:checked');
-
-            if (!nombre || !especie || !raza || !edad || !sexo) {
-                mostrarAlert('error');
-                return;
-            }
-
-            // Aquí enviarías los datos al servidor
-            const datos = {
-                nombre: nombre,
-                especie: especie,
-                raza: raza,
-                edad: edad + ' ' + document.getElementById('edadUnidad').value,
-                sexo: sexo.value,
-                color: document.getElementById('color').value,
-                peso: document.getElementById('peso').value,
-                infoAdicional: document.getElementById('infoAdicional').value,
-                foto: document.getElementById('inputFotoMascota').files[0]
-            };
-
-            console.log('Datos de mascota:', datos);
-
-            // Mostrar éxito
-            mostrarAlert('success');
-
-            // Resetear formulario después de 2 segundos
-            setTimeout(() => {
-                form.reset();
-                document.getElementById('fotoPreview').textContent = '🐕';
-                document.getElementById('raza').disabled = true;
-                ocultarAlerts();
-            }, 2000);
-        }
-
-        // Cancelar registro
-        function cancelarRegistro() {
-            if (confirm('¿Estás seguro de cancelar el registro?')) {
-                window.history.back();
-            }
-        }
-
-        // Mostrar alert
-        function mostrarAlert(tipo) {
-            ocultarAlerts();
-            const alert = document.getElementById(tipo === 'success' ? 'alertSuccess' : 'alertError');
-            alert.classList.add('show');
-
-            // Auto ocultar después de 5 segundos
-            setTimeout(() => {
-                alert.classList.remove('show');
-            }, 5000);
-        }
-
-        // Ocultar alerts
-        function ocultarAlerts() {
-            document.querySelectorAll('.alert').forEach(alert => {
-                alert.classList.remove('show');
-            });
-        }
-
-        console.log('✅ Formulario de registro cargado correctamente');
+        });
     </script>
 </body>
 

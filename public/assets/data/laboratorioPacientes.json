@@ -1,0 +1,202 @@
+[
+  {
+    "folio": "F001",
+    "fecha": "2025-10-10",
+    "propietario": "Laura Pérez",
+    "nombreMascota": "Rocky",
+    "animal": "Perro",
+    "raza": "Labrador Retriever",
+    "cantLaboratorios": 2,
+    "estado": "2"
+  },
+  {
+    "folio": "F002",
+    "fecha": "2025-09-28",
+    "propietario": "Carlos Gómez",
+    "nombreMascota": "Mishu",
+    "animal": "Gato",
+    "raza": "Persa",
+    "cantLaboratorios": 1,
+    "estado": "1"
+  },
+  {
+    "folio": "F003",
+    "fecha": "2025-10-01",
+    "propietario": "Ana Torres",
+    "nombreMascota": "Bobby",
+    "animal": "Perro",
+    "raza": "Beagle",
+    "cantLaboratorios": 3,
+    "estado": "1"
+  },
+  {
+    "folio": "F004",
+    "fecha": "2025-09-15",
+    "propietario": "Luis Fernández",
+    "nombreMascota": "Luna",
+    "animal": "Conejo",
+    "raza": "Mini Lop",
+    "cantLaboratorios": 1,
+    "estado": "2"
+  },
+  {
+    "folio": "F005",
+    "fecha": "2025-08-30",
+    "propietario": "María López",
+    "nombreMascota": "Toby",
+    "animal": "Perro",
+    "raza": "Golden Retriever",
+    "cantLaboratorios": 1,
+    "estado": "3"
+  },
+  {
+    "folio": "F006",
+    "fecha": "2025-09-21",
+    "propietario": "Jorge Castillo",
+    "nombreMascota": "Nala",
+    "animal": "Gato",
+    "raza": "Bengala",
+    "cantLaboratorios": 2,
+    "estado": "2"
+  },
+  {
+    "folio": "F007",
+    "fecha": "2025-10-12",
+    "propietario": "Paula Rivera",
+    "nombreMascota": "Simba",
+    "animal": "Ave",
+    "raza": "Cacatúa",
+    "cantLaboratorios": 1,
+    "estado": "1"
+  },
+  {
+    "folio": "F008",
+    "fecha": "2025-09-10",
+    "propietario": "Ricardo Díaz",
+    "nombreMascota": "Max",
+    "animal": "Perro",
+    "raza": "Pastor Alemán",
+    "cantLaboratorios": 2,
+    "estado": "2"
+  },
+  {
+    "folio": "F009",
+    "fecha": "2025-10-05",
+    "propietario": "Fernanda Aguilar",
+    "nombreMascota": "Coco",
+    "animal": "Ave",
+    "raza": "Perico Australiano",
+    "cantLaboratorios": 1,
+    "estado": "1"
+  },
+  {
+    "folio": "F010",
+    "fecha": "2025-09-18",
+    "propietario": "Andrés Morales",
+    "nombreMascota": "Kira",
+    "animal": "Reptil",
+    "raza": "Iguana Verde",
+    "cantLaboratorios": 1,
+    "estado": "2"
+  },
+  {
+    "folio": "F011",
+    "fecha": "2025-08-25",
+    "propietario": "Claudia Ramírez",
+    "nombreMascota": "Milo",
+    "animal": "Perro",
+    "raza": "Pomerania",
+    "cantLaboratorios": 2,
+    "estado": "3"
+  },
+  {
+    "folio": "F012",
+    "fecha": "2025-09-27",
+    "propietario": "Roberto Sánchez",
+    "nombreMascota": "Bella",
+    "animal": "Gato",
+    "raza": "Sphynx",
+    "cantLaboratorios": 2,
+    "estado": "2"
+  },
+  {
+    "folio": "F013",
+    "fecha": "2025-10-02",
+    "propietario": "Gabriela Ríos",
+    "nombreMascota": "Tommy",
+    "animal": "Conejo",
+    "raza": "Rex",
+    "cantLaboratorios": 1,
+    "estado": "1"
+  },
+  {
+    "folio": "F014",
+    "fecha": "2025-09-05",
+    "propietario": "Diego Navarro",
+    "nombreMascota": "Chispa",
+    "animal": "Perro",
+    "raza": "Jack Russell Terrier",
+    "cantLaboratorios": 1,
+    "estado": "1"
+  },
+  {
+    "folio": "F015",
+    "fecha": "2025-10-09",
+    "propietario": "Marta Herrera",
+    "nombreMascota": "Oreo",
+    "animal": "Gato",
+    "raza": "Siamés",
+    "cantLaboratorios": 2,
+    "estado": "2"
+  },
+  {
+    "folio": "F016",
+    "fecha": "2025-09-14",
+    "propietario": "Pablo Mendoza",
+    "nombreMascota": "Lucky",
+    "animal": "Perro",
+    "raza": "Boxer",
+    "cantLaboratorios": 3,
+    "estado": "2"
+  },
+  {
+    "folio": "F017",
+    "fecha": "2025-08-29",
+    "propietario": "Daniela Cruz",
+    "nombreMascota": "Daisy",
+    "animal": "Conejo",
+    "raza": "Cabeza de León",
+    "cantLaboratorios": 2,
+    "estado": "1"
+  },
+  {
+    "folio": "F018",
+    "fecha": "2025-09-20",
+    "propietario": "Sergio Paredes",
+    "nombreMascota": "Thor",
+    "animal": "Perro",
+    "raza": "Doberman",
+    "cantLaboratorios": 3,
+    "estado": "2"
+  },
+  {
+    "folio": "F019",
+    "fecha": "2025-10-07",
+    "propietario": "Lucía Vega",
+    "nombreMascota": "Maya",
+    "animal": "Reptil",
+    "raza": "Gecko Leopardo",
+    "cantLaboratorios": 1,
+    "estado": "1"
+  },
+  {
+    "folio": "F020",
+    "fecha": "2025-09-23",
+    "propietario": "Francisco Ruiz",
+    "nombreMascota": "Pelusa",
+    "animal": "Ave",
+    "raza": "Canario",
+    "cantLaboratorios": 1,
+    "estado": "2"
+  }
+]

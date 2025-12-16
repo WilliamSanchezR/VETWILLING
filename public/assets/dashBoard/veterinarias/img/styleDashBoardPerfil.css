@@ -1,0 +1,464 @@
+/* Configuramos lo basico de un archivo CSS: */
+
+/* - Primero las tipografias */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+/* - Segundo iconos */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+
+/* - Tercero estilos generales */
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Fredoka", sans-serif;
+}
+
+p, a, button, li, label, input, select, textarea, span {
+    font-family: "Open sans", sans-serif;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* - Cuarto variables */
+:root {
+    --color-primario: #0a932c;
+    --color-verde: #9de795;
+    --color-gris: #424b54;
+    --color-azul: #93bedf;
+    --color-fondo: #f8f9fa;
+
+    --fs-titulo1: 32px;
+    --fs-titulo2: 24px;
+    --fs-titulo3: 16px;
+    --fs-titulo4: 14px;
+    --fs-texto: 20px;
+    --fs-texto1: 12px;
+}
+
+/* - Quinto Desktop */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scrollbar-width: none;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    overflow-x: hidden;
+    background-color: #f5f5f5;
+    font-size: var(--fs-texto);
+}
+
+h1 {
+    font-size: var(--fs-titulo1);
+}
+
+h2 {
+    font-size: var(--fs-titulo2);
+}
+
+h3, h4 {
+    font-size: var(--fs-titulo3);
+}
+
+h5, h6 {
+    font-size: var(--fs-titulo4);
+}
+
+.logoDas {
+    margin-left: 20px;
+}
+
+.row {
+    width: 100%;
+}
+/* ============================================
+   SECCIÓN DE PERFIL Y TARJETAS DE INFORMACIÓN
+   ============================================ */
+
+/* Tarjeta de foto/perfil */
+.foto {
+    background: linear-gradient(135deg, #93bedf85 0%, #93bedf60 100%);
+    text-align: center;
+    padding: 30px 20px;
+    border-radius: 20px;
+    margin: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.foto:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.fotito {
+    border-radius: 50%;
+    height: 120px;
+    width: 120px !important;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.foto h3 {
+    font-weight: 600;
+    margin: 15px 0 10px;
+    color: var(--color-gris);
+}
+
+.foto h4 {
+    font-size: var(--fs-titulo3);
+    color: var(--color-gris);
+    margin: 5px 0;
+}
+
+.foto h4 span {
+    color: var(--color-primario);
+    font-weight: 600;
+}
+
+.foto h5 {
+    font-size: var(--fs-titulo4);
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Tarjetas de Información General y Mascotas */
+.info, .mascota {
+    background: linear-gradient(135deg, #93bedf40 0%, #93bedf20 100%);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.info:hover, .mascota:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+.info h2, .mascota h2 {
+    font-size: var(--fs-titulo2);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    border-bottom: 3px solid var(--color-primario);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-gris);
+}
+
+.info h2 a, .mascota h2 a {
+    color: var(--color-gris);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.info h2 a:hover, .mascota h2 a:hover {
+    color: var(--color-primario);
+}
+
+.info h2 .bi, .mascota h2 .bi {
+    font-size: var(--fs-titulo3);
+}
+
+.info span, .mascota span {
+    color: var(--color-gris);
+    font-weight: 600;
+    font-size: var(--fs-titulo4);
+}
+
+.info p, .mascota p {
+    font-size: var(--fs-titulo3);
+    border-bottom: 1px solid rgba(66, 75, 84, 0.2);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    color: var(--color-gris);
+    transition: border-color 0.3s ease;
+}
+
+.info p:last-child, .mascota p:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.info p:hover, .mascota p:hover {
+    border-color: var(--color-primario);
+}
+
+/* ============================================
+   SECCIÓN DE CITAS Y TRATAMIENTOS
+   ============================================ */
+
+.citas {
+    background: #fff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Tabs de navegación */
+.citas .nav-pills {
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+.citas .nav-link {
+    color: var(--color-gris);
+    font-weight: 600;
+    font-size: var(--fs-titulo4);
+    padding: 10px 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.citas .nav-link:hover {
+    background-color: rgba(147, 190, 223, 0.2);
+    color: var(--color-azul);
+}
+
+.citas .nav-link.active {
+    background-color: var(--color-primario);
+    color: #fff;
+}
+
+.citas .nav-link span {
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: var(--fs-texto1);
+    margin-left: 5px;
+}
+
+.citas .nav-link.active span {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Items de citas */
+.cita-item {
+    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #e8e8e8;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.cita-item:hover {
+    border-color: var(--color-azul);
+    box-shadow: 0 4px 12px rgba(147, 190, 223, 0.2);
+    transform: translateX(5px);
+}
+
+.cita-item span {
+    color: #999;
+    font-size: var(--fs-texto1);
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cita-item h4 {
+    margin: 0;
+    font-size: var(--fs-titulo3);
+    color: var(--color-gris);
+    font-weight: 600;
+}
+
+/* Estados de las citas */
+.estado-agendado {
+    color: var(--color-primario) !important;
+    background: rgba(10, 147, 44, 0.1);
+    padding: 5px 12px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.estado-atendido {
+    color: var(--color-azul) !important;
+    background: rgba(147, 190, 223, 0.2);
+    padding: 5px 12px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+/* ============================================
+   SECCIÓN DE DOCUMENTOS Y NOTAS
+   ============================================ */
+
+.notas {
+    height: 100%;
+}
+
+.card-documentos, .card-notas {
+    background: linear-gradient(135deg, #9de79540 0%, #9de79520 100%);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.card-documentos:hover, .card-notas:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+.card-documentos h5, .card-notas h5 {
+    color: var(--color-gris);
+    font-weight: 700;
+    font-size: var(--fs-titulo2);
+}
+
+.card-documentos .btn, .card-notas .btn {
+    border: 2px solid var(--color-primario);
+    color: var(--color-primario);
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: var(--fs-titulo4);
+}
+
+.card-documentos .btn:hover, .card-notas .btn:hover {
+    background-color: var(--color-primario);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(10, 147, 44, 0.3);
+}
+
+.card-documentos .list-group-item, .card-notas .list-group-item {
+    padding: 12px 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.card-documentos .list-group-item:hover, .card-notas .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    padding-left: 10px;
+}
+
+.card-documentos .bi-file-earmark-pdf, .card-notas .bi-file-earmark-pdf {
+    color: var(--color-primario);
+    font-size: 18px;
+}
+
+.card-documentos .text-muted, .card-notas .text-muted {
+    font-size: var(--fs-texto1);
+    color: #999 !important;
+}
+
+.card-documentos .bi-download {
+    color: var(--color-primario);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.card-documentos .bi-download:hover {
+    color: var(--color-verde);
+    transform: scale(1.2);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .foto, .info, .mascota {
+        margin: 10px 0;
+    }
+
+    .fotito {
+        height: 100px;
+        width: 100px !important;
+    }
+
+    .cita-item {
+        text-align: center;
+        padding: 15px;
+    }
+
+    .cita-item .col-6 {
+        margin-bottom: 15px;
+    }
+
+    .citas .nav-link {
+        font-size: var(--fs-texto1);
+        padding: 8px 15px;
+    }
+
+    .card-documentos, .card-notas {
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .info h2, .mascota h2 {
+        font-size: var(--fs-titulo3);
+    }
+
+    .citas .nav-link {
+        padding: 6px 10px;
+        margin-right: 5px;
+    }
+
+    .cita-item h4 {
+        font-size: var(--fs-titulo4);
+    }
+}
+
+/* ============================================
+   ANIMACIONES Y EFECTOS ADICIONALES
+   ============================================ */
+
+/* Animación de entrada */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.foto, .info, .mascota, .citas, .card-documentos, .card-notas {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Scrollbar personalizado para navegadores webkit */
+.citas::-webkit-scrollbar,
+.card-documentos::-webkit-scrollbar,
+.card-notas::-webkit-scrollbar {
+    width: 8px;
+}
+
+.citas::-webkit-scrollbar-track,
+.card-documentos::-webkit-scrollbar-track,
+.card-notas::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.citas::-webkit-scrollbar-thumb,
+.card-documentos::-webkit-scrollbar-thumb,
+.card-notas::-webkit-scrollbar-thumb {
+    background: var(--color-verde);
+    border-radius: 10px;
+}
+
+.citas::-webkit-scrollbar-thumb:hover,
+.card-documentos::-webkit-scrollbar-thumb:hover,
+.card-notas::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primario);
+}

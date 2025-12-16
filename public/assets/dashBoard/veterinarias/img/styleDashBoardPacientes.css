@@ -1,0 +1,1800 @@
+/* /* Configuramos lo basico de un archivo CSS: */
+
+    /* - Primero las tipografias */
+
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+    /* - Segundo iconos */
+
+    @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+    
+
+    /* - Tercero estilos generales */
+
+    h1,h2,h3,h4,h5,h6 {
+        font-family: "Fredoka", sans-serif;
+    }
+
+    p,a,button,li,label,input,select,textarea,span {
+        font-family: "Open sans", sans-serif;
+    }
+
+    body {
+    overflow-x: hidden;
+    }
+
+
+    /* - Cuarto variables */
+
+:root {
+    --color-primario: #0a932c;       /* Verde principal */
+    --color-verde: #9de795;          /* Verde claro */
+    --color-gris: #424b54;           /* Gris texto */
+    --color-azul: #93bedf;           /* Azul acento */
+    --color-fondo: #f8f9fa;          /* Fondo general */
+
+    --fs-titulo1: 32px;
+    --fs-titulo2: 24px;
+    --fs-titulo3: 16px;
+    --fs-titulo4: 14px;
+    --fs-texto: 20px;
+    --fs-texto1: 12px;
+}
+
+    /* - Quinto Destkop */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    overflow-x: hidden;
+    background-color: #f5f5f5;
+    font-size: var(--fs-texto);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Fredoka', sans-serif;
+}
+
+h1 { font-size: var(--fs-titulo1); }
+h2 { font-size: var(--fs-titulo2); }
+h3, h4 { font-size: var(--fs-titulo3); }
+h5, h6 { font-size: var(--fs-titulo4); }
+
+/* BARRA LATERAL IZQUIERDA */
+.barra-lateral-izquierda {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    background: linear-gradient(180deg, var(--color-primario) 0%, #0d7a24 100%);
+    transition: width 0.3s ease;
+    width: 250px;
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.barra-lateral-izquierda.colapsada {
+    width: 80px;
+}
+
+.marca-sidebar {
+    color: white;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.marca-sidebar img {
+    font-size: 30px;
+    right: 10px;
+}
+
+/* Logo completo - visible por defecto */
+
+.marca-sidebar .logoDas {
+    display: block;
+    transition: all 0.3s ease;
+}
+
+/* Logo icono - oculto por defecto */
+
+.marca-sidebar .logo-icono-sidebar {
+    display: none;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* Cuando el sidebar está colapsado */
+
+.barra-lateral-izquierda.colapsada .marca-sidebar .logoDas:not(.logo-icono-sidebar) {
+    display: none;
+}
+
+.barra-lateral-izquierda.colapsada .marca-sidebar .logo-icono-sidebar {
+    display: block;
+}
+
+/* Animación suave al cambiar */
+
+.marca-sidebar span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.texto-marca-sidebar {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: var(--fs-titulo3);
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.barra-lateral-izquierda.colapsada .texto-marca-sidebar {
+    opacity: 0;
+    width: 0;
+}
+
+.pestanas-sidebar {
+    display: flex;
+    padding: 16px 8px;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.pestana-sidebar {
+    flex: 1;
+    padding: 8px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.7);
+    font-size: var(--fs-titulo4);
+    font-family: 'Open Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.pestana-sidebar.active {
+    background: var(--color-verde);
+    color: var(--color-primario);
+    font-weight: 600;
+}
+
+.barra-lateral-izquierda.colapsada .pestanas-sidebar {
+    flex-direction: column;
+    padding: 8px;
+}
+
+.barra-lateral-izquierda.colapsada .pestana-sidebar {
+    font-size: var(--fs-texto1);
+    padding: 5px;
+}
+
+.menu-sidebar {
+    padding: 16px 0;
+}
+
+.seccion-sidebar {
+    padding: 8px 16px;
+    color: rgba(255,255,255,0.5);
+    font-size: var(--fs-texto1);
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.barra-lateral-izquierda.colapsada .seccion-sidebar {
+    text-align: center;
+    padding: 8px 0;
+}
+
+.item-sidebar {
+    margin: 4px 8px;
+    padding: 12px 16px;
+    color: rgba(255,255,255,0.85);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    position: relative;
+    font-size: var(--fs-titulo4);
+}
+
+.item-sidebar:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.item-sidebar.active {
+    background: var(--color-verde);
+    color: var(--color-primario);
+    font-weight: 600;
+}
+
+.item-sidebar i {
+    font-size: var(--fs-titulo3);
+    min-width: 24px;
+}
+
+.texto-item-sidebar {
+    white-space: nowrap;
+    overflow: hidden;
+    flex: 1;
+}
+
+.barra-lateral-izquierda.colapsada .item-sidebar {
+    justify-content: center;
+    padding: 12px;
+}
+
+.barra-lateral-izquierda.colapsada .texto-item-sidebar {
+    display: none;
+}
+
+.item-sidebar .badge {
+    margin-left: auto;
+}
+
+.barra-lateral-izquierda.colapsada .item-sidebar .badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 2px 6px;
+    font-size: 10px;
+}
+
+.boton-colapsar {
+    position: relative ;
+    bottom: 10px;
+    left: 40%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.boton-colapsar:hover {
+    background: var(--color-verde);
+    color: var(--color-primario);
+}
+
+/* PANEL DERECHO */
+.barra-lateral-derecha {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 350px;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    z-index: 999;
+    overflow-y: auto;
+}
+
+.barra-lateral-derecha.oculta {
+    transform: translateX(100%);
+}
+
+.encabezado-lateral-derecho {
+    padding: 24px;
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-verde) 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.encabezado-lateral-derecho h5 {
+    color: var(--color-fondo);
+    font-family: 'Fredoka', sans-serif;
+}
+
+.boton-cerrar-lateral {
+    background: none;
+    border: none;
+    font-size: var(--fs-titulo2);
+    cursor: pointer;
+    color: var(--color-gris);
+}
+
+.item-notificacion, .item-actividad, .item-paciente {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    gap: 12px;
+    align-items: start;
+}
+
+.item-notificacion:hover, .item-actividad:hover, .item-paciente:hover {
+    background: #f8fafc;
+}
+
+.icono-notificacion, .icono-actividad {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-titulo3);
+    flex-shrink: 0;
+}
+
+.avatar-paciente {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.barra-lateral-derecha h6 {
+    color: var(--color-gris);
+    font-family: 'Fredoka', sans-serif;
+}
+
+.barra-lateral-derecha .fw-semibold {
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+}
+
+.barra-lateral-derecha small {
+    font-size: var(--fs-texto1);
+    color: #94a3b8;
+}
+
+/* CONTENIDO PRINCIPAL */
+.contenido-principal {
+    margin-left: 250px;
+    margin-right: 0;
+    transition: margin 0.3s ease;
+    min-height: 100vh;
+}
+
+.contenido-principal.sidebar-colapsado {
+    margin-left: 80px;
+}
+
+.contenido-principal.panel-derecho-abierto {
+    margin-right: 350px;
+}
+
+.barra-navegacion-superior {
+    background: white;
+    padding: 16px 32px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 998;
+}
+
+.navegacion-izquierda {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.navegacion-izquierda span {
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+}
+
+.navegacion-izquierda .fw-semibold {
+    color: var(--color-primario);
+}
+
+.buscador-navegacion {
+    position: relative;
+}
+
+.buscador-navegacion input {
+    padding: 8px 16px 8px 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    width: 350px;
+    font-size: var(--fs-titulo4);
+}
+
+.buscador-navegacion i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-gris);
+}
+
+.acciones-navegacion {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.boton-icono-navegacion {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+    color: var(--color-gris);
+}
+.boton-icono-navegacion a {
+    color: var(--color-gris);
+    text-decoration: none;
+}
+
+.boton-icono-navegacion:hover {
+    background: var(--color-verde);
+    color: var(--color-primario);
+}
+
+.boton-icono-navegacion .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
+
+.area-contenido {
+    padding: 32px;
+}
+
+.tarjeta-bienvenida {
+    background: linear-gradient(135deg, var(--color-verde) 0%, #b8eeb0 100%);
+    border-radius: 16px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.avatar-bienvenida {
+    width: 120px;
+    height: 120px;
+    border-radius: 16px;
+    object-fit: cover;
+}
+
+.tarjeta-bienvenida h2 {
+    color: var(--color-primario);
+    margin-bottom: 8px;
+}
+
+.tarjeta-bienvenida p {
+    color: var(--color-gris);
+    font-size: var(--fs-texto);
+}
+
+.seccion-calendario {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.seccion-calendario h4 {
+    color: var(--color-gris);
+}
+
+.grilla-calendario {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.dia-calendario {
+    aspect-ratio: 1;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #f0fdf4;
+    border: 2px solid transparent;
+}
+
+.dia-calendario:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-color: var(--color-verde);
+}
+
+.dia-calendario small {
+    font-size: var(--fs-texto1);
+    color: var(--color-gris);
+}
+
+.dia-calendario strong {
+    font-size: var(--fs-titulo2);
+    color: var(--color-gris);
+    font-family: 'Fredoka', sans-serif;
+}
+
+.dia-calendario.active {
+    background: var(--color-primario);
+    color: white;
+    font-weight: 600;
+}
+
+.dia-calendario.active small,
+.dia-calendario.active strong {
+    color: white;
+}
+
+.seccion-linea-tiempo {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.seccion-linea-tiempo h4 {
+    color: var(--color-gris);
+}
+
+.item-linea-tiempo {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    margin: 8px 0;
+    background: #f8fafc;
+    border-radius: 12px;
+    align-items: center;
+}
+
+.hora-linea-tiempo {
+    font-weight: 600;
+    min-width: 100px;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+    font-family: 'Fredoka', sans-serif;
+}
+
+.punto-linea-tiempo {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.contenido-linea-tiempo {
+    flex: 1;
+}
+
+.contenido-linea-tiempo strong {
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+}
+
+.contenido-linea-tiempo .text-muted {
+    font-size: var(--fs-texto1);
+}
+
+.bg-primario-personalizado {
+    background-color: var(--color-primario) !important;
+}
+
+.texto-primario-personalizado {
+    color: var(--color-primario) !important;
+}
+
+.bg-verde-personalizado {
+    background-color: var(--color-verde) !important;
+}
+
+.bg-azul-personalizado {
+    background-color: var(--color-azul) !important;
+}
+
+.bg-gris-personalizado {
+    background-color: var(--color-gris) !important;
+}
+
+/* ESTILOS ESPECÍFICOS PARA ICONOS DE NOTIFICACIONES Y ACTIVIDADES */
+.icono-notificacion-azul {
+    background: #dbeafe;
+    color: #3b82f6;
+}
+
+.icono-notificacion-amarillo {
+    background: #fef3c7;
+    color: #f59e0b;
+}
+
+.icono-actividad-rojo {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.icono-actividad-azul {
+    background: #dbeafe;
+    color: #3b82f6;
+}
+
+.icono-actividad-verde {
+    background: #dcfce7;
+    color: #22c55e;
+}
+
+/* ========================================
+   RESPONSIVE - MEDIA QUERIES
+   ======================================== */
+
+/* TABLET - 768px a 1024px */
+@media (max-width: 1024px) {
+    
+    /* Barra de navegación superior más compacta */
+    .barra-navegacion-superior {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .buscador-navegacion {
+        order: 3;
+        width: 100%;
+    }
+
+    .buscador-navegacion input {
+        width: 100%;
+    }
+
+    /* Área de contenido con menos padding */
+    .area-contenido {
+        padding: 24px;
+    }
+
+    /* Tarjeta de bienvenida más compacta */
+    .tarjeta-bienvenida {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px;
+    }
+
+    .avatar-bienvenida {
+        width: 100px;
+        height: 100px;
+    }
+
+    .tarjeta-bienvenida h2 {
+        font-size: var(--fs-titulo2);
+    }
+
+    /* Calendario con menos columnas */
+    .grilla-calendario {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    /* Panel derecho ocupa más espacio */
+    .barra-lateral-derecha {
+        width: 300px;
+    }
+
+    .contenido-principal.panel-derecho-abierto {
+        margin-right: 300px;
+    }
+
+    /* Timeline más compacto */
+    .hora-linea-tiempo {
+        min-width: 80px;
+        font-size: var(--fs-texto1);
+    }
+}
+
+/* TABLET PEQUEÑA - 768px */
+@media (max-width: 768px) {
+    
+    /* Sidebar izquierdo siempre colapsado en móvil */
+    .barra-lateral-izquierda {
+        width: 80px;
+    }
+
+    .barra-lateral-izquierda:not(.expandida) .texto-marca-sidebar,
+    .barra-lateral-izquierda:not(.expandida) .texto-item-sidebar,
+    .barra-lateral-izquierda:not(.expandida) .pestanas-sidebar {
+        display: none;
+    }
+
+    .barra-lateral-izquierda:not(.expandida) .item-sidebar {
+        justify-content: center;
+        padding: 12px;
+    }
+
+    .barra-lateral-izquierda:not(.expandida) .seccion-sidebar {
+        text-align: center;
+        padding: 8px 0;
+    }
+
+    /* Sidebar expandido en móvil toma más espacio */
+    .barra-lateral-izquierda.expandida {
+        width: 250px;
+        box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+    }
+
+    /* Contenido principal ajustado */
+    .contenido-principal {
+        margin-left: 80px;
+    }
+
+    .contenido-principal.sidebar-colapsado {
+        margin-left: 0;
+    }
+
+    /* Panel derecho ocupa toda la pantalla en móvil */
+    .barra-lateral-derecha {
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .contenido-principal.panel-derecho-abierto {
+        margin-right: 0;
+    }
+
+    /* Calendario con 4 columnas */
+    .grilla-calendario {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .dia-calendario small {
+        font-size: 10px;
+    }
+
+    .dia-calendario strong {
+        font-size: var(--fs-titulo3);
+    }
+
+    /* Navegación superior simplificada */
+    .navegacion-izquierda span:not(.fw-semibold) {
+        display: none;
+    }
+
+    .acciones-navegacion {
+        gap: 8px;
+    }
+
+    .boton-icono-navegacion {
+        width: 35px;
+        height: 35px;
+    }
+
+    /* Botón hamburguesa para menú */
+    .boton-menu-movil {
+        display: block;
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: var(--color-primario);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 20px;
+    }
+}
+
+/* MÓVIL - Menos de 576px */
+@media (max-width: 576px) {
+    
+    /* Sidebar izquierdo oculto por defecto */
+    .barra-lateral-izquierda {
+        transform: translateX(-100%);
+        width: 250px;
+        transition: transform 0.3s ease;
+    }
+
+    .barra-lateral-izquierda.expandida {
+        transform: translateX(0);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+    }
+
+    /* Contenido principal ocupa todo el ancho */
+    .contenido-principal {
+        margin-left: 0 !important;
+    }
+
+    /* Área de contenido con menos padding */
+    .area-contenido {
+        padding: 16px;
+    }
+
+    /* Barra de navegación superior */
+    .barra-navegacion-superior {
+        padding: 12px 16px;
+    }
+
+    .navegacion-izquierda {
+        gap: 12px;
+    }
+
+    .buscador-navegacion input {
+        font-size: var(--fs-texto1);
+        padding: 8px 12px 8px 32px;
+    }
+
+    .acciones-navegacion {
+        gap: 4px;
+    }
+
+    .boton-icono-navegacion {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    /* Tarjeta de bienvenida */
+    .tarjeta-bienvenida {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .avatar-bienvenida {
+        width: 80px;
+        height: 80px;
+    }
+
+    .tarjeta-bienvenida h2 {
+        font-size: var(--fs-titulo3);
+    }
+
+    .tarjeta-bienvenida p {
+        font-size: var(--fs-titulo4);
+    }
+
+    /* Calendario compacto */
+    .seccion-calendario {
+        padding: 16px;
+    }
+
+    .seccion-calendario h4 {
+        font-size: var(--fs-titulo4);
+        margin-bottom: 12px !important;
+    }
+
+    .grilla-calendario {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .dia-calendario {
+        padding: 8px;
+        border-radius: 12px;
+    }
+
+    .dia-calendario small {
+        font-size: 9px;
+    }
+
+    .dia-calendario strong {
+        font-size: var(--fs-titulo4);
+    }
+
+    /* Timeline compacto */
+    .seccion-linea-tiempo {
+        padding: 16px;
+    }
+
+    .seccion-linea-tiempo h4 {
+        font-size: var(--fs-titulo4);
+    }
+
+    .item-linea-tiempo {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .hora-linea-tiempo {
+        min-width: auto;
+        font-size: var(--fs-texto1);
+    }
+
+    .punto-linea-tiempo {
+        display: none;
+    }
+
+    .contenido-linea-tiempo strong {
+        font-size: var(--fs-texto1);
+    }
+
+    .contenido-linea-tiempo .text-muted {
+        font-size: 10px;
+    }
+
+    /* Panel derecho ocupa toda la pantalla */
+    .barra-lateral-derecha {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Items del panel derecho más compactos */
+    .item-notificacion,
+    .item-actividad,
+    .item-paciente {
+        padding: 12px 16px;
+    }
+
+    .icono-notificacion,
+    .icono-actividad {
+        width: 35px;
+        height: 35px;
+        font-size: var(--fs-titulo4);
+    }
+
+    .avatar-paciente {
+        width: 35px;
+        height: 35px;
+    }
+
+    .barra-lateral-derecha h6 {
+        font-size: var(--fs-texto1);
+    }
+
+    .barra-lateral-derecha .fw-semibold {
+        font-size: var(--fs-texto1);
+    }
+
+    .barra-lateral-derecha small {
+        font-size: 10px;
+    }
+
+    /* Ocultar botón de colapsar en móvil */
+    .boton-colapsar {
+        display: none;
+    }
+
+    /* Pestañas del sidebar en columna */
+    .barra-lateral-izquierda.expandida .pestanas-sidebar {
+        flex-direction: column;
+    }
+
+    .barra-lateral-izquierda.expandida .pestana-sidebar {
+        width: 100%;
+    }
+}
+
+/* MÓVIL PEQUEÑO - Menos de 375px */
+@media (max-width: 375px) {
+    
+    /* Ajustes extremos para pantallas muy pequeñas */
+    .area-contenido {
+        padding: 12px;
+    }
+
+    .tarjeta-bienvenida {
+        padding: 12px;
+    }
+
+    .avatar-bienvenida {
+        width: 60px;
+        height: 60px;
+    }
+
+    .grilla-calendario {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .seccion-calendario h4,
+    .seccion-linea-tiempo h4 {
+        font-size: 13px;
+    }
+
+    .barra-navegacion-superior {
+        padding: 8px 12px;
+    }
+
+    .boton-icono-navegacion {
+        width: 30px;
+        height: 30px;
+        font-size: 13px;
+    }
+}
+
+/* ========================================
+    UTILIDADES RESPONSIVE
+   ======================================== */
+
+/* Botón para abrir menú en móvil */
+.boton-menu-movil {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .boton-menu-movil {
+        display: block;
+    }
+}
+
+/* Overlay para cerrar sidebars en móvil */
+.overlay-movil {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+}
+
+.overlay-movil.activo {
+    display: block;
+}
+
+/* Mejoras de scroll en móvil */
+@media (max-width: 768px) {
+    .barra-lateral-izquierda,
+    .barra-lateral-derecha {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Optimización de tipografía en móvil */
+@media (max-width: 576px) {
+    :root {
+        --fs-titulo1: 24px;
+        --fs-titulo2: 20px;
+        --fs-titulo3: 14px;
+        --fs-titulo4: 12px;
+        --fs-texto: 14px;
+        --fs-texto1: 11px;
+    }
+}
+
+/* ========================================
+           ESTILOS ESPECÍFICOS PARA SECCIÓN CITAS
+           ======================================== */
+
+        /* Barra de acciones */
+        .barra-acciones-citas {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .boton-vista {
+            padding: 10px 20px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            font-size: var(--fs-titulo4);
+            color: var(--color-gris);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .boton-vista:hover {
+            background: #f8fafc;
+        }
+
+        .boton-vista.active {
+            background: var(--color-primario);
+            color: white;
+            border-color: var(--color-primario);
+        }
+
+        .select-veterinario {
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: var(--fs-titulo4);
+            color: var(--color-gris);
+            cursor: pointer;
+        }
+
+        .boton-nueva-cita {
+            padding: 10px 20px;
+            background: var(--color-primario);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: var(--fs-titulo4);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .boton-nueva-cita:hover {
+            background: #0d7a24;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(10, 147, 44, 0.3);
+        }
+
+        /* Tarjetas de resumen */
+        .tarjeta-resumen-cita {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .tarjeta-resumen-cita:hover {
+            transform: translateY(-4px);
+        }
+
+        .icono-resumen {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--fs-titulo2);
+        }
+
+        .tarjeta-resumen-cita h3 {
+            font-size: var(--fs-titulo1);
+            color: var(--color-gris);
+            margin: 0;
+        }
+
+        .tarjeta-resumen-cita p {
+            font-size: var(--fs-titulo4);
+            color: #94a3b8;
+            margin: 0;
+        }
+
+        /* Calendario */
+        .contenedor-calendario-citas {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .encabezado-calendario {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .encabezado-calendario h4 {
+            font-size: var(--fs-titulo2);
+            color: var(--color-gris);
+            margin: 0;
+        }
+
+        .boton-nav-mes {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-gris);
+        }
+
+        .boton-nav-mes:hover {
+            background: var(--color-verde);
+            border-color: var(--color-verde);
+            color: var(--color-primario);
+        }
+
+        .calendario-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .dia-semana {
+            text-align: center;
+            font-size: var(--fs-titulo4);
+            font-weight: 600;
+            color: var(--color-gris);
+            padding: 12px;
+        }
+
+        .celda-dia {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border: 2px solid #f1f5f9;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--fs-titulo4);
+            color: var(--color-gris);
+            position: relative;
+        }
+
+        .celda-dia:hover {
+            background: #f8fafc;
+            border-color: var(--color-verde);
+        }
+
+        .celda-dia.hoy {
+            background: var(--color-primario);
+            color: white;
+            font-weight: 700;
+            border-color: var(--color-primario);
+        }
+
+        .celda-dia.seleccionado {
+            background: var(--color-verde);
+            color: var(--color-primario);
+            border-color: var(--color-verde);
+            font-weight: 600;
+        }
+
+        .celda-dia.otro-mes {
+            color: #cbd5e1;
+            cursor: default;
+        }
+
+        .celda-dia.tiene-citas {
+            font-weight: 600;
+        }
+
+        .indicadores-citas {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .indicador-cita {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .indicador-cita.consulta {
+            background: #22c55e;
+        }
+
+        .indicador-cita.cirugia {
+            background: #3b82f6;
+        }
+
+        .indicador-cita.vacuna {
+            background: #f59e0b;
+        }
+
+        .indicador-cita.urgencia {
+            background: #ef4444;
+        }
+
+        .leyenda-calendario {
+            display: flex;
+            gap: 24px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .item-leyenda-cal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--fs-titulo4);
+            color: var(--color-gris);
+        }
+
+        /* Vista Día - Timeline */
+        .contenedor-vista-dia {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .encabezado-vista-dia {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .navegacion-dia {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .boton-nav-dia {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .boton-nav-dia:hover {
+            background: var(--color-verde);
+            border-color: var(--color-verde);
+        }
+
+        .boton-hoy {
+            padding: 10px 20px;
+            background: var(--color-primario);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: var(--fs-titulo4);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .timeline-dia {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .linea-horario {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            border-bottom: 1px solid #f1f5f9;
+            min-height: 80px;
+        }
+
+        .hora-timeline {
+            padding: 12px;
+            font-size: var(--fs-titulo4);
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .citas-hora {
+            padding: 8px;
+            position: relative;
+        }
+
+        .cita-timeline {
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .cita-timeline.consulta {
+            border-left-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .cita-timeline.cirugia {
+            border-left-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .cita-timeline.vacuna {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .cita-timeline.urgencia {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .header-cita-timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .header-cita-timeline strong {
+            font-size: var(--fs-titulo4);
+            color: var(--color-gris);
+        }
+
+        .duracion-cita {
+            font-size: var(--fs-texto1);
+            color: #94a3b8;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .body-cita-timeline {
+            margin-bottom: 12px;
+        }
+
+        .body-cita-timeline p {
+            margin: 4px 0;
+            font-size: var(--fs-titulo4);
+            color: var(--color-gris);
+        }
+
+        .footer-cita-timeline {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-accion-cita {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--fs-titulo4);
+        }
+
+        .btn-confirmar {
+            background: #dcfce7;
+            color: #22c55e;
+        }
+
+        .btn-confirmar:hover {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-editar {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .btn-editar:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-cancelar {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .btn-cancelar:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Vista Lista */
+        .contenedor-vista-lista {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .filtros-lista {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-lista {
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: var(--fs-titulo4);
+            color: var(--color-gris);
+            cursor: pointer;
+        }
+
+        .lista-citas {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .item-cita-lista {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .item-cita-lista:hover {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .fecha-cita-lista {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            padding: 12px;
+            background: var(--color-primario);
+            color: white;
+            border-radius: 8px;
+        }
+
+        .dia-numero {
+            font-size: var(--fs-titulo1);
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .mes-nombre {
+            font-size: var(--fs-titulo4);
+            text-transform: uppercase;
+        }
+
+        .info-cita-lista {
+            flex: 1;
+        }
+
+        .info-cita-lista h5 {
+            font-size: var(--fs-titulo3);
+            color: var(--color-gris);
+            margin-bottom: 8px;
+        }
+
+        .info-cita-lista p {
+            margin: 4px 0;
+            font-size: var(--fs-titulo4);
+            color: #64748b;
+        }
+
+        .acciones-cita-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .badge-estado-lista {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: var(--fs-texto1);
+            font-weight: 600;
+        }
+
+        .badge-estado-lista.confirmada {
+            background: #dcfce7;
+            color: #22c55e;
+        }
+
+        .badge-estado-lista.pendiente {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .badge-estado-lista.urgente {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .botones-accion-lista {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-lista {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-gris);
+        }
+
+        .btn-lista:hover {
+            background: var(--color-verde);
+            color: var(--color-primario);
+        }
+
+        /* Panel derecho - Citas laterales */
+        .resumen-citas-dia {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .stat-cita-dia {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .numero-stat {
+            font-size: var(--fs-titulo2);
+            font-weight: 700;
+            color: var(--color-primario);
+        }
+
+        .label-stat {
+            font-size: var(--fs-texto1);
+            color: #94a3b8;
+        }
+
+        .cita-lateral {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .cita-lateral:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .cita-lateral.urgente {
+            border-left: 4px solid #ef4444;
+        }
+
+        .hora-cita-lateral {
+            font-size: var(--fs-titulo4);
+            font-weight: 700;
+            color: var(--color-primario);
+            margin-bottom: 8px;
+        }
+
+        .nombre-paciente-lateral {
+            font-size: var(--fs-titulo4);
+            font-weight: 600;
+            color: var(--color-gris);
+            margin-bottom: 4px;
+        }
+
+        .tipo-cita-lateral {
+            font-size: var(--fs-texto1);
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .dueno-cita-lateral {
+            font-size: var(--fs-texto1);
+            color: #94a3b8;
+        }
+
+        .badge-estado-cita {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .barra-acciones-citas {
+                padding: 16px;
+            }
+
+            .boton-vista,
+            .select-veterinario,
+            .boton-nueva-cita {
+                width: 100%;
+            }
+
+            .calendario-grid {
+                gap: 4px;
+            }
+
+            .celda-dia {
+                font-size: var(--fs-texto1);
+                padding: 4px;
+            }
+
+            .indicador-cita {
+                width: 4px;
+                height: 4px;
+            }
+
+            .linea-horario {
+                grid-template-columns: 60px 1fr;
+            }
+
+            .item-cita-lista {
+                flex-direction: column;
+            }
+
+            .fecha-cita-lista {
+                flex-direction: row;
+                min-width: auto;
+                width: 100%;
+                justify-content: flex-start;
+                gap: 12px;
+            }
+
+            .acciones-cita-lista {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tarjeta-resumen-cita {
+                padding: 16px;
+            }
+
+            .icono-resumen {
+                width: 50px;
+                height: 50px;
+                font-size: var(--fs-titulo3);
+            }
+
+            .tarjeta-resumen-cita h3 {
+                font-size: var(--fs-titulo2);
+            }
+
+            .contenedor-calendario-citas,
+            .contenedor-vista-dia,
+            .contenedor-vista-lista {
+                padding: 16px;
+            }
+
+            .dia-semana {
+                font-size: var(--fs-texto1);
+                padding: 8px 4px;
+            }
+
+            .cita-timeline {
+                padding: 12px;
+            }
+
+            .footer-cita-timeline {
+                flex-wrap: wrap;
+            }
+        }

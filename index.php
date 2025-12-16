@@ -232,43 +232,49 @@ switch ($request) {
     // ---------------------------------------PROPIETARIO-------------------------------------//
 
     //PARA LOS CLIENTES Y SUS RUTAS
-    case '/Cliente/dashboard':
+    case '/cliente/dashboard':
         require BASE_PATH . '/app/views/dashboard/cliente/dashBoard.php';
         break;
-    case '/Cliente/mascotas':
+    case '/cliente/mascotas':
         require BASE_PATH . '/app/views/dashboard/cliente/mascotas.php';
         break;
-    case '/Cliente/citas':
+    case '/cliente/citas':
         require BASE_PATH . '/app/views/dashboard/cliente/citas.php';
         break;
-    case '/Cliente/agenda':
+    case '/cliente/agenda':
         require BASE_PATH . '/app/views/dashboard/cliente/agenda.php';
         break;
-    case '/Cliente/historial':
+    case '/cliente/historial':
         require BASE_PATH . '/app/views/dashboard/cliente/historial.php';
         break;
-    case '/Cliente/tienda':
+    case '/cliente/tienda':
         require BASE_PATH . '/app/views/dashboard/cliente/tienda.php';
         break;
-    case '/Cliente/perfil':
+    case '/cliente/perfil':
         require BASE_PATH . '/app/views/dashboard/cliente/perfil.php';
         break;
-    case '/Cliente/configuracion':
+    case '/cliente/configuracion':
         require BASE_PATH . '/app/views/dashboard/cliente/confi.php';
         break;
-    case '/Cliente/registrar-mascota':
+    case '/cliente/registrar-mascota':
         require BASE_PATH . '/app/views/dashboard/cliente/registro.php';
         break;
-    case '/Cliente/editar-mascota':
+    case '/cliente/editar-mascota':
         require BASE_PATH . '/app/views/dashboard/cliente/editarMasc.php';
         break;
 
     //----------ACCIONES DEL PACIENTE---------//
-    case '/Cliente/actualizar':
+    case '/cliente/actualizar':
         require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
-    case '/Cliente/actualizar-contrasena':
-        require BASE_PATH . '/app/controllers/usuarioController.php';
+    case '/cliente/guardar-mascota':
+        require BASE_PATH . '/app/controllers/mascotasController.php';
+        break;
+    case '/cliente/actualizar-mascota':
+        require BASE_PATH . '/app/controllers/mascotasController.php';
+        break;
+    case '/cliente/eliminar-mascota':
+        require BASE_PATH . '/app/controllers/mascotasController.php';
         break;
 
 
@@ -278,6 +284,11 @@ switch ($request) {
     case '/reporte':
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
         reporteVeterinario();
+        
+
+    case '/reporte-mascotas':
+        require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
+        reporteMascotas();
 
         //     break;
 

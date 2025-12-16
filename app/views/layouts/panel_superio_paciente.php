@@ -1,15 +1,25 @@
 <?php
-require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 
-// 1. Validar si hay sesión activa
+// 1. Iniciar sesión solo si no está iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 2. Si sí hay sesión → obtener perfil
+// 2. Validar que el usuario esté logueado ANTES de cargar controlador
+if (!isset($_SESSION['user'])) {
+    // No hay usuario → redirigir al login
+    header('Location: /vetwilling/login');
+    exit();
+}
+
+// 3. Cargar controlador SOLO si existe sesión activa
+require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+
+// 4. Obtener datos del usuario
 $id = $_SESSION['user']['id_usuario'];
 $usuario = mostrarPerfil($id);
 ?>
+
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
 
@@ -147,15 +157,15 @@ $usuario = mostrarPerfil($id);
                 <i class="bi bi-person-fill"></i>
                 <span>Mi Perfil</span>
             </a>
-            <a href="<?= BASE_URL ?>/Cliente/mascotas" class="dropdown-item">
+            <a href="<?= BASE_URL ?>/cliente/mascotas" class="dropdown-item">
                 <i class="bi bi-heart-pulse-fill"></i>
                 <span>Mis Mascotas</span>
             </a>
-            <a href="<?= BASE_URL ?>/Cliente/citas" class="dropdown-item">
+            <a href="<?= BASE_URL ?>/cliente/citas" class="dropdown-item">
                 <i class="bi bi-calendar-check-fill"></i>
                 <span>Mis Citas</span>
             </a>
-            <a href="<?= BASE_URL ?>/Cliente/configuracion" class="dropdown-item">
+            <a href="<?= BASE_URL ?>/cliente/configuracion" class="dropdown-item">
                 <i class="bi bi-gear-fill"></i>
                 <span>Configuración</span>
             </a>

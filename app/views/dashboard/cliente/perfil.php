@@ -125,7 +125,7 @@ $mascotas = listarMascotas();
                                 <i class="bi bi-heart-fill"></i>
                                 Mis Mascotas (<?= count($mascotas) ?>)
                             </h2>
-                            <a href="<?= BASE_URL ?>/Cliente/registrar-mascota" class="btn-editar">
+                            <a href="<?= BASE_URL ?>/cliente/registrar-mascota" class="btn-editar">
                                 <i class="bi bi-plus-circle"></i>
                                 Agregar
                             </a>
@@ -143,11 +143,11 @@ $mascotas = listarMascotas();
                                 <div class="mascota-mini-info">
                                     <div class="mascota-mini-nombre"><?= $m['nombre'] ?></div>
                                     <div class="mascota-mini-raza">
-                                        <?= $m['raza'] ?> • <?= $m['edad'] ?> meses
+                                        <?= $m['raza'] ?> • <?= $m['edad_numero'] ?> <?= $m['edad_unidad'] ?>
                                     </div>
                                 </div>
 
-                                <a href="<?= BASE_URL ?>/Cliente/mascotas" class="btn-editar" style="padding: 8px 16px; font-size: 13px;">
+                                <a href="<?= BASE_URL ?>/cliente/mascotas" class="btn-editar" style="padding: 8px 16px; font-size: 13px;">
                                     Ver
                                 </a>
                             </div>

@@ -1,0 +1,445 @@
+/* ============================================================
+   ARCHIVO: theme-variables.css
+   INSTRUCCIÓN: Agregar DESPUÉS de tus imports en tu CSS principal
+   ============================================================ */
+
+/* VARIABLES PARA MODO CLARO (Defecto) */
+:root {
+    /* === TUS VARIABLES EXISTENTES NO SE TOCAN === */
+    /* Ya tienes: --color-primario, --color-verde, etc. */
+    
+    /* === NUEVAS VARIABLES PARA TEMAS === */
+    
+    /* Fondos */
+    --bg-body: #f5f5f5;
+    --bg-card: #ffffff;
+    --bg-sidebar: #ffffff;
+    --bg-navbar: #ffffff;
+    --bg-hover: #f0f0f0;
+    --bg-input: #ffffff;
+    
+    /* Textos */
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+    
+    /* Bordes y sombras */
+    --border-color: #dee2e6;
+    --border-light: #e9ecef;
+    --shadow-sm: rgba(0, 0, 0, 0.075);
+    --shadow-md: rgba(0, 0, 0, 0.1);
+    --shadow-lg: rgba(0, 0, 0, 0.15);
+}
+
+/* VARIABLES PARA MODO OSCURO */
+[data-theme="dark"] {
+    /* Fondos */
+    --bg-body: #1a1d1f;
+    --bg-card: #242729;
+    --bg-sidebar: #242729;
+    --bg-navbar: #2d3135;
+    --bg-hover: #313539;
+    --bg-input: #2d3135;
+    
+    /* Textos */
+    --text-primary: #e9ecef;
+    --text-secondary: #adb5bd;
+    --text-muted: #6c757d;
+    
+    /* Bordes y sombras */
+    --border-color: #3a3d41;
+    --border-light: #2d3135;
+    --shadow-sm: rgba(0, 0, 0, 0.2);
+    --shadow-md: rgba(0, 0, 0, 0.3);
+    --shadow-lg: rgba(0, 0, 0, 0.4);
+    
+    /* Ajuste de colores de marca para mejor contraste */
+    --color-primario: #0db339;
+    --color-verde: #7bc473;
+    --color-azul: #7aa8c9;
+}
+
+/* ============================================================
+   TRANSICIONES SUAVES
+   ============================================================ */
+
+* {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+}
+
+/* ============================================================
+   APLICAR VARIABLES A TUS COMPONENTES EXISTENTES
+   Reemplaza estos selectores con los nombres exactos de tu CSS
+   ============================================================ */
+
+/* BODY Y BASE */
+body {
+    background-color: var(--bg-body);
+    color: #fff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #fff;
+}
+
+p, span, label {
+    color: #fff;
+}
+
+
+/* BARRA NAVEGACIÓN SUPERIOR */
+.barra-navegacion-superior {
+    background: var(--bg-navbar);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px var(--shadow-sm);
+}
+
+.navegacion-izquierda {
+    color: #ffffff !important;
+}
+
+.buscador-navegacion input {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.buscador-navegacion input::placeholder {
+    color: var(--text-muted);
+}
+
+.buscador-navegacion i {
+    color: var(--text-muted);
+}
+
+.boton-icono-navegacion {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.boton-icono-navegacion:hover {
+    background: var(--border-color);
+}
+
+/* CONTENIDO PRINCIPAL */
+.contenido-principal {
+    background: var(--bg-body);
+}
+
+.area-contenido {
+    background: var(--bg-body);
+}
+
+/* TARJETAS */
+.tarjeta-estadistica,
+.tarjeta-bienvenida,
+.seccion-calendario,
+.seccion-linea-tiempo,
+.tarjeta-reporte,
+.tarjeta-grafico,
+.tarjeta-estadisticas,
+.foto,
+.info,
+.mascota,
+.citas,
+.notas,
+.card-documentos,
+.card-notas,
+.contenedor-tabla-pacientes,
+.contenedor-tabla-laboratorio,
+.wizard-container,
+.code-box,
+.barra-acciones-pacientes,
+.paginacion-contenedor,
+.item-linea-tiempo ,
+.contenedor-tabla,
+.item-estadistica-especie,
+.tarjeta-tabla-financiera,
+.tabla-financiera .fila-total{
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-sm);
+}
+.h1,h2,h3,h4,h5,h6{
+    color: var(--bg-body);
+}
+/* CALENDARIO */
+.dia-calendario {
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+}
+
+.dia-calendario:hover {
+    background: var(--border-color);
+}
+
+.dia-calendario small {
+    color: var(--text-muted);
+}
+
+.dia-calendario.active {
+    background: var(--color-primario);
+    color: white;
+    border-color: var(--color-primario);
+}
+
+.dia-calendario.active small {
+    color: white;
+}
+
+/* LÍNEA DE TIEMPO */
+.hora-linea-tiempo,
+.contenido-linea-tiempo .text-muted {
+    color: var(--text-secondary);
+}
+
+.contenido-linea-tiempo {
+    background: var(--bg-hover);
+}
+
+/* TABLAS */
+.tabla-pacientes,
+.tabla-laboratorio,
+.tabla-citas,
+.tabla-financiera,
+.display {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.tabla-pacientes th,
+.tabla-pacientes td,
+.tabla-laboratorio th,
+.tabla-laboratorio td,
+.tabla-citas th,
+.tabla-citas td,
+.tabla-financiera th,
+.tabla-financiera td,
+.display th,
+.display td {
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.tabla-pacientes thead,
+.tabla-laboratorio thead,
+.tabla-citas thead,
+.tabla-financiera thead,
+.display thead {
+    background: var(--bg-hover);
+}
+
+.tabla-pacientes tbody tr:hover,
+.tabla-laboratorio tbody tr:hover,
+.tabla-citas tbody tr:hover,
+.tabla-financiera tbody tr:hover,
+.display tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+.fila-gris {
+    background: var(--bg-hover);
+}
+
+.fila-blanca {
+    background: var(--bg-card);
+}
+
+/* PANEL DERECHO */
+.barra-lateral-derecha {
+    background: var(--bg-sidebar);
+    border-left: 1px solid var(--border-color);
+    box-shadow: -2px 0 10px var(--shadow-sm);
+}
+
+.encabezado-lateral-derecho {
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.item-notificacion,
+.item-actividad,
+.item-paciente {
+    color: var(--text-primary);
+}
+
+.item-notificacion:hover,
+.item-actividad:hover,
+.item-paciente:hover {
+    background: var(--bg-hover);
+}
+
+/* BOTONES */
+.boton-accion-primario {
+    background: var(--color-primario);
+    color: white;
+}
+
+.boton-accion-secundario {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.boton-accion-secundario:hover {
+    background: var(--border-color);
+}
+
+.btn-control,
+.boton-periodo,
+.boton-exportar {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-control:hover,
+.boton-periodo:hover,
+.boton-exportar:hover {
+    background: var(--bg-hover);
+}
+
+/* INPUTS Y FORMULARIOS */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+textarea,
+select,
+.form-control,
+.filtro-select {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.form-control:focus {
+    border-color: var(--color-primario);
+    background: var(--bg-input);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* MODALES */
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+/* LISTAS */
+.list-group-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+/* NAV PILLS */
+.nav-pills .nav-link {
+    color: var(--text-primary);
+}
+
+.nav-pills .nav-link:hover {
+    background: var(--bg-hover);
+}
+
+/* TEXT UTILITIES */
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* PAGINACIÓN */
+.pagination .page-link {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.pagination .page-link:hover {
+    background: var(--bg-hover);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--color-primario);
+    border-color: var(--color-primario);
+}
+
+/* CONTROLES DE TABLA */
+.controles-tabla {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+.campo-buscar input {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+/* WIZARD / FORMULARIOS */
+.step {
+    color: var(--text-primary);
+}
+
+.form-group label {
+    color: var(--text-primary);
+}
+
+.progress {
+    background: var(--bg-hover);
+}
+
+.progress-bar {
+    background: var(--bg-hover);
+}
+
+.progress-bar.active {
+    background: var(--color-primario);
+}
+
+/* REPORTES */
+.filtros-reporte {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+/* ALERTS */
+.alert {
+    border: 1px solid var(--border-color);
+}
+
+/* HR */
+hr {
+    border-color: var(--border-color);
+}
+
+/* BORDER UTILITIES */
+.border,
+.border-top,
+.border-bottom {
+    border-color: var(--border-color) !important;
+}
+
+.texto-item-sidebar{
+    color: #fff !important;
+}

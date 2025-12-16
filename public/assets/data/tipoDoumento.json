@@ -1,0 +1,14 @@
+[
+  {
+    "id": "CC",
+    "name": "Cédula de Ciudadanía"
+  },
+  {
+    "id": "CE",
+    "name": "Cédula de Extranjería"
+  },
+  {
+    "id": "PAS",
+    "name": "Pasaporte"
+  }
+]

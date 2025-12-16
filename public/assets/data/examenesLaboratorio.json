@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Hemograma completo"
+  },
+  {
+    "id": 2,
+    "name": "Perfil bioquímico"
+  },
+  {
+    "id": 3,
+    "name": "Uroanálisis"
+  },
+  {
+    "id": 4,
+    "name": "Coprológico"
+  },
+  {
+    "id": 5,
+    "name": "Examen de heces (parasitológico)"
+  },
+  {
+    "id": 6,
+    "name": "Prueba de glucosa"
+  },
+  {
+    "id": 7,
+    "name": "Prueba de creatinina"
+  },
+  {
+    "id": 8,
+    "name": "Prueba de urea"
+  },
+  {
+    "id": 9,
+    "name": "Prueba de ALT (alanina aminotransferasa)"
+  },
+  {
+    "id": 10,
+    "name": "Prueba de AST (aspartato aminotransferasa)"
+  },
+  {
+    "id": 11,
+    "name": "Prueba de proteínas totales"
+  },
+  {
+    "id": 12,
+    "name": "Prueba de albúmina"
+  },
+  {
+    "id": 13,
+    "name": "Prueba de bilirrubina total"
+  },
+  {
+    "id": 14,
+    "name": "Examen de orina"
+  },
+  {
+    "id": 15,
+    "name": "Examen de tiroides (T4, TSH)"
+  },
+  {
+    "id": 16,
+    "name": "Prueba de leptospirosis"
+  },
+  {
+    "id": 17,
+    "name": "Prueba de parvovirus"
+  },
+  {
+    "id": 18,
+    "name": "Prueba de moquillo"
+  },
+  {
+    "id": 19,
+    "name": "Prueba de hemoparásitos"
+  },
+  {
+    "id": 20,
+    "name": "Cultivo bacteriano"
+  }
+]

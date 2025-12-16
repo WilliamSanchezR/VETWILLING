@@ -1,0 +1,593 @@
+/* Filtros de reporte */
+.filtros-reporte {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.boton-periodo {
+    padding: 10px 20px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    border-radius: 8px;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.boton-periodo:hover {
+    background: #f8fafc;
+}
+
+.boton-periodo.active {
+    background: var(--color-primario);
+    color: white;
+    border-color: var(--color-primario);
+}
+
+.boton-exportar {
+    padding: 10px 20px;
+    border: 1px solid var(--color-primario);
+    background: white;
+    color: var(--color-primario);
+    border-radius: 8px;
+    font-size: var(--fs-titulo4);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.boton-exportar:hover {
+    background: var(--color-primario);
+    color: white;
+}
+
+/* Tarjetas de reporte */
+.tarjeta-reporte {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarjeta-reporte:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.icono-reporte {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-titulo2);
+    flex-shrink: 0;
+}
+
+.bg-primary-soft { background: #e0f2fe; }
+.bg-success-soft { background: #dcfce7; }
+.bg-warning-soft { background: #fef3c7; }
+.bg-info-soft { background: #dbeafe; }
+.bg-danger-soft { background: #fee2e2; }
+
+.info-reporte {
+    flex: 1;
+}
+
+.etiqueta-reporte {
+    font-size: var(--fs-titulo4);
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.valor-reporte {
+    font-size: var(--fs-titulo1);
+    color: var(--color-gris);
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.cambio-positivo {
+    font-size: var(--fs-texto1);
+    color: #22c55e;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cambio-negativo {
+    font-size: var(--fs-texto1);
+    color: #ef4444;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Tarjetas de gráficos */
+.tarjeta-grafico {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    height: 100%;
+}
+
+.encabezado-grafico {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 24px;
+}
+
+.encabezado-grafico h5 {
+    font-size: var(--fs-titulo3);
+    color: var(--color-gris);
+    margin-bottom: 4px;
+}
+
+.encabezado-grafico p {
+    font-size: var(--fs-texto1);
+}
+
+.select-grafico {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+    cursor: pointer;
+}
+
+.contenedor-grafico {
+    height: 300px;
+    position: relative;
+}
+
+.leyenda-servicios {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.item-leyenda {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+}
+
+.punto-leyenda {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Tarjetas de estadísticas */
+.tarjeta-estadisticas {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.tarjeta-estadisticas h5 {
+    font-size: var(--fs-titulo3);
+    color: var(--color-gris);
+}
+
+.lista-estadisticas {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.item-estadistica {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-estadistica {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nombre-estadistica {
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+    font-weight: 500;
+}
+
+.valor-estadistica {
+    font-size: var(--fs-texto1);
+    color: #94a3b8;
+}
+
+.barra-progreso-estadistica {
+    width: 100%;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progreso-estadistica {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primario), var(--color-verde));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Estadísticas por especie */
+.item-estadistica-especie {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.item-estadistica-especie:hover {
+    background: #f1f5f9;
+    transform: translateX(4px);
+}
+
+.icono-especie {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-titulo3);
+}
+
+.info-especie {
+    flex: 1;
+}
+
+.nombre-especie {
+    display: block;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.barra-mini {
+    flex: 1;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progreso-mini {
+    height: 100%;
+    background: var(--color-primario);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.porcentaje-especie {
+    font-size: var(--fs-texto1);
+    color: #94a3b8;
+    font-weight: 600;
+    min-width: 40px;
+}
+
+.cantidad-especie {
+    font-size: var(--fs-titulo3);
+    color: var(--color-gris);
+    font-weight: 700;
+    min-width: 50px;
+    text-align: right;
+}
+
+/* Tabla financiera */
+.tarjeta-tabla-financiera {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-top: 24px;
+}
+
+.encabezado-tabla-financiera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.encabezado-tabla-financiera h5 {
+    font-size: var(--fs-titulo3);
+    color: var(--color-gris);
+    margin: 0;
+}
+
+.boton-ver-mas {
+    padding: 8px 16px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 8px;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.boton-ver-mas:hover {
+    background: var(--color-verde);
+    color: var(--color-primario);
+}
+
+.tabla-responsive {
+    overflow-x: auto;
+}
+
+.tabla-financiera {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-financiera thead {
+    background: #f8fafc;
+}
+
+.tabla-financiera th {
+    padding: 16px;
+    text-align: left;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+    font-weight: 600;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.tabla-financiera td {
+    padding: 16px;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.tabla-financiera .concepto {
+    font-weight: 600;
+}
+
+.tabla-financiera .total {
+    color: var(--color-primario);
+    font-weight: 700;
+}
+
+.tabla-financiera .fila-total {
+    background: #f8fafc;
+}
+
+.tabla-financiera tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* Panel derecho - Items rápidos */
+.item-reporte-rapido {
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    transition: background 0.3s ease;
+    cursor: pointer;
+}
+
+.item-reporte-rapido:hover {
+    background: #f8fafc;
+}
+
+.icono-reporte-rapido {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-titulo4);
+}
+
+.item-reporte-rapido .fw-semibold {
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+}
+
+.item-reporte-rapido small {
+    font-size: var(--fs-texto1);
+}
+
+.boton-exportar-rapido {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: var(--fs-titulo4);
+    color: var(--color-gris);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.boton-exportar-rapido:hover {
+    background: #f8fafc;
+    border-color: var(--color-primario);
+    color: var(--color-primario);
+}
+
+/* ========================================
+   RESPONSIVE - REPORTES
+   ======================================== */
+
+/* TABLET - 768px */
+@media (max-width: 768px) {
+    .filtros-reporte {
+        padding: 16px;
+    }
+
+    .boton-periodo {
+        padding: 8px 16px;
+        font-size: var(--fs-texto1);
+    }
+
+    .boton-exportar {
+        padding: 8px 16px;
+        font-size: var(--fs-texto1);
+    }
+
+    .tarjeta-reporte {
+        padding: 16px;
+    }
+
+    .icono-reporte {
+        width: 50px;
+        height: 50px;
+        font-size: var(--fs-titulo3);
+    }
+
+    .valor-reporte {
+        font-size: var(--fs-titulo2);
+    }
+
+    .contenedor-grafico {
+        height: 250px;
+    }
+
+    .tarjeta-grafico,
+    .tarjeta-estadisticas {
+        padding: 16px;
+    }
+
+    .item-estadistica-especie {
+        padding: 12px;
+    }
+
+    .icono-especie {
+        width: 40px;
+        height: 40px;
+        font-size: var(--fs-titulo4);
+    }
+
+    .tarjeta-tabla-financiera {
+        padding: 16px;
+    }
+}
+
+/* MÓVIL - 576px */
+@media (max-width: 576px) {
+    .filtros-reporte .d-flex {
+        flex-direction: column;
+    }
+
+    .boton-periodo,
+    .boton-exportar {
+        width: 100%;
+    }
+
+    .tarjeta-reporte {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .icono-reporte {
+        margin: 0 auto;
+    }
+
+    .valor-reporte {
+        font-size: var(--fs-titulo3);
+    }
+
+    .contenedor-grafico {
+        height: 200px;
+    }
+
+    .tabla-financiera {
+        font-size: var(--fs-texto1);
+    }
+
+    .tabla-financiera th,
+    .tabla-financiera td {
+        padding: 12px 8px;
+    }
+
+    .encabezado-tabla-financiera {
+        flex-direction: column;
+        align-items: start;
+        gap: 16px;
+    }
+
+    .boton-ver-mas {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .item-estadistica-especie {
+        flex-wrap: wrap;
+    }
+
+    .cantidad-especie {
+        width: 100%;
+        text-align: center;
+        margin-top: 8px;
+    }
+}
+
+/* MÓVIL PEQUEÑO - 375px */
+@media (max-width: 375px) {
+    .etiqueta-reporte {
+        font-size: var(--fs-texto1);
+    }
+
+    .valor-reporte {
+        font-size: var(--fs-titulo4);
+    }
+
+    .cambio-positivo,
+    .cambio-negativo {
+        font-size: 10px;
+    }
+
+    .contenedor-grafico {
+        height: 180px;
+    }
+
+    .leyenda-servicios {
+        gap: 8px;
+    }
+
+    .item-leyenda {
+        font-size: var(--fs-texto1);
+    }
+}

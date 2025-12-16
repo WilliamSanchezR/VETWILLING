@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "nombre": "Milpro ",
+        "descripcion": "Antiparasitario Milpro Cats 16Mg - 40Mg. (Gato Adult) · Presentación: 4 tb",
+        "precio": 54000,
+        "cantidadStock": 15,
+        "fechaVencimiento": "30/1/2026"
+    },
+    {
+        "id": 2,
+        "nombre": "Canglob P vial x 6ml ",
+        "descripcion": "Vacuna para la parvovirosis ",
+        "precio": 283000,
+        "cantidadStock": 17,
+        "fechaVencimiento": "20/07/2027"
+    },
+    {
+        "id": 3,
+        "nombre": "Hemavet b12 oral ",
+        "descripcion": "Suplemento en solución nutricional, antianémico y estimulante del apetito, fuente de vitaminas del complejo B para uso oral en todas las especies de animales domésticos.",
+        "precio": 34000,
+        "cantidadStock": 21,
+        "fechaVencimiento": "31/02/2027"
+    },
+    {
+        "id": 4,
+        "nombre": "Shampoo Clorhexin ",
+        "descripcion": "Shampoo que limpia y desinfecta profundamente, da brillo, desodoriza y restaura la condición del pelo y la piel en caninos, felinos y equinos. Presentación. Frasco x 240 mL .",
+        "precio": 45000,
+        "cantidadStock": 30,
+        "fechaVencimiento": "2028"
+    },
+    {
+        "id": 5,
+        "nombre": "B-fex",
+        "descripcion": "Antibiótico de amplio espectro en suspensión oral, formulado con cefalexina, que se usa para tratar infecciones bacterianas en perros y gatos.",
+        "precio": 30000,
+        "cantidadStock": 15,
+        "fechaVencimiento": "31/12/2026"
+    }
+]

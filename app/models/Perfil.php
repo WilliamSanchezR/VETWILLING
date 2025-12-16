@@ -15,6 +15,9 @@ class Perfil
 
     // *Esta funcion se duplica por cada rol
 
+
+    
+
     public function mostrarPerfil($id)
     {
 

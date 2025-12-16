@@ -1,0 +1,65 @@
+[
+  {
+    "nit": "901234567-8",
+    "nombreDeVeterinaria": "Veterinaria Amigos Peludos",
+    "direccion": "Calle 45 #12-34, Bogotá, Colombia",
+    "telefono": "+57 310 456 7890",
+    "email": "contacto@amigospeludos.com"
+  },
+  {
+    "nit": "900876543-1",
+    "nombreDeVeterinaria": "Centro Veterinario Vida Animal",
+    "direccion": "Carrera 7 #80-22, Bogotá, Colombia",
+    "telefono": "+57 315 678 1234",
+    "email": "info@vidaanimal.co"
+  },
+  {
+    "nit": "901112223-4",
+    "nombreDeVeterinaria": "PetCare Veterinaria Integral",
+    "direccion": "Avenida Las Palmas #25-18, Medellín, Colombia",
+    "telefono": "+57 301 987 6543",
+    "email": "servicio@petcare.com.co"
+  },
+  {
+    "nit": "900998877-6",
+    "nombreDeVeterinaria": "Veterinaria Huellitas Felices",
+    "direccion": "Calle 9 #30-21, Cali, Colombia",
+    "telefono": "+57 312 555 1122",
+    "email": "contacto@huellitasfelices.com"
+  },
+  {
+    "nit": "901223344-5",
+    "nombreDeVeterinaria": "Clínica Veterinaria Mundo Animal",
+    "direccion": "Carrera 50 #18-05, Barranquilla, Colombia",
+    "telefono": "+57 300 224 8899",
+    "email": "mundoanimal@vetmail.com"
+  },
+  {
+    "nit": "901334455-2",
+    "nombreDeVeterinaria": "Veterinaria San Francisco de Asís",
+    "direccion": "Calle 20 #5-67, Bucaramanga, Colombia",
+    "telefono": "+57 320 998 2211",
+    "email": "info@sanfranciscoasis.co"
+  },
+  {
+    "nit": "901445566-3",
+    "nombreDeVeterinaria": "PetLife Centro Veterinario",
+    "direccion": "Carrera 15 #40-09, Cartagena, Colombia",
+    "telefono": "+57 316 874 5566",
+    "email": "contacto@petlife.com"
+  },
+  {
+    "nit": "901556677-4",
+    "nombreDeVeterinaria": "Clínica AnimalCare",
+    "direccion": "Calle 100 #25-45, Bogotá, Colombia",
+    "telefono": "+57 317 645 8822",
+    "email": "atencion@animalcare.co"
+  },
+  {
+    "nit": "901667788-5",
+    "nombreDeVeterinaria": "Veterinaria Patitas Sanas",
+    "direccion": "Avenida Boyacá #70-10, Bogotá, Colombia",
+    "telefono": "+57 313 221 0099",
+    "email": "patitassanas@vets.com"
+  }
+]
