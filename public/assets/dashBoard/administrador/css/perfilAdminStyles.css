@@ -732,7 +732,6 @@ input.is-valid {
 
 .modal-notificacion .btn-close:hover {
     opacity: 1;
-    transform: rotate(90deg);
 }
 
 .modal-notificacion .modal-body {
@@ -762,8 +761,8 @@ input.is-valid {
 .form-group.password input[type="password"],
 .form-group.password input[type="text"] {
     width: 100%;
-    padding: var(--spacing-md) 3.5rem var(--spacing-md) var(--spacing-md);
-    border: 2px solid var(--color-borde);
+    padding: 10px;
+    border: 2px solid #e0e0e0;
     border-radius: var(--border-radius-sm);
     font-size: var(--fs-titulo4);
     transition: all var(--transition-normal);
@@ -797,7 +796,7 @@ input.is-valid {
 .form-group.password .icon-view {
     position: absolute;
     right: var(--spacing-md);
-    top: 38px;
+    top: 48px;
     background: transparent;
     border: none;
     color: var(--neutral-color);
@@ -813,12 +812,8 @@ input.is-valid {
 
 .form-group.password .icon-view:hover {
     color: var(--primary-color);
-    transform: scale(1.15);
 }
 
-.form-group.password .icon-view:active {
-    transform: scale(0.95);
-}
 
 .form-group.password .icon-view i {
     display: block;

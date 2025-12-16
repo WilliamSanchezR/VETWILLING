@@ -63,17 +63,28 @@
                 <i class="bi bi-bar-chart"></i>
                 <span class="nav-text">Reportes</span>
             </a>
-            <a href="<?= BASE_URL ?>/veterinario/registrar-veterinario"
+        </div>
+
+        <!-- Divisor -->
+        <div class="menu-divider"></div>
+
+        <!-- Sección Gestión -->
+        <div class="menu-seccion">
+            <div class="seccion-titulo">
+                <span class="nav-section-title">Gestión</span>
+            </div>
+
+            <a href="<?= BASE_URL ?>/veterinario/registrar-pacientes"
                 class="nav-item"
                 data-section="tienda">
                 <i class="bi bi-clipboard-plus"></i>
-                <span class="nav-text">Registrar Veterinario</span>
+                <span class="nav-text">Registro pacientes</span>
             </a>
-            <a href="<?= BASE_URL ?>/veterinario/consultar-veterinario"
+            <a href="<?= BASE_URL ?>/veterinario/consultar-citas"
                 class="nav-item"
                 data-section="tienda">
                 <i class="bi bi-search"></i>
-                <span class="nav-text">Consultar Veterinario</span>
+                <span class="nav-text">Citas</span>
             </a>
         </div>
 

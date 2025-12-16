@@ -24,17 +24,23 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
     <!-- CSS -->
 <<<<<<< HEAD
+<<<<<<< HEAD
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/registro.css">
 =======
+=======
+>>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/registro.css">
 
+<<<<<<< HEAD
 >>>>>>> 16633142215270c74cab9e0c178b4c442d37b5eb
+=======
+>>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
 </head>
 
 <body>
@@ -453,6 +459,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
 
     <!-- Preview de imagen -->
@@ -460,6 +467,114 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
     <!-- JavaScript -->
 >>>>>>> 16633142215270c74cab9e0c178b4c442d37b5eb
+=======
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <!-- JavaScript -->
+    <script>
+        // Razas por especie
+        const razasPorEspecie = {
+            perro: [
+                'Labrador Retriever',
+                'Golden Retriever',
+                'Pastor Alemán',
+                'Bulldog',
+                'Beagle',
+                'Poodle',
+                'Chihuahua',
+                'Yorkshire Terrier',
+                'Boxer',
+                'Dachshund',
+                'Husky Siberiano',
+                'Shih Tzu',
+                'Mestizo',
+                'Otra raza'
+            ],
+            gato: [
+                'Siamés',
+                'Persa',
+                'Maine Coon',
+                'Bengalí',
+                'Ragdoll',
+                'Sphynx',
+                'British Shorthair',
+                'Abisinio',
+                'Scottish Fold',
+                'Mestizo',
+                'Otra raza'
+            ],
+            ave: [
+                'Canario',
+                'Periquito',
+                'Loro',
+                'Cacatúa',
+                'Agapornis',
+                'Ninfa',
+                'Otra especie'
+            ],
+            conejo: [
+                'Mini Rex',
+                'Holandés',
+                'Cabeza de León',
+                'Angora',
+                'Belier',
+                'Otra raza'
+            ],
+            hamster: [
+                'Sirio',
+                'Ruso',
+                'Roborovski',
+                'Chino',
+                'Otra especie'
+            ],
+            otro: [
+                'Especificar'
+            ]
+        };
+
+        // Actualizar razas según especie
+        function actualizarRazas() {
+            const especieSelect = document.getElementById('especie');
+            const razaSelect = document.getElementById('raza');
+            const especie = especieSelect.value;
+
+            // Limpiar opciones
+            razaSelect.innerHTML = '<option value="">Selecciona una raza</option>';
+
+            if (especie && razasPorEspecie[especie]) {
+                razaSelect.disabled = false;
+                razasPorEspecie[especie].forEach(raza => {
+                    const option = document.createElement('option');
+                    option.value = raza.toLowerCase().replace(/ /g, '-');
+                    option.textContent = raza;
+                    razaSelect.appendChild(option);
+                });
+            } else {
+                razaSelect.disabled = true;
+            }
+
+            // Actualizar emoji de preview
+            actualizarEmojiPreview(especie);
+        }
+
+        // Actualizar emoji del preview según especie
+        function actualizarEmojiPreview(especie) {
+            const preview = document.getElementById('fotoPreview');
+            const emojis = {
+                'perro': '🐕',
+                'gato': '🐈',
+                'ave': '🦜',
+                'conejo': '🐰',
+                'hamster': '🐹',
+                'otro': '🐾'
+            };
+
+            if (!preview.querySelector('img')) {
+                preview.textContent = emojis[especie] || '🐾';
+            }
+        }
+
+    <!-- Preview de imagen -->
+>>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
     <script>
         // Preview de foto
         document.getElementById('inputFotoMascota').addEventListener('change', function(e) {

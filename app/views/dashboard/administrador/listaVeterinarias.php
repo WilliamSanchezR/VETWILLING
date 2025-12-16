@@ -83,15 +83,20 @@ $datos = listarVeterinariasRegistradas();
                     <button class="btn-control" id="btnVer">
                         <i class="bi bi-eye"></i> Ver 0/0
                     </button>
-                    <button class="btn-control" id="btnFiltrar">
-                        <i class="bi bi-funnel"></i> Filtrar
-                    </button>
+                    
                     <button class="btn-control" id="btnOrdenar">
                         <i class="bi bi-sort-down"></i> Ordenar
                     </button>
-                    <button class="btn-control" id="btnExport">
+
+                     <button class="btn-control" id="btnExport">
                         <i class="bi bi-download"></i> Export
                     </button>
+
+                    <a href="<?= BASE_URL ?>/admin/pdf-veterinarias?action=reporteVeterinariasPDF" target="_blank">
+                        <button class="btn-control" id="btnGenerarPdf">
+                            <i class="bi bi-file-earmark-pdf"></i> Generar PDF
+                        </button>
+                    </a>
 
                     <a href="<?= BASE_URL ?>/admin/registro-veterinaria">
                     <button class="btn-agregar" id="btnAgregarNuevo">
@@ -106,9 +111,9 @@ $datos = listarVeterinariasRegistradas();
                 <table id="tablaListaVeterinarias" class="display tabla-admin" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Foto</th>
+                            <th>Logo</th>
                             <th>nit</th>
-                            <th>Nombre</th>
+                            <th>Razón Social</th>
                             <th>Direccion</th>
                             <th>Ciudad</th>
                             <th>Telefono</th>
@@ -164,7 +169,7 @@ $datos = listarVeterinariasRegistradas();
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
         <!-- Modo dia  y noche -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
+        <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 

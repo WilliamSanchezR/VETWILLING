@@ -28,11 +28,16 @@ $mascota = consultarMascotaId($id_mascota);
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/editaMas.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
 <<<<<<< HEAD
+<<<<<<< HEAD
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
 =======
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
 
 >>>>>>> 16633142215270c74cab9e0c178b4c442d37b5eb
+=======
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
+
+>>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
 </head>
 
 <body>
@@ -116,6 +121,7 @@ $mascota = consultarMascotaId($id_mascota);
                                     </label>
                                 </div>
                             </div>
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 
@@ -241,6 +247,8 @@ $mascota = consultarMascotaId($id_mascota);
 
                             </form>
 >>>>>>> 16633142215270c74cab9e0c178b4c442d37b5eb
+=======
+>>>>>>> 57b20714b8a483149caae10d83b299eb9f1b2382
                         </div>
 
                         <!-- NOMBRE -->
