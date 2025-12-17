@@ -56,6 +56,9 @@
                         <li class="nav-item mx-2">
                             <a href="login" class="btn btn-success px-4 fw-semibold">Ingresar</a>
                         </li>
+                        <li class="nav-item mx-2">
+                            <a href="prueba" class="btn btn-success px-4 fw-semibold">Ingresar</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -64,11 +67,11 @@
         <!-- HERO SECTION CON ANIMACIONES -->
         <section id="hero">
             <div class="container">
-                <div class="row align-items-center">
-                    <!-- Contenido izquierdo -->
-                    <div class="col-lg-6 mb-4 mb-lg-0">
-                        <h1 class="display-5 fw-bold mb-4">Profesionales en cuidado y salud de las mascotas</h1>
-                        <p class="lead text-muted mb-4">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6 hero-content">
+                        <span class="section-tag">SISTEMA DE VETERINARIA PROFESIONAL</span>
+                        <h1 class="hero-title">Profesionales en cuidado y salud de las mascotas</h1>
+                        <p class="hero-subtitle">
                             En VetWilling creemos en el bienestar integral de las mascotas.
                             Nuestro equipo combina experiencia y tecnología para ofrecer
                             una aplicación de atención veterinaria de calidad.
@@ -81,94 +84,114 @@
                                 <i class="bi bi-hospital me-2"></i>Ver Planes
                             </a>
                         </div>
+                        <div class="trust-badges">
+                            <div class="trust-badge">
+                                <i class="bi bi-shield-check"></i>
+                                <span>Datos Seguros</span>
+                            </div>
+                            <div class="trust-badge">
+                                <i class="bi bi-cloud-check"></i>
+                                <span>Cloud Backup</span>
+                            </div>
+                            <div class="trust-badge">
+                                <i class="bi bi-graph-up"></i>
+                                <span>99.9% Uptime</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Carrusel con huellas animadas -->
                     <div class="col-lg-6">
-                        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel"
-                            data-bs-interval="4000">
-
-                            <div class="hero-image">
-                                <img src="public/assets/webSite/img/chivaS.jpg" alt="">
+                        <div id="heroCarousel" class="carousel slide carousel-fade carousel-container"
+                            data-bs-ride="carousel">
+                            <div class="carousel-indicators">
+                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0"
+                                    class="active"></button>
+                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
                             </div>
 
-                            <!-- <div class="carousel-inner"> -->
-                            <!-- Slide 1 - Perro -->
-                            <!-- <div class="carousel-item active">
-                                    <div class="carousel-image-wrapper">
-                                        <img src="public/assets/webSite/img/cerdo.png" class="d-block w-100 rounded-4"
-                                            alt="Veterinaria atendiendo perro">
-                                        <div class="paws-overlay paws-dog">
-                                            <div class="paw paw-1">🐾</div>
-                                            <div class="paw paw-2">🐾</div>
-                                            <div class="paw paw-3">🐾</div>
-                                            <div class="paw paw-4">🐾</div>
-                                            <div class="paw paw-5">🐾</div>
-                                        </div>
-                                    </div>
-                                </div> -->
-
-                            <!-- Slide 2 - Gato -->
-                            <!-- <div class="carousel-item">
-                                    <div class="carousel-image-wrapper">
-                                        <img src="public/assets/webSite/img/cabrita.png" class="d-block w-100 rounded-4"
-                                            alt="Gato en consulta veterinaria">
-                                        <div class="paws-overlay paws-cat">
-                                            <div class="paw paw-1">🐾</div>
-                                            <div class="paw paw-2">🐾</div>
-                                            <div class="paw paw-3">🐾</div>
-                                            <div class="paw paw-4">🐾</div>
-                                            <div class="paw paw-5">🐾</div>
-                                            <div class="paw paw-6">🐾</div>
-                                        </div>
-                                    </div>
-                                </div> -->
-
-
-                            <!-- Slide 4 conejo -->
-                            <!-- <div class="carousel-item">
-                                    <div class="carousel-image-wrapper">
-                                        <img src="public/assets/webSite/img/car2.png" class="d-block w-100 rounded-4"
-                                            alt="Veterinaria atendiendo perro">
-                                        <div class="paws-overlay paws-dog">
-                                            <div class="paw paw-1">🐾</div>
-                                            <div class="paw paw-2">🐾</div>
-                                            <div class="paw paw-3">🐾</div>
-                                            <div class="paw paw-4">🐾</div>
-                                            <div class="paw paw-5">🐾</div>
-                                        </div>
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800"
+                                        alt="Atención veterinaria profesional">
+                                    <div class="carousel-overlay">
+                                        <h3>Atención Personalizada</h3>
+                                        <p>Cada mascota recibe el cuidado especializado que merece</p>
                                     </div>
                                 </div>
-                            </div> -->
 
-                        <!-- </div>
+                                <div class="carousel-item">
+                                    <img src="https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=800"
+                                        alt="Tecnología avanzada">
+                                    <div class="carousel-overlay">
+                                        <h3>Tecnología de Vanguardia</h3>
+                                        <p>Equipamiento moderno para diagnósticos precisos</p>
+                                    </div>
+                                </div>
+
+                                <div class="carousel-item">
+                                    <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800"
+                                        alt="Equipo profesional">
+                                    <div class="carousel-overlay">
+                                        <h3>Experiencia Comprobada</h3>
+                                        <p>Más de 10 años liderando en salud animal</p>
+                                    </div>
+                                </div>
+
+                                <div class="carousel-item">
+                                    <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800"
+                                        alt="Resultados garantizados">
+                                    <div class="carousel-overlay">
+                                        <h3>Resultados Confiables</h3>
+                                        <p>Compromiso total con el bienestar de cada paciente</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </section>
+
     </header>
 
     <main>
         <!-- SOBRE NOSOTROS -->
-        <section id="sobre-nosotros" class="py-5">
+        <section id="sobre-nosotros" class="sobre-nosotros">
             <div class="container">
-                <div class="row align-items-center">
+                <div class="row align-items-center g-5">
+
                     <div class="col-lg-6 text-center">
                         <img src="public/assets/webSite/img/perrito.png" alt="Perrito feliz en consulta veterinaria"
-                            class="img-fluid rounded-4 shadow" loading="lazy">
+                            class="img-fluid sobre-img" loading="lazy">
                     </div>
 
-                    <div class="col-lg-6 mb-4 mb-lg-0">
-                        <h2 class="display-6 fw-bold mb-4">Sobre Nosotros</h2>
-                        <p class="lead text-muted mb-4">
-                            En VetWilling creemos en el bienestar integral de tus mascotas.
-                            Nuestro equipo combina amor, experiencia y tecnología para ofrecer
-                            atención veterinaria de calidad.
+                    <div class="col-lg-6">
+                        <span class="badge text-bg-success mb-3 px-3 py-2">Quiénes somos</span>
+
+                        <h2 class="fw-bold display-6 mb-4">
+                            Cuidamos a tus mascotas <br>
+                            <span class="text-success">como parte de la familia</span>
+                        </h2>
+
+                        <p class="text-muted fs-5 mb-4">
+                            En <strong>VetWilling</strong> creemos en el bienestar integral de tus mascotas.
+                            Combinamos amor, experiencia y tecnología para ofrecer una atención veterinaria
+                            moderna, confiable y humana.
                         </p>
-                        <a href="#contacto" class="btn btn-success btn-lg px-4 py-2 fw-semibold">
-                            <i class="bi bi-whatsapp me-2"></i>Contáctanos
-                        </a>
+
+                        <div class="d-flex align-items-center gap-3">
+                            <a href="#contacto" class="btn btn-success btn-lg px-4">
+                                <i class="bi bi-whatsapp me-2"></i>Contáctanos
+                            </a>
+
+                            <span class="text-muted small">
+                                Atención personalizada y segura
+                            </span>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </section>
@@ -182,38 +205,76 @@
                     Gestiona tus citas de forma digital, mantén la información actualizada y
                     administra tu agenda con total control.
                 </p>
-
                 <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="modulo-card p-4 text-center rounded-4">
-                            <i class="bi bi-calendar-check display-1 text-success mb-3"></i>
-                            <h5 class="fw-bold mb-3">Gestión de Citas</h5>
-                            <div class="tes">
-                                <p>Agenda, modifica y controla las citas de forma rápida y organizada.</p>
+                    <div class="col-md-4 animate-on-scroll">
+                        <div class="modulo-card text-center">
+                            <div class="modulo-icon">
+                                <i class="bi bi-calendar-check"></i>
                             </div>
+                            <h5>Gestión de Citas</h5>
+                            <p>Sistema de agendamiento inteligente con recordatorios automáticos, sincronización de
+                                calendarios y gestión de disponibilidad en tiempo real.</p>
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="modulo-card p-4 text-center rounded-4">
-                            <i class="bi bi-people display-1 text-success mb-3"></i>
-                            <h5 class="fw-bold mb-3">Gestión de Clientes</h5>
-                            <div class="tes">
-                                <p>Administra la información de clientes y sus mascotas en un solo lugar.</p>
+                    <div class="col-md-4 animate-on-scroll">
+                        <div class="modulo-card text-center">
+                            <div class="modulo-icon">
+                                <i class="bi bi-people"></i>
                             </div>
+                            <h5>Gestión de Clientes</h5>
+                            <p>Base de datos completa con historiales médicos detallados, información de contacto y
+                                seguimiento personalizado de cada paciente.</p>
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="modulo-card p-4 text-center rounded-4">
-                            <i class="bi bi-clipboard-check display-1 text-success mb-3"></i>
-                            <h5 class="fw-bold mb-3">Gestión de Agenda</h5>
-                            <div class="tes">
-                                <p>Visualiza y organiza las actividades diarias del consultorio.</p>
+                    <div class="col-md-4 animate-on-scroll">
+                        <div class="modulo-card text-center">
+                            <div class="modulo-icon">
+                                <i class="bi bi-clipboard-check"></i>
                             </div>
+                            <h5>Gestión de Agenda</h5>
+                            <p>Visualización clara de actividades diarias, asignación de recursos y optimización del
+                                flujo
+                                de trabajo del consultorio.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 animate-on-scroll">
+                        <div class="modulo-card text-center">
+                            <div class="modulo-icon">
+                                <i class="bi bi-file-medical"></i>
+                            </div>
+                            <h5>Historias Clínicas</h5>
+                            <p>Registro digital completo de diagnósticos, tratamientos, vacunaciones y evolución de cada
+                                paciente con acceso instantáneo.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 animate-on-scroll">
+                        <div class="modulo-card text-center">
+                            <div class="modulo-icon">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                            <h5>Reportes y Analytics</h5>
+                            <p>Dashboard con métricas clave, informes personalizables y análisis de rendimiento para
+                                tomar
+                                decisiones estratégicas.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 animate-on-scroll">
+                        <div class="modulo-card text-center">
+                            <div class="modulo-icon">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <h5>Seguridad y Backup</h5>
+                            <p>Encriptación de datos, respaldos automáticos en la nube y cumplimiento de estándares de
+                                seguridad internacionales.</p>
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
 
