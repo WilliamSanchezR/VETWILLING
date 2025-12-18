@@ -37,10 +37,6 @@ switch ($request) {
     case '/login':
         require BASE_PATH . '/app/views/auth/login.php';
         break;
-    case '/prueba':
-        require BASE_PATH . '/app/views/website/prueba.html';
-        break;
-
     case '/iniciar-sesion':
         require BASE_PATH . '/app/controllers/loginControllers.php';
         break;
@@ -285,6 +281,9 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/mascotasController.php';
         break;
 
+    case '/cliente/actualizar-contrasena':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
 
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//

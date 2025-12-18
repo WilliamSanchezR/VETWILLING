@@ -33,18 +33,18 @@
         <!-- NAVBAR SUPERIOR -->
         <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
 
-        <div class="contenido-principal">
+        <div class="area-contenido">
             <!-- DASHBOARD CONTENT -->
             <div class="container-dashboard">
 
                 <!-- Header Tienda -->
                 <div class="header-tienda">
                     <div class="header-tienda-info">
-                        <h1>🛒 Tienda Veterinaria</h1>
+                        <h1><i class="bi bi-cart4"></i> Tienda Veterinaria</h1>
                         <p>Encuentra los mejores productos para el cuidado de tus mascotas</p>
                     </div>
                     <div class="carrito-float">
-                        🛒
+                        <button class="cart" onclick="toggleCarrito()"><i class="bi bi-cart4"></i></button>
                         <span class="carrito-badge">3</span>
                     </div>
                 </div>

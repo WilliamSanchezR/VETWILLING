@@ -1,5 +1,5 @@
 /* =============================
-   DASHBOARD CLIENTE - CSS COMPLETO
+   DASHBOARD CLIENTE - CSS CORREGIDO
    TOTALMENTE FUNCIONAL Y OPTIMIZADO
    ============================= */
 
@@ -9,7 +9,7 @@
     --color-secundario: #185e4c;
     --color-fondo: #f5f7fb;
     --color-texto: #333;
-    --sidebar-width: 280px;
+    --sidebar-width: 250px;
     --sidebar-width-collapsed: 80px;
 }
 
@@ -19,12 +19,25 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Poppins", sans-serif;
-    scrollbar-width: none;
 }
 
 body {
     background: var(--color-fondo);
     overflow-x: hidden;
+}
+
+/* Ocultar scrollbar solo en body si es necesario */
+body::-webkit-scrollbar {
+    width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
 }
 
 /* =============================
@@ -39,10 +52,9 @@ body {
     left: 0;
     padding: 20px 15px;
     border-right: 1px solid #ddd;
-    transition: width .3s ease;
-    z-index: 1;
-    width: 250px;
-    transition: width .3s ease;
+    transition: width 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
 }
 
 .sidebar.collapsed {
@@ -52,6 +64,15 @@ body {
 /* Ocultar textos cuando colapsa */
 .sidebar.collapsed .text {
     display: none;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ecf0f1;
 }
 
 .sidebar-logo {
@@ -64,18 +85,23 @@ body {
     justify-content: center;
     color: white;
     font-size: 24px;
+    flex-shrink: 0;
 }
 
 .sidebar-title {
     font-size: 18px;
     font-weight: 600;
     color: var(--color-texto);
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, visibility 0.3s;
 }
 
 .sidebar.collapsed .sidebar-title {
     opacity: 0;
-    display: none;
+    visibility: hidden;
+}
+
+.sidebar-menu {
+    list-style: none;
 }
 
 .menu-item {
@@ -97,30 +123,45 @@ body {
     transform: translateX(5px);
 }
 
+.menu-item.active {
+    background: #e8f5f1;
+    color: var(--color-principal);
+    font-weight: 600;
+}
+
 .menu-item i {
     font-size: 20px;
     width: 20px;
+    flex-shrink: 0;
 }
 
 .menu-text {
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, visibility 0.3s;
+    white-space: nowrap;
 }
 
 .sidebar.collapsed .menu-text {
     opacity: 0;
-    display: none;
+    visibility: hidden;
 }
 
-/* ===== CONTENIDO PRINCIPAL ===== */
-.contenido-principal {
-    margin-left: var(--sidebar-width);
-    min-height: 100vh;
-    transition: margin-left 0.3s ease;
-    background: var(--color-fondo);
+/* ===== NAVBAR SUPERIOR ===== */
+.navbar-superior {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 999;
 }
 
-.sidebar.collapsed~.contenido-principal {
-    margin-left: var(--sidebar-width-collapsed);
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .toggle-btn {
@@ -149,6 +190,11 @@ body {
     font-size: 22px;
     cursor: pointer;
     color: var(--color-texto);
+    transition: color 0.3s;
+}
+
+.notification-btn:hover {
+    color: var(--color-principal);
 }
 
 .notification-badge {
@@ -160,6 +206,7 @@ body {
     font-size: 10px;
     padding: 2px 6px;
     border-radius: 10px;
+    font-weight: 600;
 }
 
 .user-profile {
@@ -167,6 +214,13 @@ body {
     align-items: center;
     gap: 12px;
     cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.user-profile:hover {
+    background: #f8f9fa;
 }
 
 .user-avatar {
@@ -179,6 +233,7 @@ body {
     justify-content: center;
     color: white;
     font-weight: 600;
+    flex-shrink: 0;
 }
 
 .user-name {
@@ -186,12 +241,30 @@ body {
     color: var(--color-texto);
 }
 
+/* ===== CONTENIDO PRINCIPAL ===== */
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    width: auto;
+    transition: margin-left 0.3s ease;
+    background: var(--color-fondo);
+}
+
+.sidebar.collapsed ~ .contenido-principal {
+    margin-left: var(--sidebar-width-collapsed);
+}
+
+.area-contenido {
+    /* padding: 30px; */
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
 /* ===== CONTAINER DASHBOARD ===== */
 .container-dashboard {
     padding: 30px;
     max-width: 1400px;
-    position: relative;
-    right: 190px;
+    margin: 0 auto;
 }
 
 /* ===== BIENVENIDA ===== */
@@ -201,7 +274,8 @@ body {
     padding: 40px;
     color: white;
     margin-bottom: 30px;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(10, 147, 44, 0.3);
+    width: 100%;
 }
 
 .bienvenida-card h2 {
@@ -238,6 +312,7 @@ body {
 
 .alert-icon {
     font-size: 28px;
+    flex-shrink: 0;
 }
 
 .alert-content h3 {
@@ -259,6 +334,14 @@ body {
     color: #2c3e50;
     margin-bottom: 20px;
     font-weight: 600;
+}
+
+/* ===== MASCOTAS GRID ===== */
+.mascotas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
 }
 
 .mascota-card {
@@ -291,6 +374,7 @@ body {
     justify-content: center;
     font-size: 38px;
     background: linear-gradient(135deg, #0A932C, #087a24);
+    flex-shrink: 0;
 }
 
 .mascota-info h3 {
@@ -440,6 +524,7 @@ body {
     background: white;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
 }
 
 .cita-dia {
@@ -476,6 +561,7 @@ body {
     font-size: 15px;
     color: var(--color-principal);
     font-weight: 600;
+    flex-shrink: 0;
 }
 
 /* ===== RECORDATORIOS ===== */
@@ -525,6 +611,10 @@ body {
     .content-grid {
         grid-template-columns: 1fr;
     }
+    
+    .mascotas-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
@@ -544,8 +634,16 @@ body {
         padding: 20px;
     }
 
+    .area-contenido {
+        padding: 20px;
+    }
+
     .mascotas-grid {
         grid-template-columns: 1fr;
+    }
+
+    .bienvenida-card {
+        padding: 25px;
     }
 
     .bienvenida-card h2 {
@@ -558,5 +656,27 @@ body {
 
     .user-name {
         display: none;
+    }
+    
+    .content-grid {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .bienvenida-card h2 {
+        font-size: 20px;
+    }
+    
+    .bienvenida-card p {
+        font-size: 14px;
+    }
+    
+    .mascota-card {
+        padding: 20px;
+    }
+    
+    .card {
+        padding: 20px;
     }
 }
