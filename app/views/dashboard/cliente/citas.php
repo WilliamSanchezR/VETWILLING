@@ -18,7 +18,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/citas.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
+
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
 </head>
 
@@ -33,7 +33,7 @@
         <!-- NAVBAR SUPERIOR -->
         <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
 
-        <div class="contenido-principal">
+        <div class="area-contenido">
             <!-- DASHBOARD CONTENT -->
             <div class="container-dashboard">
 

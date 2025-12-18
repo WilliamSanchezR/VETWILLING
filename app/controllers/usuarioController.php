@@ -378,7 +378,7 @@ function modiContrasena()
             'success',
             'Contraseña actualizada',
             'La contraseña han sido actualizada correctamente',
-            '/vetwilling/Cliente/configuracion'
+            '/vetwilling/login'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la contraseña');

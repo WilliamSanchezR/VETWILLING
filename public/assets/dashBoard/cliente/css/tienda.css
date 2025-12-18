@@ -74,7 +74,21 @@
  font-size: 12px;
  font-weight: 700;
  }
-
+.cart{
+    background: white;
+    color: #9DE795;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border:none;
+}
  /* Búsqueda y Filtros */
  .barra-busqueda {
  background: white;

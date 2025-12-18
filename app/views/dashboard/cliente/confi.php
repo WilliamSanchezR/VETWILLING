@@ -1,13 +1,4 @@
-<?php
-// enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
-require_once BASE_PATH . '/app/controllers/propetarioController.php';
 
-// asignamos el valor id del registro según la tabla
-$id = $_SESSION['user']['id_propietario'] ?? '';
-
-// Llamamos la funcion del controlador
-$usuario = consultarPropietarioId($id);
-?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -28,7 +19,6 @@ $usuario = consultarPropietarioId($id);
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
 
 </head>
-
 <body>
     <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
@@ -39,7 +29,7 @@ $usuario = consultarPropietarioId($id);
         <!-- NAVBAR SUPERIOR -->
         <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
 
-        <div class="contenido-principal">
+        <div class="area-contenido">
             <div class="container-dashboard">
 
                 <!-- HEADER -->
@@ -530,10 +520,12 @@ $usuario = consultarPropietarioId($id);
 
             </div>
         </div>
+
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+      -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/confi.js"></script>
 </body>
 
