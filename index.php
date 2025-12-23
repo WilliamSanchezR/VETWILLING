@@ -306,4 +306,8 @@ switch ($request) {
     case '/representante/dashboard':
         require BASE_PATH . '/app/views/dashboard/representante/dashboardRepresentante.php';
         break;
+        
+    case '/representante/listar-especialidades':
+        require BASE_PATH . '/app/views/dashboard/representante/listaEspecialidad.php';
+        break;
 }
