@@ -40,7 +40,7 @@ $mascotas = listarMascotas();
         <!-- NAVBAR SUPERIOR -->
         <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
 
-        <div class="contenido-principal">
+        <div class="area-contenido">
             <!-- DASHBOARD CONTENT -->
             <div class="container-dashboard">
 

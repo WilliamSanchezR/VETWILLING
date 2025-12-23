@@ -129,111 +129,117 @@ h6 {
     transform: translateY(-2px);
 }
 
-/* ========================================
-   5. HERO SECTION
-======================================== */
+/* hero o la parte de la cara */
 #hero {
-    min-height: 100vh;
+    min-height: 90vh;
     display: flex;
     align-items: center;
-    padding: 140px 0 80px;
-    background: linear-gradient(135deg, #ffffff 0%, #f5fff5 50%, #e8f9ec 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
     position: relative;
     overflow: hidden;
-    justify-content: space-between;
+    padding: 100px 0 60px;
 }
-
-.hero-image img {
-    width: 450px;
-    height: 450px;
-    object-fit: cover;
-    border-radius: 50%;
-    background: #019c13;
-    padding: 20px;
-}
-
-
-
 
 #hero::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -20%;
+    top: -30%;
+    right: -15%;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(157, 231, 149, 0.15), transparent);
+    background: radial-gradient(circle, rgba(157, 231, 149, 0.15) 0%, transparent 70%);
     border-radius: 50%;
-    animation: float 20s infinite ease-in-out;
+    animation: floatSlow 25s ease-in-out infinite;
 }
 
-@keyframes float {
+#hero::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(10, 147, 44, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: floatSlow 20s ease-in-out infinite reverse;
+}
+
+@keyframes floatSlow {
 
     0%,
     100% {
-        transform: translate(0, 0);
+        transform: translate(0, 0) scale(1);
     }
 
     50% {
-        transform: translate(-30px, 30px);
+        transform: translate(30px, -30px) scale(1.1);
     }
 }
 
-#hero h1 {
-    color: var(--color-principal);
-    font-weight: 700;
-    line-height: 1.3;
-    animation: fadeInUp 0.8s ease-out;
-}
-
-#hero .lead {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    animation: fadeInUp 1s ease-out 0.2s both;
-    color: var(--color-texto) !important;
-    font-weight: 350;
-}
-
-#hero .btn {
-    border-radius: 10px;
-    padding: 8px 20px;
-    font-size: 0.95rem;
-    font-weight: 400;
-    transition: var(--transicion-suave);
-    animation: fadeInUp 1.2s ease-out 0.4s both;
-}
-
-#hero .btn-success {
-    background: linear-gradient(135deg, var(--color-principal), #0b7a26);
-    border: none;
-    box-shadow: 0 6px 20px rgba(10, 147, 44, 0.3);
-}
-
-#hero .btn-success:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 30px rgba(10, 147, 44, 0.4);
-}
-
-#hero .btn-outline-success {
-    border: 2px solid var(--color-principal);
-    color: var(--color-principal);
-    background: transparent;
-}
-
-#hero .btn-outline-success:hover {
-    background: var(--color-principal);
-    color: #fff;
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 30px rgba(10, 147, 44, 0.4);
-}
-
-/* ========================================
-   CARRUSEL HERO - DISEÑO CIRCULAR MEJORADO
-======================================== */
-#heroCarousel {
+.hero-content {
+    animation: fadeInUp 0.8s ease;
     position: relative;
-    animation: fadeInRight 1s ease-out 0.6s both;
-    left: 20%;
+    z-index: 2;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-title {
+    font-size: 3.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: #1a1a1a;
+    letter-spacing: -0.5px;
+}
+
+.hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--color-texto-light);
+    margin-bottom: 2rem;
+    line-height: 1.8;
+    font-weight: 400;
+}
+
+/* Trust Badges */
+.trust-badges {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-texto-light);
+}
+
+.trust-badge i {
+    color: var(--color-principal);
+    font-size: 1.2rem;
+}
+
+/* Carrusel Premium */
+.carousel-container {
+    position: relative;
+    border-radius: var(--radio-borde);
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    animation: fadeInRight 0.8s ease 0.2s backwards;
+    z-index: 2;
 }
 
 @keyframes fadeInRight {
@@ -248,309 +254,212 @@ h6 {
     }
 }
 
-/* Contenedor circular con fondo fijo */
-.carousel-inner {
-    position: relative;
-    border-radius: 50%;
-    overflow: visible;
-    width: 500px;
-    height: 500px;
-    margin: 0 auto;
-    background: linear-gradient(135deg, rgba(10, 147, 44, 0.15), rgba(157, 231, 149, 0.25));
-    box-shadow:
-        0 0 0 15px rgba(10, 147, 44, 0.1),
-        0 0 0 30px rgba(10, 147, 44, 0.05),
-        0 15px 50px rgba(10, 147, 44, 0.2);
-    animation: pulse-ring 3s ease-in-out infinite;
-}
-
-@keyframes pulse-ring {
-
-    0%,
-    100% {
-        box-shadow:
-            0 0 0 15px rgba(10, 147, 44, 0.1),
-            0 0 0 30px rgba(10, 147, 44, 0.05),
-            0 15px 50px rgba(10, 147, 44, 0.2);
-    }
-
-    50% {
-        box-shadow:
-            0 0 0 20px rgba(10, 147, 44, 0.15),
-            0 0 0 40px rgba(10, 147, 44, 0.08),
-            0 20px 60px rgba(10, 147, 44, 0.25);
-    }
-}
-
-/* Items del carrusel */
 .carousel-item {
+    height: 480px;
     position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-/* Wrapper de imagen que rota */
-.carousel-image-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    overflow: hidden;
 }
 
 .carousel-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
-    border-radius: 50%;
-    transition: transform 0.8s ease;
+    filter: brightness(0.95);
 }
 
-.carousel-item.active img {
-    animation: zoomInRotate 1s ease-out;
+.carousel-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
+    padding: 2.5rem;
+    color: white;
+    transform: translateY(10px);
+    opacity: 0;
+    animation: none;
 }
 
-@keyframes zoomInRotate {
-    from {
-        transform: scale(1.2) rotate(5deg);
-        opacity: 0.8;
-    }
+.carousel-item.active .carousel-overlay {
+    animation: slideUpFade 0.6s ease 0.3s forwards;
+}
 
+@keyframes slideUpFade {
     to {
-        transform: scale(1) rotate(0deg);
+        transform: translateY(0);
         opacity: 1;
     }
 }
 
-/* ========================================
-   ANIMACIONES DE HUELLAS - FUERA DEL CÍRCULO
-======================================== */
-.paws-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 700px;
-    height: 700px;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.6s ease;
-    z-index: 10;
+.carousel-overlay h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: white;
 }
 
-.carousel-item.active .paws-overlay {
+.carousel-overlay p {
+    font-size: 1rem;
+    opacity: 0.95;
+    margin-bottom: 0;
+}
+
+.carousel-indicators {
+    margin-bottom: 1.5rem;
+}
+
+.carousel-indicators [data-bs-target] {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 4px;
+    background-color: white;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.carousel-indicators .active {
     opacity: 1;
+    width: 24px;
+    border-radius: 4px;
 }
 
-.paw,
-.hoof {
-    position: absolute;
-    font-size: 45px;
-    opacity: 0;
-    filter: drop-shadow(3px 3px 8px rgba(10, 147, 44, 0.5));
-    transform-origin: center;
+/* Stats Premium */
+.stats-section {
+    padding: 4rem 0;
+    background: white;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Huellas de perro - Distribuidas alrededor del círculo */
-.paws-dog .paw-1 {
-    top: 5%;
-    left: 25%;
-    animation: pawWalkOutside 3s ease-in-out 0.2s forwards;
+.stat-item {
+    text-align: center;
+    padding: 1.5rem;
 }
 
-.paws-dog .paw-2 {
-    top: 15%;
-    right: 15%;
-    animation: pawWalkOutside 3s ease-in-out 0.5s forwards;
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-principal);
+    display: block;
+    margin-bottom: 0.5rem;
 }
 
-.paws-dog .paw-3 {
-    top: 50%;
-    right: 5%;
-    animation: pawWalkOutside 3s ease-in-out 0.8s forwards;
+.stat-label {
+    font-size: 0.95rem;
+    color: var(--color-texto-light);
+    font-weight: 500;
 }
 
-.paws-dog .paw-4 {
-    bottom: 15%;
-    right: 20%;
-    animation: pawWalkOutside 3s ease-in-out 1.1s forwards;
-}
-
-.paws-dog .paw-5 {
-    bottom: 5%;
-    left: 30%;
-    animation: pawWalkOutside 3s ease-in-out 1.4s forwards;
-}
-
-/* Huellas de gato - Más distribuidas */
-.paws-cat .paw-1 {
-    top: 8%;
-    left: 20%;
-    animation: catPawWalkOutside 3.5s ease-in-out 0.3s forwards;
-}
-
-.paws-cat .paw-2 {
-    top: 10%;
-    right: 18%;
-    animation: catPawWalkOutside 3.5s ease-in-out 0.6s forwards;
-}
-
-.paws-cat .paw-3 {
-    top: 45%;
-    right: 3%;
-    animation: catPawWalkOutside 3.5s ease-in-out 0.9s forwards;
-}
-
-.paws-cat .paw-4 {
-    bottom: 25%;
-    right: 12%;
-    animation: catPawWalkOutside 3.5s ease-in-out 1.2s forwards;
-}
-
-.paws-cat .paw-5 {
-    bottom: 10%;
-    left: 25%;
-    animation: catPawWalkOutside 3.5s ease-in-out 1.5s forwards;
-}
-
-.paws-cat .paw-6 {
-    top: 45%;
-    left: 3%;
-    animation: catPawWalkOutside 3.5s ease-in-out 1.8s forwards;
-}
-
-@keyframes pawWalkOutside {
-    0% {
-        opacity: 0;
-        transform: scale(0) rotate(-50deg) translateY(-30px);
-    }
-
-    30% {
-        opacity: 1;
-        transform: scale(1.3) rotate(-10deg) translateY(-10px);
-    }
-
-    60% {
-        opacity: 0.95;
-        transform: scale(1.15) rotate(5deg) translateY(0);
-    }
-
-    100% {
-        opacity: 0.85;
-        transform: scale(1.1) rotate(10deg) translateY(5px);
-    }
-}
-
-@keyframes catPawWalkOutside {
-    0% {
-        opacity: 0;
-        transform: scale(0) translateY(-35px) rotate(-40deg);
-    }
-
-    35% {
-        opacity: 1;
-        transform: scale(1.25) translateY(-8px) rotate(-5deg);
-    }
-
-    65% {
-        opacity: 0.9;
-        transform: scale(1.1) translateY(0) rotate(8deg);
-    }
-
-    100% {
-        opacity: 0.8;
-        transform: scale(1.05) translateY(8px) rotate(15deg);
-    }
-}
-
-.carousel-fade .carousel-item {
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-}
-
-.carousel-fade .carousel-item.active {
-    opacity: 1;
-}
-
-/* ========================================
-   6. SECCIÓN SOBRE NOSOTROS
-======================================== */
-#sobre-nosotros {
-    padding: 100px 0;
-    background: #fff;
-}
-
-#sobre-nosotros .lead {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--color-texto) !important;
-    font-weight: 350;
-}
-
-#sobre-nosotros img {
+.section-tag {
+    display: inline-block;
+    background: rgba(10, 147, 44, 0.1);
+    color: var(--color-principal);
+    padding: 0.4rem 1rem;
     border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
 }
 
-#sobre-nosotros img:hover {
-    transform: scale(1.02);
+
+/* 6. SECCIÓN SOBRE NOSOTROS */
+.sobre-nosotros {
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #f8fdfb, #ffffff);
 }
 
-/* ========================================
-   7. SECCIÓN MÓDULOS
-======================================== */
+.sobre-img {
+  border-radius: 30px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+  max-width: 90%;
+}
+
+.sobre-nosotros .badge {
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border-radius: 20px;
+}
+
+.sobre-nosotros h2 span {
+  font-weight: 700;
+}
+
+.sobre-nosotros .btn {
+  border-radius: 30px;
+}
+
+/*7. SECCIÓN MÓDULOS */
 #modulos {
-    padding: 100px 0;
-    background: linear-gradient(135deg, var(--color-principal) 0%, #087a24 100%);
-    position: relative;
+    padding: 5rem 0;
+    background: #3f6992;
 }
-
 #modulos h2 {
     color: #fff;
     font-weight: 700;
+    margin-bottom: 2.5rem;
 }
-
-#modulos .lead {
-    color: rgba(255, 255, 255, 0.9);
-    max-width: 900px;
-    margin: 0 auto;
+#modulos .lead{
+    color: #ffffff;
+    font-weight: 400;
+    margin-bottom: 3rem;
+    line-height: 1.6;
 }
 
 .modulo-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 30px;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-}
-.modulo-card p {
-    font-size: 0.95rem;
-    color: #6c757d;
-    line-height: 1.5;
+    background: white;
+    border-radius: var(--radio-borde);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    height: 100%;
+    padding: 2rem;
 }
 
 .modulo-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(10, 147, 44, 0.12);
+    border-color: var(--color-principal);
+}
+
+.modulo-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(10, 147, 44, 0.1) 0%, rgba(157, 231, 149, 0.1) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.modulo-card:hover .modulo-icon {
+    transform: scale(1.1) rotate(5deg);
+    background: linear-gradient(135deg, var(--color-principal) 0%, #15b13b 100%);
+}
+
+.modulo-icon i {
+    font-size: 1.8rem;
+    color: var(--color-principal);
+    transition: all 0.3s ease;
+}
+
+.modulo-card:hover .modulo-icon i {
+    color: white;
 }
 
 .modulo-card h5 {
-    color: var(--color-principal);
-    font-weight: 700;
-    margin-bottom: 20px;
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+    color: #1a1a1a;
 }
 
-.modulo-card i {
-    color: var(--color-principal);
-}
-
-.modulo-card img {
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+.modulo-card p {
+    font-size: 0.95rem;
+    color: var(--color-texto-light);
+    margin-bottom: 0;
+    line-height: 1.6;
 }
 
 /* ========================================
