@@ -153,8 +153,11 @@ switch ($request) {
     case '/veterinario/consultar-perfil':
         require BASE_PATH . '/app/views/dashboard/veterinaria/perfil.php';
         break;
-
-
+    case 'soporte':
+        require_once 'controllers/soporteControllers.php';
+        $controller = new SoporteController();
+        // $controller->index();
+        break;
     // ---------------------------------------ADMINISTRADOR-------------------------------------//
 
     case '/admin/dashBoard':
@@ -285,7 +288,6 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
-
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
     case '/reporte-veterinarios':
@@ -297,7 +299,6 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
         reporteMascotas();
         break;
-
     default:
         http_response_code(404);
         require BASE_PATH . '/app/views/auth/error404.html';
