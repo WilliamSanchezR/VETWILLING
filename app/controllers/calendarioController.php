@@ -1,5 +1,10 @@
 <?php
 
+// Iniciar sesión si no está iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/Eventos.php';
 
@@ -78,7 +83,7 @@ function crearAgendamientoAjax()
         $fecha_hora = $data['fecha_hora'] ?? '';
         $fecha_hora_fin = $data['fecha_hora_fin'] ?? null;
         $estado = $data['estado'] ?? 'Pendiente';
-        $id_usuario = $_SESSION['id_usuario'] ?? null;
+        $id_usuario = $_SESSION['user']['id_usuario'] ?? null;
         $id_paciente = $data['id_paciente'] ?? null;
         $id_servicio = $data['id_servicio'] ?? null;
         $id_especialidad = $data['id_especialidad'] ?? null;
@@ -182,7 +187,7 @@ function crearAgendamiento()
     $fecha_hora = $_POST['fecha_hora'] ?? '';
     $fecha_hora_fin = $_POST['fecha_hora_fin'] ?? null;
     $estado = $_POST['estado'] ?? 'Pendiente';
-    $id_usuario = $_SESSION['id_usuario'] ?? null;
+    $id_usuario = $_SESSION['user']['id_usuario'] ?? null;
     $id_paciente = $_POST['id_paciente'] ?? null;
     $id_servicio = $_POST['id_servicio'] ?? null;
     $id_especialidad = $_POST['id_especialidad'] ?? null;
