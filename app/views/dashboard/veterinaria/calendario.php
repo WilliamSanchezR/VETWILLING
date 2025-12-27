@@ -25,6 +25,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
     <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css"> -->
@@ -144,29 +147,48 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
             <div id='external-events'>
                 <h4>Eventos para Arrastrar</h4>
-                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
-                    <div class='fc-event-main'>Cita Médica</div>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-consulta' data-duration="01:00">
+                    <div class='fc-event-main'>🩺 Consulta General</div>
                 </div>
-                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event' data-duration="01:00">
-                    <div class='fc-event-main'>Llamada al cliente (1 hora)</div>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-vacunacion' data-duration="00:30">
+                    <div class='fc-event-main'>💉 Vacunación</div>
                 </div>
-            </div>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-cirugia' data-duration="02:00">
+                    <div class='fc-event-main'>⚕️ Cirugía</div>
+                </div>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-control' data-duration="00:45">
+                    <div class='fc-event-main'>📋 Control</div>
+                </div>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-emergencia' data-duration="00:30">
+                    <div class='fc-event-main'>🚨 Emergencia</div>
+                </div>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-desparasitacion' data-duration="00:20">
+                    <div class='fc-event-main'>🐛 Desparasitación</div>
+                </div>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-peluqueria' data-duration="01:30">
+                    <div class='fc-event-main'>✂️ Peluquería</div>
+                </div>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-bano' data-duration="01:00">
+                    <div class='fc-event-main'>🛁 Baño</div>
+                </div>
+                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event fc-event-otro' data-duration="01:00">
+                </div>
 
-            <!-- Bootstrap -->
+                <!-- Bootstrap -->
 
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-                integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-                crossorigin="anonymous"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+                    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+                    crossorigin="anonymous"></script>
 
-            <!-- FullCalendar -->
+                <!-- FullCalendar -->
 
-            <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-            <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/mainCalendar.js"></script>
+                <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+                <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/mainCalendar.js"></script>
 
-            <!-- Propio -->
+                <!-- Propio -->
 
-            <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
-            <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
+                <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
+                <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 
 </body>
 
