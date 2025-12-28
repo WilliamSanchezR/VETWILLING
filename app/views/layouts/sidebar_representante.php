@@ -25,7 +25,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             class="sidebar-logo-icon">
     </a>
 
-    <!-- NAVEGACIÓN -->
+    <!-- NAVEGACIÓN COMO ADMINISTARDOR-->
     <nav class="sidebar-nav">
 
         <div class="nav-section">
@@ -40,20 +40,14 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             </a>
 
             <!-- Sección Usuario con Submenú especialidades -->
-            <div class="submenu <?= $final_path == 'registro-especialidades' || $final_path == 'listar-usuarios' ? 'active open' : '' ?>">
+            <a href="<?= BASE_URL ?>/representante/listar-especialidades"
+                class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>"
+                data-section="dashboard" data-tooltip="Especialidades">
+                <i class="bi bi-house-door"></i>
+                <span class="nav-text">Especialidades</span>
+            </a>
 
-                <div class="submenu-toggle" data-tooltip="Usuario">
-                    <i class="bi bi-person-plus"></i>
-                    <span class="texto-item-sidebar">Especialidades</span>
-                    <i class="bi bi-chevron-down flecha"></i>
-                </div>
-
-                <ul class="submenu-items">
-                    <li><a class="nav-item <?= $final_path == 'registro-especialidades' ? 'active' : '' ?>" href="#" data-tooltip="Registrar">Registrar </a></li>
-                    <li><a class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>" href="#" data-tooltip="Listar">Listar</a></li>
-                </ul>
-            </div>
-
+            
             <!-- Sección con submenú Profesionales  -->
             <div class="submenu <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' ? 'active open' : '' ?>">
 
@@ -84,7 +78,25 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 </ul>
             </div>
 
+            <!-- Sessión de submenu de horarios de atencion -->
+            <div class="submenu <?= $final_path == 'registro-servicios' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
+
+                <div class="submenu-toggle" data-tooltip="Horarios de Atención">
+                    <i class="bi bi-person-plus"></i>
+                    <span class="texto-item-sidebar">Horarios de Atención</span>
+                    <i class="bi bi-chevron-down flecha"></i>
+                </div>
+
+                <ul class="submenu-items">
+                    <li><a class="nav-item <?= $final_path == 'registro-horarios' ? 'active' : '' ?>" href="#" data-tooltip="Registrar">Registrar </a></li>
+                    <li><a class="nav-item <?= $final_path == 'listar-horarios' ? 'active' : '' ?>" href="#" data-tooltip="Listar">Listar</a></li>
+                </ul>
+            </div>
     </nav>
+
+    <!-- NAVEGACION COMO VETERINARIO -->
+     
+     
 
     <!-- BOTÓN TOGGLE -->
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">

@@ -81,12 +81,10 @@ switch ($request) {
         break;
 
     case '/calendario/storeEvent':
-        $_POST['accion'] = 'crear';
         require BASE_PATH . '/app/controllers/calendarioController.php';
         break;
 
     case '/calendario/updateEvent':
-        $_POST['accion'] = 'actualizar';
         require BASE_PATH . '/app/controllers/calendarioController.php';
         break;
 
@@ -308,5 +306,9 @@ switch ($request) {
     // ---------------------------------------REPRESENTANTE-------------------------------------//
     case '/representante/dashboard':
         require BASE_PATH . '/app/views/dashboard/representante/dashboardRepresentante.php';
+        break;
+
+    case '/representante/listar-especialidades':
+        require BASE_PATH . '/app/views/dashboard/representante/listaEspecialidad.php';
         break;
 }
