@@ -3,6 +3,7 @@
 session_start();
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/email_helper.php';
 require_once __DIR__ . '/../models/Eventos.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -44,11 +45,18 @@ switch ($method) {
 
     case 'GET':
         $accion = $_GET['accion'] ?? '';
+        $request_uri = $_SERVER['REQUEST_URI'];
 
         if ($accion === 'eliminar') {
             eliminarAgendamiento($_GET['id']);
         } else if ($accion === 'cargar') {
             cargarEventos();
+        } else if (strpos($request_uri, '/calendario/getPropietarios') !== false) {
+            obtenerPropietarios();
+        } else if (strpos($request_uri, '/calendario/getMascotas') !== false) {
+            obtenerMascotasPorPropietario();
+        } else if (strpos($request_uri, '/calendario/getServicios') !== false) {
+            obtenerServicios();
         } else if (isset($_GET['id'])) {
             consultarAgendamientoId($_GET['id']);
         } else {
@@ -71,7 +79,7 @@ switch ($method) {
 function crearAgendamientoAjax()
 {
     try {
-        // Verificar que el usuario esté autenticado
+        // Verificar que el usuario este autenticado
         if (!isset($_SESSION['user']['id_usuario'])) {
             http_response_code(401);
             echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado']);
@@ -96,14 +104,12 @@ function crearAgendamientoAjax()
         // Convertir el id_usuario a entero
         $id_usuario = isset($_SESSION['user']['id_usuario']) ? (int)$_SESSION['user']['id_usuario'] : null;
 
+        $id_propietario = !empty($data['id_propietario']) ? (int)$data['id_propietario'] : null;
         $id_paciente = !empty($data['id_paciente']) ? (int)$data['id_paciente'] : null;
         $id_servicio = !empty($data['id_servicio']) ? (int)$data['id_servicio'] : null;
         $id_especialidad = !empty($data['id_especialidad']) ? (int)$data['id_especialidad'] : null;
 
-        // Log para debugging
-        error_log("DEBUG - Creando agendamiento: tipo=$tipo, fecha=$fecha_hora, id_usuario=$id_usuario");
-
-        // Validamos que los campos requeridos no estén vacíos
+        // Validamos que los campos requeridos no esten vacios
         if (empty($tipo) || empty($fecha_hora)) {
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Tipo y fecha_hora son obligatorios']);
@@ -112,7 +118,7 @@ function crearAgendamientoAjax()
 
         if (empty($id_usuario)) {
             http_response_code(401);
-            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado - id_usuario no encontrado en sesión']);
+            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado - id_usuario no encontrado']);
             exit();
         }
 
@@ -124,8 +130,33 @@ function crearAgendamientoAjax()
             $fecha_hora_fin = date('Y-m-d H:i:s', strtotime($fecha_hora_fin));
         }
 
-        // Creamos el objeto del modelo
+        // VERIFICAR DISPONIBILIDAD DE HORARIO
         $objEventos = new Eventos();
+        $disponible = $objEventos->verificarDisponibilidad($fecha_hora, $fecha_hora_fin);
+
+        if (!$disponible) {
+            // Obtener las citas que causan conflicto
+            $citasConflicto = $objEventos->obtenerCitasConflicto($fecha_hora, $fecha_hora_fin);
+
+            $mensajeConflicto = "Ya existe una cita en este horario: ";
+            if (!empty($citasConflicto)) {
+                $cita = $citasConflicto[0];
+                $horaInicio = date('H:i', strtotime($cita['fecha_hora']));
+                $horaFin = date('H:i', strtotime($cita['fecha_hora_fin']));
+                $mensajeConflicto .= "{$cita['tipo']} de {$horaInicio} a {$horaFin}";
+                if ($cita['mascota']) {
+                    $mensajeConflicto .= " ({$cita['mascota']})";
+                }
+            }
+
+            http_response_code(409);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $mensajeConflicto,
+                'conflictos' => $citasConflicto
+            ]);
+            exit();
+        }
 
         // Preparamos los datos para el registro
         $dataToInsert = [
@@ -135,17 +166,42 @@ function crearAgendamientoAjax()
             'fecha_hora_fin' => $fecha_hora_fin,
             'estado' => $estado,
             'id_usuario' => $id_usuario,
+            'id_propietario' => $id_propietario,
             'id_paciente' => $id_paciente,
             'id_servicio' => $id_servicio,
             'id_especialidad' => $id_especialidad,
         ];
 
         // Registramos el agendamiento
-        $id_generado = $objEventos->createAgendamiento($dataToInsert);
+        $id_generado = $objEventos->registrar($dataToInsert);
 
         if ($id_generado) {
             header('Content-Type: application/json');
             http_response_code(201);
+
+            // ENVIAR NOTIFICACION POR EMAIL AL PROPIETARIO
+            try {
+                $detallesCita = $objEventos->obtenerDetallesCita($id_generado);
+                if ($detallesCita && !empty($detallesCita['email_propietario'])) {
+                    $datosCita = [
+                        'email_propietario' => $detallesCita['email_propietario'],
+                        'nombre_propietario' => $detallesCita['nombre_propietario'],
+                        'nombre_mascota' => $detallesCita['nombre_mascota'],
+                        'tipo_servicio' => $detallesCita['tipo'],
+                        'fecha_hora' => $detallesCita['fecha_hora'],
+                        'estado' => $detallesCita['estado']
+                    ];
+
+                    enviarNotificacionCitaCreada($datosCita);
+                    error_log("Notificacion enviada correctamente al email: " . $detallesCita['email_propietario']);
+                } else {
+                    error_log("No se pudo enviar notificacion: propietario sin email registrado");
+                }
+            } catch (Exception $e) {
+                error_log("Error al enviar notificacion: " . $e->getMessage());
+                // No detenemos el proceso si falla el envio del email
+            }
+
             echo json_encode(['status' => 'success', 'message' => 'Agendamiento creado con éxito', 'id' => $id_generado]);
             exit();
         } else {
@@ -193,6 +249,33 @@ function actualizarAgendamientoAjax()
 
         $objEventos = new Eventos();
 
+        // VERIFICAR DISPONIBILIDAD DE HORARIO (excluyendo la cita actual)
+        $disponible = $objEventos->verificarDisponibilidad($fecha_hora, $fecha_hora_fin, $id_agendamiento);
+
+        if (!$disponible) {
+            // Obtener las citas que causan conflicto
+            $citasConflicto = $objEventos->obtenerCitasConflicto($fecha_hora, $fecha_hora_fin, $id_agendamiento);
+
+            $mensajeConflicto = "Ya existe una cita en este horario: ";
+            if (!empty($citasConflicto)) {
+                $cita = $citasConflicto[0];
+                $horaInicio = date('H:i', strtotime($cita['fecha_hora']));
+                $horaFin = date('H:i', strtotime($cita['fecha_hora_fin']));
+                $mensajeConflicto .= "{$cita['tipo']} de {$horaInicio} a {$horaFin}";
+                if ($cita['mascota']) {
+                    $mensajeConflicto .= " ({$cita['mascota']})";
+                }
+            }
+
+            http_response_code(409);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $mensajeConflicto,
+                'conflictos' => $citasConflicto
+            ]);
+            exit();
+        }
+
         $dataToUpdate = [
             'id_agendamiento' => $id_agendamiento,
             'fecha_hora' => $fecha_hora,
@@ -226,6 +309,7 @@ function crearAgendamiento()
     $fecha_hora_fin = $_POST['fecha_hora_fin'] ?? null;
     $estado = $_POST['estado'] ?? 'Pendiente';
     $id_usuario = $_SESSION['user']['id_usuario'] ?? null;
+    $id_propietario = $_POST['id_propietario'] ?? null;
     $id_paciente = $_POST['id_paciente'] ?? null;
     $id_servicio = $_POST['id_servicio'] ?? null;
     $id_especialidad = $_POST['id_especialidad'] ?? null;
@@ -242,10 +326,12 @@ function crearAgendamiento()
     // Preparamos los datos para el registro
     $data = [
         'tipo' => $tipo,
+        'observaciones' => null,
         'fecha_hora' => $fecha_hora,
         'fecha_hora_fin' => $fecha_hora_fin,
         'estado' => $estado,
         'id_usuario' => $id_usuario,
+        'id_propietario' => $id_propietario,
         'id_paciente' => $id_paciente,
         'id_servicio' => $id_servicio,
         'id_especialidad' => $id_especialidad,
@@ -454,4 +540,55 @@ function getColorByEstado($estado)
         default:
             return '#007bff'; // Azul por defecto
     }
+}
+
+// FUNCION PARA OBTENER LISTA DE PROPIETARIOS
+function obtenerPropietarios()
+{
+    require_once __DIR__ . '/../models/Calendario.php';
+    $objCalendario = new Calendario();
+    $propietarios = $objCalendario->obtenerPropietarios();
+
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'success', 'data' => $propietarios]);
+    exit();
+}
+
+// FUNCION PARA OBTENER MASCOTAS POR PROPIETARIO
+function obtenerMascotasPorPropietario()
+{
+    $id_propietario = $_GET['id_propietario'] ?? null;
+
+    if (!$id_propietario) {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'ID de propietario no proporcionado']);
+        exit();
+    }
+
+    require_once __DIR__ . '/../models/Calendario.php';
+    $objCalendario = new Calendario();
+    $mascotas = $objCalendario->obtenerMascotasPorPropietario($id_propietario);
+
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'success', 'data' => $mascotas]);
+    exit();
+}
+
+// FUNCION PARA OBTENER SERVICIOS DESDE BASE DE DATOS
+function obtenerServicios()
+{
+    require_once __DIR__ . '/../models/Calendario.php';
+
+    try {
+        $calendarioModel = new Calendario();
+        $servicios = $calendarioModel->obtenerServicios();
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'data' => $servicios]);
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Error al obtener servicios: ' . $e->getMessage()]);
+    }
+    exit();
 }
