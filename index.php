@@ -322,4 +322,16 @@ switch ($request) {
     case '/representante/listar-especialidades':
         require BASE_PATH . '/app/views/dashboard/representante/listaEspecialidad.php';
         break;
+
+    case '/representante/guardar-especialidad':
+        require BASE_PATH . '/app/controllers/especialidadController.php';
+        break;
+
+    case '/representante/actualizar-especialidad':
+        require BASE_PATH . '/app/controllers/especialidadController.php';
+        break;
+        
+    case '/representante/eliminar-especialidad':
+        require BASE_PATH . '/app/controllers/especialidadController.php';
+        break;
 }
