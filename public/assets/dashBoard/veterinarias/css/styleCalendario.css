@@ -474,29 +474,72 @@
    ============================================ */
 #external-events {
     background: var(--color-blanco);
-    border-radius: 12px;
-    padding: var(--spacing-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 48, 77, 0.08);
     position: sticky;
     top: 90px;
+    border: 1px solid rgba(0, 48, 77, 0.06);
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-content: flex-start;
 }
 
 #external-events h4 {
-    font-size: var(--fs-titulo3);
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
     color: var(--color-texto-oscuro);
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 2px solid var(--color-primario);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 48, 77, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.02em;
+    width: 100%;
+    flex-basis: 100%;
+}
+
+#external-events h4::before {
+    content: '📋';
+    font-size: 19px;
 }
 
 #external-events .fc-event {
-    margin-bottom: var(--spacing-md);
-    cursor: move;
+    margin-bottom: 0;
+    cursor: grab;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.3;
+    width: 200px;
+    flex-shrink: 0;
 }
 
 #external-events .fc-event:hover {
-    transform: scale(1.02);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+#external-events .fc-event:active {
+    cursor: grabbing;
+    transform: scale(0.98);
+}
+
+#external-events .fc-event .fc-event-main {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
 }
 
 
@@ -836,4 +879,168 @@ body.dark-mode .select-veterinario {
     right: 0;
     height: 3px;
     background: var(--color-primario);
+}
+
+/* ============================================
+   ESTILOS PERSONALIZADOS SWEETALERT2
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+.swal2-popup {
+    font-family: 'Montserrat', sans-serif !important;
+    border-radius: 12px !important;
+}
+
+.swal2-title {
+    color: #00304D !important;
+    font-weight: 600 !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.swal2-html-container {
+    color: #00304D !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.swal2-input {
+    font-family: 'Montserrat', sans-serif !important;
+    border: 2px solid #00304D !important;
+    border-radius: 6px !important;
+}
+
+.swal2-input:focus {
+    border-color: #007832 !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 120, 50, 0.25) !important;
+}
+
+.swal2-textarea {
+    font-family: 'Montserrat', sans-serif !important;
+    border: 2px solid #00304D !important;
+    border-radius: 6px !important;
+    padding: 10px !important;
+}
+
+.swal2-textarea:focus {
+    border-color: #007832 !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 120, 50, 0.25) !important;
+}
+
+.swal2-select {
+    font-family: 'Montserrat', sans-serif !important;
+    border: 2px solid #00304D !important;
+    border-radius: 6px !important;
+}
+
+.swal2-styled.swal2-confirm {
+    background-color: #007832 !important;
+    border: none !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 10px 30px !important;
+}
+
+.swal2-styled.swal2-confirm:hover {
+    background-color: #005d28 !important;
+}
+
+.swal2-styled.swal2-cancel {
+    background-color: #6c757d !important;
+    border: none !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 10px 30px !important;
+}
+
+.swal2-styled.swal2-cancel:hover {
+    background-color: #5a6268 !important;
+}
+
+.swal2-icon.swal2-success {
+    border-color: #007832 !important;
+    color: #007832 !important;
+}
+
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #007832 !important;
+}
+
+.swal2-icon.swal2-success .swal2-success-ring {
+    border-color: rgba(0, 120, 50, 0.3) !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: #dc3545 !important;
+    color: #dc3545 !important;
+}
+
+.swal2-icon.swal2-question {
+    border-color: #00304D !important;
+    color: #00304D !important;
+}
+
+.swal2-styled.swal2-deny-custom {
+    background-color: #dc3545 !important;
+    border: none !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 10px 30px !important;
+    order: 3 !important;
+}
+
+.swal2-styled.swal2-deny-custom:hover {
+    background-color: #c82333 !important;
+}
+
+.swal2-actions {
+    gap: 10px !important;
+}
+
+/* ============================================
+   EVENTOS EXTERNOS ARRASTRABLES
+   ============================================ */
+
+.fc-event-consulta {
+    background-color: #007832 !important;
+    border-color: #007832 !important;
+}
+
+.fc-event-vacunacion {
+    background-color: #17a2b8 !important;
+    border-color: #17a2b8 !important;
+}
+
+.fc-event-cirugia {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.fc-event-control {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+}
+
+.fc-event-emergencia {
+    background-color: #fd7e14 !important;
+    border-color: #fd7e14 !important;
+}
+
+.fc-event-desparasitacion {
+    background-color: #6f42c1 !important;
+    border-color: #6f42c1 !important;
+}
+
+.fc-event-peluqueria {
+    background-color: #e83e8c !important;
+    border-color: #e83e8c !important;
+}
+
+.fc-event-bano {
+    background-color: #20c997 !important;
+    border-color: #20c997 !important;
+}
+
+.fc-event-otro {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
 }

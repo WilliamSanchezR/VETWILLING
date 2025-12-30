@@ -25,6 +25,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
     <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css"> -->
@@ -143,13 +146,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
 
             <div id='external-events'>
-                <h4>Eventos para Arrastrar</h4>
-                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
-                    <div class='fc-event-main'>Cita Médica</div>
-                </div>
-                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event' data-duration="01:00">
-                    <div class='fc-event-main'>Llamada al cliente (1 hora)</div>
-                </div>
+                <!-- Los servicios se cargarán dinámicamente desde la base de datos -->
             </div>
 
             <!-- Bootstrap -->
