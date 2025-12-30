@@ -18,7 +18,7 @@ class Propietario
     public function listar()
     {
         try {
-            $sql = "SELECT * FROM propietario WHERE estado = 1 ORDER BY id_propietario DESC";
+            $sql = "SELECT * FROM propietario ORDER BY id_propietario DESC";
             $query = $this->conexion->prepare($sql);
             $query->execute();
 

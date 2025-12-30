@@ -21,9 +21,9 @@ class Eventos
     {
         try {
             $sql = "INSERT INTO agendamiento(
-                tipo, observaciones, fecha_hora, fecha_hora_fin, estado, id_usuario, id_paciente, id_servicio, id_especialidad
+                tipo, observaciones, fecha_hora, fecha_hora_fin, estado, id_usuario, id_propietario, id_paciente, id_servicio, id_especialidad
             ) VALUES(
-                :tipo, :observaciones, :fecha_hora, :fecha_hora_fin, :estado, :id_usuario, :id_paciente, :id_servicio, :id_especialidad
+                :tipo, :observaciones, :fecha_hora, :fecha_hora_fin, :estado, :id_usuario, :id_propietario, :id_paciente, :id_servicio, :id_especialidad
             )";
 
             $stmt = $this->conexion->prepare($sql);
@@ -36,10 +36,12 @@ class Eventos
             $stmt->bindParam(':id_usuario', $data['id_usuario'], PDO::PARAM_INT);
 
             // Permitir NULL en campos opcionales
+            $id_propietario = $data['id_propietario'] ?: null;
             $id_paciente = $data['id_paciente'] ?: null;
             $id_servicio = $data['id_servicio'] ?: null;
             $id_especialidad = $data['id_especialidad'] ?: null;
 
+            $stmt->bindParam(':id_propietario', $id_propietario, PDO::PARAM_INT);
             $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
             $stmt->bindParam(':id_servicio', $id_servicio, PDO::PARAM_INT);
             $stmt->bindParam(':id_especialidad', $id_especialidad, PDO::PARAM_INT);
@@ -48,9 +50,11 @@ class Eventos
 
             if (!$resultado) {
                 error_log("Error en execute: " . print_r($stmt->errorInfo(), true));
+                return false;
             }
 
-            return $resultado;
+            // Retornar el ID del último registro insertado
+            return $this->conexion->lastInsertId();
         } catch (PDOException $e) {
             error_log("Error en Eventos::registrar -> " . $e->getMessage());
             error_log("Datos recibidos: " . print_r($data, true));
@@ -70,6 +74,7 @@ class Eventos
                 fecha_hora_fin,
                 estado,
                 id_usuario,
+                id_propietario,
                 id_paciente,
                 id_servicio,
                 id_especialidad
@@ -98,6 +103,7 @@ class Eventos
                 fecha_hora_fin,
                 estado,
                 id_usuario,
+                id_propietario,
                 id_paciente,
                 id_servicio,
                 id_especialidad
@@ -125,6 +131,7 @@ class Eventos
                 fecha_hora = :fecha_hora,
                 fecha_hora_fin = :fecha_hora_fin,
                 estado = :estado,
+                id_propietario = :id_propietario,
                 id_paciente = :id_paciente,
                 id_servicio = :id_servicio,
                 id_especialidad = :id_especialidad
@@ -138,6 +145,9 @@ class Eventos
             $stmt->bindParam(':fecha_hora', $data['fecha_hora']);
             $stmt->bindParam(':fecha_hora_fin', $data['fecha_hora_fin']);
             $stmt->bindParam(':estado', $data['estado']);
+
+            $id_propietario = $data['id_propietario'] ?: null;
+            $stmt->bindParam(':id_propietario', $id_propietario);
             $stmt->bindParam(':id_paciente', $data['id_paciente']);
             $stmt->bindParam(':id_servicio', $data['id_servicio']);
             $stmt->bindParam(':id_especialidad', $data['id_especialidad']);
@@ -198,6 +208,118 @@ class Eventos
         } catch (PDOException $e) {
             error_log("Error en Eventos::updateAgendamientoDates -> " . $e->getMessage());
             return false;
+        }
+    }
+
+    // FUNCION PARA VERIFICAR DISPONIBILIDAD DE HORARIO
+    public function verificarDisponibilidad($fecha_inicio, $fecha_fin, $id_agendamiento = null)
+    {
+        try {
+            $consulta = "SELECT COUNT(*) as conflictos 
+                         FROM agendamiento 
+                         WHERE estado NOT IN ('Cancelada', 'Realizada')
+                         AND (
+                             (fecha_hora < :fecha_fin AND fecha_hora_fin > :fecha_inicio)
+                         )";
+
+            // Si estamos actualizando, excluir el agendamiento actual
+            if ($id_agendamiento) {
+                $consulta .= " AND id_agendamiento != :id_agendamiento";
+            }
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':fecha_inicio', $fecha_inicio);
+            $resultado->bindParam(':fecha_fin', $fecha_fin);
+
+            if ($id_agendamiento) {
+                $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            }
+
+            $resultado->execute();
+            $row = $resultado->fetch(PDO::FETCH_ASSOC);
+
+            // Retorna true si NO hay conflictos, false si hay conflictos
+            return $row['conflictos'] == 0;
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::verificarDisponibilidad -> " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // FUNCION PARA OBTENER CITAS QUE CAUSAN CONFLICTO
+    public function obtenerCitasConflicto($fecha_inicio, $fecha_fin, $id_agendamiento = null)
+    {
+        try {
+            $consulta = "SELECT 
+                            a.id_agendamiento,
+                            a.fecha_hora,
+                            a.fecha_hora_fin,
+                            a.tipo,
+                            CONCAT(p.nombres, ' ', p.apellidos) as propietario,
+                            pac.nombre as mascota
+                         FROM agendamiento a
+                         LEFT JOIN propietario p ON a.id_propietario = p.id_propietario
+                         LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                         WHERE a.estado NOT IN ('Cancelada', 'Realizada')
+                         AND (
+                             (a.fecha_hora < :fecha_fin AND a.fecha_hora_fin > :fecha_inicio)
+                         )";
+
+            if ($id_agendamiento) {
+                $consulta .= " AND a.id_agendamiento != :id_agendamiento";
+            }
+
+            $consulta .= " ORDER BY a.fecha_hora ASC";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':fecha_inicio', $fecha_inicio);
+            $resultado->bindParam(':fecha_fin', $fecha_fin);
+
+            if ($id_agendamiento) {
+                $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            }
+
+            $resultado->execute();
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::obtenerCitasConflicto -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // =========================================
+    // FUNCION PARA OBTENER DETALLES COMPLETOS DE UN AGENDAMIENTO
+    // =========================================
+    public function obtenerDetallesCita($id_agendamiento)
+    {
+        try {
+            $consulta = "SELECT 
+                            a.id_agendamiento,
+                            a.tipo,
+                            a.observaciones,
+                            a.fecha_hora,
+                            a.fecha_hora_fin,
+                            a.estado,
+                            p.id_propietario,
+                            CONCAT(p.nombres, ' ', p.apellidos) as nombre_propietario,
+                            p.email as email_propietario,
+                            pac.id_paciente,
+                            pac.nombre as nombre_mascota,
+                            s.nombre as nombre_servicio
+                         FROM agendamiento a
+                         LEFT JOIN propietario p ON a.id_propietario = p.id_propietario
+                         LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                         LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                         WHERE a.id_agendamiento = :id_agendamiento";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            $resultado->execute();
+
+            return $resultado->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::obtenerDetallesCita -> " . $e->getMessage());
+            return null;
         }
     }
 }

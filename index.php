@@ -98,6 +98,18 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/calendarioController.php';
         break;
 
+    case '/calendario/getPropietarios':
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
+    case '/calendario/getMascotas':
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
+    case '/calendario/getServicios':
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
     case '/veterinaria/gestion_clinica':
         require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
         break;
