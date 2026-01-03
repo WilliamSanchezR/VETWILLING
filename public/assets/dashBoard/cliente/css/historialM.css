@@ -1,0 +1,162 @@
+/* Estilos con gradiente verde para sistema veterinario */
+.area-contenido {
+    /* padding: 30px; */
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ===== CONTAINER DASHBOARD ===== */
+.container-dashboard {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.mb-1{
+    margin-bottom: 0.25rem !important;
+}
+/* Color primario en gradiente */
+.btn-primary {
+    background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #087a24 0%, #8bd684 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(10, 147, 44, 0.3);
+}
+
+/* Header con gradiente */
+.area-contenido h2 .text-primary {
+    background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Cards con borde gradiente */
+.card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.card-header-gradient {
+    background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
+    color: white;
+    padding: 1rem;
+}
+
+/* Tabs personalizados */
+.nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
+    color: white !important;
+    border: none;
+    border-radius: 8px 8px 0 0;
+}
+
+.nav-tabs .nav-link {
+    color: #0A932C;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    background: linear-gradient(135deg, #0A932C15 0%, #9DE79515 100%);
+}
+
+/* Badges con gradiente */
+.badge-gradient {
+    background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
+    color: white;
+}
+
+/* Bordes de cards especiales */
+.border-success {
+    border: 2px solid #0A932C !important;
+}
+
+.card.border-success .bi-check-circle-fill {
+    color: #0A932C;
+}
+
+/* Alertas personalizadas */
+.alert-success {
+    background: linear-gradient(135deg, #0A932C10 0%, #9DE79510 100%);
+    border-left: 4px solid #0A932C;
+    color: #065a1b;
+}
+
+/* Botones secundarios con outline */
+.btn-outline-primary {
+    border: 2px solid #0A932C;
+    color: #0A932C;
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
+    color: white;
+    border-color: transparent;
+}
+
+/* Iconos con color */
+.text-primary,
+.bi.text-primary {
+    color: #0A932C !important;
+}
+
+/* Background gradiente para secciones */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
+    color: white;
+}
+
+/* Hover en filas de tabla */
+.table-hover tbody tr:hover {
+    background: linear-gradient(90deg, #0A932C08 0%, #9DE79508 100%);
+}
+
+/* Progress bar con gradiente */
+.progress-bar-gradient {
+    background: linear-gradient(90deg, #0A932C 0%, #9DE795 100%);
+}
+
+/* Links */
+a {
+    color: #0A932C;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #087a24;
+}
+
+/* Checkbox y radio personalizados */
+.form-check-input:checked {
+    background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
+    border-color: #0A932C;
+}
+
+/* Focus en inputs */
+.form-control:focus,
+.form-select:focus {
+    border-color: #0A932C;
+    box-shadow: 0 0 0 0.25rem rgba(10, 147, 44, 0.25);
+}
+
+/* Sombras con color primario */
+.shadow-primary {
+    box-shadow: 0 4px 12px rgba(10, 147, 44, 0.15);
+}
+
+/* Modal header */
+.modal-header {
+    background: linear-gradient(135deg, #0A932C 0%, #9DE795 100%);
+    color: white;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}

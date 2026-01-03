@@ -279,7 +279,9 @@ switch ($request) {
     case '/cliente/editar-mascota':
         require BASE_PATH . '/app/views/dashboard/cliente/editarMasc.php';
         break;
-
+    case '/cliente/historial-mascota':
+        require BASE_PATH . '/app/views/dashboard/cliente/historialMascota.php';
+        break;
     //----------ACCIONES DEL PACIENTE---------//
     case '/cliente/actualizar':
         require BASE_PATH . '/app/controllers/propetarioController.php';

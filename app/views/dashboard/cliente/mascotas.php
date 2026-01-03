@@ -45,17 +45,25 @@ $mascotas = listarMascotas();
             <div class="header-mascotas">
                 <div class="header-titulo">
                     <h1>🐾 Mis Mascotas</h1>
-                    <span class="badge-count"><?= count($mascotas) ?> Mascota<?= count($mascotas) != 1 ? 's' : '' ?></span>
+                    <span class="badge-count">
+                        <?= count($mascotas) ?> Mascota<?= count($mascotas) != 1 ? 's' : '' ?>
+                    </span>
                 </div>
-                <a href="<?= BASE_URL ?>/reporte-mascotas?action=reporteMascotas" class="btn-agregar" target="_blank" style="background: #dc3545;">
+
+                <a href="<?= BASE_URL ?>/reporte-mascotas?action=reporteMascotas"
+                    class="btn-action btn-pdf"
+                    target="_blank">
                     <i class="bi bi-file-pdf"></i>
                     Exportar PDF
                 </a>
-                <a href="<?= BASE_URL ?>/cliente/registrar-mascota" class="btn-agregar">
+
+                <a href="<?= BASE_URL ?>/cliente/registrar-mascota"
+                    class="btn-action btn-agregar">
                     <i class="bi bi-plus-lg"></i>
                     Agregar Mascota
                 </a>
             </div>
+
 
             <!-- Filtros -->
             <div class="filtros-container">
@@ -64,8 +72,8 @@ $mascotas = listarMascotas();
                     <i class="bi bi-search"></i>
                 </div>
                 <button class="filter-btn active">Todas</button>
-                <button class="filter-btn">Perros 🐕</button>
-                <button class="filter-btn">Gatos 🐈</button>
+                <button class="filter-btn">Perros </button>
+                <button class="filter-btn">Gatos </button>
                 <button class="filter-btn">Vacunas al día</button>
                 <button class="filter-btn">Pendientes</button>
             </div>
@@ -90,7 +98,7 @@ $mascotas = listarMascotas();
                                         data-id="<?= $m['id_paciente'] ?>"
                                         data-nombre="<?= htmlspecialchars($m['nombre']) ?>"
                                         title="Eliminar mascota">
-                                       <i class="fa-solid fa-trash-can" style="color: red;"></i>
+                                        <i class="fa-solid fa-trash-can" style="color: red;"></i>
                                     </button>
 
                                 </div>
@@ -158,9 +166,9 @@ $mascotas = listarMascotas();
                                         <i class="bi bi-calendar-plus"></i> Agendar Cita
                                     </button>
 
-                                    <button class="action-btn action-btn-info">
+                                    <a href="<?= BASE_URL ?>/cliente/historial-mascota?id=<?= $m['id_paciente'] ?>" class="action-btn action-btn-info">
                                         <i class="bi bi-file-medical"></i> Ver Historial
-                                    </button>
+                                    </a>
 
                                     <button class="action-btn action-btn-success">
                                         <i class="bi bi-syringe"></i> Vacunas
@@ -188,11 +196,11 @@ $mascotas = listarMascotas();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/cliente/js/clientes.js"></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
 
     <script>
         // ========================================

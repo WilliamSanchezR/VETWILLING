@@ -47,7 +47,7 @@ $mascota = consultarMascotaId($id_mascota);
             <div class="header-editar">
                 <div class="header-info">
                     <h1><i class="fa-solid fa-pencil"></i> Editar Mascota</h1>
-                    <p>Actualiza la información de <strong><?= htmlspecialchars($mascota['nombre']) ?></strong></p>
+                    <p>Actualiza la información de <strong><?= ($mascota['nombre']) ?></strong></p>
                 </div>
                 <a href="<?= BASE_URL ?>/cliente/mascotas" class="btn-volver">
                     <i class="bi bi-arrow-left"></i>
@@ -68,7 +68,7 @@ $mascota = consultarMascotaId($id_mascota);
                 <div class="tabs-editar">
                     <button class="tab-btn active">
                         <i class="bi bi-info-circle"></i>
-                        Datos de <?= htmlspecialchars($mascota['nombre']) ?>
+                        Datos de <?= ($mascota['nombre']) ?>
                     </button>
                 </div>
 
@@ -93,7 +93,7 @@ $mascota = consultarMascotaId($id_mascota);
                                 <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= $mascota['img_mascota'] ?? 'default_pet.jpg' ?>"
                                     class="foto-preview-editar"
                                     id="fotoPreviewEditar"
-                                    alt="Foto de <?= htmlspecialchars($mascota['nombre']) ?>">
+                                    alt="Foto de <?= ($mascota['nombre']) ?>">
                                 <label for="inputFotoEditar" class="btn-cambiar-foto-editar">
                                     <i class="bi bi-camera-fill"></i>
                                 </label>
@@ -102,7 +102,7 @@ $mascota = consultarMascotaId($id_mascota);
                                     onchange="previewFotoEditar(event)">
                             </div>
                             <div class="foto-info-editar">
-                                <h4>Foto de <?= htmlspecialchars($mascota['nombre']) ?></h4>
+                                <h4>Foto de <?= ($mascota['nombre']) ?></h4>
                                 <p>JPG, PNG (máx. 5MB)</p>
                                 <div class="foto-btns">
                                     <label for="inputFotoEditar" class="btn-foto btn-foto-primary">
@@ -122,7 +122,7 @@ $mascota = consultarMascotaId($id_mascota);
                             <input type="text"
                                 id="nombre"
                                 name="nombre"
-                                value="<?= htmlspecialchars($mascota['nombre']) ?>"
+                                value="<?= ($mascota['nombre']) ?>"
                                 placeholder="Nombre de tu mascota"
                                 required>
                         </div>
@@ -165,8 +165,8 @@ $mascota = consultarMascotaId($id_mascota);
                         const razaSelect = document.getElementById('raza');
 
                         // Guardar la raza actual de la mascota
-                        const razaActual = '<?= htmlspecialchars($mascota['raza'] ?? '') ?>';
-                        const especieActual = '<?= htmlspecialchars($mascota['especie'] ?? '') ?>';
+                        const razaActual = '<?= ($mascota['raza'] ?? '') ?>';
+                        const especieActual = '<?= ($mascota['especie'] ?? '') ?>';
 
                         // 📋 Base de datos de razas por especie (igual que en registrar)
                         const razasPorEspecie = {
@@ -315,7 +315,7 @@ $mascota = consultarMascotaId($id_mascota);
                                 <input type="number"
                                     id="edad_numero"
                                     name="edad_numero"
-                                    value="<?= htmlspecialchars($mascota['edad_numero']) ?>"
+                                    value="<?= ($mascota['edad_numero']) ?>"
                                     placeholder="Ej: 3"
                                     min="1"
                                     max="999"
@@ -331,7 +331,7 @@ $mascota = consultarMascotaId($id_mascota);
                                     class="form-control"
                                     style="height: 50px; border: 2px solid #e0e0e0; border-radius: 8px;"
                                     >
-                                    <option value="<?= htmlspecialchars($mascota['edad_unidad']) ?>"><?= htmlspecialchars($mascota['edad_unidad']) ?></option>
+                                    <option value="<?= ($mascota['edad_unidad']) ?>"><?= ($mascota['edad_unidad']) ?></option>
                                     <option value="Dias">Días</option>
                                     <option value="Semanas">Semanas</option>
                                     <option value="Meses">Meses</option>
