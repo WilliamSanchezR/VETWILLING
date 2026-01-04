@@ -39,15 +39,15 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 <span class="nav-text">Inicio</span>
             </a>
 
-            <!-- Sección Usuario con Submenú especialidades -->
+            <!-- Sección Especialidades -->
             <a href="<?= BASE_URL ?>/representante/listar-especialidades"
                 class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>"
-                data-section="dashboard" data-tooltip="Especialidades">
-                <i class="bi bi-house-door"></i>
+                data-section="Especialidades" data-tooltip="Especialidades">
+                <i class="bi bi-person-plus"></i>
                 <span class="nav-text">Especialidades</span>
             </a>
 
-            
+
             <!-- Sección con submenú Profesionales  -->
             <div class="submenu <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' ? 'active open' : '' ?>">
 
@@ -94,9 +94,11 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             </div>
     </nav>
 
+
+
     <!-- NAVEGACION COMO VETERINARIO -->
-     
-     
+
+
 
     <!-- BOTÓN TOGGLE -->
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">

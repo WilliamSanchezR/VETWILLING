@@ -1,11 +1,10 @@
 <?php
 // Enlazamos la ruta para tomar la session del representante
 require_once BASE_PATH . '/app/helpers/session_representante.php';
+require_once BASE_PATH . '/app/controllers/especialidadController.php';
 
-// Enlazamos la dependencia del controlador de especialidades
-// require_once BASE_PATH . '/app/controllers/especialidadControllers.php';
-// Llamamos la función para listar las especialidades
-// $datos = listarEspecialidadesRegistradas();
+$datos = listarEspecialidadesRegistradas();
+$id_EspecialidadEditar = null;
 
 ?>
 
@@ -93,11 +92,11 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
                         </button>
                     </a>
 
-                    <a href="<?= BASE_URL ?>/admin/registro-veterinaria">
-                        <button class="btn-agregar" id="btnAgregarNuevo">
-                            <i class="bi bi-plus-lg"></i> Crear Nueva Especialidad
-                        </button>
-                    </a>
+
+                    <button class="btn-agregar" id="btnAgregarNuevo" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <i class="bi bi-plus-lg"></i> Crear Nueva Especialidad
+                    </button>
+
                 </div>
             </div>
 
@@ -107,21 +106,25 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
                     <thead>
                         <tr>
                             <th>Nombre</th>
+                            <th>Estado</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (!empty($datos)) : ?>
                             <?php foreach ($datos as $especialidad):  ?>
                                 <tr class="fila-blanca">
-                                   
-                                    <td><?= htmlspecialchars($especialidad['nombre_especialidad']) ?></td>
+
+                                    <td><?= htmlspecialchars($especialidad['nombre']) ?></td>
+                                    <td><?= htmlspecialchars($especialidad['estado']) ?></td>
 
                                     <td>
-                                        <button class="btn-accion btn-editar" title="Editar">
-                                            <a href=""></a>
+                                        <button class="btn-accion btn-editar" title="Editar" data-id="<?= $especialidad['id_especialidad'] ?>" data-name="<?= htmlspecialchars($especialidad['nombre']) ?>" data-bs-toggle="modal" data-bs-target="#modalEditarEspecialidad">
+                                            <i class="bi bi-pencil"></i>
                                         </button>
+
                                         <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href=""></a>
+                                            <a href="<?= BASE_URL ?>/representante/eliminar-especialidad?action=eliminar&id_especialidad=<?= $especialidad['id_especialidad'] ?>&id_veterinaria=<?= $_SESSION['user']['id_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
                                         </button>
                                     </td>
                                 </tr>
@@ -134,27 +137,86 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
         </div>
     </div>
-    
-    
 
-        <!-- SCRIPTS -->
-        <!-- 1. jQuery PRIMERO -->
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!--  Modal regitro especialidad  -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registro de Especialidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="<?= BASE_URL ?>/representante/guardar-especialidad" method="post">
+                     <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria']; ?>">
+                    <div class="modal-body">
+                        
+                        <div class="form-group">
+                            <label><i class="bi bi-folder-check"></i> Nombre *</label>
+                            <input type="text" id="nombre" name="nombre" required placeholder="Ej: Cardiología">
+                            
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
 
-        <!-- 2. Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-        <!-- 3. DataTables JS -->
-        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+     <!--  Modal Editar especialidad  -->
+    <div class="modal fade" id="modalEditarEspecialidad" tabindex="-1" aria-labelledby="modalEditarEspecialidad" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar de Especialidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="<?= BASE_URL ?>/representante/actualizar-especialidad" method="post">
+                     <input type="hidden" id="id_especialidad" name="id_especialidad" value="">
+                     <input type="hidden" name="accion" value="actualizar">
+                    <div class="modal-body">
+                        
+                        <div class="form-group">
+                            <label><i class="bi bi-folder-check"></i> Nombre *</label>
+                            <input type="text" id="nombre_especialidad" name="nombre_especialidad" required placeholder="Ej: Cardiología">
+                            
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
 
 
-        <!-- 5. Script de lista de veterinarias -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
-        <!-- Modo dia  y noche -->
-        <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
-        <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+
+    <!-- SCRIPTS -->
+    <!-- 1. jQuery PRIMERO -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- 2. Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 3. DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+
+    <!-- 5. Script de lista de veterinarias -->
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
+
+    <!-- Modo dia  y noche -->
+    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
+
+    <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/especialidades.js"></script>
 
 
 

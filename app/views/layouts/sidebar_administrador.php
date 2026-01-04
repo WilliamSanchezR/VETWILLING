@@ -30,7 +30,7 @@ $final_path = end($path_parts); // Obtiene el último elemento
     <nav class="sidebar-nav">
 
         <div class="nav-section">
-            <span class="nav-section-title">Menu Administrador</span>
+            <span class="nav-section-title">Menu Super Administrador</span>
 
             <a href="<?= BASE_URL ?>/admin/dashBoard"
                 class="nav-item <?= $final_path == 'dashBoard' ? 'active' : '' ?>"
