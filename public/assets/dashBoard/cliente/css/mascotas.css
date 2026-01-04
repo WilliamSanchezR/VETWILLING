@@ -19,52 +19,96 @@ body {
 /* HEADER DE MASCOTAS */
 .header-mascotas {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    justify-content: end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
 }
 
+/* ===== TÍTULO ===== */
 .header-titulo {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
+    position: relative;
+    right: 43%;
 }
 
 .header-titulo h1 {
-    font-size: 32px;
-    color: #2c3e50;
+    margin: 0;
+    font-size: 26px;
     font-weight: 600;
+    color: #1f2937;
 }
 
-.header-titulo .badge-count {
-    background: linear-gradient(135deg, #0A932C, #087a24);
-    color: white;
-    padding: 8px 16px;
+/* ===== BADGE CONTADOR ===== */
+.badge-count {
+    background: #e8f5ec;
+    color: #0A932C;
+    padding: 6px 12px;
     border-radius: 20px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
+}
+
+/* ===== BOTONES (BASE) ===== */
+.btn-action {
+    background: linear-gradient(135deg, #0A932C, #087a24);
+    color: #ffffff;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-action i {
+    font-size: 18px;
+}
+
+/* Hover general */
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(10, 147, 44, 0.35);
+}
+
+/* ===== MODIFICADORES ===== */
+.btn-pdf {
+    background: linear-gradient(135deg, #c62828, #b71c1c);
+}
+
+.btn-pdf:hover {
+    box-shadow: 0 6px 20px rgba(198, 40, 40, 0.35);
 }
 
 .btn-agregar {
     background: linear-gradient(135deg, #0A932C, #087a24);
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    text-decoration: none;
 }
 
-.btn-agregar:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .header-mascotas {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header-titulo {
+        justify-content: space-between;
+    }
+
+    .btn-action {
+        justify-content: center;
+        width: 100%;
+    }
 }
+
 
 /* FILTROS */
 .filtros-container {
