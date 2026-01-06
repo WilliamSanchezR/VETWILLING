@@ -73,13 +73,13 @@ function registrarEspecialidad()
 }
 
 // FUNCION PARA LISTAR LAS ESPECIALIDADES REGISTRADAS
-function listarEspecialidadesRegistradas()
+function listarEspecialidadesRegistradas($id_veterinaria)
 {
     // Creamos una instancia del modelo Especialidad
     $especialidadModel = new Especialidad();
 
     // Llamamos a la función listar del modelo
-    return $especialidadModel->listarEspecialidades(['id_veterinaria']);
+    return $especialidadModel->listarEspecialidades($id_veterinaria);
 }
 
 function actualizarEspecialidad() {

@@ -3,7 +3,7 @@
 require_once BASE_PATH . '/app/helpers/session_representante.php';
 require_once BASE_PATH . '/app/controllers/especialidadController.php';
 
-$datos = listarEspecialidadesRegistradas();
+$datos = listarEspecialidadesRegistradas($_SESSION['user']['id_veterinaria']);
 $id_EspecialidadEditar = null;
 
 ?>
