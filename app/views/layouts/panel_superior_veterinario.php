@@ -152,7 +152,7 @@ $usuario = mostrarPerfil($id);
                         <i class="bi bi-person-circle"></i>
                         <span>Mi Perfil</span>
                     </a>
-                    <a href="<?= BASE_URL ?>#" class="dropdown-item">
+                    <a href="<?= BASE_URL ?>/soporte" class="dropdown-item">
                         <i class="bi bi-question-circle"></i>
                         <span>Soporte</span>
                     </a>
