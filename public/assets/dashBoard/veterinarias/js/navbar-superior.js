@@ -351,3 +351,103 @@ window.NavbarSuperior = {
     abrirSidebarMovil: window.abrirSidebarMovil,
     agregarNotificacion: window.agregarNotificacion
 };
+const btnAbrirSoporte = document.getElementById('btnAbrirSoporte');
+const modalSoporte = document.getElementById('modalSoporte');
+const btnCerrarModal = document.getElementById('btnCerrarModal');
+const btnCancelar = document.getElementById('btnCancelar');
+const formularioSoporte = document.getElementById('formularioSoporte');
+
+// Abrir modal
+btnAbrirSoporte.addEventListener('click', function(e) {
+    e.preventDefault();
+    modalSoporte.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+});
+
+// Cerrar modal
+function cerrarModal() {
+    modalSoporte.classList.remove('active');
+    document.body.style.overflow = ''; // Restaurar scroll
+    formularioSoporte.reset();
+}
+
+btnCerrarModal.addEventListener('click', cerrarModal);
+btnCancelar.addEventListener('click', cerrarModal);
+
+// Cerrar al hacer click fuera del modal
+modalSoporte.addEventListener('click', function(e) {
+    if (e.target === modalSoporte) {
+        cerrarModal();
+    }
+});
+
+// Cerrar con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modalSoporte.classList.contains('active')) {
+        cerrarModal();
+    }
+});
+
+// Enviar formulario
+formularioSoporte.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Recopilar datos
+    const formData = {
+        nombre: document.getElementById('nombreSoporte').value,
+        email: document.getElementById('emailSoporte').value,
+        tipo_problema: document.getElementById('tipoProblema').value,
+        descripcion: document.getElementById('descripcionProblema').value,
+        fecha: new Date().toISOString()
+    };
+    
+    console.log('Datos del formulario:', formData);
+    
+    // Aquí puedes enviar a tu servidor
+    // fetch('<?= BASE_URL ?>/api/soporte.php', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(formData)
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     if(data.success) {
+    //         mostrarAlertaExito();
+    //     }
+    // })
+    // .catch(error => {
+    //     console.error('Error:', error);
+    //     alert('Error al enviar el mensaje');
+    // });
+    
+    // Simulación de envío exitoso
+    mostrarAlertaExito();
+});
+
+function mostrarAlertaExito() {
+    // Cerrar modal
+    cerrarModal();
+    
+    // Crear alerta de éxito
+    const alerta = document.createElement('div');
+    alerta.className = 'alerta-exito';
+    alerta.innerHTML = `
+        <div class="alerta-contenido">
+            <i class="bi bi-check-circle-fill"></i>
+            <div>
+                <h4>¡Mensaje enviado!</h4>
+                <p>Te responderemos pronto a tu correo</p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(alerta);
+    
+    // Remover después de 4 segundos
+    setTimeout(() => {
+        alerta.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => alerta.remove(), 300);
+    }, 4000);
+}
