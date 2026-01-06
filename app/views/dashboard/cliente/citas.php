@@ -40,19 +40,15 @@
                 <!-- Header -->
                 <div class="header-citas">
                     <div class="header-titulo">
-                        <h1>📅 Mis Citas</h1>
+                        <h1><i class="bi bi-calendar2-week"></i>Mis Citas</h1>
                         <p>Gestiona tus citas veterinarias</p>
                     </div>
-                    <button class="btn-nueva-cita">
-                        <i class="bi bi-plus-circle"></i>
-                        Nueva Cita
-                    </button>
                 </div>
 
                 <!-- Estadísticas Rápidas -->
                 <div class="stats-rapidas">
                     <div class="stat-item">
-                        <div class="stat-icon proximas">📆</div>
+                        <div class="stat-icon proximas"><i class="bi bi-calendar2-week"></i></div>
                         <div class="stat-content">
                             <h3>5</h3>
                             <p>Próximas citas</p>

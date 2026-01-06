@@ -29,14 +29,6 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/sidebar.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/registro.css">
-
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/registro.css">
-
-
-
 </head>
 
 <body>
@@ -50,7 +42,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
         <!-- NAVBAR SUPERIOR -->
         <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
 
-        <div class="contenido-principal">
+        <div class="area-contenido">
             <!-- DASHBOARD CONTENT -->
             <div class="container-registro">
 

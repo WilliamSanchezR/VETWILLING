@@ -1,9 +1,34 @@
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    width: auto;
+    transition: margin-left 0.3s ease;
+    background: var(--color-fondo);
+}
+
+.sidebar.collapsed ~ .contenido-principal {
+    margin-left: var(--sidebar-width-collapsed);
+}
+
+.area-contenido {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ===== CONTAINER DASHBOARD ===== */
+.container-dashboard {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
 .container-registro {
+    width: 100%;
     max-width: 100%;
     margin: 0 auto;
     padding: 20px 0 60px;
-    position: relative;
-    left: -120px;
+    /* position: relative; */
+    /* left: -120px; */
 }
 
 /* HEADER */

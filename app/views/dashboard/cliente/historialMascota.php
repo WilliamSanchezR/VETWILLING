@@ -51,9 +51,6 @@ $mascota = consultarMascotaId($id_mascota);
                         <h2 class="mb-1"><i class="bi bi-heart-pulse-fill text-primary me-2"></i>Historial Médico</h2>
                         <p class="text-muted mb-0">Información completa del paciente</p>
                     </div>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoRegistro">
-                        <i class="bi bi-plus-circle me-2"></i>Nuevo Registro
-                    </button>
                 </div>
 
                 <!-- INFO MASCOTA -->
