@@ -10,8 +10,7 @@ switch ($method) {
         registrarProfesional();
         break;
     case 'GET':
-        // Aquí podrías manejar las solicitudes GET si es necesario
-        listarUsuarios($_SESSION['user']['id_veterinaria']);
+        
         break;
     default:
         http_response_code(405);
