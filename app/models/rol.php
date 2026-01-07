@@ -31,4 +31,23 @@ class Rol
             return [];
         }
     }
+
+    public function listarRolRepresentante()
+    {
+        try {
+
+            //Variable que al,macena la sentencia de SQL a ejecutar
+            $consultar = "SELECT * FROM rol WHERE id_rol != 1 AND id_rol != 3 AND id_rol != 4 ORDER BY id_rol ASC";
+
+            //preparar lo necesario para ejecutar la funcion
+            $resultado = $this->conexion->prepare($consultar);
+
+            $resultado->execute();
+
+            return $resultado->fetchAll();
+        } catch (PDOException $e) {
+            die("Error en Rol::listar " . $e->getMessage());
+            return [];
+        }
+    }   
 }

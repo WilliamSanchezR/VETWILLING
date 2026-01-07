@@ -6,6 +6,7 @@ $path_parts = explode('/', $path);
 $path_parts = array_filter($path_parts); // Elimina elementos vacíos
 $final_path = end($path_parts); // Obtiene el último elemento del array
 
+
 ?>
 <!-- ESTILOS -->
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
@@ -58,7 +59,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 </div>
 
                 <ul class="submenu-items">
-                    <li><a class="nav-item <?= $final_path == 'registro-profesionales' ? 'active' : '' ?>" href="#" data-tooltip="Registrar">Registrar </a></li>
+                    <li><a class="nav-item <?= $final_path == 'registro-profesionales' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/registro-profesionales" data-tooltip="Registrar">Registrar </a></li>
                     <li><a class="nav-item <?= $final_path == 'listar-profesionales' ? 'active' : '' ?>" href="#" data-tooltip="Listar">Listar</a></li>
                 </ul>
             </div>

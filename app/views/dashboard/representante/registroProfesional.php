@@ -1,6 +1,16 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_administrador.php';
+require_once BASE_PATH . '/app/helpers/session_representante.php';
+// Enlazamos el controlador de roles para obtener los roles disponibles
+require_once BASE_PATH . '/app/controllers/rolController.php';
 
+// Enlazamos la ruta del controlador de veterinarias para listar las veterinarias
+require_once BASE_PATH . '/app/controllers/veterinariaController.php';
+require_once BASE_PATH . '/app/controllers/especialidadController.php';
+
+$datosEspecialidades = listarEspecialidadesRegistradas($_SESSION['user']['id_veterinaria']);
+
+// Llamamos la función para listar los roles
+$datosRol = listarRolRepresentante();
 ?>
 
 <!DOCTYPE html>
@@ -27,6 +37,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/styles/regitroProfesionales.styles.css">
 
 
     <!-- Global Styles -->
@@ -58,7 +69,9 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
             </div>
 
 
-            <form id="vetForm" action="<?= BASE_URL ?>/admin/guardar-Profesional" method="POST" enctype="multipart/form-data">
+            <form id="registroProfesional" action="<?= BASE_URL ?>/admin/guardar-Profesional" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
+                <input type="hidden" name="especialidades" value="" id="especialidadesInput">
 
                 <!-- Paso 1: Datos del Profesional -->
                 <div class="step active">
@@ -121,7 +134,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-camera"></i>Foto *</label>
-                                <input type="file" accept=".jpg," id="img_perfil" name="img_perfil" placeholder="ejemplo@correo.com">
+                                <input type="file" accept=".jpg," id="img_perfil" name="img_perfil" placeholder="Ej: foto.jpg">
                             </div>
                         </div>
 
@@ -132,6 +145,24 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                             </div>
                         </div>
                     </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-envelope"></i> No. registro medico *</label>
+                                <input type="text" id="registro_medico" name="registro_medico" required placeholder="123456">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-telephone"></i> Firma *</label>
+                                <input type="file" accept=".jpg," id="firma" name="firma" placeholder="Ej: firma.jpg">
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="row">
 
@@ -151,20 +182,33 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                             </div>
                         </div>
 
-                        <div class="col-md-6" id="input-veterinaria" style="display: none;">
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-12">
                             <div class="form-group">
-                                <label><i class="bi bi-hospital"></i> Veterinaria </label>
-                                <select id="veterinaria" name="veterinaria">
-                                    <option value="" disabled selected>Seleccione una veterinaria</option>
-                                    <?php if (!empty($datosVeterinaria)) : ?>
-                                        <?php foreach ($datosVeterinaria as $veterinaria):  ?>
-                                            <option value="<?= $veterinaria['id_veterinaria'] ?>"><?= $veterinaria['nombre'] ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
+                                <label for="">Especialidades</label>
+                                <button type="button" class="btn btn-primary btn-sm" id="agregarEspecialidadBtn">
+                                    <i class="bi bi-plus-lg"></i> Agregar Especialidad
+                                </button>
+
+                                <div class="listEspecialidades">
+                                    <ul>
+                                        <?php if (!empty($datosEspecialidades)) : ?>
+                                            <?php foreach ($datosEspecialidades as $especialidad):  ?>
+                                                <li>
+                                                    <input class="form-check-input check-especialidades" type="checkbox" data-name="<?= htmlspecialchars($especialidad['nombre']) ?>" value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>" id="idCheck<?= $especialidad['id_especialidad'] ?>">
+                                                    <label for="idCheck<?= $especialidad['id_especialidad'] ?>"><?= htmlspecialchars($especialidad['nombre']) ?></label>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
+                        <div class="col-md-12" id="especialidadesContainer"></div>
                     </div>
 
                     <div class="buttons">
@@ -191,7 +235,8 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
         <!-- JS Propio -->
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/registroUsuario.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/registroProfesionales.js"></script>
+
 
 </body>
 

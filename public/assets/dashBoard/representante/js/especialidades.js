@@ -26,7 +26,6 @@ class especialidades {
      }
 
     viewModalEdit(data) {
-        console.log(data);
         this.especialidadId.value = data.id;
         this.nombreEspecialidad.value = data.name;
     }

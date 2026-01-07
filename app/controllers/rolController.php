@@ -35,3 +35,12 @@ function listarRolAdmin()
 
     return $roles;
 }
+
+// Funcion para listar los roles disponibles para el representante
+function listarRolRepresentante()
+{
+    $resultado = new Rol();
+    $roles = $resultado->listarRolRepresentante();
+
+    return $roles;
+}
