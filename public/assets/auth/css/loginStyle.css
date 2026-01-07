@@ -39,20 +39,16 @@
     width: 100%;
 }
 
-/* .login .cont-input i {
-    font-size: 24px;
-    position: absolute;
-    color: var(--neutral-color);
-    margin-left: 15px;
-} */
-
 .login .cont-input input {
     border-radius: 16px;
     border: 1px solid var(--neutral-color);
-    padding: 0px 20px 0px 60px;
+    /* padding: 0px 20px 0px 60px; */
     font-size: 16px;
     height: 50px;
     width: 100%;
+}
+.cont-input{
+    margin-bottom: 6px !important;
 }
 
 .login #recover {
@@ -231,8 +227,8 @@
     height: 200px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
-    top: 570px !important;
-    left: -111px !important;
+    top: 507px !important;
+    left: -90px !important;
     z-index: 3;
 }
 
@@ -285,8 +281,8 @@
 
 .welcome-box {
     position: absolute;
-    top: 67%;
-    left: 20%;
+    top: 65%;
+    left: 21%;
     max-width: 429px;
     padding: 22px 33px;
     background: rgba(255, 255, 255, 0.15);
