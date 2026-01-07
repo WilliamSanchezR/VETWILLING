@@ -341,4 +341,8 @@ switch ($request) {
     case '/representante/registro-profesionales':
         require BASE_PATH . '/app/views/dashboard/representante/registroProfesional.php';
         break;
+
+    case '/representante/guardar-Profesional':
+        require BASE_PATH . '/app/controllers/profesionalController.php';
+        break;
 }

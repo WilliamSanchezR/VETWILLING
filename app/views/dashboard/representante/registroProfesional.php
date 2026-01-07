@@ -69,7 +69,7 @@ $datosRol = listarRolRepresentante();
             </div>
 
 
-            <form id="registroProfesional" action="<?= BASE_URL ?>/admin/guardar-Profesional" method="POST" enctype="multipart/form-data">
+            <form id="registroProfesional" action="<?= BASE_URL ?>/representante/guardar-Profesional" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
                 <input type="hidden" name="especialidades" value="" id="especialidadesInput">
 
@@ -97,7 +97,8 @@ $datosRol = listarRolRepresentante();
                                 <input type="number" id="documento" name="numero_documento" required placeholder="12345678">
                             </div>
                         </div>
-
+                    </div>
+                    <div class="row">
 
                         <div class="col-md-6">
                             <div class="form-group">
@@ -130,6 +131,8 @@ $datosRol = listarRolRepresentante();
                                 <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
 
                         <div class="col-md-6">
                             <div class="form-group">
@@ -157,7 +160,7 @@ $datosRol = listarRolRepresentante();
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-telephone"></i> Firma *</label>
+                                <label><i class="bi bi-pen"></i> Firma *</label>
                                 <input type="file" accept=".jpg," id="firma" name="firma" placeholder="Ej: firma.jpg">
                             </div>
                         </div>

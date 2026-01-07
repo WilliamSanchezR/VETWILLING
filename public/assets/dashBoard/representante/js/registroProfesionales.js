@@ -35,6 +35,21 @@ class RegistroProfesionales {
 
     toggleEspecialidades() {
         this.listEspecialidades.classList.toggle('vew-list-esp');
+
+        if (this.inputEspecialidades.value.length > 0) {
+            const listEsp = JSON.parse(this.inputEspecialidades.value);
+            if (listEsp && listEsp.length > 0) {
+                this.especialidades.forEach(e => {
+                    const espId = e.value;
+                    const encontrado = listEsp.find(esp => esp.id === espId);
+                    if (encontrado) {
+                        e.checked = true;
+                    } else {
+                        e.checked = false;
+                    }
+                });
+            }
+        }
     }
 
     asociarEspecialidades(element) {
