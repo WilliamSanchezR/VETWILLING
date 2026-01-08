@@ -16,7 +16,7 @@ $datosRol = listarRolRepresentante();
 $id = $_GET['id'];
 
 $datosProfesional = consultarProfesional($id);
-$listaEspecialidadesProfesional = listarEspecialidadesPorProfesional($id);
+$listaEspecialidadesProfesional = listarEspecialidadesPorProfesional($id, $_SESSION['user']['id_veterinaria']);
 $stringEspecialidades = '';
 
 if (count($listaEspecialidadesProfesional) > 0) {
@@ -57,7 +57,7 @@ if (count($listaEspecialidadesProfesional) > 0) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/styles/regitroProfesionales.styles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/regitroProfesionales.styles.css">
 
 
     <!-- Global Styles -->
@@ -97,6 +97,7 @@ if (count($listaEspecialidadesProfesional) > 0) {
                 <input type="hidden" name="id_usuario" value="<?= $_GET['id'] ?>">
                 <input type="hidden" name="img_perfil" value="<?= $datosProfesional['img_perfil'] ?>">
                 <input type="hidden" name="img_firma" value="<?= $datosProfesional['img_firma'] ?>">
+                <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
 
                 <!-- Paso 1: Datos del Profesional -->
                 <div class="step active">

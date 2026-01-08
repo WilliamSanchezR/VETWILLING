@@ -47,9 +47,10 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
 
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Include de la barra lateral izquierda -->
-    <?php
-    include_once __DIR__ . '/../../layouts/sidebar_administrador.php'
+     <?php
+    include_once __DIR__ . '/../../layouts/sidebar_representante.php'
     ?>
+
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="contenido-principal" id="contenidoPrincipal">
@@ -57,7 +58,7 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
 
         <!-- Include de navbar superior -->
         <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_administrador.php'
+        include_once __DIR__ . '/../../layouts/panel_superior_representante.php'
         ?>
 
 
@@ -133,7 +134,7 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
                                             <a href="<?= BASE_URL ?>/representante/editar-profesional?id=<?= $profesional['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
                                         <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/admin/eliminar-profesional?accion=eliminar&id=<?= $profesional['id_usuario'] ?>"><i class="bi bi-trash"></i></a>
+                                            <a href="<?= BASE_URL ?>/representante/eliminar-profesional?action=eliminar&id=<?= $profesional['id_prof_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
                                         </button>
                                     </td>
                                 </tr>

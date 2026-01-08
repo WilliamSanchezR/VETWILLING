@@ -37,7 +37,7 @@ $datosRol = listarRolRepresentante();
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/styles/regitroProfesionales.styles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/regitroProfesionales.styles.css">
 
 
     <!-- Global Styles -->

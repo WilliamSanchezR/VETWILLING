@@ -36,6 +36,7 @@ $id_EspecialidadEditar = null;
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/styleTableAdmin.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/listaEspecialidad.styles.css">
 
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
@@ -146,11 +147,11 @@ $id_EspecialidadEditar = null;
                     <h5 class="modal-title">Registro de Especialidad</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="<?= BASE_URL ?>/representante/guardar-especialidad" method="post">
+                <form class="registro" action="<?= BASE_URL ?>/representante/guardar-especialidad" method="post">
                      <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria']; ?>">
                     <div class="modal-body">
                         
-                        <div class="form-group">
+                        <div class="form-group form">
                             <label><i class="bi bi-folder-check"></i> Nombre *</label>
                             <input type="text" id="nombre" name="nombre" required placeholder="Ej: Cardiología">
                             

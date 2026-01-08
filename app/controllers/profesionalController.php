@@ -20,6 +20,8 @@ switch ($method) {
             $id_profesional = $_GET['id_profesional'] ?? '';
             $id_especialidad = $_GET['id_especialidad'] ?? '';
             eliminarEspecialidadDeProfesional($id_profesional, $id_especialidad);
+        } else if ($accion === 'eliminar') {
+            eliminarProfesional($_GET['id']);
         }
         break;
     default:
@@ -153,10 +155,10 @@ function consultarProfesional($id)
     return $objProfesional->consultarPorId($id);
 }
 
-function listarEspecialidadesPorProfesional($id)
+function listarEspecialidadesPorProfesional($id, $idVeterinaria)
 {
     $objProfesional = new Profesional();
-    return $objProfesional->listarEspecialidadesPorProfesional($id);
+    return $objProfesional->listarEspecialidadesPorProfesional($id, $idVeterinaria);
 }
 
 function eliminarEspecialidadDeProfesional($id_profesional, $id_especialidad)
@@ -195,12 +197,13 @@ function actualizarProfesional()
     $id_usuario = $_POST['id_usuario'] ?? '';
     $img_perfil = $_POST['img_perfil'] ?? null;
     $img_firma = $_POST['img_firma'] ?? null;
+    $id_veterinaria = $_POST['id_veterinaria'] ?? null;
 
     // Validamos que los campos no esten vacios
     if (
         empty($id_profesional) || empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
         empty($apellidos) || empty($telefono) || empty($direccion) || empty($registro_medico) ||
-        empty($id_rol) || empty($email) || empty($id_usuario)
+        empty($id_rol) || empty($email) || empty($id_usuario) || empty($id_veterinaria)
     ) {
         // Mostrar alerta de error si hay campos vacíos
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
@@ -267,7 +270,8 @@ function actualizarProfesional()
         'email' => $email,
         'id_usuario' => $id_usuario,
         'img_perfil' => $img_perfil,
-        'img_firma' => $img_firma
+        'img_firma' => $img_firma,
+        'id_veterinaria' => $id_veterinaria
     ];
 
     // Actualizamos el profesional
@@ -282,6 +286,25 @@ function actualizarProfesional()
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar el profesional');
+    }
+
+    exit();
+}
+
+function eliminarProfesional($id)
+{
+    $objProfesional = new Profesional();
+    $resultado = $objProfesional->eliminarProfesional($id);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Profesional Eliminado',
+            'El profesional ha sido eliminado correctamente',
+            '/vetwilling/representante/listar-profesionales'
+        );
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el profesional');
     }
 
     exit();
