@@ -482,7 +482,7 @@ body {
 }
 
 .action-btn-primary {
-    background: linear-gradient(135deg, #0A932C, #087a24);
+    background: linear-gradient(135deg, #930a2c, #aa1830);
     color: white;
 }
 
@@ -490,7 +490,50 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    background: transparent;
+}
 
+.action-btn-primary {
+    color: #dc2626;
+    background-color: #fee2e2;
+}
+
+.action-btn-primary:hover {
+    background-color: #fecaca;
+    color: #b91c1c;
+    transform: translateY(-1px);
+}
+
+.action-btn-primary:active {
+    transform: translateY(0);
+}
+
+.action-btn i {
+    font-size: 1rem;
+}
+
+/* Opcional: Efecto de confirmación visual */
+.action-btn-primary:hover i {
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
 .action-btn-secondary {
     background: #e9ecef;
     color: #495057;

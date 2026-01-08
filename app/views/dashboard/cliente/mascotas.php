@@ -92,16 +92,6 @@ $mascotas = listarMascotas();
                             <div class="mascota-card-header">
 
                                 <!-- MENU SUPERIOR -->
-                                <div class="mascota-menu">
-                                    <button type="button"
-                                        class="btn-eliminar-mascota btn btn-link p-0"
-                                        data-id="<?= $m['id_paciente'] ?>"
-                                        data-nombre="<?= htmlspecialchars($m['nombre']) ?>"
-                                        title="Eliminar mascota">
-                                        <i class="fa-solid fa-trash-can" style="color: red;"></i>
-                                    </button>
-
-                                </div>
 
                                 <!-- FOTO -->
                                 <div class="mascota-avatar-grande">
@@ -162,8 +152,12 @@ $mascotas = listarMascotas();
                                 <!-- BOTONES -->
                                 <div class="mascota-actions">
 
-                                    <button class="action-btn action-btn-primary">
-                                        <i class="bi bi-calendar-plus"></i> Agendar Cita
+                                    <button type="button"
+                                        class="action-btn action-btn-primary btn-link p-0"
+                                        data-id="<?= $m['id_paciente'] ?>"
+                                        data-nombre="<?= htmlspecialchars($m['nombre']) ?>"
+                                        title="Eliminar mascota">
+                                        <i class="fa-solid fa-trash-can"></i>Eliminar
                                     </button>
 
                                     <a href="<?= BASE_URL ?>/cliente/historial-mascota?id=<?= $m['id_paciente'] ?>" class="action-btn action-btn-info">

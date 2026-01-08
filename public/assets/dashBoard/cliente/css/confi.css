@@ -1,8 +1,4 @@
 /* ==========================================
-   CONFIGURACIÓN - CSS COMPLETO
-   ========================================== */
-
-/* ==========================================
    1. VARIABLES CSS
    ========================================== */
 :root {
@@ -961,4 +957,66 @@ body.dark-theme ::-webkit-scrollbar-track {
         border: 1px solid #ddd;
         page-break-inside: avoid;
     }
+}
+
+/* estilos del formulario para el soporte del propietario */
+.config-input,
+.config-textarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.3s;
+}
+
+.config-input:focus,
+.config-textarea:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.config-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.btn-enviar-soporte {
+    width: 100%;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #0A932C 0%, #087a24 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-enviar-soporte:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-enviar-soporte:active {
+    transform: translateY(0);
+}
+
+/* Dark mode support */
+body.dark-mode .config-input,
+body.dark-mode .config-textarea {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: #fff;
+}
+
+body.dark-mode .config-input:focus,
+body.dark-mode .config-textarea:focus {
+    border-color: #0A932C;
 }

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -19,6 +18,7 @@
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
 
 </head>
+
 <body>
     <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
@@ -262,37 +262,87 @@
                     <div class="config-card">
                         <div class="config-card-header">
                             <div class="config-icon">
-                                <i class="bi bi-palette-fill"></i>
+                                <i class="bi bi-headset"></i>
                             </div>
                             <div>
-                                <h3 data-translate="appearance">Apariencia</h3>
-                                <p data-translate="appearance_desc">Personaliza el aspecto de la aplicación</p>
+                                <h3 data-translate="support">Soporte</h3>
+                                <p data-translate="support_desc">¿Tienes algún problema? Coméntanos</p>
                             </div>
                         </div>
 
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4 data-translate="theme">Tema</h4>
-                                <p data-translate="theme_desc">Elige entre tema claro u oscuro</p>
+                        <form id="formularioSoporte" class="support-form">
+                            <div class="config-item">
+                                <div class="config-info">
+                                    <label for="nombreSoporte">
+                                        <h4 data-translate="name">Nombre</h4>
+                                        <p data-translate="name_desc">Tu nombre completo</p>
+                                    </label>
+                                </div>
+                                <input
+                                    type="text"
+                                    class="config-input"
+                                    id="nombreSoporte"
+                                    name="nombre"
+                                    placeholder="Juan Pérez"
+                                    required>
                             </div>
-                            <select class="config-select" id="selectTema">
-                                <option value="light" data-translate="light">Claro</option>
-                                <option value="dark" data-translate="dark">Oscuro</option>
-                                <option value="auto" data-translate="auto">Automático</option>
-                            </select>
-                        </div>
 
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4 data-translate="text_size">Tamaño de Texto</h4>
-                                <p data-translate="text_size_desc">Ajusta el tamaño del texto</p>
+                            <div class="config-item">
+                                <div class="config-info">
+                                    <label for="emailSoporte">
+                                        <h4 data-translate="email">Correo Electrónico</h4>
+                                        <p data-translate="email_desc">Para enviarte la respuesta</p>
+                                    </label>
+                                </div>
+                                <input
+                                    type="email"
+                                    class="config-input"
+                                    id="emailSoporte"
+                                    name="email"
+                                    placeholder="ejemplo@correo.com"
+                                    required>
                             </div>
-                            <select class="config-select" id="selectTamanoTexto">
-                                <option value="14" data-translate="small">Pequeño</option>
-                                <option value="16" data-translate="normal">Normal</option>
-                                <option value="18" data-translate="large">Grande</option>
-                            </select>
-                        </div>
+
+                            <div class="config-item">
+                                <div class="config-info">
+                                    <label for="tipoProblema">
+                                        <h4 data-translate="issue_type">Tipo de Problema</h4>
+                                        <p data-translate="issue_type_desc">Selecciona la categoría</p>
+                                    </label>
+                                </div>
+                                <select class="config-select" id="tipoProblema" name="tipo_problema" required>
+                                    <option value="" disabled selected>Selecciona una opción</option>
+                                    <option value="tecnico" data-translate="technical">Problema Técnico</option>
+                                    <option value="cuenta" data-translate="account">Problema con la Cuenta</option>
+                                    <option value="funcionalidad" data-translate="functionality">Funcionalidad</option>
+                                    <option value="sugerencia" data-translate="suggestion">Sugerencia</option>
+                                    <option value="otro" data-translate="other">Otro</option>
+                                </select>
+                            </div>
+
+                            <div class="config-item">
+                                <div class="config-info">
+                                    <label for="descripcionProblema">
+                                        <h4 data-translate="description">Descripción</h4>
+                                        <p data-translate="description_desc">Cuéntanos qué sucede</p>
+                                    </label>
+                                </div>
+                                <textarea
+                                    class="config-textarea"
+                                    id="descripcionProblema"
+                                    name="descripcion"
+                                    rows="5"
+                                    placeholder="Describe tu problema o sugerencia aquí..."
+                                    required></textarea>
+                            </div>
+
+                            <div class="config-item">
+                                <button type="submit" class="btn-enviar-soporte">
+                                    <i class="bi bi-send-fill"></i>
+                                    <span data-translate="send">Enviar</span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
