@@ -333,7 +333,7 @@ switch ($request) {
     case '/representante/actualizar-especialidad':
         require BASE_PATH . '/app/controllers/especialidadController.php';
         break;
-        
+
     case '/representante/eliminar-especialidad':
         require BASE_PATH . '/app/controllers/especialidadController.php';
         break;
@@ -348,5 +348,17 @@ switch ($request) {
 
     case '/representante/listar-profesionales':
         require BASE_PATH . '/app/views/dashboard/representante/listaProfesionales.php';
+        break;
+
+    case '/representante/editar-profesional':
+        require BASE_PATH . '/app/views/dashboard/representante/editarProfesional.php';
+        break;
+
+    case '/representante/eliminar-esp-profesional':
+        require BASE_PATH . '/app/controllers/profesionalController.php';
+        break;
+
+    case '/representante/actualizar-profesional':
+        require BASE_PATH . '/app/controllers/profesionalController.php';
         break;
 }

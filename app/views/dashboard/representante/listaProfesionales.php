@@ -130,7 +130,7 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
                                     <td><?= $profesional['rol'] ?></td>
                                     <td class="content-action">
                                         <button class="btn-accion btn-editar" title="Editar">
-                                            <a href="<?= BASE_URL ?>/admin/editar-profesional?id=<?= $profesional['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
+                                            <a href="<?= BASE_URL ?>/representante/editar-profesional?id=<?= $profesional['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
                                         <button class="btn-accion btn-eliminar" title="Eliminar">
                                             <a href="<?= BASE_URL ?>/admin/eliminar-profesional?accion=eliminar&id=<?= $profesional['id_usuario'] ?>"><i class="bi bi-trash"></i></a>
