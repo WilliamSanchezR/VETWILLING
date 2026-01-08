@@ -53,8 +53,7 @@ function registrarProfesional()
     if (
         empty($email) || empty($password) || empty($estado) || empty($id_rol) ||
         empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
-        empty($apellidos) || empty($telefono) || empty($direccion) || empty($id_veterinaria) ||
-        empty($listaEspecialidades)
+        empty($apellidos) || empty($telefono) || empty($direccion) || empty($id_veterinaria)
     ) {
         // Mostrar alerta de error si hay campos vacíos
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');

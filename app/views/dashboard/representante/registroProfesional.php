@@ -136,7 +136,7 @@ $datosRol = listarRolRepresentante();
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-camera"></i>Foto *</label>
+                                <label><i class="bi bi-camera"></i>Foto </label>
                                 <input type="file" accept=".jpg," id="img_perfil" name="img_perfil" placeholder="Ej: foto.jpg">
                             </div>
                         </div>
@@ -153,14 +153,14 @@ $datosRol = listarRolRepresentante();
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-envelope"></i> No. registro medico *</label>
-                                <input type="text" id="registro_medico" name="registro_medico" required placeholder="123456">
+                                <label><i class="bi bi-envelope"></i> No. registro medico </label>
+                                <input type="text" id="registro_medico" name="registro_medico" placeholder="123456">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-pen"></i> Firma *</label>
+                                <label><i class="bi bi-pen"></i> Firma </label>
                                 <input type="file" accept=".jpg," id="firma" name="firma" placeholder="Ej: firma.jpg">
                             </div>
                         </div>
