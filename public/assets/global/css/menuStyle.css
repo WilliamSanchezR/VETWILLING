@@ -355,7 +355,7 @@
        display: block;
        color: var(--text-primary);
        text-decoration: none;
-       font-size: var(--fs-texto1);
+       font-size: 15px;
        transition: color 0.3s ease;
    }
 

@@ -1,10 +1,11 @@
 <?php
 // Enlazamos la ruta para tomar la session del administrador
-require_once BASE_PATH . '/app/helpers/session_administrador.php';
+require_once BASE_PATH . '/app/helpers/session_representante.php';
 // Enlazamos el controlador de profesional para listar los profesionales
 require_once BASE_PATH . '/app/controllers/profesionalController.php';
 // Llamamos la función para listar los profesionales
-// $datos = listarprofesionales();
+
+$datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
 
 ?>
 
@@ -32,7 +33,7 @@ require_once BASE_PATH . '/app/controllers/profesionalController.php';
 
     <!-- Tus CSS -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
-    
+
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/styleTableAdmin.css">
@@ -46,9 +47,10 @@ require_once BASE_PATH . '/app/controllers/profesionalController.php';
 
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Include de la barra lateral izquierda -->
-    <?php
-    include_once __DIR__ . '/../../layouts/sidebar_administrador.php'
+     <?php
+    include_once __DIR__ . '/../../layouts/sidebar_representante.php'
     ?>
+
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="contenido-principal" id="contenidoPrincipal">
@@ -56,7 +58,7 @@ require_once BASE_PATH . '/app/controllers/profesionalController.php';
 
         <!-- Include de navbar superior -->
         <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_administrador.php'
+        include_once __DIR__ . '/../../layouts/panel_superior_representante.php'
         ?>
 
 
@@ -74,7 +76,7 @@ require_once BASE_PATH . '/app/controllers/profesionalController.php';
                 <div class="controles-izquierda">
                     <div class="campo-buscar">
                         <i class="bi bi-search"></i>
-                        <input type="text" id="buscarCitas" placeholder="Buscar profesionales...">
+                        <input type="text" id="buscarProfesionales" placeholder="Buscar profesionales...">
                     </div>
                 </div>
                 <div class="controles-derecha">
@@ -91,11 +93,11 @@ require_once BASE_PATH . '/app/controllers/profesionalController.php';
                         <i class="bi bi-download"></i> Export
                     </button>
 
-                    <a href="<?= BASE_URL ?>/admin/registro-profesional">
-                    <button class="btn-agregar" id="btnAgregarNuevo">
-                        <i class="bi bi-plus-lg"></i> Agregar Nuevo
-                    </button>
-                    </a>
+                    <!-- <a href="<?= BASE_URL ?>/admin/registro-profesional">
+                        <button class="btn-agregar" id="btnAgregarNuevo">
+                            <i class="bi bi-plus-lg"></i> Agregar Nuevo
+                        </button>
+                    </a> -->
                 </div>
             </div>
 
@@ -109,6 +111,7 @@ require_once BASE_PATH . '/app/controllers/profesionalController.php';
                             <th>Nombres y Apellidos</th>
                             <th>Telefono</th>
                             <th>Email</th>
+                            <th>Especialidades</th>
                             <th>Estado</th>
                             <th>Rol</th>
                             <th>Acciones</th>
@@ -123,14 +126,15 @@ require_once BASE_PATH . '/app/controllers/profesionalController.php';
                                     <td><?= $profesional['nombres'] ?> <?= $profesional['apellidos'] ?></td>
                                     <td><?= $profesional['telefono'] ?></td>
                                     <td><?= $profesional['email'] ?></td>
+                                    <td><?= $profesional['especialidad'] ?></td>
                                     <td><?= $profesional['estado'] ?></td>
                                     <td><?= $profesional['rol'] ?></td>
                                     <td class="content-action">
                                         <button class="btn-accion btn-editar" title="Editar">
-                                            <a href="<?= BASE_URL ?>/admin/editar-profesional?id=<?= $profesional['id_profesional'] ?>"><i class="bi bi-pencil"></i></a>
+                                            <a href="<?= BASE_URL ?>/representante/editar-profesional?id=<?= $profesional['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
                                         <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/admin/eliminar-profesional?accion=eliminar&id=<?= $profesional['id_profesional'] ?>"><i class="bi bi-trash"></i></a>
+                                            <a href="<?= BASE_URL ?>/representante/eliminar-profesional?action=eliminar&id=<?= $profesional['id_prof_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
                                         </button>
                                     </td>
                                 </tr>
@@ -153,10 +157,10 @@ require_once BASE_PATH . '/app/controllers/profesionalController.php';
         <!-- 3. DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-       
+
 
         <!-- 5. Tu script de tabla AL FINAL -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaUsuarios.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/listaprofesionales.js"></script>
 
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
