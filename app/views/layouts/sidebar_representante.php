@@ -74,7 +74,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 </div>
 
                 <ul class="submenu-items">
-                    <li><a class="nav-item <?= $final_path == 'registro-servicios' ? 'active' : '' ?>" href="#" data-tooltip="Registrar">Registrar </a></li>
+                    <li><a class="nav-item <?= $final_path == 'registro-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/registro-servicio" data-tooltip="Registrar">Registrar </a></li>
                     <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="#" data-tooltip="Listar">Listar</a></li>
                 </ul>
             </div>
