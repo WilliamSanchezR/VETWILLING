@@ -1,20 +1,21 @@
-class ListaPorfesionales {
+class ListaServicios {
     constructor() {
         document.addEventListener('DOMContentLoaded', () => this.init());
     }
     init() {
-        console.log('Lista profesionales Init');
+        console.log('Lista servicios Init');
         this.cacheDom();
         this.bindEvents();
-        this.dataTableListProfesionales();
+        this.dataTableListServicios();
     }
 
     cacheDom() {
-        this.tablaProfesionales;
+        this.tablaServicios;
         this.ordebarBtn = document.getElementById('btnOrdenar');
         this.btnExportarCSV = document.getElementById('btnExport');
         this.inputBuscarProfesionales = document.getElementById('buscarProfesionales');
         this.limpiarBusqueda = document.querySelector('.campo-buscar i');
+        this.btnCrearServicio = document.getElementById('btnAgregarNuevo');
     }
 
     bindEvents() {
@@ -36,26 +37,30 @@ class ListaPorfesionales {
                 this.buscarProfesionales();
             }
         };
+
+        if (this.btnCrearServicio) {
+            this.btnCrearServicio.onclick = () => this.crearServicio();
+        }
     }
 
     // Funcion para inicializar DataTable para la lista de laboratorios asociados
-    dataTableListProfesionales() {
+    dataTableListServicios() {
         try {
-            this.tablaProfesionales = $('#tablaListaProfesionales').DataTable({
+            this.tablaServicios = $('#tablaListaServicios').DataTable({
                 // Configuración de idioma en español
                 language: {
                     "decimal": "",
-                    "emptyTable": "No hay Profesionales disponibles",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Profesionales",
-                    "infoEmpty": "Mostrando 0 a 0 de 0 Profesionales",
-                    "infoFiltered": "(filtrado de _MAX_ Profesionales totales)",
+                    "emptyTable": "No hay Servicios disponibles",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Servicios",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 Servicios",
+                    "infoFiltered": "(filtrado de _MAX_ Servicios totales)",
                     "infoPostFix": "",
                     "thousands": ",",
-                    "lengthMenu": "Mostrar _MENU_ Profesionales",
+                    "lengthMenu": "Mostrar _MENU_ Servicios",
                     "loadingRecords": "Cargando...",
                     "processing": "Procesando...",
                     "search": "Buscar:",
-                    "zeroRecords": "No se encontraron Profesionales",
+                    "zeroRecords": "No se encontraron Servicios",
                     "paginate": {
                         "first": "Primera",
                         "last": "Última",
@@ -110,20 +115,12 @@ class ListaPorfesionales {
 
         switch (opcion) {
             case '1':
-                this.tablaProfesionales.order([2, 'asc']).draw();
-                console.log('👤 Ordenado por Nombre y Apellidos ascendente');
+                this.tablaServicios.order([2, 'asc']).draw();
+                console.log('👤 Ordenado por Nombre ascendente');
                 break;
             case '2':
-                this.tablaProfesionales.order([2, 'desc']).draw();
-                console.log('👤 Ordenado por Nombre y Apellidos descendente');
-                break;
-            case '3':
-                this.tablaProfesionales.order([1, 'asc']).draw();
-                console.log('# Ordenado por número de documento ascendente');
-                break;
-            case '4':
-                this.tablaProfesionales.order([1, 'desc']).draw();
-                console.log('# Ordenado por número de documento descendente');
+                this.tablaServicios.order([2, 'desc']).draw();
+                console.log('👤 Ordenado por Nombre descendente');
                 break;
             default:
                 if (opcion !== null) {
@@ -134,8 +131,8 @@ class ListaPorfesionales {
 
     exportarCSV() {
         try {
-            const data = this.tablaProfesionales.rows({ search: 'applied' }).data();
-            let csv = 'foto Perfil, Documento, Nombres y Apellidos, Teléfono, Email, Especialidades, Estado, Rol\n';
+            const data = this.tablaServicios.rows({ search: 'applied' }).data();
+            let csv = 'Nombre, Descripción, Costo, Estado\n';
 
             data.each(function (fila) {
                 const filaLimpia = [];
@@ -153,7 +150,7 @@ class ListaPorfesionales {
             const fecha = new Date().toISOString().split('T')[0];
 
             link.setAttribute('href', url);
-            link.setAttribute('download', `profesionales_veterinaria_${fecha}.csv`);
+            link.setAttribute('download', `servicios_veterinaria_${fecha}.csv`);
             link.style.visibility = 'hidden';
 
             document.body.appendChild(link);
@@ -161,18 +158,25 @@ class ListaPorfesionales {
             document.body.removeChild(link);
 
             alert('✅ Archivo CSV descargado correctamente');
-            console.log('✅ CSV exportado:', `profesionales_veterinaria_${fecha}.csv`);
+            console.log('✅ CSV exportado:', `servicios_veterinaria_${fecha}.csv`);
         } catch (error) {
             console.error('❌ Error al exportar CSV:', error);
             alert('Error al exportar CSV. Revisa la consola.');
         }
     }
 
-    buscarProfesionales() {
-        const valorBusqueda = this.inputBuscarProfesionales.value;
+    buscarServicios() {
+        const valorBusqueda = this.inputBuscarServicios.value;
         console.log('🔍 Buscando:', valorBusqueda);
-        this.tablaProfesionales.search(valorBusqueda).draw();
+        this.tablaServicios.search(valorBusqueda).draw();
+    }
+
+    crearServicio() {
+        // Lógica para crear un nuevo servicio
+        const eliminarUrl = `${window.location.origin}/vetwilling/representante/registro-servicio`;
+
+        window.location.href = eliminarUrl;
     }
 }
 
-new ListaPorfesionales();
+new ListaServicios();

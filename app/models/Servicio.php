@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../config/database.php';
 
 class Servicio
 {
-     private $conexion;
+    private $conexion;
 
     public function __construct()
     {
@@ -33,7 +33,7 @@ class Servicio
             if ($servicioExiste) {
                 // El servicio ya existe
                 echo "El servicio ya está registrado para esta veterinaria.";
-               return false;
+                return false;
             } else {
                 // El servicio no existe, lo registramos
                 $consulta = "INSERT INTO servicio (nombre, descripcion, costo, id_veterinaria) 
@@ -44,10 +44,9 @@ class Servicio
                 $resultado->bindParam(':descripcion', $data['descripcion']);
                 $resultado->bindParam(':costo', $data['costo']);
                 $resultado->bindParam(':id_veterinaria', $data['id_veterinaria']);
-                
+
                 // Ejecutamos la consulta
                 return $resultado->execute();
-
             }
         } catch (PDOException $e) {
             echo "Error al registrar el servicio: " . $e->getMessage();
@@ -55,4 +54,74 @@ class Servicio
         }
     }
 
+    // FUNCION PARA OBTENER LOS SERVICIOS DE UNA VETERINARIA
+    public function obtenerServiciosPorVeterinaria($id_veterinaria)
+    {
+        try {
+            $consulta = "SELECT * FROM servicio WHERE id_veterinaria = :id_veterinaria";
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_veterinaria', $id_veterinaria);
+            $resultado->execute();
+
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los servicios: " . $e->getMessage();
+            return [];
+        }
+    }
+
+    // FUNCION CONSULTAR SERVICIO POR ID
+    public function obtenerServicioPorId($id_servicio)
+    {
+        try {
+            $consulta = "SELECT * FROM servicio WHERE id_servicio = :id_servicio";
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_servicio', $id_servicio);
+            $resultado->execute();
+
+            return $resultado->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener el servicio: " . $e->getMessage();
+            return null;
+        }
+    }
+
+    public function actualizarServicio($data)
+    {
+        try {
+            $consulta = "UPDATE servicio 
+                         SET nombre = :nombre, descripcion = :descripcion, costo = :costo, estado = :estado
+                         WHERE id_servicio = :id_servicio";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':nombre', $data['nombre']);
+            $resultado->bindParam(':descripcion', $data['descripcion']);
+            $resultado->bindParam(':costo', $data['costo']);
+            $resultado->bindParam(':estado', $data['estado']);
+            $resultado->bindParam(':id_servicio', $data['id_servicio']);
+
+            return $resultado->execute();
+        } catch (PDOException $e) {
+            echo "Error al actualizar el servicio: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function eliminarServicio($id_servicio)
+    {
+        try {
+            $consulta = "UPDATE servicio 
+                         SET estado = :estado, fecha_modificacion = NOW()
+                         WHERE id_servicio = :id_servicio";
+            $estado = 'Inactivo';
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':estado', $estado);
+            $resultado->bindParam(':id_servicio', $id_servicio);
+
+            return $resultado->execute();
+        } catch (PDOException $e) {
+            echo "Error al eliminar el servicio: " . $e->getMessage();
+            return false;
+        }
+    }
 }

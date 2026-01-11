@@ -10,7 +10,15 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
 
     case 'POST':
-        registrarServicio();
+        $action = $_POST['action'] ?? '';
+        if ($action === 'actualizar') {
+            actualizarServicio();
+        } else {
+            registrarServicio();
+        }
+        break;
+    case 'GET':
+        // Aquí podrías manejar solicitudes GET si es necesario
         break;
 
     default:
@@ -31,8 +39,10 @@ function registrarServicio()
     $descripcion = $_POST['descripcion'] ?? '';
     $id_veterinaria = $_POST['id_veterinaria'] ?? '';
 
+    print_r($costo);
+
     // Validamos que los campos no esten vacios
-    if (empty($nombre) || empty($costo) || empty($id_veterinaria)) {
+    if (empty($nombre) || (empty($costo) && !is_numeric($costo)) || empty($id_veterinaria)) {
         // Mostrar un mensaje de error si algún campo está vacío
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos obligatorios');
         exit();
@@ -57,5 +67,78 @@ function registrarServicio()
     } else {
         mostrarSweetAlert('error', 'Error al Registrar', 'Hubo un problema al registrar el servicio. Intente nuevamente.');
     }
+    exit();
+}
+
+function listaServiciosPorVeterinaria($id_veterinaria)
+{
+    // Creamos una instancia del modelo Servicio
+    $servicioModel = new Servicio();
+
+    // Llamamos al método para obtener los servicios
+    return $servicioModel->obtenerServiciosPorVeterinaria($id_veterinaria);
+}
+
+function obtenerServicioPorId($id_servicio)
+{
+    // Creamos una instancia del modelo Servicio
+    $servicioModel = new Servicio();
+
+    // Llamamos al método para obtener el servicio por ID
+    return $servicioModel->obtenerServicioPorId($id_servicio);
+}
+
+function actualizarServicio()
+{
+    // Capturamos los datos enviados por el formulario
+    $data = [
+        'id_servicio' => $_POST['id_servicio'] ?? '',
+        'nombre' => $_POST['nombre'] ?? '',
+        'costo' => $_POST['costo'] ?? '',
+        'descripcion' => $_POST['descripcion'] ?? '',
+        'estado' => $_POST['estado'] ?? ''
+    ];
+
+    // Validamos que los campos no esten vacios
+    if (empty($data['id_servicio']) || empty($data['nombre']) || (empty($data['costo']) && !is_numeric($data['costo'])) || empty($data['estado'])) {
+        // Mostrar un mensaje de error si algún campo está vacío
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos obligatorios');
+        exit();
+    }
+
+    // Creamos una instancia del modelo Servicio
+    $servicioModel = new Servicio();
+
+    // Llamamos al método para actualizar el servicio
+
+    $resultado = $servicioModel->actualizarServicio($data);
+
+    if ($resultado) {
+        mostrarSweetAlert('success', 'Servicio Actualizado', 'El servicio ha sido actualizado exitosamente.', BASE_URL . '/representante/listar-servicios');
+    } else {
+        mostrarSweetAlert('error', 'Error al Actualizar', 'Hubo un problema al actualizar el servicio. Intente nuevamente.');
+    }
+    exit();
+}
+
+function eliminarServicio($id_servicio)
+{
+    // Creamos una instancia del modelo Servicio
+    $servicioModel = new Servicio();
+
+    // Llamamos al método para eliminar el servicio
+    $resultado = $servicioModel->eliminarServicio($id_servicio);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Profesional Eliminado',
+            'El profesional ha sido eliminado correctamente',
+            '/vetwilling/representante/listar-profesionales'
+        );
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el profesional');
+    }
+
     exit();
 }
