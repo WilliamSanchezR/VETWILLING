@@ -252,7 +252,7 @@
 }
 
 .btn-eliminar {
-    color: #e74c3c;
+    color: #e74c3c !important;
     background-color: transparent !important;
 }
 

@@ -128,8 +128,8 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                                             <i class="bi bi-pencil"></i>
                                         </button>
 
-                                        <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/representante/eliminar-servicio?action=eliminar&id_servicio=<?= $servicio['id_servicio'] ?>&id_veterinaria=<?= $_SESSION['user']['id_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
+                                        <button class="btn-accion btn-eliminar" title="Eliminar" onclick="window.location.href='<?= BASE_URL ?>/representante/eliminar-servicio?action=eliminar&id=<?= $servicio['id_servicio'] ?>'">
+                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
                                 </tr>

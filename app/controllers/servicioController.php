@@ -19,6 +19,11 @@ switch ($method) {
         break;
     case 'GET':
         // Aquí podrías manejar solicitudes GET si es necesario
+        $action = $_GET['action'] ?? '';
+        if ($action === 'eliminar') {
+            $id_servicio = $_GET['id'] ?? '';
+            eliminarServicio($id_servicio);
+        }
         break;
 
     default:
@@ -132,12 +137,12 @@ function eliminarServicio($id_servicio)
     if ($resultado) {
         mostrarSweetAlert(
             'success',
-            'Profesional Eliminado',
-            'El profesional ha sido eliminado correctamente',
-            '/vetwilling/representante/listar-profesionales'
+            'Servicio Eliminado',
+            'El servicio ha sido eliminado correctamente',
+            '/vetwilling/representante/listar-servicios'
         );
     } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el profesional');
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el servicio');
     }
 
     exit();
