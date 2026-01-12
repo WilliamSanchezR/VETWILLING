@@ -288,4 +288,80 @@ class Calendario
             return [];
         }
     }
+
+    // =========================================
+    //  FUNCIONES PARA CANCELACION DE CITAS (RFS 36)
+    // =========================================
+
+    /**
+     * Valida si una cita puede ser cancelada (debe estar en estado Pendiente)
+     * 
+     * @param int $id_agendamiento ID de la cita a validar
+     * @return array Array con keys: 
+     *         - 'valido' (bool): Si la cita puede ser cancelada
+     *         - 'mensaje' (string): Mensaje descriptivo
+     *         - 'estado_actual' (string): Estado actual de la cita
+     *         - 'cita' (array): Datos de la cita si es válida
+     */
+    public function validarEstadoCita($id_agendamiento)
+    {
+        try {
+            // Obtener información de la cita
+            $consulta = "SELECT 
+                            id_agendamiento,
+                            estado,
+                            fecha_hora,
+                            id_propietario,
+                            id_paciente,
+                            id_usuario,
+                            id_servicio,
+                            observaciones
+                         FROM agendamiento
+                         WHERE id_agendamiento = :id_agendamiento
+                         LIMIT 1";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            $resultado->execute();
+
+            $cita = $resultado->fetch(PDO::FETCH_ASSOC);
+
+            // Validar que la cita existe
+            if (!$cita) {
+                return [
+                    'valido' => false,
+                    'mensaje' => 'La cita no existe en el sistema',
+                    'estado_actual' => null,
+                    'cita' => null
+                ];
+            }
+
+            // Validar que la cita está en estado Pendiente
+            if ($cita['estado'] !== 'Pendiente') {
+                return [
+                    'valido' => false,
+                    'mensaje' => "La cita no puede ser cancelada. Estado actual: {$cita['estado']}. Solo se pueden cancelar citas en estado Pendiente.",
+                    'estado_actual' => $cita['estado'],
+                    'cita' => null
+                ];
+            }
+
+            // La cita es válida para cancelar
+            return [
+                'valido' => true,
+                'mensaje' => 'La cita es válida para ser cancelada',
+                'estado_actual' => $cita['estado'],
+                'cita' => $cita
+            ];
+
+        } catch (PDOException $e) {
+            error_log("Error en Calendario::validarEstadoCita -> " . $e->getMessage());
+            return [
+                'valido' => false,
+                'mensaje' => 'Error al validar el estado de la cita',
+                'estado_actual' => null,
+                'cita' => null
+            ];
+        }
+    }
 }
