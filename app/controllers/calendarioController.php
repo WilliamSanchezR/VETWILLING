@@ -831,7 +831,7 @@ function rfs36_validarYCancelarCitaAjax()
 
         // SUBTAREA 4: Enviar notificación al propietario
         $datosNotificacion = $calendario->obtenerDatosParaNotificacionCancelacion($id_agendamiento);
-        
+
         if ($datosNotificacion && !empty($datosNotificacion['email_propietario'])) {
             try {
                 enviarNotificacionCitaCancelada($datosNotificacion);
@@ -907,7 +907,7 @@ function rfs36_cancelarCita()
 
         // SUBTAREA 4: Enviar notificación al propietario
         $datosNotificacion = $calendario->obtenerDatosParaNotificacionCancelacion($id_agendamiento);
-        
+
         if ($datosNotificacion && !empty($datosNotificacion['email_propietario'])) {
             try {
                 enviarNotificacionCitaCancelada($datosNotificacion);
