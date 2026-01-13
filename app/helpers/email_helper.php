@@ -183,3 +183,101 @@ function enviarRecordatorioCita($datosCita)
         return false;
     }
 }
+// FUNCION PARA ENVIAR NOTIFICACION DE CITA CANCELADA
+function enviarNotificacionCitaCancelada($datosCancelacion)
+{
+    // Verificar si el envio de emails esta habilitado
+    if (!EMAIL_ENABLED) {
+        error_log("Envio de emails deshabilitado en configuracion");
+        return false;
+    }
+
+    $mail = new PHPMailer(true);
+
+    try {
+        // Configuracion del servidor SMTP
+        $mail->isSMTP();
+        $mail->Host = EMAIL_HOST;
+        $mail->SMTPAuth = true;
+        $mail->Username = EMAIL_USERNAME;
+        $mail->Password = EMAIL_PASSWORD;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = EMAIL_PORT;
+        $mail->CharSet = 'UTF-8';
+
+        // Destinatarios
+        $mail->setFrom(EMAIL_FROM, EMAIL_FROM_NAME);
+        $mail->addAddress($datosCancelacion['email_propietario'], $datosCancelacion['nombre_propietario']);
+
+        // Contenido del email
+        $mail->isHTML(true);
+        $mail->Subject = 'Cancelación de Cita - VetWilling';
+
+        $fechaCita = date('d/m/Y', strtotime($datosCancelacion['fecha_hora']));
+        $horaCita = date('H:i', strtotime($datosCancelacion['fecha_hora']));
+        $fechaCancelacion = date('d/m/Y H:i', strtotime($datosCancelacion['fecha_cancelacion']));
+
+        $mail->Body = "
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #dc3545; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background-color: #f9f9f9; padding: 30px; border: 1px solid #ddd; }
+                .cancelacion-info { background-color: #f8d7da; padding: 20px; margin: 20px 0; border-left: 4px solid #dc3545; border-radius: 5px; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+                .motivo-box { background-color: white; padding: 15px; margin: 15px 0; border: 1px solid #e0e0e0; border-radius: 5px; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>❌ Cita Cancelada</h1>
+                </div>
+                <div class='content'>
+                    <h2>Hola {$datosCancelacion['nombre_propietario']},</h2>
+                    <p>Te informamos que tu cita ha sido <strong style='color: #dc3545;'>cancelada</strong> exitosamente.</p>
+                    
+                    <div class='cancelacion-info'>
+                        <h3>📋 Información de la Cita Cancelada</h3>
+                        <p><strong>Mascota:</strong> {$datosCancelacion['nombre_mascota']}</p>
+                        <p><strong>Servicio:</strong> {$datosCancelacion['tipo_servicio']}</p>
+                        <p><strong>Fecha Original:</strong> {$fechaCita}</p>
+                        <p><strong>Hora Original:</strong> {$horaCita}</p>
+                        <p><strong>Fecha de Cancelación:</strong> {$fechaCancelacion}</p>
+                    </div>
+
+                    <div class='motivo-box'>
+                        <h3>💬 Motivo de la Cancelación</h3>
+                        <p>{$datosCancelacion['motivo_cancelacion']}</p>
+                    </div>
+                    
+                    <p>Si deseas <strong>reagendar</strong> esta cita o tienes alguna pregunta, no dudes en ponerte en contacto con nosotros.</p>
+                    <p>¡Esperamos verte pronto! 🐾</p>
+                </div>
+                <div class='footer'>
+                    <p>Este es un correo automático, por favor no respondas a este mensaje.</p>
+                    <p>&copy; 2025 VetWilling - Todos los derechos reservados</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+
+        $mail->AltBody = "Hola {$datosCancelacion['nombre_propietario']},\n\n"
+            . "Tu cita ha sido cancelada:\n"
+            . "Mascota: {$datosCancelacion['nombre_mascota']}\n"
+            . "Servicio: {$datosCancelacion['tipo_servicio']}\n"
+            . "Fecha Original: {$fechaCita} a las {$horaCita}\n"
+            . "Motivo: {$datosCancelacion['motivo_cancelacion']}\n\n"
+            . "Si deseas reagendar, contáctanos.\n\n"
+            . "VetWilling - Sistema de Gestión Veterinaria";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Error al enviar notificacion de cancelacion: {$mail->ErrorInfo}");
+        return false;
+    }
+}
