@@ -353,7 +353,6 @@ class Calendario
                 'estado_actual' => $cita['estado'],
                 'cita' => $cita
             ];
-
         } catch (PDOException $e) {
             error_log("Error en Calendario::validarEstadoCita -> " . $e->getMessage());
             return [
@@ -362,6 +361,118 @@ class Calendario
                 'estado_actual' => null,
                 'cita' => null
             ];
+        }
+    }
+
+    /**
+     * Registra el motivo de cancelación de una cita
+     * 
+     * @param int $id_agendamiento ID de la cita a cancelar
+     * @param string $motivo_cancelacion Motivo por el cual se cancela
+     * @param int|null $id_usuario_cancelo ID del usuario que cancela (opcional)
+     * @return array Array con keys:
+     *         - 'exito' (bool): Si se registró correctamente
+     *         - 'mensaje' (string): Mensaje descriptivo
+     *         - 'id_agendamiento' (int): ID de la cita procesada
+     */
+    public function registrarMotivoCancelacion($id_agendamiento, $motivo_cancelacion, $id_usuario_cancelo = null)
+    {
+        try {
+            // Validar que el motivo no esté vacío
+            if (empty($motivo_cancelacion) || strlen(trim($motivo_cancelacion)) === 0) {
+                return [
+                    'exito' => false,
+                    'mensaje' => 'El motivo de cancelación no puede estar vacío',
+                    'id_agendamiento' => $id_agendamiento
+                ];
+            }
+
+            // Validar longitud del motivo (máximo 500 caracteres)
+            if (strlen($motivo_cancelacion) > 500) {
+                return [
+                    'exito' => false,
+                    'mensaje' => 'El motivo de cancelación no puede exceder 500 caracteres',
+                    'id_agendamiento' => $id_agendamiento
+                ];
+            }
+
+            // Preparar la consulta de actualización
+            $consulta = "UPDATE agendamiento 
+                        SET motivo_cancelacion = :motivo_cancelacion,
+                            fecha_cancelacion = NOW()";
+
+            // Agregar usuario que canceló si se proporciona
+            if ($id_usuario_cancelo !== null) {
+                $consulta .= ", usuario_cancelo = :id_usuario_cancelo";
+            }
+
+            $consulta .= " WHERE id_agendamiento = :id_agendamiento";
+
+            $resultado = $this->conexion->prepare($consulta);
+
+            // Vincular parámetros
+            $resultado->bindParam(':motivo_cancelacion', $motivo_cancelacion, PDO::PARAM_STR);
+            $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+
+            if ($id_usuario_cancelo !== null) {
+                $resultado->bindParam(':id_usuario_cancelo', $id_usuario_cancelo, PDO::PARAM_INT);
+            }
+
+            $resultado->execute();
+
+            // Verificar que se actualizó al menos una fila
+            if ($resultado->rowCount() === 0) {
+                return [
+                    'exito' => false,
+                    'mensaje' => 'La cita no existe o no se pudo actualizar',
+                    'id_agendamiento' => $id_agendamiento
+                ];
+            }
+
+            return [
+                'exito' => true,
+                'mensaje' => 'Motivo de cancelación registrado exitosamente',
+                'id_agendamiento' => $id_agendamiento
+            ];
+        } catch (PDOException $e) {
+            error_log("Error en Calendario::registrarMotivoCancelacion -> " . $e->getMessage());
+            return [
+                'exito' => false,
+                'mensaje' => 'Error al registrar el motivo de cancelación',
+                'id_agendamiento' => $id_agendamiento
+            ];
+        }
+    }
+
+    /**
+     * Obtiene los detalles de cancelación de una cita
+     * 
+     * @param int $id_agendamiento ID de la cita
+     * @return array Array con los datos de cancelación o null
+     */
+    public function obtenerDetallesCancelacion($id_agendamiento)
+    {
+        try {
+            $consulta = "SELECT 
+                            id_agendamiento,
+                            motivo_cancelacion,
+                            fecha_cancelacion,
+                            usuario_cancelo,
+                            u.nombres as usuario_cancelo_nombre,
+                            u.apellidos as usuario_cancelo_apellido
+                         FROM agendamiento a
+                         LEFT JOIN usuario u ON a.usuario_cancelo = u.id_usuario
+                         WHERE a.id_agendamiento = :id_agendamiento
+                         LIMIT 1";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            $resultado->execute();
+
+            return $resultado->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Calendario::obtenerDetallesCancelacion -> " . $e->getMessage());
+            return null;
         }
     }
 }

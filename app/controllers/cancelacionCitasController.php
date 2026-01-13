@@ -31,6 +31,8 @@ switch ($method) {
             $accion = $_POST['accion'] ?? '';
             if ($accion === 'validar_estado') {
                 validarEstadoCita();
+            } elseif ($accion === 'registrar_motivo') {
+                registrarMotivoCancelacion();
             } elseif ($accion === 'cancelar') {
                 cancelarCita();
             } else {
@@ -46,6 +48,8 @@ switch ($method) {
 
         if ($accion === 'validar') {
             validarEstadoCitaGet();
+        } elseif ($accion === 'detalles_cancelacion') {
+            obtenerDetallesCancelacionGet();
         } else {
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Acción no especificada']);
@@ -81,7 +85,6 @@ function validarEstadoCita()
         } else {
             alertaModal('error', 'Validación Fallida', $resultado['mensaje']);
         }
-
     } catch (Exception $e) {
         error_log("Error en validarEstadoCita -> " . $e->getMessage());
         alertaModal('error', 'Error del Sistema', 'Error al validar el estado de la cita');
@@ -117,7 +120,6 @@ function validarEstadoCitaGet()
             'estado_actual' => $resultado['estado_actual'],
             'cita' => $resultado['cita']
         ]);
-
     } catch (Exception $e) {
         error_log("Error en validarEstadoCitaGet -> " . $e->getMessage());
         http_response_code(500);
@@ -129,14 +131,15 @@ function validarEstadoCitaGet()
 }
 
 /**
- * PLACEHOLDER: Función para validar y cancelar cita via AJAX
- * Se completará en las siguientes subtareas
+ * Función para validar y cancelar cita via AJAX
+ * Integra subtareas 1 y 2
  */
 function validarYCancelarCitaAjax()
 {
     try {
         $data = json_decode(file_get_contents('php://input'), true);
         $id_agendamiento = $data['id_agendamiento'] ?? null;
+        $motivo_cancelacion = $data['motivo_cancelacion'] ?? null;
 
         if (!$id_agendamiento) {
             http_response_code(400);
@@ -160,14 +163,123 @@ function validarYCancelarCitaAjax()
             exit();
         }
 
-        // TODO: Subtareas 2, 3 y 4 se completarán más adelante
-        echo json_encode([
-            'status' => 'info',
-            'message' => 'Validación completada. Cita lista para cancelación. Subtareas pendientes: Registrar motivo, actualizar estado y enviar notificaciones.'
-        ]);
+        // SUBTAREA 2: Registrar motivo de cancelación
+        if (!$motivo_cancelacion) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Motivo de cancelación es requerido'
+            ]);
+            exit();
+        }
 
+        $id_usuario = $_SESSION['id_usuario'] ?? null;
+        $registroMotivo = $calendario->registrarMotivoCancelacion($id_agendamiento, $motivo_cancelacion, $id_usuario);
+
+        if (!$registroMotivo['exito']) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $registroMotivo['mensaje']
+            ]);
+            exit();
+        }
+
+        // TODO: Subtareas 3 y 4 se completarán más adelante
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Subtareas 1 y 2 completadas. Motivo registrado. Pendientes: Actualizar estado y enviar notificaciones.',
+            'id_agendamiento' => $id_agendamiento
+        ]);
     } catch (Exception $e) {
         error_log("Error en validarYCancelarCitaAjax -> " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Error del sistema'
+        ]);
+    }
+}
+
+/**
+ * SUBTAREA 2: Registra el motivo de cancelación de una cita
+ */
+function registrarMotivoCancelacion()
+{
+    try {
+        $id_agendamiento = $_POST['id_agendamiento'] ?? null;
+        $motivo_cancelacion = $_POST['motivo_cancelacion'] ?? null;
+
+        if (!$id_agendamiento) {
+            alertaModal('error', 'Error', 'ID de cita no proporcionado');
+            return;
+        }
+
+        if (!$motivo_cancelacion) {
+            alertaModal('error', 'Error', 'Motivo de cancelación es requerido');
+            return;
+        }
+
+        // SUBTAREA 1: Validar estado de la cita
+        $calendario = new Calendario();
+        $validacion = $calendario->validarEstadoCita($id_agendamiento);
+
+        if (!$validacion['valido']) {
+            alertaModal('error', 'Error', $validacion['mensaje']);
+            return;
+        }
+
+        // SUBTAREA 2: Registrar motivo de cancelación
+        $id_usuario = $_SESSION['id_usuario'] ?? null;
+        $resultado = $calendario->registrarMotivoCancelacion($id_agendamiento, $motivo_cancelacion, $id_usuario);
+
+        if ($resultado['exito']) {
+            alertaModal('success', 'Éxito', $resultado['mensaje']);
+        } else {
+            alertaModal('error', 'Error', $resultado['mensaje']);
+        }
+    } catch (Exception $e) {
+        error_log("Error en registrarMotivoCancelacion -> " . $e->getMessage());
+        alertaModal('error', 'Error del Sistema', 'Error al registrar el motivo');
+    }
+}
+
+/**
+ * Obtiene los detalles de cancelación de una cita (GET)
+ */
+function obtenerDetallesCancelacionGet()
+{
+    try {
+        $id_agendamiento = $_GET['id_agendamiento'] ?? null;
+
+        if (!$id_agendamiento) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'ID de cita no proporcionado'
+            ]);
+            exit();
+        }
+
+        $calendario = new Calendario();
+        $detalles = $calendario->obtenerDetallesCancelacion($id_agendamiento);
+
+        if (!$detalles) {
+            http_response_code(404);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'No se encontraron detalles de cancelación'
+            ]);
+            exit();
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'detalles' => $detalles
+        ]);
+    } catch (Exception $e) {
+        error_log("Error en obtenerDetallesCancelacionGet -> " . $e->getMessage());
         http_response_code(500);
         echo json_encode([
             'status' => 'error',
@@ -199,12 +311,10 @@ function cancelarCita()
             return;
         }
 
-        // TODO: Subtareas 2, 3 y 4 se completarán más adelante
+        // TODO: Subtareas 3 y 4 se completarán más adelante
         alertaModal('info', 'Información', 'Validación completada. Próximas subtareas pendientes.');
-
     } catch (Exception $e) {
         error_log("Error en cancelarCita -> " . $e->getMessage());
         alertaModal('error', 'Error del Sistema', 'Error al procesar la cancelación');
     }
 }
-?>
