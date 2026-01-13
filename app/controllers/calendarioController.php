@@ -764,8 +764,8 @@ function rfs36_obtenerDetallesCancelacionGet()
 
 /**
  * RFS 36: Función para validar y cancelar cita via AJAX
- * Integra subtareas 1 y 2 completas
- * Próximas: Subtareas 3 y 4
+ * Integra subtareas 1, 2 y 3 completas
+ * Próximas: Subtarea 4 (Enviar notificaciones)
  */
 function rfs36_validarYCancelarCitaAjax()
 {
@@ -818,10 +818,22 @@ function rfs36_validarYCancelarCitaAjax()
             exit();
         }
 
-        // TODO: Subtareas 3 y 4 se completarán más adelante
+        // SUBTAREA 3: Actualizar estado a Cancelada
+        $actualizarEstado = $calendario->actualizarEstadoCancelada($id_agendamiento);
+
+        if (!$actualizarEstado['exito']) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $actualizarEstado['mensaje']
+            ]);
+            exit();
+        }
+
+        // TODO: Subtarea 4 (Enviar notificaciones) se completará más adelante
         echo json_encode([
             'status' => 'success',
-            'message' => 'Subtareas 1 y 2 completadas. Motivo registrado. Pendientes: Actualizar estado y enviar notificaciones.',
+            'message' => 'Subtareas 1, 2 y 3 completadas. Cita cancelada correctamente. Pendiente: Enviar notificaciones.',
             'id_agendamiento' => $id_agendamiento
         ]);
     } catch (Exception $e) {
@@ -836,12 +848,13 @@ function rfs36_validarYCancelarCitaAjax()
 
 /**
  * RFS 36: Cancelar cita (POST tradicional)
- * Se completará en las siguientes subtareas
+ * Integra subtareas 1, 2 y 3 completas
  */
 function rfs36_cancelarCita()
 {
     try {
         $id_agendamiento = $_POST['id_agendamiento'] ?? null;
+        $motivo_cancelacion = $_POST['motivo_cancelacion'] ?? null;
 
         if (!$id_agendamiento) {
             alertaModal('error', 'Error', 'ID de cita no proporcionado');
@@ -857,11 +870,32 @@ function rfs36_cancelarCita()
             return;
         }
 
-        // TODO: Subtareas 3 y 4 se completarán más adelante
-        alertaModal('info', 'Información', 'Validación completada. Próximas subtareas pendientes.');
+        // SUBTAREA 2: Registrar motivo de cancelación
+        if (!$motivo_cancelacion) {
+            alertaModal('error', 'Error', 'Motivo de cancelación es requerido');
+            return;
+        }
+
+        $id_usuario = $_SESSION['id_usuario'] ?? null;
+        $registroMotivo = $calendario->registrarMotivoCancelacion($id_agendamiento, $motivo_cancelacion, $id_usuario);
+
+        if (!$registroMotivo['exito']) {
+            alertaModal('error', 'Error', $registroMotivo['mensaje']);
+            return;
+        }
+
+        // SUBTAREA 3: Actualizar estado a Cancelada
+        $actualizarEstado = $calendario->actualizarEstadoCancelada($id_agendamiento);
+
+        if (!$actualizarEstado['exito']) {
+            alertaModal('error', 'Error', $actualizarEstado['mensaje']);
+            return;
+        }
+
+        // TODO: Subtarea 4 (Enviar notificaciones) se completará más adelante
+        alertaModal('success', 'Éxito', 'Cita cancelada correctamente. Próximo: Enviar notificaciones.');
     } catch (Exception $e) {
         error_log("Error en rfs36_cancelarCita -> " . $e->getMessage());
         alertaModal('error', 'Error del Sistema', 'Error al procesar la cancelación');
     }
 }
-

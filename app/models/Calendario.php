@@ -475,4 +475,51 @@ class Calendario
             return null;
         }
     }
+
+    /**
+     * SUBTAREA 3: Actualiza el estado de una cita a "Cancelada"
+     * 
+     * @param int $id_agendamiento ID de la cita a cancelar
+     * @return array Array con keys:
+     *         - 'exito' (bool): Si se actualizó correctamente
+     *         - 'mensaje' (string): Mensaje descriptivo
+     *         - 'id_agendamiento' (int): ID de la cita procesada
+     */
+    public function actualizarEstadoCancelada($id_agendamiento)
+    {
+        try {
+            // Preparar la consulta de actualización de estado
+            $consulta = "UPDATE agendamiento 
+                        SET estado = 'Cancelada'
+                        WHERE id_agendamiento = :id_agendamiento 
+                        AND estado = 'Pendiente'";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            $resultado->execute();
+
+            // Verificar que se actualizó al menos una fila
+            if ($resultado->rowCount() === 0) {
+                return [
+                    'exito' => false,
+                    'mensaje' => 'No se pudo actualizar el estado. Verifique que la cita exista y esté en estado Pendiente.',
+                    'id_agendamiento' => $id_agendamiento
+                ];
+            }
+
+            return [
+                'exito' => true,
+                'mensaje' => 'Estado de la cita actualizado a Cancelada correctamente',
+                'id_agendamiento' => $id_agendamiento
+            ];
+
+        } catch (PDOException $e) {
+            error_log("Error en Calendario::actualizarEstadoCancelada -> " . $e->getMessage());
+            return [
+                'exito' => false,
+                'mensaje' => 'Error al actualizar el estado de la cita',
+                'id_agendamiento' => $id_agendamiento
+            ];
+        }
+    }
 }
