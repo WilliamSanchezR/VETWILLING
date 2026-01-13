@@ -65,7 +65,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             </div>
 
             <!-- Sessión con submenu Servicios y costos-->
-            <div class="submenu <?= $final_path == 'registro-servicios' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
+            <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
 
                 <div class="submenu-toggle" data-tooltip="Servicios y Costos">
                     <i class="bi bi-person-plus"></i>
@@ -74,8 +74,8 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 </div>
 
                 <ul class="submenu-items">
-                    <li><a class="nav-item <?= $final_path == 'registro-servicios' ? 'active' : '' ?>" href="#" data-tooltip="Registrar">Registrar </a></li>
-                    <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="#" data-tooltip="Listar">Listar</a></li>
+                    <li><a class="nav-item <?= $final_path == 'registro-servicio' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/registro-servicio" data-tooltip="Registrar">Registrar </a></li>
+                    <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Listar</a></li>
                 </ul>
             </div>
 
