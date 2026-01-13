@@ -580,4 +580,114 @@ class Calendario
             return null;
         }
     }
+
+    // ╔══════════════════════════════════════════════════════════════════════════════╗
+    // ║            RFS 34: OBTENER CITAS DEL USUARIO AUTENTICADO                   ║
+    // ║  Retorna todas las citas del usuario con detalles completos (propietario,   ║
+    // ║  mascota, servicio, veterinario). Filtra según el rol del usuario.          ║
+    // ╚══════════════════════════════════════════════════════════════════════════════╝
+    
+    /**
+     * OBTENER CITAS SEGÚN EL USUARIO AUTENTICADO
+     * 
+     * @param int $id_usuario - ID del usuario autenticado
+     * @param string $tipo_usuario - 'propietario', 'veterinario' o 'admin'
+     * @param array $filtros - Filtros adicionales (estado, fecha_inicio, fecha_fin)
+     * @return array - Citas con detalles completos
+     * 
+     * Ejemplo:
+     * $citas = $calendario->obtenerCitasDelUsuario(5, 'propietario');
+     * $citas = $calendario->obtenerCitasDelUsuario(12, 'veterinario', ['estado' => 'Pendiente']);
+     */
+    public function obtenerCitasDelUsuario($id_usuario, $tipo_usuario = 'propietario', $filtros = [])
+    {
+        try {
+            // ┌─ CONSTRUIR CONSULTA BASE CON TODOS LOS DETALLES
+            $sql = "SELECT 
+                        a.id_agendamiento,
+                        a.tipo,
+                        a.observaciones,
+                        a.fecha_hora,
+                        a.fecha_hora_fin,
+                        a.estado,
+                        
+                        -- Datos del propietario
+                        pr.id_propietario,
+                        CONCAT(pr.nombres, ' ', pr.apellidos) as propietario_nombre,
+                        pr.email as propietario_email,
+                        pr.telefono as propietario_telefono,
+                        
+                        -- Datos de la mascota
+                        pac.id_paciente,
+                        pac.nombre as mascota_nombre,
+                        pac.especie as mascota_especie,
+                        pac.raza as mascota_raza,
+                        
+                        -- Datos del servicio
+                        s.id_servicio,
+                        s.nombre as servicio_nombre,
+                        s.descripcion as servicio_descripcion,
+                        s.costo as servicio_costo,
+                        
+                        -- Datos del veterinario
+                        u.id_usuario,
+                        CONCAT(u.nombres, ' ', u.apellidos) as veterinario_nombre,
+                        u.email as veterinario_email
+                    FROM agendamiento a
+                    LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
+                    LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
+                    WHERE 1=1";
+            
+            $parametros = [];
+            
+            // ┌─ FILTRAR SEGÚN EL TIPO DE USUARIO
+            if ($tipo_usuario === 'propietario') {
+                // El propietario solo ve sus propias citas
+                $sql .= " AND a.id_propietario = :id_usuario";
+                $parametros['id_usuario'] = $id_usuario;
+            } 
+            elseif ($tipo_usuario === 'veterinario') {
+                // El veterinario ve las citas asignadas a él
+                $sql .= " AND a.id_usuario = :id_usuario";
+                $parametros['id_usuario'] = $id_usuario;
+            }
+            // Si es 'admin' o otro, ve todas sin filtrar por usuario
+            
+            // ┌─ APLICAR FILTROS ADICIONALES
+            if (!empty($filtros['estado'])) {
+                $sql .= " AND a.estado = :estado";
+                $parametros['estado'] = $filtros['estado'];
+            }
+            
+            if (!empty($filtros['fecha_inicio'])) {
+                $sql .= " AND DATE(a.fecha_hora) >= :fecha_inicio";
+                $parametros['fecha_inicio'] = $filtros['fecha_inicio'];
+            }
+            
+            if (!empty($filtros['fecha_fin'])) {
+                $sql .= " AND DATE(a.fecha_hora) <= :fecha_fin";
+                $parametros['fecha_fin'] = $filtros['fecha_fin'];
+            }
+            
+            // ┌─ ORDENAR RESULTADOS POR FECHA
+            $sql .= " ORDER BY a.fecha_hora ASC";
+            
+            // ┌─ EJECUTAR CONSULTA
+            $stmt = $this->conexion->prepare($sql);
+            
+            foreach ($parametros as $clave => $valor) {
+                $stmt->bindParam(':' . $clave, $parametros[$clave]);
+            }
+            
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+        } catch (PDOException $e) {
+            error_log("Error en Calendario::obtenerCitasDelUsuario -> " . $e->getMessage());
+            return [];
+        }
+    }
 }
+
