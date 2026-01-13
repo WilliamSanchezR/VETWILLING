@@ -56,7 +56,26 @@ switch ($method) {
         $accion = $_GET['accion'] ?? '';
         $request_uri = $_SERVER['REQUEST_URI'];
 
-        if ($accion === 'eliminar') {
+        // ╔══════════════════════════════════════════════════════════════╗
+        // ║                   RFS 34: CONSULTA DE CITAS                ║
+        // ║  Nuevas rutas para consultar y filtrar citas               ║
+        // ╚══════════════════════════════════════════════════════════════╝
+        
+        if ($accion === 'mis_citas') {
+            // Obtiene las citas del usuario autenticado con filtros opcionales
+            rfs34_validarSesionYObtenerCitas();
+        } 
+        elseif ($accion === 'filtrar') {
+            // Filtra citas por múltiples criterios (estado, fecha, propietario, etc.)
+            rfs34_consultarYFiltrarCitas();
+        }
+        elseif ($accion === 'detalles_completo') {
+            // Obtiene detalles completos de una cita específica
+            rfs34_obtenerDetallesCitaCompleto();
+        }
+        // ─────────────────────────────────────────────────────────────
+        
+        else if ($accion === 'eliminar') {
             eliminarAgendamiento($_GET['id']);
         } else if ($accion === 'cargar') {
             cargarEventos();
@@ -926,3 +945,204 @@ function rfs36_cancelarCita()
         alertaModal('error', 'Error del Sistema', 'Error al procesar la cancelación');
     }
 }
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║                   RFS 34: CONSULTA DE CITAS PROGRAMADAS                    ║
+// ║  Permite a los usuarios consultar sus citas con filtros por estado, fecha   ║
+// ║  y otros criterios. Valida la sesión y el rol del usuario.                 ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+/**
+ * ┌───────────────────────────────────────────────────────────────────────────┐
+ * │ SUBTAREA 1: VALIDAR SESIÓN DEL USUARIO                                   │
+ * │ Verifica que el usuario esté autenticado antes de consultar citas         │
+ * └───────────────────────────────────────────────────────────────────────────┘
+ */
+function rfs34_validarSesionYObtenerCitas()
+{
+    try {
+        // ┌─ VALIDAR SESIÓN
+        if (!isset($_SESSION['user']['id_usuario'])) {
+            http_response_code(401);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Usuario no autenticado'
+            ]);
+            exit();
+        }
+        
+        // ┌─ OBTENER DATOS DEL USUARIO ACTUAL
+        $id_usuario = $_SESSION['user']['id_usuario'];
+        $tipo_usuario = $_SESSION['user']['tipo_usuario'] ?? 'propietario'; // propietario, veterinario, admin
+        
+        // ┌─ OBTENER FILTROS DEL REQUEST
+        $filtros = [];
+        
+        if (!empty($_GET['estado'])) {
+            $filtros['estado'] = $_GET['estado'];
+        }
+        if (!empty($_GET['fecha_inicio'])) {
+            $filtros['fecha_inicio'] = $_GET['fecha_inicio'];
+        }
+        if (!empty($_GET['fecha_fin'])) {
+            $filtros['fecha_fin'] = $_GET['fecha_fin'];
+        }
+        
+        // ┌─ LLAMAR AL MODELO
+        $calendario = new Calendario();
+        $citas = $calendario->obtenerCitasDelUsuario($id_usuario, $tipo_usuario, $filtros);
+        
+        // ┌─ RETORNAR RESULTADO
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'cantidad' => count($citas),
+            'citas' => $citas,
+            'usuario' => [
+                'id' => $id_usuario,
+                'tipo' => $tipo_usuario
+            ]
+        ]);
+        exit();
+        
+    } catch (Exception $e) {
+        error_log("Error en rfs34_validarSesionYObtenerCitas -> " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Error del sistema'
+        ]);
+        exit();
+    }
+}
+
+/**
+ * ┌───────────────────────────────────────────────────────────────────────────┐
+ * │ SUBTAREA 2 & 3: CONSULTAR Y FILTRAR CITAS                                │
+ * │ Retorna lista de citas con filtros aplicados (fecha, estado, propietario) │
+ * └───────────────────────────────────────────────────────────────────────────┘
+ */
+function rfs34_consultarYFiltrarCitas()
+{
+    try {
+        // ┌─ OBTENER FILTROS DEL REQUEST
+        $filtros = [];
+        
+        if (!empty($_GET['id_propietario'])) {
+            $filtros['id_propietario'] = (int)$_GET['id_propietario'];
+        }
+        if (!empty($_GET['estado'])) {
+            $filtros['estado'] = $_GET['estado'];
+        }
+        if (!empty($_GET['fecha_inicio'])) {
+            $filtros['fecha_inicio'] = $_GET['fecha_inicio'];
+        }
+        if (!empty($_GET['fecha_fin'])) {
+            $filtros['fecha_fin'] = $_GET['fecha_fin'];
+        }
+        if (!empty($_GET['tipo'])) {
+            $filtros['tipo'] = $_GET['tipo'];
+        }
+        if (!empty($_GET['id_usuario'])) {
+            $filtros['id_usuario'] = (int)$_GET['id_usuario'];
+        }
+        
+        // ┌─ VALIDAR QUE AL MENOS UN FILTRO ESTÉ PRESENTE
+        if (empty($filtros)) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Debe proporcionar al menos un filtro'
+            ]);
+            exit();
+        }
+        
+        // ┌─ LLAMAR AL MODELO PARA FILTRAR
+        $eventos = new Eventos();
+        $citas = $eventos->filtrarCitas($filtros);
+        
+        // ┌─ RETORNAR RESULTADO
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'cantidad' => count($citas),
+            'filtros_aplicados' => $filtros,
+            'citas' => $citas
+        ]);
+        exit();
+        
+    } catch (Exception $e) {
+        error_log("Error en rfs34_consultarYFiltrarCitas -> " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Error al filtrar citas'
+        ]);
+        exit();
+    }
+}
+
+/**
+ * ┌───────────────────────────────────────────────────────────────────────────┐
+ * │ SUBTAREA 4: MOSTRAR DETALLES COMPLETOS DE LA CITA                         │
+ * │ Retorna toda la información disponible de una cita específica              │
+ * │ (propietario, mascota, servicio, veterinario, etc.)                       │
+ * └───────────────────────────────────────────────────────────────────────────┘
+ */
+function rfs34_obtenerDetallesCitaCompleto()
+{
+    try {
+        // ┌─ VALIDAR SESIÓN
+        if (!isset($_SESSION['user']['id_usuario'])) {
+            http_response_code(401);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Usuario no autenticado'
+            ]);
+            exit();
+        }
+        
+        // ┌─ OBTENER ID DE LA CITA
+        $id_agendamiento = $_GET['id_agendamiento'] ?? null;
+        
+        if (!$id_agendamiento) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'ID de cita no proporcionado'
+            ]);
+            exit();
+        }
+        
+        // ┌─ OBTENER DETALLES COMPLETOS DE LA CITA
+        $calendario = new Calendario();
+        $detalles = $calendario->obtenerAgendamientoCompleto($id_agendamiento);
+        
+        if (!$detalles) {
+            http_response_code(404);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Cita no encontrada'
+            ]);
+            exit();
+        }
+        
+        // ┌─ RETORNAR DETALLES COMPLETOS
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'cita' => $detalles
+        ]);
+        exit();
+        
+    } catch (Exception $e) {
+        error_log("Error en rfs34_obtenerDetallesCitaCompleto -> " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Error al obtener detalles de la cita'
+        ]);
+        exit();
+    }
+}
+

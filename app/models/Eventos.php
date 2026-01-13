@@ -322,4 +322,99 @@ class Eventos
             return null;
         }
     }
+
+    // ╔══════════════════════════════════════════════════════════════════════════════╗
+    // ║                    RFS 34: FILTRAR CITAS PROGRAMADAS                        ║
+    // ║  Permite filtrar citas por propietario, estado, fecha con criterios múltiples║
+    // ╚══════════════════════════════════════════════════════════════════════════════╝
+    
+    /**
+     * FILTRAR CITAS CON MÚLTIPLES CRITERIOS
+     * 
+     * @param array $filtros - Array con claves: 'id_propietario', 'estado', 'fecha_inicio', 'fecha_fin'
+     * @return array - Citas que coinciden con los filtros
+     * 
+     * Ejemplo:
+     * $filtros = [
+     *     'id_propietario' => 5,
+     *     'estado' => 'Pendiente',
+     *     'fecha_inicio' => '2024-01-15',
+     *     'fecha_fin' => '2024-02-15'
+     * ]
+     */
+    public function filtrarCitas($filtros = [])
+    {
+        try {
+            // ┌─ BASE DE LA CONSULTA
+            $sql = "SELECT 
+                        id_agendamiento,
+                        tipo,
+                        observaciones,
+                        fecha_hora,
+                        fecha_hora_fin,
+                        estado,
+                        id_usuario,
+                        id_propietario,
+                        id_paciente,
+                        id_servicio,
+                        id_especialidad
+                    FROM agendamiento
+                    WHERE 1=1";
+            
+            $parametros = [];
+            
+            // ┌─ FILTRO POR PROPIETARIO
+            if (!empty($filtros['id_propietario'])) {
+                $sql .= " AND id_propietario = :id_propietario";
+                $parametros['id_propietario'] = $filtros['id_propietario'];
+            }
+            
+            // ┌─ FILTRO POR ESTADO
+            if (!empty($filtros['estado'])) {
+                $sql .= " AND estado = :estado";
+                $parametros['estado'] = $filtros['estado'];
+            }
+            
+            // ┌─ FILTRO POR FECHA INICIO
+            if (!empty($filtros['fecha_inicio'])) {
+                $sql .= " AND DATE(fecha_hora) >= :fecha_inicio";
+                $parametros['fecha_inicio'] = $filtros['fecha_inicio'];
+            }
+            
+            // ┌─ FILTRO POR FECHA FIN
+            if (!empty($filtros['fecha_fin'])) {
+                $sql .= " AND DATE(fecha_hora) <= :fecha_fin";
+                $parametros['fecha_fin'] = $filtros['fecha_fin'];
+            }
+            
+            // ┌─ FILTRO POR VETERINARIO (ID_USUARIO)
+            if (!empty($filtros['id_usuario'])) {
+                $sql .= " AND id_usuario = :id_usuario";
+                $parametros['id_usuario'] = $filtros['id_usuario'];
+            }
+            
+            // ┌─ FILTRO POR TIPO DE CITA
+            if (!empty($filtros['tipo'])) {
+                $sql .= " AND tipo LIKE :tipo";
+                $parametros['tipo'] = '%' . $filtros['tipo'] . '%';
+            }
+            
+            // ┌─ ORDENAR RESULTADOS
+            $sql .= " ORDER BY fecha_hora ASC";
+            
+            // ┌─ EJECUTAR CONSULTA
+            $stmt = $this->conexion->prepare($sql);
+            
+            foreach ($parametros as $clave => $valor) {
+                $stmt->bindParam(':' . $clave, $parametros[$clave]);
+            }
+            
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::filtrarCitas -> " . $e->getMessage());
+            return [];
+        }
+    }
 }
