@@ -764,8 +764,7 @@ function rfs36_obtenerDetallesCancelacionGet()
 
 /**
  * RFS 36: Función para validar y cancelar cita via AJAX
- * Integra subtareas 1, 2 y 3 completas
- * Próximas: Subtarea 4 (Enviar notificaciones)
+ * Integra subtareas 1, 2, 3 y 4 completas
  */
 function rfs36_validarYCancelarCitaAjax()
 {
@@ -830,10 +829,24 @@ function rfs36_validarYCancelarCitaAjax()
             exit();
         }
 
-        // TODO: Subtarea 4 (Enviar notificaciones) se completará más adelante
+        // SUBTAREA 4: Enviar notificación al propietario
+        $datosNotificacion = $calendario->obtenerDatosParaNotificacionCancelacion($id_agendamiento);
+        
+        if ($datosNotificacion && !empty($datosNotificacion['email_propietario'])) {
+            try {
+                enviarNotificacionCitaCancelada($datosNotificacion);
+                error_log("Notificación de cancelación enviada al email: " . $datosNotificacion['email_propietario']);
+            } catch (Exception $e) {
+                error_log("Error al enviar notificación de cancelación: " . $e->getMessage());
+                // No detenemos el proceso si falla el envio del email
+            }
+        } else {
+            error_log("No se pudo enviar notificación: propietario sin email registrado o datos incompletos");
+        }
+
         echo json_encode([
             'status' => 'success',
-            'message' => 'Subtareas 1, 2 y 3 completadas. Cita cancelada correctamente. Pendiente: Enviar notificaciones.',
+            'message' => 'Cita cancelada correctamente. Notificación enviada al propietario.',
             'id_agendamiento' => $id_agendamiento
         ]);
     } catch (Exception $e) {
@@ -848,7 +861,7 @@ function rfs36_validarYCancelarCitaAjax()
 
 /**
  * RFS 36: Cancelar cita (POST tradicional)
- * Integra subtareas 1, 2 y 3 completas
+ * Integra subtareas 1, 2, 3 y 4 completas
  */
 function rfs36_cancelarCita()
 {
@@ -892,8 +905,22 @@ function rfs36_cancelarCita()
             return;
         }
 
-        // TODO: Subtarea 4 (Enviar notificaciones) se completará más adelante
-        alertaModal('success', 'Éxito', 'Cita cancelada correctamente. Próximo: Enviar notificaciones.');
+        // SUBTAREA 4: Enviar notificación al propietario
+        $datosNotificacion = $calendario->obtenerDatosParaNotificacionCancelacion($id_agendamiento);
+        
+        if ($datosNotificacion && !empty($datosNotificacion['email_propietario'])) {
+            try {
+                enviarNotificacionCitaCancelada($datosNotificacion);
+                error_log("Notificación de cancelación enviada al email: " . $datosNotificacion['email_propietario']);
+            } catch (Exception $e) {
+                error_log("Error al enviar notificación de cancelación: " . $e->getMessage());
+                // No detenemos el proceso si falla el envio del email
+            }
+        } else {
+            error_log("No se pudo enviar notificación: propietario sin email registrado o datos incompletos");
+        }
+
+        alertaModal('success', 'Éxito', 'Cita cancelada correctamente. Notificación enviada al propietario.');
     } catch (Exception $e) {
         error_log("Error en rfs36_cancelarCita -> " . $e->getMessage());
         alertaModal('error', 'Error del Sistema', 'Error al procesar la cancelación');

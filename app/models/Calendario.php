@@ -29,8 +29,8 @@ class Calendario
                             numero_documento,
                             telefono,
                             id_veterinaria
-                         FROM propietario
-                         ORDER BY nombres ASC, apellidos ASC";
+                        FROM propietario
+                        ORDER BY nombres ASC, apellidos ASC";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->execute();
@@ -56,9 +56,9 @@ class Calendario
                             p.img_mascota,
                             p.id_propietario,
                             CONCAT(p.nombre, ' (', p.especie, ' - ', p.raza, ')') as nombre_descriptivo
-                         FROM paciente p
-                         WHERE p.id_propietario = :id_propietario
-                         ORDER BY p.nombre ASC";
+                        FROM paciente p
+                        WHERE p.id_propietario = :id_propietario
+                        ORDER BY p.nombre ASC";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_propietario', $id_propietario, PDO::PARAM_INT);
@@ -80,8 +80,8 @@ class Calendario
                             nombre,
                             descripcion,
                             costo
-                         FROM servicio
-                         ORDER BY 
+                        FROM servicio
+                        ORDER BY 
                             CASE WHEN nombre = 'Otro' THEN 1 ELSE 0 END,
                             nombre ASC";
 
@@ -112,9 +112,9 @@ class Calendario
                             pr.apellidos as propietario_apellidos,
                             CONCAT(pr.nombres, ' ', pr.apellidos) as propietario_completo,
                             CONCAT(p.nombre, ' (', pr.nombres, ' ', pr.apellidos, ')') as nombre_con_propietario
-                         FROM paciente p
-                         INNER JOIN propietario pr ON p.id_propietario = pr.id_propietario
-                         ORDER BY p.nombre ASC";
+                        FROM paciente p
+                        INNER JOIN propietario pr ON p.id_propietario = pr.id_propietario
+                        ORDER BY p.nombre ASC";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->execute();
@@ -165,13 +165,13 @@ class Calendario
                             u.nombres as veterinario_nombres,
                             u.apellidos as veterinario_apellidos,
                             CONCAT(u.nombres, ' ', u.apellidos) as veterinario_completo
-                         FROM agendamiento a
-                         LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
-                         LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
-                         LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
-                         LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
-                         WHERE a.id_agendamiento = :id_agendamiento
-                         LIMIT 1";
+                        FROM agendamiento a
+                        LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
+                        LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                        LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                        LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
+                        WHERE a.id_agendamiento = :id_agendamiento
+                        LIMIT 1";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
@@ -213,12 +213,12 @@ class Calendario
                             
                             -- Veterinario
                             CONCAT(u.nombres, ' ', u.apellidos) as veterinario_nombre
-                         FROM agendamiento a
-                         LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
-                         LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
-                         LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
-                         LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
-                         WHERE 1=1";
+                        FROM agendamiento a
+                        LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
+                        LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                        LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                        LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
+                        WHERE 1=1";
 
             // Agregar filtros dinamicos
             $params = [];
@@ -277,7 +277,7 @@ class Calendario
                             SUM(CASE WHEN estado = 'Realizada' THEN 1 ELSE 0 END) as realizadas,
                             SUM(CASE WHEN estado = 'Cancelada' THEN 1 ELSE 0 END) as canceladas,
                             SUM(CASE WHEN DATE(fecha_hora) = CURDATE() THEN 1 ELSE 0 END) as hoy
-                         FROM agendamiento";
+                        FROM agendamiento";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->execute();
@@ -316,9 +316,9 @@ class Calendario
                             id_usuario,
                             id_servicio,
                             observaciones
-                         FROM agendamiento
-                         WHERE id_agendamiento = :id_agendamiento
-                         LIMIT 1";
+                        FROM agendamiento
+                        WHERE id_agendamiento = :id_agendamiento
+                        LIMIT 1";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
@@ -460,10 +460,10 @@ class Calendario
                             usuario_cancelo,
                             u.nombres as usuario_cancelo_nombre,
                             u.apellidos as usuario_cancelo_apellido
-                         FROM agendamiento a
-                         LEFT JOIN usuario u ON a.usuario_cancelo = u.id_usuario
-                         WHERE a.id_agendamiento = :id_agendamiento
-                         LIMIT 1";
+                        FROM agendamiento a
+                        LEFT JOIN usuario u ON a.usuario_cancelo = u.id_usuario
+                        WHERE a.id_agendamiento = :id_agendamiento
+                        LIMIT 1";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
@@ -512,7 +512,6 @@ class Calendario
                 'mensaje' => 'Estado de la cita actualizado a Cancelada correctamente',
                 'id_agendamiento' => $id_agendamiento
             ];
-
         } catch (PDOException $e) {
             error_log("Error en Calendario::actualizarEstadoCancelada -> " . $e->getMessage());
             return [
@@ -520,6 +519,65 @@ class Calendario
                 'mensaje' => 'Error al actualizar el estado de la cita',
                 'id_agendamiento' => $id_agendamiento
             ];
+        }
+    }
+
+    /**
+     * SUBTAREA 4: Obtiene todos los datos necesarios para enviar notificación de cancelación
+     * 
+     * @param int $id_agendamiento ID de la cita cancelada
+     * @return array Array con todos los datos de la cita cancelada o null
+     */
+    public function obtenerDatosParaNotificacionCancelacion($id_agendamiento)
+    {
+        try {
+            $consulta = "SELECT 
+                            a.id_agendamiento,
+                            a.fecha_hora,
+                            a.fecha_cancelacion,
+                            a.motivo_cancelacion,
+                            a.estado,
+                            
+                            -- Datos del propietario
+                            pr.id_propietario,
+                            pr.nombres as nombre_propietario,
+                            pr.apellidos as apellido_propietario,
+                            CONCAT(pr.nombres, ' ', pr.apellidos) as nombre_completo_propietario,
+                            pr.email as email_propietario,
+                            pr.telefono as telefono_propietario,
+                            
+                            -- Datos de la mascota
+                            pac.id_paciente,
+                            pac.nombre as nombre_mascota,
+                            pac.especie,
+                            pac.raza,
+                            
+                            -- Datos del servicio
+                            s.id_servicio,
+                            s.nombre as tipo_servicio,
+                            s.descripcion as descripcion_servicio,
+                            s.costo,
+                            
+                            -- Usuario que canceló
+                            u.id_usuario as usuario_cancelo_id,
+                            u.nombres as usuario_cancelo_nombre,
+                            u.apellidos as usuario_cancelo_apellido
+                         FROM agendamiento a
+                         LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
+                         LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                         LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                         LEFT JOIN usuario u ON a.usuario_cancelo = u.id_usuario
+                         WHERE a.id_agendamiento = :id_agendamiento
+                         LIMIT 1";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            $resultado->execute();
+
+            return $resultado->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Calendario::obtenerDatosParaNotificacionCancelacion -> " . $e->getMessage());
+            return null;
         }
     }
 }
