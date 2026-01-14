@@ -68,18 +68,18 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
 
                 <div class="submenu-toggle" data-tooltip="Servicios y Costos">
-                    <i class="bi bi-person-plus"></i>
+                    <i class="bi bi-database-up"></i>
                     <span class="texto-item-sidebar">Servicios y Costos</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
 
                 <ul class="submenu-items">
-                    <li><a class="nav-item <?= $final_path == 'registro-servicio' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/registro-servicio" data-tooltip="Registrar">Registrar </a></li>
-                    <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Listar</a></li>
+                    <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios</a></li>
+                    <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios</a></li>
                 </ul>
             </div>
 
-            <!-- Sessión de submenu de horarios de atencion -->
+            <!-- Sessión de submenu de -->
             <div class="submenu <?= $final_path == 'registro-servicios' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
 
                 <div class="submenu-toggle" data-tooltip="Horarios de Atención">
