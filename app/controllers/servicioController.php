@@ -72,6 +72,7 @@ function registrarServicio()
     exit();
 }
 
+// FUNCION PARA LISTAR LOS SERVICIOS DE UNA VETERINARIA
 function listaServiciosPorVeterinaria($id_veterinaria)
 {
     // Creamos una instancia del modelo Servicio
@@ -81,6 +82,17 @@ function listaServiciosPorVeterinaria($id_veterinaria)
     return $servicioModel->obtenerServiciosPorVeterinaria($id_veterinaria);
 }
 
+// FUNCION PARA LISTAR LOS SERVICIOS ACTIVOS DE UNA VETERINARIA
+function listaServiciosActivosPorVeterinaria($id_veterinaria)
+{
+    // Creamos una instancia del modelo Servicio
+    $servicioModel = new Servicio();
+
+    // Llamamos al método para obtener los servicios activos
+    return $servicioModel->obtenerServiciosActivosPorVeterinaria($id_veterinaria);
+}
+
+// FUNCION PARA OBTENER UN SERVICIO POR SU ID
 function obtenerServicioPorId($id_servicio)
 {
     // Creamos una instancia del modelo Servicio
@@ -90,6 +102,7 @@ function obtenerServicioPorId($id_servicio)
     return $servicioModel->obtenerServicioPorId($id_servicio);
 }
 
+// FUNCION PARA ACTUALIZAR UN SERVICIO
 function actualizarServicio()
 {
     // Capturamos los datos enviados por el formulario
@@ -122,6 +135,7 @@ function actualizarServicio()
     exit();
 }
 
+// 
 function eliminarServicio($id_servicio)
 {
     // Creamos una instancia del modelo Servicio
