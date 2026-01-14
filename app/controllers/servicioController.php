@@ -40,14 +40,12 @@ function registrarServicio()
 {
     // Capturamos los datos enviados por el formulario
     $nombre = $_POST['nombre'] ?? '';
-    $costo = $_POST['costo'] ?? '';
     $descripcion = $_POST['descripcion'] ?? '';
     $id_veterinaria = $_POST['id_veterinaria'] ?? '';
 
-    print_r($costo);
 
     // Validamos que los campos no esten vacios
-    if (empty($nombre) || (empty($costo) && !is_numeric($costo)) || empty($id_veterinaria)) {
+    if (empty($nombre) ||  empty($id_veterinaria)) {
         // Mostrar un mensaje de error si algún campo está vacío
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos obligatorios');
         exit();
@@ -59,7 +57,6 @@ function registrarServicio()
     // Preparamos los datos para registrar el servicio
     $data = [
         'nombre' => $nombre,
-        'costo' => $costo,
         'descripcion' => $descripcion,
         'id_veterinaria' => $id_veterinaria
     ];
@@ -99,13 +96,12 @@ function actualizarServicio()
     $data = [
         'id_servicio' => $_POST['id_servicio'] ?? '',
         'nombre' => $_POST['nombre'] ?? '',
-        'costo' => $_POST['costo'] ?? '',
         'descripcion' => $_POST['descripcion'] ?? '',
         'estado' => $_POST['estado'] ?? ''
     ];
 
     // Validamos que los campos no esten vacios
-    if (empty($data['id_servicio']) || empty($data['nombre']) || (empty($data['costo']) && !is_numeric($data['costo'])) || empty($data['estado'])) {
+    if (empty($data['id_servicio']) || empty($data['nombre'])  || empty($data['estado'])) {
         // Mostrar un mensaje de error si algún campo está vacío
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos obligatorios');
         exit();

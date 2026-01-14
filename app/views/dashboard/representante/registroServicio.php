@@ -69,20 +69,13 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
                     <div class="row">
 
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label><i class="bi bi-card-text"></i>Nombre *</label>
                                 <input type="text" id="nombre" name="nombre" required placeholder="Nombre del servicio">
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-coin"></i> Costo*</label>
-                                <input type="number" id="costo" name="costo" required placeholder="12345678">
-                            </div>
-
-                        </div>
 
                         <div class="col-md-12">
                             <div class="form-group">

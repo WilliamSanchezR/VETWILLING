@@ -12,7 +12,7 @@ class ListaServicios {
     cacheDom() {
         this.tablaServicios;
         this.ordebarBtn = document.getElementById('btnOrdenar');
-        this.btnExportarCSV = document.getElementById('btnExport');
+        this.btnExportarCSV = document.getElementById('btnExportService');
         this.inputBuscarProfesionales = document.getElementById('buscarProfesionales');
         this.limpiarBusqueda = document.querySelector('.campo-buscar i');
         this.btnCrearServicio = document.getElementById('btnAgregarNuevo');
@@ -132,7 +132,7 @@ class ListaServicios {
     exportarCSV() {
         try {
             const data = this.tablaServicios.rows({ search: 'applied' }).data();
-            let csv = 'Nombre, Descripción, Costo, Estado\n';
+            let csv = 'Nombre, Descripción, Estado\n';
 
             data.each(function (fila) {
                 const filaLimpia = [];

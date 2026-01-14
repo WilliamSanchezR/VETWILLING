@@ -83,7 +83,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                         <i class="bi bi-sort-down"></i> Ordenar
                     </button>
 
-                    <button class="btn-control" id="btnExport">
+                    <button class="btn-control" id="btnExportService">
                         <i class="bi bi-download"></i> Export
                     </button>
 
@@ -108,9 +108,8 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                         <tr>
                             <th>Nombre</th>
                             <th>Descripción</th>
-                            <th>Costo</th>
                             <th>Estado</th>
-                            <th></th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -120,7 +119,6 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
                                     <td><?= htmlspecialchars($servicio['nombre']) ?></td>
                                     <td><?= htmlspecialchars($servicio['descripcion']) ?></td>
-                                    <td><?= htmlspecialchars($servicio['costo']) ?></td>
                                     <td><?= htmlspecialchars($servicio['estado']) ?></td>
 
                                     <td>

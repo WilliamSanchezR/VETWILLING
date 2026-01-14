@@ -36,13 +36,12 @@ class Servicio
                 return false;
             } else {
                 // El servicio no existe, lo registramos
-                $consulta = "INSERT INTO servicio (nombre, descripcion, costo, id_veterinaria) 
-                             VALUES (:nombre, :descripcion, :costo, :id_veterinaria)";
+                $consulta = "INSERT INTO servicio (nombre, descripcion, id_veterinaria) 
+                             VALUES (:nombre, :descripcion, :id_veterinaria)";
 
                 $resultado = $this->conexion->prepare($consulta);
                 $resultado->bindParam(':nombre', $data['nombre']);
                 $resultado->bindParam(':descripcion', $data['descripcion']);
-                $resultado->bindParam(':costo', $data['costo']);
                 $resultado->bindParam(':id_veterinaria', $data['id_veterinaria']);
 
                 // Ejecutamos la consulta
@@ -90,13 +89,12 @@ class Servicio
     {
         try {
             $consulta = "UPDATE servicio 
-                         SET nombre = :nombre, descripcion = :descripcion, costo = :costo, estado = :estado
+                         SET nombre = :nombre, descripcion = :descripcion, estado = :estado
                          WHERE id_servicio = :id_servicio";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':nombre', $data['nombre']);
             $resultado->bindParam(':descripcion', $data['descripcion']);
-            $resultado->bindParam(':costo', $data['costo']);
             $resultado->bindParam(':estado', $data['estado']);
             $resultado->bindParam(':id_servicio', $data['id_servicio']);
 
