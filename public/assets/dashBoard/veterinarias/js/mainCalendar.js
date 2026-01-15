@@ -22,12 +22,62 @@ const URLS = {
     GET_MASCOTAS: '/vetwilling/calendario/getMascotas',
 
     // 7. OBTENER SERVICIOS: Lista de servicios disponibles
-    GET_SERVICIOS: '/vetwilling/calendario/getServicios'
+    GET_SERVICIOS: '/vetwilling/calendario/getServicios',
+
+    // 8. OBTENER VETERINARIOS: Lista de veterinarios de la veterinaria
+    GET_VETERINARIOS: '/vetwilling/calendario/getVeterinarios'
 };
 
 
 // Esperamos a que todo el contenido HTML de la página se haya cargado.
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ╔═══════════════════════════════════════════════════════════════════════╗
+    // ║  FUNCIÓN PARA CONVERTIR FECHAS LOCALES A FORMATO MYSQL               ║
+    // ║  Evita problemas de zona horaria (UTC vs Local)                      ║
+    // ╚═══════════════════════════════════════════════════════════════════════╝
+    function formatDateForMySQL(date) {
+        if (!date) return null;
+        
+        // Si es un string, convertir a Date
+        if (typeof date === 'string') {
+            date = new Date(date);
+        }
+        
+        // Extraer componentes en hora local (no UTC)
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        
+        // Formato MySQL: YYYY-MM-DD HH:MM:SS
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    // ╔═══════════════════════════════════════════════════════════════════════╗
+    // ║  FUNCIÓN PARA FORMATEAR FECHAS PARA INPUT DATETIME-LOCAL             ║
+    // ║  Convierte Date a formato YYYY-MM-DDTHH:MM (hora local)              ║
+    // ╚═══════════════════════════════════════════════════════════════════════╝
+    function formatDateForInput(date) {
+        if (!date) return '';
+        
+        // Si es un string, convertir a Date
+        if (typeof date === 'string') {
+            date = new Date(date);
+        }
+        
+        // Extraer componentes en hora local (no UTC)
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        
+        // Formato para input datetime-local: YYYY-MM-DDTHH:MM
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
 
     // --- Función de Utilidad para Peticiones AJAX (Fetch) ---
     function sendEventData(url, data, successCallback, errorCallback) {
@@ -96,6 +146,28 @@ document.addEventListener('DOMContentLoaded', function () {
             return result.status === 'success' ? result.data : [];
         } catch (error) {
             console.error('Error al cargar servicios:', error);
+            return [];
+        }
+    }
+
+    // 8. OBTENER VETERINARIOS: Lista de veterinarios de la veterinaria
+    async function cargarVeterinarios() {
+        try {
+            console.log('🔄 Cargando veterinarios desde:', URLS.GET_VETERINARIOS);
+            const response = await fetch(URLS.GET_VETERINARIOS);
+            console.log('📡 Respuesta recibida:', response.status, response.statusText);
+            
+            const data = await response.json();
+            console.log('📦 Datos recibidos:', data);
+
+            if (data.status === 'success') {
+                return data.data;
+            } else {
+                console.error('❌ Error del servidor:', data.message);
+                return [];
+            }
+        } catch (error) {
+            console.error('❌ Error en la petición de veterinarios:', error);
             return [];
         }
     }
@@ -190,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
         },
 
         // --- CARGA DE EVENTOS ---
@@ -212,15 +284,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Establecer hora por defecto 8:00 AM
                 var fechaInicioConHora = new Date(fechaInicio);
                 fechaInicioConHora.setHours(8, 0, 0);
-                fechaInicioStr = fechaInicioConHora.toISOString().slice(0, 16);
+                fechaInicioStr = formatDateForInput(fechaInicioConHora);
 
                 // Establecer hora de fin por defecto 9:00 AM (1 hora después)
                 var fechaFinConHora = new Date(fechaInicio);
                 fechaFinConHora.setHours(9, 0, 0);
-                fechaFinStr = fechaFinConHora.toISOString().slice(0, 16);
+                fechaFinStr = formatDateForInput(fechaFinConHora);
             } else {
-                fechaInicioStr = fechaInicio.toISOString().slice(0, 16);
-                fechaFinStr = fechaFin.toISOString().slice(0, 16);
+                fechaInicioStr = formatDateForInput(fechaInicio);
+                fechaFinStr = formatDateForInput(fechaFin);
             }
 
             // Cargar datos desde el servidor
@@ -646,9 +718,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (result.isConfirmed && result.value) {
                     const datos = result.value;
 
-                    // Convertir fechas a ISO format
-                    const fechaInicioISO = new Date(datos.fechaInicio).toISOString();
-                    const fechaFinISO = new Date(datos.fechaFin).toISOString();
+                    // Convertir fechas a formato MySQL (hora local, no UTC)
+                    const fechaInicioMySQL = formatDateForMySQL(new Date(datos.fechaInicio));
+                    const fechaFinMySQL = formatDateForMySQL(new Date(datos.fechaFin));
 
                     // 1. Preparamos los datos a enviar al servidor
                     var newEventData = {
@@ -657,8 +729,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         id_servicio: parseInt(datos.servicio),
                         tipo: datos.servicioNombre, // Usar el nombre del servicio como tipo
                         observaciones: datos.observaciones,
-                        fecha_hora: fechaInicioISO,
-                        fecha_hora_fin: fechaFinISO,
+                        fecha_hora: fechaInicioMySQL,
+                        fecha_hora_fin: fechaFinMySQL,
                         estado: 'Pendiente',
                         allDay: 0 // Siempre será un evento con hora específica
                     };
@@ -726,9 +798,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var fechaInicio = evento.start;
             var fechaFin = evento.end;
 
-            // Formatear las fechas para los inputs
-            var fechaInicioStr = fechaInicio.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-            var fechaFinStr = fechaFin ? fechaFin.toISOString().slice(0, 16) : '';
+            // Formatear las fechas para los inputs (hora local, no UTC)
+            var fechaInicioStr = formatDateForInput(fechaInicio); // YYYY-MM-DDTHH:MM
+            var fechaFinStr = fechaFin ? formatDateForInput(fechaFin) : '';
 
             Swal.fire({
                 title: 'Editar Agendamiento',
@@ -779,15 +851,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Usuario quiere guardar cambios
                     const datos = result.value;
 
-                    // Convertir fechas a ISO format
-                    const fechaInicioISO = new Date(datos.fechaInicio).toISOString();
-                    const fechaFinISO = datos.fechaFin ? new Date(datos.fechaFin).toISOString() : null;
+                    // Convertir fechas a formato MySQL (hora local, no UTC)
+                    const fechaInicioMySQL = formatDateForMySQL(new Date(datos.fechaInicio));
+                    const fechaFinMySQL = datos.fechaFin ? formatDateForMySQL(new Date(datos.fechaFin)) : null;
 
                     var eventUpdateData = {
                         id_agendamiento: evento.id,
                         tipo: datos.tipo,
-                        new_fecha_hora: fechaInicioISO,
-                        new_fecha_hora_fin: fechaFinISO,
+                        new_fecha_hora: fechaInicioMySQL,
+                        new_fecha_hora_fin: fechaFinMySQL,
                         action: 'edit'
                     };
 
@@ -880,11 +952,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // 1. Preparamos los datos para la actualización
+                    // 1. Preparamos los datos para la actualización (hora local, no UTC)
                     var eventUpdateData = {
                         id_agendamiento: info.event.id,
-                        new_fecha_hora: info.event.start.toISOString(),
-                        new_fecha_hora_fin: info.event.end ? info.event.end.toISOString() : null,
+                        new_fecha_hora: formatDateForMySQL(info.event.start),
+                        new_fecha_hora_fin: info.event.end ? formatDateForMySQL(info.event.end) : null,
                         action: 'move'
                     };
 
@@ -927,11 +999,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // 1. Preparamos los datos para la actualización
+                    // 1. Preparamos los datos para la actualización (hora local, no UTC)
                     var eventUpdateData = {
                         id_agendamiento: info.event.id,
-                        new_fecha_hora: info.event.start.toISOString(),
-                        new_fecha_hora_fin: info.event.end ? info.event.end.toISOString() : null,
+                        new_fecha_hora: formatDateForMySQL(info.event.start),
+                        new_fecha_hora_fin: info.event.end ? formatDateForMySQL(info.event.end) : null,
                         action: 'resize'
                     };
 
@@ -980,19 +1052,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Si es todo el día, establecer hora por defecto 8:00 AM
                 var fechaInicioConHora = new Date(fechaInicio);
                 fechaInicioConHora.setHours(8, 0, 0);
-                fechaInicioStr = fechaInicioConHora.toISOString().slice(0, 16);
+                fechaInicioStr = formatDateForInput(fechaInicioConHora);
 
                 // Establecer hora de fin por defecto 9:00 AM (1 hora después)
                 var fechaFinConHora = new Date(fechaInicio);
                 fechaFinConHora.setHours(9, 0, 0);
-                fechaFinStr = fechaFinConHora.toISOString().slice(0, 16);
+                fechaFinStr = formatDateForInput(fechaFinConHora);
             } else {
-                fechaInicioStr = fechaInicio.toISOString().slice(0, 16);
+                fechaInicioStr = formatDateForInput(fechaInicio);
 
                 // Agregar 1 hora a la fecha de inicio para la fecha de fin
                 var fechaFin = new Date(fechaInicio);
                 fechaFin.setHours(fechaFin.getHours() + 1);
-                fechaFinStr = fechaFin.toISOString().slice(0, 16);
+                fechaFinStr = formatDateForInput(fechaFin);
             }
 
             // Cargar datos desde el servidor
@@ -1162,9 +1234,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (result.isConfirmed && result.value) {
                     const datos = result.value;
 
-                    // Convertir fechas a ISO format
-                    const fechaInicioISO = new Date(datos.fechaInicio).toISOString();
-                    const fechaFinISO = new Date(datos.fechaFin).toISOString();
+                    // Convertir fechas a formato MySQL (hora local, no UTC)
+                    const fechaInicioMySQL = formatDateForMySQL(new Date(datos.fechaInicio));
+                    const fechaFinMySQL = formatDateForMySQL(new Date(datos.fechaFin));
 
                     // Preparamos los datos a enviar al servidor
                     var newEventData = {
@@ -1173,8 +1245,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         id_servicio: parseInt(datos.servicio),
                         tipo: datos.servicioNombre, // Usar el nombre del servicio como tipo
                         observaciones: datos.observaciones,
-                        fecha_hora: fechaInicioISO,
-                        fecha_hora_fin: fechaFinISO,
+                        fecha_hora: fechaInicioMySQL,
+                        fecha_hora_fin: fechaFinMySQL,
                         estado: 'Pendiente',
                         allDay: 0
                     };
@@ -1224,4 +1296,481 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Dibujar el calendario
     calendar.render();
+
+    // ╔═══════════════════════════════════════════════════════════════════════╗
+    // ║                  FUNCIONALIDADES DE BARRA DE ACCIONES                ║
+    // ╚═══════════════════════════════════════════════════════════════════════╝
+
+    // ═══════════════════════════════════════════════════════════════════════
+    //  INICIALIZACIÓN: CARGAR VETERINARIOS EN EL SELECT
+    // ═══════════════════════════════════════════════════════════════════════
+    const selectVeterinario = document.querySelector('.select-veterinario');
+    
+    if (selectVeterinario) {
+        // Cargar veterinarios desde la base de datos
+        cargarVeterinarios().then(veterinarios => {
+            console.log('Veterinarios cargados:', veterinarios);
+            
+            // Limpiar el select
+            selectVeterinario.innerHTML = '<option value="">Todos los veterinarios</option>';
+            
+            if (veterinarios && veterinarios.length > 0) {
+                // Agregar cada veterinario al select
+                veterinarios.forEach(vet => {
+                    const option = document.createElement('option');
+                    option.value = vet.id_usuario;
+                    option.textContent = `${vet.nombres} ${vet.apellidos}`;
+                    selectVeterinario.appendChild(option);
+                });
+                console.log(`✅ ${veterinarios.length} veterinarios cargados en el select`);
+            } else {
+                console.warn('⚠️ No se encontraron veterinarios en la base de datos');
+            }
+        }).catch(error => {
+            console.error('❌ Error al inicializar veterinarios:', error);
+            // Mostrar "Todos" aunque haya error
+            selectVeterinario.innerHTML = '<option value="">Todos los veterinarios</option>';
+        });
+    } else {
+        console.error('❌ No se encontró el elemento .select-veterinario');
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    //  FUNCIÓN 1: CAMBIO DE VISTAS DEL CALENDARIO
+    // ═══════════════════════════════════════════════════════════════════════
+    const botonesVista = document.querySelectorAll('.boton-vista');
+    
+    botonesVista.forEach(boton => {
+        boton.addEventListener('click', function() {
+            const vista = this.getAttribute('data-vista');
+            
+            // Remover clase active de todos los botones
+            botonesVista.forEach(btn => btn.classList.remove('active'));
+            
+            // Agregar clase active al botón clickeado
+            this.classList.add('active');
+            
+            // Cambiar vista del calendario
+            switch(vista) {
+                case 'calendario':
+                    calendar.changeView('dayGridMonth');
+                    break;
+                case 'lista':
+                    calendar.changeView('listMonth');
+                    break;
+                case 'dia':
+                    calendar.changeView('timeGridDay');
+                    break;
+            }
+        });
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════
+    //  FUNCIÓN 2: FILTRO POR VETERINARIO (Con recarga desde servidor)
+    // ═══════════════════════════════════════════════════════════════════════
+    if (selectVeterinario) {
+        selectVeterinario.addEventListener('change', async function() {
+            const veterinarioId = this.value;
+            
+            console.log('🔄 Filtrando por veterinario:', veterinarioId || 'Todos');
+            
+            try {
+                // Construir URL con o sin filtro
+                let url = URLS.LOAD;
+                if (veterinarioId) {
+                    url += '?id_usuario=' + veterinarioId;
+                }
+                
+                console.log('📡 Cargando eventos desde:', url);
+                
+                // Hacer petición al servidor
+                const response = await fetch(url);
+                const eventos = await response.json();
+                
+                console.log('📦 Eventos recibidos:', eventos.length);
+                
+                // Limpiar todos los eventos del calendario
+                calendar.removeAllEvents();
+                
+                // Agregar los nuevos eventos filtrados
+                eventos.forEach(evento => {
+                    calendar.addEvent(evento);
+                });
+                
+                console.log('✅ Calendario actualizado con', eventos.length, 'eventos');
+                
+            } catch (error) {
+                console.error('❌ Error al filtrar eventos:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudieron cargar los eventos del veterinario',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    //  FUNCIÓN 3: ABRIR MODAL NUEVA CITA (Botón "Nueva Cita")
+    // ═══════════════════════════════════════════════════════════════════════
+    window.abrirModalNuevaCita = async function() {
+        // Obtener fecha y hora actual
+        const ahora = new Date();
+        
+        // Establecer hora de inicio (redondear a la próxima hora)
+        const fechaInicio = new Date(ahora);
+        fechaInicio.setMinutes(0, 0, 0);
+        if (ahora.getMinutes() > 0) {
+            fechaInicio.setHours(fechaInicio.getHours() + 1);
+        }
+        
+        // Establecer hora de fin (1 hora después)
+        const fechaFin = new Date(fechaInicio);
+        fechaFin.setHours(fechaFin.getHours() + 1);
+        
+        // Formatear fechas para los inputs
+        const fechaInicioStr = formatDateForInput(fechaInicio);
+        const fechaFinStr = formatDateForInput(fechaFin);
+        
+        // Cargar datos desde el servidor
+        const propietarios = await cargarPropietarios();
+        const servicios = await cargarServicios();
+        
+        // Crear opciones HTML para propietarios
+        let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
+        propietarios.forEach(prop => {
+            propietariosOptions += `<option value="${prop.id_propietario}">${prop.nombres} ${prop.apellidos}</option>`;
+        });
+        
+        // Crear opciones HTML para servicios
+        let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
+        servicios.forEach(serv => {
+            serviciosOptions += `<option value="${serv.id_servicio}">${serv.nombre}</option>`;
+        });
+        
+        // Mostrar SweetAlert con formulario
+        Swal.fire({
+            title: '<i class="bi bi-calendar-plus" style="color: #0a932c;"></i> Nueva Cita',
+            html: `
+                <style>
+                    .form-agendamiento {
+                        max-height: 500px;
+                        overflow-y: auto;
+                        padding: 0 5px;
+                    }
+                    
+                    .form-agendamiento::-webkit-scrollbar {
+                        width: 8px;
+                    }
+                    
+                    .form-agendamiento::-webkit-scrollbar-track {
+                        background: #f1f1f1;
+                        border-radius: 10px;
+                    }
+                    
+                    .form-agendamiento::-webkit-scrollbar-thumb {
+                        background: #888;
+                        border-radius: 10px;
+                    }
+                    
+                    .form-agendamiento::-webkit-scrollbar-thumb:hover {
+                        background: #555;
+                    }
+                    
+                    .form-group-ag {
+                        margin-bottom: 24px;
+                    }
+                    
+                    .form-label-ag {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        margin-bottom: 10px;
+                        font-weight: 600;
+                        color: #00304D;
+                        font-size: 14px;
+                    }
+                    
+                    .form-label-ag i {
+                        font-size: 16px;
+                        color: #0a932c;
+                    }
+                    
+                    .form-label-ag .required {
+                        color: #e74c3c;
+                        margin-left: 2px;
+                    }
+                    
+                    .form-control-ag {
+                        width: 100%;
+                        padding: 12px 16px;
+                        border: 2px solid #e0e0e0;
+                        border-radius: 10px;
+                        font-size: 14px;
+                        font-family: inherit;
+                        transition: all 0.3s ease;
+                        background: #ffffff;
+                        box-sizing: border-box;
+                    }
+                    
+                    .form-control-ag:focus {
+                        outline: none;
+                        border-color: #0a932c;
+                        box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1);
+                        background: #ffffff;
+                    }
+                    
+                    .form-control-ag:disabled {
+                        background: #f5f5f5;
+                        cursor: not-allowed;
+                        color: #999;
+                    }
+                    
+                    textarea.form-control-ag {
+                        resize: vertical;
+                        min-height: 100px;
+                        font-family: inherit;
+                        line-height: 1.5;
+                    }
+                    
+                    .form-helper {
+                        font-size: 12px;
+                        color: #666;
+                        margin-top: 6px;
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                    }
+                    
+                    .form-helper i {
+                        font-size: 11px;
+                    }
+                    
+                    .form-divider {
+                        height: 1px;
+                        background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+                        margin: 25px 0;
+                    }
+                </style>
+                
+                <div class="form-agendamiento">
+                    <div class="form-group-ag">
+                        <label class="form-label-ag">
+                            <i class="bi bi-person-fill"></i>
+                            Propietario
+                            <span class="required">*</span>
+                        </label>
+                        <select id="swal-propietario" class="form-control-ag">
+                            ${propietariosOptions}
+                        </select>
+                        <div class="form-helper">
+                            <i class="bi bi-info-circle"></i>
+                            Selecciona el propietario de la mascota
+                        </div>
+                    </div>
+                    
+                    <div class="form-group-ag">
+                        <label class="form-label-ag">
+                            <i class="bi bi-heart-fill"></i>
+                            Mascota
+                            <span class="required">*</span>
+                        </label>
+                        <select id="swal-mascota" class="form-control-ag" disabled>
+                            <option value="">Primero selecciona un propietario</option>
+                        </select>
+                        <div class="form-helper">
+                            <i class="bi bi-info-circle"></i>
+                            Selecciona la mascota del propietario
+                        </div>
+                    </div>
+                    
+                    <div class="form-divider"></div>
+                    
+                    <div class="form-group-ag">
+                        <label class="form-label-ag">
+                            <i class="bi bi-clipboard2-pulse-fill"></i>
+                            Servicio
+                            <span class="required">*</span>
+                        </label>
+                        <select id="swal-servicio" class="form-control-ag">
+                            ${serviciosOptions}
+                        </select>
+                        <div class="form-helper">
+                            <i class="bi bi-info-circle"></i>
+                            Tipo de servicio que se realizará
+                        </div>
+                    </div>
+                    
+                    <div class="form-divider"></div>
+                    
+                    <div class="form-group-ag">
+                        <label class="form-label-ag">
+                            <i class="bi bi-calendar-event"></i>
+                            Fecha y Hora de Inicio
+                            <span class="required">*</span>
+                        </label>
+                        <input type="datetime-local" id="swal-fecha-inicio" class="form-control-ag" 
+                               value="${fechaInicioStr}">
+                        <div class="form-helper">
+                            <i class="bi bi-clock"></i>
+                            Cuándo comienza la cita
+                        </div>
+                    </div>
+                    
+                    <div class="form-group-ag">
+                        <label class="form-label-ag">
+                            <i class="bi bi-calendar-check"></i>
+                            Fecha y Hora de Fin
+                            <span class="required">*</span>
+                        </label>
+                        <input type="datetime-local" id="swal-fecha-fin" class="form-control-ag" 
+                               value="${fechaFinStr}">
+                        <div class="form-helper">
+                            <i class="bi bi-clock"></i>
+                            Cuándo termina la cita
+                        </div>
+                    </div>
+                    
+                    <div class="form-divider"></div>
+                    
+                    <div class="form-group-ag">
+                        <label class="form-label-ag">
+                            <i class="bi bi-chat-left-text"></i>
+                            Observaciones
+                        </label>
+                        <textarea id="swal-observaciones" class="form-control-ag" 
+                                  placeholder="Ingresa detalles adicionales sobre la cita (opcional)"></textarea>
+                        <div class="form-helper">
+                            <i class="bi bi-info-circle"></i>
+                            Información adicional sobre la cita
+                        </div>
+                    </div>
+                </div>
+            `,
+            width: '600px',
+            showCancelButton: true,
+            confirmButtonText: '<i class="bi bi-check-circle"></i> Crear Cita',
+            cancelButtonText: '<i class="bi bi-x-circle"></i> Cancelar',
+            customClass: {
+                confirmButton: 'swal2-styled swal2-confirm-custom',
+                cancelButton: 'swal2-styled swal2-cancel-custom'
+            },
+            didOpen: () => {
+                // Evento para cargar mascotas cuando se seleccione propietario
+                const selectPropietario = document.getElementById('swal-propietario');
+                const selectMascota = document.getElementById('swal-mascota');
+                
+                selectPropietario.addEventListener('change', async function() {
+                    const idPropietario = this.value;
+                    
+                    if (idPropietario) {
+                        selectMascota.disabled = true;
+                        selectMascota.innerHTML = '<option value="">Cargando mascotas...</option>';
+                        
+                        const mascotas = await cargarMascotasPorPropietario(idPropietario);
+                        
+                        if (mascotas.length > 0) {
+                            selectMascota.innerHTML = '<option value="">Selecciona una mascota...</option>';
+                            mascotas.forEach(mascota => {
+                                selectMascota.innerHTML += `<option value="${mascota.id_mascota}">${mascota.nombre} (${mascota.especie})</option>`;
+                            });
+                            selectMascota.disabled = false;
+                        } else {
+                            selectMascota.innerHTML = '<option value="">Este propietario no tiene mascotas registradas</option>';
+                        }
+                    } else {
+                        selectMascota.disabled = true;
+                        selectMascota.innerHTML = '<option value="">Primero selecciona un propietario</option>';
+                    }
+                });
+            },
+            preConfirm: () => {
+                const propietario = document.getElementById('swal-propietario').value;
+                const mascota = document.getElementById('swal-mascota').value;
+                const servicio = document.getElementById('swal-servicio').value;
+                const servicioNombre = document.getElementById('swal-servicio').selectedOptions[0].text;
+                const fechaInicio = document.getElementById('swal-fecha-inicio').value;
+                const fechaFin = document.getElementById('swal-fecha-fin').value;
+                const observaciones = document.getElementById('swal-observaciones').value;
+                
+                // Validaciones
+                if (!propietario || !mascota || !servicio || !fechaInicio || !fechaFin) {
+                    Swal.showValidationMessage('Por favor completa todos los campos obligatorios');
+                    return false;
+                }
+                
+                return {
+                    propietario: propietario,
+                    mascota: mascota,
+                    servicio: servicio,
+                    servicioNombre: servicioNombre,
+                    fechaInicio: fechaInicio,
+                    fechaFin: fechaFin,
+                    observaciones: observaciones
+                };
+            }
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                const datos = result.value;
+                
+                // Convertir fechas a formato MySQL (hora local, no UTC)
+                const fechaInicioMySQL = formatDateForMySQL(new Date(datos.fechaInicio));
+                const fechaFinMySQL = formatDateForMySQL(new Date(datos.fechaFin));
+                
+                // Preparar datos a enviar al servidor
+                var newEventData = {
+                    id_propietario: parseInt(datos.propietario),
+                    id_paciente: parseInt(datos.mascota),
+                    id_servicio: parseInt(datos.servicio),
+                    tipo: datos.servicioNombre,
+                    observaciones: datos.observaciones,
+                    fecha_hora: fechaInicioMySQL,
+                    fecha_hora_fin: fechaFinMySQL,
+                    estado: 'Pendiente',
+                    allDay: 0
+                };
+                
+                // Llamada AJAX para guardar en la base de datos
+                sendEventData(URLS.CREATE, newEventData,
+                    function (response) {
+                        // Agregar evento al calendario
+                        calendar.addEvent({
+                            id: response.id,
+                            title: datos.servicioNombre,
+                            start: datos.fechaInicio,
+                            end: datos.fechaFin,
+                            backgroundColor: servicioColores[datos.servicioNombre] || '#6c757d',
+                            borderColor: servicioColores[datos.servicioNombre] || '#6c757d',
+                            allDay: false
+                        });
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Cita Creada!',
+                            text: 'La cita ha sido registrada correctamente',
+                            confirmButtonText: 'Aceptar',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: {
+                                confirmButton: 'swal2-styled swal2-confirm-custom'
+                            }
+                        });
+                    },
+                    function (errorMessage) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudo crear la cita: ' + errorMessage,
+                            confirmButtonText: 'Aceptar',
+                            customClass: {
+                                confirmButton: 'swal2-styled swal2-confirm-custom'
+                            }
+                        });
+                    }
+                );
+            }
+        });
+    };
+
 });
