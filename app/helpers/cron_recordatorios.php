@@ -9,7 +9,6 @@
 // =========================================
 
 require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../config/email_config.php';
 require_once __DIR__ . '/email_helper.php';
 require_once __DIR__ . '/notificacion_helper.php';
 require_once __DIR__ . '/../models/Eventos.php';
@@ -17,7 +16,7 @@ require_once __DIR__ . '/../models/Eventos.php';
 // =========================================
 // CONFIGURACION Y VARIABLES GLOBALES
 // =========================================
-$horasAntes = RECORDATORIO_HORAS_ANTES; // Definido en email_config.php
+$horasAntes = 24; // Enviar recordatorio 24 horas antes de la cita
 $fechaInicio = date('Y-m-d H:i:s', strtotime("+{$horasAntes} hours"));
 $fechaFin = date('Y-m-d H:i:s', strtotime("+{$horasAntes} hours +1 hour"));
 

@@ -93,12 +93,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Response status:', response.status);
                 console.log('Response statusText:', response.statusText);
 
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error('Status ' + response.status + ': ' + response.statusText + ' - ' + text);
-                    });
-                }
-                return response.json();
+                // Siempre intentar parsear como JSON, incluso en errores
+                return response.json().then(data => {
+                    if (!response.ok) {
+                        // Si es un error HTTP, lanzar con el mensaje del servidor
+                        throw { 
+                            status: response.status, 
+                            message: data.message || response.statusText,
+                            data: data
+                        };
+                    }
+                    return data;
+                });
             })
             .then(result => {
                 console.log('Result:', result);
@@ -112,7 +118,9 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('Error de comunicación AJAX:', error);
-                if (errorCallback) { errorCallback(error.message); }
+                // Extraer el mensaje del error
+                const errorMessage = error.message || error.statusText || 'Error desconocido';
+                if (errorCallback) { errorCallback(errorMessage); }
             });
     }
 

@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../../vendor/PHPMailer/PHPMailer.php';
 require_once __DIR__ . '/../../vendor/PHPMailer/SMTP.php';
 require_once __DIR__ . '/../../vendor/PHPMailer/Exception.php';
-require_once __DIR__ . '/../../config/email_config.php';
+require_once __DIR__ . '/mailer_helper.php'; // Usar la configuración existente
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -15,27 +15,12 @@ use PHPMailer\PHPMailer\Exception;
 // FUNCION PARA ENVIAR NOTIFICACION DE CITA CREADA AL PROPIETARIO
 function enviarNotificacionCitaCreada($datosCita)
 {
-    // Verificar si el envio de emails esta habilitado
-    if (!EMAIL_ENABLED) {
-        error_log("Envio de emails deshabilitado en configuracion");
-        return false;
-    }
-
-    $mail = new PHPMailer(true);
-
     try {
-        // Configuracion del servidor SMTP
-        $mail->isSMTP();
-        $mail->Host = EMAIL_HOST;
-        $mail->SMTPAuth = true;
-        $mail->Username = EMAIL_USERNAME;
-        $mail->Password = EMAIL_PASSWORD;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = EMAIL_PORT;
-        $mail->CharSet = 'UTF-8';
+        // Usar la configuración SMTP existente de mailer_helper
+        $mail = mailer_init();
 
         // Destinatarios
-        $mail->setFrom(EMAIL_FROM, EMAIL_FROM_NAME);
+        $mail->setFrom('vetwillingsoporte@gmail.com', 'VetWilling - Sistema de Citas');
         $mail->addAddress($datosCita['email_propietario'], $datosCita['nombre_propietario']);
 
         // Contenido del email
@@ -108,26 +93,12 @@ function enviarNotificacionCitaCreada($datosCita)
 // FUNCION PARA ENVIAR RECORDATORIO DE CITA (24 HORAS ANTES)
 function enviarRecordatorioCita($datosCita)
 {
-    // Verificar si el envio de emails esta habilitado
-    if (!EMAIL_ENABLED) {
-        error_log("Envio de emails deshabilitado en configuracion");
-        return false;
-    }
-
-    $mail = new PHPMailer(true);
-
     try {
-        // Configuracion del servidor SMTP
-        $mail->isSMTP();
-        $mail->Host = EMAIL_HOST;
-        $mail->SMTPAuth = true;
-        $mail->Username = EMAIL_USERNAME;
-        $mail->Password = EMAIL_PASSWORD;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = EMAIL_PORT;
-        $mail->CharSet = 'UTF-8';
+        // Usar la configuración SMTP existente de mailer_helper
+        $mail = mailer_init();
 
-        $mail->setFrom(EMAIL_FROM, EMAIL_FROM_NAME);
+        // Destinatarios
+        $mail->setFrom('vetwillingsoporte@gmail.com', 'VetWilling - Sistema de Citas');
         $mail->addAddress($datosCita['email_propietario'], $datosCita['nombre_propietario']);
 
         $mail->isHTML(true);
@@ -186,27 +157,12 @@ function enviarRecordatorioCita($datosCita)
 // FUNCION PARA ENVIAR NOTIFICACION DE CITA CANCELADA
 function enviarNotificacionCitaCancelada($datosCancelacion)
 {
-    // Verificar si el envio de emails esta habilitado
-    if (!EMAIL_ENABLED) {
-        error_log("Envio de emails deshabilitado en configuracion");
-        return false;
-    }
-
-    $mail = new PHPMailer(true);
-
     try {
-        // Configuracion del servidor SMTP
-        $mail->isSMTP();
-        $mail->Host = EMAIL_HOST;
-        $mail->SMTPAuth = true;
-        $mail->Username = EMAIL_USERNAME;
-        $mail->Password = EMAIL_PASSWORD;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = EMAIL_PORT;
-        $mail->CharSet = 'UTF-8';
+        // Usar la configuración SMTP existente de mailer_helper
+        $mail = mailer_init();
 
         // Destinatarios
-        $mail->setFrom(EMAIL_FROM, EMAIL_FROM_NAME);
+        $mail->setFrom('vetwillingsoporte@gmail.com', 'VetWilling - Sistema de Citas');
         $mail->addAddress($datosCancelacion['email_propietario'], $datosCancelacion['nombre_propietario']);
 
         // Contenido del email
