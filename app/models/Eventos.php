@@ -327,7 +327,7 @@ class Eventos
     // ║                    RFS 34: FILTRAR CITAS PROGRAMADAS                        ║
     // ║  Permite filtrar citas por propietario, estado, fecha con criterios múltiples║
     // ╚══════════════════════════════════════════════════════════════════════════════╝
-    
+
     /**
      * FILTRAR CITAS CON MÚLTIPLES CRITERIOS
      * 
@@ -360,61 +360,281 @@ class Eventos
                         id_especialidad
                     FROM agendamiento
                     WHERE 1=1";
-            
+
             $parametros = [];
-            
+
             // ┌─ FILTRO POR PROPIETARIO
             if (!empty($filtros['id_propietario'])) {
                 $sql .= " AND id_propietario = :id_propietario";
                 $parametros['id_propietario'] = $filtros['id_propietario'];
             }
-            
+
             // ┌─ FILTRO POR ESTADO
             if (!empty($filtros['estado'])) {
                 $sql .= " AND estado = :estado";
                 $parametros['estado'] = $filtros['estado'];
             }
-            
+
             // ┌─ FILTRO POR FECHA INICIO
             if (!empty($filtros['fecha_inicio'])) {
                 $sql .= " AND DATE(fecha_hora) >= :fecha_inicio";
                 $parametros['fecha_inicio'] = $filtros['fecha_inicio'];
             }
-            
+
             // ┌─ FILTRO POR FECHA FIN
             if (!empty($filtros['fecha_fin'])) {
                 $sql .= " AND DATE(fecha_hora) <= :fecha_fin";
                 $parametros['fecha_fin'] = $filtros['fecha_fin'];
             }
-            
+
             // ┌─ FILTRO POR VETERINARIO (ID_USUARIO)
             if (!empty($filtros['id_usuario'])) {
                 $sql .= " AND id_usuario = :id_usuario";
                 $parametros['id_usuario'] = $filtros['id_usuario'];
             }
-            
+
             // ┌─ FILTRO POR TIPO DE CITA
             if (!empty($filtros['tipo'])) {
                 $sql .= " AND tipo LIKE :tipo";
                 $parametros['tipo'] = '%' . $filtros['tipo'] . '%';
             }
-            
+
             // ┌─ ORDENAR RESULTADOS
             $sql .= " ORDER BY fecha_hora ASC";
-            
+
             // ┌─ EJECUTAR CONSULTA
             $stmt = $this->conexion->prepare($sql);
-            
+
             foreach ($parametros as $clave => $valor) {
                 $stmt->bindParam(':' . $clave, $parametros[$clave]);
             }
-            
+
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
         } catch (PDOException $e) {
             error_log("Error en Eventos::filtrarCitas -> " . $e->getMessage());
             return [];
+        }
+    }
+
+    // =========================================
+    //  RFS 37: FUNCIONES PARA NOTIFICACIONES Y RECORDATORIOS
+    // =========================================
+
+    /**
+     * OBTENER CITAS QUE NECESITAN RECORDATORIO
+     * 
+     * Busca todas las citas que:
+     * - Estan en estado 'Pendiente'
+     * - Ocurriran en el rango de tiempo especificado
+     * - NO tienen recordatorio enviado (recordatorio_enviado = 0 o NULL)
+     * - El propietario tiene email valido
+     * 
+     * @param string $fechaInicio Fecha/hora inicio del rango (formato: Y-m-d H:i:s)
+     * @param string $fechaFin Fecha/hora fin del rango (formato: Y-m-d H:i:s)
+     * @return array Array de citas con informacion completa del propietario y mascota
+     */
+    public function obtenerCitasParaRecordatorio($fechaInicio, $fechaFin)
+    {
+        try {
+            $sql = "SELECT 
+                        a.id_agendamiento,
+                        a.tipo,
+                        a.fecha_hora,
+                        a.fecha_hora_fin,
+                        a.estado,
+                        a.observaciones,
+                        a.recordatorio_enviado,
+                        
+                        -- DATOS DEL PROPIETARIO
+                        p.id_propietario,
+                        CONCAT(p.nombres, ' ', p.apellidos) as nombre_propietario,
+                        p.nombres as propietario_nombres,
+                        p.apellidos as propietario_apellidos,
+                        p.email as email_propietario,
+                        p.telefono as telefono_propietario,
+                        p.preferencia_notificacion,
+                        
+                        -- DATOS DE LA MASCOTA
+                        pac.id_paciente,
+                        pac.nombre as nombre_mascota,
+                        pac.especie as especie_mascota,
+                        pac.raza as raza_mascota,
+                        
+                        -- DATOS DEL SERVICIO
+                        s.id_servicio,
+                        s.nombre as nombre_servicio,
+                        
+                        -- DATOS DEL VETERINARIO
+                        u.id_usuario,
+                        CONCAT(u.nombres, ' ', u.apellidos) as nombre_veterinario
+                        
+                    FROM agendamiento a
+                    INNER JOIN propietario p ON a.id_propietario = p.id_propietario
+                    LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
+                    
+                    WHERE a.fecha_hora BETWEEN :fecha_inicio AND :fecha_fin
+                    AND a.estado = 'Pendiente'
+                    AND (a.recordatorio_enviado IS NULL OR a.recordatorio_enviado = 0)
+                    AND p.email IS NOT NULL
+                    AND p.email != ''
+                    AND p.preferencia_notificacion = 'email'
+                    
+                    ORDER BY a.fecha_hora ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio);
+            $stmt->bindParam(':fecha_fin', $fechaFin);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::obtenerCitasParaRecordatorio -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * MARCAR CITA COMO RECORDATORIO ENVIADO
+     * 
+     * Actualiza el campo recordatorio_enviado a 1 cuando se envia exitosamente
+     * 
+     * @param int $idAgendamiento ID de la cita
+     * @return bool True si se actualizo correctamente
+     */
+    public function marcarRecordatorioEnviado($idAgendamiento)
+    {
+        try {
+            $sql = "UPDATE agendamiento 
+                    SET recordatorio_enviado = 1 
+                    WHERE id_agendamiento = :id_agendamiento";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_agendamiento', $idAgendamiento, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::marcarRecordatorioEnviado -> " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * OBTENER CITAS PROXIMAS DE UN PROPIETARIO ESPECIFICO
+     * 
+     * Busca las proximas citas de un propietario en particular
+     * Util para mostrar recordatorios en el dashboard del usuario
+     * 
+     * @param int $idPropietario ID del propietario
+     * @param int $diasAdelante Numero de dias hacia adelante a buscar (default: 7)
+     * @return array Array de citas proximas
+     */
+    public function obtenerCitasProximasPropietario($idPropietario, $diasAdelante = 7)
+    {
+        try {
+            $sql = "SELECT 
+                        a.id_agendamiento,
+                        a.tipo,
+                        a.fecha_hora,
+                        a.fecha_hora_fin,
+                        a.estado,
+                        a.observaciones,
+                        
+                        pac.nombre as nombre_mascota,
+                        pac.especie as especie_mascota,
+                        
+                        s.nombre as nombre_servicio,
+                        
+                        CONCAT(u.nombres, ' ', u.apellidos) as nombre_veterinario,
+                        u.telefono as telefono_veterinario
+                        
+                    FROM agendamiento a
+                    LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
+                    
+                    WHERE a.id_propietario = :id_propietario
+                    AND a.estado = 'Pendiente'
+                    AND a.fecha_hora >= NOW()
+                    AND a.fecha_hora <= DATE_ADD(NOW(), INTERVAL :dias_adelante DAY)
+                    
+                    ORDER BY a.fecha_hora ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_propietario', $idPropietario, PDO::PARAM_INT);
+            $stmt->bindParam(':dias_adelante', $diasAdelante, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::obtenerCitasProximasPropietario -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * OBTENER ESTADISTICAS DE RECORDATORIOS ENVIADOS
+     * 
+     * Retorna estadisticas sobre recordatorios enviados en un periodo
+     * Util para reportes y monitoreo del sistema
+     * 
+     * @param string $fechaInicio Fecha inicio del periodo (Y-m-d)
+     * @param string $fechaFin Fecha fin del periodo (Y-m-d)
+     * @return array Array con estadisticas
+     */
+    public function obtenerEstadisticasRecordatorios($fechaInicio, $fechaFin)
+    {
+        try {
+            $sql = "SELECT 
+                        COUNT(*) as total_citas,
+                        SUM(CASE WHEN recordatorio_enviado = 1 THEN 1 ELSE 0 END) as recordatorios_enviados,
+                        SUM(CASE WHEN recordatorio_enviado = 0 OR recordatorio_enviado IS NULL THEN 1 ELSE 0 END) as sin_recordatorio,
+                        SUM(CASE WHEN estado = 'Pendiente' THEN 1 ELSE 0 END) as citas_pendientes,
+                        SUM(CASE WHEN estado = 'Completada' THEN 1 ELSE 0 END) as citas_completadas,
+                        SUM(CASE WHEN estado = 'Cancelada' THEN 1 ELSE 0 END) as citas_canceladas
+                        
+                    FROM agendamiento
+                    WHERE DATE(fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio);
+            $stmt->bindParam(':fecha_fin', $fechaFin);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::obtenerEstadisticasRecordatorios -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * VERIFICAR SI UNA CITA YA TIENE RECORDATORIO ENVIADO
+     * 
+     * Consulta rapida para verificar el estado del recordatorio
+     * 
+     * @param int $idAgendamiento ID de la cita
+     * @return bool True si ya se envio recordatorio
+     */
+    public function tieneRecordatorioEnviado($idAgendamiento)
+    {
+        try {
+            $sql = "SELECT recordatorio_enviado 
+                    FROM agendamiento 
+                    WHERE id_agendamiento = :id_agendamiento";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_agendamiento', $idAgendamiento, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $resultado && $resultado['recordatorio_enviado'] == 1;
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::tieneRecordatorioEnviado -> " . $e->getMessage());
+            return false;
         }
     }
 }
