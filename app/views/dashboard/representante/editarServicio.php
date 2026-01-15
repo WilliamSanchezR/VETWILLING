@@ -81,14 +81,6 @@ $servicio = obtenerServicioPorId($id);
                                 <input type="text" id="nombre" name="nombre" required placeholder="Nombre del servicio" value="<?= $servicio['nombre'] ?>">
                             </div>
                         </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-coin"></i> Costo*</label>
-                                <input type="number" id="costo" name="costo" required placeholder="12345678" value="<?= $servicio['costo'] ?>">
-                            </div>
-
-                        </div>
                         
                         <div class="col-md-6">
                             <div class="form-group">

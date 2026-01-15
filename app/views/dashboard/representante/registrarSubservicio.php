@@ -1,5 +1,8 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_representante.php';
+require_once BASE_PATH . '/app/controllers/servicioController.php';
+
+$servicios = listaServiciosActivosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
 ?>
 
@@ -9,7 +12,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Servicios</title>
+    <title>Registro de Subservicios</title>
     <!-- Icono de la página -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
@@ -54,33 +57,57 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
         <div class="wizard-container">
             <div class="wizard-header">
                 <i class="bi bi-person-vcard"></i>
-                <h2>Registro de Servicios</h2>
-                <p class="text-muted">Complete todos los campos requeridos para registrar el servicio</p>
+                <h2>Registro de Subservicios</h2>
+                <p class="text-muted">Complete todos los campos requeridos para registrar los Subservicio</p>
             </div>
 
 
-            <form id="registroProfesional" action="<?= BASE_URL ?>/representante/guardar-servicio" method="POST" enctype="multipart/form-data">
+            <form id="registroProfesional" action="<?= BASE_URL ?>/representante/guardar-subservicio" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
 
 
                 <!-- Paso 1: Datos del Profesional -->
                 <div class="step active">
-                    <h3><i class="bi bi-motherboard"></i>Datos del servicio</h3>
+                    <h3><i class="bi bi-motherboard"></i>Datos del Subservicio</h3>
 
                     <div class="row">
 
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-card-text"></i>Nombre *</label>
                                 <input type="text" id="nombre" name="nombre" required placeholder="Nombre del servicio">
                             </div>
                         </div>
 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-coin"></i> Costo*</label>
+                                <input type="number" id="costo" name="costo" required placeholder="12345678">
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label><i class="bi bi-coin"></i> Servicio*</label>
+                                <select id="servicio" name="servicio" required>
+                                    <option value="" disabled selected>Seleccione un servicio</option>
+
+
+                                    <?php if (!empty($servicios)) : ?>
+                                        <?php foreach ($servicios as $servicio):  ?>
+                                            <option value="<?= $servicio['id_servicio'] ?>"><?= $servicio['nombre'] ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+
+                        </div>
 
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label><i class="bi bi-pencil-square"></i> Descripción </label>
-                                <textarea maxlength="200" rows="4" cols="50" name="descripcion" id="descripcion" placeholder="Descripción del servicio"></textarea>
+                                <textarea maxlength="500" rows="4" cols="50" name="descripcion" id="descripcion" placeholder="Descripción del subservicio"></textarea>
                             </div>
                         </div>
                     </div>
@@ -88,7 +115,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
                     <div class="buttons">
                         <span></span>
-                        <button type="submit" class="btn btn-success" id="btnGuardarVeterinaria">
+                        <button type="submit" class="btn btn-success" id="btnguardarSubservicio">
                             Guardar <i class="bi bi-floppy"></i>
                         </button>
                     </div>

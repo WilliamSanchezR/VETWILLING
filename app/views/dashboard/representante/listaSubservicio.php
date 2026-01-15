@@ -1,10 +1,11 @@
 <?php
 // Enlazamos la ruta para tomar la session del representante
 require_once BASE_PATH . '/app/helpers/session_representante.php';
-require_once BASE_PATH . '/app/controllers/servicioController.php';
+require_once BASE_PATH . '/app/controllers/subservicioController.php';
 
-// Obtenemos los servicios de la veterinaria del representante logueado
-$datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
+
+// Obtenemos los subservicios de la veterinaria del representante logueado
+$datos = listaSubserviciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
 ?>
 
@@ -14,7 +15,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Servicios</title>
+    <title>Lista de Subservicios</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -63,7 +64,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
             <!-- Encabezado del Módulo -->
             <div class="encabezado-modulo">
-                <h3>Lista Servicios Registrados</h3>
+                <h3>Lista Subservicios Registrados</h3>
             </div>
 
             <!-- Controles de la Tabla -->
@@ -71,7 +72,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                 <div class="controles-izquierda">
                     <div class="campo-buscar">
                         <i class="bi bi-search"></i>
-                        <input type="text" id="buscarServicio" placeholder="Buscar Servicio...">
+                        <input type="text" id="buscarSubservicio" placeholder="Buscar Subservicio...">
                     </div>
                 </div>
                 <div class="controles-derecha">
@@ -83,7 +84,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                         <i class="bi bi-sort-down"></i> Ordenar
                     </button>
 
-                    <button class="btn-control" id="btnExportService">
+                    <button class="btn-control" id="btnExportSubservicios">
                         <i class="bi bi-download"></i> Export
                     </button>
 
@@ -95,7 +96,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
 
                     <button class="btn-agregar" id="btnAgregarNuevo" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        <i class="bi bi-plus-lg"></i> Crear Nuevo Servicio
+                        <i class="bi bi-plus-lg"></i> Crear Nuevo Subservicio
                     </button>
 
                 </div>
@@ -103,10 +104,12 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
             <!-- Tabla de Especialidades -->
             <div class="contenedor-tabla">
-                <table id="tablaListaServicios" class="display tabla-admin" style="width:100%">
+                <table id="tablaListaSubservicios" class="display tabla-admin" style="width:100%">
                     <thead>
                         <tr>
                             <th>Nombre</th>
+                            <th>Servicio</th>
+                            <th>Costo</th>
                             <th>Descripción</th>
                             <th>Estado</th>
                             <th>Acciones</th>
@@ -114,19 +117,21 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                     </thead>
                     <tbody>
                         <?php if (!empty($datos)) : ?>
-                            <?php foreach ($datos as $servicio):  ?>
+                            <?php foreach ($datos as $subservicio):  ?>
                                 <tr class="fila-blanca">
 
-                                    <td><?= htmlspecialchars($servicio['nombre']) ?></td>
-                                    <td><?= htmlspecialchars($servicio['descripcion']) ?></td>
-                                    <td><?= htmlspecialchars($servicio['estado']) ?></td>
+                                    <td><?= htmlspecialchars($subservicio['nombre']) ?></td>
+                                    <td><?= htmlspecialchars($subservicio['servicio']) ?></td>
+                                    <td>$<?= number_format($subservicio['costo'], 2) ?></td>
+                                    <td><?= htmlspecialchars($subservicio['descripcion']) ?></td>
+                                    <td><?= htmlspecialchars($subservicio['estado']) ?></td>
 
                                     <td>
-                                        <button class="btn-accion btn-editar" title="Editar" onclick="window.location.href='<?= BASE_URL ?>/representante/editar-servicio?id=<?= $servicio['id_servicio'] ?>'">
+                                        <button class="btn-accion btn-editar" title="Editar" onclick="window.location.href='<?= BASE_URL ?>/representante/editar-subservicio?id=<?= $subservicio['id_subservicio'] ?>'">
                                             <i class="bi bi-pencil"></i>
                                         </button>
 
-                                        <button class="btn-accion btn-eliminar" title="Eliminar" onclick="window.location.href='<?= BASE_URL ?>/representante/eliminar-servicio?action=eliminar&id=<?= $servicio['id_servicio'] ?>'">
+                                        <button class="btn-accion btn-eliminar" title="Eliminar" onclick="window.location.href='<?= BASE_URL ?>/representante/eliminar-subservicio?action=eliminar&id=<?= $subservicio['id_subservicio'] ?>'">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -161,7 +166,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
     <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
     <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/listaServicios.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/listaSubservicios.js"></script>
 
 
 
