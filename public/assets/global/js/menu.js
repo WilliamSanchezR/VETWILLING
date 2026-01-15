@@ -14,6 +14,7 @@ class MenuAdministrador {
         this.sidebar = document.getElementById("sidebar");
         this.sidebarToggle = document.getElementById("sidebarToggle");
         this.subMenu = document.querySelectorAll('.submenu-toggle');
+        this.subMenuSeccond = document.querySelectorAll('.submenu-seccond-toggle');
     }
 
 
@@ -38,6 +39,25 @@ class MenuAdministrador {
                         parent.classList.toggle('view-modal-menu');
                     } else {
                         const parent = toggle.closest('.submenu');
+                        parent.classList.toggle('open');
+                    }
+                });
+            });
+        }
+
+         if (this.subMenuSeccond) {
+            this.subMenuSeccond.forEach(toggle => {
+                toggle.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (document.getElementById("sidebar").classList.contains("collapsed")) {
+                        document.querySelectorAll('.view-modal-menu').forEach(menu => {
+                            menu.classList.remove('view-modal-menu');
+                        });
+
+                         const parent = toggle.closest('.submenu-seccond');
+                        parent.classList.toggle('view-modal-menu');
+                    } else {
+                        const parent = toggle.closest('.submenu-seccond');
                         parent.classList.toggle('open');
                     }
                 });
