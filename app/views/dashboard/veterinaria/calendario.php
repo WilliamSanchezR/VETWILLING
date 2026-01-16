@@ -80,10 +80,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                     <div class="d-flex gap-2 align-items-center">
                         <select class="select-veterinario">
-                            <option value="">Todos los veterinarios</option>
-                            <option value="1">Dr. Juan Pérez</option>
-                            <option value="2">Dra. María García</option>
-                            <option value="3">Dr. Carlos López</option>
+                            <option value="">Cargando veterinarios...</option>
                         </select>
                         <button class="boton-nueva-cita" onclick="abrirModalNuevaCita()">
                             <i class="bi bi-plus-circle"></i> Nueva Cita

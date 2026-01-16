@@ -91,6 +91,37 @@ class Eventos
         }
     }
 
+    // FUNCION PARA LISTAR AGENDAMIENTOS POR VETERINARIO
+    public function listarPorVeterinario($id_usuario)
+    {
+        try {
+            $sql = "SELECT 
+                id_agendamiento,
+                tipo,
+                observaciones,
+                fecha_hora,
+                fecha_hora_fin,
+                estado,
+                id_usuario,
+                id_propietario,
+                id_paciente,
+                id_servicio,
+                id_especialidad
+            FROM agendamiento
+            WHERE id_usuario = :id_usuario
+            ORDER BY fecha_hora ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::listarPorVeterinario -> " . $e->getMessage());
+            return [];
+        }
+    }
+
     // FUNCION PARA CONSULTAR UN AGENDAMIENTO POR ID
     public function consultarAgendamiento($id)
     {
@@ -327,7 +358,7 @@ class Eventos
     // ║                    RFS 34: FILTRAR CITAS PROGRAMADAS                        ║
     // ║  Permite filtrar citas por propietario, estado, fecha con criterios múltiples║
     // ╚══════════════════════════════════════════════════════════════════════════════╝
-    
+
     /**
      * FILTRAR CITAS CON MÚLTIPLES CRITERIOS
      * 
@@ -360,58 +391,57 @@ class Eventos
                         id_especialidad
                     FROM agendamiento
                     WHERE 1=1";
-            
+
             $parametros = [];
-            
+
             // ┌─ FILTRO POR PROPIETARIO
             if (!empty($filtros['id_propietario'])) {
                 $sql .= " AND id_propietario = :id_propietario";
                 $parametros['id_propietario'] = $filtros['id_propietario'];
             }
-            
+
             // ┌─ FILTRO POR ESTADO
             if (!empty($filtros['estado'])) {
                 $sql .= " AND estado = :estado";
                 $parametros['estado'] = $filtros['estado'];
             }
-            
+
             // ┌─ FILTRO POR FECHA INICIO
             if (!empty($filtros['fecha_inicio'])) {
                 $sql .= " AND DATE(fecha_hora) >= :fecha_inicio";
                 $parametros['fecha_inicio'] = $filtros['fecha_inicio'];
             }
-            
+
             // ┌─ FILTRO POR FECHA FIN
             if (!empty($filtros['fecha_fin'])) {
                 $sql .= " AND DATE(fecha_hora) <= :fecha_fin";
                 $parametros['fecha_fin'] = $filtros['fecha_fin'];
             }
-            
+
             // ┌─ FILTRO POR VETERINARIO (ID_USUARIO)
             if (!empty($filtros['id_usuario'])) {
                 $sql .= " AND id_usuario = :id_usuario";
                 $parametros['id_usuario'] = $filtros['id_usuario'];
             }
-            
+
             // ┌─ FILTRO POR TIPO DE CITA
             if (!empty($filtros['tipo'])) {
                 $sql .= " AND tipo LIKE :tipo";
                 $parametros['tipo'] = '%' . $filtros['tipo'] . '%';
             }
-            
+
             // ┌─ ORDENAR RESULTADOS
             $sql .= " ORDER BY fecha_hora ASC";
-            
+
             // ┌─ EJECUTAR CONSULTA
             $stmt = $this->conexion->prepare($sql);
-            
+
             foreach ($parametros as $clave => $valor) {
                 $stmt->bindParam(':' . $clave, $parametros[$clave]);
             }
-            
+
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
         } catch (PDOException $e) {
             error_log("Error en Eventos::filtrarCitas -> " . $e->getMessage());
             return [];

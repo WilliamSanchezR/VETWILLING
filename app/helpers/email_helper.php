@@ -281,3 +281,240 @@ function enviarNotificacionCitaCancelada($datosCancelacion)
         return false;
     }
 }
+
+// =========================================
+//  RFS 37: FUNCIONES DE VALIDACION DE EMAIL
+// =========================================
+
+/**
+ * VALIDAR QUE EL EMAIL TENGA UN FORMATO VALIDO Y SEGURO
+ * 
+ * Verifica que:
+ * - El campo no este vacio
+ * - Tenga formato de email valido
+ * - No contenga caracteres peligrosos
+ * - El dominio tenga estructura correcta
+ * 
+ * @param string $email Email a validar
+ * @return bool True si el email es valido, False en caso contrario
+ */
+function validarFormatoEmail($email)
+{
+    // Verificar que no este vacio
+    if (empty($email)) {
+        error_log("Validacion email: Campo vacio");
+        return false;
+    }
+
+    // Eliminar espacios en blanco al inicio y final
+    $email = trim($email);
+
+    // Validar formato basico de email usando filtro de PHP
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        error_log("Validacion email: Formato invalido - {$email}");
+        return false;
+    }
+
+    // Validar que no contenga caracteres peligrosos (inyeccion de codigo)
+    if (preg_match('/[<>"\'\(\)]/', $email)) {
+        error_log("Validacion email: Contiene caracteres no permitidos - {$email}");
+        return false;
+    }
+
+    // Validar longitud razonable (maximo 255 caracteres segun RFC)
+    if (strlen($email) > 255) {
+        error_log("Validacion email: Demasiado largo - {$email}");
+        return false;
+    }
+
+    // Separar usuario y dominio
+    $partes = explode('@', $email);
+    if (count($partes) !== 2) {
+        error_log("Validacion email: Estructura incorrecta - {$email}");
+        return false;
+    }
+
+    $usuario = $partes[0];
+    $dominio = $partes[1];
+
+    // Validar que el usuario no este vacio y no sea demasiado corto
+    if (strlen($usuario) < 1) {
+        error_log("Validacion email: Usuario vacio - {$email}");
+        return false;
+    }
+
+    // Validar que el dominio tenga al menos un punto
+    if (strpos($dominio, '.') === false) {
+        error_log("Validacion email: Dominio sin TLD - {$email}");
+        return false;
+    }
+
+    // Validar que el dominio no termine con punto
+    if (substr($dominio, -1) === '.') {
+        error_log("Validacion email: Dominio termina con punto - {$email}");
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * VALIDAR QUE EL DOMINIO DEL EMAIL EXISTA (VERIFICACION DNS)
+ * 
+ * Verifica que el dominio del email tenga registros MX o A en DNS
+ * Esto confirma que el dominio puede recibir emails
+ * 
+ * @param string $email Email completo a verificar
+ * @return bool True si el dominio existe y puede recibir emails
+ */
+function validarDominioEmail($email)
+{
+    // Primero validar el formato
+    if (!validarFormatoEmail($email)) {
+        return false;
+    }
+
+    // Extraer el dominio del email
+    $partes = explode('@', $email);
+    $dominio = $partes[1];
+
+    // Verificar registros MX (Mail Exchange) del dominio
+    // Los registros MX indican que el dominio puede recibir emails
+    if (checkdnsrr($dominio, 'MX')) {
+        return true;
+    }
+
+    // Si no tiene MX, verificar registro A (direccion IP)
+    // Algunos servidores usan el registro A para emails
+    if (checkdnsrr($dominio, 'A')) {
+        error_log("Validacion DNS: Dominio sin MX pero con registro A - {$dominio}");
+        return true;
+    }
+
+    error_log("Validacion DNS: Dominio no existe o no puede recibir emails - {$dominio}");
+    return false;
+}
+
+/**
+ * DETECTAR SI EL EMAIL ES TEMPORAL O DESECHABLE
+ * 
+ * Verifica contra una lista de dominios conocidos de emails temporales
+ * Estos servicios se usan para emails de un solo uso y no son confiables
+ * 
+ * @param string $email Email a verificar
+ * @return bool True si es temporal/desechable, False si es legitimo
+ */
+function esEmailTemporal($email)
+{
+    // Lista de dominios temporales mas comunes
+    $dominiosTemporales = [
+        'tempmail.com',
+        'guerrillamail.com',
+        'mailinator.com',
+        'maildrop.cc',
+        'throwaway.email',
+        '10minutemail.com',
+        'temp-mail.org',
+        'yopmail.com',
+        'fakeinbox.com',
+        'trashmail.com',
+        'getnada.com',
+        'mohmal.com',
+        'mintemail.com',
+        'sharklasers.com',
+        'guerrillamail.info',
+        'grr.la',
+        'guerrillamail.biz',
+        'guerrillamail.de',
+        'spam4.me',
+        'emailondeck.com'
+    ];
+
+    // Extraer dominio del email
+    $partes = explode('@', $email);
+    if (count($partes) !== 2) {
+        return false;
+    }
+
+    $dominio = strtolower($partes[1]);
+
+    // Verificar si el dominio esta en la lista de temporales
+    if (in_array($dominio, $dominiosTemporales)) {
+        error_log("Email temporal detectado: {$email}");
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * VALIDACION COMPLETA DE EMAIL (FUNCION PRINCIPAL)
+ * 
+ * Ejecuta todas las validaciones en orden:
+ * 1. Formato correcto
+ * 2. Dominio existe (DNS)
+ * 3. No es email temporal
+ * 
+ * Esta es la funcion que debe usarse antes de enviar notificaciones
+ * 
+ * @param string $email Email a validar completamente
+ * @param bool $verificarDNS Si debe verificar DNS (puede ser lento)
+ * @return array Array con 'valido' (bool) y 'mensaje' (string)
+ */
+function validarEmailCompleto($email, $verificarDNS = false)
+{
+    // PASO 1: Validar formato
+    if (!validarFormatoEmail($email)) {
+        return [
+            'valido' => false,
+            'mensaje' => 'Formato de email invalido'
+        ];
+    }
+
+    // PASO 2: Verificar que no sea email temporal
+    if (esEmailTemporal($email)) {
+        return [
+            'valido' => false,
+            'mensaje' => 'Email temporal no permitido'
+        ];
+    }
+
+    // PASO 3: Verificar DNS (opcional, puede ser lento)
+    if ($verificarDNS) {
+        if (!validarDominioEmail($email)) {
+            return [
+                'valido' => false,
+                'mensaje' => 'Dominio no existe o no puede recibir emails'
+            ];
+        }
+    }
+
+    // Si paso todas las validaciones
+    return [
+        'valido' => true,
+        'mensaje' => 'Email valido'
+    ];
+}
+
+/**
+ * SANITIZAR EMAIL PARA USO SEGURO
+ * 
+ * Limpia el email de caracteres peligrosos y espacios
+ * Debe usarse antes de guardar en base de datos o enviar
+ * 
+ * @param string $email Email a limpiar
+ * @return string Email limpio y seguro
+ */
+function sanitizarEmail($email)
+{
+    // Eliminar espacios en blanco
+    $email = trim($email);
+
+    // Convertir a minusculas (emails no son case-sensitive)
+    $email = strtolower($email);
+
+    // Filtrar usando funciones de PHP
+    $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+
+    return $email;
+}

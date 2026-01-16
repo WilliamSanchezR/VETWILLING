@@ -101,47 +101,47 @@ function registrarVeterinario()
 
     // POO - instanciamos la clase
 
-   // Lógica para cargar imagenes
-$ruta_img = null;
+    // Lógica para cargar imagenes
+    $ruta_img = null;
 
-// Validamos si se subió realmente un archivo
-if (isset($_FILES['img_perfil']) && $_FILES['img_perfil']['error'] === UPLOAD_ERR_OK) {
+    // Validamos si se subió realmente un archivo
+    if (isset($_FILES['img_perfil']) && $_FILES['img_perfil']['error'] === UPLOAD_ERR_OK) {
 
-    $file = $_FILES['img_perfil'];
+        $file = $_FILES['img_perfil'];
 
-    // Obtenemos la extensión del archivo
-    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        // Obtenemos la extensión del archivo
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-    // Definimos las extensiones permitidas 
-    $permitidas = ['png', 'jpg', 'jpeg'];
+        // Definimos las extensiones permitidas 
+        $permitidas = ['png', 'jpg', 'jpeg'];
 
-    // Validamos que la extensión de las imágenes esté dentro de las permitidas
-    if (!in_array($ext, $permitidas)) {
-        mostrarSweetAlert('error', 'Extensión no permitida', 'Recuerda que solo soporta archivos png, jpeg y jpg');
-        exit();
+        // Validamos que la extensión de las imágenes esté dentro de las permitidas
+        if (!in_array($ext, $permitidas)) {
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Recuerda que solo soporta archivos png, jpeg y jpg');
+            exit();
+        }
+
+        // Validamos el tamaño o el peso MAX 2 MB
+        if ($file['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Error al cargar la foto', 'El tamaño de la foto supera los 2 MB');
+            exit();
+        }
+
+        // Definimos el nombre del archivo y le concatenamos la extensión
+        $ruta_img = uniqid('user_') . '.' . $ext;
+
+        // Definimos el destino donde moveremos el archivo
+        $destino = BASE_PATH . '/public/uploads/veterinarios/' . $ruta_img;
+
+        // Movemos el archivo al destino
+        if (!move_uploaded_file($file['tmp_name'], $destino)) {
+            mostrarSweetAlert('error', 'Error al guardar', 'No se pudo guardar la imagen');
+            exit();
+        }
+    } else {
+        // Agregamos la imagen por defecto
+        $ruta_img = 'foto_default.jpg';
     }
-
-    // Validamos el tamaño o el peso MAX 2 MB
-    if ($file['size'] > 2 * 1024 * 1024) {
-        mostrarSweetAlert('error', 'Error al cargar la foto', 'El tamaño de la foto supera los 2 MB');
-        exit();
-    }
-
-    // Definimos el nombre del archivo y le concatenamos la extensión
-    $ruta_img = uniqid('user_') . '.' . $ext;
-
-    // Definimos el destino donde moveremos el archivo
-    $destino = BASE_PATH . '/public/uploads/veterinarios/' . $ruta_img;
-
-    // Movemos el archivo al destino
-    if (!move_uploaded_file($file['tmp_name'], $destino)) {
-        mostrarSweetAlert('error', 'Error al guardar', 'No se pudo guardar la imagen');
-        exit();
-    }
-} else {
-    // Agregamos la imagen por defecto
-    $ruta_img = 'foto_default.jpg';
-}
 
     $objVeterinario = new Veterinario();
     $data = [

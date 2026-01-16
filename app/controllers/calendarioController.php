@@ -60,21 +60,19 @@ switch ($method) {
         // ║                   RFS 34: CONSULTA DE CITAS                ║
         // ║  Nuevas rutas para consultar y filtrar citas               ║
         // ╚══════════════════════════════════════════════════════════════╝
-        
+
         if ($accion === 'mis_citas') {
             // Obtiene las citas del usuario autenticado con filtros opcionales
             rfs34_validarSesionYObtenerCitas();
-        } 
-        elseif ($accion === 'filtrar') {
+        } elseif ($accion === 'filtrar') {
             // Filtra citas por múltiples criterios (estado, fecha, propietario, etc.)
             rfs34_consultarYFiltrarCitas();
-        }
-        elseif ($accion === 'detalles_completo') {
+        } elseif ($accion === 'detalles_completo') {
             // Obtiene detalles completos de una cita específica
             rfs34_obtenerDetallesCitaCompleto();
         }
         // ─────────────────────────────────────────────────────────────
-        
+
         else if ($accion === 'eliminar') {
             eliminarAgendamiento($_GET['id']);
         } else if ($accion === 'cargar') {
@@ -85,6 +83,8 @@ switch ($method) {
             obtenerMascotasPorPropietario();
         } else if (strpos($request_uri, '/calendario/getServicios') !== false) {
             obtenerServicios();
+        } else if (strpos($request_uri, '/calendario/getVeterinarios') !== false) {
+            obtenerVeterinarios();
         } elseif ($accion === 'validar') {
             rfs36_validarEstadoCitaGet();
         } elseif ($accion === 'detalles_cancelacion') {
@@ -107,7 +107,15 @@ switch ($method) {
 //  FUNCIONES CRUD
 // =========================================
 
-// FUNCION PARA CREAR AGENDAMIENTO VIA AJAX JSON
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║                       RFS 33: REGISTRO DE CITAS                              ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+/**
+ * RFS 33: Función para crear agendamiento vía AJAX JSON
+ * Permite registrar una nueva cita con validación de disponibilidad
+ * y envío de notificaciones por email
+ */
 function crearAgendamientoAjax()
 {
     try {
@@ -248,7 +256,15 @@ function crearAgendamientoAjax()
     }
 }
 
-// FUNCION PARA ACTUALIZAR AGENDAMIENTO VIA AJAX
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║                    RFS 35: MODIFICACIÓN DE CITAS                             ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+/**
+ * RFS 35: Función para actualizar agendamiento vía AJAX
+ * Permite modificar las fechas de una cita existente con validación
+ * de disponibilidad de horario
+ */
 function actualizarAgendamientoAjax()
 {
     try {
@@ -332,7 +348,10 @@ function actualizarAgendamientoAjax()
     }
 }
 
-// FUNCION PARA CREAR UN NUEVO AGENDAMIENTO (Formulario tradicional)
+/**
+ * RFS 33: Función para crear un nuevo agendamiento (Formulario tradicional)
+ * Permite registrar citas mediante formulario HTML tradicional
+ */
 function crearAgendamiento()
 {
     // Capturamos los datos enviados por el formulario
@@ -401,7 +420,10 @@ function consultarAgendamientoId($id)
     return $objEventos->consultarAgendamiento($id);
 }
 
-// FUNCION PARA ACTUALIZAR UN AGENDAMIENTO
+/**
+ * RFS 35: Función para actualizar un agendamiento (Formulario tradicional)
+ * Permite modificar datos completos de una cita existente
+ */
 function actualizarAgendamiento()
 {
     $id_agendamiento = $_POST['id_agendamiento'] ?? '';
@@ -509,8 +531,17 @@ function eliminarAgendamiento($id)
 // FUNCION PARA CARGAR EVENTOS (Para FullCalendar con JSON)
 function cargarEventos()
 {
+    // Obtener el id_usuario del veterinario si se proporciona (filtro)
+    $id_usuario = $_GET['id_usuario'] ?? null;
+
     $objEventos = new Eventos();
-    $agendamientos = $objEventos->listar();
+
+    // Si hay filtro por veterinario, usar listarPorVeterinario, sino listar todos
+    if ($id_usuario) {
+        $agendamientos = $objEventos->listarPorVeterinario($id_usuario);
+    } else {
+        $agendamientos = $objEventos->listar();
+    }
 
     $calendar_events = [];
 
@@ -523,7 +554,10 @@ function cargarEventos()
             'end' => $agendamiento['fecha_hora_fin'] ?? null,
             'backgroundColor' => getColorByTipo($agendamiento['tipo']),
             'borderColor' => getColorByTipo($agendamiento['tipo']),
-            'allDay' => false
+            'allDay' => false,
+            'extendedProps' => [
+                'id_usuario' => $agendamiento['id_usuario']
+            ]
         ];
     }
 
@@ -619,6 +653,37 @@ function obtenerServicios()
         header('Content-Type: application/json');
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'Error al obtener servicios: ' . $e->getMessage()]);
+    }
+    exit();
+}
+
+// FUNCION PARA OBTENER VETERINARIOS DESDE BASE DE DATOS
+function obtenerVeterinarios()
+{
+    try {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
+
+        if (!$id_veterinaria) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'No se pudo obtener la veterinaria del usuario']);
+            exit();
+        }
+
+        require_once __DIR__ . '/../models/Veterinario.php';
+        $veterinarioModel = new Veterinario();
+        $veterinarios = $veterinarioModel->listar($id_veterinaria);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'data' => $veterinarios]);
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Error al obtener veterinarios: ' . $e->getMessage()]);
     }
     exit();
 }
@@ -970,14 +1035,14 @@ function rfs34_validarSesionYObtenerCitas()
             ]);
             exit();
         }
-        
+
         // ┌─ OBTENER DATOS DEL USUARIO ACTUAL
         $id_usuario = $_SESSION['user']['id_usuario'];
         $tipo_usuario = $_SESSION['user']['tipo_usuario'] ?? 'propietario'; // propietario, veterinario, admin
-        
+
         // ┌─ OBTENER FILTROS DEL REQUEST
         $filtros = [];
-        
+
         if (!empty($_GET['estado'])) {
             $filtros['estado'] = $_GET['estado'];
         }
@@ -987,11 +1052,11 @@ function rfs34_validarSesionYObtenerCitas()
         if (!empty($_GET['fecha_fin'])) {
             $filtros['fecha_fin'] = $_GET['fecha_fin'];
         }
-        
+
         // ┌─ LLAMAR AL MODELO
         $calendario = new Calendario();
         $citas = $calendario->obtenerCitasDelUsuario($id_usuario, $tipo_usuario, $filtros);
-        
+
         // ┌─ RETORNAR RESULTADO
         header('Content-Type: application/json');
         echo json_encode([
@@ -1004,7 +1069,6 @@ function rfs34_validarSesionYObtenerCitas()
             ]
         ]);
         exit();
-        
     } catch (Exception $e) {
         error_log("Error en rfs34_validarSesionYObtenerCitas -> " . $e->getMessage());
         http_response_code(500);
@@ -1027,7 +1091,7 @@ function rfs34_consultarYFiltrarCitas()
     try {
         // ┌─ OBTENER FILTROS DEL REQUEST
         $filtros = [];
-        
+
         if (!empty($_GET['id_propietario'])) {
             $filtros['id_propietario'] = (int)$_GET['id_propietario'];
         }
@@ -1046,7 +1110,7 @@ function rfs34_consultarYFiltrarCitas()
         if (!empty($_GET['id_usuario'])) {
             $filtros['id_usuario'] = (int)$_GET['id_usuario'];
         }
-        
+
         // ┌─ VALIDAR QUE AL MENOS UN FILTRO ESTÉ PRESENTE
         if (empty($filtros)) {
             http_response_code(400);
@@ -1056,11 +1120,11 @@ function rfs34_consultarYFiltrarCitas()
             ]);
             exit();
         }
-        
+
         // ┌─ LLAMAR AL MODELO PARA FILTRAR
         $eventos = new Eventos();
         $citas = $eventos->filtrarCitas($filtros);
-        
+
         // ┌─ RETORNAR RESULTADO
         header('Content-Type: application/json');
         echo json_encode([
@@ -1070,7 +1134,6 @@ function rfs34_consultarYFiltrarCitas()
             'citas' => $citas
         ]);
         exit();
-        
     } catch (Exception $e) {
         error_log("Error en rfs34_consultarYFiltrarCitas -> " . $e->getMessage());
         http_response_code(500);
@@ -1101,10 +1164,10 @@ function rfs34_obtenerDetallesCitaCompleto()
             ]);
             exit();
         }
-        
+
         // ┌─ OBTENER ID DE LA CITA
         $id_agendamiento = $_GET['id_agendamiento'] ?? null;
-        
+
         if (!$id_agendamiento) {
             http_response_code(400);
             echo json_encode([
@@ -1113,11 +1176,11 @@ function rfs34_obtenerDetallesCitaCompleto()
             ]);
             exit();
         }
-        
+
         // ┌─ OBTENER DETALLES COMPLETOS DE LA CITA
         $calendario = new Calendario();
         $detalles = $calendario->obtenerAgendamientoCompleto($id_agendamiento);
-        
+
         if (!$detalles) {
             http_response_code(404);
             echo json_encode([
@@ -1126,7 +1189,7 @@ function rfs34_obtenerDetallesCitaCompleto()
             ]);
             exit();
         }
-        
+
         // ┌─ RETORNAR DETALLES COMPLETOS
         header('Content-Type: application/json');
         echo json_encode([
@@ -1134,7 +1197,6 @@ function rfs34_obtenerDetallesCitaCompleto()
             'cita' => $detalles
         ]);
         exit();
-        
     } catch (Exception $e) {
         error_log("Error en rfs34_obtenerDetallesCitaCompleto -> " . $e->getMessage());
         http_response_code(500);
@@ -1145,4 +1207,3 @@ function rfs34_obtenerDetallesCitaCompleto()
         exit();
     }
 }
-
