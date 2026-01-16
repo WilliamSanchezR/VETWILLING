@@ -42,7 +42,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
             <div class="submenu">
                 <div class="submenu-toggle" data-tooltip="Gestión Administrador">
-                    <i class="bi bi-database-up"></i>
+                    <i class="bi bi-journal-medical"></i>
                     <span class="texto-item-sidebar">Gestión Administrador</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
@@ -103,7 +103,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             <div class="submenu">
 
                 <div class="submenu-toggle" data-tooltip="Gestión veterinario">
-                    <i class="bi bi-database-up"></i>
+                    <i class="bi bi-person-square"></i>
                     <span class="texto-item-sidebar">Gestión veterinario</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
@@ -148,6 +148,58 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         </a></li>
                 </ul>
             </div>
+
+
+            <!-- NAVEGACIÓN AUXILIAR DE VETERINARIA -->
+            <div class="submenu">
+
+                <div class="submenu-toggle" data-tooltip="Gestión auxiliar veterinario">
+                    <i class="bi bi-person-square"></i>
+                    <span class="texto-item-sidebar">Gestión auxiliar veterinario</span>
+                    <i class="bi bi-chevron-down flecha"></i>
+                </div>
+
+                <ul class="submenu-items">
+                    <li><a href="<?= BASE_URL ?>/veterinaria/seguimientos"
+                            class="nav-item"
+                            data-section="citas">
+                            <i class="bi bi-card-checklist"></i>
+                            <span class="nav-text">Ordenes de servicio</span>
+                        </a></li>
+
+                    <li><a href="<?= BASE_URL ?>/veterinaria/calendario"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-calendar-week"></i>
+                            <span class="nav-text">Examenes diagnosticos</span>
+                        </a></li>
+                    <li><a href="<?= BASE_URL ?>/veterinaria/gestion_clinica"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-hospital"></i>
+                            <span class="nav-text">lista de precios</span>
+                        </a></li>
+                    <li><a href="<?= BASE_URL ?>/veterinaria/laboratorio"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-beaker"></i>
+                            <span class="nav-text">Imprimir historia clinica</span>
+                        </a></li>
+                    <li><a href="<?= BASE_URL ?>/veterinaria/recetas"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-journal-text"></i>
+                            <span class="nav-text">Imprimir recetas</span>
+                        </a></li>
+                    <li><a href="<?= BASE_URL ?>/veterinaria/reportes"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-bar-chart"></i>
+                            <span class="nav-text">Reportes</span>
+                        </a></li>
+                </ul>
+            </div>
+
     </nav>
 
 
