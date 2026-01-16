@@ -31,6 +31,7 @@ if (count($listaEspecialidadesProfesional) > 0) {
     $stringEspecialidades = json_encode($list);
 }
 
+
 ?>
 
 <!DOCTYPE html>
@@ -210,6 +211,18 @@ if (count($listaEspecialidadesProfesional) > 0) {
                                 </select>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-card-text"></i> Estado *</label>
+                                <select id="estado" name="estado" required>
+                                    <option value="<?= $datosProfesional['estado'] ?>"><?= $datosProfesional['estado'] ?></option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                    <option value="bloqueado">Bloqueado</option>
+
+                                </select>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
@@ -228,7 +241,7 @@ if (count($listaEspecialidadesProfesional) > 0) {
                                         <?php if (!empty($datosEspecialidades)) : ?>
                                             <?php foreach ($datosEspecialidades as $especialidad):  ?>
                                                 <li>
-                                                    <input class="form-check-input check-especialidades" type="checkbox" data-name="<?= htmlspecialchars($especialidad['nombre']) ?>" value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>" id="idCheck<?= $especialidad['id_especialidad'] ?>" >
+                                                    <input class="form-check-input check-especialidades" type="checkbox" data-name="<?= htmlspecialchars($especialidad['nombre']) ?>" value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>" id="idCheck<?= $especialidad['id_especialidad'] ?>">
                                                     <label for="idCheck<?= $especialidad['id_especialidad'] ?>"><?= htmlspecialchars($especialidad['nombre']) ?></label>
                                                 </li>
                                             <?php endforeach; ?>

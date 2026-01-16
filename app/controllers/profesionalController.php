@@ -192,6 +192,7 @@ function actualizarProfesional()
     $listaEspecialidades = $_POST['especialidades'] ?? '';
     $registro_medico = $_POST['registro_medico'] ?? '';
     $id_rol = $_POST['rol'] ?? '';
+    $estado = $_POST['estado'] ?? '';
     $email = $_POST['email'] ?? '';
     $id_usuario = $_POST['id_usuario'] ?? '';
     $img_perfil = $_POST['img_perfil'] ?? null;
@@ -202,7 +203,7 @@ function actualizarProfesional()
     if (
         empty($id_profesional) || empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
         empty($apellidos) || empty($telefono) || empty($direccion) || empty($registro_medico) ||
-        empty($id_rol) || empty($email) || empty($id_usuario) || empty($id_veterinaria)
+        empty($id_rol) || empty($estado) || empty($email) || empty($id_usuario) || empty($id_veterinaria)
     ) {
         // Mostrar alerta de error si hay campos vacíos
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
@@ -265,7 +266,7 @@ function actualizarProfesional()
         'especialidades' => $listaEspecialidades,
         'registro_medico' => $registro_medico,
         'id_rol' => $id_rol,
-        'estado' => 'activo',
+        'estado' => $estado,
         'email' => $email,
         'id_usuario' => $id_usuario,
         'img_perfil' => $img_perfil,
