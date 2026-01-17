@@ -13,15 +13,24 @@ class RegistroProfesionales {
     cacheDom() {
         this.formRegistroProf = document.getElementById("registroProfesional");
         this.btnAgregarEsp = document.getElementById('agregarEspecialidadBtn');
+        this.btnAgregarServ = document.getElementById('agregarServicioBtn');
         this.listEspecialidades = document.querySelector('.listEspecialidades');
+        this.listServicios = document.querySelector('.listServicios');
         this.inputEspecialidades = document.getElementById('especialidadesInput');
+        this.inputServicios = document.getElementById('serviciosInput');
         this.especialidades = this.$$('.check-especialidades');
+        this.servicios = this.$$('.check-servicios');
         this.containerEspecialidades = document.getElementById('especialidadesContainer');
+        this.containerServicios = document.getElementById('serviciosContainer');
     }
 
     bindEvents() {
         if (this.btnAgregarEsp) {
             this.btnAgregarEsp.onclick = () => this.toggleEspecialidades();
+        }
+
+        if (this.btnAgregarServ) {
+            this.btnAgregarServ.onclick = () => this.toggleServicios();
         }
 
         if (this.especialidades) {
@@ -31,18 +40,45 @@ class RegistroProfesionales {
                 });
             });
         }
+
+
+        if (this.servicios) {
+            this.servicios.forEach(e => {
+                e.addEventListener('change', (event) => {
+                    this.asociarServicios(event);
+                });
+            });
+        }
     }
 
     toggleEspecialidades() {
         this.listEspecialidades.classList.toggle('vew-list-esp');
-        
+
         if (this.inputEspecialidades.value.length > 0) {
             const listEsp = JSON.parse(this.inputEspecialidades.value);
             if (listEsp && listEsp.length > 0) {
                 this.especialidades.forEach(e => {
                     const espId = e.value;
-                    console.log(espId);
-                    const encontrado = listEsp.find(esp => esp.id === parseInt(espId));
+                    const encontrado = listEsp.find(esp => parseInt(esp.id) === parseInt(espId));
+                    if (encontrado) {
+                        e.checked = true;
+                    } else {
+                        e.checked = false;
+                    }
+                });
+            }
+        }
+    }
+
+    toggleServicios() {
+        this.listServicios.classList.toggle('vew-list-serv');
+
+        if (this.inputServicios.value.length > 0) {
+            const listServ = JSON.parse(this.inputServicios.value);
+            if (listServ && listServ.length > 0) {
+                this.servicios.forEach(e => {
+                    const servId = e.value;
+                    const encontrado = listServ.find(serv => parseInt(serv.id) === parseInt(servId));
                     if (encontrado) {
                         e.checked = true;
                     } else {
@@ -76,6 +112,28 @@ class RegistroProfesionales {
         this.visualizarEspecialidades();
     }
 
+    asociarServicios(element) {
+        const valueServicio = element.target.value;
+        const nameServicio = element.target.dataset.name;
+        const valorServSeleccionadas = this.inputServicios.value;
+        const objServ = { id: valueServicio, name: nameServicio };
+        if (valorServSeleccionadas.length === 0) {
+            const arrayServicios = [objServ];
+            this.inputServicios.value = JSON.stringify(arrayServicios);
+        } else {
+            const listServDeserializadas = JSON.parse(valorServSeleccionadas);
+            if (element.target.checked) {
+                listServDeserializadas.push(objServ);
+                this.inputServicios.value = JSON.stringify(listServDeserializadas);
+            } else {
+                const listaFiltrada = listServDeserializadas.filter(e => e.id !== valueServicio);
+                this.inputServicios.value = JSON.stringify(listaFiltrada);
+            }
+        }
+
+        this.visualizarServicios();
+    }
+
     visualizarEspecialidades() {
         const especialidadesSeleccionadas = this.inputEspecialidades.value;
         if (especialidadesSeleccionadas.length > 0) {
@@ -100,6 +158,29 @@ class RegistroProfesionales {
         }
     }
 
+    visualizarServicios() {
+        const serviciosSeleccionados = this.inputServicios.value;
+        if (serviciosSeleccionados.length > 0) {
+            const listaServicios = JSON.parse(serviciosSeleccionados);
+            this.containerServicios.innerHTML = '';
+            listaServicios.forEach(e => {
+                const divServ = document.createElement('div');
+                const titleServ = document.createElement('span');
+                divServ.classList.add('servicio-seleccionado');
+                titleServ.textContent = e.name;
+                divServ.appendChild(titleServ);
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '<i class="bi bi-trash3"></i>';
+                removeBtn.onclick = () => this.eliminarServicio(e.id);
+                divServ.appendChild(removeBtn);
+                this.containerServicios.appendChild(divServ);
+            });
+            this.containerServicios.style.display = 'grid';
+        } else {
+            return;
+        }
+    }
+
     eliminarEspecialidad(idEsp) {
         const especialidadesSeleccionadas = this.inputEspecialidades.value;
         if (especialidadesSeleccionadas.length > 0) {
@@ -107,6 +188,16 @@ class RegistroProfesionales {
             const listaActualizada = listaEspecialidades.filter(e => e.id !== idEsp);
             this.inputEspecialidades.value = JSON.stringify(listaActualizada);
             this.visualizarEspecialidades();
+        }
+    }
+
+    eliminarServicio(idServ) {
+        const serviciosSeleccionados = this.inputServicios.value;
+        if (serviciosSeleccionados.length > 0) {
+            const listaServicios = JSON.parse(serviciosSeleccionados);
+            const listaActualizada = listaServicios.filter(e => e.id !== idServ);
+            this.inputServicios.value = JSON.stringify(listaActualizada);
+            this.visualizarServicios();
         }
     }
 

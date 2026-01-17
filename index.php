@@ -376,6 +376,11 @@ switch ($request) {
     case '/representante/eliminar-profesional':
         require BASE_PATH . '/app/controllers/profesionalController.php';
         break;
+    
+    case '/representante/eliminar-serv-profesional':
+        require BASE_PATH . '/app/controllers/profesionalController.php';
+        break;
+
     //---------------------------------------SERVICIOS-------------------------------------//
     case '/representante/registro-servicio':
         require BASE_PATH . '/app/views/dashboard/representante/registroServicio.php';

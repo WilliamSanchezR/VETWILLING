@@ -6,11 +6,16 @@ require_once BASE_PATH . '/app/controllers/rolController.php';
 // Enlazamos la ruta del controlador de veterinarias para listar las veterinarias
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 require_once BASE_PATH . '/app/controllers/especialidadController.php';
+// Enlazamos la ruta del controlador de servicios para listar los servicios
+require_once BASE_PATH . '/app/controllers/servicioController.php';
 
 $datosEspecialidades = listarEspecialidadesRegistradas($_SESSION['user']['id_veterinaria']);
 
 // Llamamos la función para listar los roles
 $datosRol = listarRolRepresentante();
+
+// Llamamos la función para listar los servicios
+$datosServicios = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 ?>
 
 <!DOCTYPE html>
@@ -72,6 +77,7 @@ $datosRol = listarRolRepresentante();
             <form id="registroProfesional" action="<?= BASE_URL ?>/representante/guardar-Profesional" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
                 <input type="hidden" name="especialidades" value="" id="especialidadesInput">
+                <input type="hidden" name="servicios" value="" id="serviciosInput">
 
                 <!-- Paso 1: Datos del Profesional -->
                 <div class="step active">
@@ -169,7 +175,7 @@ $datosRol = listarRolRepresentante();
 
                     <div class="row">
 
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label><i class="bi bi-person-rolodex"></i> Rol *</label>
                                 <select id="rol" name="rol" required>
@@ -189,30 +195,59 @@ $datosRol = listarRolRepresentante();
 
 
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="">Especialidades</label>
-                                <button type="button" class="btn btn-primary btn-sm" id="agregarEspecialidadBtn">
-                                    <i class="bi bi-plus-lg"></i> Agregar Especialidad
-                                </button>
+                        <div class="col-md-6">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="">Especialidades</label>
+                                    <button type="button" class="btn btn-primary btn-sm" id="agregarEspecialidadBtn">
+                                        <i class="bi bi-plus-lg"></i> Agregar Especialidad
+                                    </button>
 
-                                <div class="listEspecialidades">
-                                    <ul>
-                                        <?php if (!empty($datosEspecialidades)) : ?>
-                                            <?php foreach ($datosEspecialidades as $especialidad):  ?>
-                                                <li>
-                                                    <input class="form-check-input check-especialidades" type="checkbox" data-name="<?= htmlspecialchars($especialidad['nombre']) ?>" value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>" id="idCheck<?= $especialidad['id_especialidad'] ?>">
-                                                    <label for="idCheck<?= $especialidad['id_especialidad'] ?>"><?= htmlspecialchars($especialidad['nombre']) ?></label>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </ul>
+                                    <div class="listEspecialidades">
+                                        <ul>
+                                            <?php if (!empty($datosEspecialidades)) : ?>
+                                                <?php foreach ($datosEspecialidades as $especialidad):  ?>
+                                                    <li>
+                                                        <input class="form-check-input check-especialidades" type="checkbox" data-name="<?= htmlspecialchars($especialidad['nombre']) ?>" value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>" id="idCheck<?= $especialidad['id_especialidad'] ?>">
+                                                        <label for="idCheck<?= $especialidad['id_especialidad'] ?>"><?= htmlspecialchars($especialidad['nombre']) ?></label>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
+
+                            <div class="col-md-12" id="especialidadesContainer"></div>
                         </div>
 
-                        <div class="col-md-12" id="especialidadesContainer"></div>
+                        <div class="col-md-6">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="">Servicios</label>
+                                    <button type="button" class="btn btn-primary btn-sm" id="agregarServicioBtn">
+                                        <i class="bi bi-plus-lg"></i> Agregar Servicio
+                                    </button>
+
+                                    <div class="listServicios">
+                                        <ul>
+                                            <?php if (!empty($datosServicios)) : ?>
+                                                <?php foreach ($datosServicios as $servicio):  ?>
+                                                    <li>
+                                                        <input class="form-check-input check-servicios" type="checkbox" data-name="<?= htmlspecialchars($servicio['nombre']) ?>" value="<?= htmlspecialchars($servicio['id_servicio']) ?>" id="id_service_check_<?= $servicio['id_servicio'] ?>">
+                                                        <label for="id_service_check_<?= $servicio['id_servicio'] ?>"><?= htmlspecialchars($servicio['nombre']) ?></label>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12" id="serviciosContainer"></div>
+                        </div>
                     </div>
+
 
                     <div class="buttons">
                         <span></span>

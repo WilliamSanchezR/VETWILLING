@@ -40,6 +40,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 <span class="nav-text">Inicio</span>
             </a>
 
+            <!-- GESTION COMO ADMINISTRADOR -->
             <div class="submenu">
                 <div class="submenu-toggle" data-tooltip="Gestión Administrador">
                     <i class="bi bi-journal-medical"></i>
@@ -48,6 +49,18 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 </div>
 
                 <ul class="submenu-items">
+
+                    <!-- Sección configuracion veterinaria -->
+                    <li>
+                        <a href="<?= BASE_URL ?>/representante/configuracion-veterinaria"
+                            class="nav-item <?= $final_path == 'configuracion-veterinaria' ? 'active' : '' ?>"
+                            data-section="ConfiguracionVeterinaria" data-tooltip="Configuración Veterinaria">
+                            <i class="bi bi-gear-fill"></i>
+                            <span class="nav-text">Config Veterinaria</span>
+                        </a>
+                    </li>
+                    
+
                     <!-- Sección Especialidades -->
                     <li>
                         <a href="<?= BASE_URL ?>/representante/listar-especialidades"
@@ -56,6 +69,23 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             <i class="bi bi-person-plus"></i>
                             <span class="nav-text">Especialidades</span>
                         </a>
+                    </li>
+
+                     <li>
+                        <!-- Sessión con submenu Servicios y costos-->
+                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
+
+                            <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
+                                <i class="bi bi-database-up"></i>
+                                <span class="texto-item-sidebar">Servicios y Costos</span>
+                                <i class="bi bi-chevron-down flecha-second"></i>
+                            </div>
+
+                            <ul class="submenu-seccond-items">
+                                <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios</a></li>
+                                <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios</a></li>
+                            </ul>
+                        </div>
                     </li>
 
                     <li>
@@ -75,22 +105,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         </div>
                     </li>
 
-                    <li>
-                        <!-- Sessión con submenu Servicios y costos-->
-                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
-
-                            <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
-                                <i class="bi bi-database-up"></i>
-                                <span class="texto-item-sidebar">Servicios y Costos</span>
-                                <i class="bi bi-chevron-down flecha-second"></i>
-                            </div>
-
-                            <ul class="submenu-seccond-items">
-                                <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios</a></li>
-                                <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios</a></li>
-                            </ul>
-                        </div>
-                    </li>
+                   
                 </ul>
             </div>
 
@@ -154,50 +169,12 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             <div class="submenu">
 
                 <div class="submenu-toggle" data-tooltip="Gestión auxiliar veterinario">
-                    <i class="bi bi-person-square"></i>
+                    <i class="bi bi-person-badge"></i>
                     <span class="texto-item-sidebar">Gestión auxiliar veterinario</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
 
-                <ul class="submenu-items">
-                    <li><a href="<?= BASE_URL ?>/veterinaria/seguimientos"
-                            class="nav-item"
-                            data-section="citas">
-                            <i class="bi bi-card-checklist"></i>
-                            <span class="nav-text">Ordenes de servicio</span>
-                        </a></li>
-
-                    <li><a href="<?= BASE_URL ?>/veterinaria/calendario"
-                            class="nav-item"
-                            data-section="tienda">
-                            <i class="bi bi-calendar-week"></i>
-                            <span class="nav-text">Examenes diagnosticos</span>
-                        </a></li>
-                    <li><a href="<?= BASE_URL ?>/veterinaria/gestion_clinica"
-                            class="nav-item"
-                            data-section="tienda">
-                            <i class="bi bi-hospital"></i>
-                            <span class="nav-text">lista de precios</span>
-                        </a></li>
-                    <li><a href="<?= BASE_URL ?>/veterinaria/laboratorio"
-                            class="nav-item"
-                            data-section="tienda">
-                            <i class="bi bi-beaker"></i>
-                            <span class="nav-text">Imprimir historia clinica</span>
-                        </a></li>
-                    <li><a href="<?= BASE_URL ?>/veterinaria/recetas"
-                            class="nav-item"
-                            data-section="tienda">
-                            <i class="bi bi-journal-text"></i>
-                            <span class="nav-text">Imprimir recetas</span>
-                        </a></li>
-                    <li><a href="<?= BASE_URL ?>/veterinaria/reportes"
-                            class="nav-item"
-                            data-section="tienda">
-                            <i class="bi bi-bar-chart"></i>
-                            <span class="nav-text">Reportes</span>
-                        </a></li>
-                </ul>
+             
             </div>
 
     </nav>

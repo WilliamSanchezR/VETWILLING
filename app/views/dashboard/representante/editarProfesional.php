@@ -7,17 +7,22 @@ require_once BASE_PATH . '/app/controllers/rolController.php';
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 require_once BASE_PATH . '/app/controllers/especialidadController.php';
 require_once BASE_PATH . '/app/controllers/profesionalController.php';
+require_once BASE_PATH . '/app/controllers/servicioController.php';
 
 $datosEspecialidades = listarEspecialidadesRegistradas($_SESSION['user']['id_veterinaria']);
+$datosServicios = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
 // Llamamos la función para listar los roles
 $datosRol = listarRolRepresentante();
+// Llamamos la función para listar los servicios
 
 $id = $_GET['id'];
 
 $datosProfesional = consultarProfesional($id);
 $listaEspecialidadesProfesional = listarEspecialidadesPorProfesional($id, $_SESSION['user']['id_veterinaria']);
+$listaServiciosProfesional = listarServiciosPorProfesional($id);
 $stringEspecialidades = '';
+$stringServicios = '';
 
 if (count($listaEspecialidadesProfesional) > 0) {
     $list = [];
@@ -31,6 +36,17 @@ if (count($listaEspecialidadesProfesional) > 0) {
     $stringEspecialidades = json_encode($list);
 }
 
+if (count($listaServiciosProfesional) > 0) {
+    $listServ = [];
+    foreach ($listaServiciosProfesional as $serv) {
+        $listServ[] = [
+            'id' => $serv['id'],
+            'id_servicio' => $serv['id_servicio'],
+            'name' => $serv['nombre']
+        ];
+    }
+    $stringServicios = json_encode($listServ);
+}
 
 ?>
 
@@ -93,6 +109,8 @@ if (count($listaEspecialidadesProfesional) > 0) {
             <form id="editarProfesional" action="<?= BASE_URL ?>/representante/actualizar-profesional" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="especialidades" value="" id="especialidadesInput">
                 <input type="hidden" name="especialidadesCargadas" value="<?= htmlspecialchars($stringEspecialidades) ?>" id="especialidadesCargadasInput">
+                <input type="hidden" name="servicios" value="" id="serviciosInput">
+                <input type="hidden" name="serviciosCargados" value="<?= htmlspecialchars($stringServicios) ?>" id="serviciosCargadosInput">
                 <input type="hidden" name="id_profesional" value="<?= $datosProfesional['id_profesional'] ?>">
                 <input type="hidden" name="accion" value="actualizar">
                 <input type="hidden" name="id_usuario" value="<?= $_GET['id'] ?>">
@@ -181,7 +199,7 @@ if (count($listaEspecialidadesProfesional) > 0) {
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> No. registro medico *</label>
-                                <input type="text" id="registro_medico" name="registro_medico" required placeholder="123456" value="<?= $datosProfesional['registro_medico'] ?>">
+                                <input type="text" id="registro_medico" name="registro_medico" placeholder="123456" value="<?= $datosProfesional['registro_medico'] ?>">
                             </div>
                         </div>
 
@@ -256,6 +274,46 @@ if (count($listaEspecialidadesProfesional) > 0) {
                                 <div class="especialidad-seleccionada">
                                     <span><?= htmlspecialchars($especialidad['nombre']) ?></span>
                                     <a href="<?= BASE_URL ?>/representante/eliminar-esp-profesional?action=eliminarEspProfesional&id_profesional=<?= $_GET['id'] ?>&id_especialidad=<?= htmlspecialchars($especialidad['id']) ?>">
+                                        <button type="button" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </a>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="step active lista-servicios-profesional">
+                    <h3><i class="bi bi-motherboard"></i>Servicios del profesional</h3>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary btn-sm" id="agregarServicioBtn">
+                                    <i class="bi bi-plus-lg"></i> Agregar Servicio
+                                </button>
+
+                                <div class="listServicios">
+                                    <ul>
+                                        <?php if (!empty($datosServicios)) : ?>
+                                            <?php foreach ($datosServicios as $servicio):  ?>
+                                                <li>
+                                                    <input class="form-check-input check-servicios" type="checkbox" data-name="<?= htmlspecialchars($servicio['nombre']) ?>" value="<?= htmlspecialchars($servicio['id_servicio']) ?>" id="servicio_check_<?= $servicio['id_servicio'] ?>">
+                                                    <label for="servicio_check_<?= $servicio['id_servicio'] ?>"><?= htmlspecialchars($servicio['nombre']) ?></label>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12" id="serviciosContainer" <?= count($listaServiciosProfesional) > 0 ? 'style="display: grid;"' : 'style="display: none;"' ?>>
+                            <?php foreach ($listaServiciosProfesional as $servicio): ?>
+                                <div class="servicio-seleccionado">
+                                    <span><?= htmlspecialchars($servicio['nombre']) ?></span>
+                                    <a href="<?= BASE_URL ?>/representante/eliminar-serv-profesional?action=eliminarServProfesional&id_usuario=<?= $_GET['id'] ?>&id_servicio=<?= htmlspecialchars($servicio['id']) ?>">
                                         <button type="button" class="btn btn-danger btn-sm">
                                             <i class="bi bi-trash3"></i>
                                         </button>
