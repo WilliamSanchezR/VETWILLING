@@ -41,7 +41,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             </a>
 
             <!-- GESTION COMO ADMINISTRADOR -->
-            <div class="submenu">
+            <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'configuracion-veterinaria' || $final_path == 'listar-especialidades' || $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  || $final_path == 'lista-agenda-usuario' ? 'active open' : '' ?>">
                 <div class="submenu-toggle" data-tooltip="Gestión Administrador">
                     <i class="bi bi-journal-medical"></i>
                     <span class="texto-item-sidebar">Gestión Administrador</span>
@@ -90,7 +90,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
                     <li>
                         <!-- Sección con submenú Profesionales  -->
-                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' ? 'active open' : '' ?>">
+                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Profesionales">
                                 <i class="bi bi-people-fill"></i>
@@ -101,6 +101,9 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             <ul class="submenu-seccond-items">
                                 <li><a class="nav-item <?= $final_path == 'registro-profesionales' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/registro-profesionales" data-tooltip="Registrar">Registrar </a></li>
                                 <li><a class="nav-item <?= $final_path == 'listar-profesionales' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-profesionales" data-tooltip="Listar">Listar</a></li>
+                                <li>
+                                    <a class="nav-item <?= $final_path == 'lista-agenda-usuario' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/lista-agenda-usuario" data-tooltip="Agenda">Agenda</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
