@@ -282,6 +282,10 @@ switch ($request) {
     case '/cliente/historial-mascota':
         require BASE_PATH . '/app/views/dashboard/cliente/historialMascota.php';
         break;
+    case '/cliente/vacunas-mascota':
+        require BASE_PATH . '/app/views/dashboard/cliente/vacunas.php';
+        break;
+
     //----------ACCIONES DEL PACIENTE---------//
     case '/cliente/actualizar':
         require BASE_PATH . '/app/controllers/propetarioController.php';

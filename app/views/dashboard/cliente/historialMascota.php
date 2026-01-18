@@ -1,7 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/controllers/mascotasController.php';
 
-
 $id_mascota = $_GET['id'];
 $mascota = consultarMascotaId($id_mascota);
 
@@ -12,7 +11,7 @@ $mascota = consultarMascotaId($id_mascota);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citas - Dashboard VetCare</title>
+    <title>Historial Médico - Dashboard VetCare</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -27,6 +26,9 @@ $mascota = consultarMascotaId($id_mascota);
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/historialM.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
 
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
 </head>
 
@@ -45,16 +47,21 @@ $mascota = consultarMascotaId($id_mascota);
             <!-- DASHBOARD CONTENT -->
             <div class="container-fluid py-4">
 
-                <!-- HEADER -->
+                <!-- HEADER CON BOTÓN PDF -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h2 class="mb-1"><i class="bi bi-heart-pulse-fill text-primary me-2"></i>Historial Médico</h2>
                         <p class="text-muted mb-0">Información completa del paciente</p>
                     </div>
+                    <div>
+                        <button class="btn btn-danger" onclick="generarPDF()">
+                            <i class="bi bi-file-pdf me-2"></i>Descargar PDF
+                        </button>
+                    </div>
                 </div>
 
                 <!-- INFO MASCOTA -->
-                <div class="card shadow-sm mb-4">
+                <div class="card shadow-sm mb-4" id="infoMascota">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-md-2 text-center">
@@ -64,35 +71,27 @@ $mascota = consultarMascotaId($id_mascota);
                                 <div class="row">
                                     <div class="col-md-3">
                                         <label class="text-muted small">Nombre</label>
-                                        <p class="fw-bold mb-2"><?= ($mascota['nombre']) ?></p>
+                                        <p class="fw-bold mb-2" id="nombre"><?= ($mascota['nombre']) ?></p>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="text-muted small">Especie</label>
-                                        <p class="fw-bold mb-2"><?= ($mascota['especie']) ?></p>
+                                        <p class="fw-bold mb-2" id="especie"><?= ($mascota['especie']) ?></p>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="text-muted small">Raza</label>
-                                        <p class="fw-bold mb-2"><?= ($mascota['raza']) ?></p>
+                                        <p class="fw-bold mb-2" id="raza"><?= ($mascota['raza']) ?></p>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="text-muted small">Edad</label>
-                                        <p class="fw-bold mb-2"><?= ($mascota['edad']) ?></p>
+                                        <p class="fw-bold mb-2" id="edad"><?= ($mascota['edad_numero']) ?> <?= ($mascota['edad_unidad']) ?></p>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="text-muted small">Sexo</label>
-                                        <p class="fw-bold mb-2"><?= ($mascota['sexo']) ?></p>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="text-muted small">Peso</label>
-                                        <p class="fw-bold mb-2"><?= ($mascota['peso']) ?></p>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="text-muted small">Color</label>
-                                        <p class="fw-bold mb-2"><?= ($mascota['color']) ?></p>
+                                        <p class="fw-bold mb-2" id="sexo"><?= ($mascota['sexo']) ?></p>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="text-muted small">Microchip</label>
-                                        <p class="fw-bold mb-2">982000123456789</p>
+                                        <p class="fw-bold mb-2" id="microchip">982000123456789</p>
                                     </div>
                                 </div>
                             </div>
@@ -107,11 +106,7 @@ $mascota = consultarMascotaId($id_mascota);
                             <i class="bi bi-clipboard2-pulse me-2"></i>Consultas
                         </button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="vacunas-tab" data-bs-toggle="tab" data-bs-target="#vacunas" type="button">
-                            <i class="bi bi-shield-fill-check me-2"></i>Vacunas
-                        </button>
-                    </li>
+                    
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="medicamentos-tab" data-bs-toggle="tab" data-bs-target="#medicamentos" type="button">
                             <i class="bi bi-capsule me-2"></i>Medicamentos
@@ -142,7 +137,7 @@ $mascota = consultarMascotaId($id_mascota);
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover" id="tablaConsultas">
                                         <thead class="table-light">
                                             <tr>
                                                 <th>Fecha</th>
@@ -193,78 +188,12 @@ $mascota = consultarMascotaId($id_mascota);
                         </div>
                     </div>
 
-                    <!-- TAB VACUNAS -->
-                    <div class="tab-pane fade" id="vacunas" role="tabpanel">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card border-success">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <h5 class="card-title mb-1">Rabia</h5>
-                                                        <p class="text-muted small mb-1">Última dosis: 20/09/2024</p>
-                                                        <p class="text-muted small mb-0">Próxima dosis: 20/09/2025</p>
-                                                    </div>
-                                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card border-success">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <h5 class="card-title mb-1">Múltiple (DHPP)</h5>
-                                                        <p class="text-muted small mb-1">Última dosis: 20/09/2024</p>
-                                                        <p class="text-muted small mb-0">Próxima dosis: 20/09/2025</p>
-                                                    </div>
-                                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card border-warning">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <h5 class="card-title mb-1">Tos de las perreras</h5>
-                                                        <p class="text-muted small mb-1">Última dosis: 15/03/2024</p>
-                                                        <p class="text-warning small mb-0">Próxima dosis: 15/03/2025 (Próxima)</p>
-                                                    </div>
-                                                    <i class="bi bi-exclamation-circle-fill text-warning" style="font-size: 2rem;"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <div class="card border-success">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <h5 class="card-title mb-1">Leptospirosis</h5>
-                                                        <p class="text-muted small mb-1">Última dosis: 20/09/2024</p>
-                                                        <p class="text-muted small mb-0">Próxima dosis: 20/09/2025</p>
-                                                    </div>
-                                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- TAB MEDICAMENTOS -->
                     <div class="tab-pane fade" id="medicamentos" role="tabpanel">
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover" id="tablaMedicamentos">
                                         <thead class="table-light">
                                             <tr>
                                                 <th>Medicamento</th>
@@ -304,7 +233,7 @@ $mascota = consultarMascotaId($id_mascota);
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover" id="tablaExamenes">
                                         <thead class="table-light">
                                             <tr>
                                                 <th>Fecha</th>
@@ -349,7 +278,7 @@ $mascota = consultarMascotaId($id_mascota);
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover" id="tablaCirugias">
                                         <thead class="table-light">
                                             <tr>
                                                 <th>Fecha</th>
@@ -381,7 +310,7 @@ $mascota = consultarMascotaId($id_mascota);
                     <!-- TAB ALERGIAS -->
                     <div class="tab-pane fade" id="alergias" role="tabpanel">
                         <div class="card shadow-sm">
-                            <div class="card-body">
+                            <div class="card-body" id="alergiasContainer">
                                 <div class="alert alert-warning" role="alert">
                                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
                                     <strong>Alergias conocidas:</strong>
@@ -413,7 +342,7 @@ $mascota = consultarMascotaId($id_mascota);
 
             </div>
 
-            <!-- MODAL DETALLE CONSULTA -->
+            <!-- MODALES (sin cambios) -->
             <div class="modal fade" id="modalDetalleConsulta" tabindex="-1">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
@@ -469,53 +398,6 @@ $mascota = consultarMascotaId($id_mascota);
                     </div>
                 </div>
             </div>
-
-            <!-- MODAL NUEVO REGISTRO -->
-            <div class="modal fade" id="modalNuevoRegistro" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Nuevo Registro Médico</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form>
-                                <div class="mb-3">
-                                    <label class="form-label">Tipo de Registro</label>
-                                    <select class="form-select">
-                                        <option>Consulta</option>
-                                        <option>Vacuna</option>
-                                        <option>Medicamento</option>
-                                        <option>Examen</option>
-                                        <option>Cirugía</option>
-                                        <option>Alergia</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Fecha</label>
-                                    <input type="date" class="form-control" value="2024-12-30">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Veterinario</label>
-                                    <input type="text" class="form-control" placeholder="Nombre del veterinario">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Descripción</label>
-                                    <textarea class="form-control" rows="4" placeholder="Detalles del registro médico"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Adjuntar Archivo</label>
-                                    <input type="file" class="form-control">
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-primary">Guardar Registro</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </main>
@@ -523,8 +405,8 @@ $mascota = consultarMascotaId($id_mascota);
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
-    <!-- JavaScript -->
-
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/historial.js"></script>
+    
 </body>
 
 </html>
