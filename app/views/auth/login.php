@@ -51,7 +51,7 @@
             <div class="info">
                 <div class="welcome-box">
                     <!-- <img src="/assets/website/img/FAVICON.png" width="50" alt=""> -->
-                    <h1 class="welcome-title">¡Bienvenido a VetWilling¡</h1>
+                    <h1 class="welcome-title">¡Bienvenido a VetWilling!</h1>
                     <p class="welcome-sub">
                         el sistema de gestión veterinaria que optimiza tu tiempo y mejora el
                         cuidado de tus pacientes.

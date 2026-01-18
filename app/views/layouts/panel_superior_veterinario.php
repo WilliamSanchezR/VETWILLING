@@ -63,7 +63,7 @@ $usuario = mostrarPerfil($id);
 
         <!-- Tema (Modo oscuro/claro) -->
         <div class="action-item" data-tooltip="Cambiar tema">
-            <button class="btn-action" onclick="toggleTheme()" aria-label="Cambiar tema">
+            <button class="btn-action" onclick="" aria-label="Cambiar tema">
                 <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
             </button>
         </div>
