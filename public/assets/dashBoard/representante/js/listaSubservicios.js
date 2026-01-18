@@ -1,66 +1,66 @@
-class ListaServicios {
+class ListaSubservicios {
     constructor() {
         document.addEventListener('DOMContentLoaded', () => this.init());
     }
     init() {
-        console.log('Lista servicios Init');
+        console.log('Lista subservicios Init');
         this.cacheDom();
         this.bindEvents();
-        this.dataTableListServicios();
+        this.dataTableListSubservicios();
     }
 
     cacheDom() {
-        this.tablaServicios;
+        this.tablaSubservicios;
         this.ordebarBtn = document.getElementById('btnOrdenar');
-        this.btnExportarCSV = document.getElementById('btnExportService');
-        this.inputBuscarProfesionales = document.getElementById('buscarProfesionales');
+        this.btnExportarCSV = document.getElementById('btnExportSubservicios');
+        this.inputBuscarSubservicios = document.getElementById('buscarSubservicio');
         this.limpiarBusqueda = document.querySelector('.campo-buscar i');
-        this.btnCrearServicio = document.getElementById('btnAgregarNuevo');
+        this.btnCrearSubservicio = document.getElementById('btnAgregarNuevo');
     }
 
     bindEvents() {
         // Aquí puedes agregar los event listeners
         if (this.ordebarBtn) {
-            this.ordebarBtn.onclick = () => this.ordenarProfesionales();
+            this.ordebarBtn.onclick = () => this.ordenarSubservicios();
         }
         if (this.btnExportarCSV) {
             this.btnExportarCSV.onclick = () => this.exportarCSV();
         }
 
-        if (this.inputBuscarProfesionales) {
-            this.inputBuscarProfesionales.oninput = () => this.buscarProfesionales();
+        if (this.inputBuscarSubservicios) {
+            this.inputBuscarSubservicios.oninput = () => this.buscarSubservicios();
         }
 
         if (this.limpiarBusqueda) {
             this.limpiarBusqueda.onclick = () => {
-                this.inputBuscarProfesionales.value = '';
-                this.buscarProfesionales();
+                this.inputBuscarSubservicios.value = '';
+                this.buscarSubservicios();
             }
         };
 
-        if (this.btnCrearServicio) {
-            this.btnCrearServicio.onclick = () => this.crearServicio();
+        if (this.btnCrearSubservicio) {
+            this.btnCrearSubservicio.onclick = () => this.crearSubservicio();
         }
     }
 
-    // Funcion para inicializar DataTable para la lista de laboratorios asociados
-    dataTableListServicios() {
+    // Funcion para inicializar DataTable para la lista de subservicios asociados
+    dataTableListSubservicios() {
         try {
-            this.tablaServicios = $('#tablaListaServicios').DataTable({
+            this.tablaSubservicios = $('#tablaListaSubservicios').DataTable({
                 // Configuración de idioma en español
                 language: {
                     "decimal": "",
-                    "emptyTable": "No hay Servicios disponibles",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Servicios",
-                    "infoEmpty": "Mostrando 0 a 0 de 0 Servicios",
-                    "infoFiltered": "(filtrado de _MAX_ Servicios totales)",
+                    "emptyTable": "No hay Subservicios disponibles",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Subservicios",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 Subservicios",
+                    "infoFiltered": "(filtrado de _MAX_ Subservicios totales)",
                     "infoPostFix": "",
                     "thousands": ",",
-                    "lengthMenu": "Mostrar _MENU_ Servicios",
+                    "lengthMenu": "Mostrar _MENU_ Subservicios",
                     "loadingRecords": "Cargando...",
                     "processing": "Procesando...",
                     "search": "Buscar:",
-                    "zeroRecords": "No se encontraron Servicios",
+                    "zeroRecords": "No se encontraron Subservicios",
                     "paginate": {
                         "first": "Primera",
                         "last": "Última",
@@ -100,12 +100,12 @@ class ListaServicios {
         }
     }
 
-    ordenarProfesionales() {
+    ordenarSubservicios() {
         const opciones = [
-            '👤 Nombre y Apellidos (A-Z)',
-            '👤 Nombre y apellidos (Z-A)',
-            '# Documento (Ascendente)',
-            '# Documento (Descendente)'
+            'Nombre (A-Z)',
+            'Nombre (Z-A)',
+            'Costo (Ascendente)',
+            'Costo (Descendente)'
         ];
 
         const mensaje = '⬆️⬇️ Selecciona el ordenamiento:\n\n' +
@@ -115,12 +115,20 @@ class ListaServicios {
 
         switch (opcion) {
             case '1':
-                this.tablaServicios.order([2, 'asc']).draw();
-                console.log('👤 Ordenado por Nombre ascendente');
+                this.tablaSubservicios.order([0, 'asc']).draw();
+                console.log('Ordenado por Nombre ascendente');
                 break;
             case '2':
-                this.tablaServicios.order([2, 'desc']).draw();
-                console.log('👤 Ordenado por Nombre descendente');
+                this.tablaSubservicios.order([0, 'desc']).draw();
+                console.log('Ordenado por Nombre descendente');
+                break;
+            case '3':
+                this.tablaSubservicios.order([2, 'asc']).draw();
+                console.log('Ordenado por Costo ascendente');
+                break;
+            case '4':
+                this.tablaSubservicios.order([2, 'desc']).draw();
+                console.log('Ordenado por Costo descendente');
                 break;
             default:
                 if (opcion !== null) {
@@ -131,8 +139,8 @@ class ListaServicios {
 
     exportarCSV() {
         try {
-            const data = this.tablaServicios.rows({ search: 'applied' }).data();
-            let csv = 'Nombre, Descripción, Estado\n';
+            const data = this.tablaSubservicios.rows({ search: 'applied' }).data();
+            let csv = 'Nombre,servicio, Costo, Descripción, Estado\n';
 
             data.each(function (fila) {
                 const filaLimpia = [];
@@ -150,7 +158,7 @@ class ListaServicios {
             const fecha = new Date().toISOString().split('T')[0];
 
             link.setAttribute('href', url);
-            link.setAttribute('download', `servicios_veterinaria_${fecha}.csv`);
+            link.setAttribute('download', `subservicios_veterinaria_${fecha}.csv`);
             link.style.visibility = 'hidden';
 
             document.body.appendChild(link);
@@ -158,25 +166,25 @@ class ListaServicios {
             document.body.removeChild(link);
 
             alert('✅ Archivo CSV descargado correctamente');
-            console.log('✅ CSV exportado:', `servicios_veterinaria_${fecha}.csv`);
+            console.log('✅ CSV exportado:', `subservicios_veterinaria_${fecha}.csv`);
         } catch (error) {
             console.error('❌ Error al exportar CSV:', error);
             alert('Error al exportar CSV. Revisa la consola.');
         }
     }
 
-    buscarServicios() {
-        const valorBusqueda = this.inputBuscarServicios.value;
+    buscarSubservicios() {
+        const valorBusqueda = this.inputBuscarSubservicios.value;
         console.log('🔍 Buscando:', valorBusqueda);
-        this.tablaServicios.search(valorBusqueda).draw();
+        this.tablaSubservicios.search(valorBusqueda).draw();
     }
 
-    crearServicio() {
+    crearSubservicio() {
         // Lógica para crear un nuevo servicio
-        const eliminarUrl = `${window.location.origin}/vetwilling/representante/registro-servicio`;
+        const eliminarUrl = `${window.location.origin}/vetwilling/representante/registro-subservicio`;
 
         window.location.href = eliminarUrl;
     }
 }
 
-new ListaServicios();
+new ListaSubservicios();

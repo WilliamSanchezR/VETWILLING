@@ -36,13 +36,12 @@ class Servicio
                 return false;
             } else {
                 // El servicio no existe, lo registramos
-                $consulta = "INSERT INTO servicio (nombre, descripcion, costo, id_veterinaria) 
-                             VALUES (:nombre, :descripcion, :costo, :id_veterinaria)";
+                $consulta = "INSERT INTO servicio (nombre, descripcion, id_veterinaria) 
+                             VALUES (:nombre, :descripcion, :id_veterinaria)";
 
                 $resultado = $this->conexion->prepare($consulta);
                 $resultado->bindParam(':nombre', $data['nombre']);
                 $resultado->bindParam(':descripcion', $data['descripcion']);
-                $resultado->bindParam(':costo', $data['costo']);
                 $resultado->bindParam(':id_veterinaria', $data['id_veterinaria']);
 
                 // Ejecutamos la consulta
@@ -70,6 +69,23 @@ class Servicio
         }
     }
 
+    // FUNCION PARA OBTENER LOS SERVICIOS ACTIVOS DE UNA VETERINARIA
+    public function obtenerServiciosActivosPorVeterinaria($id_veterinaria)
+    {
+        try {
+            $consulta = "SELECT se.id_servicio, se.nombre FROM servicio se 
+                        WHERE se.id_veterinaria = :id_veterinaria AND se.estado = 'Activo';";
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_veterinaria', $id_veterinaria);
+            $resultado->execute();
+
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los servicios activos: " . $e->getMessage();
+            return [];
+        }
+    }
+
     // FUNCION CONSULTAR SERVICIO POR ID
     public function obtenerServicioPorId($id_servicio)
     {
@@ -86,17 +102,17 @@ class Servicio
         }
     }
 
+    // FUNCION PARA ACTUALIZAR UN SERVICIO
     public function actualizarServicio($data)
     {
         try {
             $consulta = "UPDATE servicio 
-                         SET nombre = :nombre, descripcion = :descripcion, costo = :costo, estado = :estado
+                         SET nombre = :nombre, descripcion = :descripcion, estado = :estado
                          WHERE id_servicio = :id_servicio";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':nombre', $data['nombre']);
             $resultado->bindParam(':descripcion', $data['descripcion']);
-            $resultado->bindParam(':costo', $data['costo']);
             $resultado->bindParam(':estado', $data['estado']);
             $resultado->bindParam(':id_servicio', $data['id_servicio']);
 
@@ -107,6 +123,7 @@ class Servicio
         }
     }
 
+    // FUNCION PARA ELIMINAR UN SERVICIO (CAMBIO DE ESTADO A INACTIVO)
     public function eliminarServicio($id_servicio)
     {
         try {

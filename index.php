@@ -110,6 +110,17 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/calendarioController.php';
         break;
 
+    case '/calendario/getVeterinarios':
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
+    // ╔═══════════════════════════════════════════════════════════════════════╗
+    // ║  RUTAS PARA RFS 36: CANCELACIÓN DE CITAS                             ║
+    // ╚═══════════════════════════════════════════════════════════════════════╝
+    case '/cancelarCita':
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
     case '/veterinaria/gestion_clinica':
         require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
         break;
@@ -393,5 +404,29 @@ switch ($request) {
     case '/representante/eliminar-servicio':
         require BASE_PATH . '/app/controllers/servicioController.php';
         break;
-        
+
+    //---------------------------------------SUBSERVICIOS-------------------------------------//    
+    case '/representante/registro-subservicio':
+        require BASE_PATH . '/app/views/dashboard/representante/registrarSubservicio.php';
+        break;
+
+    case '/representante/guardar-subservicio':
+        require BASE_PATH . '/app/controllers/subservicioController.php';
+        break;
+
+    case '/representante/listar-subservicios':
+        require BASE_PATH . '/app/views/dashboard/representante/listaSubservicio.php';
+        break;
+
+    case '/representante/editar-subservicio':
+        require BASE_PATH . '/app/views/dashboard/representante/editarSubservicio.php';
+        break;
+
+    case '/representante/actualizar-subservicio':
+        require BASE_PATH . '/app/controllers/subservicioController.php';
+        break;
+
+    case '/representante/eliminar-subservicio':
+        require BASE_PATH . '/app/controllers/subservicioController.php';
+        break;
 }
