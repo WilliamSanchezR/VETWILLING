@@ -131,7 +131,7 @@ $datos = listaSubserviciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                                             <i class="bi bi-pencil"></i>
                                         </button>
 
-                                        <button class="btn-accion btn-eliminar" title="Eliminar" onclick="window.location.href='<?= BASE_URL ?>/representante/eliminar-subservicio?action=eliminar&id=<?= $subservicio['id_subservicio'] ?>'">
+                                        <button class="btn-accion btn-eliminar" title="Eliminar" data-id="<?= $subservicio['id_subservicio'] ?>">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>

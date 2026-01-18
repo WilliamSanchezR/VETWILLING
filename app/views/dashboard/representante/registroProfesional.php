@@ -15,7 +15,7 @@ $datosEspecialidades = listarEspecialidadesRegistradas($_SESSION['user']['id_vet
 $datosRol = listarRolRepresentante();
 
 // Llamamos la función para listar los servicios
-$datosServicios = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
+$datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_veterinaria']);
 ?>
 
 <!DOCTYPE html>

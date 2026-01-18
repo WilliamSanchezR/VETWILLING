@@ -179,7 +179,7 @@ class Profesional
                 LEFT JOIN profesional_especialidad pe ON p.id_usuario = pe.id_usuario AND pe.estado = 'Activo' AND pe.id_veterinaria = :id_veterinaria
                 LEFT JOIN especialidad esp ON pe.id_especialidad = esp.id_especialidad
                 LEFT JOIN profesionales_servicio ps on p.id_profesional = ps.id_profesional AND ps.estado = 'Activo'
-                LEFT JOIN servicio ser ON ps.id_servicio = ser.id_servicio
+                LEFT JOIN servicio ser ON ps.id_servicio = ser.id_servicio AND ser.estado = 'Activo'
                 WHERE pv.id_veterinaria = :id_veterinaria AND us.estado = 'activo' AND pv.estado = 'Activo'
                 GROUP BY p.id_profesional, p.nombres, us.id_usuario";
 
@@ -425,7 +425,7 @@ class Profesional
                 FROM profesionales_servicio ps
                 INNER JOIN servicio ser ON ps.id_servicio = ser.id_servicio
                 INNER JOIN profesional pr ON ps.id_profesional = pr.id_profesional                
-                WHERE pr.id_usuario = :id_usuario AND ps.estado = 'Activo'";
+                WHERE pr.id_usuario = :id_usuario AND ps.estado = 'Activo' AND ser.estado = 'Activo'";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $id);

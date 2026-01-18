@@ -10,7 +10,7 @@ require_once BASE_PATH . '/app/controllers/profesionalController.php';
 require_once BASE_PATH . '/app/controllers/servicioController.php';
 
 $datosEspecialidades = listarEspecialidadesRegistradas($_SESSION['user']['id_veterinaria']);
-$datosServicios = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
+$datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_veterinaria']);
 
 // Llamamos la función para listar los roles
 $datosRol = listarRolRepresentante();

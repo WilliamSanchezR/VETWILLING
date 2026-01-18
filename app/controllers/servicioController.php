@@ -82,6 +82,16 @@ function listaServiciosPorVeterinaria($id_veterinaria)
     return $servicioModel->obtenerServiciosPorVeterinaria($id_veterinaria);
 }
 
+// FUNCION PARA LISTAR LOS SERVICIOS DE UNA VETERINARIA
+function listaServiciosPorVeterinariaActivos($id_veterinaria)
+{
+    // Creamos una instancia del modelo Servicio
+    $servicioModel = new Servicio();
+
+    // Llamamos al método para obtener los servicios
+    return $servicioModel->obtenerServiciosPorVeterinariaActivos($id_veterinaria);
+}
+
 // FUNCION PARA LISTAR LOS SERVICIOS ACTIVOS DE UNA VETERINARIA
 function listaServiciosActivosPorVeterinaria($id_veterinaria)
 {
