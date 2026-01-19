@@ -52,14 +52,23 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
                     <!-- Sección configuracion veterinaria -->
                     <li>
-                        <a href="<?= BASE_URL ?>/representante/configuracion-veterinaria"
-                            class="nav-item <?= $final_path == 'configuracion-veterinaria' ? 'active' : '' ?>"
-                            data-section="ConfiguracionVeterinaria" data-tooltip="Configuración Veterinaria">
-                            <i class="bi bi-gear-fill"></i>
-                            <span class="nav-text">Config Veterinaria</span>
-                        </a>
+
+                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
+
+                            <div class="submenu-seccond-toggle" data-tooltip="Configuración Veterinaria">
+                                <i class="bi bi-gear-fill"></i>
+                                <span class="texto-item-sidebar">Configuración Veterinaria</span>
+                                <i class="bi bi-chevron-down flecha-second"></i>
+                            </div>
+
+                            <ul class="submenu-seccond-items">
+                                <li><a class="nav-item <?= $final_path == '' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/" data-tooltip="Usuarios">Horarios</a></li>
+
+                            </ul>
+
+                        </div>
                     </li>
-                    
+
 
                     <!-- Sección Especialidades -->
                     <li>
@@ -71,8 +80,9 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         </a>
                     </li>
 
-                     <li>
-                        <!-- Sessión con submenu Servicios y costos-->
+                    <!-- Sessión con submenu Servicios y costos-->
+                    <li>
+
                         <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
@@ -88,8 +98,9 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         </div>
                     </li>
 
+                    <!-- Sección con submenú Profesionales  -->
                     <li>
-                        <!-- Sección con submenú Profesionales  -->
+
                         <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Profesionales">
@@ -108,7 +119,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         </div>
                     </li>
 
-                   
+
                 </ul>
             </div>
 
@@ -177,7 +188,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
 
-             
+
             </div>
 
     </nav>
