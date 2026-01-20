@@ -51,7 +51,7 @@
             <div class="info">
                 <div class="welcome-box">
                     <!-- <img src="/assets/website/img/FAVICON.png" width="50" alt=""> -->
-                    <h1 class="welcome-title">¡Bienvenido a VetWilling¡</h1>
+                    <h1 class="welcome-title">¡Bienvenido a VetWilling!</h1>
                     <p class="welcome-sub">
                         el sistema de gestión veterinaria que optimiza tu tiempo y mejora el
                         cuidado de tus pacientes.
@@ -61,10 +61,10 @@
                 <div class="cont-rigth">
                     <div class="bg-carousel" aria-hidden="true">
                         <div class="bg-slide active"
-                            style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/muuuu.jpg')"></div>
-                        <div class="bg-slide" style="back<?= BASE_URL ?>/publicground-image:url('<?= BASE_URL ?>/public/assets/auth/img/chadis.jpg')"></div>
-                        <div class="bg-slide" style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/ponejo.jpg')"></div>
-                        <div class="bg-slide" style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/macu.jpg')"></div>
+                            style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/perrito.jpg')"></div>
+                        <div class="bg-slide" style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/michu.jpg')"></div>
+                        <div class="bg-slide" style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/vaquita.jpg')"></div>
+                        <div class="bg-slide" style="background-image:url('<?= BASE_URL ?>/public/assets/auth/img/lorito.jpg')"></div>
                     </div>
                 </div>
             </div>
