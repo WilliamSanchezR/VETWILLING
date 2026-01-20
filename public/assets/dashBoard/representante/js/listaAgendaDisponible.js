@@ -1,23 +1,21 @@
-class ListaServicios {
+class ListaDisponibilidadProfesionales {
     constructor() {
         document.addEventListener('DOMContentLoaded', () => this.init());
     }
     init() {
-        console.log('Lista servicios Init');
+        console.log('Lista Agenda Disponible Init');
         this.cacheDom();
         this.bindEvents();
-        this.dataTableListServicios();
+        this.dataTableListProfesionales();
     }
 
     cacheDom() {
-        this.tablaServicios;
+        this.tablaProfesionales;
         this.ordebarBtn = document.getElementById('btnOrdenar');
-        this.btnExportarCSV = document.getElementById('btnExportService');
-        this.inputBuscarProfesionales = document.getElementById('buscarProfesionales');
+        this.btnExportarCSV = document.getElementById('btnExportprof');
+        this.inputBuscarProfesionales = document.getElementById('buscarProfesional');
         this.limpiarBusqueda = document.querySelector('.campo-buscar i');
-        this.btnCrearServicio = document.getElementById('btnAgregarNuevo');
-
-        this.btnEliminarServicio = document.querySelectorAll('.btn-eliminar');
+        this.btnVerAgenda = document.querySelectorAll('.btn-ver-agenda');
     }
 
     bindEvents() {
@@ -40,45 +38,34 @@ class ListaServicios {
             }
         };
 
-        if (this.btnCrearServicio) {
-            this.btnCrearServicio.onclick = () => this.crearServicio();
-        }
-
-        if (this.btnEliminarServicio) {
-            this.btnEliminarServicio.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('bi-trash')) {
-                        var btnEdit = e.target.parentElement;
-                        this.eliminarServicio(btnEdit.dataset.id);
-                    }
-                    if (e.target.classList.contains('btn-editar')) {
-                        this.eliminarServicio(e.target.dataset.id);
-
-                    }
-                })
+        if (this.btnVerAgenda) {
+            this.btnVerAgenda.forEach(boton => {
+                boton.onclick = (event) => {
+                    const idUsuario = event.currentTarget.getAttribute('data-id');
+                    window.location.href = `${window.location.origin}/vetwilling/representante/agenda-usuario?id=${idUsuario}`;
+                };
             });
         }
-
     }
 
     // Funcion para inicializar DataTable para la lista de laboratorios asociados
-    dataTableListServicios() {
+    dataTableListProfesionales() {
         try {
-            this.tablaServicios = $('#tablaListaServicios').DataTable({
+            this.tablaProfesionales = $('#tablaListaAgenda').DataTable({
                 // Configuración de idioma en español
                 language: {
                     "decimal": "",
-                    "emptyTable": "No hay Servicios disponibles",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Servicios",
-                    "infoEmpty": "Mostrando 0 a 0 de 0 Servicios",
-                    "infoFiltered": "(filtrado de _MAX_ Servicios totales)",
+                    "emptyTable": "No hay Profesionales disponibles",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Profesionales",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 Profesionales",
+                    "infoFiltered": "(filtrado de _MAX_ Profesionales totales)",
                     "infoPostFix": "",
                     "thousands": ",",
-                    "lengthMenu": "Mostrar _MENU_ Servicios",
+                    "lengthMenu": "Mostrar _MENU_ Profesionales",
                     "loadingRecords": "Cargando...",
                     "processing": "Procesando...",
                     "search": "Buscar:",
-                    "zeroRecords": "No se encontraron Servicios",
+                    "zeroRecords": "No se encontraron Profesionales",
                     "paginate": {
                         "first": "Primera",
                         "last": "Última",
@@ -118,6 +105,7 @@ class ListaServicios {
         }
     }
 
+    // Función para ordenar la lista de profesionales
     ordenarProfesionales() {
         const opciones = [
             '👤 Nombre y Apellidos (A-Z)',
@@ -133,12 +121,20 @@ class ListaServicios {
 
         switch (opcion) {
             case '1':
-                this.tablaServicios.order([2, 'asc']).draw();
-                console.log('👤 Ordenado por Nombre ascendente');
+                this.tablaProfesionales.order([2, 'asc']).draw();
+                console.log('👤 Ordenado por Nombre y Apellidos ascendente');
                 break;
             case '2':
-                this.tablaServicios.order([2, 'desc']).draw();
-                console.log('👤 Ordenado por Nombre descendente');
+                this.tablaProfesionales.order([2, 'desc']).draw();
+                console.log('👤 Ordenado por Nombre y Apellidos descendente');
+                break;
+            case '3':
+                this.tablaProfesionales.order([1, 'asc']).draw();
+                console.log('# Ordenado por número de documento ascendente');
+                break;
+            case '4':
+                this.tablaProfesionales.order([1, 'desc']).draw();
+                console.log('# Ordenado por número de documento descendente');
                 break;
             default:
                 if (opcion !== null) {
@@ -147,10 +143,11 @@ class ListaServicios {
         }
     }
 
+    // Función para exportar la lista de profesionales a CSV
     exportarCSV() {
         try {
-            const data = this.tablaServicios.rows({ search: 'applied' }).data();
-            let csv = 'Nombre, Descripción, Estado\n';
+            const data = this.tablaProfesionales.rows({ search: 'applied' }).data();
+            let csv = 'Documento, Nombres y Apellidos, Rol\n';
 
             data.each(function (fila) {
                 const filaLimpia = [];
@@ -168,7 +165,7 @@ class ListaServicios {
             const fecha = new Date().toISOString().split('T')[0];
 
             link.setAttribute('href', url);
-            link.setAttribute('download', `servicios_veterinaria_${fecha}.csv`);
+            link.setAttribute('download', `profesionales_veterinaria_${fecha}.csv`);
             link.style.visibility = 'hidden';
 
             document.body.appendChild(link);
@@ -176,41 +173,19 @@ class ListaServicios {
             document.body.removeChild(link);
 
             alert('✅ Archivo CSV descargado correctamente');
-            console.log('✅ CSV exportado:', `servicios_veterinaria_${fecha}.csv`);
+            console.log('✅ CSV exportado:', `profesionales_veterinaria_${fecha}.csv`);
         } catch (error) {
             console.error('❌ Error al exportar CSV:', error);
             alert('Error al exportar CSV. Revisa la consola.');
         }
     }
 
-    buscarServicios() {
-        const valorBusqueda = this.inputBuscarServicios.value;
+    // Función para buscar profesionales en la tabla
+    buscarProfesionales() {
+        const valorBusqueda = this.inputBuscarProfesionales.value;
         console.log('🔍 Buscando:', valorBusqueda);
-        this.tablaServicios.search(valorBusqueda).draw();
-    }
-
-    crearServicio() {
-        // Lógica para crear un nuevo servicio
-        const eliminarUrl = `${window.location.origin}/vetwilling/representante/registro-servicio`;
-
-        window.location.href = eliminarUrl;
-    }
-
-    eliminarServicio($id) {
-        Swal.fire({
-            title: '¿Eliminar servicio?',
-            text: '¿Estás seguro de que deseas eliminar este servicio?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((deleteResult) => {
-            if (deleteResult.isConfirmed) {
-                // Eliminar del servidor
-                window.location.href = `${window.location.origin}/vetwilling/representante/eliminar-servicio?action=eliminar&id=${$id}`;
-            }
-        });
+        this.tablaProfesionales.search(valorBusqueda).draw();
     }
 }
 
-new ListaServicios();
+new ListaDisponibilidadProfesionales();

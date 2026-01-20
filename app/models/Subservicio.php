@@ -61,7 +61,7 @@ class Subservicio
             $consulta = "SELECT sub.id_subservicio, sub.nombre, se.nombre AS servicio, sub.costo, sub.descripcion, sub.estado
                         FROM subservicios sub
                         INNER JOIN servicio se ON se.id_servicio = sub.id_servicio
-                        WHERE se.id_veterinaria = :id_veterinaria";
+                        WHERE se.id_veterinaria = :id_veterinaria AND se.estado = 'Activo'";
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_veterinaria', $id_veterinaria);
             $resultado->execute();
