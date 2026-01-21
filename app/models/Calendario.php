@@ -78,8 +78,7 @@ class Calendario
             $consulta = "SELECT 
                             id_servicio,
                             nombre,
-                            descripcion,
-                            costo
+                            descripcion
                         FROM servicio
                         ORDER BY 
                             CASE WHEN nombre = 'Otro' THEN 1 ELSE 0 END,
