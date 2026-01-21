@@ -431,6 +431,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/servicioController.php';
         break;
 
+    case '/representante/obtener-horarios-servicio':
+        require BASE_PATH . '/app/controllers/servicioController.php';
+        break;
+
     //---------------------------------------SUBSERVICIOS-------------------------------------//    
     case '/representante/registro-subservicio':
         require BASE_PATH . '/app/views/dashboard/representante/registrarSubservicio.php';

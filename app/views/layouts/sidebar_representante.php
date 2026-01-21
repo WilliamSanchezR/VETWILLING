@@ -87,13 +87,13 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
                             <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
                                 <i class="bi bi-database-up"></i>
-                                <span class="texto-item-sidebar">Servicios y Costos</span>
+                                <span class="texto-item-sidebar">Servicios</span>
                                 <i class="bi bi-chevron-down flecha-second"></i>
                             </div>
 
                             <ul class="submenu-seccond-items">
-                                <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios</a></li>
-                                <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios</a></li>
+                                <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios - Horarios</a></li>
+                                <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios - Costo</a></li>
                             </ul>
                         </div>
                     </li>
