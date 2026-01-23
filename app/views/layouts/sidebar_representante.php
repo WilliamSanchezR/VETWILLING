@@ -75,7 +75,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         <a href="<?= BASE_URL ?>/representante/listar-especialidades"
                             class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>"
                             data-section="Especialidades" data-tooltip="Especialidades">
-                            <i class="bi bi-person-plus"></i>
+                            <i class="bi bi-clipboard2-pulse"></i>
                             <span class="nav-text">Especialidades</span>
                         </a>
                     </li>
@@ -187,6 +187,17 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     <span class="texto-item-sidebar">Gestión auxiliar veterinario</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
+
+                <ul class="submenu-items">
+                 <li>
+                        <a href="<?= BASE_URL ?>/auxiliar/agenda-auxiliar"
+                            class="nav-item"
+                            data-section="agenda">
+                            <i class="bi bi-calendar-check"></i>
+                            <span class="nav-text">Agenda</span>
+                        </a>
+                 </li>
+                </ul>
 
 
             </div>
