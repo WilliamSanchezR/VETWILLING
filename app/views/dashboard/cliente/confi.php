@@ -485,12 +485,12 @@
 
                         <form method="POST" action="<?= BASE_URL ?>/cliente/actualizar-contrasena" id="passwordForm">
                             <input type="hidden" name="id_usuario" value="<?= $_SESSION['user']['id_usuario'] ?>">
-                            <input type="hidden" name="accion" value="modificar_contrasena">
+                            <input type="hidden" name="accion" value="modificar-contrasena">
 
                             <div class="form-group-config">
                                 <label>Contraseña Actual</label>
                                 <div class="password-input-wrapper">
-                                    <input type="password" name="contrasena_actual" id="currentPassword" required placeholder="Ingresa tu contraseña actual">
+                                    <input type="password" name="contrasena-actual" id="currentPassword" required placeholder="Ingresa tu contraseña actual">
                                     <button type="button" class="toggle-password" onclick="togglePassword('currentPassword', this)">
                                         <i class="bi bi-eye"></i>
                                     </button>
@@ -501,7 +501,7 @@
                                 <div class="form-group-config">
                                     <label>Nueva Contraseña</label>
                                     <div class="password-input-wrapper">
-                                        <input type="password" name="nueva_contrasena" id="newPassword" required minlength="8" placeholder="Mínimo 8 caracteres" oninput="checkPasswordStrength()">
+                                        <input type="password" name="nueva-contrasena" id="newPassword" required minlength="8" placeholder="Mínimo 8 caracteres" oninput="checkPasswordStrength()">
                                         <button type="button" class="toggle-password" onclick="togglePassword('newPassword', this)">
                                             <i class="bi bi-eye"></i>
                                         </button>
@@ -517,7 +517,7 @@
                                 <div class="form-group-config">
                                     <label>Confirmar Contraseña</label>
                                     <div class="password-input-wrapper">
-                                        <input type="password" name="confirmar_contrasena" id="confirmPassword" required minlength="8" placeholder="Confirma tu contraseña" oninput="checkPasswordMatch()">
+                                        <input type="password" name="confi-contrasena" id="confirmPassword" required minlength="8" placeholder="Confirma tu contraseña" oninput="checkPasswordMatch()">
                                         <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword', this)">
                                             <i class="bi bi-eye"></i>
                                         </button>
