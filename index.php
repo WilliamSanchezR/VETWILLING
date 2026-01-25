@@ -54,6 +54,9 @@ switch ($request) {
     // Fin rutas necesarias para el login
 
     // RUTA PARA CERRA SESION
+    case '/cerrar-sesion':
+        require BASE_PATH . '/app/controllers/cerrarSesion.php';
+        break;
 
     case '/logout':
         require BASE_PATH . '/app/controllers/logoutControllers.php';
@@ -328,7 +331,7 @@ switch ($request) {
         break;
     default:
         http_response_code(404);
-        require BASE_PATH . '/app/views/auth/error404.html';
+        require BASE_PATH . '/app/views/auth/error404.php';
         break;
 
 

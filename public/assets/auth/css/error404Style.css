@@ -13,6 +13,11 @@ main {
     align-items: center;
     height: 100%;
 }
+img{
+    width: 110.9%;
+    margin-top: -100px;
+
+}
 
 .cont .info {
     background-color: #93BEDF40;
@@ -23,7 +28,7 @@ main {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: -70px;
+    margin-top: -60px;
 }
 
 .cont .info h2 {

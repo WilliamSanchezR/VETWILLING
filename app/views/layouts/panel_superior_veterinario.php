@@ -245,7 +245,7 @@ $usuario = mostrarPerfil($id);
                     <div class="panel-divider"></div>
 
                     <div class="panel-footer">
-                        <a href="<?= BASE_URL ?>/logout" class="dropdown-item logout-item">
+                        <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item logout-item">
                             <div class="item-icon">
                                 <i class="bi bi-box-arrow-right"></i>
                             </div>
@@ -258,6 +258,7 @@ $usuario = mostrarPerfil($id);
         </div>
     </div>
 </nav>
+
 
 <!-- Modal de Soporte Profesional -->
 <div class="modal-overlay" id="modalSoporte">
