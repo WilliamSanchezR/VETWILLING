@@ -23,6 +23,12 @@ switch ($method) {
         if ($action === 'eliminar') {
             $id_servicio = $_GET['id'] ?? '';
             eliminarServicio($id_servicio);
+        } elseif ($action === 'obtener_horarios') {
+            $id_servicio = $_GET['id'] ?? '';
+            listaHorariosPorServicio($id_servicio);
+        } elseif ($action === 'eliminar_horarios') {
+            $id_servicio = $_GET['id'] ?? '';
+            eliminarHorariosPorServicio($id_servicio);
         }
         break;
 
@@ -42,6 +48,7 @@ function registrarServicio()
     $nombre = $_POST['nombre'] ?? '';
     $descripcion = $_POST['descripcion'] ?? '';
     $id_veterinaria = $_POST['id_veterinaria'] ?? '';
+    $horarios = $_POST['horarios'] ?? '';
 
 
     // Validamos que los campos no esten vacios
@@ -58,7 +65,8 @@ function registrarServicio()
     $data = [
         'nombre' => $nombre,
         'descripcion' => $descripcion,
-        'id_veterinaria' => $id_veterinaria
+        'id_veterinaria' => $id_veterinaria,
+        'horarios' => $horarios
     ];
 
     // Llamamos al método para registrar el servicio
@@ -120,7 +128,8 @@ function actualizarServicio()
         'id_servicio' => $_POST['id_servicio'] ?? '',
         'nombre' => $_POST['nombre'] ?? '',
         'descripcion' => $_POST['descripcion'] ?? '',
-        'estado' => $_POST['estado'] ?? ''
+        'estado' => $_POST['estado'] ?? '',
+        'horarios' => $_POST['horarios'] ?? ''
     ];
 
     // Validamos que los campos no esten vacios
@@ -165,5 +174,55 @@ function eliminarServicio($id_servicio)
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el servicio');
     }
 
+    exit();
+}
+
+function listaHorariosPorServicio($id_servicio)
+{
+    try { // Creamos una instancia del modelo Servicio
+        $servicioModel = new Servicio();
+
+        // Llamamos al método para obtener los horarios del servicio
+        $horarios = $servicioModel->obtenerHorariosPorServicio($id_servicio);
+
+        // ┌─ RETORNAR RESULTADO
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'horarios' => $horarios,
+        ]);
+    } catch (Exception $e) {
+        // ┌─ RETORNAR ERROR    
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Error al obtener los horarios del servicio: ' . $e->getMessage()
+        ]);
+    }
+}
+
+function eliminarHorariosPorServicio($id_servicio)
+{
+    // Creamos una instancia del modelo Servicio
+    $servicioModel = new Servicio();
+
+    // Llamamos al método para eliminar los horarios del servicio
+    $resultado = $servicioModel->eliminarHorariosPorServicio($id_servicio);
+
+    if ($resultado) {
+        // ┌─ RETORNAR RESULTADO
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Horarios eliminados correctamente'
+        ]);
+    } else {
+        // ┌─ RETORNAR ERROR    
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'No se pudieron eliminar los horarios'
+        ]);
+    }
     exit();
 }
