@@ -7,256 +7,359 @@ $usuario = mostrarPerfil($id);
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
 
-<!-- Navbar Superior -->
-<div class="navbar-superior" id="navbarSuperior">
-
-    <!-- Sección Izquierda - Breadcrumb -->
-    <div class="navegacion-izquierda">
-        <button class="btn-menu-movil" onclick="abrirSidebarMovil()" aria-label="Abrir menú">
-            <i class="bi bi-list"></i>
-        </button>
-
-        <nav class="breadcrumb-container" aria-label="breadcrumb">
-            <ol class="breadcrumb-custom">
-                <li class="breadcrumb-item">
-                    <i class="bi bi-house-door-fill"></i>
-                    <span>Inicio</span>
-                </li>
-                <li class="breadcrumb-divider">
-                    <i class="bi bi-chevron-right"></i>
-                </li>
-                <li class="breadcrumb-item active">
-                    <span id="paginaActual">Dashboard</span>
-                </li>
-            </ol>
-        </nav>
-    </div>
-
-    <!-- Sección Centro - Buscador -->
-    <div class="buscador-navegacion">
-        <div class="search-wrapper">
-            <i class="bi bi-search search-icon"></i>
-            <input
-                type="text"
-                id="searchInput"
-                class="search-input"
-                placeholder="Buscar pacientes, citas, registros..."
-                autocomplete="off">
-            <button class="btn-clear-search" id="btnClearSearch" style="display: none;">
-                <i class="bi bi-x-circle-fill"></i>
+<!-- Navbar Superior Profesional -->
+<nav class="navbar-superior" id="navbarSuperior">
+    <div class="navbar-container">
+        
+        <!-- Sección Izquierda -->
+        <div class="navbar-left">
+            <button class="btn-menu-mobile" onclick="abrirSidebarMovil()" aria-label="Abrir menú">
+                <i class="bi bi-list"></i>
             </button>
-        </div>
 
-        <!-- Resultados de búsqueda -->
-        <div class="search-results" id="searchResults" style="display: none;">
-            <div class="search-section">
-                <div class="search-section-title">Sugerencias</div>
-                <div class="search-items" id="searchItems">
-                    <!-- Se llenarán dinámicamente -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sección Derecha - Acciones -->
-    <div class="acciones-navegacion">
-
-        <!-- Tema (Modo oscuro/claro) -->
-        <div class="action-item" data-tooltip="Cambiar tema">
-            <button class="btn-action" onclick="" aria-label="Cambiar tema">
-                <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-            </button>
-        </div>
-
-        <!-- Notificaciones -->
-        <div class="action-item" data-tooltip="Notificaciones">
-            <button class="btn-action" onclick="toggleNotificaciones()" aria-label="Notificaciones">
-                <i class="bi bi-bell-fill"></i>
-                <span class="notification-badge">3</span>
-            </button>
-        </div>
-
-        <!-- Panel de notificaciones -->
-        <div class="notifications-panel" id="notificationsPanel" style="display: none;">
-            <div class="panel-header">
-                <h4>Notificaciones</h4>
-                <button class="btn-mark-read">Marcar todas como leídas</button>
-            </div>
-            <div class="panel-body">
-                <div class="notification-item unread">
-                    <div class="notification-icon bg-success">
-                        <i class="bi bi-calendar-check"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p class="notification-title">Nueva cita agendada</p>
-                        <p class="notification-text">Max - Consulta general</p>
-                        <span class="notification-time">Hace 5 min</span>
-                    </div>
-                </div>
-                <div class="notification-item">
-                    <div class="notification-icon bg-warning">
-                        <i class="bi bi-exclamation-triangle"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p class="notification-title">Recordatorio de vacuna</p>
-                        <p class="notification-text">Luna - Vacuna antirrábica</p>
-                        <span class="notification-time">Hace 1 hora</span>
-                    </div>
-                </div>
-                <div class="notification-item">
-                    <div class="notification-icon bg-info">
-                        <i class="bi bi-file-medical"></i>
-                    </div>
-                    <div class="notification-content">
-                        <p class="notification-title">Resultados de laboratorio</p>
-                        <p class="notification-text">Rocky - Análisis de sangre</p>
-                        <span class="notification-time">Hace 2 horas</span>
+            <div class="greeting-section">
+                <div class="greeting-content">
+                    <span class="greeting-icon" id="saludoEmoji">👋</span>
+                    <div class="greeting-text">
+                        <span class="greeting-label" id="saludoTexto">Bienvenido</span>
+                        <span class="greeting-time">
+                            <i class="bi bi-clock"></i>
+                            <span id="horaActual">00:00:00</span>
+                        </span>
                     </div>
                 </div>
             </div>
-            <div class="panel-footer">
-                <a href="#" class="btn-view-all">Ver todas las notificaciones</a>
+
+            <div class="breadcrumb-divider"></div>
+
+            <nav class="breadcrumb-nav" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active">
+                        <span id="paginaActual">Dashboard</span>
+                    </li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- Sección Centro - Búsqueda -->
+        <div class="navbar-center">
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <i class="bi bi-search search-icon"></i>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="search-input"
+                        placeholder="Buscar pacientes, citas, historiales médicos..."
+                        autocomplete="off"
+                        aria-label="Buscar">
+                    <button class="btn-clear" id="btnClearSearch" style="display: none;" aria-label="Limpiar búsqueda">
+                        <i class="bi bi-x"></i>
+                    </button>
+                    <kbd class="search-shortcut">Ctrl K</kbd>
+                </div>
+
+                <!-- Panel de Resultados -->
+                <div class="search-results-panel" id="searchResults" style="display: none;">
+                    <div class="search-results-header">
+                        <span class="results-title">Resultados de búsqueda</span>
+                        <span class="results-count" id="resultsCount">0 resultados</span>
+                    </div>
+                    <div class="search-results-body" id="searchItems">
+                        <!-- Resultados dinámicos aquí -->
+                    </div>
+                    <div class="search-results-footer">
+                        <span class="search-tip">
+                            <i class="bi bi-lightbulb"></i>
+                            Usa <kbd>↑</kbd> <kbd>↓</kbd> para navegar
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Perfil de usuario -->
-        <div class="user-profile-container">
-            <button class="btn-perfil" onclick="togglePerfilMenu()" aria-label="Menú de perfil">
-                <div class="avatar-usuario">
-                    <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
-                        alt="<?= $usuario['nombres'] ?>">
-                    <span class="status-indicator online"></span>
-                </div>
-                <div class="info-usuario">
-                    <h4 class="nombre-usuario"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h4>
-                    <p class="rol-usuario"><?= $usuario['rol'] ?></p>
-                </div>
-                <i class="bi bi-chevron-down arrow-icon"></i>
-            </button>
+        <!-- Sección Derecha - Acciones -->
+        <div class="navbar-right">
+            
+            <!-- Botón Tema -->
+            <div class="navbar-action" data-tooltip="Cambiar tema">
+                <button class="btn-icon" onclick="toggleTheme()" aria-label="Cambiar tema">
+                    <i class="bi bi-moon-stars" id="themeIcon"></i>
+                </button>
+            </div>
 
-            <!-- Menú desplegable de perfil -->
-            <div class="perfil-dropdown" id="perfilDropdown" style="display: none;">
-                <div class="dropdown-header">
-                    <div class="avatar-large">
-                        <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
-                            alt="<?= $usuario['nombres'] ?>">
-                    </div>
-                    <div class="user-info-dropdown">
-                        <h4><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h4>
-                        <p><?= $usuario['email'] ?></p>
-                    </div>
-                </div>
-                <div class="dropdown-divider"></div>
-                <div class="dropdown-body">
-                    <a href="<?= BASE_URL ?>/veterinario/consultar-perfil" class="dropdown-item">
-                        <i class="bi bi-person-circle"></i>
-                        <span>Mi Perfil</span>
-                    </a>
-                    <a href="#" class="dropdown-item" id="btnAbrirSoporte">
-                        <i class="bi bi-question-circle"></i>
-                        <span>Soporte</span>
-                    </a>
+            <!-- Botón Notificaciones -->
+            <div class="navbar-action notifications-wrapper" data-tooltip="Notificaciones">
+                <button class="btn-icon" onclick="toggleNotificaciones()" aria-label="Ver notificaciones">
+                    <i class="bi bi-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">3</span>
+                </button>
 
-                    <!-- Modal de Soporte -->
-                    <div id="modalSoporte" class="modal-soporte">
-                        <div class="modal-contenido">
-                            <div class="modal-header">
-                                <div class="modal-icon">
-                                    <i class="bi bi-headset"></i>
+                <!-- Panel de Notificaciones -->
+                <div class="dropdown-panel notifications-panel" id="notificationsPanel" style="display: none;">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="bi bi-bell-fill"></i>
+                            <h3>Notificaciones</h3>
+                        </div>
+                        <button class="btn-text-sm" onclick="marcarTodasLeidas()">
+                            Marcar todas como leídas
+                        </button>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="notifications-list">
+                            <div class="notification-item unread">
+                                <div class="notification-indicator success"></div>
+                                <div class="notification-icon success">
+                                    <i class="bi bi-calendar-check-fill"></i>
                                 </div>
-                                <h2>Centro de Soporte</h2>
-                                <button class="btn-cerrar" id="btnCerrarModal">
-                                    <i class="bi bi-x-lg"></i>
+                                <div class="notification-content">
+                                    <div class="notification-header">
+                                        <h4>Nueva cita agendada</h4>
+                                        <span class="notification-time">Hace 5 min</span>
+                                    </div>
+                                    <p>Max - Consulta general programada para mañana 10:00 AM</p>
+                                </div>
+                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)">
+                                    <i class="bi bi-x"></i>
                                 </button>
                             </div>
 
-                            <div class="modal-body">
-                                <p class="modal-descripcion">¿Tienes algún problema o sugerencia? Completa el formulario y te responderemos pronto.</p>
-
-                                <form id="formularioSoporte">
-                                    <div class="form-group">
-                                        <label for="nombreSoporte">
-                                            <i class="bi bi-person"></i> Nombre Completo
-                                        </label>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            id="nombreSoporte"
-                                            name="nombre"
-                                            placeholder="Tu nombre"
-                                            required>
+                            <div class="notification-item">
+                                <div class="notification-indicator warning"></div>
+                                <div class="notification-icon warning">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-header">
+                                        <h4>Recordatorio de vacuna</h4>
+                                        <span class="notification-time">Hace 1 hora</span>
                                     </div>
+                                    <p>Luna requiere vacuna antirrábica - Vencimiento próximo</p>
+                                </div>
+                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
 
-                                    <div class="form-group">
-                                        <label for="emailSoporte">
-                                            <i class="bi bi-envelope"></i> Correo Electrónico
-                                        </label>
-                                        <input
-                                            type="email"
-                                            class="form-control"
-                                            id="emailSoporte"
-                                            name="email"
-                                            placeholder="ejemplo@correo.com"
-                                            required>
+                            <div class="notification-item">
+                                <div class="notification-indicator info"></div>
+                                <div class="notification-icon info">
+                                    <i class="bi bi-file-medical-fill"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-header">
+                                        <h4>Resultados disponibles</h4>
+                                        <span class="notification-time">Hace 2 horas</span>
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="tipoProblema">
-                                            <i class="bi bi-tag"></i> Tipo de Consulta
-                                        </label>
-                                        <select class="form-control" id="tipoProblema" name="tipo_problema" required>
-                                            <option value="" disabled selected>Selecciona una opción</option>
-                                            <option value="tecnico">🔧 Problema Técnico</option>
-                                            <option value="cuenta">👤 Problema con la Cuenta</option>
-                                            <option value="funcionalidad">⚙️ Funcionalidad</option>
-                                            <option value="sugerencia">💡 Sugerencia</option>
-                                            <option value="otro">📋 Otro</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="descripcionProblema">
-                                            <i class="bi bi-chat-left-text"></i> Descripción
-                                        </label>
-                                        <textarea
-                                            class="form-control"
-                                            id="descripcionProblema"
-                                            name="descripcion"
-                                            rows="5"
-                                            placeholder="Describe tu problema o sugerencia detalladamente..."
-                                            required></textarea>
-                                    </div>
-
-                                    <div class="form-actions">
-                                        <button type="button" class="btn-cancelar" id="btnCancelar">
-                                            Cancelar
-                                        </button>
-                                        <button type="submit" class="btn-enviar">
-                                            <i class="bi bi-send-fill"></i>
-                                            Enviar Mensaje
-                                        </button>
-                                    </div>
-                                </form>
+                                    <p>Rocky - Análisis de sangre completado y listo para revisar</p>
+                                </div>
+                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)">
+                                    <i class="bi bi-x"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="dropdown-divider"></div>
-                <div class="dropdown-footer">
-                    <a href="<?= BASE_URL ?>/logout" class="dropdown-item logout">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span>Cerrar Sesión</span>
-                    </a>
+
+                    <div class="panel-footer">
+                        <a href="<?= BASE_URL ?>/veterinario/notificaciones" class="btn-link">
+                            Ver todas las notificaciones
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Panel lateral derecho (toggle)
-        <div class="action-item" data-tooltip="Panel lateral">
-            <button class="btn-action" onclick="alternarBarraDerecha()" aria-label="Panel lateral">
-                <i class="bi bi-layout-sidebar-inset-reverse"></i>
-            </button>
-        </div> -->
+            <div class="navbar-divider"></div>
+
+            <!-- Perfil de Usuario -->
+            <div class="navbar-action user-profile-wrapper">
+                <button class="btn-profile" onclick="togglePerfilMenu()" aria-label="Menú de usuario">
+                    <div class="profile-avatar">
+                        <img 
+                            src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
+                            alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
+                            class="avatar-img">
+                        <span class="status-dot online" title="En línea"></span>
+                    </div>
+                    <div class="profile-info">
+                        <span class="profile-name">
+                            <?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?>
+                        </span>
+                        <span class="profile-role"><?= $usuario['rol'] ?></span>
+                    </div>
+                    <i class="bi bi-chevron-down profile-arrow"></i>
+                </button>
+
+                <!-- Dropdown de Perfil -->
+                <div class="dropdown-panel profile-panel" id="perfilDropdown" style="display: none;">
+                    <div class="panel-header profile-header">
+                        <div class="profile-avatar-large">
+                            <img 
+                                src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
+                                alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>">
+                            <span class="status-dot online"></span>
+                        </div>
+                        <div class="profile-details">
+                            <h3><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h3>
+                            <p><?= $usuario['email'] ?></p>
+                            <span class="profile-badge"><?= $usuario['rol'] ?></span>
+                        </div>
+                    </div>
+
+                    <div class="panel-divider"></div>
+
+                    <div class="panel-body">
+                        <a href="<?= BASE_URL ?>/veterinario/consultar-perfil" class="dropdown-item">
+                            <div class="item-icon">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="item-content">
+                                <span class="item-title">Mi Perfil</span>
+                                <span class="item-subtitle">Ver y editar información personal</span>
+                            </div>
+                        </a>
+
+                        <a href="<?= BASE_URL ?>/veterinario/configuracion" class="dropdown-item">
+                            <div class="item-icon">
+                                <i class="bi bi-gear"></i>
+                            </div>
+                            <div class="item-content">
+                                <span class="item-title">Configuración</span>
+                                <span class="item-subtitle">Preferencias y ajustes</span>
+                            </div>
+                        </a>
+
+                        <a href="#" class="dropdown-item" id="btnAbrirSoporte">
+                            <div class="item-icon">
+                                <i class="bi bi-headset"></i>
+                            </div>
+                            <div class="item-content">
+                                <span class="item-title">Centro de Soporte</span>
+                                <span class="item-subtitle">Ayuda y asistencia técnica</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="panel-divider"></div>
+
+                    <div class="panel-footer">
+                        <a href="<?= BASE_URL ?>/logout" class="dropdown-item logout-item">
+                            <div class="item-icon">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </div>
+                            <span class="item-title">Cerrar Sesión</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<!-- Modal de Soporte Profesional -->
+<div class="modal-overlay" id="modalSoporte">
+    <div class="modal-container">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <div class="modal-header-content">
+                    <div class="modal-icon-wrapper">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <div class="modal-title-wrapper">
+                        <h2>Centro de Soporte</h2>
+                        <p>Estamos aquí para ayudarte</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close-modal" id="btnCerrarModal" aria-label="Cerrar">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <p>Completa el formulario y nuestro equipo te responderá en un máximo de 24 horas.</p>
+                </div>
+
+                <form id="formularioSoporte" class="soporte-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombreSoporte" class="form-label">
+                                <i class="bi bi-person"></i>
+                                Nombre Completo
+                                <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                class="form-input"
+                                id="nombreSoporte"
+                                placeholder="Tu nombre completo"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emailSoporte" class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Correo Electrónico
+                                <span class="required">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                class="form-input"
+                                id="emailSoporte"
+                                placeholder="correo@ejemplo.com"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoProblema" class="form-label">
+                            <i class="bi bi-tags"></i>
+                            Categoría del Problema
+                            <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="tipoProblema" required>
+                            <option value="">Selecciona una categoría</option>
+                            <option value="tecnico">🔧 Problema Técnico</option>
+                            <option value="cuenta">👤 Gestión de Cuenta</option>
+                            <option value="facturacion">💳 Facturación y Pagos</option>
+                            <option value="funcionalidad">⚡ Funcionalidades</option>
+                            <option value="otro">📋 Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcionProblema" class="form-label">
+                            <i class="bi bi-chat-left-text"></i>
+                            Descripción Detallada
+                            <span class="required">*</span>
+                        </label>
+                        <textarea
+                            class="form-textarea"
+                            id="descripcionProblema"
+                            rows="5"
+                            placeholder="Describe tu problema con el mayor detalle posible. Incluye pasos para reproducir el error si aplica..."
+                            required></textarea>
+                        <span class="form-hint">Mínimo 20 caracteres</span>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="btnCancelar">
+                            <i class="bi bi-x-circle"></i>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send-fill"></i>
+                            Enviar Solicitud
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

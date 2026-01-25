@@ -58,6 +58,7 @@
    ============================================ */
 *{
     scrollbar-width: none;
+    z-index: 1;
 }
 .contenido-principal {
     margin-left: var(--sidebar-width);
@@ -78,9 +79,9 @@
 /* Área de contenido interna */
 .area-contenido {
     padding: var(--spacing-xl);
-    width: 95%;
-    max-width: 95%;
-    margin-left: 5px !important;
+    width: 100%;
+    max-width: 100%;
+    margin-left: -9px !important;
 }
 
 /* Clase auxiliar para compatibilidad (si existe en tu código) */
