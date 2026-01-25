@@ -87,11 +87,11 @@ $id_EspecialidadEditar = null;
                         <i class="bi bi-download"></i> Export
                     </button>
 
-                    <a href="<?= BASE_URL ?>/admin/pdf-veterinarias?action=reporteVeterinariasPDF" target="_blank">
+                    <!-- <a href="<?= BASE_URL ?>/admin/pdf-veterinarias?action=reporteVeterinariasPDF" target="_blank">
                         <button class="btn-control" id="btnGenerarPdf">
                             <i class="bi bi-file-earmark-pdf"></i> Generar PDF
                         </button>
-                    </a>
+                    </a> -->
 
 
                     <button class="btn-agregar" id="btnAgregarNuevo" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -209,9 +209,6 @@ $id_EspecialidadEditar = null;
     <!-- 3. DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-
-    <!-- 5. Script de lista de veterinarias -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
     <!-- Modo dia  y noche -->
     <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
