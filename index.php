@@ -114,6 +114,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/calendarioController.php';
         break;
 
+    case '/calendario/getSubservicios':
+        require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
     // ╔═══════════════════════════════════════════════════════════════════════╗
     // ║  RUTAS PARA RFS 36: CANCELACIÓN DE CITAS                             ║
     // ╚═══════════════════════════════════════════════════════════════════════╝

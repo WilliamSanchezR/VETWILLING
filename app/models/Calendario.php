@@ -51,7 +51,9 @@ class Calendario
                             p.nombre,
                             p.especie,
                             p.raza,
-                            p.edad,
+                            p.edad_numero,
+                            p.edad_unidad,
+                            CONCAT(p.edad_numero, ' ', p.edad_unidad) as edad,
                             p.sexo,
                             p.img_mascota,
                             p.id_propietario,
@@ -71,26 +73,102 @@ class Calendario
         }
     }
 
-    // FUNCION PARA OBTENER TODOS LOS SERVICIOS DISPONIBLES
-    public function obtenerServicios()
+    // FUNCION PARA OBTENER TODOS LOS SERVICIOS DISPONIBLES FILTRADOS POR VETERINARIA
+    public function obtenerServicios($id_veterinaria = null)
     {
         try {
             $consulta = "SELECT 
                             id_servicio,
                             nombre,
                             descripcion,
-                            costo
+                            costo,
+                            id_veterinaria
                         FROM servicio
-                        ORDER BY 
+                        WHERE estado = 'Activo'";
+
+            // Filtrar por veterinaria si se proporciona el ID
+            if ($id_veterinaria) {
+                $consulta .= " AND id_veterinaria = :id_veterinaria";
+            }
+
+            $consulta .= " ORDER BY 
                             CASE WHEN nombre = 'Otro' THEN 1 ELSE 0 END,
                             nombre ASC";
 
             $resultado = $this->conexion->prepare($consulta);
+
+            if ($id_veterinaria) {
+                $resultado->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            }
+
             $resultado->execute();
 
             return $resultado->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Error en Calendario::obtenerServicios -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // FUNCION PARA OBTENER SUBSERVICIOS FILTRADOS POR VETERINARIA
+    public function obtenerSubservicios($id_veterinaria = null)
+    {
+        try {
+            $consulta = "SELECT 
+                            sub.id_subservicio,
+                            sub.id_servicio,
+                            sub.nombre as nombre_subservicio,
+                            sub.descripcion,
+                            sub.costo,
+                            s.nombre as nombre_servicio,
+                            s.id_veterinaria
+                        FROM subservicios sub
+                        INNER JOIN servicio s ON sub.id_servicio = s.id_servicio
+                        WHERE sub.estado = 'Activo' AND s.estado = 'Activo'";
+
+            // Filtrar por veterinaria si se proporciona el ID
+            if ($id_veterinaria) {
+                $consulta .= " AND s.id_veterinaria = :id_veterinaria";
+            }
+
+            $consulta .= " ORDER BY s.nombre ASC, sub.nombre ASC";
+
+            $resultado = $this->conexion->prepare($consulta);
+
+            if ($id_veterinaria) {
+                $resultado->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            }
+
+            $resultado->execute();
+
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Calendario::obtenerSubservicios -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // FUNCION PARA OBTENER SUBSERVICIOS POR ID DE SERVICIO
+    public function obtenerSubserviciosPorServicio($id_servicio)
+    {
+        try {
+            $consulta = "SELECT 
+                            id_subservicio,
+                            id_servicio,
+                            nombre,
+                            descripcion,
+                            costo
+                        FROM subservicios
+                        WHERE id_servicio = :id_servicio AND estado = 'Activo'
+                        ORDER BY nombre ASC";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_servicio', $id_servicio, PDO::PARAM_INT);
+            $resultado->execute();
+
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Calendario::obtenerSubserviciosPorServicio -> " . $e->getMessage());
             return [];
         }
     }
@@ -104,7 +182,8 @@ class Calendario
                             p.nombre,
                             p.especie,
                             p.raza,
-                            p.edad,
+                            p.edad_numero,
+                            p.edad_unidad,
                             p.sexo,
                             p.img_mascota,
                             p.id_propietario,
@@ -123,64 +202,6 @@ class Calendario
         } catch (PDOException $e) {
             error_log("Error en Calendario::obtenerTodasLasMascotas -> " . $e->getMessage());
             return [];
-        }
-    }
-
-    // FUNCION PARA OBTENER INFORMACION COMPLETA DE UN AGENDAMIENTO
-    public function obtenerAgendamientoCompleto($id_agendamiento)
-    {
-        try {
-            $consulta = "SELECT 
-                            a.id_agendamiento,
-                            a.tipo,
-                            a.observaciones,
-                            a.fecha_hora,
-                            a.fecha_hora_fin,
-                            a.estado,
-                            
-                            -- Datos del propietario
-                            a.id_propietario,
-                            pr.nombres as propietario_nombres,
-                            pr.apellidos as propietario_apellidos,
-                            CONCAT(pr.nombres, ' ', pr.apellidos) as propietario_completo,
-                            pr.telefono as propietario_telefono,
-                            pr.numero_documento as propietario_documento,
-                            
-                            -- Datos de la mascota
-                            a.id_paciente,
-                            pac.nombre as mascota_nombre,
-                            pac.especie as mascota_especie,
-                            pac.raza as mascota_raza,
-                            pac.edad as mascota_edad,
-                            pac.sexo as mascota_sexo,
-                            
-                            -- Datos del servicio
-                            a.id_servicio,
-                            s.nombre as servicio_nombre,
-                            s.descripcion as servicio_descripcion,
-                            s.costo as servicio_costo,
-                            
-                            -- Datos del veterinario
-                            a.id_usuario,
-                            u.nombres as veterinario_nombres,
-                            u.apellidos as veterinario_apellidos,
-                            CONCAT(u.nombres, ' ', u.apellidos) as veterinario_completo
-                        FROM agendamiento a
-                        LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
-                        LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
-                        LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
-                        LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
-                        WHERE a.id_agendamiento = :id_agendamiento
-                        LIMIT 1";
-
-            $resultado = $this->conexion->prepare($consulta);
-            $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
-            $resultado->execute();
-
-            return $resultado->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log("Error en Calendario::obtenerAgendamientoCompleto -> " . $e->getMessage());
-            return null;
         }
     }
 
@@ -586,7 +607,7 @@ class Calendario
     // ║  Retorna todas las citas del usuario con detalles completos (propietario,   ║
     // ║  mascota, servicio, veterinario). Filtra según el rol del usuario.          ║
     // ╚══════════════════════════════════════════════════════════════════════════════╝
-    
+
     /**
      * OBTENER CITAS SEGÚN EL USUARIO AUTENTICADO
      * 
@@ -639,55 +660,52 @@ class Calendario
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                     LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
                     WHERE 1=1";
-            
+
             $parametros = [];
-            
+
             // ┌─ FILTRAR SEGÚN EL TIPO DE USUARIO
             if ($tipo_usuario === 'propietario') {
                 // El propietario solo ve sus propias citas
                 $sql .= " AND a.id_propietario = :id_usuario";
                 $parametros['id_usuario'] = $id_usuario;
-            } 
-            elseif ($tipo_usuario === 'veterinario') {
+            } elseif ($tipo_usuario === 'veterinario') {
                 // El veterinario ve las citas asignadas a él
                 $sql .= " AND a.id_usuario = :id_usuario";
                 $parametros['id_usuario'] = $id_usuario;
             }
             // Si es 'admin' o otro, ve todas sin filtrar por usuario
-            
+
             // ┌─ APLICAR FILTROS ADICIONALES
             if (!empty($filtros['estado'])) {
                 $sql .= " AND a.estado = :estado";
                 $parametros['estado'] = $filtros['estado'];
             }
-            
+
             if (!empty($filtros['fecha_inicio'])) {
                 $sql .= " AND DATE(a.fecha_hora) >= :fecha_inicio";
                 $parametros['fecha_inicio'] = $filtros['fecha_inicio'];
             }
-            
+
             if (!empty($filtros['fecha_fin'])) {
                 $sql .= " AND DATE(a.fecha_hora) <= :fecha_fin";
                 $parametros['fecha_fin'] = $filtros['fecha_fin'];
             }
-            
+
             // ┌─ ORDENAR RESULTADOS POR FECHA
             $sql .= " ORDER BY a.fecha_hora ASC";
-            
+
             // ┌─ EJECUTAR CONSULTA
             $stmt = $this->conexion->prepare($sql);
-            
+
             foreach ($parametros as $clave => $valor) {
                 $stmt->bindParam(':' . $clave, $parametros[$clave]);
             }
-            
+
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
         } catch (PDOException $e) {
             error_log("Error en Calendario::obtenerCitasDelUsuario -> " . $e->getMessage());
             return [];
         }
     }
 }
-
