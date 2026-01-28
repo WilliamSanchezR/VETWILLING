@@ -40,27 +40,68 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 <span class="nav-text">Inicio</span>
             </a>
 
-            <div class="submenu">
+            <!-- GESTION COMO ADMINISTRADOR -->
+            <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'configuracion-veterinaria' || $final_path == 'listar-especialidades' || $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  || $final_path == 'lista-agenda-usuario' ? 'active open' : '' ?>">
                 <div class="submenu-toggle" data-tooltip="Gestión Administrador">
-                    <i class="bi bi-database-up"></i>
+                    <i class="bi bi-journal-medical"></i>
                     <span class="texto-item-sidebar">Gestión Administrador</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
 
                 <ul class="submenu-items">
+
+                    <!-- Sección configuracion veterinaria -->
+                    <li>
+
+                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
+
+                            <div class="submenu-seccond-toggle" data-tooltip="Configuración Veterinaria">
+                                <i class="bi bi-gear-fill"></i>
+                                <span class="texto-item-sidebar">Configuración Veterinaria</span>
+                                <i class="bi bi-chevron-down flecha-second"></i>
+                            </div>
+
+                            <ul class="submenu-seccond-items">
+                                <li><a class="nav-item <?= $final_path == '' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/" data-tooltip="Usuarios">Horarios</a></li>
+
+                            </ul>
+
+                        </div>
+                    </li>
+
+
                     <!-- Sección Especialidades -->
                     <li>
                         <a href="<?= BASE_URL ?>/representante/listar-especialidades"
                             class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>"
                             data-section="Especialidades" data-tooltip="Especialidades">
-                            <i class="bi bi-person-plus"></i>
+                            <i class="bi bi-clipboard2-pulse"></i>
                             <span class="nav-text">Especialidades</span>
                         </a>
                     </li>
 
+                    <!-- Sessión con submenu Servicios y costos-->
                     <li>
-                        <!-- Sección con submenú Profesionales  -->
-                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' ? 'active open' : '' ?>">
+
+                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
+
+                            <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
+                                <i class="bi bi-database-up"></i>
+                                <span class="texto-item-sidebar">Servicios</span>
+                                <i class="bi bi-chevron-down flecha-second"></i>
+                            </div>
+
+                            <ul class="submenu-seccond-items">
+                                <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios - Horarios</a></li>
+                                <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios - Costo</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Sección con submenú Profesionales  -->
+                    <li>
+
+                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Profesionales">
                                 <i class="bi bi-people-fill"></i>
@@ -71,26 +112,14 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             <ul class="submenu-seccond-items">
                                 <li><a class="nav-item <?= $final_path == 'registro-profesionales' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/registro-profesionales" data-tooltip="Registrar">Registrar </a></li>
                                 <li><a class="nav-item <?= $final_path == 'listar-profesionales' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-profesionales" data-tooltip="Listar">Listar</a></li>
+                                <li>
+                                    <a class="nav-item <?= $final_path == 'lista-agenda-usuario' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/lista-agenda-usuario" data-tooltip="Agenda">Agenda</a>
+                                </li>
                             </ul>
                         </div>
                     </li>
 
-                    <li>
-                        <!-- Sessión con submenu Servicios y costos-->
-                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
 
-                            <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
-                                <i class="bi bi-database-up"></i>
-                                <span class="texto-item-sidebar">Servicios y Costos</span>
-                                <i class="bi bi-chevron-down flecha-second"></i>
-                            </div>
-
-                            <ul class="submenu-seccond-items">
-                                <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios</a></li>
-                                <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios</a></li>
-                            </ul>
-                        </div>
-                    </li>
                 </ul>
             </div>
 
@@ -103,7 +132,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             <div class="submenu">
 
                 <div class="submenu-toggle" data-tooltip="Gestión veterinario">
-                    <i class="bi bi-database-up"></i>
+                    <i class="bi bi-person-square"></i>
                     <span class="texto-item-sidebar">Gestión veterinario</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
@@ -148,6 +177,31 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         </a></li>
                 </ul>
             </div>
+
+
+            <!-- NAVEGACIÓN AUXILIAR DE VETERINARIA -->
+            <div class="submenu">
+
+                <div class="submenu-toggle" data-tooltip="Gestión auxiliar veterinario">
+                    <i class="bi bi-person-badge"></i>
+                    <span class="texto-item-sidebar">Gestión auxiliar veterinario</span>
+                    <i class="bi bi-chevron-down flecha"></i>
+                </div>
+
+                <ul class="submenu-items">
+                 <li>
+                        <a href="<?= BASE_URL ?>/auxiliar/agenda-auxiliar"
+                            class="nav-item"
+                            data-section="agenda">
+                            <i class="bi bi-calendar-check"></i>
+                            <span class="nav-text">Agenda</span>
+                        </a>
+                 </li>
+                </ul>
+
+
+            </div>
+
     </nav>
 
 

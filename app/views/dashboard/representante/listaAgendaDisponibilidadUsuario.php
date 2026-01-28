@@ -2,10 +2,10 @@
 // Enlazamos la ruta para tomar la session del administrador
 require_once BASE_PATH . '/app/helpers/session_representante.php';
 // Enlazamos el controlador de profesional para listar los profesionales
-require_once BASE_PATH . '/app/controllers/profesionalController.php';
-// Llamamos la función para listar los profesionales
 
-$datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
+require_once BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+
+$listaUsuarios = listaUsuarios($_SESSION['user']['id_veterinaria']);
 
 ?>
 
@@ -15,7 +15,7 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de profesionales</title>
+    <title>Lista de Agenda Disponible de Profesionales</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -47,7 +47,7 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
 
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Include de la barra lateral izquierda -->
-     <?php
+    <?php
     include_once __DIR__ . '/../../layouts/sidebar_representante.php'
     ?>
 
@@ -68,7 +68,7 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
 
             <!-- Encabezado del Módulo -->
             <div class="encabezado-modulo">
-                <h3>Lista profesionales Registrados</h3>
+                <h3>Lista profesionales</h3>
             </div>
 
             <!-- Controles de la Tabla -->
@@ -76,7 +76,7 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
                 <div class="controles-izquierda">
                     <div class="campo-buscar">
                         <i class="bi bi-search"></i>
-                        <input type="text" id="buscarProfesionales" placeholder="Buscar profesionales...">
+                        <input type="text" id="buscarProfesional" placeholder="Buscar profesionales...">
                     </div>
                 </div>
                 <div class="controles-derecha">
@@ -89,60 +89,44 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
                     <button class="btn-control" id="btnOrdenar">
                         <i class="bi bi-sort-down"></i> Ordenar
                     </button>
-                    <button class="btn-control" id="btnExport">
+                    <button class="btn-control" id="btnExportprof">
                         <i class="bi bi-download"></i> Export
                     </button>
 
-                    <!-- <a href="<?= BASE_URL ?>/admin/registro-profesional">
-                        <button class="btn-agregar" id="btnAgregarNuevo">
+                    <a href="#">
+                        <button class="btn-agregar" id="btnAgregarNuevaAgenda">
                             <i class="bi bi-plus-lg"></i> Agregar Nuevo
                         </button>
-                    </a> -->
+                    </a>
                 </div>
             </div>
 
             <!-- Tabla de profesionales -->
             <div class="contenedor-tabla">
-                <table id="tablaListaProfesionales" class="display tabla-admin" style="width:100%">
+                <table id="tablaListaAgenda" class="display tabla-admin" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Foto Perfil</th>
                             <th>Documento</th>
                             <th>Nombres y Apellidos</th>
-                            <th>Telefono</th>
-                            <th>Email</th>
-                            <th>Especialidades</th>
-                            <th>Servicios</th>
-                            <th>Estado</th>
                             <th>Rol</th>
-                            <th>Acciones</th>
+                            <th>Especialidades</th>
+                            <th>Agenda Disponible</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (!empty($datos)) : ?>
-                            <?php foreach ($datos as $profesional):  ?>
-                                <tr class="fila-blanca">
-                                    <td class="tb_foto"><?php if (!empty($profesional['img_perfil'])): ?><img src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $profesional['img_perfil'] ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
-                                    <td><?= $profesional['tipo_documento'] ?> - <?= $profesional['numero_documento'] ?></td>
-                                    <td><?= $profesional['nombres'] ?> <?= $profesional['apellidos'] ?></td>
-                                    <td><?= $profesional['telefono'] ?></td>
-                                    <td><?= $profesional['email'] ?></td>
-                                    <td><?= $profesional['especialidad'] ?></td>
-                                    <td><?= $profesional['servicios'] ?></td>
-                                    <td><?= $profesional['estado'] ?></td>
-                                    <td><?= $profesional['rol'] ?></td>
-                                    <td class="content-action">
-                                        <button class="btn-accion btn-editar" title="Editar">
-                                            <a href="<?= BASE_URL ?>/representante/editar-profesional?id=<?= $profesional['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
-                                        </button>
-                                        <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/representante/eliminar-profesional?action=eliminar&id=<?= $profesional['id_prof_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-
-                        <?php endif; ?>
+                        <?php foreach ($listaUsuarios as $usuario) : ?>
+                            <tr>
+                                <td><?= htmlspecialchars($usuario['numero_documento']) ?></td>
+                                <td><?= htmlspecialchars($usuario['nombre']) ?></td>
+                                <td><?= htmlspecialchars($usuario['rol']) ?></td>
+                                <td><?= htmlspecialchars($usuario['especialidad']) ?></td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm btn-ver-agenda" data-id="<?= htmlspecialchars($usuario['id_usuario']) ?>" type="button">
+                                        Ver Agenda
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -162,9 +146,10 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
 
 
         <!-- 5. Tu script de tabla AL FINAL -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/listaprofesionales.js"></script>
+
 
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/listaAgendaDisponible.js"></script>
 
 </body>
 

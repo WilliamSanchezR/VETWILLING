@@ -16,6 +16,7 @@ class ListaSubservicios {
         this.inputBuscarSubservicios = document.getElementById('buscarSubservicio');
         this.limpiarBusqueda = document.querySelector('.campo-buscar i');
         this.btnCrearSubservicio = document.getElementById('btnAgregarNuevo');
+        this.btnEliminarServicio = document.querySelectorAll('.btn-eliminar');
     }
 
     bindEvents() {
@@ -40,6 +41,21 @@ class ListaSubservicios {
 
         if (this.btnCrearSubservicio) {
             this.btnCrearSubservicio.onclick = () => this.crearSubservicio();
+        }
+
+        if (this.btnEliminarServicio) {
+            this.btnEliminarServicio.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('bi-trash')) {
+                        var btnEdit = e.target.parentElement;
+                        this.eliminarServicio(btnEdit.dataset.id);
+                    }
+                    if (e.target.classList.contains('btn-editar')) {
+                        this.eliminarServicio(e.target.dataset.id);
+
+                    }
+                })
+            });
         }
     }
 
@@ -184,6 +200,22 @@ class ListaSubservicios {
         const eliminarUrl = `${window.location.origin}/vetwilling/representante/registro-subservicio`;
 
         window.location.href = eliminarUrl;
+    }
+
+    eliminarServicio($id) {
+        Swal.fire({
+            title: '¿Eliminar subservicio?',
+            text: '¿Estás seguro de que deseas eliminar este subservicio?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((deleteResult) => {
+            if (deleteResult.isConfirmed) {
+                // Eliminar del servidor
+                window.location.href = `${window.location.origin}/vetwilling/representante/eliminar-subservicio?action=eliminar&id=${$id}`;
+            }
+        });
     }
 }
 

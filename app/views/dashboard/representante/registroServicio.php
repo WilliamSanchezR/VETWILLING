@@ -61,6 +61,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
             <form id="registroProfesional" action="<?= BASE_URL ?>/representante/guardar-servicio" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
+                <input type="hidden" name="horarios" id="horariosInput" value="">
 
 
                 <!-- Paso 1: Datos del Profesional -->
@@ -81,6 +82,89 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
                             <div class="form-group">
                                 <label><i class="bi bi-pencil-square"></i> Descripción </label>
                                 <textarea maxlength="200" rows="4" cols="50" name="descripcion" id="descripcion" placeholder="Descripción del servicio"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label><i class="bi bi-clock"></i> Horarios de Atención *</label>
+
+                                <!-- Horario 1 -->
+                                <div class="horario-item mb-3 p-3 border rounded">
+                                    <div class="row align-items-end">
+                                        <div class="col-md-12 mb-2">
+                                            <label class="form-label small">Días</label>
+                                            <div class="btn-group d-flex flex-wrap gap-2" role="group">
+                                                <input type="checkbox" class="btn-check" name="dias[]" value="1" id="lunes1" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="lunes1">LUNES</label>
+
+                                                <input type="checkbox" class="btn-check" name="dias[]" value="2" id="martes1" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="martes1">MARTES</label>
+
+                                                <input type="checkbox" class="btn-check" name="dias[]" value="3" id="miercoles1" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="miercoles1">MIERCOLES</label>
+
+                                                <input type="checkbox" class="btn-check" name="dias[]" value="4" id="jueves1" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="jueves1">JUEVES</label>
+
+                                                <input type="checkbox" class="btn-check" name="dias[]" value="5" id="viernes1" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="viernes1">VIERNES</label>
+
+                                                <input type="checkbox" class="btn-check" name="dias[]" value="6" id="sabado1" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="sabado1">SABADO</label>
+
+                                                <input type="checkbox" class="btn-check" name="dias[]" value="7" id="domingo1" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="domingo1">DOMINGO</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <label class="form-label small">Hora Inicio</label>
+                                            <input type="time" class="form-control" id="hora_inicio_1" name="hora_inicio">
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <label class="form-label small">Hora Fin</label>
+                                            <input type="time" class="form-control" id="hora_fin_1" name="hora_fin">
+                                        </div>
+
+                                        <div class="col-md-2 mb-2">
+                                            <label class="form-label small">Hora Inicio</label>
+                                            <input type="time" class="form-control" id="hora_inicio_2" name="hora_inicio">
+                                        </div>
+                                        <div class="col-md-2 mb-2">
+                                            <label class="form-label small">Hora Fin</label>
+                                            <input type="time" class="form-control" id="hora_fin_2" name="hora_fin">
+                                        </div>
+                                        <div class="col-md-4 mb-4 text-end">
+                                            <button type="button" class="btn btn-primary btn-sm btn-agregar-horario ">
+                                                <i class="bi bi-plus"></i> Agregar Horario
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label><i class="bi bi-calendar-check"></i> Horarios Registrados</label>
+                                <div class="table-responsive">
+                                     <table id="tablaListaServicios" class="display tabla-admin" style="width:100%" id="tablaHorarios">
+                                        <thead >
+                                            <tr>
+                                                <th>Días</th>
+                                                <th>Horario Mañana</th>
+                                                <th>Horario Tarde</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="horariosBody">
+                                            <tr class="text-center">
+                                                <td colspan="4" class="text-muted">No hay horarios registrados</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -110,6 +194,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
         <!-- JS Propio -->
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/registroServicio.js"></script>
 
 
 </body>

@@ -383,6 +383,32 @@ switch ($request) {
     case '/representante/eliminar-profesional':
         require BASE_PATH . '/app/controllers/profesionalController.php';
         break;
+
+    case '/representante/eliminar-serv-profesional':
+        require BASE_PATH . '/app/controllers/profesionalController.php';
+        break;
+
+    case '/representante/lista-agenda-usuario':
+        require BASE_PATH . '/app/views/dashboard/representante/listaAgendaDisponibilidadUsuario.php';
+        break;
+
+    case '/representante/agenda-usuario':
+        require BASE_PATH . '/app/views/dashboard/representante/agendaProfesional.php';
+        break;
+
+    case '/representante/agregar-disponibilidad-agenda':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+
+    case '/representante/eliminar-agenda-usuario':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+    
+    case '/representante/editar-disponibilidad-agenda':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+
+
     //---------------------------------------SERVICIOS-------------------------------------//
     case '/representante/registro-servicio':
         require BASE_PATH . '/app/views/dashboard/representante/registroServicio.php';
@@ -405,6 +431,10 @@ switch ($request) {
         break;
 
     case '/representante/eliminar-servicio':
+        require BASE_PATH . '/app/controllers/servicioController.php';
+        break;
+
+    case '/representante/obtener-horarios-servicio':
         require BASE_PATH . '/app/controllers/servicioController.php';
         break;
 

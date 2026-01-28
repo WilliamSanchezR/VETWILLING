@@ -61,7 +61,11 @@ class Profesional
 
                 // Registramos las especialidades del profesional
                 if (!empty($data['especialidades'])) {
-                    return $this->registrarEspecialidadProfesional($usuarioData['id_usuario'], json_decode($data['especialidades']), $data['id_veterinaria']);
+                    $this->registrarEspecialidadProfesional($usuarioData['id_usuario'], json_decode($data['especialidades']), $data['id_veterinaria']);
+                }
+
+                if (!empty($data['servicios'])) {
+                    return $this->registrarServicioProfesional($idProfesional, json_decode($data['servicios']));
                 } else {
                     return $statudRegPV;
                 }
@@ -125,7 +129,11 @@ class Profesional
 
                 // Registramos las especialidades del profesional
                 if (!empty($data['especialidades'])) {
-                    return $this->registrarEspecialidadProfesional($idUser['id_usuario'], json_decode($data['especialidades']), $data['id_veterinaria']);
+                    $this->registrarEspecialidadProfesional($idUser['id_usuario'], json_decode($data['especialidades']), $data['id_veterinaria']);
+                }
+
+                if (!empty($data['servicios'])) {
+                    $this->registrarServicioProfesional($idProfesional, json_decode($data['servicios']));
                 } else {
                     return $statudRegPV;
                 }
@@ -161,13 +169,17 @@ class Profesional
                     us.email,
                     pv.estado,
                     rol.nombre AS rol, 
-                    GROUP_CONCAT(esp.nombre SEPARATOR ', ') as especialidad
+                    GROUP_CONCAT(DISTINCT esp.nombre SEPARATOR ', ') as especialidad,
+                    GROUP_CONCAT(DISTINCT ser.nombre SEPARATOR ', ') as servicios
+                    
                 FROM profesional_veterinaria pv
                 INNER JOIN profesional p ON p.id_profesional = pv.id_profesional
                 INNER JOIN usuario us on p.id_usuario = us.id_usuario
                 INNER JOIN rol ON us.id_rol = rol.id_rol
                 LEFT JOIN profesional_especialidad pe ON p.id_usuario = pe.id_usuario AND pe.estado = 'Activo' AND pe.id_veterinaria = :id_veterinaria
                 LEFT JOIN especialidad esp ON pe.id_especialidad = esp.id_especialidad
+                LEFT JOIN profesionales_servicio ps on p.id_profesional = ps.id_profesional AND ps.estado = 'Activo'
+                LEFT JOIN servicio ser ON ps.id_servicio = ser.id_servicio AND ser.estado = 'Activo'
                 WHERE pv.id_veterinaria = :id_veterinaria AND us.estado = 'activo' AND pv.estado = 'Activo'
                 GROUP BY p.id_profesional, p.nombres, us.id_usuario";
 
@@ -259,6 +271,27 @@ class Profesional
         }
     }
 
+    function deleteServProfesional($id)
+    {
+        try {
+            $estado = 'Inactivo';
+
+            $sql = "UPDATE profesionales_servicio 
+                    SET estado = :estado, fecha_modificacion = NOW() 
+                    WHERE id_prof_servicio = :id_servicio AND estado = 'Activo'";
+
+            $stmt = $this->conexion->prepare($sql);
+
+            $stmt->bindParam(':estado', $estado);
+            $stmt->bindParam(':id_servicio', $id);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Profesional::deleteServProfesional -> " . $e->getMessage());
+            return false;
+        }
+    }
+
     function actualizarProfesional($data)
     {
         // Actualizamos los datos del usuario
@@ -304,7 +337,11 @@ class Profesional
 
             // Registramos las especialidades del profesional
             if (!empty($data['especialidades'])) {
-                return $this->registrarEspecialidadProfesional($data['id_usuario'], json_decode($data['especialidades']), $data['id_veterinaria']);
+                $this->registrarEspecialidadProfesional($data['id_usuario'], json_decode($data['especialidades']), $data['id_veterinaria']);
+            } 
+
+            if (!empty($data['servicios'])) {
+                return $this->registrarServicioProfesional($data['id_profesional'], json_decode($data['servicios']));
             } else {
                 return $okProf;
             }
@@ -339,6 +376,30 @@ class Profesional
         }
     }
 
+    function registrarServicioProfesional($idUsuario, $servicios)
+    {
+        $estado = 'Activo';
+
+        try {
+            foreach ($servicios as $idServicio) {
+
+                $sqlServ = "INSERT INTO profesionales_servicio(id_servicio, id_profesional, estado)
+                                        VALUES(:id_servicio, :id_profesional, :estado)";
+
+                $stmtServ = $this->conexion->prepare($sqlServ);
+                $stmtServ->bindParam(':id_profesional', $idUsuario);
+                $stmtServ->bindParam(':id_servicio', $idServicio->id);
+                $stmtServ->bindParam(':estado', $estado);
+                $stmtServ->execute();
+            }
+
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::registrar -> " . $e->getMessage());
+            return false;
+        }
+    }
+
     function eliminarProfesional($idUsuario)
     {
         try {
@@ -351,6 +412,28 @@ class Profesional
         } catch (PDOException $e) {
             error_log("Error en Profesional::eliminarProfesional -> " . $e->getMessage());
             return false;
+        }
+    }
+
+    function listarServiciosPorProfesional($id)
+    {
+        try {
+            $sql = "SELECT 
+                    ps.id_prof_servicio as id,
+                    ser.id_servicio,
+                    ser.nombre
+                FROM profesionales_servicio ps
+                INNER JOIN servicio ser ON ps.id_servicio = ser.id_servicio
+                INNER JOIN profesional pr ON ps.id_profesional = pr.id_profesional                
+                WHERE pr.id_usuario = :id_usuario AND ps.estado = 'Activo' AND ser.estado = 'Activo'";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Profesional::listarServiciosPorProfesional -> " . $e->getMessage());
+            return [];
         }
     }
 }
