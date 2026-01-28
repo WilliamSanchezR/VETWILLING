@@ -20,6 +20,7 @@ $datos = mostrarVeterinarios();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-url" content="<?= BASE_URL ?>">
     <title>Dashboard Veterinario - Citas</title>
 
     <!-- Bootstrap CSS -->

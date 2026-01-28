@@ -24,6 +24,9 @@ const URLS = {
     // 7. OBTENER SERVICIOS: Lista de servicios disponibles
     GET_SERVICIOS: '/vetwilling/calendario/getServicios',
 
+    // 7b. OBTENER SUBSERVICIOS: Lista de subservicios disponibles
+    GET_SUBSERVICIOS: '/vetwilling/calendario/getSubservicios',
+
     // 8. OBTENER VETERINARIOS: Lista de veterinarios de la veterinaria
     GET_VETERINARIOS: '/vetwilling/calendario/getVeterinarios'
 };
@@ -93,12 +96,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Response status:', response.status);
                 console.log('Response statusText:', response.statusText);
 
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error('Status ' + response.status + ': ' + response.statusText + ' - ' + text);
-                    });
-                }
-                return response.json();
+                // Siempre intentar parsear como JSON, incluso en errores
+                return response.json().then(data => {
+                    if (!response.ok) {
+                        // Si es un error HTTP, lanzar con el mensaje del servidor
+                        throw { 
+                            status: response.status, 
+                            message: data.message || response.statusText,
+                            data: data
+                        };
+                    }
+                    return data;
+                });
             })
             .then(result => {
                 console.log('Result:', result);
@@ -112,7 +121,9 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('Error de comunicación AJAX:', error);
-                if (errorCallback) { errorCallback(error.message); }
+                // Extraer el mensaje del error
+                const errorMessage = error.message || error.statusText || 'Error desconocido';
+                if (errorCallback) { errorCallback(errorMessage); }
             });
     }
 
@@ -139,13 +150,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    async function cargarServicios() {
+    async function cargarSubservicios() {
         try {
-            const response = await fetch(URLS.GET_SERVICIOS);
+            const response = await fetch(URLS.GET_SUBSERVICIOS);
             const result = await response.json();
             return result.status === 'success' ? result.data : [];
         } catch (error) {
-            console.error('Error al cargar servicios:', error);
+            console.error('Error al cargar subservicios:', error);
             return [];
         }
     }
@@ -203,29 +214,30 @@ document.addEventListener('DOMContentLoaded', function () {
         var containerEl = document.getElementById('external-events');
 
         if (containerEl) {
-            // Cargar servicios desde la base de datos
-            const servicios = await cargarServicios();
+            // Cargar subservicios desde la base de datos
+            const subservicios = await cargarSubservicios();
 
             // Limpiar contenedor
             containerEl.innerHTML = '<h4>Servicios Disponibles</h4>';
 
-            // Crear eventos arrastrables por cada servicio
-            servicios.forEach(servicio => {
-                const color = servicioColores[servicio.nombre] || '#6c757d';
-                const emoji = servicioEmojis[servicio.nombre] || '📌';
-                const className = 'fc-event-' + servicio.nombre.toLowerCase().replace(/\s+/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            // Crear eventos arrastrables por cada subservicio
+            subservicios.forEach(subservicio => {
+                const color = servicioColores[subservicio.nombre_servicio] || '#6c757d';
+                const emoji = servicioEmojis[subservicio.nombre_servicio] || '📌';
+                const className = 'fc-event-' + (subservicio.nombre_servicio || 'general').toLowerCase().replace(/\s+/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
                 const eventDiv = document.createElement('div');
                 eventDiv.className = `fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event ${className}`;
                 eventDiv.setAttribute('data-duration', '01:00');
-                eventDiv.setAttribute('data-servicio-id', servicio.id_servicio);
-                eventDiv.setAttribute('data-servicio-nombre', servicio.nombre);
+                eventDiv.setAttribute('data-subservicio-id', subservicio.id_subservicio);
+                eventDiv.setAttribute('data-subservicio-nombre', subservicio.nombre_subservicio);
                 eventDiv.style.backgroundColor = color;
                 eventDiv.style.borderColor = color;
 
                 const mainDiv = document.createElement('div');
                 mainDiv.className = 'fc-event-main';
-                mainDiv.textContent = `${emoji} ${servicio.nombre}`;
+                const precio = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(subservicio.costo);
+                mainDiv.textContent = `${emoji} ${subservicio.nombre_subservicio} - ${precio}`;
 
                 eventDiv.appendChild(mainDiv);
                 containerEl.appendChild(eventDiv);
@@ -236,10 +248,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 itemSelector: '.fc-event',
                 eventData: function (eventEl) {
                     return {
-                        title: eventEl.getAttribute('data-servicio-nombre'),
+                        title: eventEl.getAttribute('data-subservicio-nombre'),
                         duration: eventEl.getAttribute('data-duration'),
                         extendedProps: {
-                            servicioId: eventEl.getAttribute('data-servicio-id'),
+                            subservicioId: eventEl.getAttribute('data-subservicio-id'),
                             servicioNombre: eventEl.getAttribute('data-servicio-nombre')
                         }
                     };
@@ -297,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Cargar datos desde el servidor
             const propietarios = await cargarPropietarios();
-            const servicios = await cargarServicios();
+            const subservicios = await cargarSubservicios();
 
             // Crear opciones HTML para propietarios
             let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
@@ -307,8 +319,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Crear opciones HTML para servicios
             let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
-            servicios.forEach(servicio => {
-                serviciosOptions += `<option value="${servicio.id_servicio}">${servicio.nombre} - $${parseFloat(servicio.costo).toLocaleString('es-CO')}</option>`;
+            subservicios.forEach(subservicio => {
+                const precio = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(subservicio.costo);
+                serviciosOptions += `<option value="${subservicio.id_subservicio}">${subservicio.nombre_subservicio} - ${precio}</option>`;
             });
             // lo que yo modifique
             Swal.fire({
@@ -1069,7 +1082,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Cargar datos desde el servidor
             const propietarios = await cargarPropietarios();
-            const servicios = await cargarServicios();
+            const subservicios = await cargarSubservicios();
 
             // Crear opciones HTML para propietarios
             let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
@@ -1079,9 +1092,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Crear opciones HTML para servicios con el servicio arrastrado pre-seleccionado
             let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
-            servicios.forEach(servicio => {
-                const selected = servicio.id_servicio == servicioId ? 'selected' : '';
-                serviciosOptions += `<option value="${servicio.id_servicio}" ${selected}>${servicio.nombre} - $${parseFloat(servicio.costo).toLocaleString('es-CO')}</option>`;
+            subservicios.forEach(subservicio => {
+                const selected = subservicio.id_subservicio == servicioId ? 'selected' : '';
+                const precio = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(subservicio.costo);
+                serviciosOptions += `<option value="${subservicio.id_subservicio}" ${selected}>${subservicio.nombre_subservicio} - ${precio}</option>`;
             });
 
             Swal.fire({
@@ -1530,7 +1544,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Cargar datos desde el servidor
         const propietarios = await cargarPropietarios();
-        const servicios = await cargarServicios();
+        const subservicios = await cargarSubservicios();
         
         // Crear opciones HTML para propietarios
         let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
@@ -1538,10 +1552,11 @@ document.addEventListener('DOMContentLoaded', function () {
             propietariosOptions += `<option value="${prop.id_propietario}">${prop.nombres} ${prop.apellidos}</option>`;
         });
         
-        // Crear opciones HTML para servicios
+        // Crear opciones HTML para subservicios
         let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
-        servicios.forEach(serv => {
-            serviciosOptions += `<option value="${serv.id_servicio}">${serv.nombre}</option>`;
+        subservicios.forEach(sub => {
+            const precio = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(sub.costo);
+            serviciosOptions += `<option value="${sub.id_subservicio}">${sub.nombre_subservicio} - ${precio}</option>`;
         });
         
         // Mostrar SweetAlert con formulario

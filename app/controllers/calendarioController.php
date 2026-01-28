@@ -85,6 +85,13 @@ switch ($method) {
             obtenerServicios();
         } else if (strpos($request_uri, '/calendario/getVeterinarios') !== false) {
             obtenerVeterinarios();
+        } else if (strpos($request_uri, '/calendario/getSubservicios') !== false) {
+            // Verificar si viene id_servicio como parámetro
+            if (isset($_GET['id_servicio'])) {
+                obtenerSubserviciosPorServicio();
+            } else {
+                obtenerSubservicios();
+            }
         } elseif ($accion === 'validar') {
             rfs36_validarEstadoCitaGet();
         } elseif ($accion === 'detalles_cancelacion') {
@@ -640,12 +647,27 @@ function obtenerMascotasPorPropietario()
     exit();
 }
 
-// FUNCION PARA OBTENER SERVICIOS DESDE BASE DE DATOS
+// FUNCION PARA OBTENER SERVICIOS DESDE BASE DE DATOS FILTRADOS POR VETERINARIA
 function obtenerServicios()
 {
     try {
+        // Verificar que la sesión esté iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Obtener el id_veterinaria de la sesión
+        $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
+
+        if (!$id_veterinaria) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'No se pudo obtener la veterinaria del usuario']);
+            exit();
+        }
+
         $calendarioModel = new Calendario();
-        $servicios = $calendarioModel->obtenerServicios();
+        $servicios = $calendarioModel->obtenerServicios($id_veterinaria);
 
         header('Content-Type: application/json');
         echo json_encode(['status' => 'success', 'data' => $servicios]);
@@ -684,6 +706,64 @@ function obtenerVeterinarios()
         header('Content-Type: application/json');
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'Error al obtener veterinarios: ' . $e->getMessage()]);
+    }
+    exit();
+}
+
+// FUNCION PARA OBTENER SUBSERVICIOS FILTRADOS POR VETERINARIA
+function obtenerSubservicios()
+{
+    try {
+        // Verificar que la sesión esté iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Obtener el id_veterinaria de la sesión
+        $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
+
+        if (!$id_veterinaria) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'No se pudo obtener la veterinaria del usuario']);
+            exit();
+        }
+
+        $calendarioModel = new Calendario();
+        $subservicios = $calendarioModel->obtenerSubservicios($id_veterinaria);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'data' => $subservicios]);
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Error al obtener subservicios: ' . $e->getMessage()]);
+    }
+    exit();
+}
+
+// FUNCION PARA OBTENER SUBSERVICIOS POR ID DE SERVICIO
+function obtenerSubserviciosPorServicio()
+{
+    try {
+        $id_servicio = $_GET['id_servicio'] ?? null;
+
+        if (!$id_servicio) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'ID de servicio no proporcionado']);
+            exit();
+        }
+
+        $calendarioModel = new Calendario();
+        $subservicios = $calendarioModel->obtenerSubserviciosPorServicio($id_servicio);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'data' => $subservicios]);
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Error al obtener subservicios: ' . $e->getMessage()]);
     }
     exit();
 }

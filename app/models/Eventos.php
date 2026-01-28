@@ -333,12 +333,13 @@ class Eventos
                             a.estado,
                             p.id_propietario,
                             CONCAT(p.nombres, ' ', p.apellidos) as nombre_propietario,
-                            p.email as email_propietario,
+                            u.email as email_propietario,
                             pac.id_paciente,
                             pac.nombre as nombre_mascota,
                             s.nombre as nombre_servicio
                          FROM agendamiento a
                          LEFT JOIN propietario p ON a.id_propietario = p.id_propietario
+                         LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
                          LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
                          LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                          WHERE a.id_agendamiento = :id_agendamiento";
