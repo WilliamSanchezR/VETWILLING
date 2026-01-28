@@ -68,6 +68,15 @@ $datosUsuario = [
 
     <!-- Acciones -->
     <div class="navbar-derecha">
+        <!-- Reloj en Vivo -->
+        <button 
+            class="btn-navbar btn-reloj" 
+            data-modal="reloj"
+            aria-label="Ver reloj y fecha"
+            title="Hora actual">
+            <span class="hora-actual" id="horaNavbar">--:--</span>
+        </button>
+
         <!-- Notificaciones -->
         <button 
             class="btn-navbar notificaciones" 
@@ -222,6 +231,42 @@ $datosUsuario = [
         </div>
     </div>
 </nav>
+
+<!-- Modal de Reloj -->
+<div id="modalReloj" class="modal-reloj" role="dialog" aria-modal="true" aria-labelledby="tituloReloj">
+    <div class="modal-reloj-contenido">
+        <button class="btn-cerrar-reloj" data-modal-close="reloj" aria-label="Cerrar reloj">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        
+        <div class="reloj-display">
+            <div class="reloj-digital" id="relojDigital">
+                00:00:00
+            </div>
+            <div class="reloj-fecha" id="relojFecha">
+                Cargando fecha...
+            </div>
+            
+            <div class="reloj-info">
+                <div class="info-item">
+                    <i class="bi bi-calendar-event"></i>
+                    <div class="info-label">Día</div>
+                    <div class="info-value" id="diaSemana">---</div>
+                </div>
+                <div class="info-item">
+                    <i class="bi bi-sunrise"></i>
+                    <div class="info-label">Período</div>
+                    <div class="info-value" id="periodo">---</div>
+                </div>
+                <div class="info-item">
+                    <i class="bi bi-globe"></i>
+                    <div class="info-label">Zona</div>
+                    <div class="info-value" id="zonaHoraria">UTC</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal de Soporte -->
 <div id="modalSoporte" class="modal-soporte" role="dialog" aria-modal="true" aria-labelledby="tituloSoporte" style="display: none;">
