@@ -112,6 +112,7 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
                             <th>Telefono</th>
                             <th>Email</th>
                             <th>Especialidades</th>
+                            <th>Servicios</th>
                             <th>Estado</th>
                             <th>Rol</th>
                             <th>Acciones</th>
@@ -127,6 +128,7 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
                                     <td><?= $profesional['telefono'] ?></td>
                                     <td><?= $profesional['email'] ?></td>
                                     <td><?= $profesional['especialidad'] ?></td>
+                                    <td><?= $profesional['servicios'] ?></td>
                                     <td><?= $profesional['estado'] ?></td>
                                     <td><?= $profesional['rol'] ?></td>
                                     <td class="content-action">

@@ -1101,48 +1101,143 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire({
                 title: 'Nuevo Agendamiento',
                 html: `
-                    <div style="text-align: left; margin: 20px 0; max-height: 500px; overflow-y: auto;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #00304D;">
-                            <i class="bi bi-person-fill"></i> Propietario: *
-                        </label>
-                        <select id="swal-propietario" class="swal2-input" style="margin: 0 0 20px 0; width: 90%; padding: 10px;">
-                            ${propietariosOptions}
-                        </select>
-                        
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #00304D;">
-                            <i class="bi bi-heart-fill"></i> Mascota: *
-                        </label>
-                        <select id="swal-mascota" class="swal2-input" style="margin: 0 0 20px 0; width: 90%; padding: 10px;" disabled>
-                            <option value="">Primero selecciona un propietario...</option>
-                        </select>
-                        
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #00304D;">
-                            <i class="bi bi-briefcase-fill"></i> Servicio: *
-                        </label>
-                        <select id="swal-servicio" class="swal2-input" style="margin: 0 0 20px 0; width: 90%; padding: 10px;">
-                            ${serviciosOptions}
-                        </select>
-                        
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #00304D;">
-                            <i class="bi bi-clock"></i> Fecha y Hora de Inicio: *
-                        </label>
-                        <input id="swal-fecha-inicio" type="datetime-local" class="swal2-input" 
-                               value="${fechaInicioStr}" style="margin: 0 0 20px 0; width: 90%;">
-                        
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #00304D;">
-                            <i class="bi bi-clock-history"></i> Fecha y Hora de Fin: *
-                        </label>
-                        <input id="swal-fecha-fin" type="datetime-local" class="swal2-input" 
-                               value="${fechaFinStr}" style="margin: 0 0 20px 0; width: 90%;">
-                        
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #00304D;">
-                            <i class="bi bi-card-text"></i> Observaciones (opcional):
-                        </label>
-                        <textarea id="swal-observaciones" class="swal2-textarea" 
-                                  placeholder="Agrega observaciones o detalles adicionales..." 
-                                  style="margin: 0; width: 90%; min-height: 80px; resize: vertical;"></textarea>
-                    </div>
-                `,
+    <style>
+        .form-container {
+            text-align: left;
+            margin: 20px 0;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00304D;
+            font-size: 14px;
+        }
+        
+        .form-label i {
+            margin-right: 6px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #00304D;
+            box-shadow: 0 0 0 3px rgba(0, 48, 77, 0.1);
+        }
+        
+        .form-control:disabled {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: #00304D;
+            box-shadow: 0 0 0 3px rgba(0, 48, 77, 0.1);
+        }
+        
+        /* Scrollbar personalizado */
+        .form-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .form-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .form-container::-webkit-scrollbar-thumb {
+            background: #00304D;
+            border-radius: 10px;
+        }
+        
+        .form-container::-webkit-scrollbar-thumb:hover {
+            background: #002038;
+        }
+    </style>
+    
+    <div class="form-container">
+        <div class="form-group">
+            <label class="form-label">
+                <i class="bi bi-person-fill"></i> Propietario: *
+            </label>
+            <select id="swal-propietario" class="form-control">
+                ${propietariosOptions}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="bi bi-heart-fill"></i> Mascota: *
+            </label>
+            <select id="swal-mascota" class="form-control" disabled>
+                <option value="">Primero selecciona un propietario...</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="bi bi-briefcase-fill"></i> Servicio: *
+            </label>
+            <select id="swal-servicio" class="form-control">
+                ${serviciosOptions}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="bi bi-clock"></i> Fecha y Hora de Inicio: *
+            </label>
+            <input id="swal-fecha-inicio" type="datetime-local" class="form-control" value="${fechaInicioStr}">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="bi bi-clock-history"></i> Fecha y Hora de Fin: *
+            </label>
+            <input id="swal-fecha-fin" type="datetime-local" class="form-control" value="${fechaFinStr}">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="bi bi-card-text"></i> Observaciones (opcional):
+            </label>
+            <textarea id="swal-observaciones" class="form-textarea" 
+                      placeholder="Agrega observaciones o detalles adicionales..."></textarea>
+        </div>
+    </div>
+`,
                 showCancelButton: true,
                 confirmButtonText: 'Crear Agendamiento',
                 cancelButtonText: 'Cancelar',

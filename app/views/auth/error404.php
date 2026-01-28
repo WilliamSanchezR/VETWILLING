@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página de error 404</title>
-    <link rel="stylesheet" href="public/assets/auth/css/error404Style.css">
-    <link rel="stylesheet" href="public/assets/auth/css/globalStyles.css">
-    <link rel="icon" href="public/assets/webSite/img/FAVICON.png" type="image">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/error404Style.css">
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
 </head>
 
@@ -17,7 +17,7 @@
         <div class="cont-error-404">
             <div class="cont">
                 <div class="img">
-                    <img src="public/assets/auth/img/error404.png" alt="Error de página">
+                    <img src="<?= BASE_URL ?>/public/assets/auth/img/error404.png" alt="Error de página">
                 </div>
 
                 <div class="info">

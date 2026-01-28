@@ -54,6 +54,9 @@ switch ($request) {
     // Fin rutas necesarias para el login
 
     // RUTA PARA CERRA SESION
+    case '/cerrar-sesion':
+        require BASE_PATH . '/app/controllers/cerrarSesion.php';
+        break;
 
     case '/logout':
         require BASE_PATH . '/app/controllers/logoutControllers.php';
@@ -297,6 +300,10 @@ switch ($request) {
     case '/cliente/historial-mascota':
         require BASE_PATH . '/app/views/dashboard/cliente/historialMascota.php';
         break;
+    case '/cliente/vacunas-mascota':
+        require BASE_PATH . '/app/views/dashboard/cliente/vacunas.php';
+        break;
+
     //----------ACCIONES DEL PACIENTE---------//
     case '/cliente/actualizar':
         require BASE_PATH . '/app/controllers/propetarioController.php';
@@ -328,7 +335,7 @@ switch ($request) {
         break;
     default:
         http_response_code(404);
-        require BASE_PATH . '/app/views/auth/error404.html';
+        require BASE_PATH . '/app/views/auth/error404.php';
         break;
 
 
@@ -380,6 +387,32 @@ switch ($request) {
     case '/representante/eliminar-profesional':
         require BASE_PATH . '/app/controllers/profesionalController.php';
         break;
+
+    case '/representante/eliminar-serv-profesional':
+        require BASE_PATH . '/app/controllers/profesionalController.php';
+        break;
+
+    case '/representante/lista-agenda-usuario':
+        require BASE_PATH . '/app/views/dashboard/representante/listaAgendaDisponibilidadUsuario.php';
+        break;
+
+    case '/representante/agenda-usuario':
+        require BASE_PATH . '/app/views/dashboard/representante/agendaProfesional.php';
+        break;
+
+    case '/representante/agregar-disponibilidad-agenda':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+
+    case '/representante/eliminar-agenda-usuario':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+    
+    case '/representante/editar-disponibilidad-agenda':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+
+
     //---------------------------------------SERVICIOS-------------------------------------//
     case '/representante/registro-servicio':
         require BASE_PATH . '/app/views/dashboard/representante/registroServicio.php';
@@ -402,6 +435,10 @@ switch ($request) {
         break;
 
     case '/representante/eliminar-servicio':
+        require BASE_PATH . '/app/controllers/servicioController.php';
+        break;
+
+    case '/representante/obtener-horarios-servicio':
         require BASE_PATH . '/app/controllers/servicioController.php';
         break;
 

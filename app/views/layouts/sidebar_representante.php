@@ -40,59 +40,168 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 <span class="nav-text">Inicio</span>
             </a>
 
-            <!-- Sección Especialidades -->
-            <a href="<?= BASE_URL ?>/representante/listar-especialidades"
-                class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>"
-                data-section="Especialidades" data-tooltip="Especialidades">
-                <i class="bi bi-person-plus"></i>
-                <span class="nav-text">Especialidades</span>
-            </a>
-
-
-            <!-- Sección con submenú Profesionales  -->
-            <div class="submenu <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' ? 'active open' : '' ?>">
-
-                <div class="submenu-toggle" data-tooltip="Profesionales">
-                    <i class="bi bi-people-fill"></i>
-                    <span class="texto-item-sidebar">Profesionales</span>
+            <!-- GESTION COMO ADMINISTRADOR -->
+            <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'configuracion-veterinaria' || $final_path == 'listar-especialidades' || $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  || $final_path == 'lista-agenda-usuario' ? 'active open' : '' ?>">
+                <div class="submenu-toggle" data-tooltip="Gestión Administrador">
+                    <i class="bi bi-journal-medical"></i>
+                    <span class="texto-item-sidebar">Gestión Administrador</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
 
                 <ul class="submenu-items">
-                    <li><a class="nav-item <?= $final_path == 'registro-profesionales' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/registro-profesionales" data-tooltip="Registrar">Registrar </a></li>
-                    <li><a class="nav-item <?= $final_path == 'listar-profesionales' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-profesionales" data-tooltip="Listar">Listar</a></li>
+
+                    <!-- Sección configuracion veterinaria -->
+                    <li>
+
+                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
+
+                            <div class="submenu-seccond-toggle" data-tooltip="Configuración Veterinaria">
+                                <i class="bi bi-gear-fill"></i>
+                                <span class="texto-item-sidebar">Configuración Veterinaria</span>
+                                <i class="bi bi-chevron-down flecha-second"></i>
+                            </div>
+
+                            <ul class="submenu-seccond-items">
+                                <li><a class="nav-item <?= $final_path == '' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/" data-tooltip="Usuarios">Horarios</a></li>
+
+                            </ul>
+
+                        </div>
+                    </li>
+
+
+                    <!-- Sección Especialidades -->
+                    <li>
+                        <a href="<?= BASE_URL ?>/representante/listar-especialidades"
+                            class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>"
+                            data-section="Especialidades" data-tooltip="Especialidades">
+                            <i class="bi bi-clipboard2-pulse"></i>
+                            <span class="nav-text">Especialidades</span>
+                        </a>
+                    </li>
+
+                    <!-- Sessión con submenu Servicios y costos-->
+                    <li>
+
+                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
+
+                            <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
+                                <i class="bi bi-database-up"></i>
+                                <span class="texto-item-sidebar">Servicios</span>
+                                <i class="bi bi-chevron-down flecha-second"></i>
+                            </div>
+
+                            <ul class="submenu-seccond-items">
+                                <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios - Horarios</a></li>
+                                <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios - Costo</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Sección con submenú Profesionales  -->
+                    <li>
+
+                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
+
+                            <div class="submenu-seccond-toggle" data-tooltip="Profesionales">
+                                <i class="bi bi-people-fill"></i>
+                                <span class="texto-item-sidebar">Profesionales</span>
+                                <i class="bi bi-chevron-down flecha-second"></i>
+                            </div>
+
+                            <ul class="submenu-seccond-items">
+                                <li><a class="nav-item <?= $final_path == 'registro-profesionales' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/registro-profesionales" data-tooltip="Registrar">Registrar </a></li>
+                                <li><a class="nav-item <?= $final_path == 'listar-profesionales' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-profesionales" data-tooltip="Listar">Listar</a></li>
+                                <li>
+                                    <a class="nav-item <?= $final_path == 'lista-agenda-usuario' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/lista-agenda-usuario" data-tooltip="Agenda">Agenda</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+
                 </ul>
             </div>
 
-            <!-- Sessión con submenu Servicios y costos-->
-            <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
 
-                <div class="submenu-toggle" data-tooltip="Servicios y Costos">
-                    <i class="bi bi-database-up"></i>
-                    <span class="texto-item-sidebar">Servicios y Costos</span>
+
+
+
+
+            <!-- NAVEGACION COMO VETERINARIO -->
+            <div class="submenu">
+
+                <div class="submenu-toggle" data-tooltip="Gestión veterinario">
+                    <i class="bi bi-person-square"></i>
+                    <span class="texto-item-sidebar">Gestión veterinario</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
 
                 <ul class="submenu-items">
-                    <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios</a></li>
-                    <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios</a></li>
+                    <li><a href="<?= BASE_URL ?>/veterinaria/seguimientos"
+                            class="nav-item"
+                            data-section="citas">
+                            <i class="bi bi-card-checklist"></i>
+                            <span class="nav-text">Seguimineto</span>
+                        </a></li>
+
+                    <li><a href="<?= BASE_URL ?>/veterinaria/calendario"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-calendar-week"></i>
+                            <span class="nav-text">Calendario</span>
+                        </a></li>
+                    <li><a href="<?= BASE_URL ?>/veterinaria/gestion_clinica"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-hospital"></i>
+                            <span class="nav-text">Gestion Clinicas</span>
+                        </a></li>
+                    <li><a href="<?= BASE_URL ?>/veterinaria/laboratorio"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-beaker"></i>
+                            <span class="nav-text">Laboratorio</span>
+                        </a></li>
+                    <li><a href="<?= BASE_URL ?>/veterinaria/recetas"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-journal-text"></i>
+                            <span class="nav-text">Recetas</span>
+                        </a></li>
+                    <li><a href="<?= BASE_URL ?>/veterinaria/reportes"
+                            class="nav-item"
+                            data-section="tienda">
+                            <i class="bi bi-bar-chart"></i>
+                            <span class="nav-text">Reportes</span>
+                        </a></li>
                 </ul>
             </div>
 
-            <!-- Sessión de submenu de -->
-            <div class="submenu <?= $final_path == 'registro-servicios' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
 
-                <div class="submenu-toggle" data-tooltip="Horarios de Atención">
-                    <i class="bi bi-person-plus"></i>
-                    <span class="texto-item-sidebar">Horarios de Atención</span>
+            <!-- NAVEGACIÓN AUXILIAR DE VETERINARIA -->
+            <div class="submenu">
+
+                <div class="submenu-toggle" data-tooltip="Gestión auxiliar veterinario">
+                    <i class="bi bi-person-badge"></i>
+                    <span class="texto-item-sidebar">Gestión auxiliar veterinario</span>
                     <i class="bi bi-chevron-down flecha"></i>
                 </div>
 
                 <ul class="submenu-items">
-                    <li><a class="nav-item <?= $final_path == 'registro-horarios' ? 'active' : '' ?>" href="#" data-tooltip="Registrar">Registrar </a></li>
-                    <li><a class="nav-item <?= $final_path == 'listar-horarios' ? 'active' : '' ?>" href="#" data-tooltip="Listar">Listar</a></li>
+                 <li>
+                        <a href="<?= BASE_URL ?>/auxiliar/agenda-auxiliar"
+                            class="nav-item"
+                            data-section="agenda">
+                            <i class="bi bi-calendar-check"></i>
+                            <span class="nav-text">Agenda</span>
+                        </a>
+                 </li>
                 </ul>
+
+
             </div>
+
     </nav>
 
 

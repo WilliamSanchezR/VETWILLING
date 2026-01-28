@@ -1,50 +1,57 @@
-/* ==========================================
-   1. VARIABLES CSS
-   ========================================== */
+/*
+ * ============================================
+ * VetWilling - Configuración CSS
+ * Versión: 2.0
+ * ============================================
+ */
+
+/*
+ * 1. VARIABLES CSS
+ */
 :root {
     /* Colores Principales */
     --primary-color: #0A932C;
     --primary-dark: #087a24;
     --primary-light: #9DE795;
-    
+
     /* Colores de Fondo */
     --bg-light: #f8f9fa;
     --bg-dark: #1a1a2e;
     --bg-sidebar: #ffffff;
-    
+
     /* Colores de Tarjetas */
     --card-light: #ffffff;
     --card-dark: #16213e;
-    
+
     /* Colores de Texto */
     --text-light: #1a1a2e;
     --text-dark: #ffffff;
     --text-secondary-light: #6b7280;
     --text-secondary-dark: #9ca3af;
-    
+
     /* Bordes */
     --border-light: #e5e7eb;
     --border-dark: #374151;
     --border-radius: 12px;
     --border-radius-lg: 16px;
-    
+
     /* Estados */
     --success: #10b981;
     --error: #ef4444;
     --warning: #f59e0b;
     --info: #3b82f6;
-    
+
     /* Sombras */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
     --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
     --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-    
+
     /* Transiciones */
     --transition-fast: all 0.15s ease;
     --transition: all 0.3s ease;
     --transition-slow: all 0.5s ease;
-    
+
     /* Tamaños de Fuente */
     --font-size-base: 16px;
     --font-size-xs: 12px;
@@ -55,9 +62,9 @@
     --font-size-3xl: 32px;
 }
 
-/* ==========================================
-   2. TEMA OSCURO
-   ========================================== */
+/*
+ * 2. TEMA OSCURO
+ */
 body.dark-theme {
     --bg-light: #1a1a2e;
     --bg-sidebar: #16213e;
@@ -67,9 +74,9 @@ body.dark-theme {
     --border-light: #374151;
 }
 
-/* ==========================================
-   3. RESET Y BASE
-   ========================================== */
+/*
+ * 3. RESET Y BASE
+ */
 * {
     margin: 0;
     padding: 0;
@@ -87,9 +94,9 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ==========================================
-   4. CONTAINER Y LAYOUT
-   ========================================== */
+/*
+ * 4. CONTAINER Y LAYOUT
+ */
 .container-dashboard {
     max-width: 1200px;
     margin: 0 auto;
@@ -100,9 +107,89 @@ body {
     transition: var(--transition);
 }
 
-/* ==========================================
-   5. HEADER DE CONFIGURACIÓN
-   ========================================== */
+/*
+ * 5. NOTIFICACIONES TOAST
+ */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+/* Estilos para toast-notification (usado en JS) */
+.toast-notification {
+    min-width: 300px;
+    padding: 14px 18px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: var(--transition);
+    pointer-events: auto;
+    border-left: 4px solid;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-notification i {
+    font-size: var(--font-size-xl);
+    flex-shrink: 0;
+}
+
+/* Tipos de toast */
+.toast-success {
+    border-color: var(--success);
+}
+
+.toast-success i {
+    color: var(--success);
+}
+
+.toast-error {
+    border-color: var(--error);
+}
+
+.toast-error i {
+    color: var(--error);
+}
+
+.toast-warning {
+    border-color: var(--warning);
+}
+
+.toast-warning i {
+    color: var(--warning);
+}
+
+.toast-info {
+    border-color: var(--info);
+}
+
+.toast-info i {
+    color: var(--info);
+}
+
+/* Dark theme para toasts */
+body.dark-theme .toast-notification {
+    background: var(--card-dark);
+    color: var(--text-dark);
+}
+
+/*
+ * 6. HEADER DE CONFIGURACIÓN
+ */
 .header-config {
     text-align: center;
     margin-bottom: 40px;
@@ -121,9 +208,9 @@ body {
     color: var(--text-secondary-light);
 }
 
-/* ==========================================
-   6. TABS DE NAVEGACIÓN
-   ========================================== */
+/*
+ * 7. TABS DE NAVEGACIÓN
+ */
 .tabs-config {
     display: flex;
     gap: 12px;
@@ -176,16 +263,16 @@ body {
     font-size: var(--font-size-lg);
 }
 
-/* ==========================================
-   7. CONTENIDO DE TABS
-   ========================================== */
+/*
+ * 8. CONTENIDO DE TABS
+ */
 .tab-content {
     animation: fadeIn 0.5s ease;
 }
 
-/* ==========================================
-   8. TARJETAS DE CONFIGURACIÓN
-   ========================================== */
+/*
+ * 9. TARJETAS DE CONFIGURACIÓN
+ */
 .config-card {
     background: var(--card-light);
     border-radius: var(--border-radius-lg);
@@ -201,14 +288,21 @@ body {
     transform: translateY(-2px);
 }
 
-/* Header de Tarjeta */
-.config-card-header {
+/* Header de Tarjeta - Unificado */
+.config-card-header,
+.card-header {
     display: flex;
     align-items: center;
     gap: 16px;
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 2px solid var(--border-light);
+}
+
+.card-header {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
 }
 
 .config-icon {
@@ -225,39 +319,24 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-.config-card-header h3 {
+.config-card-header h3,
+.card-header h2 {
     font-size: var(--font-size-xl);
     font-weight: 700;
     margin-bottom: 4px;
     color: var(--text-light);
 }
 
-.config-card-header p {
+.config-card-header p,
+.card-header p {
     font-size: var(--font-size-sm);
     color: var(--text-secondary-light);
     margin: 0;
 }
 
-.card-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.card-header h2 {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-light);
-}
-
-.card-header p {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary-light);
-}
-
-/* ==========================================
-   9. ITEMS DE CONFIGURACIÓN
-   ========================================== */
+/*
+ * 10. ITEMS DE CONFIGURACIÓN
+ */
 .config-item {
     display: flex;
     justify-content: space-between;
@@ -273,7 +352,7 @@ body {
 }
 
 .config-item:hover {
-    background: rgba(102, 126, 234, 0.03);
+    background: rgba(10, 147, 44, 0.03);
     margin: 0 -15px;
     padding-left: 15px;
     padding-right: 15px;
@@ -296,9 +375,9 @@ body {
     margin: 0;
 }
 
-/* ==========================================
-   10. FORMULARIOS
-   ========================================== */
+/*
+ * 11. FORMULARIOS
+ */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -320,7 +399,10 @@ body {
 
 .form-group-config input,
 .form-group-config select,
-.form-group-config textarea {
+.form-group-config textarea,
+.config-input,
+.config-textarea,
+.config-select {
     width: 100%;
     padding: 12px 16px;
     border: 2px solid var(--border-light);
@@ -330,38 +412,36 @@ body {
     background: var(--bg-light);
     transition: var(--transition);
     outline: none;
+    font-family: inherit;
 }
 
 .form-group-config input:focus,
 .form-group-config select:focus,
-.form-group-config textarea:focus {
+.form-group-config textarea:focus,
+.config-input:focus,
+.config-textarea:focus,
+.config-select:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1);
     background: var(--card-light);
 }
 
 .form-group-config input::placeholder,
-.form-group-config textarea::placeholder {
+.form-group-config textarea::placeholder,
+.config-input::placeholder,
+.config-textarea::placeholder {
     color: var(--text-secondary-light);
 }
 
-.form-group-config textarea {
+.form-group-config textarea,
+.config-textarea {
     resize: vertical;
     min-height: 100px;
 }
 
 /* Select personalizado */
 .config-select {
-    padding: 10px 16px;
-    border: 2px solid var(--border-light);
-    border-radius: var(--border-radius);
-    background: var(--bg-light);
-    color: var(--text-light);
-    font-size: var(--font-size-base);
-    font-weight: 500;
     cursor: pointer;
-    transition: var(--transition);
-    outline: none;
     min-width: 180px;
 }
 
@@ -369,14 +449,18 @@ body {
     border-color: var(--primary-color);
 }
 
-.config-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+/* Dark mode para formularios */
+body.dark-theme .config-input,
+body.dark-theme .config-textarea,
+body.dark-theme .config-select {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
 }
 
-/* ==========================================
-   11. BOTONES
-   ========================================== */
+/*
+ * 12. BOTONES
+ */
 .btn-config {
     display: inline-flex;
     align-items: center;
@@ -398,13 +482,29 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-.btn-primary-config:hover {
+.btn-primary-config:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }
 
-.btn-primary-config:active {
+.btn-primary-config:active:not(:disabled) {
     transform: translateY(0);
+}
+
+.btn-primary-config:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-secondary-config {
+    background: var(--bg-light);
+    color: var(--text-light);
+    border: 2px solid var(--border-light);
+}
+
+.btn-secondary-config:hover {
+    background: var(--card-light);
+    border-color: var(--primary-color);
 }
 
 .btn-upload,
@@ -442,9 +542,9 @@ body {
     color: white;
 }
 
-/* ==========================================
-   12. FOTO DE PERFIL
-   ========================================== */
+/*
+ * 13. FOTO DE PERFIL
+ */
 .foto-perfil-container {
     display: flex;
     align-items: center;
@@ -491,9 +591,9 @@ body {
     display: none;
 }
 
-/* ==========================================
-   13. CONTRASEÑAS
-   ========================================== */
+/*
+ * 14. CONTRASEÑAS
+ */
 .password-input-wrapper {
     position: relative;
     display: flex;
@@ -547,24 +647,8 @@ body {
     border-radius: 4px;
 }
 
-.strength-weak {
-    background: var(--error);
-    width: 33%;
-}
-
-.strength-medium {
-    background: var(--warning);
-    width: 66%;
-}
-
-.strength-strong {
-    background: var(--success);
-    width: 100%;
-}
-
 .strength-text {
     font-size: var(--font-size-xs);
-    color: var(--text-secondary-light);
     font-weight: 500;
 }
 
@@ -599,13 +683,9 @@ body {
     font-size: var(--font-size-sm);
 }
 
-.requirement-item.met {
-    color: var(--success);
-}
-
-/* ==========================================
-   14. TOGGLE SWITCH
-   ========================================== */
+/*
+ * 15. TOGGLE SWITCH
+ */
 .toggle-switch {
     position: relative;
     width: 56px;
@@ -646,9 +726,9 @@ body {
     transform: scale(0.98);
 }
 
-/* ==========================================
-   15. BADGES
-   ========================================== */
+/*
+ * 16. BADGES
+ */
 .badge {
     display: inline-block;
     padding: 2px 8px;
@@ -656,6 +736,7 @@ body {
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
+    margin-left: 8px;
 }
 
 .badge-new {
@@ -668,9 +749,9 @@ body.dark-theme .badge-new {
     color: #fbbf24;
 }
 
-/* ==========================================
-   16. ESTADÍSTICAS
-   ========================================== */
+/*
+ * 17. ESTADÍSTICAS
+ */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -701,9 +782,9 @@ body.dark-theme .stats-grid {
     color: var(--text-secondary-light);
 }
 
-/* ==========================================
-   17. NOTIFICACIONES
-   ========================================== */
+/*
+ * 18. NOTIFICACIÓN DE GUARDADO
+ */
 .save-notification {
     position: fixed;
     bottom: 30px;
@@ -734,289 +815,311 @@ body.dark-theme .stats-grid {
     font-size: var(--font-size-xl);
 }
 
+/*
+ * 19. LANGUAGE INFO
+ */
 .language-info {
-    background: #fef3c7;
-    border-left: 4px solid var(--warning);
+    background: #d4edda;
+    border-left: 4px solid var(--success);
     padding: 12px 16px;
     border-radius: var(--border-radius);
     margin-top: 12px;
     font-size: var(--font-size-sm);
-    color: #92400e;
+    color: #155724;
     display: flex;
     align-items: center;
     gap: 8px;
+    animation: slideDown 0.3s ease;
 }
 
 body.dark-theme .language-info {
-    background: #451a03;
-    color: #fbbf24;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
 }
 
-/* ==========================================
-   18. PAGE HEADER (para tabs internos)
-   ========================================== */
-.page-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.page-header h1 {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-light);
-}
-
-.page-header p {
-    font-size: var(--font-size-base);
-    color: var(--text-secondary-light);
-}
-
-/* ==========================================
-   19. ANIMACIONES
-   ========================================== */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-/* ==========================================
-   20. RESPONSIVE
-   ========================================== */
-@media (max-width: 768px) {
-    .container-dashboard {
-        padding: 15px;
-    }
-
-    .header-config h1 {
-        font-size: var(--font-size-2xl);
-    }
-
-    .tabs-config {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-    }
-
-    .tab-config {
-        padding: 10px 16px;
-        font-size: var(--font-size-sm);
-    }
-
-    .config-card {
-        padding: 20px;
-    }
-
-    .config-card-header {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .foto-perfil-container {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .config-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-    }
-
-    .toggle-switch {
-        align-self: flex-end;
-    }
-
-    .save-notification {
-        bottom: 20px;
-        right: 20px;
-        left: 20px;
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 480px) {
-    .foto-btns {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .btn-upload,
-    .btn-remove {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ==========================================
-   21. UTILIDADES
-   ========================================== */
-.text-center {
-    text-align: center;
-}
-
-.mt-20 {
-    margin-top: 20px;
-}
-
-.mb-20 {
-    margin-bottom: 20px;
-}
-
-.d-flex {
+/*
+ * 20. ALERTS
+ */
+.alert {
+    padding: 12px 16px;
+    border-radius: var(--border-radius);
+    margin-bottom: 16px;
     display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideDown 0.3s ease;
 }
 
-.gap-15 {
-    gap: 15px;
+.alert i {
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
 }
 
-/* ==========================================
-   22. SCROLLBAR PERSONALIZADO
-   ========================================== */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
-::-webkit-scrollbar-track {
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+body.dark-theme .alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border-color: var(--success);
+}
+
+body.dark-theme .alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border-color: var(--error);
+}
+
+body.dark-theme .alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+    border-color: var(--info);
+}
+
+/*
+ * 21. FAQ SECTION
+ */
+.faq-section {
+    margin-bottom: 24px;
+}
+
+.faq-item {
     background: var(--bg-light);
+    border-radius: var(--border-radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: var(--transition);
 }
 
-::-webkit-scrollbar-thumb {
-    background: var(--text-secondary-light);
-    border-radius: 4px;
+.faq-item.active {
+    box-shadow: var(--shadow-md);
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-color);
-}
-
-body.dark-theme ::-webkit-scrollbar-track {
-    background: var(--bg-dark);
-}
-
-/* ==========================================
-   23. PRINT STYLES
-   ========================================== */
-@media print {
-    .tabs-config,
-    .save-notification,
-    .btn-config,
-    .toggle-password {
-        display: none;
-    }
-
-    .config-card {
-        box-shadow: none;
-        border: 1px solid #ddd;
-        page-break-inside: avoid;
-    }
-}
-
-/* estilos del formulario para el soporte del propietario */
-.config-input,
-.config-textarea {
-    width: 100%;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: inherit;
-    transition: border-color 0.3s;
-}
-
-.config-input:focus,
-.config-textarea:focus {
-    outline: none;
-    border-color: #007bff;
-}
-
-.config-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-.btn-enviar-soporte {
-    width: 100%;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #0A932C 0%, #087a24 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
+.faq-question {
+    padding: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    font-weight: 600;
+    color: var(--text-light);
+    transition: var(--transition);
+    user-select: none;
+}
+
+.faq-question:hover {
+    background: rgba(10, 147, 44, 0.05);
+}
+
+.faq-question span {
+    flex: 1;
+}
+
+.faq-question i {
+    transition: var(--transition);
+    font-size: var(--font-size-lg);
+    color: var(--primary-color);
+}
+
+.faq-answer {
+    padding: 0 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    color: var(--text-secondary-light);
+    line-height: 1.6;
+}
+
+.faq-item.active .faq-answer {
+    padding: 0 16px 16px 16px;
+    max-height: 500px;
+    /* Aumentado para contenido más largo */
+}
+
+/*
+ * 22. FILE UPLOAD
+ */
+.file-upload {
+    border: 2px dashed var(--border-light);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.file-upload:hover {
+    border-color: var(--primary-color);
+    background: rgba(10, 147, 44, 0.03);
+}
+
+.file-upload input {
+    display: none;
+}
+
+.file-upload i {
+    font-size: 32px;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.file-list {
+    margin-top: 12px;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--bg-light);
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.file-item-info {
+    display: flex;
+    align-items: center;
     gap: 8px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
 }
 
-.btn-enviar-soporte:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+.file-item button {
+    background: none;
+    border: none;
+    color: #e53e3e;
+    cursor: pointer;
+    font-size: 18px;
 }
 
-.btn-enviar-soporte:active {
-    transform: translateY(0);
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideIn 0.3s ease;
 }
 
-/* Dark mode support */
-body.dark-mode .config-input,
-body.dark-mode .config-textarea {
-    background-color: #2d2d2d;
-    border-color: #444;
-    color: #fff;
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
-body.dark-mode .config-input:focus,
-body.dark-mode .config-textarea:focus {
-    border-color: #0A932C;
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.faq-section {
+    margin-bottom: 24px;
+}
+
+.faq-item {
+    background: #f7fafc;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.faq-question {
+    padding: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    color: #2d3748;
+    transition: background 0.3s ease;
+}
+
+.faq-question:hover {
+    background: #edf2f7;
+}
+
+.faq-answer {
+    padding: 0 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-answer.active {
+    padding: 16px;
+    max-height: 200px;
+}
+
+.priority-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.priority-badge {
+    padding: 8px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    text-align: center;
+    min-width: 80px;
+}
+
+.priority-badge:hover {
+    border-color: #667eea;
+}
+
+.priority-badge.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
 }

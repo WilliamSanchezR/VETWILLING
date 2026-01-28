@@ -16,6 +16,8 @@ class ListaServicios {
         this.inputBuscarProfesionales = document.getElementById('buscarProfesionales');
         this.limpiarBusqueda = document.querySelector('.campo-buscar i');
         this.btnCrearServicio = document.getElementById('btnAgregarNuevo');
+
+        this.btnEliminarServicio = document.querySelectorAll('.btn-eliminar');
     }
 
     bindEvents() {
@@ -41,6 +43,22 @@ class ListaServicios {
         if (this.btnCrearServicio) {
             this.btnCrearServicio.onclick = () => this.crearServicio();
         }
+
+        if (this.btnEliminarServicio) {
+            this.btnEliminarServicio.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('bi-trash')) {
+                        var btnEdit = e.target.parentElement;
+                        this.eliminarServicio(btnEdit.dataset.id);
+                    }
+                    if (e.target.classList.contains('btn-editar')) {
+                        this.eliminarServicio(e.target.dataset.id);
+
+                    }
+                })
+            });
+        }
+
     }
 
     // Funcion para inicializar DataTable para la lista de laboratorios asociados
@@ -176,6 +194,22 @@ class ListaServicios {
         const eliminarUrl = `${window.location.origin}/vetwilling/representante/registro-servicio`;
 
         window.location.href = eliminarUrl;
+    }
+
+    eliminarServicio($id) {
+        Swal.fire({
+            title: '¿Eliminar servicio?',
+            text: '¿Estás seguro de que deseas eliminar este servicio?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((deleteResult) => {
+            if (deleteResult.isConfirmed) {
+                // Eliminar del servidor
+                window.location.href = `${window.location.origin}/vetwilling/representante/eliminar-servicio?action=eliminar&id=${$id}`;
+            }
+        });
     }
 }
 

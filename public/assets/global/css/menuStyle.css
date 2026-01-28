@@ -118,7 +118,8 @@
    ITEMS DE NAVEGACIÓN
 ================================ */
    .nav-item,
-   .submenu-toggle {
+   .submenu-toggle,
+   .submenu-seccond-toggle {
        display: flex;
        align-items: center;
        padding: 12px 16px;
@@ -147,7 +148,8 @@
 
    /* Estados del item */
    .nav-item:hover,
-   .submenu-toggle:hover {
+   .submenu-toggle:hover,
+   .submenu-seccond-toggle:hover {
        background: var(--hover-bg);
        color: var(--primary-green);
        /* transform: translateX(3px); */
@@ -173,7 +175,8 @@
        border-radius: 0 4px 4px 0;
    }
 
-   .submenu-toggle i {
+   .submenu-toggle i,
+   .submenu-seccond-toggle i {
        margin-right: 2px;
        font-size: 20px;
    }
@@ -202,7 +205,6 @@
    }
 
    .sidebar.collapsed .nav-text {
-       opacity: 0;
        width: 0;
        display: none;
    }
@@ -224,7 +226,7 @@
        opacity: 0;
        pointer-events: none;
        transition: opacity 0.2s ease;
-       z-index: 1002; 
+       z-index: 1002;
    }
 
    .sidebar.collapsed .nav-item:hover::after,
@@ -332,17 +334,20 @@
      SUBMENÚS  
 
   /* Flecha animada */
-   .submenu .flecha {
+   .submenu .flecha,
+   .submenu-seccond .flecha-second {
        margin-left: auto;
        transition: transform 0.3s ease;
    }
 
-   .collapsed .submenu .flecha {
+   .collapsed .submenu .flecha,
+   .collapsed .submenu-seccond .flecha-second {
        display: none;
    }
 
    /* Lista interna (invisible por defecto) */
-   .submenu-items {
+   .submenu-items,
+   .submenu-seccond-items {
        list-style: none;
        margin: 0;
        max-height: 0;
@@ -351,24 +356,40 @@
    }
 
    /* Ítems del submenú */
-   .submenu-items li a {
-       display: block;
+   .submenu-items li a,
+   .submenu-seccond-items li a {
+       display: flex;
+       flex-direction: row;
        color: var(--text-primary);
        text-decoration: none;
        font-size: 15px;
        transition: color 0.3s ease;
+       gap: 10px;
    }
 
-   .submenu-items li a:hover {
+   .submenu-items-float li a {
+       justify-content: flex-start !important;
+   }
+
+   .submenu-items-float .nav-text,
+   .submenu-items-float .texto-item-sidebar {
+       display: flex !important;
+       opacity: 1 !important;
+   }
+
+   .submenu-items li a:hover,
+   .submenu-seccond-items li a:hover {
        color: var(--text-primary);
    }
 
    /* Cuando el submenú está abierto */
-   .submenu.open .submenu-items {
-       max-height: 200px;
+   .submenu.open .submenu-items,
+   .submenu-seccond.open .submenu-seccond-items {
+       max-height: max-content !important;
    }
 
-   .submenu.open .flecha {
+   .submenu.open .flecha,
+   .submenu-seccond.open .flecha-second {
        transform: rotate(180deg);
    }
 
@@ -381,39 +402,50 @@
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
 } */
 
-   .submenu-toggle {
+   .submenu-toggle,
+   .submenu-seccond-toggle {
        display: flex;
        flex-direction: row;
        gap: 10px;
    }
 
-   .submenu.active .submenu-toggle {
+   .submenu.active .submenu-toggle,
+   .submenu-seccond.active .submenu-seccond-toggle {
        background: var(--active-bg);
        color: var(--primary-green);
        font-weight: 600;
 
    }
 
-   .view-modal-menu .submenu-items {
+   .submenu-items-float,
+   .submenu-seccond-items-float {
        position: absolute;
        display: block;
-       width: 150px;
+       width: 200px;
        height: 50px;
        z-index: 1;
        overflow: visible;
        left: 79px;
-       background: #ffffffd0;
+       background: #ffffff;
        max-height: 500px;
        margin-top: -50px;
        max-height: max-content !important;
        height: 100%;
        padding-left: 0px;
+       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
    }
 
-   .collapsed .submenu.open .submenu-items {
+   .submenu-seccond-items-float {
+       left: 200px !important;
+       margin-top: -73px;
+   }
+
+   .collapsed .submenu.open .submenu-items,
+   .collapsed .submenu-seccond.open .submenu-seccond-items {
        max-height: 0px;
    }
 
-     .collapsed .submenu-toggle .texto-item-sidebar {
-        display: none;
-     }
+   .collapsed .submenu-toggle .texto-item-sidebar,
+   .collapsed .submenu-seccond-toggle .texto-item-sidebar {
+       display: none;
+   }

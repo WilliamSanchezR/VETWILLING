@@ -1,14 +1,14 @@
-#especialidadesContainer {
+#especialidadesContainer, #serviciosContainer {
     display: none;
     grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
-.listEspecialidades {
+.listEspecialidades, .listServicios {
     display: none;
     border-radius: 10px;
     padding: 5px;
     background-color: #ffffff;
-    width: 40%;
+    width: 35%;
     min-height: 50px;
     max-height: 250px;
     overflow-y: auto;
@@ -17,18 +17,18 @@
     margin-top: 5px;
 }
 
-.vew-list-esp {
+.vew-list-esp, .vew-list-serv {
     display: block;
 }
 
-.listEspecialidades ul {
+.listEspecialidades ul, .listServicios ul {
     display: flex;
     flex-direction: column;
     gap: 10px;
     list-style: none;
 }
 
-.listEspecialidades ul li {
+.listEspecialidades ul li, .listServicios ul li {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 10px;
@@ -36,18 +36,18 @@
     align-items: center;
 }
 
-.check-especialidades {
+.check-especialidades, .check-servicios {
     width: 18px !important;
     height: 18px !important;
     cursor: pointer;
 }
 
-.listEspecialidades label {
+.listEspecialidades label, .listServicios label {
     margin: 0px !important;
     cursor: pointer;
 }
 
-.especialidad-seleccionada {
+.especialidad-seleccionada, .servicio-seleccionado {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -61,10 +61,14 @@
     font-size: 14px;
 }
 
-.especialidad-seleccionada button {
+.especialidad-seleccionada button, .servicio-seleccionado button {
     background: none;
     border: none;
     color: #ffffff;
     cursor: pointer;
     font-size: 16px;
+}
+
+.lista-servicios-profesional {
+    margin-top: 30px;
 }

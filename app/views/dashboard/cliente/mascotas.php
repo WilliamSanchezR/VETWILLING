@@ -164,9 +164,9 @@ $mascotas = listarMascotas();
                                         <i class="bi bi-file-medical"></i> Ver Historial
                                     </a>
 
-                                    <button class="action-btn action-btn-success">
+                                    <a href="<?= BASE_URL ?>/cliente/vacunas-mascota?id=<?= $m['id_paciente'] ?>" class="action-btn action-btn-success">
                                         <i class="bi bi-syringe"></i> Vacunas
-                                    </button>
+                                    </a>
 
                                     <a href="<?= BASE_URL ?>/cliente/editar-mascota?id=<?= $m['id_paciente'] ?>"
                                         class="action-btn action-btn-secondary">

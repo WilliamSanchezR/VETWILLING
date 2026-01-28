@@ -126,7 +126,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                                             <i class="bi bi-pencil"></i>
                                         </button>
 
-                                        <button class="btn-accion btn-eliminar" title="Eliminar" onclick="window.location.href='<?= BASE_URL ?>/representante/eliminar-servicio?action=eliminar&id=<?= $servicio['id_servicio'] ?>'">
+                                        <button class="btn-accion btn-eliminar" title="Eliminar" data-id="<?= $servicio['id_servicio'] ?>">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -157,6 +157,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
     <!-- 5. Script de lista de veterinarias -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
+    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
     <!-- Modo dia  y noche -->
     <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 

@@ -14,7 +14,7 @@ switch ($method) {
             actualizarUsuario();
         } else if ($accion  === 'actualizar-constrasena') {
             cambioContrasena();
-        } else if ($accion  === 'modificar-constrasena') {
+        } else if ($accion  === 'modificar-contrasena') {
             modiContrasena();
         } else if ($accion  === 'vet-constrasena') {
             vetContrasena();

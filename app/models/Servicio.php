@@ -45,7 +45,42 @@ class Servicio
                 $resultado->bindParam(':id_veterinaria', $data['id_veterinaria']);
 
                 // Ejecutamos la consulta
-                return $resultado->execute();
+                $respuesta = $resultado->execute();
+
+                // Validamos si existen horarios para guardar
+                if ($respuesta && !empty($data['horarios'])) {
+                    $id_servicio = $this->conexion->lastInsertId();
+
+                    $horarios = json_decode($data['horarios'], true);
+
+                    foreach ($horarios as $horario) {
+                        $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
+                                             VALUES (:id_servicio, :dia_semana, :hora_inicio, :hora_fin)";
+
+                        $resultadoHorario = $this->conexion->prepare($consultaHorario);
+                        $resultadoHorario->bindParam(':id_servicio', $id_servicio);
+                        $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
+                        $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
+                        $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
+
+                        $resultadoHorario->execute();
+
+                        // validmos si hay un segundo horario
+                        if (isset($horario['horario_2'])) {
+                            $consultaHorario2 = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
+                                                 VALUES (:id_servicio, :dia_semana, :hora_inicio, :hora_fin)";
+
+                            $resultadoHorario2 = $this->conexion->prepare($consultaHorario2);
+                            $resultadoHorario2->bindParam(':id_servicio', $id_servicio);
+                            $resultadoHorario2->bindParam(':dia_semana', $horario['dia']);
+                            $resultadoHorario2->bindParam(':hora_inicio', $horario['horario_2']['hora_inicio']);
+                            $resultadoHorario2->bindParam(':hora_fin', $horario['horario_2']['hora_fin']);
+
+                            $resultadoHorario2->execute();
+                        }
+                    }
+                }
+                return $respuesta;
             }
         } catch (PDOException $e) {
             echo "Error al registrar el servicio: " . $e->getMessage();
@@ -58,6 +93,22 @@ class Servicio
     {
         try {
             $consulta = "SELECT * FROM servicio WHERE id_veterinaria = :id_veterinaria";
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_veterinaria', $id_veterinaria);
+            $resultado->execute();
+
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los servicios: " . $e->getMessage();
+            return [];
+        }
+    }
+
+    // FUNCION PARA OBTENER LOS SERVICIOS DE UNA VETERINARIA
+    public function obtenerServiciosPorVeterinariaActivos($id_veterinaria)
+    {
+        try {
+            $consulta = "SELECT * FROM servicio WHERE id_veterinaria = :id_veterinaria AND estado = 'Activo'";
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_veterinaria', $id_veterinaria);
             $resultado->execute();
@@ -116,7 +167,42 @@ class Servicio
             $resultado->bindParam(':estado', $data['estado']);
             $resultado->bindParam(':id_servicio', $data['id_servicio']);
 
-            return $resultado->execute();
+            $respuesta = $resultado->execute();
+
+            if ($respuesta && !empty($data['horarios'])) {
+                $id_servicio = $this->conexion->lastInsertId();
+
+                $horarios = json_decode($data['horarios'], true);
+
+                foreach ($horarios as $horario) {
+                    $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
+                                             VALUES (:id_servicio, :dia_semana, :hora_inicio, :hora_fin)";
+
+                    $resultadoHorario = $this->conexion->prepare($consultaHorario);
+                    $resultadoHorario->bindParam(':id_servicio', $data['id_servicio']);
+                    $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
+                    $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
+                    $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
+
+                    $resultadoHorario->execute();
+
+                    // validmos si hay un segundo horario
+                    if (isset($horario['horario_2'])) {
+                        $consultaHorario2 = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
+                                                 VALUES (:id_servicio, :dia_semana, :hora_inicio, :hora_fin)";
+
+                        $resultadoHorario2 = $this->conexion->prepare($consultaHorario2);
+                        $resultadoHorario2->bindParam(':id_servicio', $data['id_servicio']);
+                        $resultadoHorario2->bindParam(':dia_semana', $horario['dia']);
+                        $resultadoHorario2->bindParam(':hora_inicio', $horario['horario_2']['hora_inicio']);
+                        $resultadoHorario2->bindParam(':hora_fin', $horario['horario_2']['hora_fin']);
+
+                        $resultadoHorario2->execute();
+                    }
+                }
+            }
+
+            return $respuesta;
         } catch (PDOException $e) {
             echo "Error al actualizar el servicio: " . $e->getMessage();
             return false;
@@ -138,6 +224,40 @@ class Servicio
             return $resultado->execute();
         } catch (PDOException $e) {
             echo "Error al eliminar el servicio: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    // FUNCION PARA OBTENER LOS HORARIOS DE UN SERVICIO
+    public function obtenerHorariosPorServicio($id_servicio)
+    {
+        try {
+            $consulta = "SELECT * FROM horario_servicio WHERE id_servicio = :id_servicio AND estado = 'Activo' ORDER BY dia_semana ASC";
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_servicio', $id_servicio);
+            $resultado->execute();
+
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los horarios del servicio: " . $e->getMessage();
+            return [];
+        }
+    }
+
+    public function eliminarHorariosPorServicio($id_servicio)
+    {
+        try {
+            $consulta = "UPDATE horario_servicio 
+                         SET estado = :estado, fecha_modificacion = NOW()
+                         WHERE id_horario_servicio = :id_horario_servicio";
+            $estado = 'Inactivo';
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':estado', $estado);
+            $resultado->bindParam(':id_horario_servicio', $id_servicio);
+
+            return $resultado->execute();
+        } catch (PDOException $e) {
+            echo "Error al eliminar los horarios del servicio: " . $e->getMessage();
             return false;
         }
     }
