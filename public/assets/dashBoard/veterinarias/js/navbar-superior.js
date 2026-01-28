@@ -1,453 +1,172 @@
-// ========== FUNCIONALIDAD DEL NAVBAR SUPERIOR ==========
+/* ======================================================
+   NAVBAR SUPERIOR - JS GENERAL
+   ====================================================== */
 
-(function() {
-    'use strict';
-    
-    // ========== ELEMENTOS DEL DOM ==========
-    const elements = {
-        searchInput: document.getElementById('searchInput'),
-        btnClearSearch: document.getElementById('btnClearSearch'),
-        searchResults: document.getElementById('searchResults'),
-        searchItems: document.getElementById('searchItems'),
-        notificationsPanel: document.getElementById('notificationsPanel'),
-        perfilDropdown: document.getElementById('perfilDropdown'),
-        themeIcon: document.getElementById('themeIcon')
-    };
-    
-    // ========== INICIALIZACIÓN ==========
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeSearch();
-        initializeTheme();
-        setupClickOutside();
-        updateThemeIcon();
-    });
-    
-    // ========== BÚSQUEDA ========== 
-    function initializeSearch() {
-        if (!elements.searchInput) return;
-        
-        elements.searchInput.addEventListener('input', handleSearchInput);
-        elements.searchInput.addEventListener('focus', handleSearchFocus);
-        
-        if (elements.btnClearSearch) {
-            elements.btnClearSearch.addEventListener('click', clearSearch);
-        }
-    }
-    
-    function handleSearchInput(e) {
-        const query = e.target.value.trim();
-        
-        if (query.length > 0) {
-            elements.btnClearSearch.style.display = 'flex';
-            performSearch(query);
-        } else {
-            elements.btnClearSearch.style.display = 'none';
-            elements.searchResults.style.display = 'none';
-        }
-    }
-    
-    function handleSearchFocus() {
-        const query = elements.searchInput.value.trim();
-        if (query.length > 0) {
-            elements.searchResults.style.display = 'block';
-        }
-    }
-    
-    function performSearch(query) {
-        // Datos de ejemplo - reemplazar con búsqueda real
-        const resultados = [
-            {
-                icon: 'bi-heart-fill',
-                title: 'Luna',
-                description: 'Paciente - Golden Retriever',
-                link: '#'
-            },
-            {
-                icon: 'bi-calendar-check',
-                title: 'Cita con Max',
-                description: 'Hoy 15:00 - Consulta general',
-                link: '#'
-            },
-            {
-                icon: 'bi-file-medical',
-                title: 'Historia clínica',
-                description: 'Rocky - Última actualización',
-                link: '#'
-            }
-        ];
-        
-        displaySearchResults(resultados);
-    }
-    
-    function displaySearchResults(resultados) {
-        if (!elements.searchItems) return;
-        
-        elements.searchItems.innerHTML = '';
-        
-        if (resultados.length === 0) {
-            elements.searchItems.innerHTML = `
-                <div style="padding: 20px; text-align: center; color: var(--text-muted);">
-                    <i class="bi bi-search" style="font-size: 32px; margin-bottom: 8px;"></i>
-                    <p>No se encontraron resultados</p>
-                </div>
-            `;
-        } else {
-            resultados.forEach(resultado => {
-                const item = document.createElement('div');
-                item.className = 'search-item';
-                item.innerHTML = `
-                    <div class="search-item-icon">
-                        <i class="bi ${resultado.icon}"></i>
-                    </div>
-                    <div class="search-item-content">
-                        <h5>${resultado.title}</h5>
-                        <p>${resultado.description}</p>
-                    </div>
-                `;
-                item.addEventListener('click', () => {
-                    window.location.href = resultado.link;
-                });
-                elements.searchItems.appendChild(item);
-            });
-        }
-        
-        elements.searchResults.style.display = 'block';
-    }
-    
-    function clearSearch() {
-        elements.searchInput.value = '';
-        elements.btnClearSearch.style.display = 'none';
-        elements.searchResults.style.display = 'none';
-        elements.searchInput.focus();
-    }
-    
-    // ========== TOGGLE TEMA ========== 
-    window.toggleTheme = function() {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        if (newTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('theme', 'light');
-        }
-        
-        updateThemeIcon();
-        
-        // Disparar evento personalizado
-        window.dispatchEvent(new CustomEvent('themeChange', {
-            detail: { theme: newTheme }
-        }));
-    };
-    
-    function initializeTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-        updateThemeIcon();
-    }
-    
-    function updateThemeIcon() {
-        if (!elements.themeIcon) return;
-        
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        if (currentTheme === 'dark') {
-            elements.themeIcon.className = 'bi bi-sun-fill';
-        } else {
-            elements.themeIcon.className = 'bi bi-moon-stars-fill';
-        }
-    }
-    
-    // ========== TOGGLE NOTIFICACIONES ========== 
-    window.toggleNotificaciones = function() {
-        if (!elements.notificationsPanel) return;
-        
-        const isVisible = elements.notificationsPanel.style.display === 'block';
-        
-        // Cerrar otros paneles
-        if (elements.perfilDropdown) {
-            elements.perfilDropdown.style.display = 'none';
-        }
-        
-        elements.notificationsPanel.style.display = isVisible ? 'none' : 'block';
-    };
-    
-    // ========== TOGGLE PERFIL ========== 
-    window.togglePerfilMenu = function() {
-        if (!elements.perfilDropdown) return;
-        
-        const isVisible = elements.perfilDropdown.style.display === 'block';
-        
-        // Cerrar otros paneles
-        if (elements.notificationsPanel) {
-            elements.notificationsPanel.style.display = 'none';
-        }
-        
-        elements.perfilDropdown.style.display = isVisible ? 'none' : 'block';
-    };
-    
-    // ========== MARCAR TODAS COMO LEÍDAS ========== 
-    document.querySelector('.btn-mark-read')?.addEventListener('click', function() {
-        const unreadItems = document.querySelectorAll('.notification-item.unread');
-        unreadItems.forEach(item => {
-            item.classList.remove('unread');
-        });
-        
-        // Actualizar badge
-        const badge = document.querySelector('.notification-badge');
-        if (badge) {
-            badge.style.display = 'none';
-        }
-        
-        console.log('Todas las notificaciones marcadas como leídas');
-    });
-    
-    // ========== CERRAR AL HACER CLICK FUERA ========== 
-    function setupClickOutside() {
-        document.addEventListener('click', function(e) {
-            // Cerrar búsqueda
-            if (elements.searchResults && 
-                !elements.searchResults.contains(e.target) && 
-                !elements.searchInput.contains(e.target)) {
-                elements.searchResults.style.display = 'none';
-            }
-            
-            // Cerrar notificaciones
-            if (elements.notificationsPanel && 
-                !elements.notificationsPanel.contains(e.target) && 
-                !e.target.closest('.btn-action')) {
-                elements.notificationsPanel.style.display = 'none';
-            }
-            
-            // Cerrar perfil
-            if (elements.perfilDropdown && 
-                !elements.perfilDropdown.contains(e.target) && 
-                !e.target.closest('.btn-perfil')) {
-                elements.perfilDropdown.style.display = 'none';
-            }
-        });
-        
-        // Cerrar con ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (elements.searchResults) elements.searchResults.style.display = 'none';
-                if (elements.notificationsPanel) elements.notificationsPanel.style.display = 'none';
-                if (elements.perfilDropdown) elements.perfilDropdown.style.display = 'none';
-            }
-        });
-    }
-    
-    // ========== ABRIR SIDEBAR EN MÓVIL ========== 
-    window.abrirSidebarMovil = function() {
-        const sidebar = document.getElementById('barraLateralIzquierda');
-        const overlay = document.getElementById('sidebarOverlay');
-        
-        if (sidebar) {
-            sidebar.classList.add('mobile-open');
-        }
-        if (overlay) {
-            overlay.classList.add('active');
-        }
-        
-        document.body.style.overflow = 'hidden';
-    };
-    
-    // ========== ACTUALIZAR BREADCRUMB ========== 
-    function updateBreadcrumb() {
-        const paginaActual = document.getElementById('paginaActual');
-        if (!paginaActual) return;
-        
-        // Obtener de la URL o título de la página
-        const path = window.location.pathname;
-        const segments = path.split('/').filter(Boolean);
-        
-        if (segments.length > 0) {
-            const ultimoSegmento = segments[segments.length - 1];
-            const nombrePagina = ultimoSegmento
-                .replace(/-/g, ' ')
-                .replace(/_/g, ' ')
-                .split(' ')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-            
-            paginaActual.textContent = nombrePagina || 'Dashboard';
-        }
-    }
-    
-    // Actualizar breadcrumb al cargar
-    updateBreadcrumb();
-    
-    // ========== ANIMACIÓN DE SCROLL ========== 
-    let lastScroll = 0;
-    window.addEventListener('scroll', function() {
-        const navbar = document.querySelector('.navbar-superior');
-        if (!navbar) return;
-        
-        const currentScroll = window.pageYOffset;
-        
-        if (currentScroll > lastScroll && currentScroll > 100) {
-            // Scroll hacia abajo
-            navbar.style.transform = 'translateY(-100%)';
-        } else {
-            // Scroll hacia arriba
-            navbar.style.transform = 'translateY(0)';
-        }
-        
-        lastScroll = currentScroll;
-    });
-    
-    // ========== FUNCIONES DE UTILIDAD ========== 
-    
-    // Agregar notificación programáticamente
-    window.agregarNotificacion = function(tipo, titulo, texto) {
-        const panelBody = document.querySelector('.notifications-panel .panel-body');
-        if (!panelBody) return;
-        
-        const iconos = {
-            success: { icon: 'bi-check-circle', bg: 'bg-success' },
-            warning: { icon: 'bi-exclamation-triangle', bg: 'bg-warning' },
-            info: { icon: 'bi-info-circle', bg: 'bg-info' }
-        };
-        
-        const config = iconos[tipo] || iconos.info;
-        
-        const item = document.createElement('div');
-        item.className = 'notification-item unread';
-        item.innerHTML = `
-            <div class="notification-icon ${config.bg}">
-                <i class="bi ${config.icon}"></i>
-            </div>
-            <div class="notification-content">
-                <p class="notification-title">${titulo}</p>
-                <p class="notification-text">${texto}</p>
-                <span class="notification-time">Ahora</span>
-            </div>
-        `;
-        
-        panelBody.insertBefore(item, panelBody.firstChild);
-        
-        // Actualizar badge
-        const badge = document.querySelector('.notification-badge');
-        if (badge) {
-            const count = parseInt(badge.textContent) || 0;
-            badge.textContent = count + 1;
-            badge.style.display = 'flex';
-        }
-    };
-    
-    // Ejemplo de uso:
-    // agregarNotificacion('success', 'Nueva cita', 'Max - Consulta general');
-    
-})();
-
-// ========== EXPORTAR FUNCIONES GLOBALES ========== 
-window.NavbarSuperior = {
-    toggleTheme: window.toggleTheme,
-    toggleNotificaciones: window.toggleNotificaciones,
-    togglePerfilMenu: window.togglePerfilMenu,
-    abrirSidebarMovil: window.abrirSidebarMovil,
-    agregarNotificacion: window.agregarNotificacion
-};
-const btnAbrirSoporte = document.getElementById('btnAbrirSoporte');
-const modalSoporte = document.getElementById('modalSoporte');
-const btnCerrarModal = document.getElementById('btnCerrarModal');
-const btnCancelar = document.getElementById('btnCancelar');
-const formularioSoporte = document.getElementById('formularioSoporte');
-
-// Abrir modal
-btnAbrirSoporte.addEventListener('click', function(e) {
-    e.preventDefault();
-    modalSoporte.classList.add('active');
-    document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+document.addEventListener("DOMContentLoaded", () => {
+    iniciarReloj();
+    iniciarSaludo();
+    inicializarEventosGlobales();
 });
 
-// Cerrar modal
-function cerrarModal() {
-    modalSoporte.classList.remove('active');
-    document.body.style.overflow = ''; // Restaurar scroll
-    formularioSoporte.reset();
+/* ======================================================
+   RELOJ Y SALUDO
+   ====================================================== */
+
+function iniciarReloj() {
+    const horaActual = document.getElementById("horaActual");
+
+    setInterval(() => {
+        const ahora = new Date();
+        horaActual.textContent = ahora.toLocaleTimeString("es-CO");
+    }, 1000);
 }
 
-btnCerrarModal.addEventListener('click', cerrarModal);
-btnCancelar.addEventListener('click', cerrarModal);
+function iniciarSaludo() {
+    const saludoTexto = document.getElementById("saludoTexto");
+    const saludoEmoji = document.getElementById("saludoEmoji");
 
-// Cerrar al hacer click fuera del modal
-modalSoporte.addEventListener('click', function(e) {
-    if (e.target === modalSoporte) {
-        cerrarModal();
+    const hora = new Date().getHours();
+
+    if (hora < 12) {
+        saludoTexto.textContent = "Buenos días";
+        saludoEmoji.textContent = "🌅";
+    } else if (hora < 18) {
+        saludoTexto.textContent = "Buenas tardes";
+        saludoEmoji.textContent = "☀️";
+    } else {
+        saludoTexto.textContent = "Buenas noches";
+        saludoEmoji.textContent = "🌙";
     }
-});
+}
 
-// Cerrar con tecla ESC
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && modalSoporte.classList.contains('active')) {
-        cerrarModal();
-    }
-});
+/* ======================================================
+   MENÚ PERFIL
+   ====================================================== */
 
-// Enviar formulario
-formularioSoporte.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Recopilar datos
-    const formData = {
-        nombre: document.getElementById('nombreSoporte').value,
-        email: document.getElementById('emailSoporte').value,
-        tipo_problema: document.getElementById('tipoProblema').value,
-        descripcion: document.getElementById('descripcionProblema').value,
-        fecha: new Date().toISOString()
-    };
-    
-    console.log('Datos del formulario:', formData);
-    
-    // Aquí puedes enviar a tu servidor
-    // fetch('<?= BASE_URL ?>/api/soporte.php', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(formData)
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     if(data.success) {
-    //         mostrarAlertaExito();
-    //     }
-    // })
-    // .catch(error => {
-    //     console.error('Error:', error);
-    //     alert('Error al enviar el mensaje');
-    // });
-    
-    // Simulación de envío exitoso
-    mostrarAlertaExito();
-});
+function togglePerfilMenu() {
+    const menu = document.getElementById("perfilDropdown");
+    cerrarOtrosDropdowns(menu);
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
 
-function mostrarAlertaExito() {
-    // Cerrar modal
-    cerrarModal();
-    
-    // Crear alerta de éxito
-    const alerta = document.createElement('div');
-    alerta.className = 'alerta-exito';
-    alerta.innerHTML = `
-        <div class="alerta-contenido">
-            <i class="bi bi-check-circle-fill"></i>
-            <div>
-                <h4>¡Mensaje enviado!</h4>
-                <p>Te responderemos pronto a tu correo</p>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(alerta);
-    
-    // Remover después de 4 segundos
-    setTimeout(() => {
-        alerta.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => alerta.remove(), 300);
-    }, 4000);
+/* ======================================================
+   NOTIFICACIONES
+   ====================================================== */
+
+function toggleNotificaciones() {
+    const panel = document.getElementById("notificationsPanel");
+    cerrarOtrosDropdowns(panel);
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
+}
+
+function eliminarNotificacion(btn) {
+    btn.closest(".notification-item").remove();
+}
+
+function marcarTodasLeidas() {
+    document
+        .querySelectorAll(".notification-item.unread")
+        .forEach(item => item.classList.remove("unread"));
+}
+
+/* ======================================================
+   MODAL SOPORTE
+   ====================================================== */
+
+const btnAbrirSoporte = document.getElementById("btnAbrirSoporte");
+const modalSoporte = document.getElementById("modalSoporte");
+const btnCerrarModal = document.getElementById("btnCerrarModal");
+const btnCancelar = document.getElementById("btnCancelar");
+
+if (btnAbrirSoporte) {
+    btnAbrirSoporte.addEventListener("click", (e) => {
+        e.preventDefault();
+        cerrarTodos();
+        modalSoporte.classList.add("active");
+    });
+}
+
+if (btnCerrarModal) {
+    btnCerrarModal.addEventListener("click", cerrarModalSoporte);
+}
+
+if (btnCancelar) {
+    btnCancelar.addEventListener("click", cerrarModalSoporte);
+}
+
+function cerrarModalSoporte() {
+    modalSoporte.classList.remove("active");
+}
+
+/* ======================================================
+   FORMULARIO SOPORTE
+   ====================================================== */
+
+const formularioSoporte = document.getElementById("formularioSoporte");
+
+if (formularioSoporte) {
+    formularioSoporte.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const descripcion = document.getElementById("descripcionProblema").value;
+
+        if (descripcion.length < 20) {
+            alert("La descripción debe tener al menos 20 caracteres.");
+            return;
+        }
+
+        alert("✅ Solicitud enviada correctamente.");
+        formularioSoporte.reset();
+        cerrarModalSoporte();
+    });
+}
+
+/* ======================================================
+   TEMA OSCURO / CLARO
+   ====================================================== */
+
+function toggleTheme() {
+    document.body.classList.toggle("dark-theme");
+}
+
+/* ======================================================
+   SIDEBAR MÓVIL
+   ====================================================== */
+
+function abrirSidebarMovil() {
+    document.body.classList.toggle("sidebar-open");
+}
+
+/* ======================================================
+   UTILIDADES
+   ====================================================== */
+
+function cerrarOtrosDropdowns(excepto) {
+    document.querySelectorAll(".dropdown-panel").forEach(panel => {
+        if (panel !== excepto) {
+            panel.style.display = "none";
+        }
+    });
+}
+
+function cerrarTodos() {
+    document.querySelectorAll(".dropdown-panel").forEach(panel => {
+        panel.style.display = "none";
+    });
+}
+
+/* ======================================================
+   CIERRE AL HACER CLICK FUERA
+   ====================================================== */
+
+function inicializarEventosGlobales() {
+    document.addEventListener("click", (e) => {
+        if (
+            !e.target.closest(".navbar-action") &&
+            !e.target.closest(".dropdown-panel") &&
+            !e.target.closest(".modal-container")
+        ) {
+            cerrarTodos();
+        }
+    });
 }

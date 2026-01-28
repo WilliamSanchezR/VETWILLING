@@ -10,16 +10,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
-    <!-- estilos propios y algunas cosas que son importantes para que se vea mas wonito -->
+    <!-- Estilos propios -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/perfil.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/confi.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-
 </head>
 
 <body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+
     <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
 
@@ -88,7 +90,7 @@
                                         <label for="inputFoto" class="btn-upload">
                                             <i class="bi bi-upload"></i> Subir Foto
                                         </label>
-                                        <button type="button" class="btn-remove" onclick="event.preventDefault(); eliminarFoto();">
+                                        <button type="button" class="btn-remove" onclick="eliminarFoto()">
                                             <i class="bi bi-trash"></i> Eliminar
                                         </button>
                                     </div>
@@ -162,7 +164,7 @@
 
                                 <div class="form-group-config">
                                     <label>Teléfono Alternativo</label>
-                                    <input type="tel" name="telefono_alt" placeholder="+57 300 000 0000">
+                                    <input type="tel" name="telefono_alt" value="<?= isset($usuario['telefono_alt']) ? $usuario['telefono_alt'] : '' ?>" placeholder="+57 300 000 0000">
                                 </div>
                             </div>
                         </div>
@@ -181,23 +183,23 @@
 
                             <div class="form-group-config">
                                 <label>Dirección</label>
-                                <input type="text" name="direccion" value="<?= $usuario['direccion'] ?>">
+                                <input type="text" name="direccion" value="<?= isset($usuario['direccion']) ? $usuario['direccion'] : '' ?>">
                             </div>
 
                             <div class="form-group-config">
                                 <label>Biografía</label>
-                                <textarea name="biografia" rows="4" placeholder="Cuéntanos un poco sobre ti..."></textarea>
+                                <textarea name="biografia" rows="4" placeholder="Cuéntanos un poco sobre ti..."><?= isset($usuario['biografia']) ? $usuario['biografia'] : '' ?></textarea>
                             </div>
 
                             <div class="form-group-config">
                                 <label>Cómo nos conociste</label>
                                 <select name="como_conociste">
-                                    <option>Selecciona una opción</option>
-                                    <option>Redes sociales</option>
-                                    <option>Recomendación</option>
-                                    <option>Búsqueda en Google</option>
-                                    <option>Publicidad</option>
-                                    <option>Otro</option>
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="redes_sociales" <?= isset($usuario['como_conociste']) && $usuario['como_conociste'] == 'redes_sociales' ? 'selected' : '' ?>>Redes sociales</option>
+                                    <option value="recomendacion" <?= isset($usuario['como_conociste']) && $usuario['como_conociste'] == 'recomendacion' ? 'selected' : '' ?>>Recomendación</option>
+                                    <option value="google" <?= isset($usuario['como_conociste']) && $usuario['como_conociste'] == 'google' ? 'selected' : '' ?>>Búsqueda en Google</option>
+                                    <option value="publicidad" <?= isset($usuario['como_conociste']) && $usuario['como_conociste'] == 'publicidad' ? 'selected' : '' ?>>Publicidad</option>
+                                    <option value="otro" <?= isset($usuario['como_conociste']) && $usuario['como_conociste'] == 'otro' ? 'selected' : '' ?>>Otro</option>
                                 </select>
                             </div>
 
@@ -205,6 +207,10 @@
                                 <button type="submit" class="btn-config btn-primary-config">
                                     <i class="bi bi-check-lg"></i>
                                     Guardar Cambios
+                                </button>
+                                <button type="reset" class="btn-config btn-secondary-config">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                    Restablecer
                                 </button>
                             </div>
                         </div>
@@ -220,32 +226,34 @@
                                 <i class="bi bi-globe2"></i>
                             </div>
                             <div>
-                                <h3 data-translate="language_region">Idioma y Región</h3>
-                                <p data-translate="language_region_desc">Configura tu idioma y zona horaria</p>
+                                <h3>Idioma y Región</h3>
+                                <p>Configura tu idioma y zona horaria</p>
                             </div>
                         </div>
 
                         <div class="config-item">
                             <div class="config-info">
-                                <h4 data-translate="language">Idioma</h4>
-                                <p data-translate="language_desc">Selecciona el idioma de la aplicación</p>
+                                <h4>Idioma</h4>
+                                <p>Selecciona el idioma de la aplicación</p>
                             </div>
                             <select class="config-select" id="selectIdioma">
                                 <option value="es">Español</option>
                                 <option value="en">English</option>
                                 <option value="pt">Português</option>
+                                <option value="fr">Français</option>
+                                <option value="de">Deutsch</option>
                             </select>
                         </div>
 
                         <div class="language-info" id="languageInfo" style="display: none;">
-                            <i class="bi bi-info-circle"></i>
-                            <span data-translate="language_changed">Idioma cambiado exitosamente</span>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Idioma cambiado exitosamente</span>
                         </div>
 
                         <div class="config-item">
                             <div class="config-info">
-                                <h4 data-translate="timezone">Zona Horaria</h4>
-                                <p data-translate="timezone_desc">Tu zona horaria local</p>
+                                <h4>Zona Horaria</h4>
+                                <p>Tu zona horaria local</p>
                             </div>
                             <select class="config-select" id="selectZonaHoraria">
                                 <option value="gmt-5">GMT-5 (Bogotá)</option>
@@ -256,93 +264,71 @@
                                 <option value="gmt+1">GMT+1 (Madrid)</option>
                             </select>
                         </div>
+
+                        <div class="config-item">
+                            <div class="config-info">
+                                <h4>Formato de Fecha</h4>
+                                <p>Cómo quieres ver las fechas</p>
+                            </div>
+                            <select class="config-select" id="selectFormatoFecha">
+                                <option value="dd/mm/yyyy">DD/MM/YYYY (19/01/2026)</option>
+                                <option value="mm/dd/yyyy">MM/DD/YYYY (01/19/2026)</option>
+                                <option value="yyyy-mm-dd">YYYY-MM-DD (2026-01-19)</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- Apariencia -->
+                    <!-- Centro de Ayuda y Soporte -->
                     <div class="config-card">
                         <div class="config-card-header">
                             <div class="config-icon">
-                                <i class="bi bi-headset"></i>
+                                <i class="bi bi-question-circle"></i>
                             </div>
                             <div>
-                                <h3 data-translate="support">Soporte</h3>
-                                <p data-translate="support_desc">¿Tienes algún problema? Coméntanos</p>
+                                <h3>Centro de Ayuda</h3>
+                                <p>Encuentra respuestas rápidas o contáctanos</p>
                             </div>
                         </div>
 
-                        <form id="formularioSoporte" class="support-form">
-                            <div class="config-item">
-                                <div class="config-info">
-                                    <label for="nombreSoporte">
-                                        <h4 data-translate="name">Nombre</h4>
-                                        <p data-translate="name_desc">Tu nombre completo</p>
-                                    </label>
+                        <!-- FAQ Section -->
+                        <div class="faq-section">
+                            <h4 style="margin-bottom: 12px; color: #2d3748;">Preguntas Frecuentes</h4>
+
+                            <div class="faq-item">
+                                <div class="faq-question" onclick="toggleFAQ(this)">
+                                    <span>¿Cómo cambio mi contraseña?</span>
+                                    <i class="bi bi-chevron-down"></i>
                                 </div>
-                                <input
-                                    type="text"
-                                    class="config-input"
-                                    id="nombreSoporte"
-                                    name="nombre"
-                                    placeholder="Juan Pérez"
-                                    required>
+                                <div class="faq-answer">
+                                    Ve a Configuración > Seguridad > Cambiar Contraseña. Necesitarás tu contraseña actual para establecer una nueva.
+                                </div>
                             </div>
 
-                            <div class="config-item">
-                                <div class="config-info">
-                                    <label for="emailSoporte">
-                                        <h4 data-translate="email">Correo Electrónico</h4>
-                                        <p data-translate="email_desc">Para enviarte la respuesta</p>
-                                    </label>
+                            <div class="faq-item">
+                                <div class="faq-question" onclick="toggleFAQ(this)">
+                                    <span>¿Cómo exporto mis datos?</span>
+                                    <i class="bi bi-chevron-down"></i>
                                 </div>
-                                <input
-                                    type="email"
-                                    class="config-input"
-                                    id="emailSoporte"
-                                    name="email"
-                                    placeholder="ejemplo@correo.com"
-                                    required>
+                                <div class="faq-answer">
+                                    Puedes exportar tus datos desde Configuración > Privacidad > Exportar Datos. Recibirás un archivo ZIP con toda tu información.
+                                </div>
                             </div>
 
-                            <div class="config-item">
-                                <div class="config-info">
-                                    <label for="tipoProblema">
-                                        <h4 data-translate="issue_type">Tipo de Problema</h4>
-                                        <p data-translate="issue_type_desc">Selecciona la categoría</p>
-                                    </label>
+                            <div class="faq-item">
+                                <div class="faq-question" onclick="toggleFAQ(this)">
+                                    <span>¿La aplicación funciona sin internet?</span>
+                                    <i class="bi bi-chevron-down"></i>
                                 </div>
-                                <select class="config-select" id="tipoProblema" name="tipo_problema" required>
-                                    <option value="" disabled selected>Selecciona una opción</option>
-                                    <option value="tecnico" data-translate="technical">Problema Técnico</option>
-                                    <option value="cuenta" data-translate="account">Problema con la Cuenta</option>
-                                    <option value="funcionalidad" data-translate="functionality">Funcionalidad</option>
-                                    <option value="sugerencia" data-translate="suggestion">Sugerencia</option>
-                                    <option value="otro" data-translate="other">Otro</option>
-                                </select>
-                            </div>
-
-                            <div class="config-item">
-                                <div class="config-info">
-                                    <label for="descripcionProblema">
-                                        <h4 data-translate="description">Descripción</h4>
-                                        <p data-translate="description_desc">Cuéntanos qué sucede</p>
-                                    </label>
+                                <div class="faq-answer">
+                                    Algunas funciones básicas están disponibles offline, pero necesitarás conexión para sincronizar tus datos y acceder a todas las características.
                                 </div>
-                                <textarea
-                                    class="config-textarea"
-                                    id="descripcionProblema"
-                                    name="descripcion"
-                                    rows="5"
-                                    placeholder="Describe tu problema o sugerencia aquí..."
-                                    required></textarea>
                             </div>
+                        </div>
 
-                            <div class="config-item">
-                                <button type="submit" class="btn-enviar-soporte">
-                                    <i class="bi bi-send-fill"></i>
-                                    <span data-translate="send">Enviar</span>
-                                </button>
-                            </div>
-                        </form>
+                        <div class="alert alert-info">
+                            <i class="bi bi-clock"></i>
+                            <span>Tiempo de respuesta estimado: 24-48 horas</span>
+                        </div>
                     </div>
                 </div>
 
@@ -487,14 +473,19 @@
                 <div class="tab-content" id="tab-seguridad" style="display: none;">
                     <!-- Cambiar Contraseña -->
                     <div class="config-card">
-                        <div class="card-header">
-                            <h2>Cambiar Contraseña</h2>
-                            <p>Actualiza tu contraseña para mantener tu cuenta segura</p>
+                        <div class="config-card-header">
+                            <div class="config-icon">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </div>
+                            <div>
+                                <h3>Cambiar Contraseña</h3>
+                                <p>Actualiza tu contraseña para mantener tu cuenta segura</p>
+                            </div>
                         </div>
 
                         <form method="POST" action="<?= BASE_URL ?>/cliente/actualizar-contrasena" id="passwordForm">
                             <input type="hidden" name="id_usuario" value="<?= $_SESSION['user']['id_usuario'] ?>">
-                            <input type="hidden" name="accion" value="modificar-constrasena">
+                            <input type="hidden" name="accion" value="modificar-contrasena">
 
                             <div class="form-group-config">
                                 <label>Contraseña Actual</label>
@@ -560,6 +551,24 @@
                             </button>
                         </form>
                     </div>
+
+                    <!-- Actividad Reciente -->
+                    <div class="config-card">
+                        <div class="config-card-header">
+                            <div class="config-icon">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div>
+                                <h3>Actividad Reciente</h3>
+                                <p>Últimos accesos a tu cuenta</p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <span>Si notas alguna actividad sospechosa, cambia tu contraseña inmediatamente</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Notificación de guardado GLOBAL -->
@@ -573,9 +582,8 @@
 
     </main>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
-      -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/confi.js"></script>
 </body>
 

@@ -529,8 +529,7 @@ $usuario = mostrarPerfil($id);
 
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/perfil.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+
 
 
 </body>

@@ -202,6 +202,8 @@ $datosUsuario = [
                 <i class="bi bi-calendar-check-fill" aria-hidden="true"></i>
                 <span>Mis Citas</span>
             </a>
+
+            <div class="dropdown-divider" role="separator"></div>
             <a href="<?= BASE_URL ?>/cliente/configuracion" class="dropdown-item" role="menuitem">
                 <i class="bi bi-gear-fill" aria-hidden="true"></i>
                 <span>Configuración</span>
