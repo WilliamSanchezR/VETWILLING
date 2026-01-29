@@ -26,7 +26,8 @@ if (!$usuario) {
 }
 
 // Función helper para sanitizar output
-function safe_echo($value, $default = '') {
+function safe_echo($value, $default = '')
+{
     return htmlspecialchars($value ?? $default, ENT_QUOTES, 'UTF-8');
 }
 
@@ -69,8 +70,8 @@ $datosUsuario = [
     <!-- Acciones -->
     <div class="navbar-derecha">
         <!-- Reloj en Vivo -->
-        <button 
-            class="btn-navbar btn-reloj" 
+        <button
+            class="btn-navbar btn-reloj"
             data-modal="reloj"
             aria-label="Ver reloj y fecha"
             title="Hora actual">
@@ -78,8 +79,8 @@ $datosUsuario = [
         </button>
 
         <!-- Notificaciones -->
-        <button 
-            class="btn-navbar notificaciones" 
+        <button
+            class="btn-navbar notificaciones"
             data-dropdown="notificaciones"
             aria-label="Notificaciones"
             aria-haspopup="true"
@@ -89,8 +90,8 @@ $datosUsuario = [
         </button>
 
         <!-- Dropdown Notificaciones -->
-        <div 
-            class="dropdown-menu dropdown-notificaciones" 
+        <div
+            class="dropdown-menu dropdown-notificaciones"
             id="dropdownNotificaciones"
             role="menu"
             aria-labelledby="notificaciones">
@@ -115,8 +116,8 @@ $datosUsuario = [
         </div>
 
         <!-- Carrito -->
-        <button 
-            class="btn-navbar tienda" 
+        <button
+            class="btn-navbar tienda"
             aria-label="Carrito de compras"
             data-action="toggle-carrito">
             <i class="bi bi-cart-fill" aria-hidden="true"></i>
@@ -124,15 +125,15 @@ $datosUsuario = [
         </button>
 
         <!-- Carrito Sidebar -->
-        <aside 
-            id="carritoSidebar" 
+        <aside
+            id="carritoSidebar"
             class="carrito-sidebar"
             role="complementary"
             aria-label="Carrito de compras">
             <div class="carrito-header">
                 <h3>Mi Carrito</h3>
-                <button 
-                    data-action="toggle-carrito" 
+                <button
+                    data-action="toggle-carrito"
                     class="cerrar-btn"
                     aria-label="Cerrar carrito">
                     <i class="bi bi-x-lg"></i>
@@ -156,36 +157,40 @@ $datosUsuario = [
         <div class="navbar-separador" role="separator"></div>
 
         <!-- Perfil Usuario -->
-        <button 
-            class="btn-perfil" 
+        <button
+            class="btn-perfil"
             data-dropdown="perfil"
             aria-label="Menú de perfil"
             aria-haspopup="true"
             aria-expanded="false">
+
             <div class="avatar-usuario">
-                <img 
-                    src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $datosUsuario['img_perfil'] ?>" 
+                <img
+                    src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $datosUsuario['img_perfil'] ?>"
                     alt="Foto de perfil de <?= $datosUsuario['nombres'] ?>"
                     onerror="this.src='<?= BASE_URL ?>/public/uploads/usuarios/default-avatar.png'">
             </div>
+
             <div class="info-usuario">
                 <span class="nombre-usuario">
                     <?= $datosUsuario['nombres'] ?> <?= $datosUsuario['apellidos'] ?>
                 </span>
                 <span class="rol-usuario"><?= $datosUsuario['rol'] ?></span>
             </div>
+
             <i class="bi bi-chevron-down flecha-perfil" aria-hidden="true"></i>
         </button>
 
+
         <!-- Dropdown Perfil -->
-        <div 
-            class="dropdown-menu dropdown-perfil" 
+        <div
+            class="dropdown-menu dropdown-perfil"
             id="dropdownPerfil"
             role="menu">
             <div class="perfil-header">
                 <div class="avatar-usuario grande">
-                    <img 
-                        src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $datosUsuario['img_perfil'] ?>" 
+                    <img
+                        src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $datosUsuario['img_perfil'] ?>"
                         alt="Avatar"
                         onerror="this.src='<?= BASE_URL ?>/public/uploads/usuarios/default-avatar.png'">
                 </div>
@@ -196,9 +201,9 @@ $datosUsuario = [
                     <p class="email-usuario"><?= $datosUsuario['email'] ?></p>
                 </div>
             </div>
-            
+
             <div class="dropdown-divider" role="separator"></div>
-            
+
             <a href="<?= BASE_URL ?>/cliente/perfil" class="dropdown-item" role="menuitem">
                 <i class="bi bi-person-fill" aria-hidden="true"></i>
                 <span>Mi Perfil</span>
@@ -221,9 +226,9 @@ $datosUsuario = [
                 <i class="bi bi-question-circle" aria-hidden="true"></i>
                 <span>Soporte</span>
             </button>
-            
+
             <div class="dropdown-divider" role="separator"></div>
-            
+
             <a href="<?= BASE_URL ?>/logout" class="dropdown-item text-danger" role="menuitem">
                 <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                 <span>Cerrar Sesión</span>
@@ -238,7 +243,7 @@ $datosUsuario = [
         <button class="btn-cerrar-reloj" data-modal-close="reloj" aria-label="Cerrar reloj">
             <i class="bi bi-x-lg"></i>
         </button>
-        
+
         <div class="reloj-display">
             <div class="reloj-digital" id="relojDigital">
                 00:00:00
@@ -246,7 +251,7 @@ $datosUsuario = [
             <div class="reloj-fecha" id="relojFecha">
                 Cargando fecha...
             </div>
-            
+
             <div class="reloj-info">
                 <div class="info-item">
                     <i class="bi bi-calendar-event"></i>
@@ -289,7 +294,7 @@ $datosUsuario = [
             <form id="formularioSoporte" novalidate>
                 <div class="form-group">
                     <label for="nombreSoporte">
-                        <i class="bi bi-person" aria-hidden="true"></i> 
+                        <i class="bi bi-person" aria-hidden="true"></i>
                         Nombre Completo <span class="required">*</span>
                     </label>
                     <input
@@ -306,7 +311,7 @@ $datosUsuario = [
 
                 <div class="form-group">
                     <label for="emailSoporte">
-                        <i class="bi bi-envelope" aria-hidden="true"></i> 
+                        <i class="bi bi-envelope" aria-hidden="true"></i>
                         Correo Electrónico <span class="required">*</span>
                     </label>
                     <input
@@ -323,7 +328,7 @@ $datosUsuario = [
 
                 <div class="form-group">
                     <label for="tipoProblema">
-                        <i class="bi bi-tag" aria-hidden="true"></i> 
+                        <i class="bi bi-tag" aria-hidden="true"></i>
                         Tipo de Consulta <span class="required">*</span>
                     </label>
                     <select class="form-control" id="tipoProblema" name="tipo_problema" required aria-required="true">
@@ -339,7 +344,7 @@ $datosUsuario = [
 
                 <div class="form-group">
                     <label for="descripcionProblema">
-                        <i class="bi bi-chat-left-text" aria-hidden="true"></i> 
+                        <i class="bi bi-chat-left-text" aria-hidden="true"></i>
                         Descripción <span class="required">*</span>
                     </label>
                     <textarea

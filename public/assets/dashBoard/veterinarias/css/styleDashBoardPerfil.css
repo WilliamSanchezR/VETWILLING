@@ -1407,3 +1407,168 @@ textarea:focus-visible {
         page-break-inside: avoid;
     }
 }
+/* ============================================
+   SOLUCIÓN CON WRAPPER (OPCIÓN RECOMENDADA)
+   
+   Esta es la mejor solución porque el posicionamiento
+   es mucho más predecible y robusto.
+   
+   Requiere pequeño cambio en HTML (agregar un div wrapper)
+   ============================================ */
+
+/* Contenedor principal del form-group */
+.form-group.password {
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Label (se mantiene igual) */
+.form-group.password label {
+    font-weight: 600;
+    color: var(--color-texto-oscuro);
+    margin-bottom: var(--spacing-sm);
+    margin-top: 0;
+    display: block;
+    font-size: var(--fs-titulo4);
+    letter-spacing: 0.3px;
+}
+
+/* NUEVO: Wrapper para input + botón */
+.input-icon-wrapper {
+    position: relative;
+    width: 100%;
+    display: block;
+}
+
+/* Input dentro del wrapper */
+.input-icon-wrapper input,
+.input-icon-wrapper input[type="password"],
+.input-icon-wrapper input[type="text"] {
+    width: 100%;
+    padding: var(--spacing-md) 3.5rem var(--spacing-md) var(--spacing-md);
+    border: 2px solid var(--color-borde);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--fs-titulo4);
+    transition: all var(--transition-normal);
+    background: var(--color-blanco);
+    color: var(--color-texto-oscuro);
+    font-weight: 500;
+    font-family: "Open Sans", sans-serif;
+}
+
+.input-icon-wrapper input::placeholder {
+    color: var(--color-texto-claro);
+    font-weight: 400;
+}
+
+.input-icon-wrapper input:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1);
+    background: var(--color-blanco);
+}
+
+.input-icon-wrapper input:hover {
+    border-color: var(--color-verde);
+}
+
+/* Botón del ojo - SÚPER SIMPLE Y PRECISO */
+.input-icon-wrapper .icon-view {
+    position: absolute;
+    right: 8px;
+    top: 50%; /* ¡Perfecto! Porque está dentro del wrapper */
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--color-texto-medio);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    transition: all var(--transition-fast);
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+}
+
+.input-icon-wrapper .icon-view:hover {
+    color: var(--color-primario);
+    background: rgba(10, 147, 44, 0.08);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.input-icon-wrapper .icon-view:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.input-icon-wrapper .icon-view:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+.input-icon-wrapper .icon-view i {
+    display: block;
+    pointer-events: none;
+    font-size: 1.2rem;
+}
+
+/* Mensaje de error */
+.input-icon-wrapper ~ .invalid-feedback {
+    display: none;
+    color: var(--color-danger);
+    font-size: var(--fs-texto1);
+    margin-top: var(--spacing-xs);
+    font-weight: 500;
+    padding-left: 0.25rem;
+}
+
+.input-icon-wrapper input.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+/* Estados de validación */
+.input-icon-wrapper input.is-invalid {
+    border-color: var(--color-danger) !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15) !important;
+}
+
+.input-icon-wrapper input.is-valid {
+    border-color: var(--color-success) !important;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .input-icon-wrapper input {
+        padding: var(--spacing-sm) 3rem var(--spacing-sm) var(--spacing-sm);
+    }
+    
+    .input-icon-wrapper .icon-view {
+        right: 6px;
+        font-size: 1.1rem;
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@media (max-width: 480px) {
+    .input-icon-wrapper input {
+        padding: 0.6rem 2.8rem 0.6rem 0.6rem;
+        font-size: 13px;
+    }
+    
+    .input-icon-wrapper .icon-view {
+        right: 4px;
+        font-size: 1rem;
+        width: 32px;
+        height: 32px;
+    }
+    
+    .input-icon-wrapper .icon-view i {
+        font-size: 1rem;
+    }
+}

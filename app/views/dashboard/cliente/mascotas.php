@@ -116,7 +116,7 @@ $mascotas = listarMascotas();
                                 <!-- INFO DETALLADA -->
                                 <div class="info-grid">
 
-                                    <div class="info-item">
+                                    <div class="info-iten">
                                         <div class="info-icon"><i class="bi bi-calendar3"></i></div>
                                         <div class="info-content">
                                             <div class="info-label">Edad</div>
@@ -124,7 +124,7 @@ $mascotas = listarMascotas();
                                         </div>
                                     </div>
 
-                                    <div class="info-item">
+                                    <div class="info-iten">
                                         <div class="info-icon"><i class="fa-solid fa-dog"></i></div>
                                         <div class="info-content">
                                             <div class="info-label">Especie</div>
@@ -132,7 +132,7 @@ $mascotas = listarMascotas();
                                         </div>
                                     </div>
 
-                                    <div class="info-item">
+                                    <div class="info-iten">
                                         <div class="info-icon"><i class="fa-notdog fa-solid fa-paw"></i></div>
                                         <div class="info-content">
                                             <div class="info-label">Raza</div>
@@ -140,7 +140,7 @@ $mascotas = listarMascotas();
                                         </div>
                                     </div>
 
-                                    <div class="info-item">
+                                    <div class="info-iten">
                                         <div class="info-icon"><i class="bi bi-clipboard-pulse"></i></div>
                                         <div class="info-content">
                                             <div class="info-label">Última Visita</div>

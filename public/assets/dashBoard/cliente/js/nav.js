@@ -1081,3 +1081,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Continúa con tu código...
 });
 */
+
+const btnProfile = document.querySelector('.btn-perfil');
+
+btnProfile.addEventListener('click', () => {
+    const isActive = btnProfile.classList.toggle('active');
+    btnProfile.setAttribute('aria-expanded', isActive);
+});

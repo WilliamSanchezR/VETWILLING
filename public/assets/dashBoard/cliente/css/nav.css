@@ -650,8 +650,8 @@ body {
     display: flex;
     gap: 15px;
     align-items: center;
-    background: linear-gradient(135deg, #0A932C, #9DE795);
-    color: white;
+    /* background: #6b6b6b70; */
+    color: #000;
 }
 
 .nombre-completo {
@@ -1320,14 +1320,31 @@ body {
     gap: 12px;
     margin-top: 20px;
 }
+.flecha-perfil {
+    transition: transform 0.3s ease;
+    pointer-events: none; /* evita bugs al hacer click */
+}
+
+/* cuando el botón está activo */
+.btn-perfil.active .flecha-perfil {
+    transform: rotate(180deg);
+}
+
 
 .info-item {
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 10px;
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px 10px;
     text-align: center;
-    transition: all 0.2s ease;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    min-width: 0; /* 🔑 evita overflow en grid */
 }
+
 
 .info-item:hover {
     background: #e9ecef;
