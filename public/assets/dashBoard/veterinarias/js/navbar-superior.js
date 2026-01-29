@@ -170,3 +170,8 @@ function inicializarEventosGlobales() {
         }
     });
 }
+const btnProfile = document.querySelector('.btn-profile');
+
+btnProfile.addEventListener('click', () => {
+    btnProfile.classList.toggle('active');
+});

@@ -425,6 +425,8 @@ body.sidebar-collapsed .navbar-superior {
 .panel-header {
     padding: 16px;
     border-bottom: 1px solid var(--navbar-border);
+    width: auto;
+    height: 115px;
 }
 
 .panel-title {
@@ -705,7 +707,7 @@ body.sidebar-collapsed .navbar-superior {
     color: var(--text-secondary);
 }
 
-.profile-arrow {
+.-aprofilerrow {
     color: var(--text-muted);
     font-size: 14px;
     transition: var(--transition);
@@ -714,19 +716,29 @@ body.sidebar-collapsed .navbar-superior {
 .btn-profile:hover .profile-arrow {
     color: var(--primary-color);
 }
+.btn-profile:active .profile-arrow{
+    transform: rotate(175deg);
+}.profile-arrow {
+    transition: transform 0.3s ease;
+}
+
+.btn-profile.active .profile-arrow {
+    transform: rotate(175deg);
+}
+
 
 /* Profile Panel */
 .profile-panel {
     min-width: 320px;
 }
 
-.profile-header {
+/* .profile-header {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 16px;
     padding: 24px;
-}
+} */
 
 .profile-avatar-large {
     position: relative;
@@ -751,6 +763,9 @@ body.sidebar-collapsed .navbar-superior {
 
 .profile-details {
     text-align: center;
+    position: relative;
+    top: -78px;
+    left: 20px;
 }
 
 .profile-details h3 {
@@ -769,8 +784,8 @@ body.sidebar-collapsed .navbar-superior {
 .profile-badge {
     display: inline-block;
     padding: 4px 12px;
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--primary-color);
+    background: var(--primary-hover);
+    color: #fff;
     font-size: 12px;
     font-weight: 500;
     border-radius: 6px;

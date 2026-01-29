@@ -221,16 +221,6 @@ $usuario = mostrarPerfil($id);
                             </div>
                         </a>
 
-                        <a href="<?= BASE_URL ?>/veterinario/configuracion" class="dropdown-item">
-                            <div class="item-icon">
-                                <i class="bi bi-gear"></i>
-                            </div>
-                            <div class="item-content">
-                                <span class="item-title">Configuración</span>
-                                <span class="item-subtitle">Preferencias y ajustes</span>
-                            </div>
-                        </a>
-
                         <a href="#" class="dropdown-item" id="btnAbrirSoporte">
                             <div class="item-icon">
                                 <i class="bi bi-headset"></i>
