@@ -121,19 +121,19 @@ class ListaDisponibilidadProfesionales {
 
         switch (opcion) {
             case '1':
-                this.tablaProfesionales.order([2, 'asc']).draw();
+                this.tablaProfesionales.order([1, 'asc']).draw();
                 console.log('👤 Ordenado por Nombre y Apellidos ascendente');
                 break;
             case '2':
-                this.tablaProfesionales.order([2, 'desc']).draw();
+                this.tablaProfesionales.order([1, 'desc']).draw();
                 console.log('👤 Ordenado por Nombre y Apellidos descendente');
                 break;
             case '3':
-                this.tablaProfesionales.order([1, 'asc']).draw();
+                this.tablaProfesionales.order([0, 'asc']).draw();
                 console.log('# Ordenado por número de documento ascendente');
                 break;
             case '4':
-                this.tablaProfesionales.order([1, 'desc']).draw();
+                this.tablaProfesionales.order([0, 'desc']).draw();
                 console.log('# Ordenado por número de documento descendente');
                 break;
             default:
@@ -147,7 +147,7 @@ class ListaDisponibilidadProfesionales {
     exportarCSV() {
         try {
             const data = this.tablaProfesionales.rows({ search: 'applied' }).data();
-            let csv = 'Documento, Nombres y Apellidos, Rol\n';
+            let csv = 'Documento, Nombres y Apellidos, Rol, Especialidades\n';
 
             data.each(function (fila) {
                 const filaLimpia = [];
@@ -165,7 +165,7 @@ class ListaDisponibilidadProfesionales {
             const fecha = new Date().toISOString().split('T')[0];
 
             link.setAttribute('href', url);
-            link.setAttribute('download', `profesionales_veterinaria_${fecha}.csv`);
+            link.setAttribute('download', `Profesionales_Agenda_${fecha}.csv`);
             link.style.visibility = 'hidden';
 
             document.body.appendChild(link);
@@ -173,7 +173,7 @@ class ListaDisponibilidadProfesionales {
             document.body.removeChild(link);
 
             alert('✅ Archivo CSV descargado correctamente');
-            console.log('✅ CSV exportado:', `profesionales_veterinaria_${fecha}.csv`);
+            console.log('✅ CSV exportado:', `Profesionales_Agenda_${fecha}.csv`);
         } catch (error) {
             console.error('❌ Error al exportar CSV:', error);
             alert('Error al exportar CSV. Revisa la consola.');
