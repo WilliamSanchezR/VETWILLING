@@ -1,13 +1,15 @@
-/* Configuramos lo basico de un archivo CSS: */
 
-/* - Primero las tipografias */
+/* ============================================
+   IMPORTS - TIPOGRAFÍAS E ICONOS
+   ============================================ */
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-
-/* - Segundo iconos */
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
 
-/* - Tercero estilos generales */
+
+/* ============================================
+   TIPOGRAFÍAS BASE
+   ============================================ */
 h1,
 h2,
 h3,
@@ -28,6 +30,7 @@ textarea,
 span {
     font-family: "Open sans", sans-serif;
 }
+
 
 /* ============================================
    VARIABLES CSS - SISTEMA DE DISEÑO
@@ -95,20 +98,20 @@ span {
 /* ============================================
    ESTILOS GENERALES
    ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Open Sans', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     background-color: var(--color-fondo);
     color: var(--color-texto-oscuro);
     line-height: 1.6;
     font-size: var(--fs-titulo4);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
 }
 
 
@@ -119,133 +122,6 @@ body {
     padding: var(--spacing-xl) 0;
     min-height: 100vh;
 }
-
-/* ================================
-   ESTILOS GENERALES DE LOS CAMPOS
-   ================================ */
-.container.clave {
-    background: #ffffff;
-    padding: 25px 30px;
-    border-radius: 14px;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
-    margin-top: 20px;
-}
-
-/* LABELS */
-.container.clave label {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 6px;
-    display: block;
-    font-size: 0.95rem;
-}
-
-/* INPUTS */
-.container.clave input[type="password"] {
-    width: 100%;
-    border: 1.7px solid #d5d9e0;
-    padding: 10px 40px 10px 12px;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    transition: all 0.25s ease;
-}
-
-.container.clave input[type="password"]:focus {
-    border-color: #0ea5a4;
-    box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.17);
-    outline: none;
-}
-
-/* ================================
-   CONTENEDOR DEL INPUT + ICONO
-   ================================ */
-.form-group.password {
-    position: relative;
-    margin-bottom: 22px;
-}
-
-/* Check de mostrar contraseña */
-.form-group.password .ver {
-    position: absolute;
-    right: 45px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    width: 18px;
-    height: 18px;
-    opacity: 0;
-    margin: 0;
-    z-index: 3;
-}
-
-/* ================================
-   BOTÓN DEL OJO (VER / OCULTAR)
-   ================================ */
-.icon-view {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    z-index: 2;
-}
-
-.icon-view i {
-    font-size: 1.12rem;
-    color: #6a6f77;
-    transition: 0.25s ease;
-}
-
-.icon-view:hover i {
-    color: #0ea5a4;
-}
-
-/* ================================
-   EFECTO DE ERROR / VALIDACIÓN
-   ================================ */
-input.is-invalid {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2) !important;
-}
-
-input.is-valid {
-    border-color: #28a745 !important;
-    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2) !important;
-}
-
-/* ================================
-   SECCIÓN DE ANIMACIÓN SUAVE
-   ================================ */
-.form-group.password {
-    animation: fadeIn 0.6s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ================================
-   RESPONSIVE
-   ================================ */
-@media (max-width: 480px) {
-    .container.clave {
-        padding: 20px;
-    }
-    .icon-view i {
-        font-size: 1rem;
-    }
-}
-
 
 
 /* ============================================
@@ -291,6 +167,7 @@ input.is-valid {
     justify-content: center;
     padding: var(--spacing-xl) var(--spacing-lg);
     background: linear-gradient(135deg, var(--color-blanco) 0%, #f8fcfa 100%);
+    position: relative;
 }
 
 .foto .fotito {
@@ -302,12 +179,45 @@ input.is-valid {
     box-shadow: var(--shadow-md);
     margin-bottom: var(--spacing-lg);
     transition: all var(--transition-normal);
+    will-change: transform;
+    position: relative;
 }
 
 .foto .fotito:hover {
     transform: scale(1.05);
     box-shadow: var(--shadow-hover);
     border-color: var(--color-verde);
+}
+
+/* Avatar edit button */
+.avatar-edit {
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    transform: translateX(10px);
+    background: linear-gradient(135deg, var(--color-primario), #087d24);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    z-index: 2;
+    border: 3px solid var(--color-blanco);
+}
+
+.avatar-edit:hover {
+    transform: translateX(10px) scale(1.1);
+    box-shadow: var(--shadow-hover);
+    background: linear-gradient(135deg, #087d24, var(--color-primario));
+}
+
+.avatar-edit i {
+    color: var(--color-blanco);
+    font-size: 16px;
 }
 
 .foto h3 {
@@ -408,6 +318,14 @@ input.is-valid {
     transform: rotate(15deg) scale(1.1);
 }
 
+.info h2 a:focus-visible,
+.horarios h2 a:focus-visible,
+.especialidades h2 a:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
 .info p,
 .horarios p {
     font-size: var(--fs-titulo4);
@@ -479,6 +397,7 @@ input.is-valid {
     transition: all var(--transition-normal);
     position: relative;
     overflow: hidden;
+    will-change: transform;
 }
 
 .stat-card::before {
@@ -575,6 +494,11 @@ input.is-valid {
     box-shadow: var(--shadow-sm);
 }
 
+.btn_change_password:focus-visible {
+    outline: 3px solid var(--color-primario);
+    outline-offset: 3px;
+}
+
 
 /* ============================================
    SECCIÓN: CITAS Y AGENDA
@@ -632,6 +556,11 @@ input.is-valid {
     transform: translateY(-2px);
 }
 
+.nav-pills .nav-link:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+}
+
 .nav-pills .nav-link.active {
     background: linear-gradient(135deg, var(--color-primario) 0%, #087d24 100%);
     color: var(--color-blanco);
@@ -668,6 +597,7 @@ input.is-valid {
     box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
+    will-change: transform;
 }
 
 .cita-item::before {
@@ -828,6 +758,12 @@ input.is-valid {
     box-shadow: var(--shadow-md);
 }
 
+.card-documentos .btn-outline-success:focus-visible,
+.card-notas .btn-outline-success:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+}
+
 /* Lista de documentos */
 .list-group-item {
     padding: var(--spacing-md) 0;
@@ -908,32 +844,50 @@ input.is-valid {
     transform: rotate(90deg);
 }
 
+.modal-notificacion .btn-close:focus-visible {
+    outline: 2px solid var(--color-blanco);
+    outline-offset: 2px;
+}
+
 .modal-notificacion .modal-body {
     padding: var(--spacing-xl);
     background: linear-gradient(135deg, #ffffff 0%, #f8fcfa 100%);
 }
 
-/* Formulario de contraseña */
-.form-group {
-    margin-bottom: var(--spacing-xl);
-    position: relative;
+
+/* ============================================
+   FORMULARIO DE CONTRASEÑA - MEJORADO
+   ============================================ */
+.container.clave {
+    background: #ffffff;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    margin-top: 0;
 }
 
+/* Labels */
+.container.clave label,
 .form-group label {
-    display: block;
     font-weight: 600;
-    font-size: var(--fs-titulo4);
     color: var(--color-texto-oscuro);
     margin-bottom: var(--spacing-sm);
+    display: block;
+    font-size: var(--fs-titulo4);
     letter-spacing: 0.3px;
 }
 
-.form-group.password {
-    position: relative;
+.container.clave label .text-danger,
+.form-group label .text-danger {
+    color: var(--color-danger);
 }
 
+/* Inputs de contraseña */
+.container.clave input[type="password"],
+.container.clave input[type="text"],
 .form-group.password input[type="password"],
-.form-group.password input[type="text"] {
+.form-group.password input[type="text"],
+.form-control {
     width: 100%;
     padding: var(--spacing-md) 3.5rem var(--spacing-md) var(--spacing-md);
     border: 2px solid var(--color-borde);
@@ -943,34 +897,52 @@ input.is-valid {
     background: var(--color-blanco);
     color: var(--color-texto-oscuro);
     font-weight: 500;
+    font-family: "Open Sans", sans-serif;
 }
 
+.container.clave input::placeholder,
 .form-group.password input::placeholder {
     color: var(--color-texto-claro);
     font-weight: 400;
 }
 
-.form-group.password input:focus {
+.container.clave input:focus,
+.form-group.password input:focus,
+.form-control:focus {
     outline: none;
     border-color: var(--color-primario);
     box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1);
     background: var(--color-blanco);
 }
 
+.container.clave input:hover,
 .form-group.password input:hover {
     border-color: var(--color-verde);
 }
 
-/* Checkbox oculto para ver contraseña */
-.form-group.password input[type="checkbox"].ver {
-    display: none;
+
+/* ============================================
+   CONTENEDOR DEL INPUT + ICONO - MEJORADO
+   ============================================ */
+.form-group.password {
+    position: relative;
+    margin-bottom: var(--spacing-lg);
 }
 
-/* Botón de mostrar/ocultar contraseña */
-.form-group.password .icon-view {
+/* Checkbox oculto (ya no se usa pero lo dejamos por compatibilidad) */
+.form-group.password .ver {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Botón del ojo - CORREGIDO */
+.form-group.password .icon-view,
+.icon-view {
     position: absolute;
-    right: var(--spacing-md);
-    top: 38px;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     background: transparent;
     border: none;
     color: var(--color-texto-medio);
@@ -982,22 +954,96 @@ input.is-valid {
     align-items: center;
     justify-content: center;
     z-index: 10;
+    line-height: 1;
 }
 
-.form-group.password .icon-view:hover {
+.form-group.password .icon-view:hover,
+.icon-view:hover {
     color: var(--color-primario);
-    transform: scale(1.15);
+    transform: translateY(-50%) scale(1.15);
 }
 
-.form-group.password .icon-view:active {
-    transform: scale(0.95);
+.form-group.password .icon-view:active,
+.icon-view:active {
+    transform: translateY(-50%) scale(0.95);
 }
 
-.form-group.password .icon-view i {
+.form-group.password .icon-view:focus-visible,
+.icon-view:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.form-group.password .icon-view i,
+.icon-view i {
+    display: block;
+    pointer-events: none;
+}
+
+/* Para el label con input */
+.form-group.password label {
+    margin-top: var(--spacing-sm);
+}
+
+
+/* ============================================
+   VALIDACIÓN DE FORMULARIOS
+   ============================================ */
+.invalid-feedback {
+    display: none;
+    color: var(--color-danger);
+    font-size: var(--fs-texto1);
+    margin-top: var(--spacing-xs);
+    font-weight: 500;
+}
+
+.form-control.is-invalid ~ .invalid-feedback,
+input.is-invalid ~ .invalid-feedback {
     display: block;
 }
 
-/* Footer del modal */
+input.is-invalid,
+.form-control.is-invalid {
+    border-color: var(--color-danger) !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15) !important;
+}
+
+input.is-valid,
+.form-control.is-valid {
+    border-color: var(--color-success) !important;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15) !important;
+}
+
+.form-text {
+    font-size: var(--fs-texto1);
+    color: var(--color-texto-claro);
+    margin-top: var(--spacing-xs);
+    display: block;
+}
+
+/* Alertas */
+.alert {
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border: 2px solid;
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: var(--color-danger);
+    color: #721c24;
+}
+
+.alert.d-none {
+    display: none !important;
+}
+
+
+/* ============================================
+   FOOTER DEL MODAL
+   ============================================ */
 .modal-footer {
     background: var(--color-blanco);
     border: none;
@@ -1027,6 +1073,11 @@ input.is-valid {
     box-shadow: var(--shadow-md);
 }
 
+.modal-footer .btn-secondary:focus-visible {
+    outline: 2px solid var(--color-gris);
+    outline-offset: 2px;
+}
+
 .modal-footer .btn-success {
     background: linear-gradient(135deg, var(--color-primario) 0%, #087d24 100%);
     border: none;
@@ -1042,8 +1093,67 @@ input.is-valid {
     box-shadow: var(--shadow-hover);
 }
 
+.modal-footer .btn-success:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
+}
+
 .modal-footer .btn-success i {
     font-size: 1rem;
+}
+
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-group.password {
+    animation: fadeIn 0.6s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.cita-item {
+    animation: slideIn 0.4s ease;
+}
+
+
+/* ============================================
+   ESTADOS DE FOCUS MEJORADOS (ACCESIBILIDAD)
+   ============================================ */
+button:focus-visible,
+.btn:focus-visible,
+a:focus-visible {
+    outline: 3px solid var(--color-primario);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.2);
 }
 
 
@@ -1081,6 +1191,10 @@ input.is-valid {
         height: 120px;
     }
     
+    .avatar-edit {
+        top: 130px;
+    }
+    
     .nav-pills {
         flex-direction: column;
     }
@@ -1092,6 +1206,10 @@ input.is-valid {
     .stat-card {
         margin-bottom: var(--spacing-md);
     }
+    
+    .stat-card h3 {
+        font-size: 2rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1101,10 +1219,191 @@ input.is-valid {
         --fs-titulo3: 14px;
         --fs-titulo4: 12px;
         --fs-texto: 16px;
+        --fs-texto1: 11px;
     }
     
     .foto .fotito {
         width: 100px;
         height: 100px;
+    }
+    
+    .avatar-edit {
+        width: 35px;
+        height: 35px;
+        top: 110px;
+    }
+    
+    .avatar-edit i {
+        font-size: 14px;
+    }
+    
+    .modal-notificacion .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .modal-notificacion .modal-header,
+    .modal-notificacion .modal-body,
+    .modal-footer {
+        padding: var(--spacing-md);
+    }
+    
+    .container.clave input[type="password"],
+    .container.clave input[type="text"],
+    .form-group.password input {
+        padding: var(--spacing-sm) 3rem var(--spacing-sm) var(--spacing-sm);
+    }
+    
+    .form-group.password .icon-view,
+    .icon-view {
+        right: 8px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .foto,
+    .info,
+    .especialidades,
+    .estadisticas,
+    .horarios,
+    .citas,
+    .card-documentos,
+    .card-notas {
+        padding: var(--spacing-md);
+    }
+    
+    .foto .fotito {
+        width: 90px;
+        height: 90px;
+        border-width: 3px;
+    }
+    
+    .avatar-edit {
+        width: 32px;
+        height: 32px;
+        top: 100px;
+    }
+    
+    .avatar-edit i {
+        font-size: 12px;
+    }
+    
+    .especialidad-tag {
+        font-size: 10px;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .stat-card h3 {
+        font-size: 1.8rem;
+    }
+    
+    .cita-item {
+        padding: var(--spacing-md);
+    }
+    
+    .nav-pills .nav-link {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 11px;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+
+/* ============================================
+   UTILIDADES ADICIONALES
+   ============================================ */
+.position-relative {
+    position: relative;
+}
+
+.position-absolute {
+    position: absolute;
+}
+
+.end-0 {
+    right: 0;
+}
+
+.top-50 {
+    top: 50%;
+}
+
+.translate-middle-y {
+    transform: translateY(-50%);
+}
+
+.d-none {
+    display: none !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+.d-flex {
+    display: flex !important;
+}
+
+.text-danger {
+    color: var(--color-danger) !important;
+}
+
+.text-success {
+    color: var(--color-success) !important;
+}
+
+.text-muted {
+    color: var(--color-texto-claro) !important;
+}
+
+.fw-semibold {
+    font-weight: 600 !important;
+}
+
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.me-1 {
+    margin-right: 0.25rem !important;
+}
+
+.me-2 {
+    margin-right: 0.5rem !important;
+}
+
+.mt-3 {
+    margin-top: 1rem !important;
+}
+
+
+/* ============================================
+   PRINT STYLES (OPCIONAL)
+   ============================================ */
+@media print {
+    .btn_change_password,
+    .avatar-edit,
+    .modal,
+    .icon-view {
+        display: none !important;
+    }
+    
+    .foto,
+    .info,
+    .especialidades,
+    .estadisticas,
+    .horarios,
+    .citas,
+    .consultas-notas {
+        box-shadow: none;
+        border: 1px solid var(--color-borde);
+        page-break-inside: avoid;
     }
 }
