@@ -1,0 +1,55 @@
+.contenedor-agenda-profesional {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.info-profesional {
+    background: linear-gradient(135deg, #0f8f3a, #0c7a32);
+    color: #ffffff;
+    border-radius: 18px;
+    padding: 30px 40px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    max-width: 100%;
+}
+
+/* HEADER */
+.info-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.info-header .rol {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+/* BODY */
+.info-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
+
+/* ITEMS */
+.info-item {
+    background: rgba(255, 255, 255, 0.12);
+    padding: 15px 18px;
+    border-radius: 12px;
+}
+
+.info-item .label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.8;
+    margin-bottom: 6px;
+}
+
+.info-item .value {
+    font-size: 1rem;
+    font-weight: 500;
+}

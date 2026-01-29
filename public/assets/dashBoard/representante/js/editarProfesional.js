@@ -18,6 +18,13 @@ class EditarProfesional {
         this.inputEspecialidadesCargadas = document.getElementById('especialidadesCargadasInput');
         this.especialidades = this.$$('.check-especialidades');
         this.containerEspecialidades = document.getElementById('especialidadesContainer');
+
+        this.servicios = this.$$('.check-servicios');
+        this.btnAgregarServ = document.getElementById('agregarServicioBtn');
+        this.listServicios = document.querySelector('.listServicios');
+        this.inputServicios = document.getElementById('serviciosInput');
+        this.inputServiciosCargados = document.getElementById('serviciosCargadosInput');
+        this.containerServicios = document.getElementById('serviciosContainer');
     }
 
     bindEvents() {
@@ -25,10 +32,22 @@ class EditarProfesional {
             this.btnAgregarEsp.onclick = () => this.toggleEspecialidades();
         }
 
+        if (this.btnAgregarServ) {
+            this.btnAgregarServ.onclick = () => this.toggleServicios();
+        }
+
         if (this.especialidades) {
             this.especialidades.forEach(e => {
                 e.addEventListener('change', (event) => {
                     this.asociarEspecialidades(event);
+                });
+            });
+        }
+
+        if (this.servicios) {
+            this.servicios.forEach(s => {
+                s.addEventListener('change', (event) => {
+                    this.asociarServicios(event);
                 });
             });
         }
@@ -65,6 +84,42 @@ class EditarProfesional {
                     const encontrado = listEspCargadas.find(esp => esp.id_especialidad === parseInt(espId));
                     if (encontrado) {
                         e.disabled = true;
+                    }
+                });
+            }
+        }
+    }
+
+    toggleServicios() {
+        this.listServicios.classList.toggle('vew-list-serv');
+
+        if (this.inputServicios.value.length > 0 || this.inputServiciosCargados.value?.length > 0) {
+            const listServ = this.inputServicios.value.length > 0 ? JSON.parse(this.inputServicios.value) : [];
+            const listServCargadas = this.inputServiciosCargados.value.length > 0 ? JSON.parse(this.inputServiciosCargados.value) : [];
+
+            const listaCombinada = [...listServCargadas?.map(s => ({ id: s.id_servicio, name: s.nombre })), ...listServ];
+            console.log(listServCargadas);
+
+            this.servicios.forEach(s => {
+                const servId = s.value;
+                const encontrado = listaCombinada.some(serv => parseInt(serv.id) === parseInt(servId));
+                if (encontrado) {
+                    s.checked = true;
+                } else {
+                    s.checked = false;
+                }
+            });
+        }
+
+        // Agregar lógica para deshabilitar servicios ya cargadas
+        if (this.inputServiciosCargados.value.length > 0) {
+            const listServCargadas = JSON.parse(this.inputServiciosCargados.value);
+            if (listServCargadas && listServCargadas.length > 0) {
+                this.servicios.forEach(s => {
+                    const servId = s.value;
+                    const encontrado = listServCargadas.find(serv => serv.id_servicio === parseInt(servId));
+                    if (encontrado) {
+                        s.disabled = true;
                     }
                 });
             }
@@ -139,6 +194,78 @@ class EditarProfesional {
             const idProfesional = ruta.split('id=')[1].split('&')[0];
 
             const eliminarUrl = `${window.location.origin}/vetwilling/representante/eliminar-esp-profesional?action=eliminarEspProfesional&id_profesional=${idProfesional}&id_especialidad=${idEsp}`;
+
+            window.location.href = eliminarUrl;
+        }
+    }
+
+    asociarServicios(element) {
+        const valueServicio = element.target.value;
+        const nameServicio = element.target.dataset.name;
+        const valorServSeleccionadas = this.inputServicios.value;
+        const objServ = { id: valueServicio, name: nameServicio };
+
+        if (valorServSeleccionadas.length === 0) {
+            const arrayServicios = [objServ];
+            this.inputServicios.value = JSON.stringify(arrayServicios);
+        } else {
+            const listServDeserializadas = JSON.parse(valorServSeleccionadas);
+            if (element.target.checked) {
+                listServDeserializadas.push(objServ);
+                this.inputServicios.value = JSON.stringify(listServDeserializadas);
+            } else {
+                const listaFiltrada = listServDeserializadas.filter(e => e.id !== valueServicio);
+                this.inputServicios.value = JSON.stringify(listaFiltrada);
+            }
+        }
+
+        this.visualizarServicios();
+    }
+
+    visualizarServicios() {
+        const serviciosSeleccionados = this.inputServicios.value;
+        const serviciosCargados = this.inputServiciosCargados.value;
+        if (serviciosSeleccionados.length > 0) {
+            const listaServicios = JSON.parse(serviciosSeleccionados);
+            const listaCargadas = serviciosCargados.length > 0 ? JSON.parse(serviciosCargados) : [];
+            this.containerServicios.innerHTML = '';
+
+            const listaCombinada = [...listaCargadas, ...listaServicios.filter(e => !listaCargadas.some(cargada => cargada.id === e.id))];
+
+            listaCombinada.forEach(e => {
+                const divEsp = document.createElement('div');
+                const titleEsp = document.createElement('span');
+                divEsp.classList.add('servicio-seleccionado');
+                titleEsp.textContent = e.name;
+                divEsp.appendChild(titleEsp);
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.innerHTML = '<i class="bi bi-trash3"></i>';
+                removeBtn.onclick = () => this.eliminarServicio(e.id);
+                divEsp.appendChild(removeBtn);
+
+                this.containerServicios.appendChild(divEsp);
+            });
+            this.containerServicios.style.display = 'grid';
+        } else {
+            return;
+        }
+    }
+
+    eliminarServicio(idServ) {
+        const serviciosSeleccionados = this.inputServicios.value;
+        const serviciosCargados = this.inputServiciosCargados.value;
+        const listaServicios = serviciosSeleccionados.length > 0 ? JSON.parse(serviciosSeleccionados) : [];
+        const listaCargadas = serviciosCargados.length > 0 ? JSON.parse(serviciosCargados) : [];
+        if (listaServicios.length > 0 && listaServicios.some(e => e.id === idServ)) {
+            const listaActualizada = listaServicios.filter(e => e.id !== idServ);
+            this.inputServicios.value = JSON.stringify(listaActualizada);
+            this.visualizarServicios();
+        } else if (listaCargadas.length > 0 && listaCargadas.some(e => e.id === idServ)) {
+            const ruta = window.location.href;
+            const idProfesional = ruta.split('id=')[1].split('&')[0];
+
+            const eliminarUrl = `${window.location.origin}/vetwilling/representante/eliminar-serv-profesional?action=eliminarServProfesional&id_usuario=${idProfesional}&id_servicio=${idServ}`;
 
             window.location.href = eliminarUrl;
         }

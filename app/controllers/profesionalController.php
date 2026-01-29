@@ -22,6 +22,10 @@ switch ($method) {
             eliminarEspecialidadDeProfesional($id_profesional, $id_especialidad);
         } else if ($accion === 'eliminar') {
             eliminarProfesional($_GET['id']);
+        } else if ($accion === 'eliminarServProfesional') {
+            $id_servicio = $_GET['id_servicio'] ?? '';
+            $id_usuario = $_GET['id_usuario'] ?? '';
+            eliminarServicioDeProfesional($id_servicio, $id_usuario);
         }
         break;
     default:
@@ -48,6 +52,7 @@ function registrarProfesional()
     $img_perfil = null;
     $img_firma = null;
     $listaEspecialidades = $_POST['especialidades'] ?? '';
+    $listaServicios = $_POST['servicios'] ?? '';
 
     // Validamos que los campos no esten vacios
     if (
@@ -121,7 +126,8 @@ function registrarProfesional()
         'especialidades' => $listaEspecialidades,
         'id_veterinaria' => $id_veterinaria,
         'nivel_acceso' => $nivel_acceso,
-        'registro_medico' => $_POST['registro_medico'] ?? ''
+        'registro_medico' => $_POST['registro_medico'] ?? '',
+        'servicios' => $listaServicios
     ];
 
     // Registramos el usuario
@@ -160,6 +166,12 @@ function listarEspecialidadesPorProfesional($id, $idVeterinaria)
     return $objProfesional->listarEspecialidadesPorProfesional($id, $idVeterinaria);
 }
 
+function listarServiciosPorProfesional($id)
+{
+    $objProfesional = new Profesional();
+    return $objProfesional->listarServiciosPorProfesional($id);
+}
+
 function eliminarEspecialidadDeProfesional($id_profesional, $id_especialidad)
 {
     $objProfesional = new Profesional();
@@ -179,6 +191,25 @@ function eliminarEspecialidadDeProfesional($id_profesional, $id_especialidad)
     exit();
 }
 
+function eliminarServicioDeProfesional($id_servicio, $id_usario)
+{
+    $objProfesional = new Profesional();
+    $resultado = $objProfesional->deleteServProfesional($id_servicio);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Servicio Eliminado',
+            'El servicio ha sido eliminado correctamente',
+            '/vetwilling/representante/editar-profesional?id=' . $id_usario
+        );
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el servicio');
+    }
+
+    exit();
+}
+
 function actualizarProfesional()
 {
     // Obtener los datos del formulario
@@ -192,24 +223,26 @@ function actualizarProfesional()
     $listaEspecialidades = $_POST['especialidades'] ?? '';
     $registro_medico = $_POST['registro_medico'] ?? '';
     $id_rol = $_POST['rol'] ?? '';
+    $estado = $_POST['estado'] ?? '';
     $email = $_POST['email'] ?? '';
     $id_usuario = $_POST['id_usuario'] ?? '';
     $img_perfil = $_POST['img_perfil'] ?? null;
     $img_firma = $_POST['img_firma'] ?? null;
     $id_veterinaria = $_POST['id_veterinaria'] ?? null;
+    $listaServicios = $_POST['servicios'] ?? '';
 
     // Validamos que los campos no esten vacios
     if (
         empty($id_profesional) || empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
-        empty($apellidos) || empty($telefono) || empty($direccion) || empty($registro_medico) ||
-        empty($id_rol) || empty($email) || empty($id_usuario) || empty($id_veterinaria)
+        empty($apellidos) || empty($telefono) || empty($direccion) ||
+        empty($id_rol) || empty($estado) || empty($email) || empty($id_usuario) || empty($id_veterinaria)
     ) {
         // Mostrar alerta de error si hay campos vacíos
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
     }
 
-      // Imagen de perfil
+    // Imagen de perfil
     if (!empty($_FILES['img_perfil']['name'])) {
 
         $file = $_FILES['img_perfil'];
@@ -265,12 +298,13 @@ function actualizarProfesional()
         'especialidades' => $listaEspecialidades,
         'registro_medico' => $registro_medico,
         'id_rol' => $id_rol,
-        'estado' => 'activo',
+        'estado' => $estado,
         'email' => $email,
         'id_usuario' => $id_usuario,
         'img_perfil' => $img_perfil,
         'img_firma' => $img_firma,
-        'id_veterinaria' => $id_veterinaria
+        'id_veterinaria' => $id_veterinaria,
+        'servicios' => $listaServicios
     ];
 
     // Actualizamos el profesional
