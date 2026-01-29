@@ -480,13 +480,15 @@
             }
 
             return {
-                id_mascota: mascota,
-                id_subservicio: subservicio,
+                tipo: 'Cita',
+                id_propietario: propietario,
+                id_paciente: mascota,
+                id_servicio: subservicio,
                 id_veterinario: veterinario,
-                fecha_hora_inicio: formatDateForMySQL(inicio),
+                fecha_hora: formatDateForMySQL(inicio),
                 fecha_hora_fin: formatDateForMySQL(fin),
-                motivo: motivo,
-                estado: 'pendiente'
+                observaciones: motivo,
+                estado: 'Pendiente'
             };
         }
 
