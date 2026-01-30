@@ -41,7 +41,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
             </a>
 
             <!-- GESTION COMO ADMINISTRADOR -->
-            <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'configuracion-veterinaria' || $final_path == 'listar-especialidades' || $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  || $final_path == 'lista-agenda-usuario' ? 'active open' : '' ?>">
+            <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'configuracion-veterinaria' || $final_path == 'listar-especialidades' || $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  || $final_path == 'lista-agenda-usuario' || $final_path == 'lista-agenda-disponible' || $final_path == 'listar-subservicios' ? 'active open' : '' ?>">
                 <div class="submenu-toggle" data-tooltip="Gestión Administrador">
                     <i class="bi bi-journal-medical"></i>
                     <span class="texto-item-sidebar">Gestión Administrador</span>
@@ -83,7 +83,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     <!-- Sessión con submenu Servicios y costos-->
                     <li>
 
-                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
+                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'listar-subservicios' ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
                                 <i class="bi bi-database-up"></i>
@@ -101,7 +101,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     <!-- Sección con submenú Profesionales  -->
                     <li>
 
-                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
+                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario' || $final_path == 'lista-agenda-usuario' ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Profesionales">
                                 <i class="bi bi-people-fill"></i>

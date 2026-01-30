@@ -178,7 +178,7 @@ $usuario = mostrarPerfil($id);
                 <button class="btn-profile" onclick="togglePerfilMenu()" aria-label="Menú de usuario">
                     <div class="profile-avatar">
                         <img 
-                            src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
+                            src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>"
                             alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
                             class="avatar-img">
                         <span class="status-dot online" title="En línea"></span>
@@ -197,7 +197,7 @@ $usuario = mostrarPerfil($id);
                     <div class="panel-header profile-header">
                         <div class="profile-avatar-large">
                             <img 
-                                src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
+                                src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>"
                                 alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>">
                             <span class="status-dot online"></span>
                         </div>
@@ -218,16 +218,6 @@ $usuario = mostrarPerfil($id);
                             <div class="item-content">
                                 <span class="item-title">Mi Perfil</span>
                                 <span class="item-subtitle">Ver y editar información personal</span>
-                            </div>
-                        </a>
-
-                        <a href="<?= BASE_URL ?>/veterinario/configuracion" class="dropdown-item">
-                            <div class="item-icon">
-                                <i class="bi bi-gear"></i>
-                            </div>
-                            <div class="item-content">
-                                <span class="item-title">Configuración</span>
-                                <span class="item-subtitle">Preferencias y ajustes</span>
                             </div>
                         </a>
 

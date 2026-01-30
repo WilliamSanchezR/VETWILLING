@@ -182,6 +182,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/perfil.php';
         break;
 
+    case '/veterinario/actualizar-constrasena':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
     case '/veterinario/cambiar-foto':
         require BASE_PATH . '/app/controllers/veterinarioController.php';
         break;
@@ -415,6 +419,10 @@ switch ($request) {
 
     case '/representante/editar-disponibilidad-agenda':
         require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+
+    case '/representante/perfil-representante':
+        require BASE_PATH . '/app/views/dashboard/representante/perfilRepresentante.php';
         break;
 
 

@@ -1,3 +1,12 @@
+document.querySelector('.avatar-icon').addEventListener('click', () => {
+    document.getElementById('upload-logo').click();
+});
+
+document.getElementById('upload-logo').addEventListener('change', function() {
+
+    document.getElementById('form_cambio_imagen').submit();
+});
+
 function hideOrShowPassword(element) {
     const id = element.id;
     // Acceder al valor del elemento (si es un campo de entrada)
@@ -17,16 +26,6 @@ function hideOrShowPassword(element) {
     }
 }
 
-document.querySelector('.avatar-icon').addEventListener('click', () => {
-    document.getElementById('upload-logo').click();
-});
-
-document.getElementById('upload-logo').addEventListener('change', function() {
-
-    document.getElementById('form_cambio_imagen').submit();
-});
-
-
 document.querySelector('.contrasena-actual').querySelector('.icon-view').addEventListener('click', ()=> {
     document.querySelector('#ver_contrasena-actual').click();
 });
@@ -39,5 +38,3 @@ document.querySelector('.nueva-contrasena').querySelector('.icon-view').addEvent
 document.querySelector('.confi-contrasena').querySelector('.icon-view').addEventListener('click', ()=> {
     document.querySelector('#ver_confi-contrasena').click();
 });
-
-

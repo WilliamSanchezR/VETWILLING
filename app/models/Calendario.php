@@ -81,7 +81,6 @@ class Calendario
                             id_servicio,
                             nombre,
                             descripcion,
-                            costo,
                             id_veterinaria
                         FROM servicio
                         WHERE estado = 'Activo'";
@@ -386,16 +385,16 @@ class Calendario
     }
 
     /**
-     * Registra el motivo de cancelación de una cita
-     * 
-     * @param int $id_agendamiento ID de la cita a cancelar
-     * @param string $motivo_cancelacion Motivo por el cual se cancela
-     * @param int|null $id_usuario_cancelo ID del usuario que cancela (opcional)
-     * @return array Array con keys:
-     *         - 'exito' (bool): Si se registró correctamente
-     *         - 'mensaje' (string): Mensaje descriptivo
-     *         - 'id_agendamiento' (int): ID de la cita procesada
-     */
+        * Registra el motivo de cancelación de una cita
+        * 
+        * @param int $id_agendamiento ID de la cita a cancelar
+        * @param string $motivo_cancelacion Motivo por el cual se cancela
+        * @param int|null $id_usuario_cancelo ID del usuario que cancela (opcional)
+        * @return array Array con keys:
+        *         - 'exito' (bool): Si se registró correctamente
+        *         - 'mensaje' (string): Mensaje descriptivo
+        *         - 'id_agendamiento' (int): ID de la cita procesada
+        */
     public function registrarMotivoCancelacion($id_agendamiento, $motivo_cancelacion, $id_usuario_cancelo = null)
     {
         try {
@@ -466,11 +465,11 @@ class Calendario
     }
 
     /**
-     * Obtiene los detalles de cancelación de una cita
-     * 
-     * @param int $id_agendamiento ID de la cita
-     * @return array Array con los datos de cancelación o null
-     */
+        * Obtiene los detalles de cancelación de una cita
+        * 
+        * @param int $id_agendamiento ID de la cita
+        * @return array Array con los datos de cancelación o null
+        */
     public function obtenerDetallesCancelacion($id_agendamiento)
     {
         try {
@@ -498,14 +497,14 @@ class Calendario
     }
 
     /**
-     * SUBTAREA 3: Actualiza el estado de una cita a "Cancelada"
-     * 
-     * @param int $id_agendamiento ID de la cita a cancelar
-     * @return array Array con keys:
-     *         - 'exito' (bool): Si se actualizó correctamente
-     *         - 'mensaje' (string): Mensaje descriptivo
-     *         - 'id_agendamiento' (int): ID de la cita procesada
-     */
+        * SUBTAREA 3: Actualiza el estado de una cita a "Cancelada"
+        * 
+        * @param int $id_agendamiento ID de la cita a cancelar
+        * @return array Array con keys:
+        *         - 'exito' (bool): Si se actualizó correctamente
+        *         - 'mensaje' (string): Mensaje descriptivo
+        *         - 'id_agendamiento' (int): ID de la cita procesada
+        */
     public function actualizarEstadoCancelada($id_agendamiento)
     {
         try {
@@ -544,11 +543,11 @@ class Calendario
     }
 
     /**
-     * SUBTAREA 4: Obtiene todos los datos necesarios para enviar notificación de cancelación
-     * 
-     * @param int $id_agendamiento ID de la cita cancelada
-     * @return array Array con todos los datos de la cita cancelada o null
-     */
+        * SUBTAREA 4: Obtiene todos los datos necesarios para enviar notificación de cancelación
+        * 
+        * @param int $id_agendamiento ID de la cita cancelada
+        * @return array Array con todos los datos de la cita cancelada o null
+        */
     public function obtenerDatosParaNotificacionCancelacion($id_agendamiento)
     {
         try {
@@ -583,13 +582,13 @@ class Calendario
                             u.id_usuario as usuario_cancelo_id,
                             u.nombres as usuario_cancelo_nombre,
                             u.apellidos as usuario_cancelo_apellido
-                         FROM agendamiento a
-                         LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
-                         LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
-                         LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
-                         LEFT JOIN usuario u ON a.usuario_cancelo = u.id_usuario
-                         WHERE a.id_agendamiento = :id_agendamiento
-                         LIMIT 1";
+                        FROM agendamiento a
+                        LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
+                        LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                        LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                        LEFT JOIN usuario u ON a.usuario_cancelo = u.id_usuario
+                        WHERE a.id_agendamiento = :id_agendamiento
+                        LIMIT 1";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
@@ -609,17 +608,17 @@ class Calendario
     // ╚══════════════════════════════════════════════════════════════════════════════╝
 
     /**
-     * OBTENER CITAS SEGÚN EL USUARIO AUTENTICADO
-     * 
-     * @param int $id_usuario - ID del usuario autenticado
-     * @param string $tipo_usuario - 'propietario', 'veterinario' o 'admin'
-     * @param array $filtros - Filtros adicionales (estado, fecha_inicio, fecha_fin)
-     * @return array - Citas con detalles completos
-     * 
-     * Ejemplo:
-     * $citas = $calendario->obtenerCitasDelUsuario(5, 'propietario');
-     * $citas = $calendario->obtenerCitasDelUsuario(12, 'veterinario', ['estado' => 'Pendiente']);
-     */
+        * OBTENER CITAS SEGÚN EL USUARIO AUTENTICADO
+        * 
+        * @param int $id_usuario - ID del usuario autenticado
+        * @param string $tipo_usuario - 'propietario', 'veterinario' o 'admin'
+        * @param array $filtros - Filtros adicionales (estado, fecha_inicio, fecha_fin)
+        * @return array - Citas con detalles completos
+        * 
+        * Ejemplo:
+        * $citas = $calendario->obtenerCitasDelUsuario(5, 'propietario');
+        * $citas = $calendario->obtenerCitasDelUsuario(12, 'veterinario', ['estado' => 'Pendiente']);
+        */
     public function obtenerCitasDelUsuario($id_usuario, $tipo_usuario = 'propietario', $filtros = [])
     {
         try {

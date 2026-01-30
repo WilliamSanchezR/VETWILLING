@@ -151,7 +151,7 @@ class Veterinario
     {
         // Actualizamos la foto de perfil del usuario
         try {
-            $sql = "UPDATE veterinario SET img_perfil = :img_perfil
+            $sql = "UPDATE profesional SET img_perfil = :img_perfil
                     WHERE id_usuario = :id_usuario";
 
             $stmt = $this->conexion->prepare($sql);

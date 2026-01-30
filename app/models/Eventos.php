@@ -21,9 +21,9 @@ class Eventos
     {
         try {
             $sql = "INSERT INTO agendamiento(
-                tipo, observaciones, fecha_hora, fecha_hora_fin, estado, id_usuario, id_propietario, id_paciente, id_servicio, id_especialidad
+                tipo, observaciones, fecha_hora, fecha_hora_fin, estado, id_usuario, id_paciente, id_servicio, id_subservicio, id_especialidad
             ) VALUES(
-                :tipo, :observaciones, :fecha_hora, :fecha_hora_fin, :estado, :id_usuario, :id_propietario, :id_paciente, :id_servicio, :id_especialidad
+                :tipo, :observaciones, :fecha_hora, :fecha_hora_fin, :estado, :id_usuario, :id_paciente, :id_servicio, :id_subservicio, :id_especialidad
             )";
 
             $stmt = $this->conexion->prepare($sql);
@@ -35,17 +35,18 @@ class Eventos
             $stmt->bindParam(':estado', $data['estado']);
             $stmt->bindParam(':id_usuario', $data['id_usuario'], PDO::PARAM_INT);
 
-            // Permitir NULL en campos opcionales
-            $id_propietario = $data['id_propietario'] ?: null;
-            $id_paciente = $data['id_paciente'] ?: null;
-            $id_servicio = $data['id_servicio'] ?: null;
-            $id_especialidad = $data['id_especialidad'] ?: null;
+            // Bind de campos requeridos
+            $id_paciente = $data['id_paciente'];
+            $id_servicio = $data['id_servicio'];
+            $id_subservicio = $data['id_subservicio'] ?? null;
+            $id_especialidad = $data['id_especialidad'];
 
-            $stmt->bindParam(':id_propietario', $id_propietario, PDO::PARAM_INT);
             $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
             $stmt->bindParam(':id_servicio', $id_servicio, PDO::PARAM_INT);
             $stmt->bindParam(':id_especialidad', $id_especialidad, PDO::PARAM_INT);
 
+            // Bind seguro para id_subservicio
+            $stmt->bindValue(':id_subservicio', $data['id_subservicio'], PDO::PARAM_INT);
             $resultado = $stmt->execute();
 
             if (!$resultado) {
@@ -74,9 +75,9 @@ class Eventos
                 fecha_hora_fin,
                 estado,
                 id_usuario,
-                id_propietario,
                 id_paciente,
                 id_servicio,
+                id_subservicio,
                 id_especialidad
             FROM agendamiento
             ORDER BY fecha_hora ASC";
@@ -103,9 +104,9 @@ class Eventos
                 fecha_hora_fin,
                 estado,
                 id_usuario,
-                id_propietario,
                 id_paciente,
                 id_servicio,
+                id_subservicio,
                 id_especialidad
             FROM agendamiento
             WHERE id_usuario = :id_usuario
@@ -134,9 +135,9 @@ class Eventos
                 fecha_hora_fin,
                 estado,
                 id_usuario,
-                id_propietario,
                 id_paciente,
                 id_servicio,
+                id_subservicio,
                 id_especialidad
             FROM agendamiento
             WHERE id_agendamiento = :id LIMIT 1";
@@ -247,11 +248,11 @@ class Eventos
     {
         try {
             $consulta = "SELECT COUNT(*) as conflictos 
-                         FROM agendamiento 
-                         WHERE estado NOT IN ('Cancelada', 'Realizada')
-                         AND (
-                             (fecha_hora < :fecha_fin AND fecha_hora_fin > :fecha_inicio)
-                         )";
+                        FROM agendamiento 
+                        WHERE estado NOT IN ('Cancelada', 'Realizada')
+                        AND (
+                            (fecha_hora < :fecha_fin AND fecha_hora_fin > :fecha_inicio)
+                        )";
 
             // Si estamos actualizando, excluir el agendamiento actual
             if ($id_agendamiento) {
@@ -288,13 +289,13 @@ class Eventos
                             a.tipo,
                             CONCAT(p.nombres, ' ', p.apellidos) as propietario,
                             pac.nombre as mascota
-                         FROM agendamiento a
-                         LEFT JOIN propietario p ON a.id_propietario = p.id_propietario
-                         LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
-                         WHERE a.estado NOT IN ('Cancelada', 'Realizada')
-                         AND (
-                             (a.fecha_hora < :fecha_fin AND a.fecha_hora_fin > :fecha_inicio)
-                         )";
+                        FROM agendamiento a
+                        LEFT JOIN propietario p ON a.id_propietario = p.id_propietario
+                        LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                        WHERE a.estado NOT IN ('Cancelada', 'Realizada')
+                        AND (
+                            (a.fecha_hora < :fecha_fin AND a.fecha_hora_fin > :fecha_inicio)
+                        )";
 
             if ($id_agendamiento) {
                 $consulta .= " AND a.id_agendamiento != :id_agendamiento";
@@ -337,12 +338,12 @@ class Eventos
                             pac.id_paciente,
                             pac.nombre as nombre_mascota,
                             s.nombre as nombre_servicio
-                         FROM agendamiento a
-                         LEFT JOIN propietario p ON a.id_propietario = p.id_propietario
-                         LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
-                         LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
-                         LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
-                         WHERE a.id_agendamiento = :id_agendamiento";
+                        FROM agendamiento a
+                        LEFT JOIN propietario p ON a.id_propietario = p.id_propietario
+                        LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
+                        LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                        LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                        WHERE a.id_agendamiento = :id_agendamiento";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);

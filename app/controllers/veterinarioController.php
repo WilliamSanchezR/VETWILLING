@@ -332,7 +332,7 @@ function actualizarFotoPerfil()
         
         // Generar nombre único
         $img_perfil = uniqid('vet_') . '.' . $ext;
-        $destino = BASE_PATH . '/public/uploads/veterinarios/' . $img_perfil;
+        $destino = BASE_PATH . '/public/uploads/profesionales/' . $img_perfil;
         
         // Mover archivo
         if (move_uploaded_file($file['tmp_name'], $destino)) {
@@ -348,7 +348,7 @@ function actualizarFotoPerfil()
             if ($resultado) {
                 // Eliminar foto anterior si existe y no es la por defecto
                 if ($fotoAnterior && $fotoAnterior !== 'foto_default.jpg') {
-                    $rutaAnterior = BASE_PATH . '/public/uploads/veterinarios/' . $fotoAnterior;
+                    $rutaAnterior = BASE_PATH . '/public/uploads/profesionales/' . $fotoAnterior;
                     if (file_exists($rutaAnterior)) {
                         unlink($rutaAnterior);
                     }

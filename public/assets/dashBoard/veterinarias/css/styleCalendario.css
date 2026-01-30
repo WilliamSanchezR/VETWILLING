@@ -481,25 +481,26 @@
     top: 90px;
     border: 1px solid rgba(0, 48, 77, 0.06);
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-content: flex-start;
+    display: block;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
 }
 
 #external-events h4 {
     font-size: 16px;
     font-weight: 600;
     color: var(--color-texto-oscuro);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     padding-bottom: 10px;
     border-bottom: 1px solid rgba(0, 48, 77, 0.08);
     display: flex;
     align-items: center;
     gap: 8px;
     letter-spacing: -0.02em;
-    width: 100%;
-    flex-basis: 100%;
+    position: sticky;
+    top: 0;
+    background: var(--color-blanco);
+    z-index: 10;
 }
 
 #external-events h4::before {
@@ -508,40 +509,119 @@
     margin-right: 8px; 
 }
 
+/* Grupo de servicios */
+.servicio-grupo {
+    margin-bottom: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(0, 48, 77, 0.02);
+    transition: all 0.2s ease;
+}
+
+.servicio-grupo:last-child {
+    margin-bottom: 0;
+}
+
+.servicio-grupo.collapsed {
+    background: transparent;
+}
+
+/* Header del servicio (colapsable) */
+.servicio-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: rgba(0, 48, 77, 0.03);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+}
+
+.servicio-header:hover {
+    background: rgba(0, 48, 77, 0.06);
+}
+
+.servicio-header-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.servicio-icono {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.servicio-nombre {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-texto-oscuro);
+}
+
+.servicio-count {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.servicio-toggle {
+    font-size: 14px;
+    color: #6c757d;
+    transition: transform 0.2s ease;
+}
+
+/* Contenedor de subservicios */
+.subservicios-container {
+    padding: 8px 8px 4px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Estilos de los subservicios (eventos arrastrables) */
 #external-events .fc-event {
-    margin-bottom: 8px; 
+    margin-bottom: 0;
     cursor: grab;
     padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 14px; 
+    border-radius: 6px;
+    font-size: 13px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 8px; 
-    line-height: 1.4; 
     width: 100%;
-    max-width: 200px; 
-    flex-shrink: 0;
 }
 
 #external-events .fc-event:hover {
     transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 #external-events .fc-event:active {
     cursor: grabbing;
-    transform: scale(0.98) translateX(2px); 
+    transform: scale(0.98) translateX(2px);
 }
 
 #external-events .fc-event .fc-event-main {
     display: flex;
     align-items: center;
-    gap: 8px; 
+    justify-content: space-between;
     font-size: inherit;
-    flex: 1; 
+    width: 100%;
+}
+
+.subservicio-nombre {
+    flex: 1;
+    font-weight: 500;
+}
+
+.subservicio-precio {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-left: 8px;
 }
 
 
@@ -760,6 +840,33 @@ body.dark-mode #external-events,
 body.dark-mode .tarjeta-resumen-cita {
     background: #16213e;
     border-color: #2d3748;
+}
+
+body.dark-mode #external-events h4 {
+    color: #eee;
+    background: #16213e;
+    border-bottom-color: #2d3748;
+}
+
+body.dark-mode .servicio-grupo {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+body.dark-mode .servicio-header {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode .servicio-header:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .servicio-nombre {
+    color: #eee;
+}
+
+body.dark-mode .servicio-count,
+body.dark-mode .servicio-toggle {
+    color: #94a3b8;
 }
 
 body.dark-mode .fc .fc-toolbar-title,

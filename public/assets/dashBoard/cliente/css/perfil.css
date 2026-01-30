@@ -176,7 +176,7 @@
  .btn-editar {
     text-decoration: none;
      padding: 10px 20px;
-     background: #9DE795;
+     background: #0A932C;
      color: white;
      border: none;
      border-radius: 10px;
@@ -190,8 +190,9 @@
  }
 
  .btn-editar:hover {
-     background: #0A932C;
+     background: #9DE795;
      transform: translateY(-2px);
+     color: #000;
  }
 
  /* Formulario */
