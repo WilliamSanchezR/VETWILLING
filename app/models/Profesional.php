@@ -21,123 +21,46 @@ class Profesional
     function registrarProfesional($data)
     {
         try {
-            // Validamos si el email ya existe
-            $consultaEmail = $this->conexion->prepare("SELECT * FROM usuario WHERE email = :email LIMIT 1");
-            $consultaEmail->bindParam(':email', $data['email']);
-            $consultaEmail->execute();
-            $usuarioData = $consultaEmail->fetch();
+            // Creamso el usuario 
+            $idUsuario = $this->registrarUsuario($data);
 
-            if ($consultaEmail->rowCount() > 0) {
+            if ($idUsuario == 0) {
+                // Realizamos un rollback si falla alguna inserción
+                $this->conexion->rollBack();
+                return false;
+            }
 
-                // Validamos si el usuario esta relacionado con la tabla de profesionales por veterinaria
-                $consultaUsuarioVet = $this->conexion->prepare("SELECT pv.* 
-                    FROM profesional_veterinaria pv
-                    INNER JOIN profesional p ON p.id_profesional = pv.id_profesional
-                    INNER JOIN usuario u ON u.id_usuario = p.id_usuario
-                    WHERE u.id_usuario  = :id_usuario AND pv.id_veterinaria = :id_veterinaria LIMIT 1");
+            // Creamos el profesional
+            $idProfesional = $this->registrarProfesionalNuevo($data, $idUsuario);
 
-                $consultaUsuarioVet->bindParam(':id_usuario', $usuarioData['id_usuario']);
-                $consultaUsuarioVet->bindParam(':id_veterinaria', $data['id_veterinaria']);
-                $consultaUsuarioVet->execute();
+            if ($idProfesional == 0) {
+                $this->conexion->rollBack();
+                return false;
+            }
 
-                if ($consultaUsuarioVet->rowCount() > 0) {
-                    // El usuario ya está registrado para esta veterinaria
+            // Registramos el prosional en la veterinaria
+            $statudRegPV = $this->registrarVeterinariaProfesional($idProfesional, $data['id_veterinaria']);
+
+            if (!$statudRegPV) {
+                $this->conexion->rollBack();
+                return false;
+            }
+
+            if (!empty($data['especialidades'])) {
+                $registroEsp = $this->registrarEspecialidadProfesional($idUsuario, json_decode($data['especialidades']), $data['id_veterinaria']);
+
+                if (!$registroEsp) {
+                    $this->conexion->rollBack();
                     return false;
-                }
-
-                $consultaProf = $this->conexion->prepare("SELECT * FROM profesional WHERE id_usuario = :id_usuario LIMIT 1");
-                $consultaProf->bindParam(':id_usuario', $usuarioData['id_usuario']);
-                $consultaProf->execute();
-                $profesional = $consultaProf->fetch();
-
-                // Registramos el prosional en la veterinaria
-                $idProfesional = $profesional['id_profesional'];
-
-                $statudRegPV = $this->registrarVeterinariaProfesional($idProfesional, $data['id_veterinaria']);
-
-                if (!$statudRegPV) {
-                    return false;
-                }
-
-                // Registramos las especialidades del profesional
-                if (!empty($data['especialidades'])) {
-                    $this->registrarEspecialidadProfesional($usuarioData['id_usuario'], json_decode($data['especialidades']), $data['id_veterinaria']);
-                }
-
-                if (!empty($data['servicios'])) {
-                    return $this->registrarServicioProfesional($idProfesional, json_decode($data['servicios']));
-                } else {
-                    return $statudRegPV;
-                }
-            } else {
-                $insertar = "INSERT INTO usuario(email, password_hash, estado, id_rol)
-                VALUES(:email, :password_hash, :estado, :id_rol)";
-
-                $resultado = $this->conexion->prepare($insertar);
-                $resultado->bindParam(':email', $data['email']);
-                $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
-                $resultado->bindParam(':password_hash', $passwordHash);
-                $resultado->bindParam(':estado', $data['estado']);
-                $resultado->bindParam(':id_rol', $data['id_rol']);
-                $respCreacion = $resultado->execute();
-                if (!$respCreacion) {
-                    return false;
-                }
-
-                // Obtenemos el usuario recién creado
-                $consulta = $this->conexion->prepare("SELECT * FROM usuario WHERE email = :email LIMIT 1");
-                $consulta->bindParam(':email', $data['email']);
-                $consulta->execute();
-                $idUser = $consulta->fetch();
-
-                if (!$idUser) return false;
-
-                $sql = "INSERT INTO profesional(
-                        id_usuario, tipo_documento, numero_documento, registro_medico, nombres, apellidos, telefono, img_perfil, img_firma, nivel_acceso, direccion
-                    ) VALUES(
-                        :id_usuario, :tipo_documento, :numero_documento, :registro_medico, :nombres, :apellidos, :telefono, :img_perfil, :img_firma, :nivel_acceso, :direccion
-                    )";
-
-                $stmt = $this->conexion->prepare($sql);
-                $stmt->bindParam(':id_usuario', $idUser['id_usuario']);
-                $stmt->bindParam(':tipo_documento', $data['tipo_documento']);
-                $stmt->bindParam(':numero_documento', $data['numero_documento']);
-                $stmt->bindParam(':registro_medico', $data['registro_medico']);
-                $stmt->bindParam(':nombres', $data['nombres']);
-                $stmt->bindParam(':apellidos', $data['apellidos']);
-                $stmt->bindParam(':telefono', $data['telefono']);
-                $stmt->bindParam(':img_perfil', $data['img_perfil']);
-                $stmt->bindParam(':img_firma', $data['img_firma']);
-                $stmt->bindParam(':nivel_acceso', $data['nivel_acceso']);
-                $stmt->bindParam(':direccion', $data['direccion']);
-                $respCreacionPro = $stmt->execute();
-
-                if (!$respCreacionPro) {
-                    return false;
-                }
-
-                // Registramos el prosional en la veterinaria
-                $idProfesional = $this->conexion->lastInsertId();
-
-                print_r($idProfesional);
-
-                $statudRegPV = $this->registrarVeterinariaProfesional($idProfesional, $data['id_veterinaria']);
-
-                if (!$statudRegPV) {
-                    return false;
-                }
-
-                // Registramos las especialidades del profesional
-                if (!empty($data['especialidades'])) {
-                    $this->registrarEspecialidadProfesional($idUser['id_usuario'], json_decode($data['especialidades']), $data['id_veterinaria']);
-                }
-
-                if (!empty($data['servicios'])) {
-                    $this->registrarServicioProfesional($idProfesional, json_decode($data['servicios']));
-                } else {
-                    return $statudRegPV;
                 }
             }
+
+            if (!empty($data['servicios'])) {
+                $this->registrarServicioProfesional($idProfesional, json_decode($data['servicios']));
+            }
+
+            return true;
+
         } catch (PDOException $e) {
             error_log("Error en Usuario::registrar -> " . $e->getMessage());
             return false;
@@ -146,12 +69,103 @@ class Profesional
 
     function registrarVeterinariaProfesional($idProfesional, $idVeterinaria)
     {
+
+        // Validamos si el profesional ya está registrado en la veterinaria
+        $consultaPV = $this->conexion->prepare("SELECT * FROM profesional_veterinaria 
+            WHERE id_profesional = :id_profesional AND id_veterinaria = :id_veterinaria LIMIT 1");
+
+        $consultaPV->bindParam(':id_profesional', $idProfesional);
+        $consultaPV->bindParam(':id_veterinaria', $idVeterinaria);
+        $consultaPV->execute();
+
+        if ($consultaPV->rowCount() > 0) {
+            return true;
+        }
+
         $sqlVet = "INSERT INTO profesional_veterinaria(id_profesional, id_veterinaria)
                         VALUES(:id_profesional, :id_veterinaria)";
         $stmtVet = $this->conexion->prepare($sqlVet);
         $stmtVet->bindParam(':id_profesional', $idProfesional);
         $stmtVet->bindParam(':id_veterinaria', $idVeterinaria);
         return $stmtVet->execute();
+    }
+
+    function registrarUsuario($data)
+    {
+        try {
+            $consultaEmail = $this->conexion->prepare("SELECT * FROM usuario WHERE email = :email LIMIT 1");
+            $consultaEmail->bindParam(':email', $data['email']);
+            $consultaEmail->execute();
+            $usuarioData = $consultaEmail->fetch();
+            if ($consultaEmail->rowCount() > 0) {
+                return $usuarioData['id_usuario'];
+            }
+
+            $insertar = "INSERT INTO usuario(email, password_hash, estado, id_rol)
+                VALUES(:email, :password_hash, :estado, :id_rol)";
+
+            $resultado = $this->conexion->prepare($insertar);
+            $resultado->bindParam(':email', $data['email']);
+            $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
+            $resultado->bindParam(':password_hash', $passwordHash);
+            $resultado->bindParam(':estado', $data['estado']);
+            $resultado->bindParam(':id_rol', $data['id_rol']);
+            $respCreacion = $resultado->execute();
+
+
+            if ($respCreacion) {
+                return $this->conexion->lastInsertId();
+            } else {
+                return 0;
+            }
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::registrar -> " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    function registrarProfesionalNuevo($data, $id_usuario)
+    {
+
+        // Validamos si el profesional ya existe
+        try {
+            $consultaProf = $this->conexion->prepare("SELECT * FROM profesional WHERE id_usuario = :id_usuario LIMIT 1");
+            $consultaProf->bindParam(':id_usuario', $id_usuario);
+            $consultaProf->execute();
+            $profesionalData = $consultaProf->fetch();
+
+            if ($consultaProf->rowCount() > 0) {
+                return $profesionalData['id_profesional'];
+            }
+
+            $sql = "INSERT INTO profesional(
+                         id_usuario, tipo_documento, numero_documento, registro_medico, nombres, apellidos, telefono, img_perfil, img_firma, nivel_acceso, direccion
+                    ) VALUES(
+                        :id_usuario, :tipo_documento, :numero_documento, :registro_medico, :nombres, :apellidos, :telefono, :img_perfil, :img_firma, :nivel_acceso, :direccion
+                     )";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario);
+            $stmt->bindParam(':tipo_documento', $data['tipo_documento']);
+            $stmt->bindParam(':numero_documento', $data['numero_documento']);
+            $stmt->bindParam(':registro_medico', $data['registro_medico']);
+            $stmt->bindParam(':nombres', $data['nombres']);
+            $stmt->bindParam(':apellidos', $data['apellidos']);
+            $stmt->bindParam(':telefono', $data['telefono']);
+            $stmt->bindParam(':img_perfil', $data['img_perfil']);
+            $stmt->bindParam(':img_firma', $data['img_firma']);
+            $stmt->bindParam(':nivel_acceso', $data['nivel_acceso']);
+            $stmt->bindParam(':direccion', $data['direccion']);
+            $respCreacionPro = $stmt->execute();
+            if ($respCreacionPro) {
+                return $this->conexion->lastInsertId();
+            } else {
+                return 0;
+            }
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::registrar -> " . $e->getMessage());
+            return 0;
+        }
     }
 
     function listar($id_vterinaria)
@@ -167,7 +181,7 @@ class Profesional
                     p.telefono,
                     p.img_perfil,
                     us.email,
-                    pv.estado,
+                    us.estado,
                     rol.nombre AS rol, 
                     GROUP_CONCAT(DISTINCT esp.nombre SEPARATOR ', ') as especialidad,
                     GROUP_CONCAT(DISTINCT ser.nombre SEPARATOR ', ') as servicios
@@ -180,7 +194,7 @@ class Profesional
                 LEFT JOIN especialidad esp ON pe.id_especialidad = esp.id_especialidad
                 LEFT JOIN profesionales_servicio ps on p.id_profesional = ps.id_profesional AND ps.estado = 'Activo'
                 LEFT JOIN servicio ser ON ps.id_servicio = ser.id_servicio AND ser.estado = 'Activo'
-                WHERE pv.id_veterinaria = :id_veterinaria AND us.estado = 'activo' AND pv.estado = 'Activo'
+                WHERE pv.id_veterinaria = :id_veterinaria
                 GROUP BY p.id_profesional, p.nombres, us.id_usuario";
 
             $stmt = $this->conexion->prepare($sql);
@@ -338,7 +352,7 @@ class Profesional
             // Registramos las especialidades del profesional
             if (!empty($data['especialidades'])) {
                 $this->registrarEspecialidadProfesional($data['id_usuario'], json_decode($data['especialidades']), $data['id_veterinaria']);
-            } 
+            }
 
             if (!empty($data['servicios'])) {
                 return $this->registrarServicioProfesional($data['id_profesional'], json_decode($data['servicios']));

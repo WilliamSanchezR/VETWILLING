@@ -53,7 +53,7 @@ function registrarProfesional()
     $img_firma = null;
     $listaEspecialidades = $_POST['especialidades'] ?? '';
     $listaServicios = $_POST['servicios'] ?? '';
-
+   
     // Validamos que los campos no esten vacios
     if (
         empty($email) || empty($password) || empty($estado) || empty($id_rol) ||

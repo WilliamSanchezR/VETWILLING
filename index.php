@@ -400,9 +400,13 @@ switch ($request) {
     case '/representante/eliminar-agenda-usuario':
         require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
         break;
-    
+
     case '/representante/editar-disponibilidad-agenda':
         require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+
+    case '/representante/perfil-representante':
+        require BASE_PATH . '/app/views/dashboard/representante/perfilRepresentante.php';
         break;
 
 

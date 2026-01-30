@@ -25,6 +25,8 @@ class panelSuperiorAdmin {
 
         this.search = this.$('#inputBusqueda');
         this.themeIcon = this.$('#themeIcon');
+        this.btnAbrirSoporte = document.getElementById('btnAbrirSoporte');
+        this.modalSoporte = document.getElementById('modalSoporte');
 
         // Estado
         this.state = {
@@ -63,6 +65,12 @@ class panelSuperiorAdmin {
 
         this.$$('.dropdown').forEach(d => {
             d.addEventListener('click', (e) => e.stopPropagation());
+        });
+
+        this.btnAbrirSoporte?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.modalSoporte.classList.add('active');
+            document.body.style.overflow = 'hidden';
         });
     }
 
@@ -193,7 +201,7 @@ class panelSuperiorAdmin {
         const routePage = routes[routes.length - 1];
 
         switch (routePage) {
-            case 'registro-usuario':                
+            case 'registro-usuario':
             case 'listar-usuarios':
             case 'editar-usuario':
                 titlePage = 'Usuarios';
