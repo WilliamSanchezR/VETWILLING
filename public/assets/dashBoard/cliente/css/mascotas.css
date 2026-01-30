@@ -523,6 +523,12 @@ body {
 .action-btn i {
     font-size: 1rem;
 }
+.info-iten i {
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+    display: block;
+    color: #ffffff !important;
+}
 
 /* Opcional: Efecto de confirmación visual */
 .action-btn-primary:hover i {

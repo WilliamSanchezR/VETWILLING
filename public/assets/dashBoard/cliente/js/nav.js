@@ -923,3 +923,168 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('🚀 Sistema de navegación cargado completamente');
 });
+// reloj
+// ===================================
+// MÓDULO DE RELOJ EN VIVO
+// ===================================
+
+class RelojEnVivo {
+    constructor() {
+        this.modalReloj = document.getElementById('modalReloj');
+        this.btnReloj = document.querySelector('[data-modal="reloj"]');
+        this.btnCerrar = document.querySelector('[data-modal-close="reloj"]');
+        this.horaNavbar = document.getElementById('horaNavbar');
+        this.relojDigital = document.getElementById('relojDigital');
+        this.relojFecha = document.getElementById('relojFecha');
+        this.diaSemana = document.getElementById('diaSemana');
+        this.periodo = document.getElementById('periodo');
+        this.zonaHoraria = document.getElementById('zonaHoraria');
+        
+        this.diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        this.meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        
+        this.init();
+    }
+    
+    init() {
+        // Iniciar actualización del reloj
+        this.actualizarReloj();
+        setInterval(() => this.actualizarReloj(), 1000);
+        
+        // Event listeners
+        if (this.btnReloj) {
+            this.btnReloj.addEventListener('click', () => this.abrirModal());
+        }
+        
+        if (this.btnCerrar) {
+            this.btnCerrar.addEventListener('click', () => this.cerrarModal());
+        }
+        
+        if (this.modalReloj) {
+            this.modalReloj.addEventListener('click', (e) => {
+                if (e.target === this.modalReloj) {
+                    this.cerrarModal();
+                }
+            });
+        }
+        
+        // Cerrar con ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.modalReloj.classList.contains('activo')) {
+                this.cerrarModal();
+            }
+        });
+        
+        // Actualizar zona horaria
+        this.actualizarZonaHoraria();
+    }
+    
+    actualizarReloj() {
+        const ahora = new Date();
+        
+        // Actualizar hora en navbar (formato 12h con AM/PM)
+        const horas12 = ahora.getHours() % 12 || 12;
+        const minutos = String(ahora.getMinutes()).padStart(2, '0');
+        const ampm = ahora.getHours() >= 12 ? 'PM' : 'AM';
+        
+        if (this.horaNavbar) {
+            this.horaNavbar.textContent = `${horas12}:${minutos} ${ampm}`;
+        }
+        
+        // Actualizar reloj digital en modal (formato 24h simple)
+        const horas24 = String(ahora.getHours()).padStart(2, '0');
+        const segundos = String(ahora.getSeconds()).padStart(2, '0');
+        
+        if (this.relojDigital) {
+            this.relojDigital.textContent = `${horas24}:${minutos}:${segundos}`;
+        }
+        
+        // Actualizar fecha
+        const dia = ahora.getDate();
+        const mes = this.meses[ahora.getMonth()];
+        const año = ahora.getFullYear();
+        
+        if (this.relojFecha) {
+            this.relojFecha.textContent = `${dia} de ${mes} de ${año}`;
+        }
+        
+        // Actualizar día de la semana
+        if (this.diaSemana) {
+            this.diaSemana.textContent = this.diasSemana[ahora.getDay()];
+        }
+        
+        // Actualizar período del día
+        if (this.periodo) {
+            this.periodo.textContent = this.obtenerPeriodo(ahora.getHours());
+        }
+    }
+    
+    obtenerPeriodo(hora) {
+        if (hora >= 5 && hora < 12) return 'Mañana';
+        if (hora >= 12 && hora < 18) return 'Tarde';
+        if (hora >= 18 && hora < 22) return 'Noche';
+        return 'Madrugada';
+    }
+    
+    actualizarZonaHoraria() {
+        if (this.zonaHoraria) {
+            try {
+                const zona = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const offset = new Date().getTimezoneOffset();
+                const offsetHoras = Math.abs(offset / 60);
+                const signo = offset <= 0 ? '+' : '-';
+                this.zonaHoraria.textContent = `UTC${signo}${offsetHoras}`;
+            } catch (e) {
+                this.zonaHoraria.textContent = 'Local';
+            }
+        }
+    }
+    
+    abrirModal() {
+        if (this.modalReloj) {
+            this.modalReloj.classList.add('activo');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    cerrarModal() {
+        if (this.modalReloj) {
+            this.modalReloj.classList.remove('activo');
+            document.body.style.overflow = '';
+        }
+    }
+}
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    new RelojEnVivo();
+});
+
+// ===================================
+// INTEGRACIÓN CON nav.js EXISTENTE
+// ===================================
+
+// Si ya tienes un nav.js, agrega esta función al final
+// o integra la clase RelojEnVivo en tu código existente
+
+// Ejemplo de integración:
+/*
+// En tu nav.js existente, agrega:
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Tu código existente...
+    
+    // Inicializar reloj
+    const reloj = new RelojEnVivo();
+    
+    // Continúa con tu código...
+});
+*/
+
+const btnProfile = document.querySelector('.btn-perfil');
+
+btnProfile.addEventListener('click', () => {
+    const isActive = btnProfile.classList.toggle('active');
+    btnProfile.setAttribute('aria-expanded', isActive);
+});

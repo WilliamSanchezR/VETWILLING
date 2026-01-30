@@ -650,8 +650,8 @@ body {
     display: flex;
     gap: 15px;
     align-items: center;
-    background: linear-gradient(135deg, #0A932C, #9DE795);
-    color: white;
+    /* background: #6b6b6b70; */
+    color: #000;
 }
 
 .nombre-completo {
@@ -1180,5 +1180,225 @@ body {
 
     .modal-body {
         padding: 18px 15px;
+    }
+}
+
+/* reloj */
+/* ===================================
+   MÓDULO DE RELOJ EN VIVO - MINIMALISTA
+   =================================== */
+
+/* Botón del reloj en el navbar */
+.btn-reloj {
+    position: relative;
+    background: #f5f5f5;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: #333;
+    min-width: 60px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-reloj:hover {
+    background: #e8e8e8;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-reloj i {
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.hora-actual {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #333;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* Modal emergente del reloj */
+.modal-reloj {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+}
+
+.modal-reloj.activo {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Contenido del modal */
+.modal-reloj-contenido {
+    background: white;
+    border-radius: 16px;
+    padding: 35px 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 380px;
+    width: 90%;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.25s ease;
+}
+
+.modal-reloj.activo .modal-reloj-contenido {
+    transform: scale(1);
+}
+
+/* Botón cerrar */
+.btn-cerrar-reloj {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #f5f5f5;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn-cerrar-reloj:hover {
+    background: #e8e8e8;
+    color: #333;
+    transform: rotate(90deg);
+}
+
+/* Display del reloj */
+.reloj-display {
+    text-align: center;
+    color: #333;
+}
+
+.reloj-digital {
+    font-size: 3.5rem;
+    font-weight: 700;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+    color: #2c3e50;
+}
+
+.reloj-fecha {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 25px;
+    text-transform: capitalize;
+    font-weight: 500;
+}
+
+/* Información adicional */
+.reloj-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+}
+.flecha-perfil {
+    transition: transform 0.3s ease;
+    pointer-events: none; /* evita bugs al hacer click */
+}
+
+/* cuando el botón está activo */
+.btn-perfil.active .flecha-perfil {
+    transform: rotate(180deg);
+}
+
+
+.info-item {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px 10px;
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    min-width: 0; /* 🔑 evita overflow en grid */
+}
+
+
+.info-item:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.info-item i {
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+    display: block;
+    color: #495057;
+}
+
+.info-label {
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-reloj-contenido {
+        padding: 25px 20px;
+    }
+    
+    .reloj-digital {
+        font-size: 2.5rem;
+    }
+    
+    .reloj-info {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .btn-reloj {
+        min-width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hora-actual {
+        font-size: 0.7rem;
+    }
+    
+    .btn-reloj i {
+        font-size: 1rem;
     }
 }
