@@ -39,20 +39,6 @@ $final_path = end($path_parts); // Obtiene el último elemento
                 <span class="nav-text">Inicio</span>
             </a>
 
-            <div class="submenu <?= $final_path == 'registro-usuario' || $final_path == 'listar-usuarios' ? 'active open' : '' ?>">
-
-                <div class="submenu-toggle" data-tooltip="Usuario">
-                    <i class="bi bi-person-plus"></i>
-                    <span class="texto-item-sidebar">Usuario</span>
-                    <i class="bi bi-chevron-down flecha"></i>
-                </div>
-
-                <ul class="submenu-items">
-                    <li><a class="nav-item <?= $final_path == 'registro-usuario' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/registro-usuario" data-tooltip="Registrar">Registrar </a></li>
-                    <li><a class="nav-item <?= $final_path == 'listar-usuarios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/listar-usuarios" data-tooltip="Listar">Listar</a></li>
-                </ul>
-            </div>
-
             <!-- Menu Veterinaria -->
             <div class="submenu <?= $final_path == 'registro-veterinaria' || $final_path == 'listar-veterinarias' ? 'active open' : '' ?>">
 
@@ -67,6 +53,23 @@ $final_path = end($path_parts); // Obtiene el último elemento
                     <li><a class="nav-item <?= $final_path == 'listar-veterinarias' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/listar-veterinarias" data-tooltip="Listar">Listar</a></li>
                 </ul>
             </div>
+
+
+            <!-- Menu Usuario -->
+            <div class="submenu <?= $final_path == 'registro-usuario' || $final_path == 'listar-usuarios' ? 'active open' : '' ?>">
+
+                <div class="submenu-toggle" data-tooltip="Usuario">
+                    <i class="bi bi-person-plus"></i>
+                    <span class="texto-item-sidebar">Usuario</span>
+                    <i class="bi bi-chevron-down flecha"></i>
+                </div>
+
+                <ul class="submenu-items">
+                    <li><a class="nav-item <?= $final_path == 'registro-usuario' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/registro-usuario" data-tooltip="Registrar">Registrar </a></li>
+                    <li><a class="nav-item <?= $final_path == 'listar-usuarios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/listar-usuarios" data-tooltip="Listar">Listar</a></li>
+                </ul>
+            </div>
+
 
             <a href="<?= BASE_URL ?>/admin/listar-tickets"
                 class="nav-item <?= $final_path == '' ? 'active' : '' ?>"

@@ -79,7 +79,7 @@ class Perfil
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
                                 rl.nombres, rl.apellidos, rl.nivel_acceso, rl.img_perfil, rl.telefono,
-                                r.nombre AS rol
+                                r.nombre AS rol, rl.direccion, rl.fecha_creacion
                                 FROM usuario u
                                 INNER JOIN representante_legal rl ON u.id_usuario = rl.id_usuario
                                 INNER JOIN rol r ON u.id_rol = r.id_rol
