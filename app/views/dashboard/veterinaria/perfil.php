@@ -62,8 +62,17 @@ $usuario = mostrarPerfil($id);
                     <!-- Foto y datos básicos -->
                     <div class="col-md-4">
                         <div class="foto">
-                            <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>" class="fotito"
-                                alt="Pedro Perez" width="100">
+                            <form class="contenedor-foto" id="form_cambio_imagen" action="<?= BASE_URL ?>/veterinario/cambiar-foto" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="id_usuario" value="<?= $id ?>">
+                                <input type="hidden" name="accion" value="cambiar-foto">
+                                <img src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>" class="fotito"
+                                    alt="Pedro Perez" width="100">
+                                <div class="avatar-icon">
+                                    <i class="bi bi-camera-fill"></i>
+                                </div>
+                                <input type="file" id="upload-logo" accept="image/*" name="img_perfil">
+                            </form>
+                            
                             <h3><?= $usuario['nombres'] ?> <br> <?= $usuario['apellidos'] ?></h3>
                             <h4><span>+57</span> <?= $usuario['telefono'] ?></h4>
                             <h5><?= $usuario['email'] ?></h5>

@@ -116,8 +116,9 @@ $veterinario = listarVeterinario($id);
                                     <option value="<?= $veterinario['estado'] ?>">
                                         <?= $veterinario['estado'] ?>
                                     </option>
-                                    <option value="Activo">Activo</option>
-                                    <option value="Bloqueado">Bloqueado</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                    <option value="bloqueado">Bloqueado</option>
                                 </select>
                             </div>
                         </div>

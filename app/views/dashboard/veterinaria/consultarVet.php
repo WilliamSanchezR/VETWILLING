@@ -146,7 +146,7 @@ $datos = mostrarVeterinarios();
                                         <a href="<?= BASE_URL ?>/veterinario/editar-veterinario?id=<?= $veterinario['id_usuario'] ?>" class="btn-accion btn-editar" title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a href="<?= BASE_URL ?>/veterinario/eliminar-veterinario?accion=eliminar&id=<?= $veterinario['id_usuario'] ?>" class="btn-accion btn-eliminar" title="Eliminar">
+                                        <a href="<?= BASE_URL ?>/veterinario/eliminar-veterinario?accion=eliminar&id=<?= $veterinario['id_usuario'] ?>" class="btn-accion btn-eliminar" title="Inhabilitar">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </td>

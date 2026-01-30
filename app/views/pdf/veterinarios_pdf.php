@@ -154,7 +154,7 @@ $veterinarios = mostrarVeterinarios($id_veterinaria);
                             <td><?= $veterinario['tipo_documento'] ?> - <?= $veterinario['numero_documento'] ?></td>
                             <td><?= $veterinario['telefono'] ?></td>
                             <td><?= $veterinario['email'] ?></td>
-                            <td class="<?= $veterinario['estado'] == 'Activo' ? 'estado-activo' : 'estado-inactivo' ?>">
+                            <td class="<?= $veterinario['estado'] == 'activo' ? 'estado-activo' : 'estado-inactivo' ?>">
                                 <?= $veterinario['estado'] ?>
                             </td>
 
