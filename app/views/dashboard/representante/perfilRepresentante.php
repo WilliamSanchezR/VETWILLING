@@ -1,5 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_all.php';
+require_once BASE_PATH . '/app/helpers/session_representante.php';
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 
 $rol = $_SESSION['user']['id_rol'];
@@ -40,7 +40,7 @@ $usuario = mostrarPerfil($id);
 
     <?php
     // <!-- BARRA LATERAL IZQUIERDA -->
-    include_once __DIR__ . '/../../layouts/sidebar_administrador.php';
+    include_once __DIR__ . '/../../layouts/sidebar_representante.php';
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->
