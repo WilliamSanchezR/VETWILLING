@@ -315,7 +315,7 @@ function actualizarProfesional()
             'success',
             'Profesional actualizado',
             'El profesional ha sido actualizado correctamente',
-            '/vetwilling/representante/editar-profesional?id=' . $id_usuario
+            '/vetwilling/representante/listar-profesionales'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar el profesional');
