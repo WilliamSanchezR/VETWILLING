@@ -138,7 +138,7 @@ function registrarProfesional()
             'success',
             'Profesional registrado',
             'El profesional ha sido creado correctamente',
-            '/vetwilling/representante/registro-profesionales'
+            '/vetwilling/representante/listar-profesionales'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo registrar el profesional');
