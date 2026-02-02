@@ -4,6 +4,7 @@ require_once BASE_PATH . '/app/controllers/mascotasController.php';
 $id_mascota = $_GET['id'];
 $mascota = consultarMascotaId($id_mascota);
 
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -65,7 +66,9 @@ $mascota = consultarMascotaId($id_mascota);
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-md-2 text-center">
-                                <img src="https://via.placeholder.com/120" alt="Mascota" class="rounded-circle img-fluid" style="width: 120px; height: 120px; object-fit: cover;">
+                                <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= $mascota['img_mascota'] ?>"
+                                        alt="<?= htmlspecialchars($mascota['nombre']) ?>"
+                                        style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover;">
                             </div>
                             <div class="col-md-10">
                                 <div class="row">
