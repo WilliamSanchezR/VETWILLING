@@ -52,7 +52,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 <ul class="submenu-items">
 
                     <!-- Sección configuracion veterinaria -->
-                    <li>
+                    <!-- <li>
 
                         <div class="submenu-seccond">
 
@@ -68,7 +68,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             </ul>
 
                         </div>
-                    </li>
+                    </li> -->
 
 
                     <!-- Sección Especialidades -->
@@ -181,7 +181,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
 
             <!-- NAVEGACIÓN AUXILIAR DE VETERINARIA -->
-            <div class="submenu">
+            <!-- <div class="submenu">
 
                 <div class="submenu-toggle" data-tooltip="Gestión auxiliar veterinario">
                     <i class="bi bi-person-badge"></i>
@@ -201,7 +201,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 </ul>
 
 
-            </div>
+            </div> -->
 
     </nav>
 
