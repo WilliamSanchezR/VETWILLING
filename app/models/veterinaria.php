@@ -153,4 +153,21 @@ class Veterinaria
             return [];
         }
     }
+
+    public function consultaIformacionVeterinaria($idVeterinaria)
+    {
+        try {
+            $consulta = "SELECT id_veterinaria, nombre, foto
+                         FROM veterinaria 
+                         WHERE id_veterinaria = :id_veterinaria";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_veterinaria', $idVeterinaria);
+            $resultado->execute();
+            return $resultado->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al consultar la información de la veterinaria: " . $e->getMessage();
+            return null;
+        }
+    }
 }

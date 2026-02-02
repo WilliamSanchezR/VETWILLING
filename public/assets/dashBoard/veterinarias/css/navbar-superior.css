@@ -1269,3 +1269,15 @@ body.sidebar-collapsed .navbar-superior {
     border-top-color: var(--text-primary);
     z-index: 10000;
 }
+
+.image-avatar {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+}
+
+.image-avatar  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
