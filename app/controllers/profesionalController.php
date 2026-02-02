@@ -53,7 +53,7 @@ function registrarProfesional()
     $img_firma = null;
     $listaEspecialidades = $_POST['especialidades'] ?? '';
     $listaServicios = $_POST['servicios'] ?? '';
-
+   
     // Validamos que los campos no esten vacios
     if (
         empty($email) || empty($password) || empty($estado) || empty($id_rol) ||
@@ -138,7 +138,7 @@ function registrarProfesional()
             'success',
             'Profesional registrado',
             'El profesional ha sido creado correctamente',
-            '/vetwilling/representante/registro-profesionales'
+            '/vetwilling/representante/listar-profesionales'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo registrar el profesional');
@@ -315,7 +315,7 @@ function actualizarProfesional()
             'success',
             'Profesional actualizado',
             'El profesional ha sido actualizado correctamente',
-            '/vetwilling/representante/editar-profesional?id=' . $id_usuario
+            '/vetwilling/representante/listar-profesionales'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar el profesional');

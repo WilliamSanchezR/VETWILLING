@@ -92,12 +92,6 @@ $listaUsuarios = listaUsuarios($_SESSION['user']['id_veterinaria']);
                     <button class="btn-control" id="btnExportprof">
                         <i class="bi bi-download"></i> Export
                     </button>
-
-                    <a href="#">
-                        <button class="btn-agregar" id="btnAgregarNuevaAgenda">
-                            <i class="bi bi-plus-lg"></i> Agregar Nuevo
-                        </button>
-                    </a>
                 </div>
             </div>
 

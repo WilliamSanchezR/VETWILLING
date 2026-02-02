@@ -297,28 +297,50 @@ class Usuario
     {
         // Actualizamos la foto de perfil del usuario
         try {
-            $sql = "UPDATE administrador SET img_perfil = :img_perfil
-                    WHERE id_usuario = :id_usuario";
 
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_usuario', $data['id_usuario']);
-            $stmt->bindParam(':img_perfil', $data['img_perfil']);
+            // Cosnsultamos el usurio para obteerr su rol
+            $consultar = "SELECT us.id_rol
+                FROM usuario us
+                WHERE us.id_usuario = :id LIMIT 1";
 
-            $ok = $stmt->execute();
-            // Verificamos si la actualización fue exitosa
-            if ($ok) {
-                return true;
+            $resultado = $this->conexion->prepare($consultar);
+            $resultado->bindParam(':id', $data['id_usuario']);
+            $resultado->execute();
+            $user = $resultado->fetch();
+
+
+            if (!$user) {
+                return false;
             }
 
-            // SI NO ES ADMIN, INTENTAMOS CON REPRESENTANTE LEGAL
-            $sqlRep = "UPDATE representante_legal SET img_perfil = :img_perfil
+            if ($user['id_rol'] == '1') {
+
+                $sql = "UPDATE administrador SET img_perfil = :img_perfil
                     WHERE id_usuario = :id_usuario";
 
-            $stmt2 = $this->conexion->prepare($sqlRep);
-            $stmt2->bindParam(':id_usuario', $data['id_usuario']);
-            $stmt2->bindParam(':img_perfil', $data['img_perfil']);
+                $stmt = $this->conexion->prepare($sql);
+                $stmt->bindParam(':id_usuario', $data['id_usuario']);
+                $stmt->bindParam(':img_perfil', $data['img_perfil']);
 
-            return $stmt2->execute();
+                $ok = $stmt->execute();
+                // Verificamos si la actualización fue exitosa
+                if ($ok) {
+                    return true;
+                }
+            } else if($user['id_rol'] == '4') {
+
+                // SI NO ES ADMIN, INTENTAMOS CON REPRESENTANTE LEGAL
+                $sqlRep = "UPDATE representante_legal SET img_perfil = :img_perfil
+                    WHERE id_usuario = :id_usuario";
+
+                $stmt2 = $this->conexion->prepare($sqlRep);
+                $stmt2->bindParam(':id_usuario', $data['id_usuario']);
+                $stmt2->bindParam(':img_perfil', $data['img_perfil']);
+
+                return $stmt2->execute();
+            } else {
+                return false;
+            }
         } catch (PDOException $e) {
             error_log("Error en Usuario::actualizarFotoPerfil -> " . $e->getMessage());
             return false;

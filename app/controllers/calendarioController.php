@@ -6,6 +6,7 @@ require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
 require_once __DIR__ . '/../models/Calendario.php';
 require_once __DIR__ . '/../models/Eventos.php';
+require_once __DIR__ . '/../models/DisponibilidadUsuario.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -77,6 +78,8 @@ switch ($method) {
             eliminarAgendamiento($_GET['id']);
         } else if ($accion === 'cargar') {
             cargarEventos();
+        } else if (strpos($request_uri, '/calendario/loadEvents') !== false) {
+            cargarEventos();
         } else if (strpos($request_uri, '/calendario/getPropietarios') !== false) {
             obtenerPropietarios();
         } else if (strpos($request_uri, '/calendario/getMascotas') !== false) {
@@ -85,6 +88,13 @@ switch ($method) {
             obtenerServicios();
         } else if (strpos($request_uri, '/calendario/getVeterinarios') !== false) {
             obtenerVeterinarios();
+        } else if (strpos($request_uri, '/calendario/getSubservicios') !== false) {
+            // Verificar si viene id_servicio como parámetro
+            if (isset($_GET['id_servicio'])) {
+                obtenerSubserviciosPorServicio();
+            } else {
+                obtenerSubservicios();
+            }
         } elseif ($accion === 'validar') {
             rfs36_validarEstadoCitaGet();
         } elseif ($accion === 'detalles_cancelacion') {
@@ -129,6 +139,13 @@ function crearAgendamientoAjax()
         // Obtener datos enviados en JSON
         $data = json_decode(file_get_contents("php://input"), true);
 
+        // LOG TEMPORAL PARA DEPURACIÓN
+        error_log("=== DATOS RECIBIDOS EN crearAgendamientoAjax ===");
+        error_log("Data completa: " . print_r($data, true));
+        error_log("id_servicio recibido: " . ($data['id_servicio'] ?? 'NO EXISTE'));
+        error_log("id_subservicio recibido: " . ($data['id_subservicio'] ?? 'NO EXISTE'));
+        error_log("==============================================");
+
         if (!$data) {
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'No se recibieron datos']);
@@ -144,15 +161,21 @@ function crearAgendamientoAjax()
         // Convertir el id_usuario a entero
         $id_usuario = isset($_SESSION['user']['id_usuario']) ? (int)$_SESSION['user']['id_usuario'] : null;
 
-        $id_propietario = !empty($data['id_propietario']) ? (int)$data['id_propietario'] : null;
         $id_paciente = !empty($data['id_paciente']) ? (int)$data['id_paciente'] : null;
         $id_servicio = !empty($data['id_servicio']) ? (int)$data['id_servicio'] : null;
-        $id_especialidad = !empty($data['id_especialidad']) ? (int)$data['id_especialidad'] : null;
+
+        // Validación robusta para id_subservicio
+        $id_subservicio = null;
+        if (isset($data['id_subservicio']) && is_numeric($data['id_subservicio']) && $data['id_subservicio'] > 0) {
+            $id_subservicio = (int)$data['id_subservicio'];
+        }
+
+        $id_especialidad = !empty($data['id_especialidad']) ? (int)$data['id_especialidad'] : 1;
 
         // Validamos que los campos requeridos no esten vacios
-        if (empty($tipo) || empty($fecha_hora)) {
+        if (empty($tipo) || empty($fecha_hora) || empty($id_subservicio)) {
             http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Tipo y fecha_hora son obligatorios']);
+            echo json_encode(['status' => 'error', 'message' => 'Tipo, fecha_hora y subservicio son obligatorios']);
             exit();
         }
 
@@ -170,7 +193,41 @@ function crearAgendamientoAjax()
             $fecha_hora_fin = date('Y-m-d H:i:s', strtotime($fecha_hora_fin));
         }
 
-        // VERIFICAR DISPONIBILIDAD DE HORARIO
+        // VALIDAR QUE LA CITA ESTÉ DENTRO DE LA DISPONIBILIDAD DEL VETERINARIO
+        $disponibilidadModel = new DisponibilidadUsuario();
+
+        // Resolver id_veterinaria
+        $id_veterinaria = resolverIdVeterinaria();
+
+        if (!$id_veterinaria) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'No se pudo determinar la veterinaria asociada'
+            ]);
+            exit();
+        }
+
+        // Validar que la cita esté dentro de la disponibilidad
+        $validacionDisponibilidad = $disponibilidadModel->validarCitaDentroDisponibilidad(
+            $id_usuario,
+            $id_veterinaria,
+            $fecha_hora,
+            $fecha_hora_fin
+        );
+
+        if (!$validacionDisponibilidad['valido']) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $validacionDisponibilidad['mensaje'],
+                'tipo' => 'disponibilidad',
+                'rangos_disponibles' => $validacionDisponibilidad['rangos_disponibles']
+            ]);
+            exit();
+        }
+
+        // VERIFICAR DISPONIBILIDAD DE HORARIO (conflicto con otras citas)
         $objEventos = new Eventos();
         $disponible = $objEventos->verificarDisponibilidad($fecha_hora, $fecha_hora_fin);
 
@@ -193,6 +250,7 @@ function crearAgendamientoAjax()
             echo json_encode([
                 'status' => 'error',
                 'message' => $mensajeConflicto,
+                'tipo' => 'conflicto',
                 'conflictos' => $citasConflicto
             ]);
             exit();
@@ -206,14 +264,23 @@ function crearAgendamientoAjax()
             'fecha_hora_fin' => $fecha_hora_fin,
             'estado' => $estado,
             'id_usuario' => $id_usuario,
-            'id_propietario' => $id_propietario,
             'id_paciente' => $id_paciente,
             'id_servicio' => $id_servicio,
+            'id_subservicio' => $id_subservicio,
             'id_especialidad' => $id_especialidad,
         ];
 
+        // LOG DATOS A INSERTAR
+        error_log("=== DATOS A INSERTAR EN BD ===");
+        error_log(print_r($dataToInsert, true));
+        error_log("==============================");
+
         // Registramos el agendamiento
         $id_generado = $objEventos->registrar($dataToInsert);
+
+        error_log("=== RESULTADO DE INSERCIÓN ===");
+        error_log("ID Generado: " . ($id_generado ? $id_generado : 'FALSE'));
+        error_log("==============================");
 
         if ($id_generado) {
             header('Content-Type: application/json');
@@ -297,6 +364,51 @@ function actualizarAgendamientoAjax()
 
         $objEventos = new Eventos();
 
+        // Obtener la cita actual para conocer el id_usuario (veterinario)
+        $citaActual = $objEventos->consultarAgendamiento($id_agendamiento);
+
+        if (!$citaActual) {
+            http_response_code(404);
+            echo json_encode(['status' => 'error', 'message' => 'Cita no encontrada']);
+            exit();
+        }
+
+        $id_usuario = $citaActual['id_usuario'];
+
+        // VALIDAR QUE LA CITA ESTÉ DENTRO DE LA DISPONIBILIDAD DEL VETERINARIO
+        $disponibilidadModel = new DisponibilidadUsuario();
+
+        // Resolver id_veterinaria
+        $id_veterinaria = resolverIdVeterinaria();
+
+        if (!$id_veterinaria) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'No se pudo determinar la veterinaria asociada'
+            ]);
+            exit();
+        }
+
+        // Validar que la nueva fecha esté dentro de la disponibilidad
+        $validacionDisponibilidad = $disponibilidadModel->validarCitaDentroDisponibilidad(
+            $id_usuario,
+            $id_veterinaria,
+            $fecha_hora,
+            $fecha_hora_fin
+        );
+
+        if (!$validacionDisponibilidad['valido']) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $validacionDisponibilidad['mensaje'],
+                'tipo' => 'disponibilidad',
+                'rangos_disponibles' => $validacionDisponibilidad['rangos_disponibles']
+            ]);
+            exit();
+        }
+
         // VERIFICAR DISPONIBILIDAD DE HORARIO (excluyendo la cita actual)
         $disponible = $objEventos->verificarDisponibilidad($fecha_hora, $fecha_hora_fin, $id_agendamiento);
 
@@ -319,6 +431,7 @@ function actualizarAgendamientoAjax()
             echo json_encode([
                 'status' => 'error',
                 'message' => $mensajeConflicto,
+                'tipo' => 'conflicto',
                 'conflictos' => $citasConflicto
             ]);
             exit();
@@ -531,6 +644,9 @@ function eliminarAgendamiento($id)
 // FUNCION PARA CARGAR EVENTOS (Para FullCalendar con JSON)
 function cargarEventos()
 {
+    // LOG DE INICIO
+    error_log("=== CARGANDO EVENTOS (cargarEventos) ===");
+
     // Obtener el id_usuario del veterinario si se proporciona (filtro)
     $id_usuario = $_GET['id_usuario'] ?? null;
 
@@ -543,27 +659,51 @@ function cargarEventos()
         $agendamientos = $objEventos->listar();
     }
 
+    error_log("Eventos encontrados en BD: " . count($agendamientos));
+
     $calendar_events = [];
 
     // Mapear los datos al formato de FullCalendar
     foreach ($agendamientos as $agendamiento) {
+        // Asegurar formato ISO 8601 para FullCalendar (YYYY-MM-DDTHH:mm:ss)
+        $start = str_replace(' ', 'T', $agendamiento['fecha_hora']);
+        $end = $agendamiento['fecha_hora_fin'] ? str_replace(' ', 'T', $agendamiento['fecha_hora_fin']) : null;
+
         $calendar_events[] = [
             'id' => $agendamiento['id_agendamiento'],
             'title' => $agendamiento['tipo'],
-            'start' => $agendamiento['fecha_hora'],
-            'end' => $agendamiento['fecha_hora_fin'] ?? null,
+            'start' => $start,
+            'end' => $end,
             'backgroundColor' => getColorByTipo($agendamiento['tipo']),
             'borderColor' => getColorByTipo($agendamiento['tipo']),
             'allDay' => false,
             'extendedProps' => [
-                'id_usuario' => $agendamiento['id_usuario']
+                'id_usuario' => $agendamiento['id_usuario'],
+                'id_servicio' => $agendamiento['id_servicio'],
+                'id_subservicio' => $agendamiento['id_subservicio'] ?? null,
+                'id_especialidad' => $agendamiento['id_especialidad'],
+                'id_paciente' => $agendamiento['id_paciente'],
+                'observaciones' => $agendamiento['observaciones']
             ]
         ];
     }
 
     // Devolvemos la respuesta en formato JSON
+    // Limpiar cualquier buffer de salida previo para evitar JSON inválido
+    if (ob_get_length()) ob_clean();
+
     header('Content-Type: application/json');
-    echo json_encode($calendar_events);
+    header('Access-Control-Allow-Origin: *'); // Por si acaso hay temas de CORS/Subdominios
+
+    $json = json_encode($calendar_events);
+
+    if ($json === false) {
+        error_log("Error al codificar JSON: " . json_last_error_msg());
+        echo json_encode(['error' => 'Error al generar JSON']);
+    } else {
+        echo $json;
+    }
+
     exit();
 }
 
@@ -640,12 +780,55 @@ function obtenerMascotasPorPropietario()
     exit();
 }
 
-// FUNCION PARA OBTENER SERVICIOS DESDE BASE DE DATOS
+// Helper para obtener id_veterinaria desde sesión o relación profesional
+function resolverIdVeterinaria()
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
+    if (!empty($id_veterinaria)) {
+        return $id_veterinaria;
+    }
+
+    $id_usuario = $_SESSION['user']['id_usuario'] ?? null;
+    if (empty($id_usuario)) {
+        return null;
+    }
+
+    $disponibilidadModel = new DisponibilidadUsuario();
+    return $disponibilidadModel->obtenerVeterinariaPorUsuario($id_usuario);
+}
+
+// FUNCION PARA OBTENER SERVICIOS DESDE BASE DE DATOS FILTRADOS POR VETERINARIA
 function obtenerServicios()
 {
     try {
+        // Verificar que la sesión esté iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Obtener el id_veterinaria de la sesión o relación profesional
+        $id_veterinaria = resolverIdVeterinaria();
+
+        error_log("=== DEBUG obtenerServicios ===");
+        error_log("ID Veterinaria resuelta: " . $id_veterinaria);
+        error_log("Datos de sesión: " . print_r($_SESSION['user'], true));
+
+        if (!$id_veterinaria) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'No se pudo obtener la veterinaria del usuario']);
+            exit();
+        }
+
         $calendarioModel = new Calendario();
-        $servicios = $calendarioModel->obtenerServicios();
+        $servicios = $calendarioModel->obtenerServicios($id_veterinaria);
+
+        error_log("Servicios encontrados: " . count($servicios));
+        error_log("Servicios: " . print_r($servicios, true));
 
         header('Content-Type: application/json');
         echo json_encode(['status' => 'success', 'data' => $servicios]);
@@ -665,7 +848,7 @@ function obtenerVeterinarios()
             session_start();
         }
 
-        $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
+        $id_veterinaria = resolverIdVeterinaria();
 
         if (!$id_veterinaria) {
             header('Content-Type: application/json');
@@ -684,6 +867,64 @@ function obtenerVeterinarios()
         header('Content-Type: application/json');
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'Error al obtener veterinarios: ' . $e->getMessage()]);
+    }
+    exit();
+}
+
+// FUNCION PARA OBTENER SUBSERVICIOS FILTRADOS POR VETERINARIA
+function obtenerSubservicios()
+{
+    try {
+        // Verificar que la sesión esté iniciada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Obtener el id_veterinaria de la sesión o relación profesional
+        $id_veterinaria = resolverIdVeterinaria();
+
+        if (!$id_veterinaria) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'No se pudo obtener la veterinaria del usuario']);
+            exit();
+        }
+
+        $calendarioModel = new Calendario();
+        $subservicios = $calendarioModel->obtenerSubservicios($id_veterinaria);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'data' => $subservicios]);
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Error al obtener subservicios: ' . $e->getMessage()]);
+    }
+    exit();
+}
+
+// FUNCION PARA OBTENER SUBSERVICIOS POR ID DE SERVICIO
+function obtenerSubserviciosPorServicio()
+{
+    try {
+        $id_servicio = $_GET['id_servicio'] ?? null;
+
+        if (!$id_servicio) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'ID de servicio no proporcionado']);
+            exit();
+        }
+
+        $calendarioModel = new Calendario();
+        $subservicios = $calendarioModel->obtenerSubserviciosPorServicio($id_servicio);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'data' => $subservicios]);
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Error al obtener subservicios: ' . $e->getMessage()]);
     }
     exit();
 }

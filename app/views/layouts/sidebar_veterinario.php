@@ -20,12 +20,22 @@
         <div class="nav-section">
             <span class="nav-section-title">General</span>
 
-            <a href="<?= BASE_URL ?>/veterinaria/dashboard"
-                class="nav-item"
-                data-section="dashboard">
-                <i class="bi bi-house-door"></i>
-                <span class="nav-text">Inicio</span>
-            </a>
+            <?php if ($_SESSION['user']['id_rol'] === 4): ?>
+                <a href="<?= BASE_URL ?>/representante/dashboard"
+                    class="nav-item <?= $final_path == 'dashBoard' ? 'active' : '' ?>"
+                    data-section="dashboard" data-tooltip="Inicio">
+                    <i class="bi bi-house-door"></i>
+                    <span class="nav-text">Inicio</span>
+                </a>
+            <?php else: ?>
+                <a href="<?= BASE_URL ?>/veterinaria/dashboard"
+                    class="nav-item"
+                    data-section="dashboard">
+                    <i class="bi bi-house-door"></i>
+                    <span class="nav-text">Inicio</span>
+                </a>
+            <?php endif; ?>
+
             <a href="<?= BASE_URL ?>/veterinaria/seguimientos"
                 class="nav-item"
                 data-section="citas">
@@ -39,6 +49,14 @@
                 <i class="bi bi-calendar-week"></i>
                 <span class="nav-text">Calendario</span>
             </a>
+
+            <a href="<?= BASE_URL ?>/veterinaria/mi-agenda"
+                class="nav-item"
+                data-section="agenda">
+                <i class="bi bi-clock"></i>
+                <span class="nav-text">Mi Disponibilidad</span>
+            </a>
+
             <a href="<?= BASE_URL ?>/veterinaria/gestion_clinica"
                 class="nav-item"
                 data-section="tienda">

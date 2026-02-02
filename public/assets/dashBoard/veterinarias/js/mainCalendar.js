@@ -24,8 +24,14 @@ const URLS = {
     // 7. OBTENER SERVICIOS: Lista de servicios disponibles
     GET_SERVICIOS: '/vetwilling/calendario/getServicios',
 
+    // 7b. OBTENER SUBSERVICIOS: Lista de subservicios disponibles
+    GET_SUBSERVICIOS: '/vetwilling/calendario/getSubservicios',
+
     // 8. OBTENER VETERINARIOS: Lista de veterinarios de la veterinaria
-    GET_VETERINARIOS: '/vetwilling/calendario/getVeterinarios'
+    GET_VETERINARIOS: '/vetwilling/calendario/getVeterinarios',
+
+    // 9. OBTENER DISPONIBILIDAD DEL PROFESIONAL
+    GET_DISPONIBILIDAD: '/vetwilling/disponibilidad/horarios'
 };
 
 
@@ -93,12 +99,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Response status:', response.status);
                 console.log('Response statusText:', response.statusText);
 
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error('Status ' + response.status + ': ' + response.statusText + ' - ' + text);
-                    });
-                }
-                return response.json();
+                // Siempre intentar parsear como JSON, incluso en errores
+                return response.json().then(data => {
+                    if (!response.ok) {
+                        // Si es un error HTTP, lanzar con el mensaje del servidor
+                        throw { 
+                            status: response.status, 
+                            message: data.message || response.statusText,
+                            data: data
+                        };
+                    }
+                    return data;
+                });
             })
             .then(result => {
                 console.log('Result:', result);
@@ -107,13 +119,66 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (successCallback) { successCallback(result); }
                 } else {
                     console.error('Error lógico en el servidor:', result.message);
-                    if (errorCallback) { errorCallback(result.message); }
+                    if (errorCallback) { errorCallback(result.message, result); }
                 }
             })
             .catch(error => {
                 console.error('Error de comunicación AJAX:', error);
-                if (errorCallback) { errorCallback(error.message); }
+                
+                // Si el error viene con data que contiene información de disponibilidad
+                if (error.data && error.data.tipo === 'disponibilidad') {
+                    mostrarErrorDisponibilidad(error.data);
+                } else if (error.data && error.data.tipo === 'conflicto') {
+                    // Error de conflicto con otra cita
+                    const errorMessage = error.message || error.statusText || 'Error desconocido';
+                    if (errorCallback) { errorCallback(errorMessage, error.data); }
+                } else {
+                    // Error genérico
+                    const errorMessage = error.message || error.statusText || 'Error desconocido';
+                    if (errorCallback) { errorCallback(errorMessage, error.data); }
+                }
             });
+    }
+
+    /**
+     * Muestra un mensaje de error específico cuando la cita está fuera de disponibilidad
+     */
+    function mostrarErrorDisponibilidad(data) {
+        let rangosHTML = '';
+        
+        if (data.rangos_disponibles && data.rangos_disponibles.length > 0) {
+            rangosHTML = '<div style="margin-top: 15px; text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px;">';
+            rangosHTML += '<strong style="color: #28a745;">📅 Horarios disponibles:</strong><ul style="margin: 10px 0; padding-left: 20px;">';
+            
+            data.rangos_disponibles.forEach(rango => {
+                const horaInicio = rango.hora_inicio.substring(0, 5);
+                const horaFin = rango.hora_fin.substring(0, 5);
+                const especialidad = rango.especialidad ? ` (${rango.especialidad})` : '';
+                rangosHTML += `<li style="margin: 5px 0; color: #495057;">${horaInicio} - ${horaFin}${especialidad}</li>`;
+            });
+            
+            rangosHTML += '</ul></div>';
+        }
+
+        // Extraer solo el primer mensaje antes de "Rangos disponibles:"
+        const mensajePrincipal = data.message.split('\n')[0];
+
+        Swal.fire({
+            icon: 'warning',
+            title: '⚠️ Horario No Disponible',
+            html: `
+                <div style="text-align: center;">
+                    <p style="font-size: 18px; margin-bottom: 10px;">${mensajePrincipal}</p>
+                    ${rangosHTML}
+                    <p style="margin-top: 15px; color: #6c757d; font-size: 13px;">
+                        <strong>💡 Sugerencia:</strong> Selecciona un horario dentro de la disponibilidad del veterinario.
+                    </p>
+                </div>
+            `,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#3085d6',
+            width: '600px'
+        });
     }
 
     // --- Funciones para cargar datos del servidor ---
@@ -150,6 +215,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    async function cargarSubservicios() {
+        try {
+            const response = await fetch(URLS.GET_SUBSERVICIOS);
+            const result = await response.json();
+            return result.status === 'success' ? result.data : [];
+        } catch (error) {
+            console.error('Error al cargar subservicios:', error);
+            return [];
+        }
+    }
+
     // 8. OBTENER VETERINARIOS: Lista de veterinarios de la veterinaria
     async function cargarVeterinarios() {
         try {
@@ -174,27 +250,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Mapeo de servicios a colores
     const servicioColores = {
-        'Consulta General': '#007832',
-        'Vacunación': '#17a2b8',
-        'Cirugía': '#dc3545',
-        'Control': '#ffc107',
-        'Emergencia': '#fd7e14',
-        'Desparasitación': '#6f42c1',
-        'Peluquería': '#e83e8c',
-        'Baño': '#20c997',
+        'Consulta general': '#0A932C',
+        'Exámenes de laboratorio': '#93BEDF',
+        'Baño y peluquería': '#9DE795',
         'Otro': '#6c757d'
     };
 
+    // Función para calcular luminosidad de un color y determinar si necesita texto oscuro
+    function getTextColor(bgColor) {
+        // Extraer RGB del color
+        let r, g, b;
+        
+        if (bgColor.startsWith('#')) {
+            r = parseInt(bgColor.slice(1, 3), 16);
+            g = parseInt(bgColor.slice(3, 5), 16);
+            b = parseInt(bgColor.slice(5, 7), 16);
+        } else if (bgColor.startsWith('rgb')) {
+            const match = bgColor.match(/\d+/g);
+            r = parseInt(match[0]);
+            g = parseInt(match[1]);
+            b = parseInt(match[2]);
+        }
+        
+        // Calcular luminosidad relativa (formula W3C)
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        
+        // Si es claro (> 0.6), usar texto oscuro; si es oscuro, usar texto claro
+        return luminance > 0.6 ? '#1a1a1a' : '#ffffff';
+    }
+
+    // Función para generar variación de color para subservicios
+    function getSubservicioColor(servicioColor, index, total) {
+        // Convertir hex a RGB
+        const r = parseInt(servicioColor.slice(1, 3), 16);
+        const g = parseInt(servicioColor.slice(3, 5), 16);
+        const b = parseInt(servicioColor.slice(5, 7), 16);
+        
+        // Generar variación más oscura/clara con mejor contraste
+        // Rango ajustado para evitar colores demasiado claros
+        const factor = 0.7 + (index / total) * 0.4; // Rango de 0.7 a 1.1
+        const newR = Math.min(255, Math.round(r * factor));
+        const newG = Math.min(255, Math.round(g * factor));
+        const newB = Math.min(255, Math.round(b * factor));
+        
+        return `rgb(${newR}, ${newG}, ${newB})`;
+    }
+
     // Mapeo de emojis por servicio
     const servicioEmojis = {
-        'Consulta General': '🩺',
-        'Vacunación': '💉',
-        'Cirugía': '⚕️',
-        'Control': '📋',
-        'Emergencia': '🚨',
-        'Desparasitación': '🐛',
-        'Peluquería': '✂️',
-        'Baño': '🛁',
+        'Consulta general': '🩺',
+        'Exámenes de laboratorio': '🔬',
+        'Baño y peluquería': '✂️',
         'Otro': '📌'
     };
 
@@ -203,32 +309,95 @@ document.addEventListener('DOMContentLoaded', function () {
         var containerEl = document.getElementById('external-events');
 
         if (containerEl) {
-            // Cargar servicios desde la base de datos
+            // Cargar servicios y subservicios desde la base de datos
             const servicios = await cargarServicios();
+            const subservicios = await cargarSubservicios();
 
             // Limpiar contenedor
             containerEl.innerHTML = '<h4>Servicios Disponibles</h4>';
 
-            // Crear eventos arrastrables por cada servicio
-            servicios.forEach(servicio => {
+            // Agrupar subservicios por servicio
+            const subserviciosPorServicio = {};
+            subservicios.forEach(subservicio => {
+                const idServicio = subservicio.id_servicio;
+                if (!subserviciosPorServicio[idServicio]) {
+                    subserviciosPorServicio[idServicio] = [];
+                }
+                subserviciosPorServicio[idServicio].push(subservicio);
+            });
+
+            // Crear grupos colapsables por cada servicio
+            servicios.forEach((servicio, index) => {
                 const color = servicioColores[servicio.nombre] || '#6c757d';
                 const emoji = servicioEmojis[servicio.nombre] || '📌';
-                const className = 'fc-event-' + servicio.nombre.toLowerCase().replace(/\s+/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                const subsDelServicio = subserviciosPorServicio[servicio.id_servicio] || [];
+                
+                // Crear el grupo de servicio
+                const grupoDiv = document.createElement('div');
+                grupoDiv.className = 'servicio-grupo collapsed';
+                
+                // Crear header del grupo (colapsable)
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'servicio-header';
+                headerDiv.style.borderLeft = `4px solid ${color}`;
+                headerDiv.innerHTML = `
+                    <div class="servicio-header-content">
+                        <span class="servicio-icono">${emoji}</span>
+                        <span class="servicio-nombre">${servicio.nombre}</span>
+                        <span class="servicio-count">(${subsDelServicio.length})</span>
+                    </div>
+                    <i class="bi bi-chevron-right servicio-toggle"></i>
+                `;
+                
+                // Crear contenedor de subservicios
+                const subserviciosContainer = document.createElement('div');
+                subserviciosContainer.className = 'subservicios-container';
+                subserviciosContainer.style.display = 'none'; // Contraído por defecto
+                
+                // Agregar subservicios al contenedor
+                subsDelServicio.forEach((subservicio, subIndex) => {
+                    // Generar color variante para cada subservicio
+                    const subservicioColor = getSubservicioColor(color, subIndex, subsDelServicio.length);
+                    const textColor = getTextColor(subservicioColor);
+                    
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = `fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event`;
+                    eventDiv.setAttribute('data-duration', '01:00');
+                    eventDiv.setAttribute('data-subservicio-id', subservicio.id_subservicio);
+                    eventDiv.setAttribute('data-subservicio-nombre', subservicio.nombre_subservicio);
+                    eventDiv.setAttribute('data-servicio-nombre', servicio.nombre);
+                    eventDiv.style.backgroundColor = subservicioColor;
+                    eventDiv.style.borderColor = subservicioColor;
+                    eventDiv.style.color = textColor;
 
-                const eventDiv = document.createElement('div');
-                eventDiv.className = `fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event ${className}`;
-                eventDiv.setAttribute('data-duration', '01:00');
-                eventDiv.setAttribute('data-servicio-id', servicio.id_servicio);
-                eventDiv.setAttribute('data-servicio-nombre', servicio.nombre);
-                eventDiv.style.backgroundColor = color;
-                eventDiv.style.borderColor = color;
+                    const mainDiv = document.createElement('div');
+                    mainDiv.className = 'fc-event-main';
+                    const precio = new Intl.NumberFormat('es-CO', {
+                        style: 'currency',
+                        currency: 'COP',
+                        minimumFractionDigits: 0
+                    }).format(subservicio.costo);
+                    mainDiv.innerHTML = `
+                        <span class="subservicio-nombre">${subservicio.nombre_subservicio}</span>
+                        <span class="subservicio-precio">${precio}</span>
+                    `;
 
-                const mainDiv = document.createElement('div');
-                mainDiv.className = 'fc-event-main';
-                mainDiv.textContent = `${emoji} ${servicio.nombre}`;
-
-                eventDiv.appendChild(mainDiv);
-                containerEl.appendChild(eventDiv);
+                    eventDiv.appendChild(mainDiv);
+                    subserviciosContainer.appendChild(eventDiv);
+                });
+                
+                // Evento de toggle collapse
+                headerDiv.addEventListener('click', function() {
+                    const isExpanded = subserviciosContainer.style.display === 'block';
+                    subserviciosContainer.style.display = isExpanded ? 'none' : 'block';
+                    const icon = headerDiv.querySelector('.servicio-toggle');
+                    icon.className = isExpanded ? 'bi bi-chevron-right servicio-toggle' : 'bi bi-chevron-down servicio-toggle';
+                    grupoDiv.classList.toggle('collapsed', isExpanded);
+                });
+                
+                grupoDiv.appendChild(headerDiv);
+                grupoDiv.appendChild(subserviciosContainer);
+                containerEl.appendChild(grupoDiv);
             });
 
             // Inicializar draggable
@@ -236,10 +405,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 itemSelector: '.fc-event',
                 eventData: function (eventEl) {
                     return {
-                        title: eventEl.getAttribute('data-servicio-nombre'),
+                        title: eventEl.getAttribute('data-subservicio-nombre'),
                         duration: eventEl.getAttribute('data-duration'),
                         extendedProps: {
-                            servicioId: eventEl.getAttribute('data-servicio-id'),
+                            subservicioId: eventEl.getAttribute('data-subservicio-id'),
                             servicioNombre: eventEl.getAttribute('data-servicio-nombre')
                         }
                     };
@@ -249,6 +418,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     initializeExternalEvents();
+
+    async function cargarDisponibilidad() {
+        try {
+            const response = await fetch(`${URLS.GET_DISPONIBILIDAD}?action=horarios`);
+            if (!response.ok) {
+                return [];
+            }
+            const data = await response.json();
+            return Array.isArray(data) ? data : [];
+        } catch (error) {
+            return [];
+        }
+    }
 
     // --- Inicialización Principal del Calendario ---
     var calendarEl = document.getElementById('calendar');
@@ -267,6 +449,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // --- CARGA DE EVENTOS ---
         events: URLS.LOAD,
+
+        // --- DISPONIBILIDAD (Business Hours) ---
+        businessHours: true,
+        selectConstraint: 'businessHours',
+        eventConstraint: 'businessHours',
 
         // --- INTERACCIÓN Y CREACIÓN DE EVENTOS (Selectable) ---
         selectable: true,
@@ -298,6 +485,10 @@ document.addEventListener('DOMContentLoaded', function () {
             // Cargar datos desde el servidor
             const propietarios = await cargarPropietarios();
             const servicios = await cargarServicios();
+            const subservicios = await cargarSubservicios();
+
+            console.log('Servicios cargados:', servicios);
+            console.log('Subservicios cargados:', subservicios);
 
             // Crear opciones HTML para propietarios
             let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
@@ -305,10 +496,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 propietariosOptions += `<option value="${prop.id_propietario}">${prop.nombres} ${prop.apellidos}</option>`;
             });
 
-            // Crear opciones HTML para servicios
+            // Crear opciones HTML para servicios principales
             let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
             servicios.forEach(servicio => {
-                serviciosOptions += `<option value="${servicio.id_servicio}">${servicio.nombre} - $${parseFloat(servicio.costo).toLocaleString('es-CO')}</option>`;
+                serviciosOptions += `<option value="${servicio.id_servicio}">${servicio.nombre}</option>`;
             });
             // lo que yo modifique
             Swal.fire({
@@ -487,6 +678,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 <select id="swal-servicio" class="form-control-ag">
                     ${serviciosOptions}
                 </select>
+                <div class="form-helper">
+                    <i class="bi bi-info-circle"></i>
+                    Selecciona el tipo de servicio principal
+                </div>
+            </div>
+            
+            <div class="form-group-ag">
+                <label class="form-label-ag">
+                    <i class="bi bi-list-check"></i>
+                    Subservicio
+                    <span class="required">*</span>
+                </label>
+                <select id="swal-subservicio" class="form-control-ag" disabled>
+                    <option value="">Primero selecciona un servicio...</option>
+                </select>
+                <div class="form-helper">
+                    <i class="bi bi-info-circle"></i>
+                    Selecciona el subservicio específico
+                </div>
             </div>
             
             <div class="form-divider"></div>
@@ -498,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <span class="required">*</span>
                 </label>
                 <input id="swal-fecha-inicio" type="datetime-local" class="form-control-ag" 
-                       value="${fechaInicioStr}">
+                    value="${fechaInicioStr}">
             </div>
             
             <div class="form-group-ag">
@@ -508,7 +718,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <span class="required">*</span>
                 </label>
                 <input id="swal-fecha-fin" type="datetime-local" class="form-control-ag" 
-                       value="${fechaFinStr}">
+                    value="${fechaFinStr}">
                 <div class="form-helper">
                     <i class="bi bi-clock"></i>
                     La duración del servicio se calculará automáticamente
@@ -523,7 +733,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     Observaciones
                 </label>
                 <textarea id="swal-observaciones" class="form-control-ag" 
-                          placeholder="Agrega observaciones o detalles adicionales sobre el agendamiento..."></textarea>
+                        placeholder="Agrega observaciones o detalles adicionales sobre el agendamiento..."></textarea>
             </div>
         </div>
     `,
@@ -644,11 +854,48 @@ document.addEventListener('DOMContentLoaded', function () {
                             mascotaSelect.disabled = true;
                         }
                     });
+
+                    // Agregar evento al cambiar el servicio para filtrar subservicios
+                    const servicioSelect = document.getElementById('swal-servicio');
+                    const subservicioSelect = document.getElementById('swal-subservicio');
+
+                    servicioSelect.addEventListener('change', function () {
+                        const idServicio = this.value;
+
+                        if (idServicio) {
+                            // Filtrar subservicios por el servicio seleccionado
+                            const subserviciosFiltrados = subservicios.filter(sub => 
+                                sub.id_servicio == idServicio
+                            );
+
+                            if (subserviciosFiltrados.length > 0) {
+                                let subserviciosOptions = '<option value="">Selecciona un subservicio...</option>';
+                                subserviciosFiltrados.forEach(sub => {
+                                    const costoCOP = new Intl.NumberFormat('es-CO', {
+                                        style: 'currency',
+                                        currency: 'COP',
+                                        minimumFractionDigits: 0
+                                    }).format(sub.costo);
+                                    subserviciosOptions += `<option value="${sub.id_subservicio}">${sub.nombre_subservicio} - ${costoCOP}</option>`;
+                                });
+
+                                subservicioSelect.innerHTML = subserviciosOptions;
+                                subservicioSelect.disabled = false;
+                            } else {
+                                subservicioSelect.innerHTML = '<option value="">No hay subservicios para este servicio</option>';
+                                subservicioSelect.disabled = true;
+                            }
+                        } else {
+                            subservicioSelect.innerHTML = '<option value="">Primero selecciona un servicio...</option>';
+                            subservicioSelect.disabled = true;
+                        }
+                    });
                 },
                 preConfirm: () => {
                     const propietario = document.getElementById('swal-propietario').value;
                     const mascota = document.getElementById('swal-mascota').value;
                     const servicio = document.getElementById('swal-servicio').value;
+                    const subservicio = document.getElementById('swal-subservicio').value;
                     const fechaInicio = document.getElementById('swal-fecha-inicio').value;
                     const fechaFin = document.getElementById('swal-fecha-fin').value;
                     const observaciones = document.getElementById('swal-observaciones').value;
@@ -665,6 +912,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (!servicio) {
                         Swal.showValidationMessage('Debes seleccionar un servicio');
+                        return false;
+                    }
+
+                    if (!subservicio) {
+                        Swal.showValidationMessage('Debes seleccionar un subservicio');
                         return false;
                     }
 
@@ -685,7 +937,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     // Obtener el nombre del servicio seleccionado
-                    const selectElement = document.getElementById('swal-servicio');
+                    const selectElement = document.getElementById('swal-subservicio');
                     const selectedOption = selectElement.options[selectElement.selectedIndex];
                     const servicioNombre = selectedOption.text.split(' - ')[0]; // Extraer solo el nombre sin el costo
 
@@ -707,6 +959,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         propietario: propietario,
                         mascota: mascota,
                         servicio: servicio,
+                        subservicio: subservicio,
                         servicioNombre: servicioNombre,
                         fechaInicio: fechaInicio,
                         fechaFin: fechaFin,
@@ -724,10 +977,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // 1. Preparamos los datos a enviar al servidor
                     var newEventData = {
-                        id_propietario: parseInt(datos.propietario),
                         id_paciente: parseInt(datos.mascota),
-                        id_servicio: parseInt(datos.servicio),
-                        tipo: datos.servicioNombre, // Usar el nombre del servicio como tipo
+                        id_servicio: parseInt(datos.servicio), // ID del servicio principal
+                        id_subservicio: parseInt(datos.subservicio), // ID del subservicio específico
+                        id_especialidad: 1, // Especialidad por defecto
+                        tipo: datos.servicioNombre, // Usar el nombre del subservicio como tipo
                         observaciones: datos.observaciones,
                         fecha_hora: fechaInicioMySQL,
                         fecha_hora_fin: fechaFinMySQL,
@@ -771,7 +1025,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             });
                         },
                         // Función de Error
-                        function (errorMessage) {
+                        function (errorMessage, errorData) {
+                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                            if (errorData && errorData.tipo === 'disponibilidad') {
+                                return; // No mostrar alerta duplicada
+                            }
+                            
+                            // Para otros tipos de error, mostrar alerta
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -810,19 +1070,19 @@ document.addEventListener('DOMContentLoaded', function () {
                             Tipo de Servicio:
                         </label>
                         <input id="swal-tipo" class="swal2-input" value="${evento.title}" 
-                               placeholder="Tipo de servicio" style="margin: 0 0 15px 0; width: 90%;">
+                            placeholder="Tipo de servicio" style="margin: 0 0 15px 0; width: 90%;">
                         
                         <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #00304D;">
                             Fecha y Hora de Inicio:
                         </label>
                         <input id="swal-fecha-inicio" type="datetime-local" class="swal2-input" 
-                               value="${fechaInicioStr}" style="margin: 0 0 15px 0; width: 90%;">
+                            value="${fechaInicioStr}" style="margin: 0 0 15px 0; width: 90%;">
                         
                         <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #00304D;">
                             Fecha y Hora de Fin:
                         </label>
                         <input id="swal-fecha-fin" type="datetime-local" class="swal2-input" 
-                               value="${fechaFinStr}" placeholder="Opcional" style="margin: 0; width: 90%;">
+                            value="${fechaFinStr}" placeholder="Opcional" style="margin: 0; width: 90%;">
                     </div>
                 `,
                 showCancelButton: true,
@@ -972,7 +1232,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                 timerProgressBar: true
                             });
                         },
-                        function (errorMessage) {
+                        function (errorMessage, errorData) {
+                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                            if (errorData && errorData.tipo === 'disponibilidad') {
+                                info.revert();
+                                return;
+                            }
+                            
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1019,7 +1285,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                 timerProgressBar: true
                             });
                         },
-                        function (errorMessage) {
+                        function (errorMessage, errorData) {
+                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                            if (errorData && errorData.tipo === 'disponibilidad') {
+                                info.revert();
+                                return;
+                            }
+                            
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1040,8 +1312,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // Prevenir creación automática del evento
             info.draggedEl.style.display = 'block';
 
-            // Obtener información del servicio arrastrado
-            const servicioId = info.draggedEl.getAttribute('data-servicio-id');
+            // Obtener información del subservicio arrastrado
+            const subservicioIdArrastrado = info.draggedEl.getAttribute('data-subservicio-id');
+            const subservicioNombre = info.draggedEl.getAttribute('data-subservicio-nombre');
             const servicioNombre = info.draggedEl.getAttribute('data-servicio-nombre');
 
             // Determinar fechas iniciales basadas en donde se soltó
@@ -1070,6 +1343,11 @@ document.addEventListener('DOMContentLoaded', function () {
             // Cargar datos desde el servidor
             const propietarios = await cargarPropietarios();
             const servicios = await cargarServicios();
+            const subservicios = await cargarSubservicios();
+
+            // Encontrar el subservicio arrastrado para obtener su id_servicio
+            const subservicioArrastrado = subservicios.find(sub => sub.id_subservicio == subservicioIdArrastrado);
+            const servicioIdPreseleccionado = subservicioArrastrado ? subservicioArrastrado.id_servicio : null;
 
             // Crear opciones HTML para propietarios
             let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
@@ -1077,11 +1355,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 propietariosOptions += `<option value="${prop.id_propietario}">${prop.nombres} ${prop.apellidos}</option>`;
             });
 
-            // Crear opciones HTML para servicios con el servicio arrastrado pre-seleccionado
+            // Crear opciones HTML para servicios
             let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
             servicios.forEach(servicio => {
-                const selected = servicio.id_servicio == servicioId ? 'selected' : '';
-                serviciosOptions += `<option value="${servicio.id_servicio}" ${selected}>${servicio.nombre} - $${parseFloat(servicio.costo).toLocaleString('es-CO')}</option>`;
+                const selected = servicio.id_servicio == servicioIdPreseleccionado ? 'selected' : '';
+                serviciosOptions += `<option value="${servicio.id_servicio}" ${selected}>${servicio.nombre}</option>`;
+            });
+
+            // Filtrar subservicios del servicio pre-seleccionado
+            const subserviciosFiltrados = servicioIdPreseleccionado 
+                ? subservicios.filter(sub => sub.id_servicio == servicioIdPreseleccionado)
+                : [];
+
+            // Crear opciones HTML para subservicios
+            let subserviciosOptions = '<option value="">Selecciona un subservicio...</option>';
+            subserviciosFiltrados.forEach(subservicio => {
+                const selected = subservicio.id_subservicio == subservicioIdArrastrado ? 'selected' : '';
+                const precio = new Intl.NumberFormat('es-CO', {
+                    style: 'currency',
+                    currency: 'COP',
+                    minimumFractionDigits: 0
+                }).format(subservicio.costo);
+                subserviciosOptions += `<option value="${subservicio.id_subservicio}" ${selected}>${subservicio.nombre_subservicio} - ${precio}</option>`;
             });
 
             Swal.fire({
@@ -1203,6 +1498,15 @@ document.addEventListener('DOMContentLoaded', function () {
         
         <div class="form-group">
             <label class="form-label">
+                <i class="bi bi-list-check"></i> Subservicio: *
+            </label>
+            <select id="swal-subservicio" class="form-control" ${servicioIdPreseleccionado ? '' : 'disabled'}>
+                ${subserviciosOptions}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">
                 <i class="bi bi-clock"></i> Fecha y Hora de Inicio: *
             </label>
             <input id="swal-fecha-inicio" type="datetime-local" class="form-control" value="${fechaInicioStr}">
@@ -1220,7 +1524,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <i class="bi bi-card-text"></i> Observaciones (opcional):
             </label>
             <textarea id="swal-observaciones" class="form-textarea" 
-                      placeholder="Agrega observaciones o detalles adicionales..."></textarea>
+                    placeholder="Agrega observaciones o detalles adicionales..."></textarea>
         </div>
     </div>
 `,
@@ -1255,11 +1559,48 @@ document.addEventListener('DOMContentLoaded', function () {
                             mascotaSelect.disabled = true;
                         }
                     });
+
+                    // Agregar evento al cambiar el servicio para filtrar subservicios
+                    const servicioSelect = document.getElementById('swal-servicio');
+                    const subservicioSelect = document.getElementById('swal-subservicio');
+
+                    servicioSelect.addEventListener('change', function () {
+                        const idServicio = this.value;
+
+                        if (idServicio) {
+                            // Filtrar subservicios por el servicio seleccionado
+                            const subserviciosFiltrados = subservicios.filter(sub => 
+                                sub.id_servicio == idServicio
+                            );
+
+                            if (subserviciosFiltrados.length > 0) {
+                                let subserviciosOptions = '<option value="">Selecciona un subservicio...</option>';
+                                subserviciosFiltrados.forEach(sub => {
+                                    const costoCOP = new Intl.NumberFormat('es-CO', {
+                                        style: 'currency',
+                                        currency: 'COP',
+                                        minimumFractionDigits: 0
+                                    }).format(sub.costo);
+                                    subserviciosOptions += `<option value="${sub.id_subservicio}">${sub.nombre_subservicio} - ${costoCOP}</option>`;
+                                });
+
+                                subservicioSelect.innerHTML = subserviciosOptions;
+                                subservicioSelect.disabled = false;
+                            } else {
+                                subservicioSelect.innerHTML = '<option value="">No hay subservicios para este servicio</option>';
+                                subservicioSelect.disabled = true;
+                            }
+                        } else {
+                            subservicioSelect.innerHTML = '<option value="">Primero selecciona un servicio...</option>';
+                            subservicioSelect.disabled = true;
+                        }
+                    });
                 },
                 preConfirm: () => {
                     const propietario = document.getElementById('swal-propietario').value;
                     const mascota = document.getElementById('swal-mascota').value;
                     const servicio = document.getElementById('swal-servicio').value;
+                    const subservicio = document.getElementById('swal-subservicio').value;
                     const fechaInicio = document.getElementById('swal-fecha-inicio').value;
                     const fechaFin = document.getElementById('swal-fecha-fin').value;
                     const observaciones = document.getElementById('swal-observaciones').value;
@@ -1275,6 +1616,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     if (!servicio) {
+                        Swal.showValidationMessage('Debes seleccionar un servicio');
+                        return false;
+                    }
+
+                    if (!subservicio) {
+                        Swal.showValidationMessage('Debes seleccionar un subservicio');
+                        return false;
+                    }
+
+                    if (!fechaInicio) {
                         Swal.showValidationMessage('Debes seleccionar un servicio');
                         return false;
                     }
@@ -1295,21 +1646,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         return false;
                     }
 
-                    // Obtener el nombre del servicio seleccionado
-                    const selectElement = document.getElementById('swal-servicio');
-                    const selectedOption = selectElement.options[selectElement.selectedIndex];
-                    const servicioNombre = selectedOption.text.split(' - ')[0]; // Extraer solo el nombre sin el costo
+                    // Obtener el nombre del subservicio seleccionado
+                    const selectSubservicio = document.getElementById('swal-subservicio');
+                    const selectedSubservicio = selectSubservicio.options[selectSubservicio.selectedIndex];
+                    const subservicioNombre = selectedSubservicio.text.split(' - ')[0]; // Extraer solo el nombre sin el costo
 
                     // Obtener el color basado en el nombre del servicio
                     const servicioColores = {
-                        'Consulta General': '#007832',
-                        'Vacunación': '#17a2b8',
-                        'Cirugía': '#dc3545',
-                        'Control': '#ffc107',
-                        'Emergencia': '#fd7e14',
-                        'Desparasitación': '#6f42c1',
-                        'Peluquería': '#e83e8c',
-                        'Baño': '#20c997',
+                        'Consulta general': '#0A932C',
+                        'Exámenes de laboratorio': '#93BEDF',
+                        'Baño y peluquería': '#9DE795',
                         'Otro': '#6c757d'
                     };
                     const color = servicioColores[servicioNombre] || '#6c757d';
@@ -1318,7 +1664,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         propietario: propietario,
                         mascota: mascota,
                         servicio: servicio,
+                        subservicio: subservicio,
                         servicioNombre: servicioNombre,
+                        subservicioNombre: subservicioNombre,
                         fechaInicio: fechaInicio,
                         fechaFin: fechaFin,
                         observaciones: observaciones,
@@ -1335,10 +1683,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Preparamos los datos a enviar al servidor
                     var newEventData = {
-                        id_propietario: parseInt(datos.propietario),
                         id_paciente: parseInt(datos.mascota),
-                        id_servicio: parseInt(datos.servicio),
-                        tipo: datos.servicioNombre, // Usar el nombre del servicio como tipo
+                        id_servicio: parseInt(datos.servicio), // ID servicio padre
+                        id_subservicio: parseInt(datos.subservicio), // ID subservicio
+                        id_especialidad: 1, // Especialidad por defecto
+                        tipo: datos.subservicioNombre, // Usar el nombre del subservicio como tipo
                         observaciones: datos.observaciones,
                         fecha_hora: fechaInicioMySQL,
                         fecha_hora_fin: fechaFinMySQL,
@@ -1371,7 +1720,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             });
                         },
-                        function (errorMessage) {
+                        function (errorMessage, errorData) {
+                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                            if (errorData && errorData.tipo === 'disponibilidad') {
+                                return; // No mostrar alerta duplicada
+                            }
+                            
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1460,6 +1814,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Cargar disponibilidad y aplicarla al calendario
+    cargarDisponibilidad().then((businessHours) => {
+        if (businessHours.length > 0) {
+            calendar.setOption('businessHours', businessHours);
+
+            const disponibilidadBackground = businessHours.map((bh) => ({
+                daysOfWeek: bh.daysOfWeek,
+                startTime: bh.startTime,
+                endTime: bh.endTime,
+                display: 'background',
+                color: '#c8f7d2'
+            }));
+
+            calendar.addEventSource(disponibilidadBackground);
+        }
+    });
+
     // ═══════════════════════════════════════════════════════════════════════
     //  FUNCIÓN 2: FILTRO POR VETERINARIO (Con recarga desde servidor)
     // ═══════════════════════════════════════════════════════════════════════
@@ -1531,6 +1902,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Cargar datos desde el servidor
         const propietarios = await cargarPropietarios();
         const servicios = await cargarServicios();
+        const subservicios = await cargarSubservicios();
         
         // Crear opciones HTML para propietarios
         let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
@@ -1540,8 +1912,8 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Crear opciones HTML para servicios
         let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
-        servicios.forEach(serv => {
-            serviciosOptions += `<option value="${serv.id_servicio}">${serv.nombre}</option>`;
+        servicios.forEach(servicio => {
+            serviciosOptions += `<option value="${servicio.id_servicio}">${servicio.nombre}</option>`;
         });
         
         // Mostrar SweetAlert con formulario
@@ -1553,6 +1925,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         max-height: 500px;
                         overflow-y: auto;
                         padding: 0 5px;
+                        text-align: left;
                     }
                     
                     .form-agendamiento::-webkit-scrollbar {
@@ -1574,14 +1947,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     
                     .form-group-ag {
-                        margin-bottom: 24px;
+                        margin-bottom: 20px;
                     }
                     
                     .form-label-ag {
                         display: flex;
                         align-items: center;
                         gap: 8px;
-                        margin-bottom: 10px;
+                        margin-bottom: 8px;
                         font-weight: 600;
                         color: #00304D;
                         font-size: 14px;
@@ -1599,9 +1972,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     .form-control-ag {
                         width: 100%;
-                        padding: 12px 16px;
+                        padding: 10px 14px;
                         border: 2px solid #e0e0e0;
-                        border-radius: 10px;
+                        border-radius: 8px;
                         font-size: 14px;
                         font-family: inherit;
                         transition: all 0.3s ease;
@@ -1612,7 +1985,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     .form-control-ag:focus {
                         outline: none;
                         border-color: #0a932c;
-                        box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1);
+                        box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.1);
                         background: #ffffff;
                     }
                     
@@ -1624,7 +1997,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     textarea.form-control-ag {
                         resize: vertical;
-                        min-height: 100px;
+                        min-height: 80px;
                         font-family: inherit;
                         line-height: 1.5;
                     }
@@ -1632,10 +2005,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     .form-helper {
                         font-size: 12px;
                         color: #666;
-                        margin-top: 6px;
+                        margin-top: 5px;
                         display: flex;
                         align-items: center;
-                        gap: 5px;
+                        gap: 4px;
                     }
                     
                     .form-helper i {
@@ -1645,7 +2018,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     .form-divider {
                         height: 1px;
                         background: linear-gradient(to right, transparent, #e0e0e0, transparent);
-                        margin: 25px 0;
+                        margin: 20px 0;
                     }
                 </style>
                 
@@ -1672,19 +2045,15 @@ document.addEventListener('DOMContentLoaded', function () {
                             <span class="required">*</span>
                         </label>
                         <select id="swal-mascota" class="form-control-ag" disabled>
-                            <option value="">Primero selecciona un propietario</option>
+                            <option value="">Primero selecciona un propietario...</option>
                         </select>
-                        <div class="form-helper">
-                            <i class="bi bi-info-circle"></i>
-                            Selecciona la mascota del propietario
-                        </div>
                     </div>
                     
                     <div class="form-divider"></div>
                     
                     <div class="form-group-ag">
                         <label class="form-label-ag">
-                            <i class="bi bi-clipboard2-pulse-fill"></i>
+                            <i class="bi bi-briefcase-fill"></i>
                             Servicio
                             <span class="required">*</span>
                         </label>
@@ -1693,7 +2062,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         </select>
                         <div class="form-helper">
                             <i class="bi bi-info-circle"></i>
-                            Tipo de servicio que se realizará
+                            Selecciona el tipo de servicio principal
+                        </div>
+                    </div>
+                    
+                    <div class="form-group-ag">
+                        <label class="form-label-ag">
+                            <i class="bi bi-list-check"></i>
+                            Subservicio
+                            <span class="required">*</span>
+                        </label>
+                        <select id="swal-subservicio" class="form-control-ag" disabled>
+                            <option value="">Primero selecciona un servicio...</option>
+                        </select>
+                        <div class="form-helper">
+                            <i class="bi bi-info-circle"></i>
+                            Selecciona el subservicio específico
                         </div>
                     </div>
                     
@@ -1706,11 +2090,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <span class="required">*</span>
                         </label>
                         <input type="datetime-local" id="swal-fecha-inicio" class="form-control-ag" 
-                               value="${fechaInicioStr}">
-                        <div class="form-helper">
-                            <i class="bi bi-clock"></i>
-                            Cuándo comienza la cita
-                        </div>
+                            value="${fechaInicioStr}">
                     </div>
                     
                     <div class="form-group-ag">
@@ -1720,10 +2100,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             <span class="required">*</span>
                         </label>
                         <input type="datetime-local" id="swal-fecha-fin" class="form-control-ag" 
-                               value="${fechaFinStr}">
+                            value="${fechaFinStr}">
                         <div class="form-helper">
                             <i class="bi bi-clock"></i>
-                            Cuándo termina la cita
+                            La duración del servicio se calculará automáticamente
                         </div>
                     </div>
                     
@@ -1731,15 +2111,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     <div class="form-group-ag">
                         <label class="form-label-ag">
-                            <i class="bi bi-chat-left-text"></i>
+                            <i class="bi bi-card-text"></i>
                             Observaciones
                         </label>
                         <textarea id="swal-observaciones" class="form-control-ag" 
-                                  placeholder="Ingresa detalles adicionales sobre la cita (opcional)"></textarea>
-                        <div class="form-helper">
-                            <i class="bi bi-info-circle"></i>
-                            Información adicional sobre la cita
-                        </div>
+                                placeholder="Agrega observaciones o detalles adicionales..."></textarea>
                     </div>
                 </div>
             `,
@@ -1751,6 +2127,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 confirmButton: 'swal2-styled swal2-confirm-custom',
                 cancelButton: 'swal2-styled swal2-cancel-custom'
             },
+            focusConfirm: false,
             didOpen: () => {
                 // Evento para cargar mascotas cuando se seleccione propietario
                 const selectPropietario = document.getElementById('swal-propietario');
@@ -1765,18 +2142,52 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         const mascotas = await cargarMascotasPorPropietario(idPropietario);
                         
-                        if (mascotas.length > 0) {
-                            selectMascota.innerHTML = '<option value="">Selecciona una mascota...</option>';
-                            mascotas.forEach(mascota => {
-                                selectMascota.innerHTML += `<option value="${mascota.id_mascota}">${mascota.nombre} (${mascota.especie})</option>`;
-                            });
-                            selectMascota.disabled = false;
-                        } else {
-                            selectMascota.innerHTML = '<option value="">Este propietario no tiene mascotas registradas</option>';
-                        }
+                        let mascotasOptions = '<option value="">Selecciona una mascota...</option>';
+                        mascotas.forEach(mascota => {
+                            mascotasOptions += `<option value="${mascota.id_paciente}">${mascota.nombre} (${mascota.especie})</option>`;
+                        });
+                        
+                        selectMascota.innerHTML = mascotasOptions;
+                        selectMascota.disabled = false;
                     } else {
                         selectMascota.disabled = true;
-                        selectMascota.innerHTML = '<option value="">Primero selecciona un propietario</option>';
+                        selectMascota.innerHTML = '<option value="">Primero selecciona un propietario...</option>';
+                    }
+                });
+
+                // Agregar evento al cambiar el servicio para filtrar subservicios
+                const servicioSelect = document.getElementById('swal-servicio');
+                const subservicioSelect = document.getElementById('swal-subservicio');
+
+                servicioSelect.addEventListener('change', function () {
+                    const idServicio = this.value;
+
+                    if (idServicio) {
+                        // Filtrar subservicios por el servicio seleccionado
+                        const subserviciosFiltrados = subservicios.filter(sub => 
+                            sub.id_servicio == idServicio
+                        );
+
+                        if (subserviciosFiltrados.length > 0) {
+                            let subserviciosOptions = '<option value="">Selecciona un subservicio...</option>';
+                            subserviciosFiltrados.forEach(sub => {
+                                const costoCOP = new Intl.NumberFormat('es-CO', {
+                                    style: 'currency',
+                                    currency: 'COP',
+                                    minimumFractionDigits: 0
+                                }).format(sub.costo);
+                                subserviciosOptions += `<option value="${sub.id_subservicio}">${sub.nombre_subservicio} - ${costoCOP}</option>`;
+                            });
+
+                            subservicioSelect.innerHTML = subserviciosOptions;
+                            subservicioSelect.disabled = false;
+                        } else {
+                            subservicioSelect.innerHTML = '<option value="">No hay subservicios para este servicio</option>';
+                            subservicioSelect.disabled = true;
+                        }
+                    } else {
+                        subservicioSelect.innerHTML = '<option value="">Primero selecciona un servicio...</option>';
+                        subservicioSelect.disabled = true;
                     }
                 });
             },
@@ -1784,30 +2195,84 @@ document.addEventListener('DOMContentLoaded', function () {
                 const propietario = document.getElementById('swal-propietario').value;
                 const mascota = document.getElementById('swal-mascota').value;
                 const servicio = document.getElementById('swal-servicio').value;
-                const servicioNombre = document.getElementById('swal-servicio').selectedOptions[0].text;
+                const subservicio = document.getElementById('swal-subservicio').value;
                 const fechaInicio = document.getElementById('swal-fecha-inicio').value;
                 const fechaFin = document.getElementById('swal-fecha-fin').value;
                 const observaciones = document.getElementById('swal-observaciones').value;
                 
                 // Validaciones
-                if (!propietario || !mascota || !servicio || !fechaInicio || !fechaFin) {
-                    Swal.showValidationMessage('Por favor completa todos los campos obligatorios');
+                if (!propietario) {
+                    Swal.showValidationMessage('Debes seleccionar un propietario');
                     return false;
                 }
+
+                if (!mascota) {
+                    Swal.showValidationMessage('Debes seleccionar una mascota');
+                    return false;
+                }
+
+                if (!servicio) {
+                    Swal.showValidationMessage('Debes seleccionar un servicio');
+                    return false;
+                }
+
+                if (!subservicio) {
+                    Swal.showValidationMessage('Debes seleccionar un subservicio');
+                    return false;
+                }
+
+                if (!fechaInicio) {
+                    Swal.showValidationMessage('Debes ingresar la fecha y hora de inicio');
+                    return false;
+                }
+
+                if (!fechaFin) {
+                    Swal.showValidationMessage('Debes ingresar la fecha y hora de fin');
+                    return false;
+                }
+
+                // Validar que la fecha de fin sea posterior a la de inicio
+                if (new Date(fechaFin) <= new Date(fechaInicio)) {
+                    Swal.showValidationMessage('La fecha de fin debe ser posterior a la fecha de inicio');
+                    return false;
+                }
+
+                // Obtener el nombre del subservicio seleccionado
+                const selectSubservicio = document.getElementById('swal-subservicio');
+                const selectedSubservicio = selectSubservicio.options[selectSubservicio.selectedIndex];
+                const subservicioNombre = selectedSubservicio.text.split(' - ')[0];
+
+                // Obtener el nombre del servicio para el color
+                const selectServicio = document.getElementById('swal-servicio');
+                const servicioNombre = selectServicio.options[selectServicio.selectedIndex].text;
+
+                // Obtener el color basado en el nombre del servicio
+                const servicioColores = {
+                    'Consulta general': '#0A932C',
+                    'Exámenes de laboratorio': '#93BEDF',
+                    'Baño y peluquería': '#9DE795',
+                    'Otro': '#6c757d'
+                };
+                const color = servicioColores[servicioNombre] || '#6c757d';
                 
                 return {
                     propietario: propietario,
                     mascota: mascota,
                     servicio: servicio,
+                    subservicio: subservicio,
                     servicioNombre: servicioNombre,
+                    subservicioNombre: subservicioNombre,
                     fechaInicio: fechaInicio,
                     fechaFin: fechaFin,
-                    observaciones: observaciones
+                    observaciones: observaciones,
+                    color: color
                 };
             }
         }).then((result) => {
             if (result.isConfirmed && result.value) {
                 const datos = result.value;
+                
+                console.log('Datos del formulario:', datos);
                 
                 // Convertir fechas a formato MySQL (hora local, no UTC)
                 const fechaInicioMySQL = formatDateForMySQL(new Date(datos.fechaInicio));
@@ -1815,10 +2280,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Preparar datos a enviar al servidor
                 var newEventData = {
-                    id_propietario: parseInt(datos.propietario),
                     id_paciente: parseInt(datos.mascota),
-                    id_servicio: parseInt(datos.servicio),
-                    tipo: datos.servicioNombre,
+                    id_servicio: parseInt(datos.servicio), // ID del servicio principal
+                    id_subservicio: parseInt(datos.subservicio), // ID del subservicio específico
+                    id_especialidad: 1, // Especialidad por defecto
+                    tipo: datos.subservicioNombre, // Usar el nombre del subservicio como tipo
                     observaciones: datos.observaciones,
                     fecha_hora: fechaInicioMySQL,
                     fecha_hora_fin: fechaFinMySQL,
@@ -1826,17 +2292,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     allDay: 0
                 };
                 
+                console.log('Datos a enviar al servidor:', newEventData);
+                
                 // Llamada AJAX para guardar en la base de datos
                 sendEventData(URLS.CREATE, newEventData,
                     function (response) {
                         // Agregar evento al calendario
                         calendar.addEvent({
                             id: response.id,
-                            title: datos.servicioNombre,
+                            title: datos.subservicioNombre,
                             start: datos.fechaInicio,
                             end: datos.fechaFin,
-                            backgroundColor: servicioColores[datos.servicioNombre] || '#6c757d',
-                            borderColor: servicioColores[datos.servicioNombre] || '#6c757d',
+                            backgroundColor: datos.color,
+                            borderColor: datos.color,
                             allDay: false
                         });
                         
@@ -1846,21 +2314,20 @@ document.addEventListener('DOMContentLoaded', function () {
                             text: 'La cita ha sido registrada correctamente',
                             confirmButtonText: 'Aceptar',
                             timer: 3000,
-                            timerProgressBar: true,
-                            customClass: {
-                                confirmButton: 'swal2-styled swal2-confirm-custom'
-                            }
+                            timerProgressBar: true
                         });
                     },
-                    function (errorMessage) {
+                    function (errorMessage, errorData) {
+                        // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                        if (errorData && errorData.tipo === 'disponibilidad') {
+                            return; // No mostrar alerta duplicada
+                        }
+                        
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
                             text: 'No se pudo crear la cita: ' + errorMessage,
-                            confirmButtonText: 'Aceptar',
-                            customClass: {
-                                confirmButton: 'swal2-styled swal2-confirm-custom'
-                            }
+                            confirmButtonText: 'Aceptar'
                         });
                     }
                 );

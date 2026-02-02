@@ -242,21 +242,21 @@
     justify-content: center;
 }
 
-.btn-editar {
+.btn-editar, .btn-editar a {
     color: var(--primary-color);
 }
 
-.btn-editar:hover {
+.btn-editar:hover, .btn-editar a:hover {
     background-color: rgba(10, 147, 44, 0.1);
     transform: scale(1.1);
 }
 
-.btn-eliminar {
+.btn-eliminar, .btn-eliminar a {
     color: #e74c3c !important;
     background-color: transparent !important;
 }
 
-.btn-eliminar:hover {
+.btn-eliminar:hover, .btn-eliminar a:hover {
     background-color: rgba(10, 147, 44, 0.1) !important;
     transform: scale(1.1) !important;
 }

@@ -7,6 +7,24 @@ require __DIR__ . '/../models/Login.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+$accion = $_POST['action'] ?? '';
+
+
+if ($accion === 'seleccionarVeterinaria') {
+    // Capturamos el id_veterinaria seleccionado
+    $id_veterinaria = $_POST['id_veterinaria'] ?? '';  
+
+     session_start();
+    $_SESSION['user']['id_veterinaria'] = $id_veterinaria;
+    mostrarSweetAlert(
+        "success",
+        "Veterinaria Seleccionada",
+        "Ha seleccionado la veterinaria correctamente.",
+        "/vetwilling/veterinaria/dashboard"
+    );
+    exit();;
+}
+
     // Capturamos en variables los valores enviados a traves de los names de formulario y el metho POST 
 
     $email = $_POST['email'] ?? '';
@@ -32,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Si pasa esta linea, el usuario es valido
-
+    
     session_start();
     $_SESSION['user'] = [
         'id_usuario' => $resultado['id_usuario'],
@@ -46,6 +64,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     $rol = $resultado['id_rol'];
+
+    // Validamos si el usuario retorna mas de un id_veterinaria (caso veterinarios asociados a varias veterinarias)
+    if (strpos($resultado['id_veterinaria'], ',') !== false) {
+        // mostramos una alerta para que seleccione la veterinaria a la que desea ingresar
+        mostrarSweetAlert(
+            'info',
+            'Seleccione Veterinaria',
+            'Usted esta asociado a varias veterinarias, por favor seleccione a cual desea ingresar.',
+            '/vetwilling/login/seleccionarVeterinaria'
+        );
+        exit();
+    }
 
     switch ($rol) {
         case 1: // Administrador

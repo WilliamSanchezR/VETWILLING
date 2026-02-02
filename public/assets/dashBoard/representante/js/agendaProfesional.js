@@ -153,7 +153,12 @@ class AgendaProfesional {
         }).then((deleteResult) => {
             if (deleteResult.isConfirmed) {
                 // Eliminar del servidor
-                window.location.href = `${window.location.origin}/vetwilling/representante/eliminar-agenda-usuario?action=eliminar&id=${$id}`;
+                const redirect = encodeURIComponent(window.location.href);
+                const basePath = window.location.pathname.includes('/veterinaria/mi-agenda')
+                    ? `${window.location.origin}/vetwilling/veterinario/eliminar-disponibilidad-agenda`
+                    : `${window.location.origin}/vetwilling/representante/eliminar-agenda-usuario`;
+
+                window.location.href = `${basePath}?action=eliminar&id=${$id}&redirect=${redirect}`;
             }
         });
     }

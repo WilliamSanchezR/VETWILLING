@@ -20,6 +20,7 @@ $usuario = mostrarPerfil($id);
 
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css">
 
 <div class="barra-navegacion-superior">
     <div class="navegacion-izquierda">
@@ -130,14 +131,17 @@ $usuario = mostrarPerfil($id);
                 </div>
             </div>
             <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item">
+            <a href="<?= BASE_URL ?>/representante/perfil-representante" class="dropdown-item">
                 <i class="bi bi-person-fill"></i>
                 <span>Mi Perfil</span>
             </a>
-            <a href="#" class="dropdown-item">
-                <i class="bi bi-gear-fill"></i>
-                <span>Configuración</span>
+            <a href="#" class="dropdown-item" id="btnAbrirSoporte">
+                <i class="bi bi-question-circle"></i>
+                <span>Soporte</span>
             </a>
+
+
+
             <div class="dropdown-divider"></div>
             <a href="<?= BASE_URL ?>/logout" class="dropdown-item text-danger">
                 <i class="bi bi-box-arrow-right"></i>
@@ -146,6 +150,90 @@ $usuario = mostrarPerfil($id);
         </div>
     </div>
 
+</div>
+
+<!-- Modal de Soporte -->
+<div id="modalSoporte" class="modal-soporte">
+    <div class="modal-contenido">
+        <div class="modal-header">
+            <div class="modal-icon">
+                <i class="bi bi-headset"></i>
+            </div>
+            <h2>Centro de Soporte</h2>
+            <button class="btn-cerrar" id="btnCerrarModal">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <p class="modal-descripcion">¿Tienes algún problema o sugerencia? Completa el formulario y te responderemos pronto.</p>
+
+            <form id="formularioSoporte">
+                <div class="form-group">
+                    <label for="nombreSoporte">
+                        <i class="bi bi-person"></i> Nombre Completo
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="nombreSoporte"
+                        name="nombre"
+                        placeholder="Tu nombre"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailSoporte">
+                        <i class="bi bi-envelope"></i> Correo Electrónico
+                    </label>
+                    <input
+                        type="email"
+                        class="form-control"
+                        id="emailSoporte"
+                        name="email"
+                        placeholder="ejemplo@correo.com"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoProblema">
+                        <i class="bi bi-tag"></i> Tipo de Consulta
+                    </label>
+                    <select class="form-control" id="tipoProblema" name="tipo_problema" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="tecnico">🔧 Problema Técnico</option>
+                        <option value="cuenta">👤 Problema con la Cuenta</option>
+                        <option value="funcionalidad">⚙️ Funcionalidad</option>
+                        <option value="sugerencia">💡 Sugerencia</option>
+                        <option value="otro">📋 Otro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcionProblema">
+                        <i class="bi bi-chat-left-text"></i> Descripción
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="descripcionProblema"
+                        name="descripcion"
+                        rows="5"
+                        placeholder="Describe tu problema o sugerencia detalladamente..."
+                        required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancelar" id="btnCancelar">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-enviar">
+                        <i class="bi bi-send-fill"></i>
+                        Enviar Mensaje
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/panelSuperiorAdmin.js"></script>

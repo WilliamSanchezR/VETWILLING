@@ -34,26 +34,27 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
             <!-- Sección Dashboard -->
             <a href="<?= BASE_URL ?>/representante/dashboard"
-                class="nav-item <?= $final_path == 'dashBoard' ? 'active' : '' ?>"
+                class="nav-item <?= $final_path == 'dashboard' ? 'active' : '' ?>"
                 data-section="dashboard" data-tooltip="Inicio">
                 <i class="bi bi-house-door"></i>
                 <span class="nav-text">Inicio</span>
             </a>
 
             <!-- GESTION COMO ADMINISTRADOR -->
-            <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'configuracion-veterinaria' || $final_path == 'listar-especialidades' || $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  || $final_path == 'lista-agenda-usuario' ? 'active open' : '' ?>">
+            <div class="submenu">
                 <div class="submenu-toggle" data-tooltip="Gestión Administrador">
                     <i class="bi bi-journal-medical"></i>
                     <span class="texto-item-sidebar">Gestión Administrador</span>
                     <i class="bi bi-chevron-down flecha"></i>
+                    
                 </div>
 
                 <ul class="submenu-items">
 
                     <!-- Sección configuracion veterinaria -->
-                    <li>
+                    <!-- <li>
 
-                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
+                        <div class="submenu-seccond">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Configuración Veterinaria">
                                 <i class="bi bi-gear-fill"></i>
@@ -67,7 +68,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             </ul>
 
                         </div>
-                    </li>
+                    </li> -->
 
 
                     <!-- Sección Especialidades -->
@@ -83,7 +84,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     <!-- Sessión con submenu Servicios y costos-->
                     <li>
 
-                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' ? 'active open' : '' ?>">
+                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'listar-subservicios' ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
                                 <i class="bi bi-database-up"></i>
@@ -101,7 +102,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     <!-- Sección con submenú Profesionales  -->
                     <li>
 
-                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
+                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario' || $final_path == 'lista-agenda-usuario' ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Profesionales">
                                 <i class="bi bi-people-fill"></i>
@@ -180,7 +181,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
 
             <!-- NAVEGACIÓN AUXILIAR DE VETERINARIA -->
-            <div class="submenu">
+            <!-- <div class="submenu">
 
                 <div class="submenu-toggle" data-tooltip="Gestión auxiliar veterinario">
                     <i class="bi bi-person-badge"></i>
@@ -200,7 +201,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 </ul>
 
 
-            </div>
+            </div> -->
 
     </nav>
 

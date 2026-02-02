@@ -1,8 +1,12 @@
 <?php
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 
 $id = $_SESSION['user']['id_usuario'];
 $usuario = mostrarPerfil($id);
+
+$veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
+
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
@@ -13,6 +17,15 @@ $usuario = mostrarPerfil($id);
         
         <!-- Sección Izquierda -->
         <div class="navbar-left">
+            <div class="image-avatar">
+                <?php
+                if (isset($veterinaria['foto']) && !empty($veterinaria['foto'])): ?>
+                    <img 
+                        src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>" 
+                        alt="Logo de <?= $veterinaria['nombre'] ?>" 
+                        class="navbar-logo" title="<?= $veterinaria['nombre'] ?>">                    
+                <?php endif; ?> 
+            </div>
             <button class="btn-menu-mobile" onclick="abrirSidebarMovil()" aria-label="Abrir menú">
                 <i class="bi bi-list"></i>
             </button>
@@ -177,10 +190,17 @@ $usuario = mostrarPerfil($id);
             <div class="navbar-action user-profile-wrapper">
                 <button class="btn-profile" onclick="togglePerfilMenu()" aria-label="Menú de usuario">
                     <div class="profile-avatar">
-                        <img 
-                            src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
+                        <?php if ($usuario['id_rol'] == 4): ?>
+                            <img 
+                            src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>"
                             alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
                             class="avatar-img">
+                        <?php else: ?>
+                        <img 
+                            src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>"
+                            alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
+                            class="avatar-img">
+                        <?php endif; ?>
                         <span class="status-dot online" title="En línea"></span>
                     </div>
                     <div class="profile-info">
@@ -197,7 +217,7 @@ $usuario = mostrarPerfil($id);
                     <div class="panel-header profile-header">
                         <div class="profile-avatar-large">
                             <img 
-                                src="<?= BASE_URL ?>/public/uploads/veterinarios/<?= $usuario['img_perfil'] ?>"
+                                src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>"
                                 alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>">
                             <span class="status-dot online"></span>
                         </div>

@@ -16,7 +16,9 @@ switch ($method) {
 
         if ($accion === 'actualizar') {
             actualizarVeterinario();
-        } else {
+        } else if ($accion === 'cambiar-foto') {
+            actualizarFotoPerfil();
+        }else {
             registrarVeterinario();
         }
 
@@ -69,12 +71,13 @@ switch ($method) {
 
 function registrarVeterinario()
 {
-
-
+    // DEBUG - Temporal para ver qué datos llegan
+    error_log("POST: " . print_r($_POST, true));
+    error_log("FILES: " . print_r($_FILES, true));
+    
     session_start();
 
-    // capturamos en variables los datos desde el formulario a travez del metodo POST y los name de los campos
-
+    // Capturamos en variables los datos desde el formulario
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
@@ -86,23 +89,29 @@ function registrarVeterinario()
     $estado = 'activo';
     $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? '';
     $numero_licencia_profesional = $_POST['numero_licencia_profesional'] ?? '';
-    $ruta_img = $_POST['img_perfil'] ?? '';
+    
+    // ❌ ELIMINA ESTA LÍNEA: $ruta_img = $_POST['img_perfil'] ?? '';
 
-    // Validamos los caampos que son obligatorios
-
+    // Validamos los campos que son obligatorios
     if (empty($numero_documento) || empty($nombres) || empty($apellidos) || empty($tipo_documento) || empty($telefono) || empty($email)) {
-        mostrarSweetAlert('error', 'Campos vacios', 'Por favor completar todos los campos');
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completar todos los campos');
         exit();
     }
 
-    // capturamos el id del usuario que inicia secion para guardarlo solo si es necesario
+    // Validar email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        mostrarSweetAlert('error', 'Email inválido', 'Por favor ingresa un correo válido');
+        exit();
+    }
 
-    $id_veterinaria = $_SESSION['user']['id_veterinaria'];
+    // Validar que exista la sesión de veterinaria
+    if (empty($id_veterinaria)) {
+        mostrarSweetAlert('error', 'Error de sesión', 'No se encontró la veterinaria asociada');
+        exit();
+    }
 
-    // POO - instanciamos la clase
-
-    // Lógica para cargar imagenes
-    $ruta_img = null;
+    // Lógica para cargar imágenes
+    $ruta_img = 'foto_default.jpg'; // ✅ Valor por defecto
 
     // Validamos si se subió realmente un archivo
     if (isset($_FILES['img_perfil']) && $_FILES['img_perfil']['error'] === UPLOAD_ERR_OK) {
@@ -113,11 +122,11 @@ function registrarVeterinario()
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
         // Definimos las extensiones permitidas 
-        $permitidas = ['png', 'jpg', 'jpeg'];
+        $permitidas = ['png', 'jpg', 'jpeg', 'webp'];
 
         // Validamos que la extensión de las imágenes esté dentro de las permitidas
         if (!in_array($ext, $permitidas)) {
-            mostrarSweetAlert('error', 'Extensión no permitida', 'Recuerda que solo soporta archivos png, jpeg y jpg');
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Recuerda que solo soporta archivos png, jpeg, jpg y webp');
             exit();
         }
 
@@ -128,21 +137,24 @@ function registrarVeterinario()
         }
 
         // Definimos el nombre del archivo y le concatenamos la extensión
-        $ruta_img = uniqid('user_') . '.' . $ext;
+        $ruta_img = uniqid('vet_') . '.' . $ext;
 
         // Definimos el destino donde moveremos el archivo
         $destino = BASE_PATH . '/public/uploads/veterinarios/' . $ruta_img;
+
+        // Verificar que el directorio exista
+        if (!is_dir(BASE_PATH . '/public/uploads/veterinarios/')) {
+            mkdir(BASE_PATH . '/public/uploads/veterinarios/', 0755, true);
+        }
 
         // Movemos el archivo al destino
         if (!move_uploaded_file($file['tmp_name'], $destino)) {
             mostrarSweetAlert('error', 'Error al guardar', 'No se pudo guardar la imagen');
             exit();
         }
-    } else {
-        // Agregamos la imagen por defecto
-        $ruta_img = 'foto_default.jpg';
     }
 
+    // POO - instanciamos la clase
     $objVeterinario = new Veterinario();
     $data = [
         'nombres' => $nombres,
@@ -159,17 +171,24 @@ function registrarVeterinario()
         'numero_licencia_profesional' => $numero_licencia_profesional
     ];
 
-    // Enviamos la data al metodo (registrar) de la clase instanciada anteriormente (Veterinario) y esperamos una respuesta booleana del modelo en resultados
+    // DEBUG - Ver qué datos se envían al modelo
+    error_log("DATA PARA REGISTRAR: " . print_r($data, true));
 
-    $resultado = $objVeterinario->registrar($data);
+    // Enviamos la data al método registrar
+    try {
+        $resultado = $objVeterinario->registrar($data);
 
-    // Si la respuesta del modelo es verdadera confirmamos el registro y redireccionameos, si es falsa notificamos y redireccionamos
-
-    if ($resultado === true) {
-        mostrarSweetAlert('success', 'Registro del veterinario exitoso', 'Se ha creado un nuevo veterinario en la veterinaria', '/vetwilling/veterinario/consultar-veterinarios');
-    } else {
-        mostrarSweetAlert('error', 'Error al registrar', 'No se pudo registrar el veterinario. Intenta nuevamente');
+        // Si la respuesta del modelo es verdadera confirmamos el registro
+        if ($resultado === true) {
+            mostrarSweetAlert('success', 'Registro del veterinario exitoso', 'Se ha creado un nuevo veterinario en la veterinaria', '/vetwilling/veterinario/consultar-veterinarios');
+        } else {
+            mostrarSweetAlert('error', 'Error al registrar', 'No se pudo registrar el veterinario. Intenta nuevamente');
+        }
+    } catch (Exception $e) {
+        error_log("EXCEPCIÓN EN REGISTRO: " . $e->getMessage());
+        mostrarSweetAlert('error', 'Error al registrar', 'Error: ' . $e->getMessage());
     }
+    
     exit();
 }
 
@@ -266,9 +285,93 @@ function eliminarVeterinario($id)
     $respuesta = $objVeterinario->eliminar($id);
 
     if ($respuesta === true) {
-        mostrarSweetAlert('success', 'Eliminacion del veterinario exitosa', 'Se ha eliminado el veterinario de la veterinaria', '/vetwilling/veterinario/consultar-veterinario');
+        mostrarSweetAlert('success',
+            'Veterinario Inhabilitado',
+            'El veterinario ha sido Inhabilitado', '/vetwilling/veterinario/consultar-veterinarios');
     } else {
         mostrarSweetAlert('error', 'Error al eliminar', 'No se pudo eliminar el veterinario. Intenta nuevamente');
     }
+    exit();
+}
+
+
+// FUNCION PARA CAMBIAR LA FOTO DE PERFIL 
+function actualizarFotoPerfil()
+{
+    session_start();
+    
+    $id_usuario = $_POST['id_usuario'] ?? '';
+
+    if (empty($id_usuario)) {
+        mostrarSweetAlert('error', 'Error', 'ID de usuario no proporcionado');
+        exit();
+    }
+
+    if (isset($_FILES['img_perfil']) && $_FILES['img_perfil']['error'] === UPLOAD_ERR_OK) {
+
+        $file = $_FILES['img_perfil'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitidas = ['png', 'jpg', 'jpeg', 'webp'];
+        
+        // Validar extensión
+        if (!in_array($ext, $permitidas)) {
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG o WEBP');
+            exit();
+        }
+        
+        // Validar tamaño (2MB máximo)
+        if ($file['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Archivo muy grande', 'La foto no debe superar los 2MB');
+            exit();
+        }
+        
+        // Obtener la foto anterior para eliminarla
+        $objVeterinario = new Veterinario();
+        $veterinarioActual = $objVeterinario->listarVeterinario($id_usuario);
+        $fotoAnterior = $veterinarioActual['img_perfil'] ?? null;
+        
+        // Generar nombre único
+        $img_perfil = uniqid('vet_') . '.' . $ext;
+        $destino = BASE_PATH . '/public/uploads/profesionales/' . $img_perfil;
+        
+        // Mover archivo
+        if (move_uploaded_file($file['tmp_name'], $destino)) {
+            
+            // Actualizar en base de datos
+            $data = [
+                'id_usuario' => $id_usuario,
+                'img_perfil' => $img_perfil
+            ];
+            
+            $resultado = $objVeterinario->actualizarFotoPerfil($data);
+            
+            if ($resultado) {
+                // Eliminar foto anterior si existe y no es la por defecto
+                if ($fotoAnterior && $fotoAnterior !== 'foto_default.jpg') {
+                    $rutaAnterior = BASE_PATH . '/public/uploads/profesionales/' . $fotoAnterior;
+                    if (file_exists($rutaAnterior)) {
+                        unlink($rutaAnterior);
+                    }
+                }
+                
+                // Actualizar sesión
+                $_SESSION['user']['img_perfil'] = $img_perfil;
+                
+                mostrarSweetAlert(
+                    'success',
+                    '¡Foto actualizada!',
+                    'Tu foto de perfil se ha actualizado correctamente',
+                    '/vetwilling/veterinario/consultar-perfil'
+                );
+            } else {
+                mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la imagen en la base de datos');
+            }
+        } else {
+            mostrarSweetAlert('error', 'Error', 'No se pudo guardar la imagen');
+        }
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se ha seleccionado ninguna imagen');
+    }
+
     exit();
 }

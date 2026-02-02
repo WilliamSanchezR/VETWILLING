@@ -43,7 +43,10 @@ class Login
                     break;
 
                 case 2: // Veterinario
-                    $consultar = "SELECT id_veterinaria, nombres, apellidos, telefono, numero_licencia_profesional, img_perfil FROM veterinario WHERE id_usuario = :id";
+                    $consultar = "SELECT nombres, apellidos, telefono, registro_medico, img_perfil,     GROUP_CONCAT(DISTINCT  pv.id_veterinaria SEPARATOR ', ') as id_veterinaria
+                        FROM profesional p
+                        INNER JOIN profesional_veterinaria pv On p.id_profesional = pv.id_profesional
+                        WHERE p.id_usuario = :id AND pv.estado = 'Activo'";
                     break;
 
                 case 3: // Propietario

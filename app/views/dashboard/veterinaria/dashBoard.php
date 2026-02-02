@@ -1,5 +1,7 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_veterinario.php';
+
+
 ?>
 
 <!DOCTYPE html>
@@ -345,6 +347,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
 
         </div>
+
     </div>
     <!-- Bootstrap -->
 
