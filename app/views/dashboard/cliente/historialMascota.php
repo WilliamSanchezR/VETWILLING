@@ -236,7 +236,7 @@ $mascota = consultarMascotaId($id_mascota);
                                                 <th>Procedimiento</th>
                                                 <th>Veterinario</th>
                                                 <th>Notas</th>
-                                                <th>Detalles</th>
+                                                <!-- <th>Detalles</th> -->
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -245,11 +245,11 @@ $mascota = consultarMascotaId($id_mascota);
                                                 <td>Castración</td>
                                                 <td>Dr. Ramírez</td>
                                                 <td>Procedimiento sin complicaciones</td>
-                                                <td>
+                                                <!-- <td>
                                                     <button class="btn btn-sm btn-info">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
-                                                </td>
+                                                </td> -->
                                             </tr>
                                         </tbody>
                                     </table>
