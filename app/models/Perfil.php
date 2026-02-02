@@ -39,7 +39,7 @@ class Perfil
                 case 1: // ADMINISTRADOR
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil, a.telefono, a.direccion, a.fecha_creacion,
+                                a.nombres, a.apellidos, a.nivel_acceso, a.img_perfil, a.telefono, a.direccion, a.fecha_creacion, r.id_rol,
                                 r.nombre AS rol
                                 FROM usuario u
                                 INNER JOIN administrador a ON u.id_usuario = a.id_usuario
@@ -50,7 +50,7 @@ class Perfil
                 case 2: // VETERINARIO
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                p.nombres, p.apellidos, p.telefono, p.img_perfil,
+                                p.nombres, p.apellidos, p.telefono, p.img_perfil, r.id_rol,
                                 r.nombre AS rol
                                 FROM usuario u
                                 INNER JOIN profesional p ON u.id_usuario = p.id_usuario
@@ -61,7 +61,7 @@ class Perfil
                 case 3: // PROPIETARIO
                     $consultar = "SELECT 
                             u.id_usuario, u.email, u.estado,
-                            p.nombres, p.apellidos, p.telefono, p.direccion,
+                            p.nombres, p.apellidos, p.telefono, p.direccion, r.id_rol,
                             p.img_perfil, p.numero_documento, p.tipo_documento,
                             r.nombre AS rol,
 
@@ -78,7 +78,7 @@ class Perfil
                 case 4: // REPRESENTANTE LEGAL
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                rl.nombres, rl.apellidos, rl.nivel_acceso, rl.img_perfil, rl.telefono,
+                                rl.nombres, rl.apellidos, rl.nivel_acceso, rl.img_perfil, rl.telefono, r.id_rol,
                                 r.nombre AS rol, rl.direccion, rl.fecha_creacion
                                 FROM usuario u
                                 INNER JOIN representante_legal rl ON u.id_usuario = rl.id_usuario

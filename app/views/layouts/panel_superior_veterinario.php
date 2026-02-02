@@ -177,10 +177,17 @@ $usuario = mostrarPerfil($id);
             <div class="navbar-action user-profile-wrapper">
                 <button class="btn-profile" onclick="togglePerfilMenu()" aria-label="Menú de usuario">
                     <div class="profile-avatar">
+                        <?php if ($usuario['id_rol'] == 4): ?>
+                            <img 
+                            src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>"
+                            alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
+                            class="avatar-img">
+                        <?php else: ?>
                         <img 
                             src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>"
                             alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
                             class="avatar-img">
+                        <?php endif; ?>
                         <span class="status-dot online" title="En línea"></span>
                     </div>
                     <div class="profile-info">
