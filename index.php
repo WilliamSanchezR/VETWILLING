@@ -316,6 +316,9 @@ switch ($request) {
     case '/cliente/agenda':
         require BASE_PATH . '/app/views/dashboard/cliente/agenda.php';
         break;
+    case '/cliente/agendar-cita':
+        require BASE_PATH . '/app/views/dashboard/cliente/agendarCita.php';
+        break;
     case '/cliente/historial':
         require BASE_PATH . '/app/views/dashboard/cliente/historial.php';
         break;
