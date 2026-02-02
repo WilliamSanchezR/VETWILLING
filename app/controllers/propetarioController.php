@@ -114,7 +114,7 @@ function actualizarPropietario()
     $resultado = $prop->actualizar($data, $actualizarImagen);
 
     if ($resultado === true) {
-        mostrarSweetAlert('success', 'Actualización exitosa', 'Datos actualizados correctamente', '/vetwilling/Cliente/perfil');
+        mostrarSweetAlert('success', 'Actualización exitosa', 'Datos actualizados correctamente', '/vetwilling/cliente/perfil');
     } else {
         mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el propietario. Intenta nuevamente');
     }

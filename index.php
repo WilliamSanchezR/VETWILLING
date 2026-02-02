@@ -172,12 +172,16 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/reportes.php';
         break;
 
-
-    case '/veterinario/registrar-veterinarios':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';
-        break;
+    // RUTA COMENTADA: Registrar veterinarios
+    // case '/veterinario/registrar-veterinarios':
+    //     require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';
+    //     break;
     case '/veterinario/registrar-pacientes':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/registro-pacientes-laboratorio.php';
+        require BASE_PATH . '/app/views/dashboard/veterinaria/registro-pacientes.php';
+        break;
+
+    case '/veterinario/guardar-paciente':
+        require BASE_PATH . '/app/controllers/registroPacienteController.php';
         break;
 
     case '/veterinario/guardar-veterinario':
@@ -187,9 +191,10 @@ switch ($request) {
     case '/veterinario/consultar-citas':
         require BASE_PATH . '/app/views/dashboard/veterinaria/citas.php';
         break;
-    case '/veterinario/consultar-veterinarios':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/consultarVet.php';
-        break;
+    // RUTA COMENTADA: Consultar veterinarios
+    // case '/veterinario/consultar-veterinarios':
+    //     require BASE_PATH . '/app/views/dashboard/veterinaria/consultarVet.php';
+    //     break;
     case '/veterinario/editar-veterinario':
         require BASE_PATH . '/app/views/dashboard/veterinaria/editar-veterinario.php';
         break;
@@ -315,6 +320,9 @@ switch ($request) {
         break;
     case '/cliente/agenda':
         require BASE_PATH . '/app/views/dashboard/cliente/agenda.php';
+        break;
+    case '/cliente/agendar-cita':
+        require BASE_PATH . '/app/views/dashboard/cliente/agendarCita.php';
         break;
     case '/cliente/historial':
         require BASE_PATH . '/app/views/dashboard/cliente/historial.php';

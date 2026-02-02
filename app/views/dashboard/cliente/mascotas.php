@@ -62,6 +62,11 @@ $mascotas = listarMascotas();
                     <i class="bi bi-plus-lg"></i>
                     Agregar Mascota
                 </a>
+                <a href="<?= BASE_URL ?>/cliente/agendar-cita"
+                    class="btn-action btn-agregar">
+                    <i class="bi bi-plus-lg"></i>
+                    Agendar Nueva Cita
+                </a>
             </div>
 
 
