@@ -49,6 +49,14 @@
                 <i class="bi bi-calendar-week"></i>
                 <span class="nav-text">Calendario</span>
             </a>
+
+            <a href="<?= BASE_URL ?>/veterinaria/mi-agenda"
+                class="nav-item"
+                data-section="agenda">
+                <i class="bi bi-clock"></i>
+                <span class="nav-text">Mi Disponibilidad</span>
+            </a>
+
             <a href="<?= BASE_URL ?>/veterinaria/gestion_clinica"
                 class="nav-item"
                 data-section="tienda">

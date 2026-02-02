@@ -4,13 +4,50 @@
     gap: 30px;
 }
 
+.agenda-veterinario .contenido-principal {
+    padding-top: 90px;
+    overflow: visible;
+}
+
+.agenda-veterinario .area-contenido {
+    overflow: visible;
+}
+
+.agenda-veterinario .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 1000;
+}
+
+.agenda-veterinario .navbar-superior {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+}
+
 .info-profesional {
-    background: linear-gradient(135deg, #0f8f3a, #0c7a32);
+    background: #0f8f3a;
     color: #ffffff;
     border-radius: 18px;
     padding: 30px 40px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     max-width: 100%;
+}
+
+.agenda-veterinario .btn-agregar,
+.agenda-veterinario .btn-control,
+.agenda-veterinario .btn-primary {
+    background: #0f8f3a;
+    border-color: #0f8f3a;
+    background-image: none;
+}
+
+.agenda-veterinario .btn-agregar:hover,
+.agenda-veterinario .btn-control:hover,
+.agenda-veterinario .btn-primary:hover {
+    background: #0c7a32;
+    border-color: #0c7a32;
 }
 
 /* HEADER */

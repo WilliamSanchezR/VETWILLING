@@ -28,7 +28,10 @@ const URLS = {
     GET_SUBSERVICIOS: '/vetwilling/calendario/getSubservicios',
 
     // 8. OBTENER VETERINARIOS: Lista de veterinarios de la veterinaria
-    GET_VETERINARIOS: '/vetwilling/calendario/getVeterinarios'
+    GET_VETERINARIOS: '/vetwilling/calendario/getVeterinarios',
+
+    // 9. OBTENER DISPONIBILIDAD DEL PROFESIONAL
+    GET_DISPONIBILIDAD: '/vetwilling/disponibilidad/horarios'
 };
 
 
@@ -116,15 +119,66 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (successCallback) { successCallback(result); }
                 } else {
                     console.error('Error lógico en el servidor:', result.message);
-                    if (errorCallback) { errorCallback(result.message); }
+                    if (errorCallback) { errorCallback(result.message, result); }
                 }
             })
             .catch(error => {
                 console.error('Error de comunicación AJAX:', error);
-                // Extraer el mensaje del error
-                const errorMessage = error.message || error.statusText || 'Error desconocido';
-                if (errorCallback) { errorCallback(errorMessage); }
+                
+                // Si el error viene con data que contiene información de disponibilidad
+                if (error.data && error.data.tipo === 'disponibilidad') {
+                    mostrarErrorDisponibilidad(error.data);
+                } else if (error.data && error.data.tipo === 'conflicto') {
+                    // Error de conflicto con otra cita
+                    const errorMessage = error.message || error.statusText || 'Error desconocido';
+                    if (errorCallback) { errorCallback(errorMessage, error.data); }
+                } else {
+                    // Error genérico
+                    const errorMessage = error.message || error.statusText || 'Error desconocido';
+                    if (errorCallback) { errorCallback(errorMessage, error.data); }
+                }
             });
+    }
+
+    /**
+     * Muestra un mensaje de error específico cuando la cita está fuera de disponibilidad
+     */
+    function mostrarErrorDisponibilidad(data) {
+        let rangosHTML = '';
+        
+        if (data.rangos_disponibles && data.rangos_disponibles.length > 0) {
+            rangosHTML = '<div style="margin-top: 15px; text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px;">';
+            rangosHTML += '<strong style="color: #28a745;">📅 Horarios disponibles:</strong><ul style="margin: 10px 0; padding-left: 20px;">';
+            
+            data.rangos_disponibles.forEach(rango => {
+                const horaInicio = rango.hora_inicio.substring(0, 5);
+                const horaFin = rango.hora_fin.substring(0, 5);
+                const especialidad = rango.especialidad ? ` (${rango.especialidad})` : '';
+                rangosHTML += `<li style="margin: 5px 0; color: #495057;">${horaInicio} - ${horaFin}${especialidad}</li>`;
+            });
+            
+            rangosHTML += '</ul></div>';
+        }
+
+        // Extraer solo el primer mensaje antes de "Rangos disponibles:"
+        const mensajePrincipal = data.message.split('\n')[0];
+
+        Swal.fire({
+            icon: 'warning',
+            title: '⚠️ Horario No Disponible',
+            html: `
+                <div style="text-align: center;">
+                    <p style="font-size: 18px; margin-bottom: 10px;">${mensajePrincipal}</p>
+                    ${rangosHTML}
+                    <p style="margin-top: 15px; color: #6c757d; font-size: 13px;">
+                        <strong>💡 Sugerencia:</strong> Selecciona un horario dentro de la disponibilidad del veterinario.
+                    </p>
+                </div>
+            `,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#3085d6',
+            width: '600px'
+        });
     }
 
     // --- Funciones para cargar datos del servidor ---
@@ -365,6 +419,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     initializeExternalEvents();
 
+    async function cargarDisponibilidad() {
+        try {
+            const response = await fetch(`${URLS.GET_DISPONIBILIDAD}?action=horarios`);
+            if (!response.ok) {
+                return [];
+            }
+            const data = await response.json();
+            return Array.isArray(data) ? data : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
     // --- Inicialización Principal del Calendario ---
     var calendarEl = document.getElementById('calendar');
 
@@ -382,6 +449,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // --- CARGA DE EVENTOS ---
         events: URLS.LOAD,
+
+        // --- DISPONIBILIDAD (Business Hours) ---
+        businessHours: true,
+        selectConstraint: 'businessHours',
+        eventConstraint: 'businessHours',
 
         // --- INTERACCIÓN Y CREACIÓN DE EVENTOS (Selectable) ---
         selectable: true,
@@ -953,7 +1025,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             });
                         },
                         // Función de Error
-                        function (errorMessage) {
+                        function (errorMessage, errorData) {
+                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                            if (errorData && errorData.tipo === 'disponibilidad') {
+                                return; // No mostrar alerta duplicada
+                            }
+                            
+                            // Para otros tipos de error, mostrar alerta
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1154,7 +1232,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                 timerProgressBar: true
                             });
                         },
-                        function (errorMessage) {
+                        function (errorMessage, errorData) {
+                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                            if (errorData && errorData.tipo === 'disponibilidad') {
+                                info.revert();
+                                return;
+                            }
+                            
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1201,7 +1285,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                 timerProgressBar: true
                             });
                         },
-                        function (errorMessage) {
+                        function (errorMessage, errorData) {
+                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                            if (errorData && errorData.tipo === 'disponibilidad') {
+                                info.revert();
+                                return;
+                            }
+                            
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1630,7 +1720,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             });
                         },
-                        function (errorMessage) {
+                        function (errorMessage, errorData) {
+                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                            if (errorData && errorData.tipo === 'disponibilidad') {
+                                return; // No mostrar alerta duplicada
+                            }
+                            
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1717,6 +1812,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     break;
             }
         });
+    });
+
+    // Cargar disponibilidad y aplicarla al calendario
+    cargarDisponibilidad().then((businessHours) => {
+        if (businessHours.length > 0) {
+            calendar.setOption('businessHours', businessHours);
+
+            const disponibilidadBackground = businessHours.map((bh) => ({
+                daysOfWeek: bh.daysOfWeek,
+                startTime: bh.startTime,
+                endTime: bh.endTime,
+                display: 'background',
+                color: '#c8f7d2'
+            }));
+
+            calendar.addEventSource(disponibilidadBackground);
+        }
     });
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -2205,7 +2317,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             timerProgressBar: true
                         });
                     },
-                    function (errorMessage) {
+                    function (errorMessage, errorData) {
+                        // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
+                        if (errorData && errorData.tipo === 'disponibilidad') {
+                            return; // No mostrar alerta duplicada
+                        }
+                        
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',

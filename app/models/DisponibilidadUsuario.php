@@ -291,4 +291,150 @@ class DisponibilidadUsuario
             return false;
         }
     }
+
+    // Función para obtener especialidades de un usuario
+    public function obtenerEspecialidadesUsuario($id_usuario, $id_veterinaria)
+    {
+        try {
+            $sql = "SELECT DISTINCT
+                        esp.id_especialidad,
+                        esp.nombre
+                    FROM especialidad esp
+                    INNER JOIN profesional_especialidad pe ON esp.id_especialidad = pe.id_especialidad
+                    WHERE pe.id_usuario = :id_usuario 
+                    AND pe.id_veterinaria = :id_veterinaria
+                    AND pe.estado = 'Activo'
+                    ORDER BY esp.nombre ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en DisponibilidadUsuario::obtenerEspecialidadesUsuario -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // Función para obtener la veterinaria asociada a un usuario
+    public function obtenerVeterinariaPorUsuario($id_usuario)
+    {
+        try {
+            $sql = "SELECT pv.id_veterinaria
+                    FROM profesional_veterinaria pv
+                    INNER JOIN profesional pr ON pv.id_profesional = pr.id_profesional
+                    WHERE pr.id_usuario = :id_usuario
+                    AND pv.estado = 'Activo'
+                    ORDER BY pv.id_prof_veterinaria DESC
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $row['id_veterinaria'] ?? null;
+        } catch (PDOException $e) {
+            error_log("Error en DisponibilidadUsuario::obtenerVeterinariaPorUsuario -> " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Valida si un horario de cita está dentro de la disponibilidad del veterinario
+     * @param int $id_usuario ID del veterinario
+     * @param int $id_veterinaria ID de la veterinaria
+     * @param string $fecha_hora_inicio Fecha y hora de inicio de la cita (Y-m-d H:i:s)
+     * @param string $fecha_hora_fin Fecha y hora de fin de la cita (Y-m-d H:i:s)
+     * @return array ['valido' => bool, 'mensaje' => string, 'rangos_disponibles' => array]
+     */
+    public function validarCitaDentroDisponibilidad($id_usuario, $id_veterinaria, $fecha_hora_inicio, $fecha_hora_fin)
+    {
+        try {
+            // Obtener el día de la semana (1=Lunes, 7=Domingo)
+            $datetime = new DateTime($fecha_hora_inicio);
+            $dia_semana_num = (int)$datetime->format('N'); // 1=Lunes, 7=Domingo
+
+            // Extraer solo la hora de inicio y fin
+            $hora_inicio_cita = $datetime->format('H:i:s');
+            $hora_fin_cita = (new DateTime($fecha_hora_fin))->format('H:i:s');
+
+            // Buscar disponibilidades para ese día y usuario
+            $sql = "SELECT 
+                        du.hora_inicio,
+                        du.hora_fin,
+                        esp.nombre as especialidad
+                    FROM disponibilidad_usuario du
+                    LEFT JOIN especialidad esp ON du.id_especialidad = esp.id_especialidad
+                    WHERE du.id_usuario = :id_usuario
+                    AND du.id_veterinaria = :id_veterinaria
+                    AND du.dia_semana = :dia_semana
+                    ORDER BY du.hora_inicio ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':dia_semana', $dia_semana_num, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $disponibilidades = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Si no hay disponibilidades para ese día
+            if (empty($disponibilidades)) {
+                $dias = ['', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+                return [
+                    'valido' => false,
+                    'mensaje' => 'No hay disponibilidad configurada para el día ' . $dias[$dia_semana_num],
+                    'rangos_disponibles' => []
+                ];
+            }
+
+            // Validar si la cita está dentro de algún rango de disponibilidad
+            $dentroDeRango = false;
+            foreach ($disponibilidades as $disp) {
+                $hora_inicio_disp = $disp['hora_inicio'];
+                $hora_fin_disp = $disp['hora_fin'];
+
+                // Verificar si la cita está completamente dentro del rango
+                if ($hora_inicio_cita >= $hora_inicio_disp && $hora_fin_cita <= $hora_fin_disp) {
+                    $dentroDeRango = true;
+                    break;
+                }
+            }
+
+            if (!$dentroDeRango) {
+                // Formatear rangos disponibles para el mensaje
+                $rangos_formateados = array_map(function ($disp) {
+                    $inicio = date('h:i A', strtotime($disp['hora_inicio']));
+                    $fin = date('h:i A', strtotime($disp['hora_fin']));
+                    $especialidad = $disp['especialidad'] ? " ({$disp['especialidad']})" : "";
+                    return "{$inicio} - {$fin}{$especialidad}";
+                }, $disponibilidades);
+
+                $mensaje = "El horario seleccionado está fuera de la disponibilidad del veterinario.\n\n";
+                $mensaje .= "Rangos disponibles:\n" . implode("\n", $rangos_formateados);
+
+                return [
+                    'valido' => false,
+                    'mensaje' => $mensaje,
+                    'rangos_disponibles' => $disponibilidades
+                ];
+            }
+
+            return [
+                'valido' => true,
+                'mensaje' => 'La cita está dentro del horario disponible',
+                'rangos_disponibles' => $disponibilidades
+            ];
+        } catch (Exception $e) {
+            error_log("Error en DisponibilidadUsuario::validarCitaDentroDisponibilidad -> " . $e->getMessage());
+            return [
+                'valido' => false,
+                'mensaje' => 'Error al validar disponibilidad: ' . $e->getMessage(),
+                'rangos_disponibles' => []
+            ];
+        }
+    }
 }
