@@ -181,6 +181,15 @@ switch ($request) {
     case '/veterinario/consultar-perfil':
         require BASE_PATH . '/app/views/dashboard/veterinaria/perfil.php';
         break;
+
+    case '/veterinario/actualizar-constrasena':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
+    case '/veterinario/cambiar-foto':
+        require BASE_PATH . '/app/controllers/veterinarioController.php';
+        break;
+
     case 'soporte':
         require_once 'controllers/soporteControllers.php';
         $controller = new SoporteController();

@@ -142,14 +142,14 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-building"></i> Ciudad *</label>
-                                <input type="text" id="ciudad" required placeholder="Bogotá">
+                                <input type="text" id="ciudad"  placeholder="Bogotá">
                             </div>
                         </div>
                     </div>
 
                     <div class="buttons">
                         <span></span>
-                        <button type="submit" class="btn-next" onclick="nextStep()">
+                        <button type="submit" class="btn-next" >
                             Registrar <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>

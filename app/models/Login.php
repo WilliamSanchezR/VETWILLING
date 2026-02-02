@@ -43,7 +43,7 @@ class Login
                     break;
 
                 case 2: // Veterinario
-                    $consultar = "SELECT id_veterinaria, nombres, apellidos, telefono, numero_licencia_profesional, img_perfil FROM veterinario WHERE id_usuario = :id";
+                    $consultar = "SELECT nombres, apellidos, telefono, registro_medico, img_perfil FROM profesional WHERE id_usuario = :id";
                     break;
 
                 case 3: // Propietario

@@ -50,10 +50,10 @@ class Perfil
                 case 2: // VETERINARIO
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                v.nombres, v.apellidos, v.telefono, v.img_perfil,
+                                p.nombres, p.apellidos, p.telefono, p.img_perfil,
                                 r.nombre AS rol
                                 FROM usuario u
-                                INNER JOIN veterinario v ON u.id_usuario = v.id_usuario
+                                INNER JOIN profesional p ON u.id_usuario = p.id_usuario
                                 INNER JOIN rol r ON u.id_rol = r.id_rol
                                 WHERE u.id_usuario = :id";
                     break;
