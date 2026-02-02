@@ -1,6 +1,5 @@
 <?php
 
-session_start();
 
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
