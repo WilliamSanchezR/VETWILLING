@@ -19,7 +19,7 @@ function showStep(index) {
     document.querySelector('.wizard-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     // Si estamos en el paso de confirmación, actualizar resumen
-    if (index === 3) {
+    if (index === 2) {
         mostrarResumenConfirmacion();
     }
 }
@@ -31,11 +31,12 @@ function mostrarResumenConfirmacion() {
                 <div class="resumen-card">
                     <h4><i class="bi bi-person-check text-success"></i> Datos del Propietario</h4>
                     <ul>
-                        <li><strong>Nombre:</strong> ${document.getElementById('nombrePropietario').value}</li>
-                        <li><strong>Documento:</strong> ${document.getElementById('tipoDocumento').value} ${document.getElementById('documento').value}</li>
+                        <li><strong>Nombres:</strong> ${document.getElementById('nombres').value}</li>
+                        <li><strong>Apellidos:</strong> ${document.getElementById('apellidos').value}</li>
+                        <li><strong>Documento:</strong> ${document.getElementById('tipoDocumento').value} ${document.getElementById('numeroDocumento').value}</li>
                         <li><strong>Teléfono:</strong> ${document.getElementById('telefono').value}</li>
-                        <li><strong>Correo:</strong> ${document.getElementById('correo').value}</li>
-                        <li><strong>Dirección:</strong> ${document.getElementById('direccion').value}, ${document.getElementById('ciudad').value}</li>
+                        <li><strong>Correo:</strong> ${document.getElementById('email').value}</li>
+                        <li><strong>Dirección:</strong> ${document.getElementById('direccion').value}</li>
                     </ul>
                 </div>
 
@@ -44,27 +45,16 @@ function mostrarResumenConfirmacion() {
                     <ul>
                         <li><strong>Nombre:</strong> ${document.getElementById('nombreMascota').value}</li>
                         <li><strong>Especie:</strong> ${document.getElementById('especie').value}</li>
-                        <li><strong>Raza:</strong> ${document.getElementById('raza').value || 'No especificada'}</li>
-                        <li><strong>Edad:</strong> ${document.getElementById('edad').value} años</li>
-                        <li><strong>Peso:</strong> ${document.getElementById('peso').value} kg</li>
+                        <li><strong>Raza:</strong> ${document.getElementById('raza').value}</li>
+                        <li><strong>Edad:</strong> ${document.getElementById('edadNumero').value} ${document.getElementById('edadUnidad').value}</li>
                         <li><strong>Sexo:</strong> ${document.getElementById('sexo').value}</li>
-                        <li><strong>Esterilizado:</strong> ${document.getElementById('esterilizado').value}</li>
                     </ul>
-                </div>
-
-                <div class="resumen-card" id="resumenExamenes">
-                    <h4><i class="bi bi-flask text-primary"></i> Información de Exámenes Clínicos</h4>
-                  <ul>
-                  ${laboratoriosSeleccionados.map((elemnt) => {
-                    return `<li>${elemnt.name}</li>`;
-                  }).join('')}
-                  </ul>
                 </div>
             </div>
         `;
 
     // Insertar el resumen antes de los botones
-    const confirmStep = steps[3];
+    const confirmStep = steps[2];
     const existingResumen = confirmStep.querySelector('.resumen-final');
 
     if (!existingResumen) {
@@ -108,19 +98,6 @@ function nextStep() {
             confirmButtonText: 'Entendido'
         });
         return; // ← ESTO ES CRÍTICO
-    }
-
-    if (currentStep === 2) {
-        if (laboratoriosSeleccionados.length === 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'No se han asociado Exámenes',
-                html: `Por favor registre exámenes de laboratorio.`,
-                confirmButtonColor: '#0a932c',
-                confirmButtonText: 'Entendido'
-            });
-            return; // ← ESTO ES CRÍTICO
-        }
     }
 
     if (currentStep < steps.length - 1) {
@@ -315,7 +292,85 @@ function consultarExamenes(valorInput) {
 // Evento del botón "Confirmar Registro"
 btnConfirmarRegistr.addEventListener('click', (e) => {
     e.preventDefault();
-    document.location.href = '../../../../dashBoard/veterinarias/dashBoardLaboratorio.html';
+    
+    // Recopilar datos del formulario
+    const formData = new FormData();
+    
+    // Datos del propietario
+    formData.append('nombres', document.getElementById('nombres').value);
+    formData.append('apellidos', document.getElementById('apellidos').value);
+    formData.append('tipo_documento', document.getElementById('tipoDocumento').value);
+    formData.append('numero_documento', document.getElementById('numeroDocumento').value);
+    formData.append('telefono', document.getElementById('telefono').value);
+    formData.append('email', document.getElementById('email').value);
+    formData.append('direccion', document.getElementById('direccion').value);
+    
+    // Datos de la mascota
+    formData.append('nombre_mascota', document.getElementById('nombreMascota').value);
+    formData.append('especie', document.getElementById('especie').value);
+    formData.append('raza', document.getElementById('raza').value);
+    formData.append('sexo', document.getElementById('sexo').value);
+    formData.append('edad_numero', document.getElementById('edadNumero').value);
+    formData.append('edad_unidad', document.getElementById('edadUnidad').value);
+    
+    // Log para debug
+    console.log('Datos a enviar:');
+    for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+    
+    // Mostrar loading
+    Swal.fire({
+        title: 'Procesando...',
+        text: 'Registrando paciente',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
+    // Enviar datos al servidor
+    fetch('/vetwilling/veterinario/guardar-paciente', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(result => {
+        console.log('Response data:', result);
+        
+        if (result.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Registro exitoso',
+                text: result.message,
+                confirmButtonColor: '#0a932c',
+                confirmButtonText: 'Aceptar'
+            }).then(() => {
+                // Recargar la página para limpiar el formulario
+                window.location.href = '/vetwilling/veterinario/registrar-pacientes';
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al registrar',
+                text: result.message,
+                confirmButtonColor: '#0a932c',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al procesar el registro',
+            confirmButtonColor: '#0a932c'
+        });
+    });
 });
 
 // Evento del botón "Volver a revisar"
@@ -323,16 +378,8 @@ document.getElementById('btnVolver')?.addEventListener('click', function () {
     prevStep();
 });
 
-// Evento del input de búsqueda de exámenes
-buscadorExamenes.addEventListener("input", (e) => {
-    const valorInput = e.target.value;
-    consultarExamenes(valorInput);
-});
-
 // Inicialización al cargar el DOM
 document.addEventListener("DOMContentLoaded", () => {
-    consultaTipoDocumento();
-    consultaEspecie();
-    cargarListaLaboratorio();
-    dataTablesLaboratorios();
+    // Inicialización básica
+    showStep(0);
 });
