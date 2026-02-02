@@ -35,9 +35,9 @@
 
 /* ITEMS */
 .info-item {
-    background: rgba(255, 255, 255, 0.12);
-    padding: 15px 18px;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.12) !important;
+    padding: 15px 18px !important;
+    border-radius: 12px !important;
 }
 
 .info-item .label {

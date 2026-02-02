@@ -34,18 +34,19 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
             <!-- Sección Dashboard -->
             <a href="<?= BASE_URL ?>/representante/dashboard"
-                class="nav-item <?= $final_path == 'dashBoard' ? 'active' : '' ?>"
+                class="nav-item <?= $final_path == 'dashboard' ? 'active' : '' ?>"
                 data-section="dashboard" data-tooltip="Inicio">
                 <i class="bi bi-house-door"></i>
                 <span class="nav-text">Inicio</span>
             </a>
 
             <!-- GESTION COMO ADMINISTRADOR -->
-            <div class="submenu <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'configuracion-veterinaria' || $final_path == 'listar-especialidades' || $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  || $final_path == 'lista-agenda-usuario' || $final_path == 'lista-agenda-disponible' || $final_path == 'listar-subservicios' ? 'active open' : '' ?>">
+            <div class="submenu">
                 <div class="submenu-toggle" data-tooltip="Gestión Administrador">
                     <i class="bi bi-journal-medical"></i>
                     <span class="texto-item-sidebar">Gestión Administrador</span>
                     <i class="bi bi-chevron-down flecha"></i>
+                    
                 </div>
 
                 <ul class="submenu-items">
@@ -53,7 +54,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     <!-- Sección configuracion veterinaria -->
                     <li>
 
-                        <div class="submenu-seccond <?= $final_path == 'registro-profesionales' || $final_path == 'listar-profesionales' || $final_path == 'agenda-usuario'  ? 'active open' : '' ?>">
+                        <div class="submenu-seccond">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Configuración Veterinaria">
                                 <i class="bi bi-gear-fill"></i>

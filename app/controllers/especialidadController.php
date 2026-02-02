@@ -66,7 +66,7 @@ function registrarEspecialidad()
     $resultado = $especialidadModel->registrarEspecialidad($data);
 
     if ($resultado) {
-        mostrarSweetAlert('success', 'Especialidad registrada', 'La especialidad ha sido registrada exitosamente.');
+        mostrarSweetAlert('success', 'Especialidad registrada', 'La especialidad ha sido registrada exitosamente.', '/vetwilling/representante/listar-especialidades');
     } else {
         mostrarSweetAlert('error', 'Error al registrar', 'Hubo un problema al registrar la especialidad.');
     }
@@ -107,7 +107,7 @@ function actualizarEspecialidad() {
     $resultado = $especialidadModel->actualizarEspecialidad($data);
 
     if ($resultado) {
-        mostrarSweetAlert('success', 'Especialidad actualizada', 'La especialidad ha sido actualizada exitosamente.');
+        mostrarSweetAlert('success', 'Especialidad actualizada', 'La especialidad ha sido actualizada exitosamente.', '/vetwilling/representante/listar-especialidades');
     } else {
         mostrarSweetAlert('error', 'Error al actualizar', 'Hubo un problema al actualizar la especialidad.');
     }

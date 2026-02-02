@@ -49,6 +49,25 @@ class RegistroProfesionales {
                 });
             });
         }
+
+        // Vaidar si le doy por fuera del contenedor this.listServicios se cierre
+        if (this.listServicios) {
+            document.addEventListener('click', (event) => {
+                const isClickInside = this.listServicios.contains(event.target) || this.btnAgregarServ.contains(event.target);
+                if (!isClickInside) {
+                    this.listServicios.classList.remove('vew-list-serv');
+                }
+            });
+        }
+
+        if (this.listEspecialidades) {
+            document.addEventListener('click', (event) => {
+                const isClickInside = this.listEspecialidades.contains(event.target) || this.btnAgregarEsp.contains(event.target);
+                if (!isClickInside) {
+                    this.listEspecialidades.classList.remove('vew-list-esp');
+                }
+            });
+        }
     }
 
     toggleEspecialidades() {
