@@ -45,6 +45,14 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/recoveryPassControllers.php';
         break;
 
+    case '/login/seleccionarVeterinaria':
+        require BASE_PATH . '/app/views/auth/seleccionarVeterinaria.php';
+        break;
+
+    case '/login/ingresarVeterinaria':
+        require BASE_PATH . '/app/controllers/loginControllers.php';
+        break;
+
     // Restablecer contraseña
 
     case '/recoverpw':

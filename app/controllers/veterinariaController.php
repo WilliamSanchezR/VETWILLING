@@ -131,6 +131,15 @@ function consultarVeterinariasRegistradas($id)
     return $veterinaria;
 }
 
+// consultar veterinarias por arry de ids
+function consultarVeterinariasPorArray($idsArray)
+{
+    // Creamos el objeto de la clase Veterinaria
+    $veterinariaModel = new Veterinaria();
+    $veterinarias = $veterinariaModel->consultarVeterinariasPorArray($idsArray);
+    return $veterinarias;
+}
+
 // FUNCION PARA ACTUALIZAR LOS DATOS DE LA VETERINARIA
 function actualizarVeterinaria()
 {

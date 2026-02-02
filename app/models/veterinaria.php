@@ -134,4 +134,23 @@ class Veterinaria
             return false;
         }
     }
+
+    public function consultarVeterinariasPorArray($idsArray)
+    {
+        try {
+            // Convertimos el array de IDs en una cadena separada por comas para la consulta SQL
+            $placeholders = rtrim(str_repeat('?,', count($idsArray)), ',');
+            $consulta = "SELECT id_veterinaria, nit, nombre, ciudad, foto
+                         FROM veterinaria 
+                         WHERE id_veterinaria IN ($placeholders)";
+
+            $resultado = $this->conexion->prepare($consulta);
+            // Ejecutamos la consulta con los IDs como parámetros
+            $resultado->execute($idsArray);
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al consultar las veterinarias: " . $e->getMessage();
+            return [];
+        }
+    }
 }
