@@ -92,18 +92,22 @@
                 <span class="nav-section-title">Gestión</span>
             </div>
 
+            <!-- INTERFAZ COMENTADA: Registro de Veterinarios
             <a href="<?= BASE_URL ?>/veterinario/registrar-veterinarios"
                 class="nav-item"
                 data-section="tienda">
                 <i class="bi bi-clipboard-plus"></i>
                 <span class="nav-text">Registro Veterinarios</span>
             </a>
+            -->
+            <!-- INTERFAZ COMENTADA: Listar Veterinarios
             <a href="<?= BASE_URL ?>/veterinario/consultar-veterinarios"
                 class="nav-item"
                 data-section="tienda">
                 <i class="bi bi-calendar-check"></i>
                 <span class="nav-text">Listar Veterinarios</span>
             </a>
+            -->
             <a href="<?= BASE_URL ?>/veterinario/registrar-pacientes"
                 class="nav-item"
                 data-section="tienda">

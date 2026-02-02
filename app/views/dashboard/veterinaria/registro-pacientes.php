@@ -63,7 +63,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         <div class="wizard-container">
             <div class="wizard-header">
                 <i class="bi bi-flask"></i>
-                <h2>Registro de Paciente Laboratorio</h2>
+                <h2>Registro de Paciente</h2>
                 <p class="text-muted">Complete todos los campos requeridos para registrar un nuevo paciente</p>
             </div>
 
@@ -72,12 +72,10 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div id="bar1" class="progress-bar active"></div>
                     <div id="bar2" class="progress-bar"></div>
                     <div id="bar3" class="progress-bar"></div>
-                    <div id="bar4" class="progress-bar"></div>
                 </div>
                 <div class="progress-labels">
                     <span class="active">Propietario</span>
                     <span>Mascota</span>
-                    <span>Laboratorio</span>
                     <span>Confirmar</span>
                 </div>
             </div>
@@ -91,16 +89,14 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-person"></i> Nombre completo *</label>
-                                <input type="text" id="nombrePropietario" required placeholder="Ej: Juan Pérez García">
+                                <label><i class="bi bi-person"></i> Nombres *</label>
+                                <input type="text" id="nombres" required placeholder="Ej: Juan Carlos">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-card-text"></i> Tipo de documento *</label>
-                                <select id="tipoDocumento" required>
-                                    <option value="">Seleccione...</option>
-                                </select>
+                                <label><i class="bi bi-person"></i> Apellidos *</label>
+                                <input type="text" id="apellidos" required placeholder="Ej: Pérez García">
                             </div>
                         </div>
                     </div>
@@ -108,23 +104,34 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-hash"></i> Número de documento *</label>
-                                <input type="number" id="documento" required placeholder="12345678">
+                                <label><i class="bi bi-card-text"></i> Tipo de documento *</label>
+                                <select id="tipoDocumento" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="CC">CC - Cédula de Ciudadanía</option>
+                                    <option value="TI">TI - Tarjeta de Identidad</option>
+                                    <option value="CE">CE - Cédula de Extranjería</option>
+                                </select>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-hash"></i> Número de documento *</label>
+                                <input type="text" id="numeroDocumento" required placeholder="12345678">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-telephone"></i> Teléfono *</label>
                                 <input type="tel" id="telefono" required placeholder="+57 300 123 4567">
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                <input type="email" id="correo" required placeholder="ejemplo@correo.com">
+                                <input type="email" id="email" required placeholder="ejemplo@correo.com">
                             </div>
                         </div>
                     </div>
@@ -132,21 +139,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div class="form-group">
                         <label><i class="bi bi-geo-alt"></i> Dirección completa *</label>
                         <input type="text" id="direccion" required placeholder="Calle 12 # 34-56, Apto 102">
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-building"></i> Ciudad *</label>
-                                <input type="text" id="ciudad" required placeholder="Bogotá">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-map"></i> Barrio</label>
-                                <input type="text" id="barrio" placeholder="Chapinero">
-                            </div>
-                        </div>
                     </div>
 
                     <div class="buttons">
@@ -173,6 +165,12 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 <label><i class="bi bi-palette"></i> Especie *</label>
                                 <select id="especie" required>
                                     <option value="">Seleccione...</option>
+                                    <option value="Canino">Canino</option>
+                                    <option value="Felino">Felino</option>
+                                    <option value="Ave">Ave</option>
+                                    <option value="Roedor">Roedor</option>
+                                    <option value="Reptil">Reptil</option>
+                                    <option value="Otro">Otro</option>
                                 </select>
                             </div>
                         </div>
@@ -181,32 +179,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-award"></i> Raza</label>
-                                <input type="text" id="raza" placeholder="Ej: Labrador">
+                                <label><i class="bi bi-award"></i> Raza *</label>
+                                <input type="text" id="raza" required placeholder="Ej: Labrador">
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-palette-fill"></i> Color / Señas particulares</label>
-                                <input type="text" id="color" placeholder="Ej: Blanco con manchas negras">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label><i class="bi bi-cake2"></i> Edad (años) *</label>
-                                <input type="number" id="edad" required min="0" max="30" placeholder="3">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label><i class="bi bi-speedometer2"></i> Peso (kg) *</label>
-                                <input type="number" id="peso" required step="0.1" min="0" placeholder="15.5">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
                             <div class="form-group">
                                 <label><i class="bi bi-gender-ambiguous"></i> Sexo *</label>
                                 <select id="sexo" required>
@@ -221,55 +198,22 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-scissors"></i> ¿Esterilizado/Castrado? *</label>
-                                <select id="esterilizado" required>
-                                    <option value="">Seleccione...</option>
-                                    <option value="Si">Sí</option>
-                                    <option value="No">No</option>
-                                </select>
+                                <label><i class="bi bi-cake2"></i> Edad (cantidad) *</label>
+                                <input type="number" id="edadNumero" required min="0" max="99" placeholder="3">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-upc-scan"></i> Microchip (si aplica)</label>
-                                <input type="text" id="microchip" placeholder="123456789012345">
+                                <label><i class="bi bi-calendar"></i> Unidad de tiempo *</label>
+                                <select id="edadUnidad" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="años">Años</option>
+                                    <option value="meses">Meses</option>
+                                    <option value="semanas">Semanas</option>
+                                    <option value="días">Días</option>
+                                </select>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="buttons">
-                        <button type="button" class="btn-prev" onclick="prevStep()">
-                            <i class="bi bi-arrow-left"></i> Anterior
-                        </button>
-                        <button type="button" class="btn-next" onclick="nextStep()">
-                            Siguiente <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Paso 3: Historial Médico -->
-                <div class="step">
-                    <h3><i class="bi bi-file-medical me-2"></i>Registro Laboratorios</h3>
-
-                    <div class="campo-buscar">
-                        <i class="bi bi-search"></i>
-                        <input type="text" id="buscarExamenes" placeholder="Buscar Examenes" autocomplete="off">
-                        <ul class="lista-sugerencias autocomplete-items" id="listaSugerencias"></ul>
-                    </div>
-
-                    <div class="contenedor-tabla-laboratorio">
-                        <table class="tabla-laboratorio" id="lista-laboratorios">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Laboratorio</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="cont-laboratorio">
-                            </tbody>
-                        </table>
                     </div>
 
                     <div class="buttons">
@@ -313,7 +257,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Propio -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/registroPacientesLaboratorio.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/registroPacientes.js"></script>
 
 
 </body>
