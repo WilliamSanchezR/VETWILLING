@@ -1,8 +1,12 @@
 <?php
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 
 $id = $_SESSION['user']['id_usuario'];
 $usuario = mostrarPerfil($id);
+
+$veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
+
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
@@ -13,6 +17,15 @@ $usuario = mostrarPerfil($id);
         
         <!-- Sección Izquierda -->
         <div class="navbar-left">
+            <div class="image-avatar">
+                <?php
+                if (isset($veterinaria['foto']) && !empty($veterinaria['foto'])): ?>
+                    <img 
+                        src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>" 
+                        alt="Logo de <?= $veterinaria['nombre'] ?>" 
+                        class="navbar-logo" title="<?= $veterinaria['nombre'] ?>">                    
+                <?php endif; ?> 
+            </div>
             <button class="btn-menu-mobile" onclick="abrirSidebarMovil()" aria-label="Abrir menú">
                 <i class="bi bi-list"></i>
             </button>
