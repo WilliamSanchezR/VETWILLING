@@ -91,7 +91,6 @@ body {
 
 .header-titulo h1 {
     font-size: 32px;
-    color: var(--text-primary);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -100,7 +99,6 @@ body {
 }
 
 .header-titulo p {
-    color: var(--text-secondary);
     margin-top: 5px;
     font-size: 15px;
 }

@@ -32,9 +32,14 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+<<<<<<< HEAD
     width: var(--sidebar-width);
     width: var(--sidebar-collapsed);
 
+=======
+    position: relative;
+    right: 25%;
+>>>>>>> 1006b9a1f261611789aed56ec4a6e07c8a5dba7f
 }
 
 .header-titulo h1 {

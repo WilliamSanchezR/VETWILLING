@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/usuario.php';
 
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {

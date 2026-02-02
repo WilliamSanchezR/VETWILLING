@@ -216,9 +216,17 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                 <div class="dropdown-panel profile-panel" id="perfilDropdown" style="display: none;">
                     <div class="panel-header profile-header">
                         <div class="profile-avatar-large">
+                            <?php if ($usuario['id_rol'] == 4): ?>
                             <img 
-                                src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>"
-                                alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>">
+                            src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>"
+                            alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
+                            >
+                        <?php else: ?>
+                        <img 
+                            src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>"
+                            alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
+                            >
+                        <?php endif; ?>
                             <span class="status-dot online"></span>
                         </div>
                         <div class="profile-details">

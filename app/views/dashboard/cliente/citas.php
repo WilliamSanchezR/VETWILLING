@@ -1,3 +1,13 @@
+<?php
+require_once BASE_PATH . '/app/controllers/mascotasController.php';
+
+// Obtener las mascotas del propietario actual
+$mascotas = listarMascotas();
+
+// Obtener servicios disponibles (necesitaremos crear esta función)
+// Por ahora, dejamos un array vacío que se llenará dinámicamente con AJAX
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
