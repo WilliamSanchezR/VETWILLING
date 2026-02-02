@@ -6,6 +6,7 @@ require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
 require_once __DIR__ . '/../models/Calendario.php';
 require_once __DIR__ . '/../models/Eventos.php';
+require_once __DIR__ . '/../models/DisponibilidadUsuario.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -192,7 +193,41 @@ function crearAgendamientoAjax()
             $fecha_hora_fin = date('Y-m-d H:i:s', strtotime($fecha_hora_fin));
         }
 
-        // VERIFICAR DISPONIBILIDAD DE HORARIO
+        // VALIDAR QUE LA CITA ESTÉ DENTRO DE LA DISPONIBILIDAD DEL VETERINARIO
+        $disponibilidadModel = new DisponibilidadUsuario();
+
+        // Resolver id_veterinaria
+        $id_veterinaria = resolverIdVeterinaria();
+
+        if (!$id_veterinaria) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'No se pudo determinar la veterinaria asociada'
+            ]);
+            exit();
+        }
+
+        // Validar que la cita esté dentro de la disponibilidad
+        $validacionDisponibilidad = $disponibilidadModel->validarCitaDentroDisponibilidad(
+            $id_usuario,
+            $id_veterinaria,
+            $fecha_hora,
+            $fecha_hora_fin
+        );
+
+        if (!$validacionDisponibilidad['valido']) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $validacionDisponibilidad['mensaje'],
+                'tipo' => 'disponibilidad',
+                'rangos_disponibles' => $validacionDisponibilidad['rangos_disponibles']
+            ]);
+            exit();
+        }
+
+        // VERIFICAR DISPONIBILIDAD DE HORARIO (conflicto con otras citas)
         $objEventos = new Eventos();
         $disponible = $objEventos->verificarDisponibilidad($fecha_hora, $fecha_hora_fin);
 
@@ -215,6 +250,7 @@ function crearAgendamientoAjax()
             echo json_encode([
                 'status' => 'error',
                 'message' => $mensajeConflicto,
+                'tipo' => 'conflicto',
                 'conflictos' => $citasConflicto
             ]);
             exit();
@@ -328,6 +364,51 @@ function actualizarAgendamientoAjax()
 
         $objEventos = new Eventos();
 
+        // Obtener la cita actual para conocer el id_usuario (veterinario)
+        $citaActual = $objEventos->consultarAgendamiento($id_agendamiento);
+
+        if (!$citaActual) {
+            http_response_code(404);
+            echo json_encode(['status' => 'error', 'message' => 'Cita no encontrada']);
+            exit();
+        }
+
+        $id_usuario = $citaActual['id_usuario'];
+
+        // VALIDAR QUE LA CITA ESTÉ DENTRO DE LA DISPONIBILIDAD DEL VETERINARIO
+        $disponibilidadModel = new DisponibilidadUsuario();
+
+        // Resolver id_veterinaria
+        $id_veterinaria = resolverIdVeterinaria();
+
+        if (!$id_veterinaria) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'No se pudo determinar la veterinaria asociada'
+            ]);
+            exit();
+        }
+
+        // Validar que la nueva fecha esté dentro de la disponibilidad
+        $validacionDisponibilidad = $disponibilidadModel->validarCitaDentroDisponibilidad(
+            $id_usuario,
+            $id_veterinaria,
+            $fecha_hora,
+            $fecha_hora_fin
+        );
+
+        if (!$validacionDisponibilidad['valido']) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => $validacionDisponibilidad['mensaje'],
+                'tipo' => 'disponibilidad',
+                'rangos_disponibles' => $validacionDisponibilidad['rangos_disponibles']
+            ]);
+            exit();
+        }
+
         // VERIFICAR DISPONIBILIDAD DE HORARIO (excluyendo la cita actual)
         $disponible = $objEventos->verificarDisponibilidad($fecha_hora, $fecha_hora_fin, $id_agendamiento);
 
@@ -350,6 +431,7 @@ function actualizarAgendamientoAjax()
             echo json_encode([
                 'status' => 'error',
                 'message' => $mensajeConflicto,
+                'tipo' => 'conflicto',
                 'conflictos' => $citasConflicto
             ]);
             exit();
@@ -698,6 +780,27 @@ function obtenerMascotasPorPropietario()
     exit();
 }
 
+// Helper para obtener id_veterinaria desde sesión o relación profesional
+function resolverIdVeterinaria()
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
+    if (!empty($id_veterinaria)) {
+        return $id_veterinaria;
+    }
+
+    $id_usuario = $_SESSION['user']['id_usuario'] ?? null;
+    if (empty($id_usuario)) {
+        return null;
+    }
+
+    $disponibilidadModel = new DisponibilidadUsuario();
+    return $disponibilidadModel->obtenerVeterinariaPorUsuario($id_usuario);
+}
+
 // FUNCION PARA OBTENER SERVICIOS DESDE BASE DE DATOS FILTRADOS POR VETERINARIA
 function obtenerServicios()
 {
@@ -707,11 +810,11 @@ function obtenerServicios()
             session_start();
         }
 
-        // Obtener el id_veterinaria de la sesión
-        $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
+        // Obtener el id_veterinaria de la sesión o relación profesional
+        $id_veterinaria = resolverIdVeterinaria();
 
         error_log("=== DEBUG obtenerServicios ===");
-        error_log("ID Veterinaria de sesión: " . $id_veterinaria);
+        error_log("ID Veterinaria resuelta: " . $id_veterinaria);
         error_log("Datos de sesión: " . print_r($_SESSION['user'], true));
 
         if (!$id_veterinaria) {
@@ -745,7 +848,7 @@ function obtenerVeterinarios()
             session_start();
         }
 
-        $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
+        $id_veterinaria = resolverIdVeterinaria();
 
         if (!$id_veterinaria) {
             header('Content-Type: application/json');
@@ -777,8 +880,8 @@ function obtenerSubservicios()
             session_start();
         }
 
-        // Obtener el id_veterinaria de la sesión
-        $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
+        // Obtener el id_veterinaria de la sesión o relación profesional
+        $id_veterinaria = resolverIdVeterinaria();
 
         if (!$id_veterinaria) {
             header('Content-Type: application/json');

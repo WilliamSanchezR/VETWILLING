@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/DisponibilidadUsuario.php';
@@ -13,7 +15,9 @@ switch ($method) {
     case 'GET':
         // Esta variable captura la accion de listar
         $accion = $_GET['action'] ?? '';
-        if ($accion === 'eliminar') {
+        if ($accion === 'horarios') {
+            obtenerDisponibilidadesJson();
+        } else if ($accion === 'eliminar') {
             eliminarAgenda($_GET['id']);
         }
         break;
@@ -75,10 +79,12 @@ function agregarDisponibilidadAgenda()
     // Llamamos al método agregarDisponibilidadAgenda del modelo
     $resultado = $disponibilidadUsuarioModel->agregarDisponibilidadAgenda($data);
 
+    $redirect = $_POST['redirect'] ?? null;
+
     if ($resultado) {
-        mostrarSweetAlert('success', 'Disponibilidad registrada', 'La disponibilidad ha sido registrada exitosamente.');
+        mostrarSweetAlert('success', 'Disponibilidad registrada', 'La disponibilidad ha sido registrada exitosamente.', $redirect);
     } else {
-        mostrarSweetAlert('error', 'Error al registrar', 'Hubo un problema al registrar la disponibilidad.');
+        mostrarSweetAlert('error', 'Error al registrar', 'Hubo un problema al registrar la disponibilidad.', $redirect);
     }
 }
 
@@ -103,10 +109,12 @@ function eliminarAgenda($id_disponibilidad)
     // Llamamos al método eliminarDisponibilidad del modelo
     $resultado = $disponibilidadUsuarioModel->eliminarAgenda($id_disponibilidad);
 
+    $redirect = $_GET['redirect'] ?? null;
+
     if ($resultado) {
-        mostrarSweetAlert('success', 'Disponibilidad eliminada', 'La disponibilidad ha sido eliminada exitosamente.');
+        mostrarSweetAlert('success', 'Disponibilidad eliminada', 'La disponibilidad ha sido eliminada exitosamente.', $redirect);
     } else {
-        mostrarSweetAlert('error', 'Error al eliminar', 'Hubo un problema al eliminar la disponibilidad.');
+        mostrarSweetAlert('error', 'Error al eliminar', 'Hubo un problema al eliminar la disponibilidad.', $redirect);
     }
 }
 
@@ -136,9 +144,50 @@ function editarDisponibilidadAgenda()
     // Llamamos al método editarDisponibilidadAgenda del modelo
     $resultado = $disponibilidadUsuarioModel->editarDisponibilidadAgenda($data);
 
+    $redirect = $_POST['redirect'] ?? null;
+
     if ($resultado) {
-        mostrarSweetAlert('success', 'Disponibilidad actualizada', 'La disponibilidad ha sido actualizada exitosamente.');
+        mostrarSweetAlert('success', 'Disponibilidad actualizada', 'La disponibilidad ha sido actualizada exitosamente.', $redirect);
     } else {
-        mostrarSweetAlert('error', 'Error al actualizar', 'Hubo un problema al actualizar la disponibilidad.');
+        mostrarSweetAlert('error', 'Error al actualizar', 'Hubo un problema al actualizar la disponibilidad.', $redirect);
     }
+}
+
+// Función para obtener disponibilidades en formato JSON (FullCalendar)
+function obtenerDisponibilidadesJson()
+{
+    $id_usuario = $_GET['id_usuario'] ?? ($_SESSION['user']['id_usuario'] ?? null);
+    $id_veterinaria = $_GET['id_veterinaria'] ?? ($_SESSION['user']['id_veterinaria'] ?? null);
+
+    if (empty($id_veterinaria) && !empty($id_usuario)) {
+        $disponibilidadUsuarioModel = new DisponibilidadUsuario();
+        $id_veterinaria = $disponibilidadUsuarioModel->obtenerVeterinariaPorUsuario($id_usuario);
+    }
+
+    if (empty($id_usuario) || empty($id_veterinaria)) {
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Faltan parámetros de usuario o veterinaria']);
+        exit();
+    }
+
+    $disponibilidadUsuarioModel = new DisponibilidadUsuario();
+    $disponibilidades = $disponibilidadUsuarioModel->obtenerDisponibilidadesPorUsuario($id_usuario, $id_veterinaria);
+
+    $businessHours = [];
+    foreach ($disponibilidades as $disponibilidad) {
+        $dia = (int)$disponibilidad['dia_semana'];
+        // FullCalendar usa 0=Domingo ... 6=Sábado
+        $diaFullCalendar = ($dia === 7) ? 0 : $dia;
+
+        $businessHours[] = [
+            'daysOfWeek' => [$diaFullCalendar],
+            'startTime' => substr($disponibilidad['hora_inicio'], 0, 5),
+            'endTime' => substr($disponibilidad['hora_fin'], 0, 5)
+        ];
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode($businessHours);
+    exit();
 }

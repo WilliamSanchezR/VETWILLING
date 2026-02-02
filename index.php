@@ -78,6 +78,22 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/calendario.php';
         break;
 
+    case '/veterinaria/mi-agenda':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/agenda-veterinario.php';
+        break;
+
+    case '/veterinario/agregar-disponibilidad-agenda':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+
+    case '/veterinario/editar-disponibilidad-agenda':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+
+    case '/veterinario/eliminar-disponibilidad-agenda':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
+        break;
+
     // RUTAS DEL CONTROLADOR DE CALENDARIO
     case '/calendario/cargar':
         require BASE_PATH . '/app/controllers/calendarioController.php';
@@ -119,6 +135,10 @@ switch ($request) {
 
     case '/calendario/getSubservicios':
         require BASE_PATH . '/app/controllers/calendarioController.php';
+        break;
+
+    case '/disponibilidad/horarios':
+        require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
         break;
 
     // ╔═══════════════════════════════════════════════════════════════════════╗
