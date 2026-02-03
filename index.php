@@ -309,21 +309,77 @@ switch ($request) {
     // ---------------------------------------PROPIETARIO-------------------------------------//
 
     //PARA LOS CLIENTES Y SUS RUTAS
+    // ═══════════════════════════════════════════════════════════════
+    //  RUTAS DE CITAS PARA CLIENTES
+    // ═══════════════════════════════════════════════════════════════
+
+    // VISTA: Ver todas las citas del cliente
+    case '/cliente/citas':
+        require BASE_PATH . '/app/views/dashboard/cliente/citas.php';
+        break;
+
+    // VISTA: Agendar nueva cita
+    case '/cliente/agendar-cita':
+        require BASE_PATH . '/app/views/dashboard/cliente/agendarCita.php';
+        break;
+
+    // API: Listar citas del cliente
+    case '/cliente/api/citas/listar':
+        require BASE_PATH . '/app/controllers/citasClienteController.php';
+        break;
+
+    // API: Crear cita
+    case '/cliente/api/citas/crear':
+        require BASE_PATH . '/app/controllers/citasClienteController.php';
+        break;
+
+    // API: Cancelar cita
+    case '/cliente/api/citas/cancelar':
+        require BASE_PATH . '/app/controllers/citasClienteController.php';
+        break;
+
+    // API: Modificar cita
+    case '/cliente/api/citas/modificar':
+        require BASE_PATH . '/app/controllers/citasClienteController.php';
+        break;
+
+    // API: Obtener servicios
+    case '/cliente/api/servicios':
+        require BASE_PATH . '/app/controllers/citasClienteController.php';
+        break;
+
+    // API: Obtener subservicios
+    case '/cliente/api/subservicios':
+        require BASE_PATH . '/app/controllers/citasClienteController.php';
+        break;
+
+    // API: Obtener mascotas del cliente
+    case '/cliente/api/mascotas':
+        require BASE_PATH . '/app/controllers/citasClienteController.php';
+        break;
+
+    case '/cliente/cambiar-foto':
+        require BASE_PATH . '/app/controllers/propetarioController.php';
+        break;
+
+
+
+
     case '/cliente/dashboard':
         require BASE_PATH . '/app/views/dashboard/cliente/dashBoard.php';
         break;
     case '/cliente/mascotas':
         require BASE_PATH . '/app/views/dashboard/cliente/mascotas.php';
         break;
-    case '/cliente/citas':
-        require BASE_PATH . '/app/views/dashboard/cliente/citas.php';
-        break;
+    // case '/cliente/citas':
+    //     require BASE_PATH . '/app/views/dashboard/cliente/citas.php';
+    //     break;
     case '/cliente/agenda':
         require BASE_PATH . '/app/views/dashboard/cliente/agenda.php';
         break;
-    case '/cliente/agendar-cita':
-        require BASE_PATH . '/app/views/dashboard/cliente/agendarCita.php';
-        break;
+    // case '/cliente/agendar-cita':
+    //     require BASE_PATH . '/app/views/dashboard/cliente/agendarCita.php';
+    //     break;
     case '/cliente/historial':
         require BASE_PATH . '/app/views/dashboard/cliente/historial.php';
         break;

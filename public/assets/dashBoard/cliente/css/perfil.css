@@ -15,6 +15,103 @@
      margin: 0 auto;
  }
 
+
+
+
+
+
+
+/* Contenedor de la foto de perfil */
+.contenedor-foto {
+    position: relative;
+    /* width: 150px;
+    height: 150px; */
+    /* margin: 0 auto 20px; */
+}
+
+/* Imagen de perfil circular */
+.foto .fotito {
+    width: 140px;
+    height: 140px;
+    border-radius: var(--border-radius-circle);
+    object-fit: cover;
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-lg);
+    transition: all var(--transition-normal);
+}
+
+.foto .fotito:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-green);
+}
+
+/* Ícono de cámara en la esquina inferior derecha */
+.avatar-icon {
+    position: absolute;
+    bottom: 5px;
+    right: -10px;
+    width: 40px;
+    height: 40px;
+    background-color: #0A932C;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.avatar-icon i {
+    color: #fff;
+    font-size: 18px;
+}
+
+/* Hover en el ícono */
+.avatar-icon:hover {
+    background-color: #218838;
+    transform: scale(1.1);
+}
+
+/* Ocultar el input file */
+#upload-logo {
+    display: none;
+}
+
+/* Contenedor principal de la foto */
+.foto {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.foto h3 {
+    margin-top: 15px;
+    color: #333;
+    font-weight: 600;
+}
+
+.foto h4 {
+    color: #666;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.foto h5 {
+    color: #999;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+
+
+
+
+
  /* Header Perfil */
  .header-perfil {
      background: linear-gradient(135deg, #0A932C, #9DE795);
@@ -29,10 +126,10 @@
  }
 
  .avatar-grande {
-     width: 120px;
-     height: 120px;
+     width: 135px;
+     height: 135px;
      border-radius: 50%;
-     background: white;
+     background: #ffffff;
      display: flex;
      align-items: center;
      justify-content: center;
