@@ -789,13 +789,13 @@ $id_usuario = $_SESSION['user']['id_usuario'];
 
     <script>
         // ═══════════════════════════════════════════════════════════
-        //  CONFIGURACIÓN Y CONSTANTES
+        //  CONFIGURACIÓN Y CONSTANTES - ✅ CORREGIDO
         // ═══════════════════════════════════════════════════════════
 
         const BASE_URL = '<?= BASE_URL ?>';
         const URLS = {
-            MIS_CITAS: BASE_URL + '/calendario/cargar?accion=mis_citas',
-            CANCELAR_CITA: BASE_URL + '/cancelarCita'
+            MIS_CITAS: BASE_URL + '/cliente/api/citas/listar?accion=listar',
+            CANCELAR_CITA: BASE_URL + '/cliente/api/citas/cancelar'
         };
 
         let citasData = []; // Almacenar todas las citas
@@ -1273,6 +1273,7 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
+                            accion: 'cancelar', // ✅ AGREGADO
                             id_agendamiento: idCita,
                             motivo_cancelacion: motivo
                         })

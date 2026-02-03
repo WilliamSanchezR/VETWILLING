@@ -3,9 +3,6 @@ require_once BASE_PATH . '/app/controllers/mascotasController.php';
 
 // Obtener las mascotas del propietario actual
 $mascotas = listarMascotas();
-
-// Obtener servicios disponibles (necesitaremos crear esta función)
-// Por ahora, dejamos un array vacío que se llenará dinámicamente con AJAX
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -687,14 +684,14 @@ $mascotas = listarMascotas();
 
     <script>
         // ═══════════════════════════════════════════════════════════
-        //  CONFIGURACIÓN Y CONSTANTES
+        //  CONFIGURACIÓN Y CONSTANTES - ✅ CORREGIDO
         // ═══════════════════════════════════════════════════════════
         
         const BASE_URL = '<?= BASE_URL ?>';
         const URLS = {
-            GET_SERVICIOS: BASE_URL + '/calendario/getServicios',
-            GET_SUBSERVICIOS: BASE_URL + '/calendario/getSubservicios',
-            CREATE_CITA: BASE_URL + '/calendario/storeEvent'
+            GET_SERVICIOS: BASE_URL + '/cliente/api/servicios?accion=servicios',
+            GET_SUBSERVICIOS: BASE_URL + '/cliente/api/subservicios?accion=subservicios',
+            CREATE_CITA: BASE_URL + '/cliente/api/citas/crear'
         };
 
         // ═══════════════════════════════════════════════════════════
@@ -806,7 +803,7 @@ $mascotas = listarMascotas();
             });
 
             // ═══════════════════════════════════════════════════════════
-            //  ENVÍO DEL FORMULARIO
+            //  ENVÍO DEL FORMULARIO - ✅ CORREGIDO
             // ═══════════════════════════════════════════════════════════
             
             const form = document.getElementById('formAgendarCita');
@@ -829,6 +826,7 @@ $mascotas = listarMascotas();
                 // Recopilar datos del formulario
                 const formData = new FormData(form);
                 const data = {
+                    accion: 'crear', // ✅ AGREGADO
                     id_paciente: parseInt(formData.get('id_paciente')),
                     id_servicio: parseInt(formData.get('id_servicio')),
                     id_subservicio: parseInt(formData.get('id_subservicio')),
@@ -837,8 +835,7 @@ $mascotas = listarMascotas();
                     observaciones: formData.get('observaciones') || '',
                     fecha_hora: formatDateForMySQL(new Date(formData.get('fecha_hora'))),
                     fecha_hora_fin: formatDateForMySQL(new Date(formData.get('fecha_hora_fin'))),
-                    estado: 'Pendiente',
-                    allDay: 0
+                    estado: 'Pendiente'
                 };
 
                 console.log('Datos a enviar:', data);
@@ -925,7 +922,7 @@ $mascotas = listarMascotas();
         }
 
         // ═══════════════════════════════════════════════════════════
-        //  FUNCIÓN PARA CARGAR SUBSERVICIOS POR SERVICIO
+        //  FUNCIÓN PARA CARGAR SUBSERVICIOS POR SERVICIO - ✅ CORREGIDO
         // ═══════════════════════════════════════════════════════════
         
         async function cargarSubserviciosPorServicio(idServicio) {
@@ -935,7 +932,7 @@ $mascotas = listarMascotas();
             selectSubservicio.innerHTML = '<option value="">Cargando subservicios...</option>';
 
             try {
-                const response = await fetch(`${URLS.GET_SUBSERVICIOS}?id_servicio=${idServicio}`);
+                const response = await fetch(`${URLS.GET_SUBSERVICIOS}&id_servicio=${idServicio}`); // ✅ Cambiado ? por &
                 const result = await response.json();
 
                 if (result.status === 'success' && result.data.length > 0) {
