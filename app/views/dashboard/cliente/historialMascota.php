@@ -138,56 +138,7 @@ $mascota = consultarMascotaId($id_mascota);
                     <!-- TAB CONSULTAS -->
                     <div class="tab-pane fade show active" id="consultas" role="tabpanel">
                         <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover" id="tablaConsultas">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Fecha</th>
-                                                <th>Motivo</th>
-                                                <th>Veterinario</th>
-                                                <th>Diagnóstico</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>15/12/2024</td>
-                                                <td>Control general</td>
-                                                <td>Dr. García López</td>
-                                                <td>Saludable</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modalDetalleConsulta">
-                                                        <i class="bi bi-eye"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>03/11/2024</td>
-                                                <td>Vómitos frecuentes</td>
-                                                <td>Dra. Martínez</td>
-                                                <td>Gastritis leve</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-info">
-                                                        <i class="bi bi-eye"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>20/09/2024</td>
-                                                <td>Vacunación anual</td>
-                                                <td>Dr. García López</td>
-                                                <td>N/A</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-info">
-                                                        <i class="bi bi-eye"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalSolicitarConsulta">Solicitar Consulta</button>
                         </div>
                     </div>
 
@@ -288,7 +239,7 @@ $mascota = consultarMascotaId($id_mascota);
                                                 <th>Procedimiento</th>
                                                 <th>Veterinario</th>
                                                 <th>Notas</th>
-                                                <th>Detalles</th>
+                                                <!-- <th>Detalles</th> -->
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -297,11 +248,11 @@ $mascota = consultarMascotaId($id_mascota);
                                                 <td>Castración</td>
                                                 <td>Dr. Ramírez</td>
                                                 <td>Procedimiento sin complicaciones</td>
-                                                <td>
+                                                <!-- <td>
                                                     <button class="btn btn-sm btn-info">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
-                                                </td>
+                                                </td> -->
                                             </tr>
                                         </tbody>
                                     </table>

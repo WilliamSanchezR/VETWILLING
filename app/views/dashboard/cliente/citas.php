@@ -1,4 +1,12 @@
 <?php
+require_once BASE_PATH . '/app/controllers/mascotasController.php';
+
+// Obtener las mascotas del propietario actual
+$mascotas = listarMascotas();
+
+// Obtener servicios disponibles (necesitaremos crear esta función)
+// Por ahora, dejamos un array vacío que se llenará dinámicamente con AJAX
+$Citas = [];
 // Iniciar sesión si no está iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -740,9 +748,11 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 <div class="filtros-avanzados">
                     <div class="filtro-grupo">
                         <label>Mascota</label>
-                        <select id="filtro-mascota">
-                            <option value="">Todas las mascotas</option>
-                            <!-- Se llenarán dinámicamente -->
+                        <select>
+                            <option>Todas las mascotas</option>
+                            <?php foreach ($mascotas as $mascota): ?>
+                                <option value="<?= $mascota['id_paciente'] ?>"><?= htmlspecialchars($mascota['nombre']) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
@@ -779,6 +789,43 @@ $id_usuario = $_SESSION['user']['id_usuario'];
 
             </div>
 
+                        <!-- Cita Urgente -->
+                        <div class="cita-card urgente">
+                            <div class="cita-hora">
+                                <div class="hora-numero">09:00</div>
+                                <div class="hora-periodo">AM</div>
+                            </div>
+                            <div class="mascota-avatar-grande">
+                                <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= $mascota['img_mascota'] ?>"
+                                    alt="<?= htmlspecialchars($mascota['nombre']) ?>"
+                                    style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover;">
+                            </div>
+
+                            <div class="cita-info">
+                                <div class="cita-titulo">
+                                    Control de Urgencia - <?= htmlspecialchars($mascota['nombre']) ?>
+                                    <span class="tipo-badge emergencia">Emergencia</span>
+                                </div>
+
+                                <div class="cita-detalles">
+                                    <div class="detalle">
+                                        <i class="bi bi-person"></i>
+                                        <span>Dr. Juan Martínez</span>
+                                    </div>
+                                    <div class="detalle">
+                                        <i class="bi bi-geo-alt"></i>
+                                        <span>Consultorio 2</span>
+                                    </div>
+                                    <div class="detalle">
+                                        <i class="bi bi-clock"></i>
+                                        <span>30 minutos</span>
+                                    </div>
+                                </div>
+
+                                <div class="cita-notas">
+                                    <strong>Motivo:</strong> Revisión por vómito recurrente. Traer ayuno de 8 horas.
+                                </div>
+                            </div>
         </div>
 
     </main>

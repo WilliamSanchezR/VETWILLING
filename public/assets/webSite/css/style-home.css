@@ -1272,3 +1272,17 @@ h6 {
         height: 280px;
     }
 }
+@media (max-width: 768px) {
+    .trust-badges {
+        justify-content: space-around;
+        gap: 0;
+    }
+
+    .trust-badge span {
+        display: none;
+    }
+
+    .trust-badge i {
+        font-size: 1.4rem;
+    }
+}
