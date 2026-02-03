@@ -170,7 +170,7 @@ $mascotas = listarMascotas();
                                     </a>
 
                                     <button type="button"
-                                        class="action-btn action-btn-primary btn-link p-0"
+                                        class="action-btn action-btn-primary btn-link p-0 btn-eliminar-mascota"
                                         data-id="<?= $m['id_paciente'] ?>"
                                         data-nombre="<?= htmlspecialchars($m['nombre']) ?>"
                                         title="Eliminar mascota">

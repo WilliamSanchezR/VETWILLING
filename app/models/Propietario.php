@@ -194,4 +194,28 @@ class Propietario
             return false;
         }
     }
+
+    public function fotoPerfil($data)
+    {
+        // Actualizamos la foto de perfil del usuario
+        try {
+            $sql = "UPDATE propietario SET img_perfil = :img_perfil
+                    WHERE id_usuario = :id_usuario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $data['id_usuario']);
+            $stmt->bindParam(':img_perfil', $data['img_perfil']);
+
+            $ok = $stmt->execute();
+            // Verificamos si la actualización fue exitosa
+            if ($ok) {
+                return true;
+            }
+
+           
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::actualizarFotoPerfil -> " . $e->getMessage());
+            return false;
+        }
+    }
 }

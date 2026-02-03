@@ -130,7 +130,7 @@ function registrarUsuario()
             'success',
             'Usuario registrado',
             'El usuario ha sido creado correctamente',
-            '/vetwilling/admin/registro-usuario'
+            '/vetwilling/admin/listar-usuarios'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo registrar el usuario');

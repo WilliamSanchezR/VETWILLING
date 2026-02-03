@@ -1,6 +1,12 @@
 <?php
 require_once BASE_PATH . '/app/controllers/mascotasController.php';
 
+require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+
+$rol = $_SESSION['user']['id_rol'];
+$id = $_SESSION['user']['id_usuario'];
+$usuario = mostrarPerfil($id);
+
 $mascotas = listarMascotas();
 ?>
 
@@ -47,10 +53,16 @@ $mascotas = listarMascotas();
                 <!-- Header Perfil -->
                 <div class="header-perfil">
                     <div class="avatar-grande">
-                        <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
-                        <div class="avatar-edit">
-                            <i class="bi bi-camera-fill" style="color: white; font-size: 16px;"></i>
-                        </div>
+                        <form class="contenedor-foto" id="form_cambio_imagen" action="<?= BASE_URL ?>/cliente/cambiar-foto" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="id_usuario" value="<?= $id ?>">
+                            <input type="hidden" name="accion" value="cambiar-foto">
+                            <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" class="fotito"
+                                alt="Pedro Perez" width="100">
+                            <div class="avatar-icon">
+                                <i class="bi bi-camera-fill"></i>
+                            </div>
+                            <input type="file" id="upload-logo" accept="image/*" name="img_perfil">
+                        </form>
                     </div>
                     <div class="info-perfil-header">
                         <h1><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h1>
@@ -224,6 +236,15 @@ $mascotas = listarMascotas();
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
     <!-- JavaScript -->
     <script>
+        document.querySelector('.avatar-icon').addEventListener('click', () => {
+            document.getElementById('upload-logo').click();
+        });
+
+        document.getElementById('upload-logo').addEventListener('change', function() {
+
+            document.getElementById('form_cambio_imagen').submit();
+        });
+
         // Tabs
         document.querySelectorAll('.tab-perfil').forEach(tab => {
             tab.addEventListener('click', function() {

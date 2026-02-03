@@ -152,8 +152,12 @@ $mascota = consultarMascotaId($id_mascota);
                                     <span class="required">*</span>
                                 </label>
                                 <select id="raza" name="raza" required>
-                                    <option value="">Selecciona una raza</option>
+                                     <option value="<?= $mascota['raza'] ?>"><?= $mascota['raza'] ?></option>
+                                     <option value="Boxer">Boxer</option>
+                                        <option value="Angora">Angora</option>
                                 </select>
+
+                                 
                             </div>
                         </div>
                 </div>

@@ -12,6 +12,8 @@ switch ($method) {
 
         if ($accion === 'actualizar') {
             actualizarPropietario();
+        }else if ($accion === 'cambiar-foto') {
+            fotoPerfil();
         }
         break;
 
@@ -135,6 +137,88 @@ function eliminarPropietario($id)
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar');
+    }
+
+    exit();
+}
+
+
+// FUNCION PARA CAMBIAR LA FOTO DE PERFIL 
+function fotoPerfil()
+{
+    session_start();
+    
+    $id_usuario = $_POST['id_usuario'] ?? '';
+
+    if (empty($id_usuario)) {
+        mostrarSweetAlert('error', 'Error', 'ID de usuario no proporcionado');
+        exit();
+    }
+
+    if (isset($_FILES['img_perfil']) && $_FILES['img_perfil']['error'] === UPLOAD_ERR_OK) {
+
+        $file = $_FILES['img_perfil'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitidas = ['png', 'jpg', 'jpeg', 'webp'];
+        
+        // Validar extensión
+        if (!in_array($ext, $permitidas)) {
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG o WEBP');
+            exit();
+        }
+        
+        // Validar tamaño (2MB máximo)
+        if ($file['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Archivo muy grande', 'La foto no debe superar los 2MB');
+            exit();
+        }
+        
+        // Obtener la foto anterior para eliminarla
+        $objVeterinario = new Propietario();
+        $veterinarioActual = $objVeterinario->consultarPropietario($id_usuario);
+        $fotoAnterior = $veterinarioActual['img_perfil'] ?? null;
+        
+        // Generar nombre único
+        $img_perfil = uniqid('vet_') . '.' . $ext;
+        $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
+        
+        // Mover archivo
+        if (move_uploaded_file($file['tmp_name'], $destino)) {
+            
+            // Actualizar en base de datos
+            $data = [
+                'id_usuario' => $id_usuario,
+                'img_perfil' => $img_perfil
+            ];
+            
+            $resultado = $objVeterinario->fotoPerfil($data);
+            
+            if ($resultado) {
+                // Eliminar foto anterior si existe y no es la por defecto
+                if ($fotoAnterior && $fotoAnterior !== 'foto_default.jpg') {
+                    $rutaAnterior = BASE_PATH . '/public/uploads/usuarios/' . $fotoAnterior;
+                    if (file_exists($rutaAnterior)) {
+                        unlink($rutaAnterior);
+                    }
+                }
+                
+                // Actualizar sesión
+                $_SESSION['user']['img_perfil'] = $img_perfil;
+                
+                mostrarSweetAlert(
+                    'success',
+                    '¡Foto actualizada!',
+                    'Tu foto de perfil se ha actualizado correctamente',
+                    '/vetwilling/cliente/perfil'
+                );
+            } else {
+                mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la imagen en la base de datos');
+            }
+        } else {
+            mostrarSweetAlert('error', 'Error', 'No se pudo guardar la imagen');
+        }
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se ha seleccionado ninguna imagen');
     }
 
     exit();

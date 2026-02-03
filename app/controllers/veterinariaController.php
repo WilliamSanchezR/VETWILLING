@@ -104,7 +104,7 @@ function registrarVeterinaria()
             'success',
             'Veterinaria registrada',
             'La veterinaria ha sido creada correctamente',
-            '/vetwilling/admin/registro-veterinaria'
+            '/vetwilling/admin/listar-veterinarias'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo registrar la veterinaria');
