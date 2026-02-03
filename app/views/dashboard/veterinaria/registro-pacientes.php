@@ -8,7 +8,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laboratorio - Registro Paciente</title>
+    <title>Registro Paciente</title>
     <!-- Icono de la página -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
