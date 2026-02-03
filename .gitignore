@@ -1,9 +1,14 @@
 /vendor/
 
-/public/uploads/usuarios/*
-
-/public/uploads/veterinarios/*
+/public/uploads/firmas/*
 
 /public/uploads/mascotas/*
 
+/public/uploads/profesionales/*
+
+/public/uploads/usuarios/*
+
 /public/uploads/veterinaria/*
+
+/public/uploads/veterinarios/*
+
