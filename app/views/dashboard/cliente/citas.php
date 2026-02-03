@@ -6,6 +6,7 @@ $mascotas = listarMascotas();
 
 // Obtener servicios disponibles (necesitaremos crear esta función)
 // Por ahora, dejamos un array vacío que se llenará dinámicamente con AJAX
+$Citas = [];
 ?>
 
 <!DOCTYPE html>
@@ -106,9 +107,9 @@ $mascotas = listarMascotas();
                         <label>Mascota</label>
                         <select>
                             <option>Todas las mascotas</option>
-                            <option>Max</option>
-                            <option>Luna</option>
-                            <option>Rocky</option>
+                            <?php foreach ($mascotas as $mascota): ?>
+                                <option value="<?= $mascota['id_paciente'] ?>"><?= htmlspecialchars($mascota['nombre']) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
@@ -154,12 +155,15 @@ $mascotas = listarMascotas();
                                 <div class="hora-numero">09:00</div>
                                 <div class="hora-periodo">AM</div>
                             </div>
-
-                            <div class="cita-mascota-avatar">🐕</div>
+                            <div class="mascota-avatar-grande">
+                                <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= $mascota['img_mascota'] ?>"
+                                    alt="<?= htmlspecialchars($mascota['nombre']) ?>"
+                                    style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover;">
+                            </div>
 
                             <div class="cita-info">
                                 <div class="cita-titulo">
-                                    Control de Urgencia - Max
+                                    Control de Urgencia - <?= htmlspecialchars($mascota['nombre']) ?>
                                     <span class="tipo-badge emergencia">Emergencia</span>
                                 </div>
 

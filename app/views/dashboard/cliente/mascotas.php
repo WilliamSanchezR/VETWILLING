@@ -108,7 +108,6 @@ $mascotas = listarMascotas();
                                 <!-- INFO PRINCIPAL -->
                                 <div class="mascota-info-header">
                                     <h3><?= htmlspecialchars($m['nombre']) ?></h3>
-                                    <p><?= htmlspecialchars($m['raza']) ?></p>
                                     <div>
                                         <span class="mascota-chip"><?= htmlspecialchars($m['sexo']) ?></span>
                                         <span class="mascota-chip">Activo</span>
@@ -157,6 +156,19 @@ $mascotas = listarMascotas();
                                 <!-- BOTONES -->
                                 <div class="mascota-actions">
 
+                                    <a href="<?= BASE_URL ?>/cliente/historial-mascota?id=<?= $m['id_paciente'] ?>" class="action-btn action-btn-info">
+                                        <i class="bi bi-file-medical"></i> Ver Historial
+                                    </a>
+
+                                    <a href="<?= BASE_URL ?>/cliente/vacunas-mascota?id=<?= $m['id_paciente'] ?>" class="action-btn action-btn-success">
+                                         Vacunas
+                                    </a>
+
+                                    <a href="<?= BASE_URL ?>/cliente/editar-mascota?id=<?= $m['id_paciente'] ?>"
+                                        class="action-btn action-btn-secondary">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+
                                     <button type="button"
                                         class="action-btn action-btn-primary btn-link p-0"
                                         data-id="<?= $m['id_paciente'] ?>"
@@ -164,19 +176,6 @@ $mascotas = listarMascotas();
                                         title="Eliminar mascota">
                                         <i class="fa-solid fa-trash-can"></i>Eliminar
                                     </button>
-
-                                    <a href="<?= BASE_URL ?>/cliente/historial-mascota?id=<?= $m['id_paciente'] ?>" class="action-btn action-btn-info">
-                                        <i class="bi bi-file-medical"></i> Ver Historial
-                                    </a>
-
-                                    <a href="<?= BASE_URL ?>/cliente/vacunas-mascota?id=<?= $m['id_paciente'] ?>" class="action-btn action-btn-success">
-                                        <i class="bi bi-syringe"></i> Vacunas
-                                    </a>
-
-                                    <a href="<?= BASE_URL ?>/cliente/editar-mascota?id=<?= $m['id_paciente'] ?>"
-                                        class="action-btn action-btn-secondary">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </a>
 
                                 </div>
 

@@ -15,9 +15,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 90%;
+    max-width: 100%;
     position: relative;
-    left: 4%;
+    left: 0%;
+    width: 100%;
 }
 
 .header-info h1 {
@@ -323,6 +324,9 @@
 .radio-option input[type="radio"]:checked+.radio-label {
     border-color: #0A932C;
     background: linear-gradient(135deg, #0A932C, #0A932C);
+    color: white;
+}
+.radio-option input[type="radio"]:checked+.radio-label i {
     color: white;
 }
 
