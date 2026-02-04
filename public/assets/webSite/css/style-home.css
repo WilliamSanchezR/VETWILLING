@@ -30,7 +30,20 @@
 html {
     scroll-behavior: smooth;
 }
+/* Agregar al final del archivo, en UTILIDADES (sección 13) */
 
+section[id] {
+    scroll-margin-top: 110px;
+}
+
+/* O específicamente para cada sección: */
+#hero,
+#sobre-nosotros,
+#modulos,
+#precios,
+#equipo {
+    scroll-margin-top: 110px;
+}
 body {
     font-family: var(--fuente-texto);
     color: var(--color-texto);

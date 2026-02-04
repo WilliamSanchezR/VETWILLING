@@ -161,7 +161,7 @@ $mascotas = listarMascotas();
                                     </a>
 
                                     <a href="<?= BASE_URL ?>/cliente/vacunas-mascota?id=<?= $m['id_paciente'] ?>" class="action-btn action-btn-success">
-                                         Vacunas
+                                        <i class="fas fa-syringe"></i> Vacunas
                                     </a>
 
                                     <a href="<?= BASE_URL ?>/cliente/editar-mascota?id=<?= $m['id_paciente'] ?>"
