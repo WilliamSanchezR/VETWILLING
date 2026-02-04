@@ -350,14 +350,7 @@ $mascota = consultarMascotaId($id_mascota);
                             Ejemplo: Para un cachorro de 3 meses, ingresa "3" y selecciona "Meses"
                         </small>
                     </div>
-
-                    <style>
-                        .edad-container .form-control:focus {
-                            border-color: #1b8f72;
-                            box-shadow: 0 0 0 0.2rem rgba(27, 143, 114, 0.25);
-                            outline: none;
-                        }
-                    </style>
+                        
 
                     <script>
                         // Agregar este script al final de tu página (después del script de preview de imagen)

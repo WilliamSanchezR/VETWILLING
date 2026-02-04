@@ -1,4 +1,12 @@
 <?php
+require_once BASE_PATH . '/app/controllers/mascotasController.php';
+
+// Obtener las mascotas del propietario actual
+$mascotas = listarMascotas();
+
+// Obtener servicios disponibles (necesitaremos crear esta función)
+// Por ahora, dejamos un array vacío que se llenará dinámicamente con AJAX
+$Citas = [];
 // Iniciar sesión si no está iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -10,13 +18,11 @@ if (!isset($_SESSION['user']['id_usuario'])) {
     exit();
 }
 
-<<<<<<< HEAD
 // Obtener servicios disponibles (necesitaremos crear esta función)
 // Por ahora, dejamos un array vacío que se llenará dinámicamente con AJAX
 $Citas = [];
-=======
+
 $id_usuario = $_SESSION['user']['id_usuario'];
->>>>>>> 06725c7a64e01304736ea7645a70097e019e6b6e
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -746,17 +752,13 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 <div class="filtros-avanzados">
                     <div class="filtro-grupo">
                         <label>Mascota</label>
-<<<<<<< HEAD
+
                         <select>
                             <option>Todas las mascotas</option>
                             <?php foreach ($mascotas as $mascota): ?>
                                 <option value="<?= $mascota['id_paciente'] ?>"><?= htmlspecialchars($mascota['nombre']) ?></option>
                             <?php endforeach; ?>
-=======
-                        <select id="filtro-mascota">
-                            <option value="">Todas las mascotas</option>
-                            <!-- Se llenarán dinámicamente -->
->>>>>>> 06725c7a64e01304736ea7645a70097e019e6b6e
+
                         </select>
                     </div>
 
@@ -783,18 +785,17 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 </div>
 
                 <!-- Timeline de Citas -->
-<<<<<<< HEAD
-                <div class="citas-timeline">
 
-                    <!-- Hoy -->
-                    <div class="timeline-dia">
-                        <div class="dia-header">
-                            <div class="dia-fecha">
-                                <h3>Viernes, 22 de Noviembre</h3>
-                                <p>Hoy</p>
-                            </div>
-                            <span class="dia-badge">2 citas</span>
-                        </div>
+                <div class="citas-timeline">
+                <div class="citas-timeline" id="citasContainer">
+                    <!-- Loading inicial -->
+                    <div class="loading-container">
+                        <div class="spinner"></div>
+                        <p>Cargando tus citas...</p>
+                    </div>
+                </div>
+
+            </div>
 
                         <!-- Cita Urgente -->
                         <div class="cita-card urgente">
@@ -833,84 +834,16 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                                     <strong>Motivo:</strong> Revisión por vómito recurrente. Traer ayuno de 8 horas.
                                 </div>
                             </div>
-
-                            <div class="cita-acciones">
-                                <button class="btn-accion btn-ver">
-                                    <i class="bi bi-eye"></i>
-                                    Ver Detalles
-                                </button>
-                                <button class="btn-accion btn-reagendar">
-                                    <i class="bi bi-calendar"></i>
-                                    Reagendar
-                                </button>
-                                <button class="btn-accion btn-cancelar">
-                                    <i class="bi bi-x-circle"></i>
-                                    Cancelar
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Cita Normal -->
-                        <div class="cita-card">
-                            <div class="cita-hora">
-                                <div class="hora-numero">03:00</div>
-                                <div class="hora-periodo">PM</div>
-                            </div>
-
-                            <div class="cita-mascota-avatar">🐈</div>
-
-                            <div class="cita-info">
-                                <div class="cita-titulo">
-                                    Baño y Peluquería - Luna
-                                    <span class="tipo-badge bano">Estética</span>
-                                </div>
-
-                                <div class="cita-detalles">
-                                    <div class="detalle">
-                                        <i class="bi bi-person"></i>
-                                        <span>María López (Peluquera)</span>
-                                    </div>
-                                    <div class="detalle">
-                                        <i class="bi bi-geo-alt"></i>
-                                        <span>Sala de Estética</span>
-                                    </div>
-                                    <div class="detalle">
-                                        <i class="bi bi-clock"></i>
-                                        <span>1 hora</span>
-                                    </div>
-                                </div>
-
-                                <div class="cita-notas">
-                                    <strong>Servicio:</strong> Baño completo, corte de uñas y limpieza de oídos.
-                                </div>
-                            </div>
-
-                            <div class="cita-acciones">
-                                <button class="btn-accion btn-ver">
-                                    <i class="bi bi-eye"></i>
-                                    Ver Detalles
-                                </button>
-                                <button class="btn-accion btn-reagendar">
-                                    <i class="bi bi-calendar"></i>
-                                    Reagendar
-                                </button>
-                                <button class="btn-accion btn-cancelar">
-                                    <i class="bi bi-x-circle"></i>
-                                    Cancelar
-                                </button>
-                            </div>
-                        </div>
-=======
                 <div class="citas-timeline" id="citasContainer">
                     <!-- Loading inicial -->
                     <div class="loading-container">
                         <div class="spinner"></div>
                         <p>Cargando tus citas...</p>
->>>>>>> 06725c7a64e01304736ea7645a70097e019e6b6e
                     </div>
                 </div>
 
             </div>
+
 
         </div>
 

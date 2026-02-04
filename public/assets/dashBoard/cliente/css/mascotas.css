@@ -640,29 +640,25 @@ body {
 }
 
 .action-btn-success {
-    background: var(--color-success);
-    color: var(--color-bg-white);
+    background: #0a9b4247;
+    color: #0a9b42;
 }
 
-.action-btn-success i {
-    color: var(--color-bg-white);
-}
 
 .action-btn-success:hover {
-    background: var(--color-success-dark);
+    background: #0a9b42;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
-}
+    color: var(--color-bg-white);}
 
 .action-btn-info {
-    background: var(--color-info);
-    color: var(--color-bg-white);
+    background: #17a2b82e;
+    color: #17a2b8;
 }
 
 .action-btn-info:hover {
     background: var(--color-info-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+    color: var(--color-bg-white);
 }
 
 .action-btn-danger {
