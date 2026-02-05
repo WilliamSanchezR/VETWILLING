@@ -2,7 +2,7 @@
 
 /**
  * ═══════════════════════════════════════════════════════════════════
- *  MODELO DE CITAS PARA CLIENTES/PROPIETARIOS
+ *  MODELO DE CITAS PARA CLIENTES/PROPIETARIOS - ✅ CORREGIDO
  *  Archivo: CitasCliente.php
  *  Descripción: Maneja todas las operaciones de BD para citas de clientes
  * ═══════════════════════════════════════════════════════════════════
@@ -20,40 +20,36 @@ class CitasCliente
         $this->conexion = $db->getConexion();
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  RFS 33: CREAR CITA
-    // ═══════════════════════════════════════════════════════════════════
-/**
- * Obtiene el id_propietario a partir del id_usuario
- *
- * @param int $id_usuario
- * @return int|null
- */
-public function obtenerIdPropietarioPorUsuario($id_usuario)
-{
-    try {
-        $sql = "SELECT id_propietario
-                FROM propietario
-                WHERE id_usuario = :id_usuario
-                LIMIT 1";
+    /**
+     * Obtiene el id_propietario a partir del id_usuario
+     *
+     * @param int $id_usuario
+     * @return int|null
+     */
+    public function obtenerIdPropietarioPorUsuario($id_usuario)
+    {
+        try {
+            $sql = "SELECT id_propietario
+                    FROM propietario
+                    WHERE id_usuario = :id_usuario
+                    LIMIT 1";
 
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
-        $stmt->execute();
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
 
-        $id = $stmt->fetchColumn();
-        return $id ? (int)$id : null;
+            $id = $stmt->fetchColumn();
+            return $id ? (int)$id : null;
 
-    } catch (PDOException $e) {
-        error_log("❌ Error obtenerIdPropietarioPorUsuario -> " . $e->getMessage());
-        return null;
+        } catch (PDOException $e) {
+            error_log("❌ Error obtenerIdPropietarioPorUsuario -> " . $e->getMessage());
+            return null;
+        }
     }
-}
-
-
 
     /**
      * Crea una nueva cita en la base de datos
+     * ✅ CORREGIDO: Manejo adecuado de valores NULL
      * 
      * @param array $datos - Datos de la cita
      * @return int|false - ID de la cita creada o false si falla
@@ -89,24 +85,37 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
             $stmt = $this->conexion->prepare($sql);
 
-            // Bind de parámetros
-            $stmt->bindParam(':id_propietario', $datos['id_propietario'], PDO::PARAM_INT);
-            $stmt->bindParam(':id_paciente', $datos['id_paciente'], PDO::PARAM_INT);
-            $stmt->bindParam(':id_servicio', $datos['id_servicio'], PDO::PARAM_INT);
-            $stmt->bindParam(':id_subservicio', $datos['id_subservicio'], PDO::PARAM_INT);
-            $stmt->bindParam(':id_especialidad', $datos['id_especialidad'], PDO::PARAM_INT);
-            $stmt->bindParam(':tipo', $datos['tipo'], PDO::PARAM_STR);
-            $stmt->bindParam(':observaciones', $datos['observaciones'], PDO::PARAM_STR);
-            $stmt->bindParam(':fecha_hora', $datos['fecha_hora'], PDO::PARAM_STR);
-            $stmt->bindParam(':fecha_hora_fin', $datos['fecha_hora_fin'], PDO::PARAM_STR);
-            $stmt->bindParam(':estado', $datos['estado'], PDO::PARAM_STR);
-
-            // id_usuario puede ser NULL si aún no se asigna veterinario
-            $id_usuario = $datos['id_usuario'] ?? null;
-            if ($id_usuario === null) {
-                $stmt->bindValue(':id_usuario', null, PDO::PARAM_NULL);
+            // ✅ CORRECCIÓN: Usar bindValue para campos que pueden ser NULL
+            
+            // id_propietario - puede ser NULL
+            if (isset($datos['id_propietario']) && $datos['id_propietario'] !== null) {
+                $stmt->bindValue(':id_propietario', (int)$datos['id_propietario'], PDO::PARAM_INT);
             } else {
-                $stmt->bindValue(':id_usuario', $id_usuario, PDO::PARAM_INT);
+                $stmt->bindValue(':id_propietario', null, PDO::PARAM_NULL);
+            }
+
+            // Campos requeridos (NOT NULL)
+            $stmt->bindValue(':id_paciente', (int)$datos['id_paciente'], PDO::PARAM_INT);
+            $stmt->bindValue(':id_servicio', (int)$datos['id_servicio'], PDO::PARAM_INT);
+            $stmt->bindValue(':id_subservicio', (int)$datos['id_subservicio'], PDO::PARAM_INT);
+            $stmt->bindValue(':id_especialidad', (int)$datos['id_especialidad'], PDO::PARAM_INT);
+            $stmt->bindValue(':tipo', $datos['tipo'], PDO::PARAM_STR);
+            $stmt->bindValue(':fecha_hora', $datos['fecha_hora'], PDO::PARAM_STR);
+            $stmt->bindValue(':fecha_hora_fin', $datos['fecha_hora_fin'], PDO::PARAM_STR);
+            $stmt->bindValue(':estado', $datos['estado'], PDO::PARAM_STR);
+
+            // observaciones - puede ser NULL
+            if (isset($datos['observaciones']) && $datos['observaciones'] !== null && $datos['observaciones'] !== '') {
+                $stmt->bindValue(':observaciones', $datos['observaciones'], PDO::PARAM_STR);
+            } else {
+                $stmt->bindValue(':observaciones', null, PDO::PARAM_NULL);
+            }
+
+            // id_usuario - puede ser NULL (veterinario aún no asignado)
+            if (isset($datos['id_usuario']) && $datos['id_usuario'] !== null) {
+                $stmt->bindValue(':id_usuario', (int)$datos['id_usuario'], PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue(':id_usuario', null, PDO::PARAM_NULL);
             }
 
             $resultado = $stmt->execute();
@@ -116,21 +125,28 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
             }
 
             return false;
+            
         } catch (PDOException $e) {
             error_log("❌ Error en CitasCliente::crearCita -> " . $e->getMessage());
+            // Registro local para depuración accesible desde el proyecto
+            $dir = __DIR__ . '/../logs';
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+            $file = $dir . '/citas_error.log';
+            $ts = date('Y-m-d H:i:s');
+            $info = isset($e->errorInfo) ? print_r($e->errorInfo, true) : 'sin errorInfo';
+            $entry = "[{$ts}] CitasCliente::crearCita EXCEPTION: " . $e->getMessage() . " | errorInfo: " . $info . "\n";
+            @file_put_contents($file, $entry, FILE_APPEND | LOCK_EX);
             return false;
         }
     }
-
-    // ═══════════════════════════════════════════════════════════════════
-    //  RFS 34: LISTAR CITAS
-    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Lista todas las citas de un propietario con filtros opcionales
      * 
      * @param int $id_propietario - ID del propietario
-     * @param array $filtros - Filtros opcionales (estado, fecha_inicio, fecha_fin, id_paciente)
+     * @param array $filtros - Filtros opcionales
      * @return array - Array de citas
      */
     public function listarCitasPropietario($id_propietario, $filtros = [])
@@ -144,40 +160,34 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
                         a.fecha_hora_fin,
                         a.estado,
                         
-                        -- Propietario
                         pr.id_propietario,
                         CONCAT(pr.nombres, ' ', pr.apellidos) as propietario_nombre,
                         pr.telefono as propietario_telefono,
                         
-                        -- Mascota
                         pac.id_paciente,
                         pac.nombre as mascota_nombre,
                         pac.especie as mascota_especie,
                         pac.raza as mascota_raza,
                         
-                        -- Servicio
                         s.id_servicio,
                         s.nombre as servicio_nombre,
                         
-                        -- Subservicio
                         sub.id_subservicio,
                         sub.nombre as subservicio_nombre,
                         sub.costo as subservicio_costo,
                         
-                        -- Veterinario
-                        u.id_usuario,
-                        CONCAT(u.nombres, ' ', u.apellidos) as veterinario_nombre
+                        a.id_usuario,
+                        COALESCE(CONCAT(v.nombres, ' ', v.apellidos), 'No asignado') as veterinario_nombre
                         
                     FROM agendamiento a
                     INNER JOIN propietario pr ON a.id_propietario = pr.id_propietario
                     INNER JOIN paciente pac ON a.id_paciente = pac.id_paciente
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
-                    LEFT JOIN usuario u ON a.id_usuario = u.id_usuario
+                    LEFT JOIN veterinario v ON a.id_usuario = v.id_usuario
                     
                     WHERE a.id_propietario = :id_propietario";
 
-            // Aplicar filtros
             $params = ['id_propietario' => $id_propietario];
 
             if (!empty($filtros['estado'])) {
@@ -213,21 +223,21 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("❌ Error en CitasCliente::listarCitasPropietario -> " . $e->getMessage());
+            // Registro local accesible en el proyecto
+            $dir = __DIR__ . '/../logs';
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+            $file = $dir . '/citas_error.log';
+            $ts = date('Y-m-d H:i:s');
+            $entry = "[{$ts}] CitasCliente::listarCitasPropietario EXCEPTION: " . $e->getMessage() . " | SQL: " . (isset($sql) ? $sql : 'no_sql') . "\n";
+            @file_put_contents($file, $entry, FILE_APPEND | LOCK_EX);
             return [];
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  RFS 35: MODIFICAR CITA
-    // ═══════════════════════════════════════════════════════════════════
-
     /**
      * Modifica las fechas de una cita
-     * 
-     * @param int $id_agendamiento - ID de la cita
-     * @param string $fecha_hora - Nueva fecha y hora de inicio
-     * @param string $fecha_hora_fin - Nueva fecha y hora de fin
-     * @return bool - true si se actualizó correctamente
      */
     public function modificarFechasCita($id_agendamiento, $fecha_hora, $fecha_hora_fin)
     {
@@ -250,15 +260,8 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  RFS 36: CANCELAR CITA
-    // ═══════════════════════════════════════════════════════════════════
-
     /**
      * Valida si una cita puede ser cancelada
-     * 
-     * @param int $id_agendamiento - ID de la cita
-     * @return array - ['valido' => bool, 'mensaje' => string, 'estado_actual' => string]
      */
     public function validarEstadoCita($id_agendamiento)
     {
@@ -307,11 +310,6 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
     /**
      * Registra el motivo de cancelación
-     * 
-     * @param int $id_agendamiento - ID de la cita
-     * @param string $motivo - Motivo de cancelación
-     * @param int $id_usuario - ID del usuario que cancela
-     * @return array - ['exito' => bool, 'mensaje' => string]
      */
     public function registrarMotivoCancelacion($id_agendamiento, $motivo, $id_usuario = null)
     {
@@ -351,9 +349,6 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
     /**
      * Actualiza el estado de la cita a Cancelada
-     * 
-     * @param int $id_agendamiento - ID de la cita
-     * @return array - ['exito' => bool, 'mensaje' => string]
      */
     public function actualizarEstadoCancelada($id_agendamiento)
     {
@@ -380,16 +375,8 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  FUNCIONES DE VALIDACIÓN
-    // ═══════════════════════════════════════════════════════════════════
-
     /**
      * Verifica que una mascota pertenezca a un propietario
-     * 
-     * @param int $id_paciente - ID de la mascota
-     * @param int $id_propietario - ID del propietario
-     * @return bool - true si la mascota pertenece al propietario
      */
     public function verificarMascotaPropietario($id_paciente, $id_propietario)
     {
@@ -414,10 +401,6 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
     /**
      * Verifica que una cita pertenezca a un propietario
-     * 
-     * @param int $id_agendamiento - ID de la cita
-     * @param int $id_propietario - ID del propietario
-     * @return bool - true si la cita pertenece al propietario
      */
     public function verificarCitaPropietario($id_agendamiento, $id_propietario)
     {
@@ -442,11 +425,6 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
     /**
      * Verifica disponibilidad de horario
-     * 
-     * @param string $fecha_inicio - Fecha y hora de inicio
-     * @param string $fecha_fin - Fecha y hora de fin
-     * @param int|null $id_agendamiento - ID de cita a excluir (para modificaciones)
-     * @return bool - true si está disponible
      */
     public function verificarDisponibilidad($fecha_inicio, $fecha_fin, $id_agendamiento = null)
     {
@@ -482,11 +460,6 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
     /**
      * Obtiene citas que causan conflicto de horario
-     * 
-     * @param string $fecha_inicio - Fecha y hora de inicio
-     * @param string $fecha_fin - Fecha y hora de fin
-     * @param int|null $id_agendamiento - ID de cita a excluir
-     * @return array - Array de citas en conflicto
      */
     public function obtenerCitasConflicto($fecha_inicio, $fecha_fin, $id_agendamiento = null)
     {
@@ -526,15 +499,8 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  FUNCIONES AUXILIARES
-    // ═══════════════════════════════════════════════════════════════════
-
     /**
      * Obtiene detalles completos de una cita
-     * 
-     * @param int $id_agendamiento - ID de la cita
-     * @return array|null - Datos de la cita o null
      */
     public function obtenerDetallesCita($id_agendamiento)
     {
@@ -572,9 +538,6 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
     /**
      * Obtiene datos para notificación de cancelación
-     * 
-     * @param int $id_agendamiento - ID de la cita
-     * @return array|null - Datos para la notificación
      */
     public function obtenerDatosNotificacionCancelacion($id_agendamiento)
     {
@@ -608,9 +571,6 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
     /**
      * Obtiene servicios disponibles
-     * 
-     * @param int|null $id_veterinaria - ID de la veterinaria
-     * @return array - Array de servicios
      */
     public function obtenerServicios($id_veterinaria = null)
     {
@@ -641,9 +601,6 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
     /**
      * Obtiene subservicios de un servicio
-     * 
-     * @param int $id_servicio - ID del servicio
-     * @return array - Array de subservicios
      */
     public function obtenerSubserviciosPorServicio($id_servicio)
     {
@@ -667,9 +624,6 @@ public function obtenerIdPropietarioPorUsuario($id_usuario)
 
     /**
      * Obtiene mascotas de un propietario
-     * 
-     * @param int $id_propietario - ID del propietario
-     * @return array - Array de mascotas
      */
     public function obtenerMascotasPropietario($id_propietario)
     {
