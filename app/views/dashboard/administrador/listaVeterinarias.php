@@ -114,10 +114,10 @@ $datos = listarVeterinariasRegistradas();
                             <th>Logo</th>
                             <th>nit</th>
                             <th>Razón Social</th>
-                            <th>Direccion</th>
                             <th>Ciudad</th>
-                            <th>Telefono</th>
+                            <th>Representante Legal</th>
                             <th>Email</th>
+                            <th>Telefono</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -126,13 +126,13 @@ $datos = listarVeterinariasRegistradas();
                         <?php if (!empty($datos)) : ?>
                             <?php foreach ($datos as $veterinaria):  ?>
                                 <tr class="fila-blanca">
-                                    <td class="tb_foto"><?php if (!empty($veterinaria['foto'])): ?><img src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
+                                    <td class="tb_foto"><?php if (!empty($veterinaria['logo'])): ?><img src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['logo'] ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
                                     <td><?= $veterinaria['nit'] ?></td>
-                                    <td><?= $veterinaria['nombre'] ?></td>
-                                    <td><?= $veterinaria['direccion'] ?></td>
+                                    <td><?= $veterinaria['razon_social'] ?></td>
                                     <td><?= $veterinaria['ciudad'] ?></td>
-                                    <td><?= $veterinaria['telefono'] ?></td>
+                                    <td><?= $veterinaria['nombre'] ?></td>
                                     <td><?= $veterinaria['email'] ?></td>
+                                    <td><?= $veterinaria['telefono'] ?></td>
                                     <td><?= $veterinaria['estado'] ?></td>
                                     
                                     
