@@ -58,17 +58,18 @@ class Veterinaria
         // Listamos las veterinarias registradas en la base de datos
         try {
             $consulta = "SELECT 
-                            id_veterinaria, 
-                            nit, 
-                            nombre, 
-                            direccion, 
-                            ciudad, 
-                            telefono, 
-                            email, 
-                            foto,
-                            fecha_creacion, 
-                            estado
-                         FROM veterinaria";
+                            v.id_veterinaria, 
+                            v.nit, 
+                            v.nombre AS razon_social, 
+                            v.ciudad, 
+                            v.foto AS logo,
+                            v.estado, 
+                            CONCAT(rl.nombres, ' ', rl.apellidos) AS nombre,                    
+                            rl.telefono,
+                            u.email
+                         FROM veterinaria v
+                         INNER JOIN representante_legal rl ON v.id_veterinaria = rl.id_veterinaria
+                         INNER JOIN usuario u ON rl.id_usuario = u.id_usuario";
             $resultado = $this->conexion->prepare($consulta);
             $resultado->execute();
             // Devolvemos los resultados como un array asociativo
