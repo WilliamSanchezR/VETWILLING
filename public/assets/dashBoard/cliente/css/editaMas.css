@@ -11,7 +11,7 @@
     padding: 35px 40px;
     color: white;
     margin-bottom: 30px;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    /* box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -394,7 +394,6 @@
 
 .btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 .btn-secondary {

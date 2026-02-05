@@ -18,6 +18,10 @@ if (!isset($_SESSION['user']['id_usuario'])) {
     exit();
 }
 
+// Obtener servicios disponibles (necesitaremos crear esta función)
+// Por ahora, dejamos un array vacío que se llenará dinámicamente con AJAX
+$Citas = [];
+
 $id_usuario = $_SESSION['user']['id_usuario'];
 ?>
 <!DOCTYPE html>
@@ -748,11 +752,13 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 <div class="filtros-avanzados">
                     <div class="filtro-grupo">
                         <label>Mascota</label>
+
                         <select>
                             <option>Todas las mascotas</option>
                             <?php foreach ($mascotas as $mascota): ?>
                                 <option value="<?= $mascota['id_paciente'] ?>"><?= htmlspecialchars($mascota['nombre']) ?></option>
                             <?php endforeach; ?>
+
                         </select>
                     </div>
 
@@ -779,6 +785,8 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 </div>
 
                 <!-- Timeline de Citas -->
+
+                <div class="citas-timeline">
                 <div class="citas-timeline" id="citasContainer">
                     <!-- Loading inicial -->
                     <div class="loading-container">
@@ -826,6 +834,17 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                                     <strong>Motivo:</strong> Revisión por vómito recurrente. Traer ayuno de 8 horas.
                                 </div>
                             </div>
+                <div class="citas-timeline" id="citasContainer">
+                    <!-- Loading inicial -->
+                    <div class="loading-container">
+                        <div class="spinner"></div>
+                        <p>Cargando tus citas...</p>
+                    </div>
+                </div>
+
+            </div>
+
+
         </div>
 
     </main>
