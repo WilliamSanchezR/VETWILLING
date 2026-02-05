@@ -1,26 +1,22 @@
 <?php
 /**
  * ═══════════════════════════════════════════════════════════════════
- *  CONTROLADOR DE CITAS PARA CLIENTES/PROPIETARIOS
+ *  CONTROLADOR DE CITAS PARA CLIENTES/PROPIETARIOS - COMPLETO
  *  Archivo: citasClienteController.php
- *  Descripción: Maneja todas las operaciones de citas desde el rol cliente
  * ═══════════════════════════════════════════════════════════════════
  */
 
 session_start();
 
-require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/CitasCliente.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'POST':
-        // Verificar si es una petición AJAX JSON
         $content_type = $_SERVER['CONTENT_TYPE'] ?? '';
         
         if (strpos($content_type, 'application/json') !== false) {
-            // Es una petición JSON desde el frontend
             $data = json_decode(file_get_contents("php://input"), true);
             $accion = $data['accion'] ?? '';
             
@@ -78,25 +74,17 @@ switch ($method) {
 //  FUNCIÓN AUXILIAR: OBTENER ID_PROPIETARIO
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * Obtiene el id_propietario desde la sesión o desde la BD
- * 
- * @return int|null
- */
 function obtenerIdPropietario()
 {
-    // Si ya está en sesión, usarlo
     if (isset($_SESSION['user']['id_propietario'])) {
         return (int)$_SESSION['user']['id_propietario'];
     }
 
-    // Si no está en sesión pero tenemos id_usuario, buscarlo en BD
     if (isset($_SESSION['user']['id_usuario'])) {
         $id_usuario = $_SESSION['user']['id_usuario'];
         $modeloCitas = new CitasCliente();
         $id_propietario = $modeloCitas->obtenerIdPropietarioPorUsuario($id_usuario);
         
-        // Guardarlo en sesión para futuras peticiones
         if ($id_propietario) {
             $_SESSION['user']['id_propietario'] = $id_propietario;
             return $id_propietario;
@@ -106,24 +94,33 @@ function obtenerIdPropietario()
     return null;
 }
 
+// Registro local de errores para depuración (archivo: app/logs/citas_error.log)
+function logCitaError($mensaje)
+{
+    $dir = __DIR__ . '/../logs';
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+    $file = $dir . '/citas_error.log';
+    $ts = date('Y-m-d H:i:s');
+    $entry = "[{$ts}] " . $mensaje . "\n";
+    @file_put_contents($file, $entry, FILE_APPEND | LOCK_EX);
+}
+
 // ═══════════════════════════════════════════════════════════════════
 //  FUNCIÓN 1: CREAR CITA (RFS 33)
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * Permite al cliente crear una nueva cita para su mascota
- */
+
 function crearCitaCliente()
 {
     try {
-        // ┌─ VALIDAR SESIÓN
         if (!isset($_SESSION['user']['id_usuario'])) {
             http_response_code(401);
             echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado']);
             exit();
         }
 
-        // ┌─ OBTENER ID DEL PROPIETARIO (desde sesión o BD)
         $id_propietario = obtenerIdPropietario();
 
         if (!$id_propietario) {
@@ -132,7 +129,6 @@ function crearCitaCliente()
             exit();
         }
 
-        // ┌─ OBTENER DATOS DEL REQUEST
         $data = json_decode(file_get_contents("php://input"), true);
 
         if (!$data) {
@@ -141,7 +137,6 @@ function crearCitaCliente()
             exit();
         }
 
-        // ┌─ VALIDAR CAMPOS REQUERIDOS
         $camposRequeridos = ['id_paciente', 'id_servicio', 'id_subservicio', 'fecha_hora', 'fecha_hora_fin'];
         foreach ($camposRequeridos as $campo) {
             if (empty($data[$campo])) {
@@ -151,7 +146,6 @@ function crearCitaCliente()
             }
         }
 
-        // ┌─ VERIFICAR QUE LA MASCOTA PERTENEZCA AL PROPIETARIO
         $modeloCitas = new CitasCliente();
         
         if (!$modeloCitas->verificarMascotaPropietario($data['id_paciente'], $id_propietario)) {
@@ -160,7 +154,6 @@ function crearCitaCliente()
             exit();
         }
 
-        // ┌─ VERIFICAR DISPONIBILIDAD DE HORARIO
         $disponible = $modeloCitas->verificarDisponibilidad(
             $data['fecha_hora'], 
             $data['fecha_hora_fin']
@@ -189,7 +182,6 @@ function crearCitaCliente()
             exit();
         }
 
-        // ┌─ PREPARAR DATOS PARA INSERTAR
         $datosInsert = [
             'id_propietario' => $id_propietario,
             'id_paciente' => (int)$data['id_paciente'],
@@ -201,26 +193,13 @@ function crearCitaCliente()
             'fecha_hora' => $data['fecha_hora'],
             'fecha_hora_fin' => $data['fecha_hora_fin'],
             'estado' => 'Pendiente',
-            'id_usuario' => null
+            // El campo id_usuario almacena el usuario que crea la cita (propietario en este caso)
+            'id_usuario' => isset($_SESSION['user']['id_usuario']) ? (int)$_SESSION['user']['id_usuario'] : null
         ];
 
-        // ┌─ REGISTRAR CITA
         $id_cita = $modeloCitas->crearCita($datosInsert);
 
         if ($id_cita) {
-            // ┌─ ENVIAR NOTIFICACIÓN POR EMAIL (opcional)
-            try {
-                $detallesCita = $modeloCitas->obtenerDetallesCita($id_cita);
-                
-                if ($detallesCita && !empty($detallesCita['email_propietario'])) {
-                    // enviarNotificacionCitaCreada($detallesCita);
-                    error_log("✅ Cita creada, notificación pendiente");
-                }
-            } catch (Exception $e) {
-                error_log("⚠️ Error al enviar notificación: " . $e->getMessage());
-            }
-
-            // ┌─ RESPUESTA EXITOSA
             header('Content-Type: application/json');
             http_response_code(201);
             echo json_encode([
@@ -230,15 +209,21 @@ function crearCitaCliente()
             ]);
             exit();
         } else {
+            // Log detallado para depuración local
+            $payload = isset($data) ? print_r($data, true) : 'sin payload';
+            logCitaError("crearCita devolvió false. Payload: {$payload}");
             http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => 'Error al crear la cita']);
+            echo json_encode(['status' => 'error', 'message' => 'Error al crear la cita. Consulte logs locales.']);
             exit();
         }
 
     } catch (Exception $e) {
         error_log("❌ Error en crearCitaCliente: " . $e->getMessage());
+        // Además del error_log, escribimos en el log local para que el usuario pueda acceder desde el proyecto
+        $payload = isset($data) ? print_r($data, true) : 'sin payload';
+        logCitaError("Excepción en crearCitaCliente: " . $e->getMessage() . " | Payload: " . $payload);
         http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Error del sistema: ' . $e->getMessage()]);
+        echo json_encode(['status' => 'error', 'message' => 'Error del sistema. Consulte logs locales.']);
         exit();
     }
 }
@@ -250,6 +235,7 @@ function crearCitaCliente()
 function listarCitasCliente()
 {
     try {
+        logCitaError("Entrando a listarCitasCliente. Usuario: " . (isset($_SESSION['user']['id_usuario']) ? $_SESSION['user']['id_usuario'] : 'no_auth'));
         if (!isset($_SESSION['user']['id_usuario'])) {
             http_response_code(401);
             echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado']);
@@ -281,6 +267,7 @@ function listarCitasCliente()
 
         $modeloCitas = new CitasCliente();
         $citas = $modeloCitas->listarCitasPropietario($id_propietario, $filtros);
+        logCitaError("listarCitasCliente: id_propietario={$id_propietario} - citas_obtenidas=" . count($citas));
 
         header('Content-Type: application/json');
         echo json_encode([
