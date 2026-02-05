@@ -27,6 +27,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
 
 
     <!-- Global Styles -->
@@ -54,9 +55,26 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
         <div class="wizard-container">
             <div class="wizard-header">
                 <i class="bi bi-building-check"></i>
-                <h2>Registro de la Veterinaria</h2>
-                <p class="text-muted">Complete todos los campos requeridos para registrar la veterinaria</p>
+                <h2>Registro de la Veterinaria y Representante Legal</h2>
+                <p class="text-muted">Complete todos los campos requeridos para registrar la veterinaria y su representante legal</p>
             </div>
+
+
+
+            <div class="progress-wrapper">
+                <div class="progress">
+                    <div id="bar1" class="progress-bar active"></div>
+                    <div id="bar2" class="progress-bar"></div>
+                    <div id="bar3" class="progress-bar"></div>
+                </div>
+                <div class="progress-labels">
+                    <span class="active">Veterinaria</span>
+                    <span>Representante Legal</span>
+                    <span>Confirmar</span>
+                </div>
+            </div>
+
+
 
 
             <form id="vetForm" action="<?= BASE_URL ?>/admin/guardar-veterinaria" method="POST" enctype="multipart/form-data">
@@ -77,7 +95,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-clipboard2-data"></i> Razón Social *</label>
-                                <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Mundo Patitas S.A.S">
+                                <input type="text" id="nombreVeterinaria" name="nombreVeterinaria" required placeholder="Ej: Mundo Patitas S.A.S">
                             </div>
                         </div>
 
@@ -88,14 +106,14 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Email *</label>
-                                <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
+                                <input type="email" id="emailVeterinaria" name="emailVeterinaria" required placeholder="ejemplo@correo.com">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567">
+                                <input type="tel" id="telefonoVeterinaria" name="telefonoVeterinaria" required placeholder="+57 300 123 4567">
                             </div>
                         </div>
 
@@ -108,7 +126,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                             <div class="form-group">
                                 <div class="form-group">
                                     <label><i class="bi bi-card-image"></i> Logo </label>
-                                    <input type="file" accept=".jpg, .png, .jpeg" id="foto" name="foto">
+                                    <input type="file" accept=".jpg, .png, .jpeg" id="fotoVeterinaria" name="fotoVeterinaria">
                                 </div>
                             </div>
                         </div>
@@ -183,7 +201,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label><i class="bi bi-geo-alt"></i> Dirección *</label>
-                                <input type="text" id="direccion" name="direccion" required placeholder="Calle 12 # 34-56, Barrio Centro">
+                                <input type="text" id="direccionVeterinaria" name="direccionVeterinaria" required placeholder="Calle 12 # 34-56, Barrio Centro">
                             </div>
                         </div>
 
@@ -191,11 +209,107 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
                     <div class="buttons">
                         <span></span>
-                        <button type="submit" class="btn btn-success" id="btnGuardarVeterinaria">
-                            Guardar <i class="bi bi-floppy"></i>
+                        <button type="button" class="btn-next" onclick="nextStep()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
+
+
                 </div>
+
+                <div class="step">
+                    <h3><i class="bi bi-person-badge"></i>Datos del Representante Legal</h3>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-card-text"></i> Tipo de documento *</label>
+                                <select id="tipoDocumento" name="tipo_documento" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="CC">Cédula de Ciudadanía</option>
+                                    <option value="CE">Cédula de Extranjería</option>
+                                    <option value="PAS">Pasaporte</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-hash"></i> Número de documento *</label>
+                                <input type="number" id="documento" name="numero_documento" required placeholder="12345678">
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-person"></i> Nombres *</label>
+                                <input type="text" id="nombres" name="nombres" required placeholder="Ej: Juan Martin">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-person"></i> Apellidos *</label>
+                                <input type="text" id="apellidos" name="apellidos" required placeholder="Ej: Pérez García">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
+                                <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-camera"></i>Foto *</label>
+                                <input type="file" accept=".jpg," id="img_perfil" name="img_perfil" placeholder="ejemplo@correo.com">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-geo-alt"></i> Dirección *</label>
+                                <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="buttons">
+                        <button type="button" class="btn-prev" onclick="prevStep()">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <button type="button" class="btn-next" onclick="nextStep()">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="step">
+                    <h1>¿Deseas confirmar el envío del formulario?</h1>
+                    <p>Por favor, revisa que toda la información sea correcta antes de continuar.</p>
+
+                    <div class="buttons">
+                        <button type="button" class="btn btn-secondary" id="btnVolver">Volver a revisar</button>
+                        <button type="submit" class="btn btn-success" id="btnConfirmarVeterinaria">Confirmar y enviar</button>
+                    </div>
+                </div>
+
             </form>
         </div>
 
@@ -211,6 +325,8 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
         <!-- JS Propio -->
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/registroPacientes.js"></script>
 
 </body>
 
