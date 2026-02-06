@@ -1,4 +1,7 @@
-/* ========================================
+.trust-badge:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}/* ========================================
    1. IMPORTS
 ======================================== */
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
@@ -284,12 +287,13 @@ h6 {
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 60%, transparent 100%);
-    padding: 2.5rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 100%);
+    padding: 3rem 2.5rem 2.5rem;
     color: white;
     transform: translateY(10px);
     opacity: 0;
     animation: none;
+    transition: all 0.4s ease;
 }
 
 .carousel-item.active .carousel-overlay {
@@ -297,6 +301,10 @@ h6 {
 }
 
 @keyframes slideUpFade {
+    0% {
+        transform: translateY(15px);
+        opacity: 0;
+    }
     to {
         transform: translateY(0);
         opacity: 1;
@@ -304,16 +312,20 @@ h6 {
 }
 
 .carousel-overlay h3 {
-    font-size: 1.6rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
     color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
 }
 
 .carousel-overlay p {
-    font-size: 1rem;
-    opacity: 0.95;
+    font-size: 1.05rem;
+    opacity: 0.98;
     margin-bottom: 0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1.4;
 }
 
 .carousel-indicators {
@@ -321,20 +333,29 @@ h6 {
 }
 
 .carousel-indicators [data-bs-target] {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    margin: 0 4px;
-    background-color: white;
-    opacity: 0.4;
-    transition: all 0.3s ease;
-    border: none;
+    margin: 0 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    opacity: 0.5;
+    transition: all 0.4s ease;
+    border: 2px solid white;
+    cursor: pointer;
+}
+
+.carousel-indicators [data-bs-target]:hover {
+    opacity: 0.8;
+    transform: scale(1.15);
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 .carousel-indicators .active {
     opacity: 1;
-    width: 24px;
-    border-radius: 4px;
+    width: 28px;
+    border-radius: 5px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.4);
 }
 
 /* Stats Premium */
@@ -755,6 +776,10 @@ h6 {
 
 /* Móviles */
 @media (max-width: 768px) {
+    section-tag{
+        position: relative;
+        top: -10px;
+    }
     .custom-navbar {
         border-radius: 0 0 20px 20px;
     }
@@ -1074,7 +1099,7 @@ h6 {
     width: 100%;
     height: 100%;
     text-align: center;
-    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 2.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform-style: preserve-3d;
 }
 
