@@ -423,6 +423,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
+    // pasarela de pago
+    case '/cliente/pasarela-pago':
+        require BASE_PATH . '/app/views/dashboard/cliente/pasarelaPago.php';
+        break;
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
     case '/reporte-veterinarios':
