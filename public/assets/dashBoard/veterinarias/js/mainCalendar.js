@@ -439,6 +439,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // --- CONFIGURACIÓN DE APARIENCIA Y VISTA ---
         locale: 'es',
+        timeZone: 'local',
         themeSystem: 'bootstrap5',
         initialView: 'dayGridMonth',
         headerToolbar: {

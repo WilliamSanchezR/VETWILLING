@@ -16,61 +16,98 @@ class Veterinario
         $this->conexion = $db->getConexion();
     }
 
+    public function contarPacientesPorVeterinario($id_usuario)
+    {
+        try {
+            $sql = "SELECT COUNT(DISTINCT a.id_paciente)
+                    FROM agendamiento a
+                    WHERE a.id_usuario = :id_usuario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::contarPacientesPorVeterinario - " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function contarCitasHoyPorVeterinario($id_usuario, $fecha)
+    {
+        try {
+            $sql = "SELECT COUNT(*)
+                    FROM agendamiento a
+                    WHERE a.id_usuario = :id_usuario
+                      AND DATE(a.fecha_hora) = :fecha";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha', $fecha, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::contarCitasHoyPorVeterinario - " . $e->getMessage());
+            return 0;
+        }
+    }
+
 
 
     public function registrar($data)
-{
-    try {
-        $this->conexion->beginTransaction();
+    {
+        try {
+            $this->conexion->beginTransaction();
 
-        // INSERT USUARIO
-        $sqlUsuario = "INSERT INTO usuario (email, password_hash, estado, id_rol)
+            // INSERT USUARIO
+            $sqlUsuario = "INSERT INTO usuario (email, password_hash, estado, id_rol)
                        VALUES (:email, :password_hash, :estado, :id_rol)";
-        $stmtUsuario = $this->conexion->prepare($sqlUsuario);
+            $stmtUsuario = $this->conexion->prepare($sqlUsuario);
 
-        $passwordHash = password_hash($data['password_hash'], PASSWORD_DEFAULT);
+            $passwordHash = password_hash($data['password_hash'], PASSWORD_DEFAULT);
 
-        $stmtUsuario->execute([
-            ':email' => $data['email'],
-            ':password_hash' => $passwordHash,
-            ':estado' => $data['estado'],
-            ':id_rol' => 2
-        ]);
+            $stmtUsuario->execute([
+                ':email' => $data['email'],
+                ':password_hash' => $passwordHash,
+                ':estado' => $data['estado'],
+                ':id_rol' => 2
+            ]);
 
-        $id_usuario = $this->conexion->lastInsertId();
+            $id_usuario = $this->conexion->lastInsertId();
 
-        // INSERT VETERINARIO
-        $sqlVet = "INSERT INTO veterinario 
+            // INSERT VETERINARIO
+            $sqlVet = "INSERT INTO veterinario 
             (id_usuario, tipo_documento, numero_documento, nombres, apellidos,
              telefono, img_perfil, numero_licencia_profesional, id_veterinaria, fecha_contratacion)
             VALUES
             (:id_usuario, :tipo_documento, :numero_documento, :nombres, :apellidos,
              :telefono, :img_perfil, :numero_licencia_profesional, :id_veterinaria, :fecha_contratacion)";
 
-        $stmtVet = $this->conexion->prepare($sqlVet);
+            $stmtVet = $this->conexion->prepare($sqlVet);
 
-        $stmtVet->execute([
-            ':id_usuario' => $id_usuario,
-            ':tipo_documento' => $data['tipo_documento'],
-            ':numero_documento' => $data['numero_documento'],
-            ':nombres' => $data['nombres'],
-            ':apellidos' => $data['apellidos'],
-            ':telefono' => $data['telefono'],
-            ':img_perfil' => $data['img_perfil'],
-            ':numero_licencia_profesional' => $data['numero_licencia_profesional'],
-            ':id_veterinaria' => $data['id_veterinaria'],
-            ':fecha_contratacion' => date('Y-m-d')
-        ]);
+            $stmtVet->execute([
+                ':id_usuario' => $id_usuario,
+                ':tipo_documento' => $data['tipo_documento'],
+                ':numero_documento' => $data['numero_documento'],
+                ':nombres' => $data['nombres'],
+                ':apellidos' => $data['apellidos'],
+                ':telefono' => $data['telefono'],
+                ':img_perfil' => $data['img_perfil'],
+                ':numero_licencia_profesional' => $data['numero_licencia_profesional'],
+                ':id_veterinaria' => $data['id_veterinaria'],
+                ':fecha_contratacion' => date('Y-m-d')
+            ]);
 
-        $this->conexion->commit();
-        return true;
-
-    } catch (PDOException $e) {
-        $this->conexion->rollBack();
-        error_log("ERROR REGISTRAR VETERINARIO: " . $e->getMessage());
-        return false;
+            $this->conexion->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->conexion->rollBack();
+            error_log("ERROR REGISTRAR VETERINARIO: " . $e->getMessage());
+            return false;
+        }
     }
-}
 
 
 
@@ -147,7 +184,7 @@ class Veterinario
     }
 
 
-     public function actualizarFotoPerfil($data)
+    public function actualizarFotoPerfil($data)
     {
         // Actualizamos la foto de perfil del usuario
         try {
@@ -163,8 +200,6 @@ class Veterinario
             if ($ok) {
                 return true;
             }
-
-           
         } catch (PDOException $e) {
             error_log("Error en Usuario::actualizarFotoPerfil -> " . $e->getMessage());
             return false;
@@ -178,16 +213,16 @@ class Veterinario
     {
         try {
             // Actualizamos el estado del usuario a 'inactivo'
-        $actualizar = "UPDATE usuario SET
+            $actualizar = "UPDATE usuario SET
                         estado = :estado
                         WHERE id_usuario = :id_usuario";
-        // Preparar y ejecutar la consulta
-        $resultado = $this->conexion->prepare($actualizar);
+            // Preparar y ejecutar la consulta
+            $resultado = $this->conexion->prepare($actualizar);
 
-        $resultado->bindValue(':estado', 'inactivo');
-        $resultado->bindValue(':id_usuario', $id);
+            $resultado->bindValue(':estado', 'inactivo');
+            $resultado->bindValue(':id_usuario', $id);
 
-        return $resultado->execute();
+            return $resultado->execute();
         } catch (PDOException $e) {
             error_log("Error en veterinario::eliminar - " . $e->getMessage());
             return false;

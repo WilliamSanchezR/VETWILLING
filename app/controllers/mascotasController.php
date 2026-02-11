@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
-require_once __DIR__ . '/../models/Mascotas.php';
+require_once __DIR__ . '/../models/mascotas.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
