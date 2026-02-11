@@ -53,7 +53,7 @@
 
     <!-- BOTÓN TOGGLE -->
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
-        <i class="bi bi-chevron-left"></i>
+        <i class="bi bi-list"></i>
     </button>
 
 </aside>
