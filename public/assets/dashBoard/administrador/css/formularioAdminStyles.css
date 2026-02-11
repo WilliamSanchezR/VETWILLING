@@ -51,6 +51,35 @@
     animation: pulse 2s infinite;
 }
 
+#pills-tab {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+#pills-tab li {
+    list-style: none;
+    padding: 0px;
+    background: #00000014;
+}
+
+#pills-tab .nav-link {
+    padding: 10px 15px;
+    font-size: var(--fs-titulo4);
+    color: #383838;
+    border: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+#pills-tab .nav-link.active {
+    color: var(--primary-color);
+    background-color:  var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+    color: #fff;
+}
+
 @keyframes pulse {
 
     0%,

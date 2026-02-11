@@ -84,7 +84,14 @@ class Veterinaria
     public function consultarVeterinariasRegistradas($id)
     {
         try {
-            $consulta = "SELECT id_veterinaria, nit, nombre, direccion, ciudad, telefono, email, estado, foto FROM veterinaria WHERE id_veterinaria = :id";
+            $consulta = "SELECT v.id_veterinaria, v.nit, v.nombre, v.direccion, v.ciudad, v.telefono, v.email, v.estado, v.foto, 
+            rl.id_usuario, rl.tipo_documento, rl.numero_documento,
+            rl.nombres, rl.apellidos, rl.telefono as telefono_user, us.email as email_user, us.estado as estado_user, rol.id_rol, rol.nombre as rol_name, rl.direccion as direccion_user
+            FROM veterinaria v
+            INNER JOIN representante_legal rl ON v.id_veterinaria = rl.id_veterinaria
+            INNER JOIN usuario us ON rl.id_usuario = us.id_usuario
+            INNER JOIN rol ON us.id_rol = rol.id_rol
+            WHERE v.id_veterinaria = :id";
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id', $id);
             $resultado->execute();
@@ -100,6 +107,7 @@ class Veterinaria
     {
         // Actualizamos los datos de la veterinaria en la base de datos
         try {
+
             $consulta = "UPDATE veterinaria 
                          SET foto = :foto,
                              nombre = :nombre, 
@@ -123,7 +131,13 @@ class Veterinaria
             $resultado->bindParam(':id_veterinaria', $data['id_veterinaria']);
 
             // Ejecutamos la consulta
-            return $resultado->execute();
+            $response = $resultado->execute();
+
+            if (!$response) {
+                return false;
+            }
+
+            return $this->actualizarUsuarioVeterinaria($data);
         } catch (PDOException $e) {
             echo "Error al actualizar la veterinaria: " . $e->getMessage();
             return false;
@@ -142,6 +156,50 @@ class Veterinaria
             return $resultado->execute();
         } catch (PDOException $e) {
             echo "Error al eliminar la veterinaria: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function actualizarUsuarioVeterinaria($data)
+    {
+        // Actualizamos los datos del usuario
+        try {
+            $sql = "UPDATE usuario SET email = :email, estado = :estado
+                    WHERE id_usuario = :id_usuario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $data['id_usuario']);
+            $stmt->bindParam(':email', $data['email_user']);
+            $stmt->bindParam(':estado', $data['estado_user']);
+
+            $ok = $stmt->execute();
+            // Verificamos si la actualización fue exitosa
+            if (!$ok) return false;
+
+            // REPRESENTANTE LEGAL
+            $sqlRep = "UPDATE representante_legal
+                SET id_veterinaria = :id_veterinaria,
+                tipo_documento = :tipo_documento,
+                numero_documento = :numero_documento,
+                nombres = :nombres,
+                apellidos = :apellidos,
+                telefono = :telefono,
+                direccion = :direccion
+                WHERE id_usuario = :id_usuario";
+            // Preparar y ejecutar la consulta
+            $stmt3 = $this->conexion->prepare($sqlRep);
+            $stmt3->bindParam(':id_usuario', $data['id_usuario']);
+            $stmt3->bindParam(':id_veterinaria', $data['id_veterinaria']);
+            $stmt3->bindParam(':tipo_documento', $data['tipo_documento']);
+            $stmt3->bindParam(':numero_documento', $data['numero_documento']);
+            $stmt3->bindParam(':nombres', $data['nombres']);
+            $stmt3->bindParam(':apellidos', $data['apellidos']);
+            $stmt3->bindParam(':telefono', $data['telefono_user']);
+            $stmt3->bindParam(':direccion', $data['direccion_user']);
+
+            return $stmt3->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::actualizarUsuario -> " . $e->getMessage());
             return false;
         }
     }

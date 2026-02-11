@@ -1,5 +1,10 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
+require_once BASE_PATH . '/app/controllers/dashboardsAdminControllers.php';
+
+$totalVeterinarias = getTotalVeterinarias();
+// Aquí puedes usar $dashboardInfo para mostrar la información en el dashboard, por ejemplo:
+// echo "Total Veterinarias Activas: " . $dashboardInfo;
 
 ?>
 
@@ -93,13 +98,13 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         </div>
                         <div class="stat-trend up">
                             <i class="bi bi-arrow-up"></i>
-                            8%
+                            0%
                         </div>
                     </div>
-                    <div class="stat-value">142</div>
+                    <div class="stat-value"><?= $totalVeterinarias ?></div>
                     <div class="stat-label">Veterinarias Activas</div>
                     <div class="stat-footer">
-                        <i class="bi bi-check-circle"></i> 5 pendientes de aprobación
+                        <i class="bi bi-check-circle"></i> 0 pendientes de aprobación
                     </div>
                 </div>
 
