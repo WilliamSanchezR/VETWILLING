@@ -25,6 +25,10 @@ $citasHoy = $idUsuario ? $statsVeterinario->contarCitasHoyPorVeterinario($idUsua
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
@@ -84,7 +88,7 @@ $citasHoy = $idUsuario ? $statsVeterinario->contarCitasHoyPorVeterinario($idUsua
             <div class="barra-acciones-pacientes">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div class="d-flex gap-2">
-                        <button class="boton-accion-primario" onclick="abrirModalNuevoPaciente()">
+                        <button class="boton-accion-primario" id="btnNuevoPaciente">
                             <i class="bi bi-plus-circle"></i> Nuevo Paciente
                         </button>
                         <button class="boton-accion-secundario">
