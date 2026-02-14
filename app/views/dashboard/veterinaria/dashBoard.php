@@ -1,7 +1,11 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_veterinario.php';
+require_once BASE_PATH . '/app/models/Veterinario.php';
 
-
+$idUsuario = $_SESSION['user']['id_usuario'] ?? null;
+$statsVeterinario = new Veterinario();
+$totalPacientes = $idUsuario ? $statsVeterinario->contarPacientesPorVeterinario($idUsuario) : 0;
+$citasHoy = $idUsuario ? $statsVeterinario->contarCitasHoyPorVeterinario($idUsuario, date('Y-m-d')) : 0;
 ?>
 
 <!DOCTYPE html>
@@ -20,6 +24,10 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <!-- Bootstrap Iconos -->
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
@@ -57,7 +65,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <i class="bi bi-heart-fill text-danger"></i>
                         </div>
                         <div>
-                            <h3 classs="mb-0">248</h3>
+                            <h3 class="mb-0"><?= htmlspecialchars((string) $totalPacientes) ?></h3>
                             <p class="text-muted mb-0">Total Pacientes</p>
                         </div>
                     </div>
@@ -69,20 +77,8 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <i class="bi bi-calendar-check-fill text-success"></i>
                         </div>
                         <div>
-                            <h3 class="mb-0">32</h3>
+                            <h3 class="mb-0"><?= htmlspecialchars((string) $citasHoy) ?></h3>
                             <p class="text-muted mb-0">Citas Hoy</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="tarjeta-estadistica">
-                        <div class="icono-estadistica bg-warning-soft">
-                            <i class="bi bi-exclamation-triangle-fill text-warning"></i>
-                        </div>
-                        <div>
-                            <h3 class="mb-0">8</h3>
-                            <p class="text-muted mb-0">Urgencias</p>
                         </div>
                     </div>
                 </div>
@@ -92,7 +88,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             <div class="barra-acciones-pacientes">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div class="d-flex gap-2">
-                        <button class="boton-accion-primario" onclick="abrirModalNuevoPaciente()">
+                        <button class="boton-accion-primario" id="btnNuevoPaciente">
                             <i class="bi bi-plus-circle"></i> Nuevo Paciente
                         </button>
                         <button class="boton-accion-secundario">
