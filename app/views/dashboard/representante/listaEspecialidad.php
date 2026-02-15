@@ -43,6 +43,7 @@ $listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/styleTableAdmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/listaEspecialidad.styles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/modalStyle.css">
 
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
@@ -124,7 +125,7 @@ $listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
                                 <tr class="fila-blanca">
 
                                     <td><?= htmlspecialchars($especialidad['nombre_esp']) ?></td>
-                                    <td><?= htmlspecialchars($especialidad['nombre_ser']) ?></td>     
+                                    <td><?= htmlspecialchars($especialidad['nombre_ser']) ?></td>
                                     <td><?= htmlspecialchars($especialidad['estado']) ?></td>
 
                                     <td>
@@ -152,26 +153,29 @@ $listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Registro de Especialidad</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h2 class="modal-title"><i class="bi bi-newspaper"></i> Registro de Especialidad</h2>
                 </div>
                 <form class="registro" action="<?= BASE_URL ?>/representante/guardar-especialidad" method="post">
-                     <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria']; ?>">
+                    <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria']; ?>">
                     <div class="modal-body">
-                        
-                        <div class="form-group form">
-                            <label><i class="bi bi-folder-check"></i> Nombre *</label>
-                            <input type="text" id="nombre" name="nombre" required placeholder="Ej: Cardiología">
-                            
-                        </div>
+                        <div class="form-modal">
+                            <div class="form-group-ag">
+                                <label class="form-label-ag" for="nombre">
+                                    <i class="bi bi-folder-check"></i>
+                                    Nombre
+                                    <span class="required">*</span>
+                                </label>
+                                <input class="form-control-ag" type="text" id="nombre" name="nombre" required placeholder="Ej: Cardiología">
+                            </div>
 
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><i class="bi bi-person-rolodex"></i> Servicio *</label>
-                                <select id="servicio" name="servicio" required>
+                            <div class="form-group-ag">
+                                <label class="form-label-ag" for="servicio">
+                                    <i class="bi bi-briefcase-fill"></i>
+                                    Servicio
+                                    <span class="required">*</span>
+                                </label>
+                                <select class="form-control-ag" id="servicio" name="servicio" required>
                                     <option value="" disabled selected>Seleccione un servicio</option>
-
-
                                     <?php if (!empty($listaServicios)) : ?>
                                         <?php foreach ($listaServicios as $servicio):  ?>
                                             <option value="<?= $servicio['id_servicio'] ?>"><?= htmlspecialchars($servicio['nombre']) ?></option>
@@ -181,60 +185,65 @@ $listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
                             </div>
                         </div>
 
-
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="submit" class="btn btn-primary"> <i class="bi bi-floppy"></i> Guardar</button>
                     </div>
-                    
+
                 </form>
             </div>
         </div>
     </div>
 
 
-     <!--  Modal Editar especialidad  -->
+    <!--  Modal Editar especialidad  -->
     <div class="modal fade" id="modalEditarEspecialidad" tabindex="-1" aria-labelledby="modalEditarEspecialidad" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Editar de Especialidad</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h2 class="modal-title"><i class="bi bi-newspaper"></i> Editar de Especialidad</h2>
                 </div>
                 <form action="<?= BASE_URL ?>/representante/actualizar-especialidad" method="post">
-                     <input type="hidden" id="id_especialidad" name="id_especialidad" value="">
-                     <input type="hidden" name="accion" value="actualizar">
+                    <input type="hidden" id="id_especialidad" name="id_especialidad" value="">
+                    <input type="hidden" name="accion" value="actualizar">
                     <div class="modal-body">
-                        
-                        <div class="form-group">
-                            <label><i class="bi bi-folder-check"></i> Nombre *</label>
-                            <input type="text" id="nombre_especialidad" name="nombre_especialidad" required placeholder="Ej: Cardiología">
-                            
-                        </div>
 
+                        <div class="form-modal">
+                            <div class="form-group-ag">
+                                <label class="form-label-ag" for="nombre_especialidad"><i class="bi bi-folder-check"></i>
+                                    Nombre
+                                    <span class="required">*</span>
+                                </label>
+                                <input class="form-control-ag" type="text" id="nombre_especialidad" name="nombre_especialidad" required placeholder="Ej: Cardiología">
 
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label><i class="bi bi-person-rolodex"></i> Servicio *</label>
-                                <select id="servicio_especialidad" name="servicio_especialidad" required>
-                                    <option value="" disabled selected>Seleccione un servicio</option>
-
-
-                                    <?php if (!empty($listaServicios)) : ?>
-                                        <?php foreach ($listaServicios as $servicio):  ?>
-                                            <option value="<?= $servicio['id_servicio'] ?>"><?= htmlspecialchars($servicio['nombre']) ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
                             </div>
+
+
+                            <div class="col-md-12">
+                                <div class="form-group-ag">
+                                    <label class="form-label-ag" for="servicio_especialidad"><i class="bi bi-briefcase-fill"></i>
+                                        Servicio
+                                        <span class="required">*</span>
+                                    </label>
+                                    <select class="form-control-ag" id="servicio_especialidad" name="servicio_especialidad" required>
+                                        <option value="" disabled selected>Seleccione un servicio</option>
+
+
+                                        <?php if (!empty($listaServicios)) : ?>
+                                            <?php foreach ($listaServicios as $servicio):  ?>
+                                                <option value="<?= $servicio['id_servicio'] ?>"><?= htmlspecialchars($servicio['nombre']) ?></option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
+                                </div>
+                            </div>
+
                         </div>
 
-                    </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
 
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Actualizar</button>
-                    </div>
-                    
                 </form>
             </div>
         </div>
