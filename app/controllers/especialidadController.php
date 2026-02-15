@@ -25,6 +25,8 @@ switch ($method) {
         $accion = $_GET['action'] ?? '';
         if ($accion === 'eliminar') {
             eliminarEspecialidad($_GET['id_especialidad'], $_GET['id_veterinaria']);
+        } else if ($accion === 'lista') {
+            listarEpsServicios($_GET['servicio']);
         }
         break;
 
@@ -61,7 +63,7 @@ function registrarEspecialidad()
     $data = [
         'nombre' => $nombre,
         'servicio' => $servicio,
-        'id_veterinaria' => $id_veterinaria 
+        'id_veterinaria' => $id_veterinaria
     ];
 
     // Llamamos a la función registrar del modelo
@@ -84,7 +86,8 @@ function listarEspecialidadesRegistradas($id_veterinaria)
     return $especialidadModel->listarEspecialidades($id_veterinaria);
 }
 
-function actualizarEspecialidad() {
+function actualizarEspecialidad()
+{
     // Capturamos los datos enviados por el formulario
     $id_especialidad = $_POST['id_especialidad'] ?? '';
     $nombre_especialidad = $_POST['nombre_especialidad'] ?? '';
@@ -118,7 +121,7 @@ function actualizarEspecialidad() {
 }
 
 // FUNCION PARA ELIMINAR UNA ESPECIALIDAD
-function eliminarEspecialidad($id_especialidad,$id_veterinaria)
+function eliminarEspecialidad($id_especialidad, $id_veterinaria)
 {
     // Validamos que el ID no esté vacío
     if (empty($id_especialidad)) {
@@ -130,11 +133,35 @@ function eliminarEspecialidad($id_especialidad,$id_veterinaria)
     $especialidadModel = new Especialidad();
 
     // Llamamos a la función eliminar del modelo
-    $resultado = $especialidadModel->eliminarEspecialidad($id_especialidad,$id_veterinaria);
+    $resultado = $especialidadModel->eliminarEspecialidad($id_especialidad, $id_veterinaria);
 
     if ($resultado) {
         mostrarSweetAlert('success', 'Especialidad eliminada', 'La especialidad ha sido eliminada exitosamente.');
     } else {
         mostrarSweetAlert('error', 'Error al eliminar', 'Hubo un problema al eliminar la especialidad.');
     }
+}
+
+function listarEpsServicios($servicio)
+{
+    // Creamos una instancia del modelo Especialidad
+    $especialidadModel = new Especialidad();
+    // Recibir el parámetro
+    $id_servicio = $_GET['servicio'] ?? '';
+
+    // Convertir string "1,2,3" a array [1,2,3]
+    if (!empty($id_servicio)) {
+        $id_servicio = explode(',', $id_servicio);
+        $id_servicio = array_map('intval', $id_servicio); // Convertir a enteros
+    }
+
+    // Llamamos a la función obtenerEspecialidadesPorServicio del modelo
+    $especilidades = $especialidadModel->obtenerEspecialidadesPorServicio($id_servicio);
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'success',
+        'especialidades' => $especilidades
+    ]);
+    exit();
 }

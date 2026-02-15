@@ -148,4 +148,38 @@ class Especialidad
             return false;
         }
     }
+
+    // FUNCION PARA OBTENER LAS ESPECIALIDADES POR SERVICIO
+    public function obtenerEspecialidadesPorServicio($id_servicio)
+    {
+        try {
+            // Si $id_servicio no es un array, lo convertimos en array
+            if (!is_array($id_servicio)) {
+                $id_servicio = [$id_servicio];
+            }
+
+            // Crear placeholders dinámicos para cada elemento del array
+            $placeholders = implode(',', array_fill(0, count($id_servicio), '?'));
+
+            
+            $consulta = "SELECT ESP.id_especialidad, ESP.nombre 
+                        FROM especialidad ESP
+                        WHERE ESP.id_servicio_esp IN($placeholders)";
+
+
+            $resultado = $this->conexion->prepare($consulta);
+            
+            // Vincular cada valor del array
+            foreach ($id_servicio as $index => $valor) {
+                $resultado->bindValue($index + 1, $valor, PDO::PARAM_INT);
+            }
+            
+            $resultado->execute();
+
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener las especialidades por servicio: " . $e->getMessage();
+            return [];
+        }
+}
 }

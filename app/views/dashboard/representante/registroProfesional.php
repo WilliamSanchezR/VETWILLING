@@ -9,8 +9,6 @@ require_once BASE_PATH . '/app/controllers/especialidadController.php';
 // Enlazamos la ruta del controlador de servicios para listar los servicios
 require_once BASE_PATH . '/app/controllers/servicioController.php';
 
-$datosEspecialidades = listarEspecialidadesRegistradas($_SESSION['user']['id_veterinaria']);
-
 // Llamamos la función para listar los roles
 $datosRol = listarRolRepresentante();
 
@@ -195,32 +193,8 @@ $datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_vete
 
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="">Especialidades</label>
-                                    <button type="button" class="btn btn-primary btn-sm" id="agregarEspecialidadBtn">
-                                        <i class="bi bi-plus-lg"></i> Agregar Especialidad
-                                    </button>
 
-                                    <div class="listEspecialidades">
-                                        <ul>
-                                            <?php if (!empty($datosEspecialidades)) : ?>
-                                                <?php foreach ($datosEspecialidades as $especialidad):  ?>
-                                                    <li>
-                                                        <input class="form-check-input check-especialidades" type="checkbox" data-name="<?= htmlspecialchars($especialidad['nombre']) ?>" value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>" id="idCheck<?= $especialidad['id_especialidad'] ?>">
-                                                        <label for="idCheck<?= $especialidad['id_especialidad'] ?>"><?= htmlspecialchars($especialidad['nombre']) ?></label>
-                                                    </li>
-                                                <?php endforeach; ?>
-                                            <?php endif; ?>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12" id="especialidadesContainer"></div>
-                        </div>
-
+                        <!-- Servicios  -->
                         <div class="col-md-6">
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -246,6 +220,27 @@ $datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_vete
 
                             <div class="col-md-12" id="serviciosContainer"></div>
                         </div>
+
+                        <!-- Especialidades  -->
+                        <div class="col-md-6">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="">Especialidades</label>
+                                    <button type="button" class="btn btn-primary btn-sm" id="agregarEspecialidadBtn">
+                                        <i class="bi bi-plus-lg"></i> Agregar Especialidad
+                                    </button>
+
+                                    <div class="listEspecialidades">
+                                        <ul>
+                                            
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12" id="especialidadesContainer"></div>
+                        </div>
+
                     </div>
 
 

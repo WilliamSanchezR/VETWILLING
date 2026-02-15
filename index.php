@@ -517,6 +517,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/representante/perfilRepresentante.php';
         break;
 
+    case '/representante/api/especialidades':
+        require BASE_PATH . '/app/controllers/especialidadController.php';
+        break;
+
 
     //---------------------------------------SERVICIOS-------------------------------------//
     case '/representante/registro-servicio':
