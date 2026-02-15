@@ -92,7 +92,35 @@ class Servicio
     public function obtenerServiciosPorVeterinaria($id_veterinaria)
     {
         try {
-            $consulta = "SELECT * FROM servicio WHERE id_veterinaria = :id_veterinaria";
+            $consulta = "SELECT 
+                            SERV.id_servicio,
+                            SERV.nombre,
+                            SERV.estado,
+                            GROUP_CONCAT(
+                                CONCAT(
+                                    CASE HS.dia_semana
+                                        WHEN 1 THEN 'Lunes'
+                                        WHEN 2 THEN 'Martes'
+                                        WHEN 3 THEN 'Miércoles'
+                                        WHEN 4 THEN 'Jueves'
+                                        WHEN 5 THEN 'Viernes'
+                                        WHEN 6 THEN 'Sábado'
+                                        WHEN 7 THEN 'Domingo'
+                                    END,
+                                    ' ',
+                                    TIME_FORMAT(HS.hora_inicio, '%h:%i %p'),
+                                    ' - ',
+                                    TIME_FORMAT(HS.hora_fin, '%h:%i %p')
+                                )
+                                ORDER BY HS.dia_semana ASC, HS.hora_inicio ASC
+                                SEPARATOR ' | '
+                            ) AS horarios
+                        FROM servicio SERV
+                        LEFT JOIN horario_servicio HS 
+                            ON SERV.id_servicio = HS.id_servicio 
+                            AND HS.estado = 'Activo'
+                        WHERE SERV.id_veterinaria = :id_veterinaria
+                        GROUP BY SERV.id_servicio, SERV.nombre, SERV.estado;";
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_veterinaria', $id_veterinaria);
             $resultado->execute();

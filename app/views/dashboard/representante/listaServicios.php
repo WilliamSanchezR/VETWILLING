@@ -107,7 +107,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                     <thead>
                         <tr>
                             <th>Nombre</th>
-                            <th>Descripción</th>
+                            <th>Horarios</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -118,7 +118,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                                 <tr class="fila-blanca">
 
                                     <td><?= htmlspecialchars($servicio['nombre']) ?></td>
-                                    <td><?= htmlspecialchars($servicio['descripcion']) ?></td>
+                                    <td><?= htmlspecialchars($servicio['horarios']) ?></td>
                                     <td><?= htmlspecialchars($servicio['estado']) ?></td>
 
                                     <td>
