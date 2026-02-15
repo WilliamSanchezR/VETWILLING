@@ -165,18 +165,18 @@ $agendaProfesional = obtenerDisponibilidadesPorUsuario($id, $_SESSION['user']['i
 
             <div class="modal fade" id="modalAgregarAgenda" tabindex="-1" aria-labelledby="modalAgregarAgendaLabel" aria-hidden="true">
                 <div class="modal-dialog">
-                    <form id="formAgenda" method="POST" action="<?= BASE_URL ?>/representante/agregar-disponibilidad-agenda" enctype="multipart/form-data">
+                    <form id="formAgenda" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="id_usuario" value="<?= htmlspecialchars($_GET['id']) ?>">
                         <input type="hidden" name="id_veterinaria" value="<?= htmlspecialchars($_SESSION['user']['id_veterinaria']) ?>">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="modalAgregarAgendaLabel"><i class="bi bi-calendar-plus"></i> Agregar disponibilidad de agenda</h1>
+                                <h2 class="modal-title" id="modalAgregarAgendaLabel"><i class="bi bi-calendar-plus"></i> Agregar disponibilidad de agenda</h2>
                             </div>
                             <div class="modal-body">
 
                                 <div class="form-modal">
                                     <div class="form-group-ag">
-                                        <label for="especialidad" class="form-label-ag">Especialidad</label>
+                                        <label for="especialidad" class="form-label-ag"><i class="bi bi-card-heading"></i> Especialidad</label>
                                         <select class="form-control-ag" id="especialidad" name="id_especialidad" required>
                                             <option value="" disabled selected>Seleccione una especialidad</option>
                                             <?php foreach ($listaEspecialidadesProfesional as $especialidad): ?>
@@ -186,7 +186,7 @@ $agendaProfesional = obtenerDisponibilidadesPorUsuario($id, $_SESSION['user']['i
                                     </div>
 
                                     <div class="form-group-ag">
-                                        <label for="dia_semana" class="form-label-ag">Día de la semana</label>
+                                        <label for="dia_semana" class="form-label-ag"> <i class="bi bi-calendar3"></i> Día de la semana</label>
                                         <select class="form-control-ag" id="dia_semana" name="dia_semana" required>
                                             <option value="">Seleccione...</option>
                                             <option value="1">Lunes</option>
@@ -200,39 +200,43 @@ $agendaProfesional = obtenerDisponibilidadesPorUsuario($id, $_SESSION['user']['i
                                     </div>
 
 
-                                    <div class="row">
+                                    <div class="row form-group-ag">
+                                        <div class="col-md-12 form-label-ag bold"><i class="bi bi-clock-history"></i> Primera Jornada</div>
                                         <div class="col-md-6">
-                                            <label for="hora_inicio" class="form-label-ag">Hora Inicio</label>
-                                            <input type="time" class="form-control-ag" id="hora_inicio" name="hora_inicio" required>
+                                            <label for="hora_inicio" class="form-label-ag"><i class="bi bi-clock"></i> Hora Inicio</label>
+                                            <input type="time" class="form-control-ag" id="hora_inicio" name="hora_inicio">
                                         </div>
 
                                         <div class="col-md-6">
-                                            <label for="hora_fin" class="form-label-ag">Hora Fin</label>
-                                            <input type="time" class="form-control-ag" id="hora_fin" name="hora_fin" required>
+                                            <label for="hora_fin" class="form-label-ag"><i class="bi bi-clock"></i> Hora Fin</label>
+                                            <input type="time" class="form-control-ag" id="hora_fin" name="hora_fin">
                                         </div>
                                     </div>
 
-                                    <div class="row">
+                                    <div class="row form-group-ag">
+                                        <div class="col-md-12 form-label-ag bold"><i class="bi bi-clock-history"></i> Segunda Jornada</div>
                                         <div class="col-md-6">
-                                            <label for="hora_inicio_seccond" class="form-label-ag">Hora Inicio</label>
+                                            <label for="hora_inicio_seccond" class="form-label-ag"><i class="bi bi-clock"></i> Hora Inicio</label>
                                             <input type="time" class="form-control-ag" id="hora_inicio_seccond" name="hora_inicio_seccond">
                                         </div>
 
                                         <div class="col-md-6">
-                                            <label for="hora_fin_seccond" class="form-label-ag">Hora Fin</label>
+                                            <label for="hora_fin_seccond" class="form-label-ag"><i class="bi bi-clock"></i> Hora Fin</label>
                                             <input type="time" class="form-control-ag" id="hora_fin_seccond" name="hora_fin_seccond">
                                         </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="duracion_minutos" class="form-label-ag">Duración por cita (minutos)</label>
-                                        <select class="form-control-ag" id="duracion_minutos" name="duracion_minutos" required>
-                                            <option value="15">15 minutos</option>
-                                            <option value="20">20 minutos</option>
-                                            <option value="30">30 minutos</option>
-                                            <option value="45">45 minutos</option>
-                                            <option value="60">60 minutos</option>
-                                        </select>
+                                    <div class="row form-group-ag">
+                                        <div class="mb-3">
+                                            <label for="duracion_minutos" class="form-label-ag"><i class="bi bi-stopwatch"></i> Duración por cita (minutos)</label>
+                                            <select class="form-control-ag" id="duracion_minutos" name="duracion_minutos" required>
+                                                <option value="15">15 minutos</option>
+                                                <option value="20">20 minutos</option>
+                                                <option value="30">30 minutos</option>
+                                                <option value="45">45 minutos</option>
+                                                <option value="60">60 minutos</option>
+                                            </select>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -261,12 +265,12 @@ $agendaProfesional = obtenerDisponibilidadesPorUsuario($id, $_SESSION['user']['i
 
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h2 class="modal-title" id="modalEditarAgendaLabel">Editar disponibilidad de agenda</h2>
+                            <h2 class="modal-title" id="modalEditarAgendaLabel"><i class="bi bi-calendar-plus"></i> Editar disponibilidad de agenda</h2>
                         </div>
                         <div class="modal-body">
                             <div class="form-modal">
                                 <div class="form-group-ag">
-                                    <label for="id_especialidad" class="form-label-ag">Especialidad</label>
+                                     <label for="edit_especialidad" class="form-label-ag"><i class="bi bi-card-heading"></i> Especialidad</label>
                                     <select class="form-control-ag" id="edit_especialidad" name="id_especialidad" required>
                                         <option value="" disabled selected>Seleccione una especialidad</option>
                                         <?php foreach ($listaEspecialidadesProfesional as $especialidad): ?>
@@ -276,7 +280,7 @@ $agendaProfesional = obtenerDisponibilidadesPorUsuario($id, $_SESSION['user']['i
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="edit_dia" class="form-label-ag">Día de la semana</label>
+                                    <label for="edit_dia" class="form-label-ag"><i class="bi bi-calendar3"></i> Día de la semana</label>
                                     <select class="form-control-ag" id="edit_dia" name="dia_semana" required>
                                         <option value="">Seleccione...</option>
                                         <option value="1">Lunes</option>
@@ -291,20 +295,21 @@ $agendaProfesional = obtenerDisponibilidadesPorUsuario($id, $_SESSION['user']['i
 
 
                                 <div class="row">
+
                                     <div class="col-md-6">
-                                        <label for="hora_inicio" class="form-label-ag">Hora Inicio</label>
+                                        <label for="edit_hora_inicio" class="form-label-ag"><i class="bi bi-clock"></i> Hora Inicio</label>
                                         <input type="time" class="form-control-ag" id="edit_hora_inicio" name="hora_inicio" required>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label for="hora_fin" class="form-label-ag">Hora Fin</label>
+                                        <label for="edit_hora_fin" class="form-label-ag"><i class="bi bi-clock"></i> Hora Fin</label>
                                         <input type="time" class="form-control-ag" id="edit_hora_fin" name="hora_fin" required>
                                     </div>
                                 </div>
 
 
                                 <div class="mb-3">
-                                    <label for="duracion_minutos" class="form-label-ag">Duración por cita (minutos)</label>
+                                    <label for="edit_duracion" class="form-label-ag"><i class="bi bi-clock"></i> Duración por cita (minutos)</label>
                                     <select class="form-control-ag" id="edit_duracion" name="duracion_minutos" required>
                                         <option value="15">15 minutos</option>
                                         <option value="20">20 minutos</option>

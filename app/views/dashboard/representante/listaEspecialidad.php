@@ -161,7 +161,7 @@ $listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
                         <div class="form-modal">
                             <div class="form-group-ag">
                                 <label class="form-label-ag" for="nombre">
-                                    <i class="bi bi-folder-check"></i>
+                                    <i class="bi bi-card-heading"></i>
                                     Nombre
                                     <span class="required">*</span>
                                 </label>
@@ -210,7 +210,7 @@ $listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
 
                         <div class="form-modal">
                             <div class="form-group-ag">
-                                <label class="form-label-ag" for="nombre_especialidad"><i class="bi bi-folder-check"></i>
+                                <label class="form-label-ag" for="nombre_especialidad"><i class="bi bi-card-heading"></i>
                                     Nombre
                                     <span class="required">*</span>
                                 </label>
