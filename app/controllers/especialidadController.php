@@ -45,9 +45,10 @@ function registrarEspecialidad()
     // Capturamos los datos enviados por el formulario
     $nombre = $_POST['nombre'] ?? '';
     $id_veterinaria = $_POST['id_veterinaria'] ?? '';
+    $servicio = $_POST['servicio'] ?? '';
 
     // Validamos que los campos no esten vacios
-    if (empty($nombre) || empty($id_veterinaria)) {
+    if (empty($nombre) || empty($id_veterinaria) || empty($servicio)) {
         // Mostrar un mensaje de error si algún campo está vacío
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
@@ -59,6 +60,7 @@ function registrarEspecialidad()
     // Preparamos los datos para registrar la especialidad
     $data = [
         'nombre' => $nombre,
+        'servicio' => $servicio,
         'id_veterinaria' => $id_veterinaria 
     ];
 
@@ -86,9 +88,10 @@ function actualizarEspecialidad() {
     // Capturamos los datos enviados por el formulario
     $id_especialidad = $_POST['id_especialidad'] ?? '';
     $nombre_especialidad = $_POST['nombre_especialidad'] ?? '';
+    $servicio_especialidad = $_POST['servicio_especialidad'] ?? '';
 
     // Validamos que los campos no esten vacios
-    if (empty($id_especialidad) || empty($nombre_especialidad)) {
+    if (empty($id_especialidad) || empty($nombre_especialidad) || empty($servicio_especialidad)) {
         // Mostrar un mensaje de error si algún campo está vacío
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
@@ -100,7 +103,8 @@ function actualizarEspecialidad() {
     // Preparamos los datos para actualizar la especialidad
     $data = [
         'id_especialidad' => $id_especialidad,
-        'nombre' => $nombre_especialidad
+        'nombre' => $nombre_especialidad,
+        'servicio' => $servicio_especialidad
     ];
 
     // Llamamos a la función actualizar del modelo

@@ -2,9 +2,15 @@
 // Enlazamos la ruta para tomar la session del representante
 require_once BASE_PATH . '/app/helpers/session_representante.php';
 require_once BASE_PATH . '/app/controllers/especialidadController.php';
+require_once BASE_PATH . '/app/controllers/servicioController.php';
+
 
 $datos = listarEspecialidadesRegistradas($_SESSION['user']['id_veterinaria']);
 $id_EspecialidadEditar = null;
+
+$listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
+
+
 
 ?>
 
@@ -106,7 +112,8 @@ $id_EspecialidadEditar = null;
                 <table id="tablaListaEspecialidades" class="display tabla-admin" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
+                            <th>Nombre Especialidad</th>
+                            <th>Nombre Servicio</th>
                             <th>Estado</th>
                             <th></th>
                         </tr>
@@ -116,11 +123,12 @@ $id_EspecialidadEditar = null;
                             <?php foreach ($datos as $especialidad):  ?>
                                 <tr class="fila-blanca">
 
-                                    <td><?= htmlspecialchars($especialidad['nombre']) ?></td>
+                                    <td><?= htmlspecialchars($especialidad['nombre_esp']) ?></td>
+                                    <td><?= htmlspecialchars($especialidad['nombre_ser']) ?></td>     
                                     <td><?= htmlspecialchars($especialidad['estado']) ?></td>
 
                                     <td>
-                                        <button class="btn-accion btn-editar" title="Editar" data-id="<?= $especialidad['id_especialidad'] ?>" data-name="<?= htmlspecialchars($especialidad['nombre']) ?>" data-bs-toggle="modal" data-bs-target="#modalEditarEspecialidad">
+                                        <button class="btn-accion btn-editar" title="Editar" data-id="<?= $especialidad['id_especialidad'] ?>" data-name="<?= htmlspecialchars($especialidad['nombre_esp']) ?>" data-servicio="<?= $especialidad['id_servicio'] ?>" data-bs-toggle="modal" data-bs-target="#modalEditarEspecialidad">
                                             <i class="bi bi-pencil"></i>
                                         </button>
 
@@ -156,6 +164,24 @@ $id_EspecialidadEditar = null;
                             <input type="text" id="nombre" name="nombre" required placeholder="Ej: Cardiología">
                             
                         </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label><i class="bi bi-person-rolodex"></i> Servicio *</label>
+                                <select id="servicio" name="servicio" required>
+                                    <option value="" disabled selected>Seleccione un servicio</option>
+
+
+                                    <?php if (!empty($listaServicios)) : ?>
+                                        <?php foreach ($listaServicios as $servicio):  ?>
+                                            <option value="<?= $servicio['id_servicio'] ?>"><?= htmlspecialchars($servicio['nombre']) ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                        </div>
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Guardar</button>
@@ -185,7 +211,26 @@ $id_EspecialidadEditar = null;
                             <input type="text" id="nombre_especialidad" name="nombre_especialidad" required placeholder="Ej: Cardiología">
                             
                         </div>
+
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label><i class="bi bi-person-rolodex"></i> Servicio *</label>
+                                <select id="servicio_especialidad" name="servicio_especialidad" required>
+                                    <option value="" disabled selected>Seleccione un servicio</option>
+
+
+                                    <?php if (!empty($listaServicios)) : ?>
+                                        <?php foreach ($listaServicios as $servicio):  ?>
+                                            <option value="<?= $servicio['id_servicio'] ?>"><?= htmlspecialchars($servicio['nombre']) ?></option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                        </div>
+
                     </div>
+
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Actualizar</button>
                     </div>

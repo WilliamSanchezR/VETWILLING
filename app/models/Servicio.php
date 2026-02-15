@@ -261,4 +261,24 @@ class Servicio
             return false;
         }
     }
+
+    // FUNCION PARA OBTENER LOS SERVICIOS ACTIVOS DE UNA VETERINARIA
+    public function obtenerServiciosActivos($id_veterinaria)
+    {
+        try {
+            // CONSULTA PARA TRAER EL ID DEL SERVICIO EL NOMBRE RELACIONADOS A LA VETERINARIA ACTIVA 
+            $consulta = "SELECT se.id_servicio, se.nombre
+                        FROM servicio se 
+                        WHERE se.id_veterinaria = :id_veterinaria AND se.estado = 'Activo'
+                        GROUP BY se.id_servicio;";
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_veterinaria', $id_veterinaria);
+            $resultado->execute();
+
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los servicios activos: " . $e->getMessage();
+            return [];
+        }
+    }
 }

@@ -51,12 +51,12 @@ class Especialidad
                 }
             } else {
                 // La especialidad no existe, la registramos
-                $consulta = "INSERT INTO especialidad (nombre) 
-                             VALUES (:nombre)";
+                $consulta = "INSERT INTO especialidad (nombre, id_servicio_esp) 
+                             VALUES (:nombre, :servicio)";
 
                 $resultado = $this->conexion->prepare($consulta);
                 $resultado->bindParam(':nombre', $data['nombre']);
-
+                $resultado->bindParam(':servicio', $data['servicio']);
                 // Ejecutamos la consulta
                 $resultado->execute();
 
@@ -77,9 +77,10 @@ class Especialidad
     {
         // Listamos las especialidades registradas en la base de datos
         try {
-            $consulta = "SELECT ESP.id_especialidad, ESP.nombre, ESPV.estado
+            $consulta = "SELECT ESP.id_especialidad, ESP.nombre As nombre_esp, SERV.nombre AS nombre_ser, SERV.id_servicio, ESPV.estado
                         FROM esps_por_veterinaria ESPV
                         INNER JOIN especialidad ESP On ESPV.id_especialidad = ESP.id_especialidad
+                        INNER JOIN servicio SERV On ESP.id_servicio_esp = SERV.id_servicio
                         WHERE ESPV.id_veterinaria = :id_veterinaria";
 
             $resultado = $this->conexion->prepare($consulta);
@@ -113,11 +114,12 @@ class Especialidad
     {
         try {
             $consulta = "UPDATE especialidad 
-                         SET nombre = :nombre_especialidad 
+                         SET nombre = :nombre_especialidad, id_servicio_esp = :servicio 
                          WHERE id_especialidad = :id_especialidad";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':nombre_especialidad', $data['nombre']);
+            $resultado->bindParam(':servicio', $data['servicio']);  
             $resultado->bindParam(':id_especialidad', $data['id_especialidad'], PDO::PARAM_INT);
 
             return $resultado->execute();
