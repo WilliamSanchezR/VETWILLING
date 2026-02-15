@@ -14,6 +14,7 @@ class AgendaProfesional {
         this.btnEditarAgenda = document.querySelectorAll('.btn-editar-agenda');
         this.btnEliminarAgenda = document.querySelectorAll('.btn-eliminar-agenda');
         this.segundaFranjaHorarioContainer = document.getElementById('segundaFranjaHorarioContainer');
+        this.formAgendaRegister = document.getElementById('formAgenda');
     }
 
     bindEvents() {
@@ -44,6 +45,16 @@ class AgendaProfesional {
 
                     }
                 })
+            });
+        }
+
+        if (this.formAgendaRegister) {
+            this.formAgendaRegister.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(this.formAgendaRegister);
+                const data = Object.fromEntries(formData.entries());
+                this.crearAgendaProfesional(data);
             });
         }
     }
@@ -173,6 +184,94 @@ class AgendaProfesional {
         document.getElementById('edit_duracion').value = disponibilidad.duracion;
         document.getElementById('edit_especialidad').value = disponibilidad.id_especialidad;
 
+    }
+
+    crearAgendaProfesional(data) {
+        // Validamos que los campos obligatorios se hallan registrado
+        if (!data.id_usuario || !data.id_veterinaria || !data.dia_semana || !data.duracion_minutos) {
+            this.mostrarMensajeError('Campos vacíos', 'Por favor complete todos los campos obligatorios');
+            return;
+        }
+
+        // Verificar si el primer par de horarios está ingresado (ambos o ninguno)
+        const tienePrimerHorario = data.hora_inicio || data.hora_fin;
+        const primerHorarioCompleto = data.hora_inicio && data.hora_fin;
+
+        // Verificar si el segundo par de horarios está ingresado (ambos o ninguno)
+        const tieneSegundoHorario = data.hora_inicio_seccond || data.hora_fin_seccond;
+        const segundoHorarioCompleto = data.hora_inicio_seccond && data.hora_fin_seccond;
+
+        // Validar que al menos uno de los dos grupos de horarios esté completo
+        if (!primerHorarioCompleto && !segundoHorarioCompleto) {
+            this.mostrarMensajeError('Horario incompleto', 'Debe ingresar al menos un par completo de horarios (inicio y fin)');
+            return;
+        }
+
+        // Validar que si se ingresó uno del primer par, el otro también debe estar ingresado
+        if (tienePrimerHorario && !primerHorarioCompleto) {
+            this.mostrarMensajeError('Horario de la mañana incompleto', 'Si ingresa un horario en la mañana, debe completar tanto la hora de inicio como la hora de fin');
+            return;
+        }
+
+        // Validar que si se ingresó uno del segundo par, el otro también debe estar ingresado
+        if (tieneSegundoHorario && !segundoHorarioCompleto) {
+            this.mostrarMensajeError('Horario de la tarde incompleto', 'Si ingresa un horario en el horario de la tarde, debe completar tanto la hora de inicio como la hora de fin');
+            return;
+        }
+
+        // Validamos si se ingreso el primero horario y el segundo horario, el horario de la tarde no puede ser menor al horario de la mañana
+        if (primerHorarioCompleto && segundoHorarioCompleto) {
+            const horaInicioManana = new Date(`1970-01-01T${data.hora_inicio}:00`);
+            const horaFinManana = new Date(`1970-01-01T${data.hora_fin}:00`);
+            const horaInicioTarde = new Date(`1970-01-01T${data.hora_inicio_seccond}:00`);
+            const horaFinTarde = new Date(`1970-01-01T${data.hora_fin_seccond}:00`);
+
+            if (horaInicioTarde < horaFinManana) {
+                this.mostrarMensajeError('Horario de la tarde inválido', 'El horario de la tarde no puede ser menor al horario de la mañana');
+                return;
+            }
+
+                if (horaFinTarde < horaFinManana) {
+                this.mostrarMensajeError('Horario de la tarde inválido', 'El horario de la tarde no puede ser menor al horario de la mañana');
+                return;
+            }
+        }
+
+        // Enviar datos al servidor para registrar la disponibilidad
+        fetch(`${window.location.origin}/vetwilling/representante/agregar-disponibilidad-agenda`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Disponibilidad registrada',
+                    text: 'La disponibilidad ha sido registrada exitosamente.'
+                });
+                // Recargar la página después de cerrar el mensaje
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                this.mostrarMensajeError('Error al registrar', 'Hubo un problema al registrar la disponibilidad.');
+            }
+        })
+        .catch(error => {
+            this.mostrarMensajeError('Error al registrar', 'Hubo un problema al registrar la disponibilidad.');
+        });
+    }
+
+    mostrarMensajeError(title, mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: title,
+            text: mensaje
+        });
     }
 }
 

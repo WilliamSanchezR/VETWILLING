@@ -54,37 +54,54 @@ function listaUsuarios($id_veterinaria)
 // Función para agregar una nueva disponibilidad a la agenda
 function agregarDisponibilidadAgenda()
 {
+    // Obtenermos los datos enviados en JSON
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
     // Creamos una instancia del modelo DisponibilidadUsuario
     $disponibilidadUsuarioModel = new DisponibilidadUsuario();
 
-    $data = [
-        'id_usuario' => $_POST['id_usuario'],
-        'id_especialidad' => $_POST['id_especialidad'],
-        'id_veterinaria' => $_POST['id_veterinaria'],
-        'dia_semana' => $_POST['dia_semana'],
-        'hora_inicio' => $_POST['hora_inicio'],
-        'hora_fin' => $_POST['hora_fin'],
-        'hora_inicio_2' => $_POST['hora_inicio_seccond'],
-        'hora_fin_2' => $_POST['hora_fin_seccond'],
-        'duracion_minutos' => $_POST['duracion_minutos']
-    ];
+    // Validar campos obligatorios básicos
+    if (empty($data['id_usuario']) || empty($data['id_veterinaria']) || empty($data['dia_semana']) || empty($data['duracion_minutos'])) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos obligatorios');
+        exit();
+    }
 
-    if (empty($data['id_usuario']) || empty($data['id_veterinaria']) || empty($data['dia_semana']) || empty($data['hora_inicio']) || empty($data['hora_fin']) || empty($data['duracion_minutos']) || (empty($data['hora_inicio_2']) && !empty($data['hora_fin_2'])) || (!empty($data['hora_inicio_2']) && empty($data['hora_fin_2']))) {
-        // Mostrar un mensaje de error si algún campo está vacío
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
+    // Verificar si el primer par de horarios está ingresado (ambos o ninguno)
+    $tienePrimerHorario = !empty($data['hora_inicio']) || !empty($data['hora_fin']);
+    $primerHorarioCompleto = !empty($data['hora_inicio']) && !empty($data['hora_fin']);
+
+    // Verificar si el segundo par de horarios está ingresado (ambos o ninguno)
+    $tieneSegundoHorario = !empty($data['hora_inicio_seccond']) || !empty($data['hora_fin_seccond']);
+    $segundoHorarioCompleto = !empty($data['hora_inicio_seccond']) && !empty($data['hora_fin_seccond']);
+
+    // Validar que al menos uno de los dos grupos de horarios esté completo
+    if (!$primerHorarioCompleto && !$segundoHorarioCompleto) {
+        mostrarSweetAlert('error', 'Horario incompleto', 'Debe ingresar al menos un par completo de horarios (inicio y fin)');
+        exit();
+    }
+
+    // Validar que si se ingresó uno del primer par, el otro también debe estar ingresado
+    if ($tienePrimerHorario && !$primerHorarioCompleto) {
+        mostrarSweetAlert('error', 'Primera franja incompleta', 'Si ingresa un horario en la primera franja, debe completar tanto la hora de inicio como la hora de fin');
+        exit();
+    }
+
+    // Validar que si se ingresó uno del segundo par, el otro también debe estar ingresado
+    if ($tieneSegundoHorario && !$segundoHorarioCompleto) {
+        mostrarSweetAlert('error', 'Segunda franja incompleta', 'Si ingresa un horario en la segunda franja, debe completar tanto la hora de inicio como la hora de fin');
         exit();
     }
 
     // Llamamos al método agregarDisponibilidadAgenda del modelo
     $resultado = $disponibilidadUsuarioModel->agregarDisponibilidadAgenda($data);
 
-    $redirect = $_POST['redirect'] ?? null;
-
-    if ($resultado) {
-        mostrarSweetAlert('success', 'Disponibilidad registrada', 'La disponibilidad ha sido registrada exitosamente.', $redirect);
-    } else {
-        mostrarSweetAlert('error', 'Error al registrar', 'Hubo un problema al registrar la disponibilidad.', $redirect);
-    }
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => $resultado ?  'success' : 'error',
+        'resultado' => $resultado
+    ]);
+    exit();
 }
 
 
