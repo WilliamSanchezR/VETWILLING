@@ -95,14 +95,14 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
         <div class="navbar-right">
             
             <!-- Botón Tema -->
-            <div class="navbar-action" data-tooltip="Cambiar tema">
+            <div class="navbar-action">
                 <button class="btn-icon" onclick="toggleTheme()" aria-label="Cambiar tema">
                     <i class="bi bi-moon-stars" id="themeIcon"></i>
                 </button>
             </div>
 
             <!-- Botón Notificaciones -->
-            <div class="navbar-action notifications-wrapper" data-tooltip="Notificaciones">
+            <div class="navbar-action notifications-wrapper">
                 <button class="btn-icon" onclick="toggleNotificaciones()" aria-label="Ver notificaciones">
                     <i class="bi bi-bell"></i>
                     <span class="notification-badge" id="notificationBadge">3</span>

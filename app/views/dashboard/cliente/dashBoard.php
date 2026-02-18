@@ -46,7 +46,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
                 <!-- BIENVENIDA -->
                 <div class="bienvenida-card">
-                    <h2>¡Bienvenido, <?= $usuario['nombres'] ?>! 🐾</h2>
+                    <h2>¡Bienvenido, <?= $usuario['nombres'] ?>! <i class="fas fa-paw" style="color: #ffffff; font-size: 0.9em;"></i></h2>
                     <p>Nos alegra verte nuevamente. En VetWilling cuidamos de tus mascotas con amor, profesionalismo y dedicación.</p>
                     <p class="frase">Tu familia está en buenas patas.</p>
                 </div>
@@ -122,7 +122,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                         </div>
 
                         <div class="recordatorio-item">
-                            <div class="recordatorio-icon">💊</div>
+                            <div class="recordatorio-icon"><span><i class="bi bi-capsule"></i></span></div>
                             <div class="recordatorio-texto">
                                 <h4>Desparasitación - Luna</h4>
                                 <p>Próxima dosis en 5 días</p>
@@ -130,7 +130,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                         </div>
 
                         <div class="recordatorio-item">
-                            <div class="recordatorio-icon">🩺</div>
+                            <div class="recordatorio-icon"><span><i class="bi bi-heart-pulse-fill"></i></span></div>
                             <div class="recordatorio-texto">
                                 <h4>Control anual - Rocky</h4>
                                 <p>Programar chequeo general para diciembre</p>
@@ -138,7 +138,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                         </div>
 
                         <div class="recordatorio-item">
-                            <div class="recordatorio-icon">🛁</div>
+                            <div class="recordatorio-icon"><span><i class="bi bi-droplet-fill"></i></span></div>
                             <div class="recordatorio-texto">
                                 <h4>Baño programado - Luna</h4>
                                 <p>28 de noviembre a las 11:00 AM</p>

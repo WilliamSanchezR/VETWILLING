@@ -171,7 +171,7 @@
                                                 type="button"
                                                 class="btn btn-link btn-sm p-0 ms-1"
                                                 data-bs-toggle="tooltip"
-                                                title="3 o 4 dígitos en el reverso de la tarjeta">
+                                                title="3 dígitos en el reverso de la tarjeta">
                                                 <i class="bi bi-question-circle"></i>
                                             </button>
                                         </label>
