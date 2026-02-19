@@ -83,7 +83,7 @@ function animarEstadisticas() {
 // ========== CONFIGURAR EVENT LISTENERS ==========
 function configurarEventListeners() {
     // Botones de acción
-    const btnNuevoPaciente = document.querySelector('[onclick*="abrirModalNuevoPaciente"]');
+    const btnNuevoPaciente = document.getElementById('btnNuevoPaciente');
     if (btnNuevoPaciente) {
         btnNuevoPaciente.addEventListener('click', function (e) {
             e.preventDefault();
@@ -257,11 +257,297 @@ function configurarBotonesTabla() {
 
 // ========== ACCIONES DE PACIENTES ==========
 function abrirModalNuevoPaciente() {
-    // Implementar modal de nuevo paciente
-    console.log('Abrir modal nuevo paciente');
+    if (typeof Swal === 'undefined') {
+        console.error('SweetAlert2 no esta disponible');
+        mostrarNotificacion('No se pudo abrir el formulario. Falta SweetAlert2.', 'error');
+        return;
+    }
 
-    // Ejemplo: mostrar alerta
-    mostrarNotificacion('Abriendo formulario de nuevo paciente...', 'info');
+    Swal.fire({
+        title: 'Nuevo Paciente',
+        html: `
+            <div class="form-paciente">
+                <div class="form-grid-2">
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Nombres *</label>
+                        <input id="pac-nombres" class="form-control-paciente" type="text" placeholder="Juan Carlos">
+                    </div>
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Apellidos *</label>
+                        <input id="pac-apellidos" class="form-control-paciente" type="text" placeholder="Perez Garcia">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Tipo de documento *</label>
+                        <select id="pac-tipo-documento" class="form-control-paciente">
+                            <option value="">Seleccione...</option>
+                            <option value="CC">CC - Cedula</option>
+                            <option value="TI">TI - Tarjeta de Identidad</option>
+                            <option value="CE">CE - Cedula de Extranjeria</option>
+                        </select>
+                    </div>
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Numero de documento *</label>
+                        <input id="pac-numero-documento" class="form-control-paciente" type="text" placeholder="12345678">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Telefono *</label>
+                        <input id="pac-telefono" class="form-control-paciente" type="tel" placeholder="3001234567">
+                    </div>
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Email *</label>
+                        <input id="pac-email" class="form-control-paciente" type="email" placeholder="correo@dominio.com">
+                    </div>
+                </div>
+
+                <div class="form-group-paciente">
+                    <label class="form-label-paciente">Direccion *</label>
+                    <input id="pac-direccion" class="form-control-paciente" type="text" placeholder="Calle 12 # 34-56">
+                </div>
+
+                <div class="form-divider-paciente"></div>
+
+                <div class="form-grid-2">
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Nombre de mascota *</label>
+                        <input id="pac-nombre-mascota" class="form-control-paciente" type="text" placeholder="Max">
+                    </div>
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Especie *</label>
+                        <select id="pac-especie" class="form-control-paciente">
+                            <option value="">Seleccione...</option>
+                            <option value="Perro">Perro</option>
+                            <option value="Gato">Gato</option>
+                            <option value="Ave">Ave</option>
+                            <option value="Conejo">Conejo</option>
+                            <option value="Hamster">Hamster</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Raza *</label>
+                        <input id="pac-raza" class="form-control-paciente" type="text" placeholder="Labrador">
+                    </div>
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Sexo *</label>
+                        <select id="pac-sexo" class="form-control-paciente">
+                            <option value="">Seleccione...</option>
+                            <option value="Macho">Macho</option>
+                            <option value="Hembra">Hembra</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Edad *</label>
+                        <input id="pac-edad-numero" class="form-control-paciente" type="number" min="0" placeholder="3">
+                    </div>
+                    <div class="form-group-paciente">
+                        <label class="form-label-paciente">Unidad de edad *</label>
+                        <select id="pac-edad-unidad" class="form-control-paciente">
+                            <option value="">Seleccione...</option>
+                            <option value="Anios">Anios</option>
+                            <option value="Meses">Meses</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Registrar',
+        cancelButtonText: 'Cancelar',
+        width: '700px',
+        padding: '24px',
+        background: '#ffffff',
+        customClass: {
+            popup: 'popup-paciente',
+            title: 'title-paciente',
+            confirmButton: 'btn-confirmar-paciente',
+            cancelButton: 'btn-cancelar-paciente'
+        },
+        buttonsStyling: false,
+        focusConfirm: false,
+        showLoaderOnConfirm: true,
+        didOpen: () => {
+            const styleId = 'swal-paciente-styles';
+            if (!document.getElementById(styleId)) {
+                const style = document.createElement('style');
+                style.id = styleId;
+                style.textContent = `
+                    .swal2-popup .form-paciente {
+                        text-align: left;
+                    }
+
+                    .swal2-popup .form-grid-2 {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 12px;
+                    }
+
+                    .swal2-popup .form-group-paciente {
+                        margin-bottom: 12px;
+                    }
+
+                    .swal2-popup .form-label-paciente {
+                        font-weight: 600;
+                        font-size: 13px;
+                        color: #00304d;
+                        margin-bottom: 6px;
+                        display: block;
+                    }
+
+                    .swal2-popup .form-control-paciente {
+                        width: 100%;
+                        padding: 10px 12px;
+                        border-radius: 8px;
+                        border: 1px solid #e0e0e0;
+                        font-size: 14px;
+                        outline: none;
+                        background: #ffffff;
+                    }
+
+                    .swal2-popup .form-control-paciente:focus {
+                        border-color: #0a932c;
+                        box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.12);
+                    }
+
+                    .swal2-popup .form-divider-paciente {
+                        height: 1px;
+                        background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+                        margin: 16px 0;
+                    }
+
+                    .popup-paciente {
+                        border-radius: 16px !important;
+                        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+                    }
+
+                    .title-paciente {
+                        font-size: 24px !important;
+                        font-weight: 700 !important;
+                        color: #00304d !important;
+                        padding: 20px 20px 10px 20px !important;
+                    }
+
+                    .swal2-actions {
+                        gap: 12px !important;
+                        margin-top: 20px !important;
+                    }
+
+                    .btn-confirmar-paciente,
+                    .btn-cancelar-paciente {
+                        padding: 12px 30px !important;
+                        border-radius: 10px !important;
+                        font-weight: 600 !important;
+                        font-size: 15px !important;
+                        transition: all 0.3s ease !important;
+                        border: none !important;
+                        cursor: pointer !important;
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        gap: 8px !important;
+                    }
+
+                    .btn-confirmar-paciente {
+                        background: linear-gradient(135deg, #0a932c 0%, #0a932c 100%) !important;
+                        color: #ffffff !important;
+                    }
+
+                    .btn-confirmar-paciente:hover {
+                        transform: translateY(-2px) !important;
+                        box-shadow: 0 8px 20px rgba(10, 147, 44, 0.35) !important;
+                    }
+
+                    .btn-cancelar-paciente {
+                        background: #f0f0f0 !important;
+                        color: #666666 !important;
+                    }
+
+                    .btn-cancelar-paciente:hover {
+                        background: #e0e0e0 !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        },
+        preConfirm: () => {
+            const data = {
+                nombres: document.getElementById('pac-nombres').value.trim(),
+                apellidos: document.getElementById('pac-apellidos').value.trim(),
+                tipo_documento: document.getElementById('pac-tipo-documento').value,
+                numero_documento: document.getElementById('pac-numero-documento').value.trim(),
+                telefono: document.getElementById('pac-telefono').value.trim(),
+                email: document.getElementById('pac-email').value.trim(),
+                direccion: document.getElementById('pac-direccion').value.trim(),
+                nombre_mascota: document.getElementById('pac-nombre-mascota').value.trim(),
+                especie: document.getElementById('pac-especie').value,
+                raza: document.getElementById('pac-raza').value.trim(),
+                sexo: document.getElementById('pac-sexo').value,
+                edad_numero: document.getElementById('pac-edad-numero').value.trim(),
+                edad_unidad: document.getElementById('pac-edad-unidad').value
+            };
+
+            const camposRequeridos = [
+                data.nombres,
+                data.apellidos,
+                data.tipo_documento,
+                data.numero_documento,
+                data.telefono,
+                data.email,
+                data.direccion,
+                data.nombre_mascota,
+                data.especie,
+                data.raza,
+                data.sexo,
+                data.edad_numero,
+                data.edad_unidad
+            ];
+
+            if (camposRequeridos.some(valor => !valor)) {
+                Swal.showValidationMessage('Completa todos los campos obligatorios.');
+                return false;
+            }
+
+            const formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+                formData.append(key, value);
+            });
+
+            return fetch('/vetwilling/veterinario/guardar-paciente', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (!result.success) {
+                        Swal.showValidationMessage(result.message || 'No se pudo registrar el paciente.');
+                        return false;
+                    }
+                    return result;
+                })
+                .catch(() => {
+                    Swal.showValidationMessage('Ocurrio un error al registrar el paciente.');
+                    return false;
+                });
+        }
+    }).then(result => {
+        if (result.isConfirmed && result.value && result.value.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Registro exitoso',
+                text: result.value.message || 'El paciente fue registrado correctamente.'
+            });
+        }
+    });
 }
 
 function verDetallesPaciente(fila) {

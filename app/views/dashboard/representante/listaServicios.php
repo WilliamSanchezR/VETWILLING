@@ -107,7 +107,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                     <thead>
                         <tr>
                             <th>Nombre</th>
-                            <th>Descripción</th>
+                            <th>Horarios</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -118,7 +118,7 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                                 <tr class="fila-blanca">
 
                                     <td><?= htmlspecialchars($servicio['nombre']) ?></td>
-                                    <td><?= htmlspecialchars($servicio['descripcion']) ?></td>
+                                    <td><?= htmlspecialchars($servicio['horarios']) ?></td>
                                     <td><?= htmlspecialchars($servicio['estado']) ?></td>
 
                                     <td>
@@ -155,7 +155,6 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
 
     <!-- 5. Script de lista de veterinarias -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
     <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
     <!-- Modo dia  y noche -->

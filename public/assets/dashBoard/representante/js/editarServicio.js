@@ -114,18 +114,22 @@ class EditarServicio {
                 return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
             };
 
-            const horaInicio = formatTime(diaObj.horario_1.hora_inicio);
-            const horaFin = formatTime(diaObj.horario_1.hora_fin);
-            const inicioHour = parseInt(diaObj.horario_1.hora_inicio.split(':')[0]);
-            const esAnteDeMedioDia = inicioHour < 12;
+            if (diaObj.horario_1) {
+                const horaInicio = formatTime(diaObj.horario_1.hora_inicio);
+                const horaFin = formatTime(diaObj.horario_1.hora_fin);
+                const inicioHour = parseInt(diaObj.horario_1.hora_inicio.split(':')[0]);
+                const esAnteDeMedioDia = inicioHour < 12;
 
-            if (esAnteDeMedioDia) {
-                horario1Cell.textContent = `${horaInicio} - ${horaFin}`;
-            } else if (!diaObj.horario_2 && !esAnteDeMedioDia) {
-                horario1Cell.textContent = 'N/A';
-                horario2Cell.textContent = `${horaInicio} - ${horaFin}`;
+                if (esAnteDeMedioDia) {
+                    horario1Cell.textContent = `${horaInicio} - ${horaFin}`;
+                } else if (!diaObj.horario_2 && !esAnteDeMedioDia) {
+                    horario1Cell.textContent = 'N/A';
+                    horario2Cell.textContent = `${horaInicio} - ${horaFin}`;
+                } else {
+                    horario1Cell.textContent = `${horaInicio} - ${horaFin}`;
+                }
             } else {
-                horario1Cell.textContent = `${horaInicio} - ${horaFin}`;
+                horario1Cell.textContent = 'N/A';
             }
 
             if (diaObj.horario_2) {
@@ -173,7 +177,15 @@ class EditarServicio {
             return;
         }
 
-        if (!this.hora_inicio_1.value || !this.hora_fin_1.value) {
+        var horaInicio1 = this.hora_inicio_1.value;
+        var horaFin1 = this.hora_fin_1.value;
+        var horaInicio2 = this.hora_inicio_2.value;
+        var horaFin2 = this.hora_fin_2.value;
+
+        var ingresoHorario1 = horaInicio1 || horaFin1;
+        var ingresoHorario2 = horaInicio2 || horaFin2;
+
+        if (ingresoHorario1 && (!this.hora_inicio_1.value || !this.hora_fin_1.value)) {
             Swal.fire({
                 title: 'Atención',
                 text: 'Por favor, ingrese la hora de inicio y fin para el primer horario.',
@@ -184,7 +196,7 @@ class EditarServicio {
             return;
         }
 
-        if (this.hora_inicio_2.value && !this.hora_fin_2.value) {
+        if (ingresoHorario2 && (!this.hora_inicio_2.value || !this.hora_fin_2.value)) {
             Swal.fire({
                 title: 'Atención',
                 text: 'Por favor, ingrese la hora de inicio y fin para el segundo horario.',
@@ -195,14 +207,15 @@ class EditarServicio {
             return;
         }
 
+
         if (combinedList.length > 0) {
 
             combinedList.forEach(diaObj => {
                 // validamos si el dia ya fue agregado
                 if (selectedDias.includes(diaObj.dia)) {
                     // validamos si los horarios coinciden
-                    const mismoHorario1 = diaObj.horario_1.hora_inicio === this.hora_inicio_1.value &&
-                        diaObj.horario_1.hora_fin === this.hora_fin_1.value;
+                    const mismoHorario1 = diaObj.horario_1?.hora_inicio === this.hora_inicio_1?.value &&
+                        diaObj.horario_1?.hora_fin === this.hora_fin_1?.value;
 
                     if (mismoHorario1) {
                         validacionReptidos = true;
@@ -210,7 +223,7 @@ class EditarServicio {
                     }
                     // Validamos si el horario se cruza con el ya existente 
                     const seCruzaHorario1 = ((this.hora_inicio_1?.value < diaObj.horario_1?.hora_fin) &&
-                        (this.hora_fin_1.value > diaObj.horario_1?.hora_inicio));
+                        (this.hora_fin_1?.value > diaObj.horario_1?.hora_inicio));
                     if (seCruzaHorario1) {
                         validacionReptidos = true;
                         return;
@@ -218,7 +231,7 @@ class EditarServicio {
 
                     // Valifamos si el primer horario no se cruce con el segundo horario ya existente
                     const seCruzaHorario1_2 = ((this.hora_inicio_1?.value < diaObj.horario_2?.hora_fin) &&
-                        (this.hora_fin_1.value > diaObj.horario_2?.hora_inicio));
+                        (this.hora_fin_1?.value > diaObj.horario_2?.hora_inicio));
 
                     if (seCruzaHorario1_2) {
                         validacionReptidos = true;
@@ -227,8 +240,8 @@ class EditarServicio {
 
                     // Validamos el segundo horario si existe
                     if (this.hora_inicio_2?.value && this.hora_fin_2?.value) {
-                        const mismoHorario2 = diaObj.horario_2.hora_inicio === this.hora_inicio_2.value &&
-                            diaObj.horario_2.hora_fin === this.hora_fin_2.value;
+                        const mismoHorario2 = diaObj.horario_2?.hora_inicio === this.hora_inicio_2?.value &&
+                            diaObj.horario_2?.hora_fin === this.hora_fin_2?.value;
                         if (mismoHorario2) {
                             validacionReptidos = true;
                             return;
@@ -270,11 +283,11 @@ class EditarServicio {
         const horarioData = selectedDias.map(dia => {
             const horario = {
                 dia: dia,
-                horario_1: {
+                horario_1: ingresoHorario1 ? {
                     hora_inicio: this.hora_inicio_1.value,
                     hora_fin: this.hora_fin_1.value
-                },
-                horario_2: this.hora_inicio_2.value ? {
+                } : null,
+                horario_2: ingresoHorario2 ? {
                     hora_inicio: this.hora_inicio_2.value,
                     hora_fin: this.hora_fin_2.value
                 } : null

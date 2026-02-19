@@ -46,6 +46,8 @@ class RegistroProfesionales {
             this.servicios.forEach(e => {
                 e.addEventListener('change', (event) => {
                     this.asociarServicios(event);
+                    // Cargar especialidades según servicios seleccionados
+                    this.cargarEspecialidadesPorServicios();
                 });
             });
         }
@@ -217,7 +219,120 @@ class RegistroProfesionales {
             const listaActualizada = listaServicios.filter(e => e.id !== idServ);
             this.inputServicios.value = JSON.stringify(listaActualizada);
             this.visualizarServicios();
+            // Recargar especialidades al eliminar un servicio
+            this.cargarEspecialidadesPorServicios();
         }
+    }
+
+    // Método para cargar especialidades según servicios seleccionados
+    cargarEspecialidadesPorServicios() {
+        const serviciosSeleccionados = this.inputServicios.value;
+        
+        // Si no hay servicios seleccionados, limpiar especialidades
+        if (!serviciosSeleccionados || serviciosSeleccionados.length === 0) {
+            this.actualizarListaEspecialidades([]);
+            return;
+        }
+
+        // Obtener los IDs de servicios seleccionados
+        const listaServicios = JSON.parse(serviciosSeleccionados);
+        const idsServicios = listaServicios.map(s => s.id).join(',');
+
+        // Realizar petición AJAX a la API
+        fetch(`/vetwilling/representante/api/especialidades?action=lista&servicio=${idsServicios}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    this.actualizarListaEspecialidades(data.especialidades);
+                } else {
+                    console.error('Error al cargar especialidades:', data);
+                    this.actualizarListaEspecialidades([]);
+                }
+            })
+            .catch(error => {
+                console.error('Error en la petición:', error);
+                this.actualizarListaEspecialidades([]);
+            });
+    }
+
+    // Método para actualizar la lista de especialidades en el DOM
+    actualizarListaEspecialidades(especialidades) {
+        const ulEspecialidades = this.listEspecialidades.querySelector('ul');
+        
+        if (!ulEspecialidades) return;
+
+        // Limpiar la lista actual
+        ulEspecialidades.innerHTML = '';
+
+        // Si no hay especialidades, mostrar mensaje
+        if (especialidades.length === 0) {
+            ulEspecialidades.innerHTML = '<li style="padding: 10px; text-align: center; color: #999;">Seleccione un servicio para ver las especialidades disponibles</li>';
+            // Limpiar especialidades seleccionadas
+            this.inputEspecialidades.value = '';
+            this.containerEspecialidades.innerHTML = '';
+            this.containerEspecialidades.style.display = 'none';
+            return;
+        }
+
+        // Obtener las especialidades actualmente seleccionadas
+        const especialidadesSeleccionadas = this.inputEspecialidades.value 
+            ? JSON.parse(this.inputEspecialidades.value) 
+            : [];
+
+        // Crear los nuevos items de la lista
+        especialidades.forEach(esp => {
+            const li = document.createElement('li');
+            const checkbox = document.createElement('input');
+            checkbox.className = 'form-check-input check-especialidades';
+            checkbox.type = 'checkbox';
+            checkbox.value = esp.id_especialidad;
+            checkbox.id = `idCheck${esp.id_especialidad}`;
+            checkbox.dataset.name = esp.nombre;
+
+            // Marcar como checked si ya estaba seleccionada
+            const yaSeleccionada = especialidadesSeleccionadas.find(
+                e => parseInt(e.id) === parseInt(esp.id_especialidad)
+            );
+            if (yaSeleccionada) {
+                checkbox.checked = true;
+            }
+
+            // Agregar evento change
+            checkbox.addEventListener('change', (event) => {
+                this.asociarEspecialidades(event);
+            });
+
+            const label = document.createElement('label');
+            label.htmlFor = `idCheck${esp.id_especialidad}`;
+            label.textContent = esp.nombre;
+
+            li.appendChild(checkbox);
+            li.appendChild(label);
+            ulEspecialidades.appendChild(li);
+        });
+
+        // Actualizar la referencia de los checkboxes
+        this.especialidades = this.$$('.check-especialidades');
+
+        // Filtrar especialidades seleccionadas que ya no están disponibles
+        this.filtrarEspecialidadesNoDisponibles(especialidades);
+    }
+
+    // Método para eliminar de las seleccionadas las que ya no están disponibles
+    filtrarEspecialidadesNoDisponibles(especialidadesDisponibles) {
+        const especialidadesSeleccionadas = this.inputEspecialidades.value 
+            ? JSON.parse(this.inputEspecialidades.value) 
+            : [];
+
+        if (especialidadesSeleccionadas.length === 0) return;
+
+        const idsDisponibles = especialidadesDisponibles.map(e => e.id_especialidad.toString());
+        const especialidadesFiltradas = especialidadesSeleccionadas.filter(
+            esp => idsDisponibles.includes(esp.id.toString())
+        );
+
+        this.inputEspecialidades.value = JSON.stringify(especialidadesFiltradas);
+        this.visualizarEspecialidades();
     }
 
 }

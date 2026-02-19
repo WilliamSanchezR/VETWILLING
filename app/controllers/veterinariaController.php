@@ -205,12 +205,23 @@ function actualizarVeterinaria()
     $telefono = $_POST['telefono'] ?? '';
     $email = $_POST['email'] ?? '';
     $estado = $_POST['estado'] ?? 'Activo';
+    /// Datos de representante legal
+    $id_usuario = $_POST['id_usuario'] ?? '';
+    $id_rol = $_POST['id_rol'] ?? '';
+    $tipo_documento = $_POST['tipo_documento'] ?? '';
+    $numero_documento = $_POST['numero_documento'] ?? '';
+    $nombres = $_POST['nombres'] ?? '';
+    $apellidos = $_POST['apellidos'] ?? '';
+    $email_user = $_POST['email_user'] ?? '';
+    $telefono_user = $_POST['telefono_user'] ?? '';
+    $direccion_user = $_POST['direccion_user'] ?? '';
+    $estado_user = $_POST['estado_user'] ?? '';
 
 
     // Validamos que los campos no esten vacios
     if (
         empty($nit) || empty($nombre) || empty($direccion) || empty($ciudad) || empty($telefono) ||
-        empty($email) || empty($estado)
+        empty($email) || empty($estado) || empty($id_usuario) || empty($tipo_documento) || empty($numero_documento) || empty($nombres) || empty($apellidos) || empty($telefono_user) || empty($email_user) || empty($id_rol) || empty($direccion_user)
     ) {
         // Mostrar un mensaje de error si algún campo está vacío
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
@@ -250,7 +261,17 @@ function actualizarVeterinaria()
         'email' => $email,
         'estado' => $estado,
         'foto' => $foto,
-        'id_veterinaria' => $_POST['id_veterinaria'] ?? ''
+        'id_veterinaria' => $_POST['id_veterinaria'] ?? '',
+        'id_usuario' => $id_usuario,
+        'id_rol' => $id_rol,
+        'tipo_documento' => $tipo_documento,
+        'numero_documento' => $numero_documento,
+        'nombres' => $nombres,
+        'apellidos' => $apellidos,
+        'email_user' => $email_user,
+        'telefono_user' => $telefono_user,
+        'direccion_user' => $direccion_user,
+        'estado_user' => $estado_user
     ];
     // Llamamos a la funcion actualizar del modelo Veterinaria
     $resultado = $objVeterinaria->actualizar($data);

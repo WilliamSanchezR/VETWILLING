@@ -71,20 +71,10 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     </li> -->
 
 
-                    <!-- Sección Especialidades -->
-                    <li>
-                        <a href="<?= BASE_URL ?>/representante/listar-especialidades"
-                            class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>"
-                            data-section="Especialidades" data-tooltip="Especialidades">
-                            <i class="bi bi-clipboard2-pulse"></i>
-                            <span class="nav-text">Especialidades</span>
-                        </a>
-                    </li>
-
                     <!-- Sessión con submenu Servicios y costos-->
                     <li>
 
-                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'listar-subservicios' ? 'active open' : '' ?>">
+                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'listar-subservicios' || $final_path == 'listar-especialidades' ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
                                 <i class="bi bi-database-up"></i>
@@ -94,10 +84,12 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
                             <ul class="submenu-seccond-items">
                                 <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios - Horarios</a></li>
+                                <li><a class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-especialidades" data-tooltip="Listar">Especialidades</a></li>
                                 <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios - Costo</a></li>
                             </ul>
                         </div>
                     </li>
+
 
                     <!-- Sección con submenú Profesionales  -->
                     <li>
