@@ -7,6 +7,7 @@ class ConfigVeterinaria {
     init() {
         console.log('ConfigVeterinaria initialized');
         this.cacheDom();
+        this.inicializarMunicipios();
         this.bindEvents();
         this.consultarHorariosExistentes();
     }
@@ -26,6 +27,15 @@ class ConfigVeterinaria {
         this.btnGuardarCambios = document.getElementById('btnGuardarVeterinaria');
         this.formVeterinariaRegister = document.getElementById('vetForm');
         this.idVeterinaria = document.getElementById('id_veterianaria').value;
+        this.selectCiudad = document.getElementById('ciudad');
+    }
+
+    /**
+     * Inicializa el select de municipios con los datos actuales
+     */
+    inicializarMunicipios() {
+        const municipioActual = this.selectCiudad?.getAttribute('data-value') || null;
+        renderizarMunicipios('ciudad', municipioActual);
     }
 
     bindEvents() {

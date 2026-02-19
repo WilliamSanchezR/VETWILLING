@@ -119,62 +119,7 @@ $veterinariaData = consultarVeterinariasRegistradas($idVeterinaria);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-pin-map"></i>Ciudad *</label>
-                                <select name="ciudad" id="ciudad" required>
-                                    <option value="<?= $veterinariaData['ciudad'] ?>"><?= $veterinariaData['ciudad'] ?></option>
-
-                                    <!-- Principales ciudades -->
-                                    <option value="Bogotá">Bogotá</option>
-                                    <option value="Medellín">Medellín</option>
-                                    <option value="Cali">Cali</option>
-                                    <option value="Barranquilla">Barranquilla</option>
-                                    <option value="Cartagena">Cartagena</option>
-                                    <option value="Bucaramanga">Bucaramanga</option>
-                                    <option value="Cúcuta">Cúcuta</option>
-                                    <option value="Pereira">Pereira</option>
-                                    <option value="Manizales">Manizales</option>
-                                    <option value="Armenia">Armenia</option>
-                                    <option value="Ibagué">Ibagué</option>
-                                    <option value="Villavicencio">Villavicencio</option>
-                                    <option value="Neiva">Neiva</option>
-                                    <option value="Pasto">Pasto</option>
-                                    <option value="Popayán">Popayán</option>
-                                    <option value="Tunja">Tunja</option>
-                                    <option value="Montería">Montería</option>
-                                    <option value="Sincelejo">Sincelejo</option>
-                                    <option value="Valledupar">Valledupar</option>
-                                    <option value="Riohacha">Riohacha</option>
-                                    <option value="Santa Marta">Santa Marta</option>
-                                    <option value="San Andrés">San Andrés</option>
-                                    <option value="Leticia">Leticia</option>
-                                    <option value="Mocoa">Mocoa</option>
-                                    <option value="Yopal">Yopal</option>
-                                    <option value="Arauca">Arauca</option>
-                                    <option value="Florencia">Florencia</option>
-                                    <option value="Quibdó">Quibdó</option>
-                                    <option value="Inírida">Inírida</option>
-                                    <option value="Mitú">Mitú</option>
-                                    <option value="Puerto Carreño">Puerto Carreño</option>
-
-                                    <!-- Área metropolitana y ciudades comunes -->
-                                    <option value="Soacha">Soacha</option>
-                                    <option value="Chía">Chía</option>
-                                    <option value="Zipaquirá">Zipaquirá</option>
-                                    <option value="Girardot">Girardot</option>
-                                    <option value="Facatativá">Facatativá</option>
-                                    <option value="Fusagasugá">Fusagasugá</option>
-
-                                    <option value="Envigado">Envigado</option>
-                                    <option value="Itagüí">Itagüí</option>
-                                    <option value="Bello">Bello</option>
-                                    <option value="Rionegro">Rionegro</option>
-
-                                    <option value="Palmira">Palmira</option>
-                                    <option value="Tuluá">Tuluá</option>
-                                    <option value="Buenaventura">Buenaventura</option>
-
-                                    <option value="Dosquebradas">Dosquebradas</option>
-                                    <option value="La Dorada">La Dorada</option>
-                                </select>
+                                <select name="ciudad" id="ciudad" data-value="<?= $veterinariaData['ciudad'] ?>" required></select>
                             </div>
                         </div>
 
@@ -313,6 +258,9 @@ $veterinariaData = consultarVeterinariasRegistradas($idVeterinaria);
 
     <!-- 5. Tu script de tabla AL FINAL -->
     <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+
+    <!-- Script de municipios -->
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/representante/js/municipios.js"></script>
 
     <script src="<?= BASE_URL ?>/public/assets/dashboard/representante/js/configVeterinaria.js"></script>
 
