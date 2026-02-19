@@ -101,6 +101,9 @@ switch ($request) {
     case '/veterinario/eliminar-disponibilidad-agenda':
         require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
         break;
+    case '/veterinario/suscripcion':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/suscripcion.php';
+        break;
 
     // RUTAS DEL CONTROLADOR DE CALENDARIO
     case '/calendario/cargar':
