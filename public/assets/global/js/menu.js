@@ -95,6 +95,17 @@ class MenuAdministrador {
             }
 
         });
+
+         document.querySelectorAll('.submenu-items a').forEach((element) => {
+            const href = element.getAttribute('href');
+            if (href.includes(paginaActual)) {
+                const parentSubMenu = element.closest('.submenu');
+                if (parentSubMenu) {
+                    parentSubMenu.classList.add('open', 'active');
+                }
+            }
+
+        });
     }
 
     toggleSidebar() {

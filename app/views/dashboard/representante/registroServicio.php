@@ -160,12 +160,12 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
                             <div class="form-group">
                                 <label><i class="bi bi-calendar-check"></i> Horarios Registrados</label>
                                 <div class="table-responsive">
-                                    <table id="tablaListaServicios" class="display tabla-admin" style="width:100%" id="tablaHorarios">
+                                    <table id="tablaHorarios" class="display tabla-admin" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th>Días</th>
-                                                <th>Horario Mañana</th>
-                                                <th>Horario Tarde</th>
+                                                <th>Horario Primera Jornada</th>
+                                                <th>Horario Segunda Jornada</th>
                                                 <th>Acciones</th>
                                             </tr>
                                         </thead>

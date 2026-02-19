@@ -15,6 +15,8 @@ switch ($method) {
         $accion = $_POST['accion'] ?? '';
         if ($accion === 'actualizar') {
             actualizarVeterinaria();
+        } else if ($accion === 'actualizarInfo') {
+            actualizarInfoVeterinaria();
         } else {
             registrarVeterinaria();
         }
@@ -22,9 +24,15 @@ switch ($method) {
 
     case 'GET':
         // Esta variable captura la accion de eliminar
-        $accion = $_GET['action'] ?? '';
-        if ($accion === 'eliminar') {
+        $action = $_GET['action'] ?? '';
+        if ($action === 'eliminar') {
             eliminarVeterinaria($_GET['id']);
+        }  elseif ($action === 'obtener_horarios') {
+            $id_veterinaria = $_GET['id'] ?? '';
+            consultarHorariosVeterinaria($id_veterinaria);
+        } elseif ($action === 'eliminar_horarios') {
+            $idHorario = $_GET['id'] ?? '';
+            eliminarHorariosPorVeterinaria($idHorario);
         }
         break;
 
@@ -318,4 +326,122 @@ function consultarVeterinariaPorId($id)
     $veterinariaModel = new Veterinaria();
     $veterinaria = $veterinariaModel->consultarVeterinariasRegistradas($id);
     return $veterinaria;
+}
+
+function actualizarInfoVeterinaria()
+{
+    // Capturamos los datos enviados por el formulario
+    $foto = $_POST['foto_actual'] ?? null;
+    $direccion = $_POST['direccion'] ?? '';
+    $ciudad = $_POST['ciudad'] ?? '';
+    $telefono = $_POST['telefono'] ?? '';
+    $horarios = $_POST['horarios'] ?? '';
+    $id_veterinaria = $_POST['id_veterinaria'] ?? '';
+
+
+    // Validamos que los campos no esten vacios
+    if (
+        empty($direccion) || empty($ciudad) || empty($telefono) || empty($id_veterinaria)
+    ) {
+        // Mostrar un mensaje de error si algún campo está vacío
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
+        exit();
+    }
+
+    // Validamos y procesamos la foto de la veterinaria si se ha enviado
+    if (!empty($_FILES['foto']['name'])) {
+        $file = $_FILES['foto'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitidas = ['png', 'jpg', 'jpeg'];
+        // Validar extensión y tamaño
+        if (!in_array($ext, $permitidas)) {
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
+            exit();
+        }
+        // Validar tamaño
+        if ($file['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Error', 'La foto supera las 2MB');
+            exit();
+        }
+        // Generar un nombre único para la imagen
+        $foto = uniqid('veterinaria_') . '.' . $ext;
+        $destino = BASE_PATH . '/public/uploads/veterinaria/' . $foto;
+        move_uploaded_file($file['tmp_name'], $destino);
+    }
+    // Creamos el objeto de la clase Veterinaria
+    $objVeterinaria = new Veterinaria();
+    // Preparamos los datos para la actualización
+    $data = [
+        'direccion' => $direccion,
+        'ciudad' => $ciudad,
+        'telefono' => $telefono,
+        'foto' => $foto,
+        'id_veterinaria' => $id_veterinaria,
+        'horarios' => $horarios
+    ];
+    // Llamamos a la funcion actualizar del modelo Veterinaria
+    $resultado = $objVeterinaria->actualizarInformacionVeterinaria($data);
+    // Verificamos el resultado y mostramos una alerta
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Veterinaria actualizada',
+            'Los datos han sido actualizados correctamente',
+            '/vetwilling/representante/veterinaria_info'
+        );
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la veterinaria');
+    }
+    exit();
+}
+
+function consultarHorariosVeterinaria($id_veterinaria)
+{
+     try {
+        
+        $veterinariaModel = new Veterinaria();
+
+        // Llamamos al método para obtener los horarios del servicio
+        $horarios = $veterinariaModel->consultarHorariosVeterinaria($id_veterinaria);
+
+        // ┌─ RETORNAR RESULTADO
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'horarios' => $horarios,
+        ]);
+    } catch (Exception $e) {
+        // ┌─ RETORNAR ERROR    
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Error al obtener los horarios de la veterinaria: ' . $e->getMessage()
+        ]);
+    }
+}
+
+function eliminarHorariosPorVeterinaria($idHorario)
+{
+        $veterinariaModel = new Veterinaria();
+
+    // Llamamos al método para eliminar los horarios del servicio
+    $resultado = $veterinariaModel->eliminarHorariosPorVeterinaria($idHorario);
+
+    if ($resultado) {
+        // ┌─ RETORNAR RESULTADO
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Horarios eliminados correctamente'
+        ]);
+    } else {
+        // ┌─ RETORNAR ERROR    
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'No se pudieron eliminar los horarios'
+        ]);
+    }
+    exit();
+
 }

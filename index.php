@@ -445,6 +445,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/representante/dashboardRepresentante.php';
         break;
 
+    case '/representante/veterinaria_info':
+        require BASE_PATH . '/app/views/dashboard/representante/configVeterinaria.php';
+        break;
+
     case '/representante/listar-especialidades':
         require BASE_PATH . '/app/views/dashboard/representante/listaEspecialidad.php';
         break;
@@ -519,6 +523,18 @@ switch ($request) {
 
     case '/representante/api/especialidades':
         require BASE_PATH . '/app/controllers/especialidadController.php';
+        break;
+
+    case '/representante/actualizar-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+    
+    case '/representante/obtener-horarios-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+    
+    case '/representante/actualizar-horario-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
         break;
 
 

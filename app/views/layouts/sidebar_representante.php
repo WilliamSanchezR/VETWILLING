@@ -46,29 +46,18 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     <i class="bi bi-journal-medical"></i>
                     <span class="texto-item-sidebar">Gestión Administrador</span>
                     <i class="bi bi-chevron-down flecha"></i>
-                    
+
                 </div>
 
                 <ul class="submenu-items">
 
                     <!-- Sección configuracion veterinaria -->
-                    <!-- <li>
-
-                        <div class="submenu-seccond">
-
-                            <div class="submenu-seccond-toggle" data-tooltip="Configuración Veterinaria">
-                                <i class="bi bi-gear-fill"></i>
-                                <span class="texto-item-sidebar">Configuración Veterinaria</span>
-                                <i class="bi bi-chevron-down flecha-second"></i>
-                            </div>
-
-                            <ul class="submenu-seccond-items">
-                                <li><a class="nav-item <?= $final_path == '' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/" data-tooltip="Usuarios">Horarios</a></li>
-
-                            </ul>
-
-                        </div>
-                    </li> -->
+                    <a href="<?= BASE_URL ?>/representante/veterinaria_info"
+                        class="nav-item <?= $final_path == 'veterinaria_info' ? 'active' : '' ?>"
+                        data-section="Veterinaria" data-tooltip="Veterinaria">
+                        <i class="bi bi-gear-fill"></i>
+                        <span class="nav-text">Veterinaria</span>
+                    </a>
 
 
                     <!-- Sessión con submenu Servicios y costos-->
