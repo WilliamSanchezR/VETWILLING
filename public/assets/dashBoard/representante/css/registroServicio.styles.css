@@ -1,3 +1,8 @@
 #descripcion {
     resize: none;
 }
+
+.titulo-jornada {
+    margin-bottom: 10px !important;
+    padding: 0px !important;
+}

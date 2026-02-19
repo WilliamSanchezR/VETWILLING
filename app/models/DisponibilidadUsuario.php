@@ -58,59 +58,63 @@ class DisponibilidadUsuario
                 return false;
             }
 
-            $sql = "INSERT INTO disponibilidad_usuario 
+            if (!empty($data['hora_inicio']) && !empty($data['hora_fin'])) {
+                $sql = "INSERT INTO disponibilidad_usuario 
                     (id_usuario, id_especialidad, id_veterinaria, dia_semana, hora_inicio, hora_fin, duracion_minutos) 
                     VALUES 
                     (:id_usuario, :id_especialidad, :id_veterinaria, :dia_semana, :hora_inicio, :hora_fin, :duracion_minutos)";
 
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_usuario', $data['id_usuario'], PDO::PARAM_INT);
-            $stmt->bindParam(':id_especialidad', $data['id_especialidad'], PDO::PARAM_STR);
-            $stmt->bindParam(':id_veterinaria', $data['id_veterinaria'], PDO::PARAM_INT);
-            $stmt->bindParam(':dia_semana', $data['dia_semana'], PDO::PARAM_STR);
-            $stmt->bindParam(':hora_inicio', $data['hora_inicio'], PDO::PARAM_STR);
-            $stmt->bindParam(':hora_fin', $data['hora_fin'], PDO::PARAM_STR);
-            $stmt->bindParam(':duracion_minutos', $data['duracion_minutos'], PDO::PARAM_INT);
+                $stmt = $this->conexion->prepare($sql);
+                $stmt->bindParam(':id_usuario', $data['id_usuario'], PDO::PARAM_INT);
+                $stmt->bindParam(':id_especialidad', $data['id_especialidad'], PDO::PARAM_STR);
+                $stmt->bindParam(':id_veterinaria', $data['id_veterinaria'], PDO::PARAM_INT);
+                $stmt->bindParam(':dia_semana', $data['dia_semana'], PDO::PARAM_STR);
+                $stmt->bindParam(':hora_inicio', $data['hora_inicio'], PDO::PARAM_STR);
+                $stmt->bindParam(':hora_fin', $data['hora_fin'], PDO::PARAM_STR);
+                $stmt->bindParam(':duracion_minutos', $data['duracion_minutos'], PDO::PARAM_INT);
 
-            $estadoRespuesta  = $stmt->execute();
+                $estadoRespuesta  = $stmt->execute();
 
-            if ($estadoRespuesta) {
-                // Si se insertó la primera franja, verificar y agregar la segunda si existe
-                if (!empty($data['hora_inicio_2']) && !empty($data['hora_fin_2'])) {
+                if (!$estadoRespuesta) {
+                    error_log("Error al insertar la primera franja: " . implode(" | ", $stmt->errorInfo()));
+                    return false;
+                }
+            }
+            // Si se insertó la primera franja, verificar y agregar la segunda si existe
+            if (!empty($data['hora_inicio_seccond']) && !empty($data['hora_fin_seccond'])) {
 
-                    if ($this->validarDisponibilidad(
-                        $data['id_usuario'],
-                        $data['id_especialidad'],
-                        $data['id_veterinaria'],
-                        $data['dia_semana'],
-                        $data['hora_inicio_2'],
-                        $data['hora_fin_2']
-                    ) === false) {
-                        error_log("El horario de la segunda franja se cruza con otro existente");
-                        return false;
-                    }
+                if ($this->validarDisponibilidad(
+                    $data['id_usuario'],
+                    $data['id_especialidad'],
+                    $data['id_veterinaria'],
+                    $data['dia_semana'],
+                    $data['hora_inicio_seccond'],
+                    $data['hora_fin_seccond']
+                ) === false) {
+                    error_log("El horario de la segunda franja se cruza con otro existente");
+                    return false;
+                }
 
-                    $sql2 = "INSERT INTO disponibilidad_usuario 
+                $sql2 = "INSERT INTO disponibilidad_usuario 
                             (id_usuario, id_especialidad, id_veterinaria, dia_semana, hora_inicio, hora_fin, duracion_minutos) 
                             VALUES 
                             (:id_usuario, :id_especialidad, :id_veterinaria, :dia_semana, :hora_inicio, :hora_fin, :duracion_minutos)";
 
-                    $stmt2 = $this->conexion->prepare($sql2);
-                    $stmt2->bindParam(':id_usuario', $data['id_usuario'], PDO::PARAM_INT);
-                    $stmt2->bindParam(':id_especialidad', $data['id_especialidad'], PDO::PARAM_STR);
-                    $stmt2->bindParam(':id_veterinaria', $data['id_veterinaria'], PDO::PARAM_INT);
-                    $stmt2->bindParam(':dia_semana', $data['dia_semana'], PDO::PARAM_STR);
-                    $stmt2->bindParam(':hora_inicio', $data['hora_inicio_2'], PDO::PARAM_STR);
-                    $stmt2->bindParam(':hora_fin', $data['hora_fin_2'], PDO::PARAM_STR);
-                    $stmt2->bindParam(':duracion_minutos', $data['duracion_minutos'], PDO::PARAM_INT);
+                $stmt2 = $this->conexion->prepare($sql2);
+                $stmt2->bindParam(':id_usuario', $data['id_usuario'], PDO::PARAM_INT);
+                $stmt2->bindParam(':id_especialidad', $data['id_especialidad'], PDO::PARAM_STR);
+                $stmt2->bindParam(':id_veterinaria', $data['id_veterinaria'], PDO::PARAM_INT);
+                $stmt2->bindParam(':dia_semana', $data['dia_semana'], PDO::PARAM_STR);
+                $stmt2->bindParam(':hora_inicio', $data['hora_inicio_seccond'], PDO::PARAM_STR);
+                $stmt2->bindParam(':hora_fin', $data['hora_fin_seccond'], PDO::PARAM_STR);
+                $stmt2->bindParam(':duracion_minutos', $data['duracion_minutos'], PDO::PARAM_INT);
 
-                    $estadoRespuesta2  = $stmt2->execute();
+                $estadoRespuesta2  = $stmt2->execute();
 
-                    return $estadoRespuesta2;
-                }
+                return $estadoRespuesta2;
             }
 
-            return $estadoRespuesta;
+            return true;
         } catch (PDOException $e) {
             error_log("Error en DisponibilidadUsuario::agregarDisponibilidadAgenda -> " . $e->getMessage());
             return false;
