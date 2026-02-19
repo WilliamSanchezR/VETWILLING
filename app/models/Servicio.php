@@ -54,16 +54,18 @@ class Servicio
                     $horarios = json_decode($data['horarios'], true);
 
                     foreach ($horarios as $horario) {
-                        $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
+                        if (isset($horario['horario_1'])) {
+                            $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
                                              VALUES (:id_servicio, :dia_semana, :hora_inicio, :hora_fin)";
 
-                        $resultadoHorario = $this->conexion->prepare($consultaHorario);
-                        $resultadoHorario->bindParam(':id_servicio', $id_servicio);
-                        $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
-                        $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
-                        $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
+                            $resultadoHorario = $this->conexion->prepare($consultaHorario);
+                            $resultadoHorario->bindParam(':id_servicio', $id_servicio);
+                            $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
+                            $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
+                            $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
 
-                        $resultadoHorario->execute();
+                            $resultadoHorario->execute();
+                        }
 
                         // validmos si hay un segundo horario
                         if (isset($horario['horario_2'])) {
@@ -198,22 +200,22 @@ class Servicio
             $respuesta = $resultado->execute();
 
             if ($respuesta && !empty($data['horarios'])) {
-                $id_servicio = $this->conexion->lastInsertId();
 
                 $horarios = json_decode($data['horarios'], true);
 
                 foreach ($horarios as $horario) {
-                    $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
+                    if (isset($horario['horario_1'])) {
+                        $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
                                              VALUES (:id_servicio, :dia_semana, :hora_inicio, :hora_fin)";
 
-                    $resultadoHorario = $this->conexion->prepare($consultaHorario);
-                    $resultadoHorario->bindParam(':id_servicio', $data['id_servicio']);
-                    $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
-                    $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
-                    $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
+                        $resultadoHorario = $this->conexion->prepare($consultaHorario);
+                        $resultadoHorario->bindParam(':id_servicio', $data['id_servicio']);
+                        $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
+                        $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
+                        $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
 
-                    $resultadoHorario->execute();
-
+                        $resultadoHorario->execute();
+                    }
                     // validmos si hay un segundo horario
                     if (isset($horario['horario_2'])) {
                         $consultaHorario2 = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 

@@ -155,7 +155,6 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
 
     <!-- 5. Script de lista de veterinarias -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
     <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
     <!-- Modo dia  y noche -->

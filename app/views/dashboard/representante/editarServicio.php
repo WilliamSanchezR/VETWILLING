@@ -133,24 +133,35 @@ $servicio = obtenerServicioPorId($id);
                                                 <label class="btn btn-outline-primary" for="domingo1">DOMINGO</label>
                                             </div>
                                         </div>
-                                        <div class="col-md-2 mb-2">
-                                            <label class="form-label small">Hora Inicio</label>
-                                            <input type="time" class="form-control" id="hora_inicio_1" name="hora_inicio">
-                                        </div>
-                                        <div class="col-md-2 mb-2">
-                                            <label class="form-label small">Hora Fin</label>
-                                            <input type="time" class="form-control" id="hora_fin_1" name="hora_fin">
+                                        <div class="col-md-5 row">
+                                            <div class="col-md-12">
+                                                <h3 class="titulo-jornada">Primera Jornada</h3>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label small">Hora Inicio</label>
+                                                <input type="time" class="form-control" id="hora_inicio_1" name="hora_inicio">
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label small">Hora Fin</label>
+                                                <input type="time" class="form-control" id="hora_fin_1" name="hora_fin">
+                                            </div>
                                         </div>
 
-                                        <div class="col-md-2 mb-2">
-                                            <label class="form-label small">Hora Inicio</label>
-                                            <input type="time" class="form-control" id="hora_inicio_2" name="hora_inicio">
+
+                                        <div class="col-md-5 row">
+                                            <div class="col-md-12">
+                                                <h3 class="titulo-jornada">Segunda Jornada</h3>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label small">Hora Inicio</label>
+                                                <input type="time" class="form-control" id="hora_inicio_2" name="hora_inicio">
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label small">Hora Fin</label>
+                                                <input type="time" class="form-control" id="hora_fin_2" name="hora_fin">
+                                            </div>
                                         </div>
-                                        <div class="col-md-2 mb-2">
-                                            <label class="form-label small">Hora Fin</label>
-                                            <input type="time" class="form-control" id="hora_fin_2" name="hora_fin">
-                                        </div>
-                                        <div class="col-md-4 mb-4 text-end">
+                                        <div class="col-md-2 mb-2 text-end">
                                             <button type="button" class="btn btn-primary btn-sm btn-agregar-horario ">
                                                 <i class="bi bi-plus"></i> Agregar Horario
                                             </button>
