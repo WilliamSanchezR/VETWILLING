@@ -175,6 +175,14 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/reportes.php';
         break;
 
+    case '/veterinaria/reportes/data':
+        require BASE_PATH . '/app/controllers/reportesController.php';
+        break;
+
+    case '/veterinaria/reportes/pdf':
+        require BASE_PATH . '/app/controllers/reportesController.php';
+        break;
+
     // RUTA COMENTADA: Registrar veterinarios
     // case '/veterinario/registrar-veterinarios':
     //     require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';
@@ -449,6 +457,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/representante/dashboardRepresentante.php';
         break;
 
+    case '/representante/veterinaria_info':
+        require BASE_PATH . '/app/views/dashboard/representante/configVeterinaria.php';
+        break;
+
     case '/representante/listar-especialidades':
         require BASE_PATH . '/app/views/dashboard/representante/listaEspecialidad.php';
         break;
@@ -523,6 +535,30 @@ switch ($request) {
 
     case '/representante/api/especialidades':
         require BASE_PATH . '/app/controllers/especialidadController.php';
+        break;
+
+    case '/representante/actualizar-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+
+    case '/representante/obtener-horarios-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+
+    case '/representante/actualizar-horario-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+
+    case '/representante/propietarios':
+        require BASE_PATH . '/app/views/dashboard/representante/listaPropietarios.php';
+        break;
+
+    case '/representante/propietarios/api/listar':
+        require BASE_PATH . '/app/controllers/propetarioController.php';
+        break;
+
+    case '/representante/api/propietarios':
+        require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
 
 
