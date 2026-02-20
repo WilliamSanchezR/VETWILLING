@@ -1,5 +1,15 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_veterinario.php';
+require_once BASE_PATH . '/app/models/Veterinario.php';
+
+$idUsuario = $_SESSION['user']['id_usuario'] ?? null;
+$fechaHoy = date('Y-m-d');
+$statsVeterinario = new Veterinario();
+
+$totalCitasHoy = $idUsuario ? $statsVeterinario->contarCitasHoyPorVeterinario($idUsuario, $fechaHoy) : 0;
+$totalPendientesHoy = $idUsuario ? $statsVeterinario->contarCitasPendientesHoyPorVeterinario($idUsuario, $fechaHoy) : 0;
+$totalPacientesHoy = $idUsuario ? $statsVeterinario->contarPacientesHoyPorVeterinario($idUsuario, $fechaHoy) : 0;
+$totalCitasSemana = $idUsuario ? $statsVeterinario->contarCitasSemanaPorVeterinario($idUsuario, $fechaHoy) : 0;
 ?>
 
 <!DOCTYPE html>
@@ -64,6 +74,54 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         <!-- ÁREA DE CONTENIDO -->
         <div class="area-contenido">
 
+            <!-- TARJETAS DE RESUMEN -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="tarjeta-resumen-cita">
+                        <div class="icono-resumen bg-success-soft">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        </div>
+                        <div>
+                            <h3><?= htmlspecialchars((string)$totalCitasHoy) ?></h3>
+                            <p>Citas Hoy</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="tarjeta-resumen-cita">
+                        <div class="icono-resumen bg-warning-soft">
+                            <i class="bi bi-clock-fill text-warning"></i>
+                        </div>
+                        <div>
+                            <h3><?= htmlspecialchars((string)$totalPendientesHoy) ?></h3>
+                            <p>Pendientes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="tarjeta-resumen-cita">
+                        <div class="icono-resumen bg-info-soft">
+                            <i class="bi bi-people-fill text-info"></i>
+                        </div>
+                        <div>
+                            <h3><?= htmlspecialchars((string)$totalPacientesHoy) ?></h3>
+                            <p>Pacientes Hoy</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="tarjeta-resumen-cita">
+                        <div class="icono-resumen bg-success-soft">
+                            <i class="bi bi-calendar-week-fill text-success"></i>
+                        </div>
+                        <div>
+                            <h3><?= htmlspecialchars((string)$totalCitasSemana) ?></h3>
+                            <p>Esta Semana</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- BARRA DE ACCIONES -->
             <div class="barra-acciones-citas">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -89,61 +147,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 </div>
             </div>
 
-            <!-- TARJETAS DE RESUMEN -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="tarjeta-resumen-cita">
-                        <div class="icono-resumen bg-success-soft">
-                            <i class="bi bi-check-circle-fill text-success"></i>
-                        </div>
-                        <div>
-                            <h3>24</h3>
-                            <p>Citas Hoy</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="tarjeta-resumen-cita">
-                        <div class="icono-resumen bg-warning-soft">
-                            <i class="bi bi-clock-fill text-warning"></i>
-                        </div>
-                        <div>
-                            <h3>8</h3>
-                            <p>Pendientes</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="tarjeta-resumen-cita">
-                        <div class="icono-resumen bg-danger-soft">
-                            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
-                        </div>
-                        <div>
-                            <h3>3</h3>
-                            <p>Urgencias</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="tarjeta-resumen-cita">
-                        <div class="icono-resumen bg-info-soft">
-                            <i class="bi bi-calendar-week-fill text-info"></i>
-                        </div>
-                        <div>
-                            <h3>156</h3>
-                            <p>Esta Semana</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- VISTA CALENDARIO -->
             <div id='calendar'>
 
-            </div>
-
-            <div id='external-events'>
-                <!-- Los servicios se cargarán dinámicamente desde la base de datos -->
             </div>
 
             <!-- Bootstrap -->

@@ -74,6 +74,47 @@ class Veterinario
         }
     }
 
+    public function contarCitasPendientesHoyPorVeterinario($id_usuario, $fecha)
+    {
+        try {
+            $sql = "SELECT COUNT(*)
+                    FROM agendamiento a
+                    WHERE a.id_usuario = :id_usuario
+                      AND DATE(a.fecha_hora) = :fecha
+                      AND UPPER(a.estado) = 'PENDIENTE'";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha', $fecha, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::contarCitasPendientesHoyPorVeterinario - " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function contarCitasSemanaPorVeterinario($id_usuario, $fecha)
+    {
+        try {
+            $sql = "SELECT COUNT(*)
+                    FROM agendamiento a
+                    WHERE a.id_usuario = :id_usuario
+                      AND YEARWEEK(a.fecha_hora, 1) = YEARWEEK(:fecha, 1)";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha', $fecha, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::contarCitasSemanaPorVeterinario - " . $e->getMessage());
+            return 0;
+        }
+    }
+
     public function obtenerCitasHoyPorVeterinario($id_usuario, $fecha)
     {
         try {
