@@ -183,12 +183,27 @@ class Propietario
     {
         try {
             // Cambiar estado en vez de borrar
-            $sql = "UPDATE propietario SET estado = 0 WHERE id_propietario = :id";
+            // consultamos el id del usuario asociado al propietario
+            $sqlUsuario = "SELECT id_usuario FROM propietario WHERE id_propietario = :id LIMIT 1";
+            $queryUsuario = $this->conexion->prepare($sqlUsuario);
+            $queryUsuario->bindParam(':id', $id, PDO::PARAM_INT);
+            $queryUsuario->execute();
 
-            $query = $this->conexion->prepare($sql);
-            $query->bindParam(':id', $id, PDO::PARAM_INT);
+            $resultUsuario = $queryUsuario->fetch(PDO::FETCH_ASSOC);
 
-            return $query->execute();
+            if (!$resultUsuario) {
+                error_log("Error: No se encontró el propietario con ID: " . $id);
+                return false;
+            }
+
+            $id_usuario = $resultUsuario['id_usuario'];
+
+            // Primero inhabilitamos el usuario
+            $sqlInhabilitarUsuario = "UPDATE usuario SET estado = 'Inactivo' WHERE id_usuario = :id_usuario";
+            $queryInhabilitarUsuario = $this->conexion->prepare($sqlInhabilitarUsuario);
+            $queryInhabilitarUsuario->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+
+            return $queryInhabilitarUsuario->execute();
         } catch (PDOException $e) {
             error_log("Error en Propietario::eliminar → " . $e->getMessage());
             return false;
@@ -211,11 +226,29 @@ class Propietario
             if ($ok) {
                 return true;
             }
-
-           
         } catch (PDOException $e) {
             error_log("Error en Usuario::actualizarFotoPerfil -> " . $e->getMessage());
             return false;
+        }
+    }
+
+    public function listarPropietariosVeterinaria($id_veterinaria)
+    {
+        try {
+            $sql = "SELECT p.id_propietario, p.img_perfil, p.tipo_documento, p.numero_documento, CONCAT( p.nombres, ' ', p.apellidos) AS nombre, p.telefono,  u.email, u.estado AS estado
+                    FROM propietario p
+                    JOIN usuario u ON p.id_usuario = u.id_usuario
+                    WHERE p.id_veterinaria = :id_veterinaria
+                    ORDER BY p.id_propietario DESC";
+
+            $query = $this->conexion->prepare($sql);
+            $query->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            $query->execute();
+
+            return $query->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Propietario::listarPropietariosVeterinaria → " . $e->getMessage());
+            return [];
         }
     }
 }

@@ -296,4 +296,114 @@ class Veterinaria
             return false;
         }
     }
+
+    // FUNCION PARA ACTUALIZAR LOS DATOS DE LA VETERINARIA
+    public function actualizarInformacionVeterinaria($data)
+    {
+        // Actualizamos los datos de la veterinaria en la base de datos
+        try {
+
+            $consulta = "UPDATE veterinaria 
+                         SET foto = :foto,                            
+                             direccion = :direccion, 
+                             telefono = :telefono,
+                             ciudad = :ciudad
+                         WHERE id_veterinaria = :id_veterinaria";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':foto', $data['foto']);
+            $resultado->bindParam(':direccion', $data['direccion']);
+            $resultado->bindParam(':ciudad', $data['ciudad']);
+            $resultado->bindParam(':telefono', $data['telefono']);
+            $resultado->bindParam(':id_veterinaria', $data['id_veterinaria']);
+
+            // Ejecutamos la consulta
+            $response = $resultado->execute();
+
+            if (!$response) {
+                return false;
+            }
+
+            if ($response && !empty($data['horarios'])) {
+                return $this->registrarHorarioVeterinaria($data);
+            } else {
+                return true;
+            }
+        } catch (PDOException $e) {
+            echo "Error al actualizar la veterinaria: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function registrarHorarioVeterinaria($data)
+    {
+        try {
+
+            $horarios = json_decode($data['horarios'], true);
+
+            foreach ($horarios as $horario) {
+                if (isset($horario['horario_1'])) {
+                    $sql = "INSERT INTO horario_veterinaria (id_veterinaria, dia_semana, hora_inicio, hora_fin) 
+                    VALUES (:id_veterinaria, :dia_semana, :hora_inicio, :hora_fin)";
+
+                    $stmt = $this->conexion->prepare($sql);
+                    $stmt->bindParam(':id_veterinaria', $data['id_veterinaria']);
+                    $stmt->bindParam(':dia_semana', $horario['dia']);
+                    $stmt->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
+                    $stmt->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
+
+                    $stmt->execute();
+                }
+                // validmos si hay un segundo horario
+                if (isset($horario['horario_2'])) {
+                    $consultaHorario2 = "INSERT INTO horario_veterinaria (id_veterinaria, dia_semana, hora_inicio, hora_fin) 
+                    VALUES (:id_veterinaria, :dia_semana, :hora_inicio, :hora_fin)";
+
+
+                    $resultadoHorario2 = $this->conexion->prepare($consultaHorario2);
+                    $resultadoHorario2->bindParam(':id_veterinaria', $data['id_veterinaria']);
+                    $resultadoHorario2->bindParam(':dia_semana', $horario['dia']);
+                    $resultadoHorario2->bindParam(':hora_inicio', $horario['horario_2']['hora_inicio']);
+                    $resultadoHorario2->bindParam(':hora_fin', $horario['horario_2']['hora_fin']);
+
+                    $resultadoHorario2->execute();
+                }
+            }
+
+            return true;
+        } catch (PDOException $e) {
+            echo "Error al registrar el horario de atención: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function consultarHorariosVeterinaria($idVeterinaria)
+    {
+        try {
+            $consulta = "SELECT id_horario_veterinaria as id_horario, dia_semana, hora_inicio, hora_fin
+                         FROM horario_veterinaria 
+                         WHERE id_veterinaria = :id_veterinaria and estado = 'Activo'";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_veterinaria', $idVeterinaria);
+            $resultado->execute();
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al consultar los horarios de la veterinaria: " . $e->getMessage();
+            return [];
+        }
+    }
+
+    public function eliminarHorariosPorVeterinaria($idHorario)
+    {
+        try {
+            $consulta = "UPDATE horario_veterinaria SET estado = 'Inactivo' WHERE id_horario_veterinaria = :id_horario";
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_horario', $idHorario);
+            return $resultado->execute();
+        } catch (PDOException $e) {
+            echo "Error al eliminar el horario de la veterinaria: " . $e->getMessage();
+            return false;
+        }
+    }
 }

@@ -1,5 +1,9 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_representante.php';
+require_once BASE_PATH . '/app/controllers/veterinariaController.php';
+
+$idVeterinaria =  $_SESSION['user']['id_veterinaria'];
+$veterinariaData = consultarVeterinariasRegistradas($idVeterinaria);
 
 ?>
 
@@ -9,34 +13,33 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Servicios</title>
-    <!-- Icono de la página -->
-    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
+    <title>Configuración de Veterinaria</title>
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Iconos -->
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-    <!-- SweetAlert2 - AGREGAR ANTES DE TUS SCRIPTS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Open+Sans:wght@300..800&display=swap"
+        rel="stylesheet">
 
-    <!-- Propio -->
+    <!-- Tus CSS -->
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
+
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/registroServicio.styles.css">
 
-
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/configVeterinaria.styles.css">
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 </head>
 
 <body>
 
-    <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Include de la barra lateral izquierda -->
     <?php
     include_once __DIR__ . '/../../layouts/sidebar_representante.php'
@@ -52,43 +55,95 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
         ?>
 
         <div class="wizard-container">
-            <div class="wizard-header">
-                <i class="bi bi-person-vcard"></i>
-                <h2>Registro de Servicios</h2>
-                <p class="text-muted">Complete todos los campos requeridos para registrar el servicio</p>
-            </div>
+            <form id="vetForm" action="<?= BASE_URL ?>/representante/actualizar-veterinaria" method="POST" enctype="multipart/form-data">
+
+                <div class="wizard-header">
+                    <i class="bi bi-person-vcard"></i>
+                    <h2>Editar veterinaria</h2>
+                    <p class="text-muted">Complete todos los campos requeridos para registrar la veterinaria</p>
+                </div>
 
 
-            <form id="registroProfesional" action="<?= BASE_URL ?>/representante/guardar-servicio" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
-                <input type="hidden" name="horarios" id="horariosInput" value="">
+                <input type="hidden" id="id_veterianaria" name="id_veterinaria" value="<?= $veterinariaData['id_veterinaria'] ?>">
+                <input type="hidden" name="accion" value="actualizarInfo">
+                <input type="hidden" name="foto_actual" value="<?= $veterinariaData['foto'] ?>">
+                <input type="hidden" name="horarios" id="horariosInput">
 
-
-                <!-- Paso 1: Datos del Profesional -->
+                <!-- Paso 1: Datos del Veterinaria -->
                 <div class="step active">
-                    <h3><i class="bi bi-motherboard"></i>Datos del servicio</h3>
+                    <h3><i class="bi bi-motherboard"></i>Datos de la Veterinaria</h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-hash"></i> Nit *</label>
+                                <input type="text" id="nit" name="nit" required placeholder="000.123.456-7" value="<?= $veterinariaData['nit'] ?>" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-clipboard2-data"></i> Razón Social *</label>
+                                <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Juan Pérez García" value="<?= $veterinariaData['nombre'] ?>" disabled>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="row">
 
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-card-text"></i>Nombre *</label>
-                                <input type="text" id="nombre" name="nombre" required placeholder="Nombre del servicio">
+                                <label><i class="bi bi-envelope"></i> Email *</label>
+                                <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $veterinariaData['email'] ?>" disabled>
                             </div>
                         </div>
 
-
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-pencil-square"></i> Descripción </label>
-                                <textarea maxlength="200" rows="4" cols="50" name="descripcion" id="descripcion" placeholder="Descripción del servicio"></textarea>
+                                <label><i class="bi bi-telephone"></i> Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567" value="<?= $veterinariaData['telefono'] ?>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label><i class="bi bi-envelope"></i> Logo </label>
+                                    <input type="file" accept=".jpg, .png, .jpeg" id="foto" name="foto">
+                                </div>
                             </div>
                         </div>
 
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-pin-map"></i>Ciudad *</label>
+                                <select name="ciudad" id="ciudad" data-value="<?= $veterinariaData['ciudad'] ?>" required></select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label><i class="bi bi-geo-alt"></i> Dirección *</label>
+                                <input type="text" id="direccion" name="direccion" required placeholder="Ej: Calle 12 # 34-56" value="<?= $veterinariaData['direccion'] ?>">
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div class="step active">
+                    <h3><i class="bi bi-clock-history"></i> Horarios de atención</h3>
+
+                    <div class="row">
                         <div class="col-12">
                             <div class="form-group">
-                                <label><i class="bi bi-clock"></i> Horarios de Atención *</label>
-
                                 <!-- Horario 1 -->
                                 <div class="horario-item mb-3 p-3 border rounded">
                                     <div class="row align-items-end">
@@ -179,34 +234,37 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
                             </div>
                         </div>
                     </div>
+                </div>
 
 
-                    <div class="buttons">
-                        <span></span>
-                        <button type="submit" class="btn btn-success" id="btnGuardarVeterinaria">
-                            Guardar <i class="bi bi-floppy"></i>
-                        </button>
-                    </div>
+                <div class="buttons">
+                    <span></span>
+                    <button type="submit" class="btn btn-success" id="btnGuardarVeterinaria">
+                        Guardar <i class="bi bi-floppy"></i>
+                    </button>
                 </div>
             </form>
         </div>
+    </div>
 
 
+    <!-- SCRIPTS -->
+    <!-- 1. jQuery PRIMERO -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-        <!-- jQuery -->
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <!-- Bootstrap -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-            crossorigin="anonymous"></script>
+    <!-- 2. Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
 
-        <!-- SweetAlert2 -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- 5. Tu script de tabla AL FINAL -->
+    <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
-        <!-- JS Propio -->
-        <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/registroServicio.js"></script>
+    <!-- Script de municipios -->
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/representante/js/municipios.js"></script>
 
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/representante/js/configVeterinaria.js"></script>
+
+    <!-- C:\xampp\htdocs\vetwilling\public\assets\dashBoard\representante\js\configVeterinaria.js -->
 
 </body>
 
