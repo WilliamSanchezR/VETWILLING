@@ -36,19 +36,19 @@
     <!-- Estilos propios -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/pasarelaPago.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets//payments/css/pasarelaPago.css">
 </head>
 
 <body>
 
     <!-- SIDEBAR -->
-    <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
+    <?php include_once __DIR__ . '../../layouts/panel_superio_paciente.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido-principal" id="contenidoPrincipal">
 
         <!-- NAVBAR -->
-        <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
+        <?php include_once __DIR__ . '../../layouts/sidebar_pasiente.php'; ?>
 
         <div class="container">
 
@@ -284,16 +284,8 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/pasarelaPago.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/payments/js/pasarelaPago.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document
-                .querySelectorAll('[data-bs-toggle="tooltip"]')
-                .forEach(el => new bootstrap.Tooltip(el));
-        });
-    </script>
 
 </body>
 </html>

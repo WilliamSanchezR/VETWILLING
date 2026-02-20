@@ -27,8 +27,8 @@
     --color-gray-900: #111827;
 
     /* Tipografía */
-    --font-primary: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-display: 'Inter', system-ui, sans-serif;
+    /* --font-primary: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; */
+    /* --font-display: 'Inter', system-ui, sans-serif; */
 
     /* Tamaños de texto */
     --text-xs: 0.75rem;      /* 12px */
