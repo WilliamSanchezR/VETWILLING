@@ -46,45 +46,30 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     <i class="bi bi-journal-medical"></i>
                     <span class="texto-item-sidebar">Gestión Administrador</span>
                     <i class="bi bi-chevron-down flecha"></i>
-                    
+
                 </div>
 
                 <ul class="submenu-items">
 
                     <!-- Sección configuracion veterinaria -->
-                    <!-- <li>
+                    <a href="<?= BASE_URL ?>/representante/veterinaria_info"
+                        class="nav-item <?= $final_path == 'veterinaria_info' ? 'active' : '' ?>"
+                        data-section="Veterinaria" data-tooltip="Veterinaria">
+                        <i class="bi bi-gear-fill"></i>
+                        <span class="nav-text">Veterinaria</span>
+                    </a>
+                    <a href="<?= BASE_URL ?>/representante/propietarios"
+                        class="nav-item <?= $final_path == 'propietarios' ? 'active' : '' ?>"
+                        data-section="Propietarios" data-tooltip="Propietarios">
+                        <i class="bi bi-person-lines-fill"></i>
+                        <span class="nav-text">Propietarios</span>
+                    </a>
 
-                        <div class="submenu-seccond">
-
-                            <div class="submenu-seccond-toggle" data-tooltip="Configuración Veterinaria">
-                                <i class="bi bi-gear-fill"></i>
-                                <span class="texto-item-sidebar">Configuración Veterinaria</span>
-                                <i class="bi bi-chevron-down flecha-second"></i>
-                            </div>
-
-                            <ul class="submenu-seccond-items">
-                                <li><a class="nav-item <?= $final_path == '' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/" data-tooltip="Usuarios">Horarios</a></li>
-
-                            </ul>
-
-                        </div>
-                    </li> -->
-
-
-                    <!-- Sección Especialidades -->
-                    <li>
-                        <a href="<?= BASE_URL ?>/representante/listar-especialidades"
-                            class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>"
-                            data-section="Especialidades" data-tooltip="Especialidades">
-                            <i class="bi bi-clipboard2-pulse"></i>
-                            <span class="nav-text">Especialidades</span>
-                        </a>
-                    </li>
 
                     <!-- Sessión con submenu Servicios y costos-->
                     <li>
 
-                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'listar-subservicios' ? 'active open' : '' ?>">
+                        <div class="submenu-seccond <?= $final_path == 'registro-servicio' || $final_path == 'listar-servicios' || $final_path == 'listar-subservicios' || $final_path == 'listar-especialidades' ? 'active open' : '' ?>">
 
                             <div class="submenu-seccond-toggle" data-tooltip="Servicios y Costos">
                                 <i class="bi bi-database-up"></i>
@@ -94,10 +79,12 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
                             <ul class="submenu-seccond-items">
                                 <li><a class="nav-item <?= $final_path == 'listar-servicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-servicios" data-tooltip="Listar">Servicios - Horarios</a></li>
+                                <li><a class="nav-item <?= $final_path == 'listar-especialidades' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-especialidades" data-tooltip="Listar">Especialidades</a></li>
                                 <li><a class="nav-item <?= $final_path == 'listar-subservicios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/representante/listar-subservicios" data-tooltip="Listar">Subservicios - Costo</a></li>
                             </ul>
                         </div>
                     </li>
+
 
                     <!-- Sección con submenú Profesionales  -->
                     <li>
@@ -119,6 +106,15 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             </ul>
                         </div>
                     </li>
+
+                    <!-- Sección con submenú Propietarios -->
+                     <a href="<?= BASE_URL ?>/representante/propietarios"
+                        class="nav-item <?= $final_path == 'propietarios' ? 'active' : '' ?>"
+                        data-section="Propietarios" data-tooltip="Propietarios">
+                        <i class="bi bi-person-lines-fill"></i>
+                        <span class="nav-text">Propietarios</span>
+                    </a>
+
 
 
                 </ul>

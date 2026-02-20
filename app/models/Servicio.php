@@ -54,16 +54,18 @@ class Servicio
                     $horarios = json_decode($data['horarios'], true);
 
                     foreach ($horarios as $horario) {
-                        $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
+                        if (isset($horario['horario_1'])) {
+                            $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
                                              VALUES (:id_servicio, :dia_semana, :hora_inicio, :hora_fin)";
 
-                        $resultadoHorario = $this->conexion->prepare($consultaHorario);
-                        $resultadoHorario->bindParam(':id_servicio', $id_servicio);
-                        $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
-                        $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
-                        $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
+                            $resultadoHorario = $this->conexion->prepare($consultaHorario);
+                            $resultadoHorario->bindParam(':id_servicio', $id_servicio);
+                            $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
+                            $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
+                            $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
 
-                        $resultadoHorario->execute();
+                            $resultadoHorario->execute();
+                        }
 
                         // validmos si hay un segundo horario
                         if (isset($horario['horario_2'])) {
@@ -92,7 +94,35 @@ class Servicio
     public function obtenerServiciosPorVeterinaria($id_veterinaria)
     {
         try {
-            $consulta = "SELECT * FROM servicio WHERE id_veterinaria = :id_veterinaria";
+            $consulta = "SELECT 
+                            SERV.id_servicio,
+                            SERV.nombre,
+                            SERV.estado,
+                            GROUP_CONCAT(
+                                CONCAT(
+                                    CASE HS.dia_semana
+                                        WHEN 1 THEN 'Lunes'
+                                        WHEN 2 THEN 'Martes'
+                                        WHEN 3 THEN 'Miércoles'
+                                        WHEN 4 THEN 'Jueves'
+                                        WHEN 5 THEN 'Viernes'
+                                        WHEN 6 THEN 'Sábado'
+                                        WHEN 7 THEN 'Domingo'
+                                    END,
+                                    ' ',
+                                    TIME_FORMAT(HS.hora_inicio, '%h:%i %p'),
+                                    ' - ',
+                                    TIME_FORMAT(HS.hora_fin, '%h:%i %p')
+                                )
+                                ORDER BY HS.dia_semana ASC, HS.hora_inicio ASC
+                                SEPARATOR ' | '
+                            ) AS horarios
+                        FROM servicio SERV
+                        LEFT JOIN horario_servicio HS 
+                            ON SERV.id_servicio = HS.id_servicio 
+                            AND HS.estado = 'Activo'
+                        WHERE SERV.id_veterinaria = :id_veterinaria
+                        GROUP BY SERV.id_servicio, SERV.nombre, SERV.estado;";
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_veterinaria', $id_veterinaria);
             $resultado->execute();
@@ -170,22 +200,22 @@ class Servicio
             $respuesta = $resultado->execute();
 
             if ($respuesta && !empty($data['horarios'])) {
-                $id_servicio = $this->conexion->lastInsertId();
 
                 $horarios = json_decode($data['horarios'], true);
 
                 foreach ($horarios as $horario) {
-                    $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
+                    if (isset($horario['horario_1'])) {
+                        $consultaHorario = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
                                              VALUES (:id_servicio, :dia_semana, :hora_inicio, :hora_fin)";
 
-                    $resultadoHorario = $this->conexion->prepare($consultaHorario);
-                    $resultadoHorario->bindParam(':id_servicio', $data['id_servicio']);
-                    $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
-                    $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
-                    $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
+                        $resultadoHorario = $this->conexion->prepare($consultaHorario);
+                        $resultadoHorario->bindParam(':id_servicio', $data['id_servicio']);
+                        $resultadoHorario->bindParam(':dia_semana', $horario['dia']);
+                        $resultadoHorario->bindParam(':hora_inicio', $horario['horario_1']['hora_inicio']);
+                        $resultadoHorario->bindParam(':hora_fin', $horario['horario_1']['hora_fin']);
 
-                    $resultadoHorario->execute();
-
+                        $resultadoHorario->execute();
+                    }
                     // validmos si hay un segundo horario
                     if (isset($horario['horario_2'])) {
                         $consultaHorario2 = "INSERT INTO horario_servicio (id_servicio, dia_semana, hora_inicio, hora_fin) 
@@ -259,6 +289,26 @@ class Servicio
         } catch (PDOException $e) {
             echo "Error al eliminar los horarios del servicio: " . $e->getMessage();
             return false;
+        }
+    }
+
+    // FUNCION PARA OBTENER LOS SERVICIOS ACTIVOS DE UNA VETERINARIA
+    public function obtenerServiciosActivos($id_veterinaria)
+    {
+        try {
+            // CONSULTA PARA TRAER EL ID DEL SERVICIO EL NOMBRE RELACIONADOS A LA VETERINARIA ACTIVA 
+            $consulta = "SELECT se.id_servicio, se.nombre
+                        FROM servicio se 
+                        WHERE se.id_veterinaria = :id_veterinaria AND se.estado = 'Activo'
+                        GROUP BY se.id_servicio;";
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindParam(':id_veterinaria', $id_veterinaria);
+            $resultado->execute();
+
+            return $resultado->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error al obtener los servicios activos: " . $e->getMessage();
+            return [];
         }
     }
 }

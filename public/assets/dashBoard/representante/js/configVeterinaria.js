@@ -1,17 +1,16 @@
-class EditarServicio {
+class ConfigVeterinaria {
     constructor() {
-
         this.$$ = (s) => document.querySelectorAll(s);
         document.addEventListener('DOMContentLoaded', () => this.init());
     }
 
     init() {
-        console.log('Registro Servicio Init');
+        console.log('ConfigVeterinaria initialized');
         this.cacheDom();
+        this.inicializarMunicipios();
         this.bindEvents();
         this.consultarHorariosExistentes();
     }
-
 
     cacheDom() {
         this.listDiasSelected = [];
@@ -25,135 +24,28 @@ class EditarServicio {
         this.hora_inicio_2 = document.getElementById('hora_inicio_2');
         this.hora_fin_2 = document.getElementById('hora_fin_2');
         this.tblHorariosBody = document.getElementById('horariosBody');
+        this.btnGuardarCambios = document.getElementById('btnGuardarVeterinaria');
+        this.formVeterinariaRegister = document.getElementById('vetForm');
+        this.idVeterinaria = document.getElementById('id_veterianaria').value;
+        this.selectCiudad = document.getElementById('ciudad');
+    }
+
+    /**
+     * Inicializa el select de municipios con los datos actuales
+     */
+    inicializarMunicipios() {
+        const municipioActual = this.selectCiudad?.getAttribute('data-value') || null;
+        renderizarMunicipios('ciudad', municipioActual);
     }
 
     bindEvents() {
         if (this.btnAgregarHorario) {
             this.btnAgregarHorario.onclick = () => this.agregarHorario();
         }
-    }
 
-    async consultarHorariosExistentes() {
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const idServicio = urlParams.get('id');
-            const response = await fetch(`/vetwilling/representante/obtener-horarios-servicio?action=obtener_horarios&id=${idServicio}`);
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                if (Array.isArray(result.horarios)) {
-                    let listDiasCargados = [];
-                    result.horarios.forEach(horario => {
-                        if (!listDiasCargados.includes(horario.dia_semana.toString()) && listDiasCargados.some(d => d.dia === horario.dia_semana.toString() && !d.horario_2)) {
-                            const diaObj = listDiasCargados.find(d => d.dia === horario.dia_semana.toString());
-                            diaObj.id.push(horario.id_horario_servicio);
-                            diaObj.horario_2 = {
-                                hora_inicio: horario.hora_inicio,
-                                hora_fin: horario.hora_fin
-                            };
-
-                            listDiasCargados = listDiasCargados.map(d => d.dia === horario.dia_semana.toString() ? diaObj : d);
-                        } else {
-                            const diaObj = {
-                                id: [horario.id_horario_servicio],
-                                dia: horario.dia_semana.toString(),
-                                horario_1: {
-                                    hora_inicio: horario.hora_inicio,
-                                    hora_fin: horario.hora_fin
-                                },
-                                horario_2: null
-                            };
-
-                            listDiasCargados.push(diaObj);
-                        }
-                    });
-
-                    this.listDiasCargadosDB = result.horarios;
-                    this.listDBDiasSelected = listDiasCargados;
-                    this.actualizarTablaHorarios();
-                }
-            }
-        } catch (error) {
-            console.error('Error al cargar horarios:', error);
-            return [];
+        if (this.btnGuardarCambios) {
+            this.btnGuardarCambios.onclick = (event) => this.guardarCambios(event);
         }
-    }
-
-    actualizarTablaHorarios() {
-        this.tblHorariosBody.innerHTML = '';
-        const combinedList = [...this.listDBDiasSelected, ...this.listDiasSelected];
-        if (combinedList.length === 0) {
-            const row = document.createElement('tr');
-            const cell = document.createElement('td');
-            cell.colSpan = 4;
-            cell.className = 'text-center';
-            cell.textContent = 'No hay horarios agregados.';
-            row.appendChild(cell);
-            this.tblHorariosBody.appendChild(row);
-            return;
-        }
-        combinedList.forEach(diaObj => {
-            const row = document.createElement('tr');
-            const diaCell = document.createElement('td');
-            diaCell.textContent = (diaObj.dia) === '1' ? 'Lunes' :
-                (diaObj.dia) === '2' ? 'Martes' :
-                    (diaObj.dia) === '3' ? 'Miércoles' :
-                        (diaObj.dia) === '4' ? 'Jueves' :
-                            (diaObj.dia) === '5' ? 'Viernes' :
-                                (diaObj.dia) === '6' ? 'Sábado' :
-                                    (diaObj.dia) === '7' ? 'Domingo' : diaObj.dia;
-
-            const horario1Cell = document.createElement('td');
-            const horario2Cell = document.createElement('td');
-            // Formateamos las horas en formato 12 horas con AM/PM
-
-            const formatTime = (time) => {
-                const [hour, minute] = time.split(':');
-                const date = new Date();
-                date.setHours(parseInt(hour), parseInt(minute));
-                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-            };
-
-            if (diaObj.horario_1) {
-                const horaInicio = formatTime(diaObj.horario_1.hora_inicio);
-                const horaFin = formatTime(diaObj.horario_1.hora_fin);
-                const inicioHour = parseInt(diaObj.horario_1.hora_inicio.split(':')[0]);
-                const esAnteDeMedioDia = inicioHour < 12;
-
-                if (esAnteDeMedioDia) {
-                    horario1Cell.textContent = `${horaInicio} - ${horaFin}`;
-                } else if (!diaObj.horario_2 && !esAnteDeMedioDia) {
-                    horario1Cell.textContent = 'N/A';
-                    horario2Cell.textContent = `${horaInicio} - ${horaFin}`;
-                } else {
-                    horario1Cell.textContent = `${horaInicio} - ${horaFin}`;
-                }
-            } else {
-                horario1Cell.textContent = 'N/A';
-            }
-
-            if (diaObj.horario_2) {
-                horario2Cell.textContent = diaObj.horario_2?.hora_inicio && diaObj.horario_2?.hora_fin ?
-                    `${formatTime(diaObj.horario_2.hora_inicio)} - ${formatTime(diaObj.horario_2.hora_fin)}` : 'N/A';
-            } else if (horario2Cell.textContent === '') {
-                horario2Cell.textContent = 'N/A';
-            }
-
-            const eliminarBtn = document.createElement('button');
-            eliminarBtn.innerHTML = '<i class="bi bi-trash"></i>';
-            eliminarBtn.className = 'btn btn-danger btn-sm';
-            eliminarBtn.type = 'button';
-            eliminarBtn.setAttribute('aria-label', `Eliminar horario de ${diaObj.dia}`);
-            eliminarBtn.onclick = () => this.eliminarHorario(diaObj);
-            const eliminarCell = document.createElement('td');
-            eliminarCell.appendChild(eliminarBtn);
-
-            row.appendChild(diaCell);
-            row.appendChild(horario1Cell);
-            row.appendChild(horario2Cell);
-            row.appendChild(eliminarCell);
-            this.tblHorariosBody.appendChild(row);
-        });
     }
 
     agregarHorario() {
@@ -312,6 +204,155 @@ class EditarServicio {
         this.hora_fin_2.value = '';
     }
 
+    guardarCambios(event) {
+        event.preventDefault();
+
+        // Obtenemos el formulario y creamos un FormData
+        const formData = new FormData(this.formVeterinariaRegister);
+        formData.append('horarios', JSON.stringify(this.listDiasSelected));
+
+        const data = Object.fromEntries(formData.entries());
+
+        console.log(data);
+
+        // Validamos los campos requeridos
+        if (!data.ciudad || !data.direccion || !data.telefono) {
+            Swal.fire({
+                title: 'Atención',
+                text: 'Por favor, complete todos los campos requeridos.',
+                icon: 'warning',
+                showCancelButton: false,
+                cancelButtonText: 'Cerrar'
+            });
+            return;
+        }
+
+        // Enviamos los datos al servidor 
+        this.formVeterinariaRegister.submit();
+
+    }
+
+    async consultarHorariosExistentes() {
+        try {
+            const response = await fetch(`/vetwilling/representante/obtener-horarios-veterinaria?action=obtener_horarios&id=${this.idVeterinaria}`);
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                if (Array.isArray(result.horarios)) {
+                    let listDiasCargados = [];
+                    result.horarios.forEach(horario => {
+                        if (!listDiasCargados.includes(horario.dia_semana.toString()) && listDiasCargados.some(d => d.dia === horario.dia_semana.toString() && !d.horario_2)) {
+                            const diaObj = listDiasCargados.find(d => d.dia === horario.dia_semana.toString());
+                            diaObj.id.push(horario.id_horario);
+                            diaObj.horario_2 = {
+                                hora_inicio: horario.hora_inicio,
+                                hora_fin: horario.hora_fin
+                            };
+
+                            listDiasCargados = listDiasCargados.map(d => d.dia === horario.dia_semana.toString() ? diaObj : d);
+                        } else {
+                            const diaObj = {
+                                id: [horario.id_horario],
+                                dia: horario.dia_semana.toString(),
+                                horario_1: {
+                                    hora_inicio: horario.hora_inicio,
+                                    hora_fin: horario.hora_fin
+                                },
+                                horario_2: null
+                            };
+
+                            listDiasCargados.push(diaObj);
+                        }
+                    });
+
+                    this.listDiasCargadosDB = result.horarios;
+                    this.listDBDiasSelected = listDiasCargados;
+                    this.actualizarTablaHorarios();
+                }
+            }
+        } catch (error) {
+            console.error('Error al cargar horarios:', error);
+            return [];
+        }
+    }
+
+    actualizarTablaHorarios() {
+        this.tblHorariosBody.innerHTML = '';
+        const combinedList = [...this.listDBDiasSelected, ...this.listDiasSelected];
+        if (combinedList.length === 0) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 4;
+            cell.className = 'text-center';
+            cell.textContent = 'No hay horarios agregados.';
+            row.appendChild(cell);
+            this.tblHorariosBody.appendChild(row);
+            return;
+        }
+        combinedList.forEach(diaObj => {
+            const row = document.createElement('tr');
+            const diaCell = document.createElement('td');
+            diaCell.textContent = (diaObj.dia) === '1' ? 'Lunes' :
+                (diaObj.dia) === '2' ? 'Martes' :
+                    (diaObj.dia) === '3' ? 'Miércoles' :
+                        (diaObj.dia) === '4' ? 'Jueves' :
+                            (diaObj.dia) === '5' ? 'Viernes' :
+                                (diaObj.dia) === '6' ? 'Sábado' :
+                                    (diaObj.dia) === '7' ? 'Domingo' : diaObj.dia;
+
+            const horario1Cell = document.createElement('td');
+            const horario2Cell = document.createElement('td');
+            // Formateamos las horas en formato 12 horas con AM/PM
+
+            const formatTime = (time) => {
+                const [hour, minute] = time.split(':');
+                const date = new Date();
+                date.setHours(parseInt(hour), parseInt(minute));
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            };
+
+            if (diaObj.horario_1) {
+                const horaInicio = formatTime(diaObj.horario_1.hora_inicio);
+                const horaFin = formatTime(diaObj.horario_1.hora_fin);
+                const inicioHour = parseInt(diaObj.horario_1.hora_inicio.split(':')[0]);
+                const esAnteDeMedioDia = inicioHour < 12;
+
+                if (esAnteDeMedioDia) {
+                    horario1Cell.textContent = `${horaInicio} - ${horaFin}`;
+                } else if (!diaObj.horario_2 && !esAnteDeMedioDia) {
+                    horario1Cell.textContent = 'N/A';
+                    horario2Cell.textContent = `${horaInicio} - ${horaFin}`;
+                } else {
+                    horario1Cell.textContent = `${horaInicio} - ${horaFin}`;
+                }
+            } else {
+                horario1Cell.textContent = 'N/A';
+            }
+
+            if (diaObj.horario_2) {
+                horario2Cell.textContent = diaObj.horario_2?.hora_inicio && diaObj.horario_2?.hora_fin ?
+                    `${formatTime(diaObj.horario_2.hora_inicio)} - ${formatTime(diaObj.horario_2.hora_fin)}` : 'N/A';
+            } else if (horario2Cell.textContent === '') {
+                horario2Cell.textContent = 'N/A';
+            }
+
+            const eliminarBtn = document.createElement('button');
+            eliminarBtn.innerHTML = '<i class="bi bi-trash"></i>';
+            eliminarBtn.className = 'btn btn-danger btn-sm';
+            eliminarBtn.type = 'button';
+            eliminarBtn.setAttribute('aria-label', `Eliminar horario de ${diaObj.dia}`);
+            eliminarBtn.onclick = () => this.eliminarHorario(diaObj);
+            const eliminarCell = document.createElement('td');
+            eliminarCell.appendChild(eliminarBtn);
+
+            row.appendChild(diaCell);
+            row.appendChild(horario1Cell);
+            row.appendChild(horario2Cell);
+            row.appendChild(eliminarCell);
+            this.tblHorariosBody.appendChild(row);
+        });
+    }
+
     eliminarHorario(dia) {
         if (dia.id && dia.id.length > 0) {
             // Si el día tiene IDs asociados, significa que está en la base de datos
@@ -338,7 +379,8 @@ class EditarServicio {
     async eliminarHorarioServidor(dia) {
         try {
             for (const id_horario of dia.id) {
-                const response = await fetch(`/vetwilling/representante/actualizar-servicio?action=eliminar_horarios&id=${id_horario}`, {
+
+                const response = await fetch(`/vetwilling/representante/actualizar-horario-veterinaria?action=eliminar_horarios&id=${id_horario}`, {
                     method: 'GET',
                 });
                 const result = await response.json();
@@ -365,4 +407,4 @@ class EditarServicio {
 
 }
 
-new EditarServicio();
+new ConfigVeterinaria();

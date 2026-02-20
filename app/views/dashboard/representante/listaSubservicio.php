@@ -102,12 +102,12 @@ $datos = listaSubserviciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
                 </div>
             </div>
 
-            <!-- Tabla de Especialidades -->
+            <!-- Tabla de Subservicios -->
             <div class="contenedor-tabla">
                 <table id="tablaListaSubservicios" class="display tabla-admin" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
+                            <th>Nombre subservicio</th>
                             <th>Servicio</th>
                             <th>Costo</th>
                             <th>Descripción</th>

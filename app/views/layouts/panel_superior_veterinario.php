@@ -2,59 +2,78 @@
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 
-$id = $_SESSION['user']['id_usuario'];
-$usuario = mostrarPerfil($id);
-
+$id         = $_SESSION['user']['id_usuario'];
+$usuario    = mostrarPerfil($id);
 $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 
+// Suscripción: Free | Basic | Pro | Enterprise
+$suscripcion     = $usuario['suscripcion'] ?? 'basic';
+$sub_slug        = strtolower($suscripcion);
+
+$sub_icons = [
+    'Essential'       => 'bi-gift',
+    'basic'      => 'bi-lightning-charge-fill',
+    'ProCare'        => 'bi-stars',
+    'MasterVet' => 'bi-gem',
+];
+$sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
 
-<!-- Navbar Superior Profesional -->
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║         NAVBAR SUPERIOR — VetWilling            ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
 <nav class="navbar-superior" id="navbarSuperior">
     <div class="navbar-container">
-        
-        <!-- Sección Izquierda -->
+
+        <!-- ─── IZQUIERDA ────────────────────────────────── -->
         <div class="navbar-left">
-            <div class="image-avatar">
-                <?php
-                if (isset($veterinaria['foto']) && !empty($veterinaria['foto'])): ?>
-                    <img 
-                        src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>" 
-                        alt="Logo de <?= $veterinaria['nombre'] ?>" 
-                        class="navbar-logo" title="<?= $veterinaria['nombre'] ?>">                    
-                <?php endif; ?> 
+
+            <!-- Logo veterinaria -->
+            <?php if (!empty($veterinaria['foto'])): ?>
+            <div class="vet-logo-wrap">
+                <img
+                    src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>"
+                    alt="<?= htmlspecialchars($veterinaria['nombre']) ?>"
+                    class="vet-logo"
+                    title="<?= htmlspecialchars($veterinaria['nombre']) ?>">
             </div>
+            <?php endif; ?>
+
+            <!-- Botón menú móvil -->
             <button class="btn-menu-mobile" onclick="abrirSidebarMovil()" aria-label="Abrir menú">
                 <i class="bi bi-list"></i>
             </button>
 
+            <!-- Saludo + reloj -->
             <div class="greeting-section">
-                <div class="greeting-content">
-                    <span class="greeting-icon" id="saludoEmoji">👋</span>
-                    <div class="greeting-text">
-                        <span class="greeting-label" id="saludoTexto">Bienvenido</span>
-                        <span class="greeting-time">
-                            <i class="bi bi-clock"></i>
-                            <span id="horaActual">00:00:00</span>
-                        </span>
-                    </div>
+                <span class="greeting-icon" id="saludoEmoji">👋</span>
+                <div class="greeting-text">
+                    <span class="greeting-label" id="saludoTexto">Bienvenido</span>
+                    <span class="greeting-time">
+                        <i class="bi bi-clock"></i>
+                        <span id="horaActual">00:00:00</span>
+                    </span>
                 </div>
             </div>
 
-            <div class="breadcrumb-divider"></div>
+            <div class="nav-sep"></div>
 
-            <nav class="breadcrumb-nav" aria-label="breadcrumb">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item active">
                         <span id="paginaActual">Dashboard</span>
                     </li>
                 </ol>
             </nav>
-        </div>
 
-        <!-- Sección Centro - Búsqueda -->
+        </div>
+        <!-- ─── FIN IZQUIERDA ─────────────────────────────── -->
+
+
+        <!-- ─── CENTRO — Buscador ────────────────────────── -->
         <div class="navbar-center">
             <div class="search-container">
                 <div class="search-input-wrapper">
@@ -63,24 +82,22 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                         type="text"
                         id="searchInput"
                         class="search-input"
-                        placeholder="Buscar pacientes, citas, historiales médicos..."
+                        placeholder="Buscar pacientes, citas, historiales…"
                         autocomplete="off"
                         aria-label="Buscar">
-                    <button class="btn-clear" id="btnClearSearch" style="display: none;" aria-label="Limpiar búsqueda">
+                    <button class="btn-clear" id="btnClearSearch" style="display:none" aria-label="Limpiar">
                         <i class="bi bi-x"></i>
                     </button>
                     <kbd class="search-shortcut">Ctrl K</kbd>
                 </div>
 
-                <!-- Panel de Resultados -->
-                <div class="search-results-panel" id="searchResults" style="display: none;">
+                <!-- Panel de resultados -->
+                <div class="search-results-panel" id="searchResults" style="display:none">
                     <div class="search-results-header">
-                        <span class="results-title">Resultados de búsqueda</span>
+                        <span class="results-title">Resultados</span>
                         <span class="results-count" id="resultsCount">0 resultados</span>
                     </div>
-                    <div class="search-results-body" id="searchItems">
-                        <!-- Resultados dinámicos aquí -->
-                    </div>
+                    <div class="search-results-body" id="searchItems"></div>
                     <div class="search-results-footer">
                         <span class="search-tip">
                             <i class="bi bi-lightbulb"></i>
@@ -90,38 +107,40 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                 </div>
             </div>
         </div>
+        <!-- ─── FIN CENTRO ────────────────────────────────── -->
 
-        <!-- Sección Derecha - Acciones -->
+
+        <!-- ─── DERECHA — Acciones ───────────────────────── -->
         <div class="navbar-right">
-            
-            <!-- Botón Tema -->
-            <div class="navbar-action" data-tooltip="Cambiar tema">
-                <button class="btn-icon" onclick="toggleTheme()" aria-label="Cambiar tema">
-                    <i class="bi bi-moon-stars" id="themeIcon"></i>
-                </button>
-            </div>
 
-            <!-- Botón Notificaciones -->
-            <div class="navbar-action notifications-wrapper" data-tooltip="Notificaciones">
-                <button class="btn-icon" onclick="toggleNotificaciones()" aria-label="Ver notificaciones">
+            <!-- Tema oscuro/claro -->
+            <button class="btn-icon" onclick="toggleTheme()" aria-label="Cambiar tema">
+                <i class="bi bi-moon-stars" id="themeIcon"></i>
+            </button>
+
+            <!-- Notificaciones -->
+            <div class="navbar-action notifications-wrapper">
+                <button class="btn-icon" onclick="toggleNotificaciones()" aria-label="Notificaciones">
                     <i class="bi bi-bell"></i>
                     <span class="notification-badge" id="notificationBadge">3</span>
                 </button>
 
-                <!-- Panel de Notificaciones -->
-                <div class="dropdown-panel notifications-panel" id="notificationsPanel" style="display: none;">
+                <div class="dropdown-panel notifications-panel" id="notificationsPanel" style="display:none">
                     <div class="panel-header">
                         <div class="panel-title">
-                            <i class="bi bi-bell-fill"></i>
-                            <h3>Notificaciones</h3>
+                            <div>
+                                <i class="bi bi-bell-fill"></i>
+                                <h3>Notificaciones</h3>
+                            </div>
+                            <button class="btn-text-sm" onclick="marcarTodasLeidas()">
+                                Marcar todas leídas
+                            </button>
                         </div>
-                        <button class="btn-text-sm" onclick="marcarTodasLeidas()">
-                            Marcar todas como leídas
-                        </button>
                     </div>
 
                     <div class="panel-body">
                         <div class="notifications-list">
+
                             <div class="notification-item unread">
                                 <div class="notification-indicator success"></div>
                                 <div class="notification-icon success">
@@ -132,9 +151,9 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                                         <h4>Nueva cita agendada</h4>
                                         <span class="notification-time">Hace 5 min</span>
                                     </div>
-                                    <p>Max - Consulta general programada para mañana 10:00 AM</p>
+                                    <p>Max — Consulta general mañana 10:00 AM</p>
                                 </div>
-                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)">
+                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
@@ -147,11 +166,11 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                                 <div class="notification-content">
                                     <div class="notification-header">
                                         <h4>Recordatorio de vacuna</h4>
-                                        <span class="notification-time">Hace 1 hora</span>
+                                        <span class="notification-time">Hace 1 h</span>
                                     </div>
-                                    <p>Luna requiere vacuna antirrábica - Vencimiento próximo</p>
+                                    <p>Luna — Antirrábica con vencimiento próximo</p>
                                 </div>
-                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)">
+                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
@@ -164,14 +183,15 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                                 <div class="notification-content">
                                     <div class="notification-header">
                                         <h4>Resultados disponibles</h4>
-                                        <span class="notification-time">Hace 2 horas</span>
+                                        <span class="notification-time">Hace 2 h</span>
                                     </div>
-                                    <p>Rocky - Análisis de sangre completado y listo para revisar</p>
+                                    <p>Rocky — Análisis de sangre listo para revisar</p>
                                 </div>
-                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)">
+                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
                                     <i class="bi bi-x"></i>
                                 </button>
                             </div>
+
                         </div>
                     </div>
 
@@ -184,55 +204,62 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                 </div>
             </div>
 
-            <div class="navbar-divider"></div>
+            <div class="nav-sep-v"></div>
 
-            <!-- Perfil de Usuario -->
+            <!-- Perfil -->
             <div class="navbar-action user-profile-wrapper">
                 <button class="btn-profile" onclick="togglePerfilMenu()" aria-label="Menú de usuario">
+
+                    <!-- Avatar -->
                     <div class="profile-avatar">
-                        <?php if ($usuario['id_rol'] == 4): ?>
-                            <img 
-                            src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>"
-                            alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
+                        <img
+                            src="<?= BASE_URL ?>/public/uploads/<?= $usuario['id_rol'] == 4 ? 'usuarios' : 'profesionales' ?>/<?= $usuario['img_perfil'] ?>"
+                            alt="<?= htmlspecialchars($usuario['nombres'] . ' ' . $usuario['apellidos']) ?>"
                             class="avatar-img">
-                        <?php else: ?>
-                        <img 
-                            src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>"
-                            alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
-                            class="avatar-img">
-                        <?php endif; ?>
                         <span class="status-dot online" title="En línea"></span>
                     </div>
+
+                    <!-- Info -->
                     <div class="profile-info">
                         <span class="profile-name">
-                            <?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?>
+                            <?= htmlspecialchars($usuario['nombres']) ?>
+                            <?= htmlspecialchars($usuario['apellidos']) ?>
                         </span>
-                        <span class="profile-role"><?= $usuario['rol'] ?></span>
+                        <span>
+
+                        </span>
+                        <!-- Badge suscripción en botón -->
+                        <span class="sub-badge sub-<?= $sub_slug ?>">
+                            <i class="bi <?= $sub_icon ?>"></i>
+                            <?= $suscripcion ?>
+                        </span>
                     </div>
+
                     <i class="bi bi-chevron-down profile-arrow"></i>
                 </button>
 
-                <!-- Dropdown de Perfil -->
-                <div class="dropdown-panel profile-panel" id="perfilDropdown" style="display: none;">
-                    <div class="panel-header profile-header">
+                <!-- ── Dropdown perfil ── -->
+                <div class="dropdown-panel profile-panel" id="perfilDropdown" style="display:none">
+
+                    <!-- Cabecera con avatar grande -->
+                    <div class="profile-header">
                         <div class="profile-avatar-large">
-                            <?php if ($usuario['id_rol'] == 4): ?>
-                            <img 
-                            src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>"
-                            alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
-                            >
-                        <?php else: ?>
-                        <img 
-                            src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>"
-                            alt="<?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?>"
-                            >
-                        <?php endif; ?>
+                            <img
+                                src="<?= BASE_URL ?>/public/uploads/<?= $usuario['id_rol'] == 4 ? 'usuarios' : 'profesionales' ?>/<?= $usuario['img_perfil'] ?>"
+                                alt="<?= htmlspecialchars($usuario['nombres']) ?>">
                             <span class="status-dot online"></span>
                         </div>
                         <div class="profile-details">
-                            <h3><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h3>
-                            <p><?= $usuario['email'] ?></p>
-                            <span class="profile-badge"><?= $usuario['rol'] ?></span>
+                            <h3><?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?></h3>
+                            <p><?= htmlspecialchars($usuario['email']) ?></p>
+                            <div class="profile-badges-row">
+                                <span class="profile-badge"><?= htmlspecialchars($usuario['rol']) ?></span>
+                                <!-- Badge suscripción en dropdown -->
+                                <span class="sub-plan-chip sub-<?= $sub_slug ?>">
+                                    <i class="bi <?= $sub_icon ?>"></i>
+                                    <?= $suscripcion ?>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -259,6 +286,17 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             </div>
                         </a>
                     </div>
+                    
+                    <div class="panel-body">
+                        <a href="<?= BASE_URL ?>/veterinario/suscripcion" class="dropdown-item">
+                            <div class="item-icon">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="item-content">
+                                <span class="item-title">Mi Suscripción</span>
+                                <span class="item-subtitle">Ver y cambiar mi suscripción</span>
+                            </div>
+                        </a>
 
                     <div class="panel-divider"></div>
 
@@ -272,17 +310,22 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                     </div>
                 </div>
             </div>
+            <!-- ─── FIN PERFIL ─────────────────────────────── -->
 
         </div>
+        <!-- ─── FIN DERECHA ───────────────────────────────── -->
+
     </div>
 </nav>
 
 
-<!-- Modal de Soporte Profesional -->
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║         MODAL DE SOPORTE                        ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
 <div class="modal-overlay" id="modalSoporte">
     <div class="modal-container">
         <div class="modal-content">
-            
+
             <div class="modal-header">
                 <div class="modal-header-content">
                     <div class="modal-icon-wrapper">
@@ -301,7 +344,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
             <div class="modal-body">
                 <div class="alert-info">
                     <i class="bi bi-info-circle"></i>
-                    <p>Completa el formulario y nuestro equipo te responderá en un máximo de 24 horas.</p>
+                    <p>Completa el formulario y nuestro equipo te responderá en máximo 24 horas.</p>
                 </div>
 
                 <form id="formularioSoporte" class="soporte-form">
@@ -361,7 +404,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             class="form-textarea"
                             id="descripcionProblema"
                             rows="5"
-                            placeholder="Describe tu problema con el mayor detalle posible. Incluye pasos para reproducir el error si aplica..."
+                            placeholder="Describe tu problema con el mayor detalle posible…"
                             required></textarea>
                         <span class="form-hint">Mínimo 20 caracteres</span>
                     </div>
@@ -378,6 +421,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                     </div>
                 </form>
             </div>
+
         </div>
     </div>
 </div>

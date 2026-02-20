@@ -15,6 +15,9 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
     <!-- Iconos -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
 
     <!-- Favicon -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
@@ -43,14 +46,14 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
                 <!-- BIENVENIDA -->
                 <div class="bienvenida-card">
-                    <h2>¡Bienvenido, <?= $usuario['nombres'] ?>! 🐾</h2>
+                    <h2>¡Bienvenido, <?= $usuario['nombres'] ?>! <i class="fas fa-paw" style="color: #ffffff; font-size: 0.9em;"></i></h2>
                     <p>Nos alegra verte nuevamente. En VetWilling cuidamos de tus mascotas con amor, profesionalismo y dedicación.</p>
                     <p class="frase">Tu familia está en buenas patas.</p>
                 </div>
 
                 <!-- ALERTA -->
                 <div class="alert-box">
-                    <div class="alert-icon">💉</div>
+                    <div class="alert-icon"><i class="fas fa-syringe"></i></div>
                     <div class="alert-content">
                         <h3>Recordatorio Importante</h3>
                         <p>Max tiene vacuna antirrábica pendiente para el 25 de noviembre</p>
@@ -63,7 +66,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                     <!-- PRÓXIMAS CITAS -->
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">📅 Próximas Citas</h2>
+                            <h2 class="card-title"><i class="bi bi-calendar2-week"></i> Próximas Citas</h2>
                             <a href="#" class="card-action">Ver todas</a>
                         </div>
 
@@ -107,11 +110,11 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                     <!-- RECORDATORIOS -->
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">🔔 Recordatorios</h2>
+                            <h2 class="card-title"><i class="bi bi-bell-fill"></i> Recordatorios</h2>
                         </div>
 
                         <div class="recordatorio-item">
-                            <div class="recordatorio-icon">💉</div>
+                            <div class="recordatorio-icon"><span><i class="fas fa-syringe"></i></span></div>
                             <div class="recordatorio-texto">
                                 <h4>Vacuna Antirrábica - Max</h4>
                                 <p>Programada para el 25 de noviembre</p>
@@ -119,7 +122,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                         </div>
 
                         <div class="recordatorio-item">
-                            <div class="recordatorio-icon">💊</div>
+                            <div class="recordatorio-icon"><span><i class="bi bi-capsule"></i></span></div>
                             <div class="recordatorio-texto">
                                 <h4>Desparasitación - Luna</h4>
                                 <p>Próxima dosis en 5 días</p>
@@ -127,7 +130,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                         </div>
 
                         <div class="recordatorio-item">
-                            <div class="recordatorio-icon">🩺</div>
+                            <div class="recordatorio-icon"><span><i class="bi bi-heart-pulse-fill"></i></span></div>
                             <div class="recordatorio-texto">
                                 <h4>Control anual - Rocky</h4>
                                 <p>Programar chequeo general para diciembre</p>
@@ -135,7 +138,7 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                         </div>
 
                         <div class="recordatorio-item">
-                            <div class="recordatorio-icon">🛁</div>
+                            <div class="recordatorio-icon"><span><i class="bi bi-droplet-fill"></i></span></div>
                             <div class="recordatorio-texto">
                                 <h4>Baño programado - Luna</h4>
                                 <p>28 de noviembre a las 11:00 AM</p>
