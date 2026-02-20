@@ -64,6 +64,54 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         <!-- ÁREA DE CONTENIDO -->
         <div class="area-contenido">
 
+            <!-- TARJETAS DE RESUMEN -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="tarjeta-resumen-cita">
+                        <div class="icono-resumen bg-success-soft">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                        </div>
+                        <div>
+                            <h3><?= $usuario['total_agendamientos'] ?? 0  ?></h3>
+                            <p>Citas Hoy</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="tarjeta-resumen-cita">
+                        <div class="icono-resumen bg-warning-soft">
+                            <i class="bi bi-clock-fill text-warning"></i>
+                        </div>
+                        <div>
+                            <h3><?= $usuario['total_pendientes'] ?? 0 ?></h3>
+                            <p>Pendientes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="tarjeta-resumen-cita">
+                        <div class="icono-resumen bg-danger-soft">
+                            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                        </div>
+                        <div>
+                            <h3><?= $usuario['total_urgencias'] ?? 0 ?></h3>
+                            <p>Urgencias</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="tarjeta-resumen-cita">
+                        <div class="icono-resumen bg-info-soft">
+                            <i class="bi bi-calendar-week-fill text-info"></i>
+                        </div>
+                        <div>
+                            <h3><?= $usuario['total_semana'] ?? 0 ?></h3>
+                            <p>Esta Semana</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- BARRA DE ACCIONES -->
             <div class="barra-acciones-citas">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -89,78 +137,34 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 </div>
             </div>
 
-            <!-- TARJETAS DE RESUMEN -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="tarjeta-resumen-cita">
-                        <div class="icono-resumen bg-success-soft">
-                            <i class="bi bi-check-circle-fill text-success"></i>
-                        </div>
-                        <div>
-                            <h3>24</h3>
-                            <p>Citas Hoy</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="tarjeta-resumen-cita">
-                        <div class="icono-resumen bg-warning-soft">
-                            <i class="bi bi-clock-fill text-warning"></i>
-                        </div>
-                        <div>
-                            <h3>8</h3>
-                            <p>Pendientes</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="tarjeta-resumen-cita">
-                        <div class="icono-resumen bg-danger-soft">
-                            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
-                        </div>
-                        <div>
-                            <h3>3</h3>
-                            <p>Urgencias</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="tarjeta-resumen-cita">
-                        <div class="icono-resumen bg-info-soft">
-                            <i class="bi bi-calendar-week-fill text-info"></i>
-                        </div>
-                        <div>
-                            <h3>156</h3>
-                            <p>Esta Semana</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- VISTA CALENDARIO -->
             <div id='calendar'>
 
             </div>
 
-            <div id='external-events'>
+
+            <!-- Los comento como dijo el profesor para no tener nada de eso pero por si algo queda comentado para un futuro -->
+             
+            <!-- <div id='external-events'> -->
                 <!-- Los servicios se cargarán dinámicamente desde la base de datos -->
-            </div>
+            <!-- </div> -->
+        </div>
+    </div>
+    <!-- Bootstrap -->
 
-            <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
 
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-                integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-                crossorigin="anonymous"></script>
+    <!-- FullCalendar -->
 
-            <!-- FullCalendar -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/mainCalendar.js"></script>
 
-            <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-            <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/mainCalendar.js"></script>
+    <!-- Propio -->
 
-            <!-- Propio -->
-
-            <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
-            <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 
 </body>
 

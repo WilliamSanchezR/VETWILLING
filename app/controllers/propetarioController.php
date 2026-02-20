@@ -12,18 +12,22 @@ switch ($method) {
 
         if ($accion === 'actualizar') {
             actualizarPropietario();
-        }else if ($accion === 'cambiar-foto') {
+        } else if ($accion === 'cambiar-foto') {
             fotoPerfil();
         }
         break;
 
     case 'GET':
-
         $accion = $_GET['accion'] ?? '';
 
         // --- ELIMINAR ---
         if ($accion === 'eliminar' && isset($_GET['id'])) {
             eliminarPropietario($_GET['id']);
+            exit();
+        }
+
+        if ($accion === 'listar-veterinaria') {
+            listarPropietariosVeterinaria($_GET['id']);
             exit();
         }
 
@@ -34,16 +38,34 @@ switch ($method) {
             exit();
         }
 
+        if ($accion === 'listar-veterinaria') {
+            $id_veterinaria = $_GET['id_veterinaria'] ?? '';
+
+            exit();
+        }
+
         // --- SI HAY ID PERO SIN ACCION, CONSULTA DIRECTA ---
         if (isset($_GET['id'])) {
             echo json_encode(consultarPropietarioId($_GET['id']));
             exit();
         }
 
+        echo "No se ha especificado una acción válida o falta el ID para la consulta/eliminación";
+
         // --- LISTAR TODOS ---
         echo json_encode(listarPropietarios());
         break;
 
+    case 'DELETE':
+        $id = $_GET['id'] ?? '';
+        if ($id) {
+            eliminarPropietarioAJAX($id);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID de propietario no proporcionado']);
+        }
+
+        break;
     default:
         http_response_code(405);
         echo json_encode(['error' => 'Método no permitido']);
@@ -147,7 +169,7 @@ function eliminarPropietario($id)
 function fotoPerfil()
 {
     session_start();
-    
+
     $id_usuario = $_POST['id_usuario'] ?? '';
 
     if (empty($id_usuario)) {
@@ -160,39 +182,39 @@ function fotoPerfil()
         $file = $_FILES['img_perfil'];
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $permitidas = ['png', 'jpg', 'jpeg', 'webp'];
-        
+
         // Validar extensión
         if (!in_array($ext, $permitidas)) {
             mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG o WEBP');
             exit();
         }
-        
+
         // Validar tamaño (2MB máximo)
         if ($file['size'] > 2 * 1024 * 1024) {
             mostrarSweetAlert('error', 'Archivo muy grande', 'La foto no debe superar los 2MB');
             exit();
         }
-        
+
         // Obtener la foto anterior para eliminarla
         $objVeterinario = new Propietario();
         $veterinarioActual = $objVeterinario->consultarPropietario($id_usuario);
         $fotoAnterior = $veterinarioActual['img_perfil'] ?? null;
-        
+
         // Generar nombre único
         $img_perfil = uniqid('vet_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
-        
+
         // Mover archivo
         if (move_uploaded_file($file['tmp_name'], $destino)) {
-            
+
             // Actualizar en base de datos
             $data = [
                 'id_usuario' => $id_usuario,
                 'img_perfil' => $img_perfil
             ];
-            
+
             $resultado = $objVeterinario->fotoPerfil($data);
-            
+
             if ($resultado) {
                 // Eliminar foto anterior si existe y no es la por defecto
                 if ($fotoAnterior && $fotoAnterior !== 'foto_default.jpg') {
@@ -201,10 +223,10 @@ function fotoPerfil()
                         unlink($rutaAnterior);
                     }
                 }
-                
+
                 // Actualizar sesión
                 $_SESSION['user']['img_perfil'] = $img_perfil;
-                
+
                 mostrarSweetAlert(
                     'success',
                     '¡Foto actualizada!',
@@ -223,3 +245,62 @@ function fotoPerfil()
 
     exit();
 }
+
+// Función para listar propietarios asociados a una veterinaria
+function listarPropietariosVeterinaria($id_veterinaria)
+{
+
+    try { // Creamos una instancia del modelo Servicio
+        $obj = new Propietario();
+        $lista = $obj->listarPropietariosVeterinaria($id_veterinaria);
+
+        // ┌─ RETORNAR RESULTADO
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'propietarios' => $lista,
+        ]);
+    } catch (Exception $e) {
+        // ┌─ RETORNAR ERROR    
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Error al obtener los horarios del servicio: ' . $e->getMessage()
+        ]);
+    }
+}
+
+function eliminarPropietarioAJAX($id)
+{
+    try {
+        $obj = new Propietario();
+        $resultado = $obj->eliminar($id);
+
+
+        if ($resultado) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Propietario inhabilitado correctamente',
+            ]);
+        } else {
+            header('Content-Type: application/json');
+            header('HTTP/1.1 500 Internal Server Error');
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'No se pudo eliminar el propietario',
+            ]);
+        }
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Error al eliminar el propietario: ' . $e->getMessage()
+        ]);
+    }
+
+    exit();
+}
+
+// ==================== FIN CRUD ====================

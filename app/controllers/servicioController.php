@@ -226,3 +226,12 @@ function eliminarHorariosPorServicio($id_servicio)
     }
     exit();
 }
+
+function listarServiciosActivos($id_veterinaria)
+{
+    // Creamos una instancia del modelo Servicio
+    $servicioModel = new Servicio();
+
+    // Llamamos al método para obtener los servicios activos de la veterinaria
+    return $servicioModel->obtenerServiciosActivos($id_veterinaria);
+}

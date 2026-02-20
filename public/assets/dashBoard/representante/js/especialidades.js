@@ -16,6 +16,7 @@ class especialidades {
         this.btnExportarCSV = document.getElementById('btnExport');
         this.especialidadId = document.getElementById("id_especialidad");
         this.nombreEspecialidad = document.getElementById("nombre_especialidad");
+        this.servicioEspecialidad = document.getElementById("servicio_especialidad");
     }
 
     bindEvents() {
@@ -45,6 +46,7 @@ class especialidades {
     viewModalEdit(data) {
         this.especialidadId.value = data.id;
         this.nombreEspecialidad.value = data.name;
+        this.servicioEspecialidad.value = data.servicio;
     }
 
         // Funcion para inicializar DataTable para la lista de especialidades asociados

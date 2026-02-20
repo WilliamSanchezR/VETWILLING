@@ -9,7 +9,6 @@ require_once BASE_PATH . '/app/controllers/especialidadController.php';
 require_once BASE_PATH . '/app/controllers/profesionalController.php';
 require_once BASE_PATH . '/app/controllers/servicioController.php';
 
-$datosEspecialidades = listarEspecialidadesRegistradas($_SESSION['user']['id_veterinaria']);
 $datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_veterinaria']);
 
 // Llamamos la función para listar los roles
@@ -244,45 +243,6 @@ if (count($listaServiciosProfesional) > 0) {
 
                     </div>
                 </div>
-                <div class="step active">
-                    <h3><i class="bi bi-motherboard"></i>Especialidades del profesional</h3>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary btn-sm" id="agregarEspecialidadBtn">
-                                    <i class="bi bi-plus-lg"></i> Agregar Especialidad
-                                </button>
-
-                                <div class="listEspecialidades">
-                                    <ul>
-                                        <?php if (!empty($datosEspecialidades)) : ?>
-                                            <?php foreach ($datosEspecialidades as $especialidad):  ?>
-                                                <li>
-                                                    <input class="form-check-input check-especialidades" type="checkbox" data-name="<?= htmlspecialchars($especialidad['nombre']) ?>" value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>" id="idCheck<?= $especialidad['id_especialidad'] ?>">
-                                                    <label for="idCheck<?= $especialidad['id_especialidad'] ?>"><?= htmlspecialchars($especialidad['nombre']) ?></label>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12" id="especialidadesContainer" <?= count($listaEspecialidadesProfesional) > 0 ? 'style="display: grid;"' : 'style="display: none;"' ?>>
-                            <?php foreach ($listaEspecialidadesProfesional as $especialidad): ?>
-                                <div class="especialidad-seleccionada">
-                                    <span><?= htmlspecialchars($especialidad['nombre']) ?></span>
-                                    <a href="<?= BASE_URL ?>/representante/eliminar-esp-profesional?action=eliminarEspProfesional&id_profesional=<?= $_GET['id'] ?>&id_especialidad=<?= htmlspecialchars($especialidad['id']) ?>">
-                                        <button type="button" class="btn btn-danger btn-sm">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </a>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                </div>
 
                  <div class="step active lista-servicios-profesional">
                     <h3><i class="bi bi-motherboard"></i>Servicios del profesional</h3>
@@ -323,6 +283,40 @@ if (count($listaServiciosProfesional) > 0) {
                         </div>
                     </div>
                 </div>
+
+                <div class="step active lista-servicios-profesional">
+                    <h3><i class="bi bi-motherboard"></i>Especialidades del profesional</h3>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary btn-sm" id="agregarEspecialidadBtn">
+                                    <i class="bi bi-plus-lg"></i> Agregar Especialidad
+                                </button>
+
+                                <div class="listEspecialidades">
+                                    <ul>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12" id="especialidadesContainer" <?= count($listaEspecialidadesProfesional) > 0 ? 'style="display: grid;"' : 'style="display: none;"' ?>>
+                            <?php foreach ($listaEspecialidadesProfesional as $especialidad): ?>
+                                <div class="especialidad-seleccionada">
+                                    <span><?= htmlspecialchars($especialidad['nombre']) ?></span>
+                                    <a href="<?= BASE_URL ?>/representante/eliminar-esp-profesional?action=eliminarEspProfesional&id_profesional=<?= $_GET['id'] ?>&id_especialidad=<?= htmlspecialchars($especialidad['id']) ?>">
+                                        <button type="button" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </a>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+
+                
 
                 <div class="buttons">
                     <span></span>

@@ -101,6 +101,9 @@ switch ($request) {
     case '/veterinario/eliminar-disponibilidad-agenda':
         require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
         break;
+    case '/veterinario/suscripcion':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/suscripcion.php';
+        break;
 
     // RUTAS DEL CONTROLADOR DE CALENDARIO
     case '/calendario/cargar':
@@ -423,6 +426,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
+    // pasarela de pago
+    case '/cliente/pasarela-pago':
+        require BASE_PATH . '/app/views/dashboard/cliente/pasarelaPago.php';
+        break;
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
     case '/reporte-veterinarios':
@@ -443,6 +450,10 @@ switch ($request) {
     // ---------------------------------------REPRESENTANTE-------------------------------------//
     case '/representante/dashboard':
         require BASE_PATH . '/app/views/dashboard/representante/dashboardRepresentante.php';
+        break;
+
+    case '/representante/veterinaria_info':
+        require BASE_PATH . '/app/views/dashboard/representante/configVeterinaria.php';
         break;
 
     case '/representante/listar-especialidades':
@@ -515,6 +526,34 @@ switch ($request) {
 
     case '/representante/perfil-representante':
         require BASE_PATH . '/app/views/dashboard/representante/perfilRepresentante.php';
+        break;
+
+    case '/representante/api/especialidades':
+        require BASE_PATH . '/app/controllers/especialidadController.php';
+        break;
+
+    case '/representante/actualizar-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+
+    case '/representante/obtener-horarios-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+
+    case '/representante/actualizar-horario-veterinaria':
+        require BASE_PATH . '/app/controllers/veterinariaController.php';
+        break;
+
+    case '/representante/propietarios':
+        require BASE_PATH . '/app/views/dashboard/representante/listaPropietarios.php';
+        break;
+
+    case '/representante/propietarios/api/listar':
+        require BASE_PATH . '/app/controllers/propetarioController.php';
+        break;
+
+    case '/representante/api/propietarios':
+        require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
 
 

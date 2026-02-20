@@ -23,7 +23,7 @@ class ListaServicios {
     bindEvents() {
         // Aquí puedes agregar los event listeners
         if (this.ordebarBtn) {
-            this.ordebarBtn.onclick = () => this.ordenarProfesionales();
+            this.ordebarBtn.onclick = () => this.ordenarServicios();
         }
         if (this.btnExportarCSV) {
             this.btnExportarCSV.onclick = () => this.exportarCSV();
@@ -118,12 +118,10 @@ class ListaServicios {
         }
     }
 
-    ordenarProfesionales() {
+    ordenarServicios() {
         const opciones = [
-            '👤 Nombre y Apellidos (A-Z)',
-            '👤 Nombre y apellidos (Z-A)',
-            '# Documento (Ascendente)',
-            '# Documento (Descendente)'
+            'Nombre (A-Z)',
+            'Nombre (Z-A)'
         ];
 
         const mensaje = '⬆️⬇️ Selecciona el ordenamiento:\n\n' +
@@ -133,12 +131,12 @@ class ListaServicios {
 
         switch (opcion) {
             case '1':
-                this.tablaServicios.order([2, 'asc']).draw();
-                console.log('👤 Ordenado por Nombre ascendente');
+                this.tablaServicios.order([0, 'asc']).draw();
+                console.log('Ordenado por Nombre ascendente');
                 break;
             case '2':
-                this.tablaServicios.order([2, 'desc']).draw();
-                console.log('👤 Ordenado por Nombre descendente');
+                this.tablaServicios.order([0, 'desc']).draw();
+                console.log('Ordenado por Nombre descendente');
                 break;
             default:
                 if (opcion !== null) {
