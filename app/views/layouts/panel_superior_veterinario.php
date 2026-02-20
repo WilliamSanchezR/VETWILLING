@@ -7,13 +7,13 @@ $usuario    = mostrarPerfil($id);
 $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 
 // Suscripción: Free | Basic | Pro | Enterprise
-$suscripcion     = $usuario['suscripcion'] ?? 'basic';
+$suscripcion     = $usuario['suscripcion'] ?? 'pro';
 $sub_slug        = strtolower($suscripcion);
 
 $sub_icons = [
     'Essential'       => 'bi-gift',
     'basic'      => 'bi-lightning-charge-fill',
-    'ProCare'        => 'bi-stars',
+    'Pro'        => 'bi-stars',
     'MasterVet' => 'bi-gem',
 ];
 $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';

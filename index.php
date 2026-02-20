@@ -434,10 +434,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
-    // pasarela de pago
-    case '/cliente/pasarela-pago':
-        require BASE_PATH . '/app/views/dashboard/cliente/pasarelaPago.php';
-        break;
+
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
     case '/reporte-veterinarios':
@@ -617,5 +614,13 @@ switch ($request) {
 
     case '/representante/eliminar-subservicio':
         require BASE_PATH . '/app/controllers/subservicioController.php';
+        break;
+
+    // pasarela de pago
+    case '/pasarela-pago':
+        require BASE_PATH . '/app/views/payments/pasarelaPago.php';
+        break;
+    case '/confirmacion-pago':
+        require BASE_PATH . '/app/views/payments/confirmacion.php';
         break;
 }
