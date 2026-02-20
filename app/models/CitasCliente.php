@@ -168,6 +168,7 @@ class CitasCliente
                         pac.nombre as mascota_nombre,
                         pac.especie as mascota_especie,
                         pac.raza as mascota_raza,
+                        pac.img_mascota,
                         
                         s.id_servicio,
                         s.nombre as servicio_nombre,

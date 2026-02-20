@@ -1,12 +1,4 @@
 <?php
-require_once BASE_PATH . '/app/controllers/mascotasController.php';
-
-// Obtener las mascotas del propietario actual
-$mascotas = listarMascotas();
-
-// Obtener servicios disponibles (necesitaremos crear esta función)
-// Por ahora, dejamos un array vacío que se llenará dinámicamente con AJAX
-$Citas = [];
 // Iniciar sesión si no está iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -17,10 +9,6 @@ if (!isset($_SESSION['user']['id_usuario'])) {
     header('Location: ' . BASE_URL . '/login');
     exit();
 }
-
-// Obtener servicios disponibles (necesitaremos crear esta función)
-// Por ahora, dejamos un array vacío que se llenará dinámicamente con AJAX
-$Citas = [];
 
 $id_usuario = $_SESSION['user']['id_usuario'];
 ?>
@@ -752,13 +740,9 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 <div class="filtros-avanzados">
                     <div class="filtro-grupo">
                         <label>Mascota</label>
-
-                        <select>
-                            <option>Todas las mascotas</option>
-                            <?php foreach ($mascotas as $mascota): ?>
-                                <option value="<?= $mascota['id_paciente'] ?>"><?= htmlspecialchars($mascota['nombre']) ?></option>
-                            <?php endforeach; ?>
-
+                        <select id="filtro-mascota">
+                            <option value="">Todas las mascotas</option>
+                            <!-- Se llenarán dinámicamente -->
                         </select>
                     </div>
 
@@ -785,8 +769,6 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 </div>
 
                 <!-- Timeline de Citas -->
-
-                <div class="citas-timeline">
                 <div class="citas-timeline" id="citasContainer">
                     <!-- Loading inicial -->
                     <div class="loading-container">
@@ -796,54 +778,6 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 </div>
 
             </div>
-
-                        <!-- Cita Urgente -->
-                        <div class="cita-card urgente">
-                            <div class="cita-hora">
-                                <div class="hora-numero">09:00</div>
-                                <div class="hora-periodo">AM</div>
-                            </div>
-                            <div class="mascota-avatar-grande">
-                                <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= $mascota['img_mascota'] ?>"
-                                    alt="<?= htmlspecialchars($mascota['nombre']) ?>"
-                                    style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover;">
-                            </div>
-
-                            <div class="cita-info">
-                                <div class="cita-titulo">
-                                    Control de Urgencia - <?= htmlspecialchars($mascota['nombre']) ?>
-                                    <span class="tipo-badge emergencia">Emergencia</span>
-                                </div>
-
-                                <div class="cita-detalles">
-                                    <div class="detalle">
-                                        <i class="bi bi-person"></i>
-                                        <span>Dr. Juan Martínez</span>
-                                    </div>
-                                    <div class="detalle">
-                                        <i class="bi bi-geo-alt"></i>
-                                        <span>Consultorio 2</span>
-                                    </div>
-                                    <div class="detalle">
-                                        <i class="bi bi-clock"></i>
-                                        <span>30 minutos</span>
-                                    </div>
-                                </div>
-
-                                <div class="cita-notas">
-                                    <strong>Motivo:</strong> Revisión por vómito recurrente. Traer ayuno de 8 horas.
-                                </div>
-                            </div>
-                <div class="citas-timeline" id="citasContainer">
-                    <!-- Loading inicial -->
-                    <div class="loading-container">
-                        <div class="spinner"></div>
-                        <p>Cargando tus citas...</p>
-                    </div>
-                </div>
-
-            </div>
-
 
         </div>
 
@@ -1028,7 +962,10 @@ $id_usuario = $_SESSION['user']['id_usuario'];
             if (fechaInicio) {
                 citasFiltradas = citasFiltradas.filter(c => {
                     const fechaCita = new Date(c.fecha_hora);
-                    return fechaCita >= new Date(fechaInicio);
+                    // Convertir fecha inicio a objeto local
+                    const [añoInicio, mesInicio, diaInicio] = fechaInicio.split('-');
+                    const fechaInicioObj = new Date(parseInt(añoInicio), parseInt(mesInicio) - 1, parseInt(diaInicio));
+                    return fechaCita >= fechaInicioObj;
                 });
             }
 
@@ -1037,7 +974,10 @@ $id_usuario = $_SESSION['user']['id_usuario'];
             if (fechaFin) {
                 citasFiltradas = citasFiltradas.filter(c => {
                     const fechaCita = new Date(c.fecha_hora);
-                    return fechaCita <= new Date(fechaFin + 'T23:59:59');
+                    // Convertir fecha fin a objeto local y agregar 23:59:59
+                    const [añoFin, mesFin, diaFin] = fechaFin.split('-');
+                    const fechaFinObj = new Date(parseInt(añoFin), parseInt(mesFin) - 1, parseInt(diaFin), 23, 59, 59);
+                    return fechaCita <= fechaFinObj;
                 });
             }
 
@@ -1072,7 +1012,10 @@ $id_usuario = $_SESSION['user']['id_usuario'];
             let html = '';
             
             for (const [fecha, citasDelDia] of Object.entries(citasPorDia)) {
-                const fechaObj = new Date(fecha);
+                // Convertir fecha string local a objeto Date correctamente
+                const [año, mes, dia] = fecha.split('-');
+                const fechaObj = new Date(año, parseInt(mes) - 1, parseInt(dia));
+                
                 const hoy = new Date();
                 hoy.setHours(0, 0, 0, 0);
                 
@@ -1127,7 +1070,11 @@ $id_usuario = $_SESSION['user']['id_usuario'];
             
             citas.forEach(cita => {
                 const fecha = new Date(cita.fecha_hora);
-                const fechaKey = fecha.toISOString().split('T')[0];
+                // Usar fecha local en lugar de UTC para evitar desplazamiento de zona horaria
+                const año = fecha.getFullYear();
+                const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+                const dia = String(fecha.getDate()).padStart(2, '0');
+                const fechaKey = `${año}-${mes}-${dia}`;
                 
                 if (!grupos[fechaKey]) {
                     grupos[fechaKey] = [];
@@ -1154,7 +1101,11 @@ $id_usuario = $_SESSION['user']['id_usuario'];
             const periodo = fecha.getHours() >= 12 ? 'PM' : 'AM';
             
             const tipoBadge = obtenerTipoBadge(cita.tipo);
-            const iconoMascota = obtenerIconoMascota(cita.mascota_especie);
+            
+            // Determinar la foto de la mascota
+            const fotoMascota = cita.img_mascota && cita.img_mascota !== 'default_pet.jpg' 
+                ? `${BASE_URL}/public/uploads/mascotas/${cita.img_mascota}`
+                : `${BASE_URL}/public/uploads/mascotas/default_pet.jpg`;
 
             const esUrgente = cita.tipo && cita.tipo.toLowerCase().includes('emergencia');
             const claseUrgente = esUrgente ? 'urgente' : '';
@@ -1166,7 +1117,8 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                         <div class="hora-periodo">${periodo}</div>
                     </div>
 
-                    <div class="cita-mascota-avatar">${iconoMascota}</div>
+                    <div class="cita-mascota-avatar" style="background-image: url('${fotoMascota}'); background-size: cover; background-position: center; border-radius: 12px;">
+                    </div>
 
                     <div class="cita-info">
                         <div class="cita-titulo">
@@ -1274,10 +1226,19 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 minute: '2-digit'
             });
 
+            // Determinar la foto de la mascota
+            const fotoMascota = cita.img_mascota && cita.img_mascota !== 'default_pet.jpg' 
+                ? `${BASE_URL}/public/uploads/mascotas/${cita.img_mascota}`
+                : `${BASE_URL}/public/uploads/mascotas/default_pet.jpg`;
+
             Swal.fire({
                 title: 'Detalles de la Cita',
                 html: `
                     <div style="text-align: left; padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <img src="${fotoMascota}" alt="Foto de ${cita.mascota_nombre}" 
+                                 style="width: 150px; height: 150px; border-radius: 12px; object-fit: cover;">
+                        </div>
                         <p><strong>Mascota:</strong> ${cita.mascota_nombre}</p>
                         <p><strong>Especie:</strong> ${cita.mascota_especie} - ${cita.mascota_raza}</p>
                         <p><strong>Servicio:</strong> ${cita.tipo}</p>
