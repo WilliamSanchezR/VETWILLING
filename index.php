@@ -620,7 +620,7 @@ switch ($request) {
     case '/pasarela-pago':
         require BASE_PATH . '/app/views/payments/pasarelaPago.php';
         break;
-    case '/confirmacion-pago':
+    case '/pagos/confirmacion':
         require BASE_PATH . '/app/views/payments/confirmacion.php';
         break;
 }

@@ -1,73 +1,100 @@
+<?php
+/*
+Variables que deberían venir del controller:
+
+$estado        // approved | declined | error
+$mensaje       // texto explicativo
+$referencia    // referencia interna
+$monto         // valor pagado formateado
+$dashboard_url // a dónde regresar según rol
+*/
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Pasarela de pago segura para servicios veterinarios VetWilling">
-    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
-    <!-- Preconnect -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <title>Confirmación de Pago | VetWilling</title>
 
-    <!-- Bootstrap -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Iconos -->
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer">
+    <style>
+        body {
+            background: #f4f6f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    <!-- Favicon -->
-    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
-    <link rel="apple-touch-icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png">
+        .confirmation-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
 
-    <title>Pasarela de Pago Segura | VetWilling</title>
+        .icon-success {
+            font-size: 60px;
+            color: #2e7d32;
+        }
 
-    <!-- Estilos propios -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/pasarelaPago.css">
+        .icon-error {
+            font-size: 60px;
+            color: #dc3545;
+        }
+
+        .btn-primary-custom {
+            background: #2e7d32;
+            border: none;
+        }
+
+        .btn-primary-custom:hover {
+            background: #1b5e20;
+        }
+    </style>
 </head>
 
 <body>
 
-    <!-- SIDEBAR -->
-    <?php include_once __DIR__ . '../../layouts/panel_superio_paciente.php'; ?>
+    <div class="confirmation-card">
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="contenido-principal" id="contenidoPrincipal">
+        <?php if ($estado === 'approved'): ?>
 
-        <!-- NAVBAR -->
-        <?php include_once __DIR__ . '../../layouts/sidebar_pasiente.php'; ?>
+            <div class="icon-success">✔</div>
+            <h3 class="mt-3">Pago exitoso</h3>
+            <p class="text-muted"><?= $mensaje ?></p>
 
-        <div class="container">
+            <div class="mt-3">
+                <p><strong>Referencia:</strong> <?= $referencia ?></p>
+                <p><strong>Monto pagado:</strong> $<?= $monto ?></p>
+            </div>
 
-            
-        </div>
-    </main>
+            <a href="<?= $dashboard_url ?>" class="btn btn-primary-custom mt-4">
+                Volver al panel
+            </a>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/pasarelaPago.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+        <?php else: ?>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document
-                .querySelectorAll('[data-bs-toggle="tooltip"]')
-                .forEach(el => new bootstrap.Tooltip(el));
-        });
-    </script>
+            <div class="icon-error">✖</div>
+            <h3 class="mt-3">Pago no aprobado</h3>
+            <p class="text-muted"><?= $mensaje ?></p>
+
+            <a href="<?= BASE_URL ?>/pagos/reintentar?ref=<?= $referencia ?>" class="btn btn-outline-danger mt-4">
+                Intentar nuevamente
+            </a>
+
+        <?php endif; ?>
+
+    </div>
 
 </body>
+
 </html>

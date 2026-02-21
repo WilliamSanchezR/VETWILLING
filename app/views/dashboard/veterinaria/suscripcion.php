@@ -83,7 +83,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </ul>
 
                     <div class="plan-divider"></div>
-                    <button class="btn btn-outline">Solicitar prueba</button>
+                    <a class="btn btn-outline" href="<?= BASE_URL ?>/pasarela-pago">Solicitar prueba</a>
                 </div>
 
 
