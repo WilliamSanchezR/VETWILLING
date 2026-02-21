@@ -83,7 +83,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </ul>
 
                     <div class="plan-divider"></div>
-                    <a class="btn btn-outline" href="<?= BASE_URL ?>/pasarela-pago">Solicitar prueba</a>
+                    <a class="btn btn-outline" href="<?= BASE_URL ?>/pasarela-pago?origen=suscripcion&plan=basico">
+                        Solicitar prueba
+                    </a>
                 </div>
 
 
@@ -113,7 +115,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </ul>
 
                     <div class="plan-divider"></div>
-                    <button class="btn btn-primary">Solicitar prueba →</button>
+                    <a class="btn btn-outline" href="<?= BASE_URL ?>/pasarela-pago?origen=suscripcion&plan=procare">
+                        Solicitar prueba
+                    </a>
                 </div>
 
 
@@ -142,7 +146,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </ul>
 
                     <div class="plan-divider"></div>
-                    <button class="btn btn-outline">Solicitar prueba</button>
+                    <a class="btn btn-outline" href="<?= BASE_URL ?>/pasarela-pago?origen=suscripcion&plan=mastervet">
+                        Solicitar prueba
+                    </a>
                 </div>
 
             </div>
