@@ -1,6 +1,62 @@
 *{
     scrollbar-width: none;
 }
+
+.agenda-table-full {
+    width: 100% !important;
+}
+
+.modal-agenda-dialog {
+    max-width: 480px;
+}
+
+.modal-agenda-content {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.modal-agenda-header {
+    background: #fff;
+    border-bottom: 1.5px solid #f0f4f0;
+    padding: 22px 28px 18px;
+}
+
+.modal-agenda-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a1a2e;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.modal-agenda-title-icon {
+    color: #2e7d32;
+    font-size: 21px;
+}
+
+.modal-agenda-close {
+    opacity: 0.45;
+}
+
+.modal-agenda-body {
+    background: #fff;
+    padding: 22px 28px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-agenda-footer {
+    background: #fff;
+    border-top: 1.5px solid #f0f0f0;
+    padding: 16px 28px;
+    gap: 10px;
+}
+
 .contenedor-agenda-profesional {
     display: flex;
     flex-direction: column;

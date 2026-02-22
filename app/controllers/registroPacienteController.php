@@ -47,13 +47,26 @@ function registrarPacienteConPropietario()
     $email = $_POST['email'] ?? '';
     $direccion = $_POST['direccion'] ?? '';
 
-    // Capturar datos de la mascota
-    $nombre_mascota = $_POST['nombre_mascota'] ?? '';
-    $especie = $_POST['especie'] ?? '';
-    $raza = $_POST['raza'] ?? '';
-    $sexo = $_POST['sexo'] ?? '';
-    $edad_numero = $_POST['edad_numero'] ?? '';
-    $edad_unidad = $_POST['edad_unidad'] ?? '';
+    // Capturar datos de mascotas (nuevo formato) o mascota única (compatibilidad)
+    $mascotas = [];
+
+    if (!empty($_POST['mascotas'])) {
+        $mascotasDecodificadas = json_decode($_POST['mascotas'], true);
+        if (is_array($mascotasDecodificadas)) {
+            $mascotas = $mascotasDecodificadas;
+        }
+    }
+
+    if (empty($mascotas)) {
+        $mascotas[] = [
+            'nombre' => $_POST['nombre_mascota'] ?? '',
+            'especie' => $_POST['especie'] ?? '',
+            'raza' => $_POST['raza'] ?? '',
+            'sexo' => $_POST['sexo'] ?? '',
+            'edad_numero' => $_POST['edad_numero'] ?? '',
+            'edad_unidad' => $_POST['edad_unidad'] ?? ''
+        ];
+    }
 
     // Validar campos obligatorios del propietario
     if (
@@ -67,16 +80,26 @@ function registrarPacienteConPropietario()
         exit();
     }
 
-    // Validar campos obligatorios de la mascota
-    if (
-        empty($nombre_mascota) || empty($especie) || empty($raza) || empty($sexo) ||
-        empty($edad_numero) || empty($edad_unidad)
-    ) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Complete todos los campos de la mascota'
-        ]);
-        exit();
+    // Validar campos obligatorios de cada mascota
+    foreach ($mascotas as $index => $mascota) {
+        $nombreMascota = trim($mascota['nombre'] ?? '');
+        $especieMascota = trim($mascota['especie'] ?? '');
+        $razaMascota = trim($mascota['raza'] ?? '');
+        $sexoMascota = trim($mascota['sexo'] ?? '');
+        $edadNumeroMascota = trim((string) ($mascota['edad_numero'] ?? ''));
+        $edadUnidadMascota = trim($mascota['edad_unidad'] ?? '');
+
+        if (
+            $nombreMascota === '' || $especieMascota === '' || $razaMascota === '' || $sexoMascota === '' ||
+            $edadNumeroMascota === '' || $edadUnidadMascota === ''
+        ) {
+            $numeroMascota = $index + 1;
+            echo json_encode([
+                'success' => false,
+                'message' => "Complete todos los campos de la mascota #{$numeroMascota}"
+            ]);
+            exit();
+        }
     }
 
     try {
@@ -108,37 +131,40 @@ function registrarPacienteConPropietario()
             exit();
         }
 
-        // 2. Registrar la mascota
+        // 2. Registrar mascotas
         $mascotaModel = new Mascota();
 
-        $dataMascota = [
-            'id_propietario' => $id_propietario,
-            'nombre' => $nombre_mascota,
-            'especie' => $especie,
-            'raza' => $raza,
-            'edad_numero' => $edad_numero,
-            'edad_unidad' => $edad_unidad,
-            'sexo' => $sexo,
-            'img_mascota' => null
-        ];
+        $registradas = 0;
+        foreach ($mascotas as $mascota) {
+            $dataMascota = [
+                'id_propietario' => $id_propietario,
+                'nombre' => trim($mascota['nombre']),
+                'especie' => trim($mascota['especie']),
+                'raza' => trim($mascota['raza']),
+                'edad_numero' => (int) $mascota['edad_numero'],
+                'edad_unidad' => trim($mascota['edad_unidad']),
+                'sexo' => trim($mascota['sexo']),
+                'img_mascota' => null
+            ];
 
-        error_log("Datos mascota a insertar: " . print_r($dataMascota, true));
+            error_log("Datos mascota a insertar: " . print_r($dataMascota, true));
+            $resultado = $mascotaModel->registrar($dataMascota);
 
-        $resultado = $mascotaModel->registrar($dataMascota);
+            if (!$resultado) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'No se pudo registrar una de las mascotas'
+                ]);
+                exit();
+            }
 
-        error_log("Resultado registro mascota: " . ($resultado ? 'true' : 'false'));
-
-        if ($resultado) {
-            echo json_encode([
-                'success' => true,
-                'message' => 'El paciente y propietario han sido registrados correctamente'
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'No se pudo registrar la mascota'
-            ]);
+            $registradas++;
         }
+
+        echo json_encode([
+            'success' => true,
+            'message' => "Registro exitoso: propietario y {$registradas} mascota(s) guardadas correctamente"
+        ]);
     } catch (Exception $e) {
         error_log("Error en registroPacienteController: " . $e->getMessage());
         echo json_encode([

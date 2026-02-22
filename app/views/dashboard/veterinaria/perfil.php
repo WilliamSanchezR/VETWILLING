@@ -250,7 +250,7 @@ $usuario = mostrarPerfil($id);
                                         <input type="checkbox" id="ver_contrasena-actual" class="ver" onChange="hideOrShowPassword(this)" />
                                         <button type="button" class="icon-view">
                                             <i class="bi bi-eye" id="contrasena-actual-visible"></i>
-                                            <i class="bi bi-eye-slash" style="display: none;" id="contrasena-actual-hidden"></i>
+                                            <i class="bi bi-eye-slash d-none" id="contrasena-actual-hidden"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -263,7 +263,7 @@ $usuario = mostrarPerfil($id);
                                         <input type="checkbox" id="ver_nueva-contrasena" class="ver" onChange="hideOrShowPassword(this)" />
                                         <button type="button" class="icon-view">
                                             <i class="bi bi-eye" id="nueva-contrasena-visible"></i>
-                                            <i class="bi bi-eye-slash" style="display: none;" id="nueva-contrasena-hidden"></i>
+                                            <i class="bi bi-eye-slash d-none" id="nueva-contrasena-hidden"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -277,7 +277,7 @@ $usuario = mostrarPerfil($id);
                                         <input type="checkbox" id="ver_confi-contrasena" class="ver" onChange="hideOrShowPassword(this)" />
                                         <button type="button" class="icon-view">
                                             <i class="bi bi-eye" id="confi-contrasena-visible"></i>
-                                            <i class="bi bi-eye-slash" style="display: none;" id="confi-contrasena-hidden"></i>
+                                            <i class="bi bi-eye-slash d-none" id="confi-contrasena-hidden"></i>
                                         </button>
                                     </div>
                                 </div>

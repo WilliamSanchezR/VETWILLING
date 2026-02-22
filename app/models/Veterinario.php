@@ -178,6 +178,53 @@ class Veterinario
         }
     }
 
+    public function obtenerPacientesPorVeterinario($id_usuario)
+    {
+        try {
+            $sql = "SELECT 
+                        p.id_paciente,
+                        p.nombre AS paciente_nombre,
+                        p.especie,
+                        p.raza,
+                        p.edad_numero,
+                        p.edad_unidad,
+                        p.sexo,
+                        CONCAT(pr.nombres, ' ', pr.apellidos) AS propietario_nombre,
+                        (
+                            SELECT MAX(a.fecha_hora)
+                            FROM agendamiento a
+                            WHERE a.id_usuario = :id_usuario
+                              AND a.id_paciente = p.id_paciente
+                        ) AS ultima_visita,
+                        (
+                            SELECT a2.estado
+                            FROM agendamiento a2
+                            WHERE a2.id_usuario = :id_usuario
+                              AND a2.id_paciente = p.id_paciente
+                            ORDER BY a2.fecha_hora DESC, a2.id_agendamiento DESC
+                            LIMIT 1
+                        ) AS estado_ultima_cita
+                    FROM paciente p
+                    INNER JOIN propietario pr ON p.id_propietario = pr.id_propietario
+                    WHERE EXISTS (
+                        SELECT 1
+                        FROM agendamiento a3
+                        WHERE a3.id_usuario = :id_usuario
+                          AND a3.id_paciente = p.id_paciente
+                    )
+                    ORDER BY ultima_visita DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::obtenerPacientesPorVeterinario - " . $e->getMessage());
+            return [];
+        }
+    }
+
 
 
     public function registrar($data)
