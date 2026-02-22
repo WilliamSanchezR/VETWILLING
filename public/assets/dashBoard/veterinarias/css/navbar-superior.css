@@ -105,6 +105,10 @@
     --t-slow:                  0.35s;
 }
 
+.is-hidden {
+    display: none;
+}
+
 /* ── Dark mode ── */
 [data-theme="dark"] {
     --surface:                 #141820;

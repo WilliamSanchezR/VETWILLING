@@ -180,7 +180,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 <span class="porcentaje-prog">45%</span>
                             </div>
                             <div class="barra-progreso-seg">
-                                <div class="fill-progreso" style="width: 45%;"></div>
+                                <div class="fill-progreso fill-progreso-45"></div>
                             </div>
                         </div>
 
@@ -266,7 +266,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 <span class="porcentaje-prog">75%</span>
                             </div>
                             <div class="barra-progreso-seg">
-                                <div class="fill-progreso" style="width: 75%;"></div>
+                                <div class="fill-progreso fill-progreso-75"></div>
                             </div>
                         </div>
 
@@ -339,7 +339,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 <span class="porcentaje-prog">90%</span>
                             </div>
                             <div class="barra-progreso-seg">
-                                <div class="fill-progreso" style="width: 90%;"></div>
+                                <div class="fill-progreso fill-progreso-90"></div>
                             </div>
                         </div>
 

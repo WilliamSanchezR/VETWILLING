@@ -32,13 +32,13 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 
             <!-- Logo veterinaria -->
             <?php if (!empty($veterinaria['foto'])): ?>
-            <div class="vet-logo-wrap">
-                <img
-                    src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>"
-                    alt="<?= htmlspecialchars($veterinaria['nombre']) ?>"
-                    class="vet-logo"
-                    title="<?= htmlspecialchars($veterinaria['nombre']) ?>">
-            </div>
+                <div class="vet-logo-wrap">
+                    <img
+                        src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>"
+                        alt="<?= htmlspecialchars($veterinaria['nombre']) ?>"
+                        class="vet-logo"
+                        title="<?= htmlspecialchars($veterinaria['nombre']) ?>">
+                </div>
             <?php endif; ?>
 
             <!-- Botón menú móvil -->
@@ -85,14 +85,14 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                         placeholder="Buscar pacientes, citas, historiales…"
                         autocomplete="off"
                         aria-label="Buscar">
-                    <button class="btn-clear" id="btnClearSearch" style="display:none" aria-label="Limpiar">
+                    <button class="btn-clear is-hidden" id="btnClearSearch" aria-label="Limpiar">
                         <i class="bi bi-x"></i>
                     </button>
                     <kbd class="search-shortcut">Ctrl K</kbd>
                 </div>
 
                 <!-- Panel de resultados -->
-                <div class="search-results-panel" id="searchResults" style="display:none">
+                <div class="search-results-panel is-hidden" id="searchResults">
                     <div class="search-results-header">
                         <span class="results-title">Resultados</span>
                         <span class="results-count" id="resultsCount">0 resultados</span>
@@ -125,7 +125,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                     <span class="notification-badge" id="notificationBadge">3</span>
                 </button>
 
-                <div class="dropdown-panel notifications-panel" id="notificationsPanel" style="display:none">
+                <div class="dropdown-panel notifications-panel is-hidden" id="notificationsPanel">
                     <div class="panel-header">
                         <div class="panel-title">
                             <div>
@@ -239,7 +239,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                 </button>
 
                 <!-- ── Dropdown perfil ── -->
-                <div class="dropdown-panel profile-panel" id="perfilDropdown" style="display:none">
+                <div class="dropdown-panel profile-panel is-hidden" id="perfilDropdown">
 
                     <!-- Cabecera con avatar grande -->
                     <div class="profile-header">
@@ -286,7 +286,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             </div>
                         </a>
                     </div>
-                    
+
                     <div class="panel-body">
                         <a href="<?= BASE_URL ?>/veterinario/suscripcion" class="dropdown-item">
                             <div class="item-icon">
@@ -298,24 +298,24 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             </div>
                         </a>
 
-                    <div class="panel-divider"></div>
+                        <div class="panel-divider"></div>
 
-                    <div class="panel-footer">
-                        <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item logout-item">
-                            <div class="item-icon">
-                                <i class="bi bi-box-arrow-right"></i>
-                            </div>
-                            <span class="item-title">Cerrar Sesión</span>
-                        </a>
+                        <div class="panel-footer">
+                            <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item logout-item">
+                                <div class="item-icon">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </div>
+                                <span class="item-title">Cerrar Sesión</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
+                <!-- ─── FIN PERFIL ─────────────────────────────── -->
+
             </div>
-            <!-- ─── FIN PERFIL ─────────────────────────────── -->
+            <!-- ─── FIN DERECHA ───────────────────────────────── -->
 
         </div>
-        <!-- ─── FIN DERECHA ───────────────────────────────── -->
-
-    </div>
 </nav>
 
 
