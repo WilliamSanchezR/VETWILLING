@@ -121,7 +121,7 @@ $agendaVeterinario = !empty($id_veterinaria)
                 </div>
 
                 <div class="contenedor-tabla">
-                    <table id="tablaListaAgenda" class="display tabla-admin" style="width:100%">
+                    <table id="tablaListaAgenda" class="display tabla-admin agenda-table-full">
                         <thead>
                             <tr>
                                 <th>Día</th>
@@ -160,32 +160,51 @@ $agendaVeterinario = !empty($id_veterinaria)
             <!-- Modal Registro Agenda -->
 
             <div class="modal fade" id="modalAgregarAgenda" tabindex="-1" aria-labelledby="modalAgregarAgendaLabel" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered modal-agenda-dialog">
                     <form id="formAgenda" method="POST" action="<?= BASE_URL ?>/veterinario/agregar-disponibilidad-agenda" enctype="multipart/form-data">
                         <input type="hidden" name="id_usuario" value="<?= htmlspecialchars($id) ?>">
                         <input type="hidden" name="id_veterinaria" value="<?= htmlspecialchars($id_veterinaria) ?>">
                         <input type="hidden" name="redirect" value="<?= htmlspecialchars(BASE_URL . $_SERVER['REQUEST_URI']) ?>">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="modalAgregarAgendaLabel">Agregar disponibilidad de agenda</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
 
-                                <div class="mb-3">
-                                    <label for="especialidad" class="form-label">Especialidad</label>
-                                    <select class="form-select" id="especialidad" name="id_especialidad" required>
-                                        <option value="" disabled selected>Seleccione una especialidad</option>
+                        <div class="modal-content modal-agenda-content">
+
+                            <!-- ── HEADER ── -->
+                            <div class="modal-header modal-agenda-header">
+                                <h5 class="modal-title modal-agenda-title" id="modalAgregarAgendaLabel">
+                                    <i class="bi bi-calendar2-plus modal-agenda-title-icon"></i>
+                                    Agregar Disponibilidad
+                                </h5>
+                                <button type="button" class="btn-close modal-agenda-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+
+                            <!-- ── BODY ── -->
+                            <div class="modal-body modal-agenda-body">
+
+                                <!-- Especialidad -->
+                                <div>
+                                    <label for="especialidad" class="form-label am-label">
+                                        <i class="bi bi-patch-plus"></i> Especialidad
+                                        <span class="am-req">*</span>
+                                    </label>
+                                    <select class="form-select am-input" id="especialidad" name="id_especialidad" required>
+                                        <option value="" disabled selected>Seleccione una especialidad...</option>
                                         <?php foreach ($listaEspecialidades as $especialidad): ?>
-                                            <option value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>"><?= htmlspecialchars($especialidad['nombre']) ?></option>
+                                            <option value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>">
+                                                <?= htmlspecialchars($especialidad['nombre']) ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     </select>
+                                    <span class="am-hint"><i class="bi bi-info-circle"></i> Especialidad principal del veterinario</span>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="dia_semana" class="form-label">Día de la semana</label>
-                                    <select class="form-select" id="dia_semana" name="dia_semana" required>
-                                        <option value="">Seleccione...</option>
+                                <!-- Día de la semana -->
+                                <div>
+                                    <label for="dia_semana" class="form-label am-label">
+                                        <i class="bi bi-calendar-week"></i> Día de la semana
+                                        <span class="am-req">*</span>
+                                    </label>
+                                    <select class="form-select am-input" id="dia_semana" name="dia_semana" required>
+                                        <option value="" disabled selected>Seleccione un día...</option>
                                         <option value="1">Lunes</option>
                                         <option value="2">Martes</option>
                                         <option value="3">Miércoles</option>
@@ -196,48 +215,74 @@ $agendaVeterinario = !empty($id_veterinaria)
                                     </select>
                                 </div>
 
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label for="hora_inicio" class="form-label">Hora Inicio</label>
-                                        <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="hora_fin" class="form-label">Hora Fin</label>
-                                        <input type="time" class="form-control" id="hora_fin" name="hora_fin" required>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label for="hora_inicio_seccond" class="form-label">Hora Inicio (2da jornada)</label>
-                                        <input type="time" class="form-control" id="hora_inicio_seccond" name="hora_inicio_seccond">
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="hora_fin_seccond" class="form-label">Hora Fin (2da jornada)</label>
-                                        <input type="time" class="form-control" id="hora_fin_seccond" name="hora_fin_seccond">
+                                <!-- 1ª Jornada -->
+                                <div>
+                                    <label class="form-label am-label">
+                                        <i class="bi bi-clock"></i> Horario — 1ª Jornada
+                                        <span class="am-req">*</span>
+                                    </label>
+                                    <div class="am-time-row">
+                                        <div class="am-time-col">
+                                            <span class="am-sublabel">Hora inicio</span>
+                                            <input type="time" class="form-control am-input" id="hora_inicio" name="hora_inicio" required>
+                                        </div>
+                                        <i class="bi bi-arrow-right am-arrow"></i>
+                                        <div class="am-time-col">
+                                            <span class="am-sublabel">Hora fin</span>
+                                            <input type="time" class="form-control am-input" id="hora_fin" name="hora_fin" required>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="duracion_minutos" class="form-label">Duración por cita (minutos)</label>
-                                    <select class="form-select" id="duracion_minutos" name="duracion_minutos" required>
+                                <!-- 2ª Jornada -->
+                                <div>
+                                    <label class="form-label am-label">
+                                        <i class="bi bi-clock-history"></i> Horario — 2ª Jornada
+                                        <span class="am-opt">(opcional)</span>
+                                    </label>
+                                    <div class="am-time-row">
+                                        <div class="am-time-col">
+                                            <span class="am-sublabel">Hora inicio</span>
+                                            <input type="time" class="form-control am-input" id="hora_inicio_seccond" name="hora_inicio_seccond">
+                                        </div>
+                                        <i class="bi bi-arrow-right am-arrow"></i>
+                                        <div class="am-time-col">
+                                            <span class="am-sublabel">Hora fin</span>
+                                            <input type="time" class="form-control am-input" id="hora_fin_seccond" name="hora_fin_seccond">
+                                        </div>
+                                    </div>
+                                    <span class="am-hint"><i class="bi bi-info-circle"></i> Solo si trabaja en dos jornadas el mismo día</span>
+                                </div>
+
+                                <!-- Duración -->
+                                <div>
+                                    <label for="duracion_minutos" class="form-label am-label">
+                                        <i class="bi bi-hourglass-split"></i> Duración por cita
+                                        <span class="am-req">*</span>
+                                    </label>
+                                    <select class="form-select am-input" id="duracion_minutos" name="duracion_minutos" required>
                                         <option value="15">15 minutos</option>
                                         <option value="20">20 minutos</option>
-                                        <option value="30">30 minutos</option>
+                                        <option value="30" selected>30 minutos</option>
                                         <option value="45">45 minutos</option>
                                         <option value="60">60 minutos</option>
                                     </select>
+                                    <span class="am-hint"><i class="bi bi-info-circle"></i> Tiempo reservado por cada cita agendada</span>
                                 </div>
 
+                            </div>
 
+                            <!-- ── FOOTER ── -->
+                            <div class="modal-footer modal-agenda-footer">
+                                <button type="button" class="am-btn am-btn-cancel" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </button>
+                                <button type="submit" class="am-btn am-btn-confirm">
+                                    <i class="bi bi-check-circle"></i> Agregar
+                                </button>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                <button type="submit" class="btn btn-primary">Agregar</button>
-                            </div>
+
+                        </div>
                     </form>
                 </div>
             </div>
@@ -247,7 +292,7 @@ $agendaVeterinario = !empty($id_veterinaria)
 
         <!-- Modal Editar Agenda -->
         <div class="modal fade" id="modalEditarAgenda" tabindex="-1" aria-labelledby="modalEditarAgendaLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-centered modal-agenda-dialog">
                 <form id="formEditAgenda" method="POST" action="<?= BASE_URL ?>/veterinario/editar-disponibilidad-agenda" enctype="multipart/form-data">
                     <input type="hidden" name="id_usuario" value="<?= htmlspecialchars($id) ?>">
                     <input type="hidden" name="id_veterinaria" value="<?= htmlspecialchars($id_veterinaria) ?>">
@@ -255,27 +300,47 @@ $agendaVeterinario = !empty($id_veterinaria)
                     <input type="hidden" name="action" value="editar">
                     <input type="hidden" name="redirect" value="<?= htmlspecialchars(BASE_URL . $_SERVER['REQUEST_URI']) ?>">
 
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="modalEditarAgendaLabel">Editar disponibilidad de agenda</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
+                    <div class="modal-content modal-agenda-content">
 
-                            <div class="mb-3">
-                                <label for="id_especialidad" class="form-label">Especialidad</label>
-                                <select class="form-select" id="edit_especialidad" name="id_especialidad" required>
-                                    <option value="" disabled selected>Seleccione una especialidad</option>
+                        <!-- ── HEADER ── -->
+                        <div class="modal-header modal-agenda-header">
+                            <h5 class="modal-title modal-agenda-title" id="modalEditarAgendaLabel">
+                                <i class="bi bi-calendar2-check modal-agenda-title-icon"></i>
+                                Editar Disponibilidad
+                            </h5>
+                            <button type="button" class="btn-close modal-agenda-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+
+                        <!-- ── BODY ── -->
+                        <div class="modal-body modal-agenda-body">
+
+                            <!-- Especialidad -->
+                            <div>
+                                <label for="edit_especialidad" class="form-label am-label">
+                                    <i class="bi bi-patch-plus"></i> Especialidad
+                                    <span class="am-req">*</span>
+                                </label>
+                                <select class="form-select am-input" id="edit_especialidad" name="id_especialidad" required>
+                                    <option value="" disabled selected>Seleccione una especialidad...</option>
                                     <?php foreach ($listaEspecialidades as $especialidad): ?>
-                                        <option value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>"><?= htmlspecialchars($especialidad['nombre']) ?></option>
+                                        <option value="<?= htmlspecialchars($especialidad['id_especialidad']) ?>">
+                                            <?= htmlspecialchars($especialidad['nombre']) ?>
+                                        </option>
                                     <?php endforeach; ?>
                                 </select>
+                                <span class="am-hint">
+                                    <i class="bi bi-info-circle"></i> Especialidad principal del veterinario
+                                </span>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="edit_dia" class="form-label">Día de la semana</label>
-                                <select class="form-select" id="edit_dia" name="dia_semana" required>
-                                    <option value="">Seleccione...</option>
+                            <!-- Día de la semana -->
+                            <div>
+                                <label for="edit_dia" class="form-label am-label">
+                                    <i class="bi bi-calendar-week"></i> Día de la semana
+                                    <span class="am-req">*</span>
+                                </label>
+                                <select class="form-select am-input" id="edit_dia" name="dia_semana" required>
+                                    <option value="" disabled selected>Seleccione un día...</option>
                                     <option value="1">Lunes</option>
                                     <option value="2">Martes</option>
                                     <option value="3">Miércoles</option>
@@ -286,41 +351,59 @@ $agendaVeterinario = !empty($id_veterinaria)
                                 </select>
                             </div>
 
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label for="hora_inicio" class="form-label">Hora Inicio</label>
-                                    <input type="time" class="form-control" id="edit_hora_inicio" name="hora_inicio" required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="hora_fin" class="form-label">Hora Fin</label>
-                                    <input type="time" class="form-control" id="edit_hora_fin" name="hora_fin" required>
+                            <!-- Horario -->
+                            <div>
+                                <label class="form-label am-label">
+                                    <i class="bi bi-clock"></i> Horario
+                                    <span class="am-req">*</span>
+                                </label>
+                                <div class="am-time-row">
+                                    <div class="am-time-col">
+                                        <span class="am-sublabel">Hora inicio</span>
+                                        <input type="time" class="form-control am-input" id="edit_hora_inicio" name="hora_inicio" required>
+                                    </div>
+                                    <i class="bi bi-arrow-right am-arrow"></i>
+                                    <div class="am-time-col">
+                                        <span class="am-sublabel">Hora fin</span>
+                                        <input type="time" class="form-control am-input" id="edit_hora_fin" name="hora_fin" required>
+                                    </div>
                                 </div>
                             </div>
 
-
-                            <div class="mb-3">
-                                <label for="duracion_minutos" class="form-label">Duración por cita (minutos)</label>
-                                <select class="form-select" id="edit_duracion" name="duracion_minutos" required>
+                            <!-- Duración -->
+                            <div>
+                                <label for="edit_duracion" class="form-label am-label">
+                                    <i class="bi bi-hourglass-split"></i> Duración por cita
+                                    <span class="am-req">*</span>
+                                </label>
+                                <select class="form-select am-input" id="edit_duracion" name="duracion_minutos" required>
                                     <option value="15">15 minutos</option>
                                     <option value="20">20 minutos</option>
                                     <option value="30">30 minutos</option>
                                     <option value="45">45 minutos</option>
                                     <option value="60">60 minutos</option>
                                 </select>
+                                <span class="am-hint">
+                                    <i class="bi bi-info-circle"></i> Tiempo reservado por cada cita agendada
+                                </span>
                             </div>
 
+                        </div>
 
+                        <!-- ── FOOTER ── -->
+                        <div class="modal-footer modal-agenda-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Actualizar
+                            </button>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                            <button type="submit" class="btn btn-primary">Actualizar</button>
-                        </div>
+
+                    </div>
                 </form>
             </div>
         </div>
-
 
 
     </div>

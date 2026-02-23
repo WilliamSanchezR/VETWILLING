@@ -54,6 +54,177 @@ class Veterinario
         }
     }
 
+    public function contarPacientesHoyPorVeterinario($id_usuario, $fecha)
+    {
+        try {
+            $sql = "SELECT COUNT(DISTINCT a.id_paciente)
+                    FROM agendamiento a
+                    WHERE a.id_usuario = :id_usuario
+                      AND DATE(a.fecha_hora) = :fecha";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha', $fecha, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::contarPacientesHoyPorVeterinario - " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function contarCitasPendientesHoyPorVeterinario($id_usuario, $fecha)
+    {
+        try {
+            $sql = "SELECT COUNT(*)
+                    FROM agendamiento a
+                    WHERE a.id_usuario = :id_usuario
+                      AND DATE(a.fecha_hora) = :fecha
+                      AND UPPER(a.estado) = 'PENDIENTE'";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha', $fecha, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::contarCitasPendientesHoyPorVeterinario - " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function contarCitasSemanaPorVeterinario($id_usuario, $fecha)
+    {
+        try {
+            $sql = "SELECT COUNT(*)
+                    FROM agendamiento a
+                    WHERE a.id_usuario = :id_usuario
+                      AND YEARWEEK(a.fecha_hora, 1) = YEARWEEK(:fecha, 1)";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha', $fecha, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::contarCitasSemanaPorVeterinario - " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function obtenerCitasHoyPorVeterinario($id_usuario, $fecha)
+    {
+        try {
+            // Debug
+            error_log("=== QUERY CITAS HOY ===");
+            error_log("Buscando citas para id_usuario: " . $id_usuario . " en fecha: " . $fecha);
+
+            // Primero consultamos TODAS las citas del usuario para ver qué fechas hay
+            $sqlDebug = "SELECT id_agendamiento, fecha_hora, DATE(fecha_hora) as fecha_solo, id_usuario 
+                        FROM agendamiento 
+                        WHERE id_usuario = :id_usuario 
+                        ORDER BY fecha_hora DESC LIMIT 10";
+            $stmtDebug = $this->conexion->prepare($sqlDebug);
+            $stmtDebug->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtDebug->execute();
+            $todasCitas = $stmtDebug->fetchAll(PDO::FETCH_ASSOC);
+            error_log("TODAS las citas del usuario (últimas 10): " . print_r($todasCitas, true));
+
+            $sql = "SELECT 
+                        a.id_agendamiento,
+                        a.fecha_hora,
+                        a.fecha_hora_fin,
+                        a.tipo,
+                        a.estado,
+                        a.observaciones,
+                        p.id_paciente,
+                        p.nombre AS paciente_nombre,
+                        p.especie,
+                        p.raza,
+                        p.edad_numero,
+                        p.edad_unidad,
+                        p.sexo,
+                        p.img_mascota,
+                        prop.id_propietario,
+                        prop.nombres AS propietario_nombres,
+                        prop.apellidos AS propietario_apellidos,
+                        prop.telefono AS propietario_telefono,
+                                                u.email AS propietario_email
+                    FROM agendamiento a
+                    LEFT JOIN paciente p ON a.id_paciente = p.id_paciente
+                    LEFT JOIN propietario prop ON p.id_propietario = prop.id_propietario
+                                        LEFT JOIN usuario u ON prop.id_usuario = u.id_usuario
+                    WHERE a.id_usuario = :id_usuario
+                      AND DATE(a.fecha_hora) = :fecha
+                    ORDER BY a.fecha_hora ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha', $fecha, PDO::PARAM_STR);
+            $stmt->execute();
+
+            $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            error_log("Registros encontrados para fecha " . $fecha . ": " . count($resultado));
+            error_log("========================");
+
+            return $resultado;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::obtenerCitasHoyPorVeterinario - " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function obtenerPacientesPorVeterinario($id_usuario)
+    {
+        try {
+            $sql = "SELECT 
+                        p.id_paciente,
+                        p.nombre AS paciente_nombre,
+                        p.especie,
+                        p.raza,
+                        p.edad_numero,
+                        p.edad_unidad,
+                        p.sexo,
+                        CONCAT(pr.nombres, ' ', pr.apellidos) AS propietario_nombre,
+                        (
+                            SELECT MAX(a.fecha_hora)
+                            FROM agendamiento a
+                            WHERE a.id_usuario = :id_usuario
+                              AND a.id_paciente = p.id_paciente
+                        ) AS ultima_visita,
+                        (
+                            SELECT a2.estado
+                            FROM agendamiento a2
+                            WHERE a2.id_usuario = :id_usuario
+                              AND a2.id_paciente = p.id_paciente
+                            ORDER BY a2.fecha_hora DESC, a2.id_agendamiento DESC
+                            LIMIT 1
+                        ) AS estado_ultima_cita
+                    FROM paciente p
+                    INNER JOIN propietario pr ON p.id_propietario = pr.id_propietario
+                    WHERE EXISTS (
+                        SELECT 1
+                        FROM agendamiento a3
+                        WHERE a3.id_usuario = :id_usuario
+                          AND a3.id_paciente = p.id_paciente
+                    )
+                    ORDER BY ultima_visita DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::obtenerPacientesPorVeterinario - " . $e->getMessage());
+            return [];
+        }
+    }
+
 
 
     public function registrar($data)

@@ -149,7 +149,7 @@ $datosUsuario = [
 
             <div class="carrito-footer">
                 <p>Total: <span id="totalCarrito">$0</span></p>
-                <button class="btn-pagar" disabled>Proceder al pago</button>
+                <a class="btn-pagar" href="<?= BASE_URL ?>/pasarela-pago?origen=tienda" disabled>Proceder al pago</a>
             </div>
         </aside>
 

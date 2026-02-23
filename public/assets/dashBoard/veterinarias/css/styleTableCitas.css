@@ -24,6 +24,10 @@
     scrollbar-width: none;
 }
 
+.tabla-full-width {
+    width: 100% !important;
+}
+
 .contenido-principal {
     margin-left: var(--sidebar-width);
     min-height: 100vh;

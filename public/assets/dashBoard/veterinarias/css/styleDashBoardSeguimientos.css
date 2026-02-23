@@ -77,6 +77,18 @@
     margin-left: var(--sidebar-collapsed-width);
 }
 
+.fill-progreso-45 {
+    width: 45%;
+}
+
+.fill-progreso-75 {
+    width: 75%;
+}
+
+.fill-progreso-90 {
+    width: 90%;
+}
+
 .area-contenido {
     padding: var(--spacing-xl);
     padding-top: calc(70px + var(--spacing-xl));

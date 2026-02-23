@@ -44,12 +44,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // ╚═══════════════════════════════════════════════════════════════════════╝
     function formatDateForMySQL(date) {
         if (!date) return null;
-        
+
         // Si es un string, convertir a Date
         if (typeof date === 'string') {
             date = new Date(date);
         }
-        
+
         // Extraer componentes en hora local (no UTC)
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const seconds = String(date.getSeconds()).padStart(2, '0');
-        
+
         // Formato MySQL: YYYY-MM-DD HH:MM:SS
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
@@ -68,19 +68,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // ╚═══════════════════════════════════════════════════════════════════════╝
     function formatDateForInput(date) {
         if (!date) return '';
-        
+
         // Si es un string, convertir a Date
         if (typeof date === 'string') {
             date = new Date(date);
         }
-        
+
         // Extraer componentes en hora local (no UTC)
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
-        
+
         // Formato para input datetime-local: YYYY-MM-DDTHH:MM
         return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
@@ -103,8 +103,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json().then(data => {
                     if (!response.ok) {
                         // Si es un error HTTP, lanzar con el mensaje del servidor
-                        throw { 
-                            status: response.status, 
+                        throw {
+                            status: response.status,
                             message: data.message || response.statusText,
                             data: data
                         };
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => {
                 console.error('Error de comunicación AJAX:', error);
-                
+
                 // Si el error viene con data que contiene información de disponibilidad
                 if (error.data && error.data.tipo === 'disponibilidad') {
                     mostrarErrorDisponibilidad(error.data);
@@ -145,18 +145,18 @@ document.addEventListener('DOMContentLoaded', function () {
      */
     function mostrarErrorDisponibilidad(data) {
         let rangosHTML = '';
-        
+
         if (data.rangos_disponibles && data.rangos_disponibles.length > 0) {
             rangosHTML = '<div style="margin-top: 15px; text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px;">';
             rangosHTML += '<strong style="color: #28a745;">📅 Horarios disponibles:</strong><ul style="margin: 10px 0; padding-left: 20px;">';
-            
+
             data.rangos_disponibles.forEach(rango => {
                 const horaInicio = rango.hora_inicio.substring(0, 5);
                 const horaFin = rango.hora_fin.substring(0, 5);
                 const especialidad = rango.especialidad ? ` (${rango.especialidad})` : '';
                 rangosHTML += `<li style="margin: 5px 0; color: #495057;">${horaInicio} - ${horaFin}${especialidad}</li>`;
             });
-            
+
             rangosHTML += '</ul></div>';
         }
 
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('🔄 Cargando veterinarios desde:', URLS.GET_VETERINARIOS);
             const response = await fetch(URLS.GET_VETERINARIOS);
             console.log('📡 Respuesta recibida:', response.status, response.statusText);
-            
+
             const data = await response.json();
             console.log('📦 Datos recibidos:', data);
 
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function getTextColor(bgColor) {
         // Extraer RGB del color
         let r, g, b;
-        
+
         if (bgColor.startsWith('#')) {
             r = parseInt(bgColor.slice(1, 3), 16);
             g = parseInt(bgColor.slice(3, 5), 16);
@@ -271,10 +271,10 @@ document.addEventListener('DOMContentLoaded', function () {
             g = parseInt(match[1]);
             b = parseInt(match[2]);
         }
-        
+
         // Calcular luminosidad relativa (formula W3C)
         const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        
+
         // Si es claro (> 0.6), usar texto oscuro; si es oscuro, usar texto claro
         return luminance > 0.6 ? '#1a1a1a' : '#ffffff';
     }
@@ -285,14 +285,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const r = parseInt(servicioColor.slice(1, 3), 16);
         const g = parseInt(servicioColor.slice(3, 5), 16);
         const b = parseInt(servicioColor.slice(5, 7), 16);
-        
+
         // Generar variación más oscura/clara con mejor contraste
         // Rango ajustado para evitar colores demasiado claros
         const factor = 0.7 + (index / total) * 0.4; // Rango de 0.7 a 1.1
         const newR = Math.min(255, Math.round(r * factor));
         const newG = Math.min(255, Math.round(g * factor));
         const newB = Math.min(255, Math.round(b * factor));
-        
+
         return `rgb(${newR}, ${newG}, ${newB})`;
     }
 
@@ -331,11 +331,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const color = servicioColores[servicio.nombre] || '#6c757d';
                 const emoji = servicioEmojis[servicio.nombre] || '📌';
                 const subsDelServicio = subserviciosPorServicio[servicio.id_servicio] || [];
-                
+
                 // Crear el grupo de servicio
                 const grupoDiv = document.createElement('div');
                 grupoDiv.className = 'servicio-grupo collapsed';
-                
+
                 // Crear header del grupo (colapsable)
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'servicio-header';
@@ -348,18 +348,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     <i class="bi bi-chevron-right servicio-toggle"></i>
                 `;
-                
+
                 // Crear contenedor de subservicios
                 const subserviciosContainer = document.createElement('div');
                 subserviciosContainer.className = 'subservicios-container';
                 subserviciosContainer.style.display = 'none'; // Contraído por defecto
-                
+
                 // Agregar subservicios al contenedor
                 subsDelServicio.forEach((subservicio, subIndex) => {
                     // Generar color variante para cada subservicio
                     const subservicioColor = getSubservicioColor(color, subIndex, subsDelServicio.length);
                     const textColor = getTextColor(subservicioColor);
-                    
+
                     const eventDiv = document.createElement('div');
                     eventDiv.className = `fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event`;
                     eventDiv.setAttribute('data-duration', '01:00');
@@ -385,16 +385,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     eventDiv.appendChild(mainDiv);
                     subserviciosContainer.appendChild(eventDiv);
                 });
-                
+
                 // Evento de toggle collapse
-                headerDiv.addEventListener('click', function() {
+                headerDiv.addEventListener('click', function () {
                     const isExpanded = subserviciosContainer.style.display === 'block';
                     subserviciosContainer.style.display = isExpanded ? 'none' : 'block';
                     const icon = headerDiv.querySelector('.servicio-toggle');
                     icon.className = isExpanded ? 'bi bi-chevron-right servicio-toggle' : 'bi bi-chevron-down servicio-toggle';
                     grupoDiv.classList.toggle('collapsed', isExpanded);
                 });
-                
+
                 grupoDiv.appendChild(headerDiv);
                 grupoDiv.appendChild(subserviciosContainer);
                 containerEl.appendChild(grupoDiv);
@@ -865,7 +865,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         if (idServicio) {
                             // Filtrar subservicios por el servicio seleccionado
-                            const subserviciosFiltrados = subservicios.filter(sub => 
+                            const subserviciosFiltrados = subservicios.filter(sub =>
                                 sub.id_servicio == idServicio
                             );
 
@@ -1031,7 +1031,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (errorData && errorData.tipo === 'disponibilidad') {
                                 return; // No mostrar alerta duplicada
                             }
-                            
+
                             // Para otros tipos de error, mostrar alerta
                             Swal.fire({
                                 icon: 'error',
@@ -1064,31 +1064,180 @@ document.addEventListener('DOMContentLoaded', function () {
             var fechaFinStr = fechaFin ? formatDateForInput(fechaFin) : '';
 
             Swal.fire({
-                title: 'Editar Agendamiento',
+                title: '<i class="bi bi-calendar-check" style="color:#2e7d32; margin-right:8px;"></i> Editar Agendamiento',
                 html: `
-                    <div style="text-align: left; margin: 20px 0;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #00304D;">
-                            Tipo de Servicio:
+                <div class="swal-edit-form">
+
+                    <div class="swal-field-group">
+                        <label class="swal-label" for="swal-tipo">
+                            <i class="bi bi-scissors swal-label-icon"></i>
+                            Tipo de Servicio <span class="swal-required">*</span>
                         </label>
-                        <input id="swal-tipo" class="swal2-input" value="${evento.title}" 
-                            placeholder="Tipo de servicio" style="margin: 0 0 15px 0; width: 90%;">
-                        
-                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #00304D;">
-                            Fecha y Hora de Inicio:
-                        </label>
-                        <input id="swal-fecha-inicio" type="datetime-local" class="swal2-input" 
-                            value="${fechaInicioStr}" style="margin: 0 0 15px 0; width: 90%;">
-                        
-                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #00304D;">
-                            Fecha y Hora de Fin:
-                        </label>
-                        <input id="swal-fecha-fin" type="datetime-local" class="swal2-input" 
-                            value="${fechaFinStr}" placeholder="Opcional" style="margin: 0; width: 90%;">
+                        <input id="swal-tipo" class="swal-custom-input" value="${evento.title}"
+                            placeholder="Ej: Consulta general, Vacunación...">
+                        <span class="swal-hint">
+                            <i class="bi bi-info-circle"></i> Selecciona el tipo de servicio principal
+                        </span>
                     </div>
-                `,
+
+                    <div class="swal-field-group">
+                        <label class="swal-label" for="swal-fecha-inicio">
+                            <i class="bi bi-calendar-date swal-label-icon"></i>
+                            Fecha y Hora de Inicio <span class="swal-required">*</span>
+                        </label>
+                        <input id="swal-fecha-inicio" type="datetime-local" class="swal-custom-input"
+                            value="${fechaInicioStr}">
+                    </div>
+
+                    <div class="swal-field-group">
+                        <label class="swal-label" for="swal-fecha-fin">
+                            <i class="bi bi-calendar2-check swal-label-icon"></i>
+                            Fecha y Hora de Fin
+                            <span class="swal-optional">(opcional)</span>
+                        </label>
+                        <input id="swal-fecha-fin" type="datetime-local" class="swal-custom-input"
+                            value="${fechaFinStr}">
+                        <span class="swal-hint">
+                            <i class="bi bi-info-circle"></i> Si no se indica, se usará la duración por defecto
+                        </span>
+                    </div>
+
+                </div>
+
+                <style>
+                    /* Popup más ancho */
+                    .swal2-popup {
+                        width: 480px !important;
+                        border-radius: 14px !important;
+                    }
+
+                    /* Título */
+                    .swal2-title {
+                        font-size: 22px !important;
+                        font-weight: 700 !important;
+                        color: #1a1a2e !important;
+                        padding-bottom: 0 !important;
+                    }
+
+                    /* Contenedor general */
+                    .swal-edit-form {
+                        text-align: left;
+                        padding: 6px 4px 4px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 20px;
+                    }
+
+                    /* Grupo label + input + hint */
+                    .swal-field-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 5px;
+                    }
+
+                    /* Label */
+                    .swal-label {
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: #1a1a2e;
+                        display: flex;
+                        align-items: center;
+                        gap: 7px;
+                        margin-bottom: 1px;
+                    }
+
+                    .swal-label-icon {
+                        color: #2e7d32;
+                        font-size: 15px;
+                    }
+
+                    .swal-required {
+                        color: #e53935;
+                        font-size: 14px;
+                        line-height: 1;
+                    }
+
+                    .swal-optional {
+                        font-weight: 400;
+                        font-size: 11px;
+                        color: #9ca3af;
+                    }
+
+                    /* Hint debajo del input */
+                    .swal-hint {
+                        font-size: 11.5px;
+                        color: #6b7280;
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                        margin-top: 2px;
+                    }
+
+                    .swal-hint i {
+                        font-size: 12px;
+                        color: #9ca3af;
+                    }
+
+                    /* Input */
+                    .swal-custom-input {
+                        width: 100%;
+                        padding: 10px 14px;
+                        border: 1.5px solid #d1d5db;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        font-family: inherit;
+                        color: #1a1a2e;
+                        background: #f9fafb;
+                        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                        outline: none;
+                        box-sizing: border-box;
+                    }
+
+                    .swal-custom-input:focus {
+                        border-color: #2e7d32;
+                        background: #fff;
+                        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
+                    }
+
+                    .swal-custom-input::placeholder {
+                        color: #9ca3af;
+                        font-size: 13px;
+                    }
+
+                    /* Botón confirmar */
+                    .swal2-confirm {
+                        background-color: #2e7d32 !important;
+                        border-radius: 8px !important;
+                        font-weight: 600 !important;
+                        padding: 10px 24px !important;
+                        font-size: 14px !important;
+                    }
+
+                    .swal2-confirm:hover {
+                        background-color: #1b5e20 !important;
+                    }
+
+                    /* Botón cancelar */
+                    .swal2-cancel {
+                        background-color: #6b7280 !important;
+                        border-radius: 8px !important;
+                        font-weight: 600 !important;
+                        padding: 10px 24px !important;
+                        font-size: 14px !important;
+                    }
+
+                    /* Divider entre content y botones */
+                    .swal2-actions {
+                        margin-top: 8px !important;
+                        gap: 10px !important;
+                    }
+                </style>
+            `,
                 showCancelButton: true,
-                confirmButtonText: 'Guardar Cambios',
-                cancelButtonText: 'Cancelar',
+                confirmButtonText: '<i class="bi bi-check-circle"></i> Guardar Cambios',
+                cancelButtonText: '<i class="bi bi-x-circle"></i> Cancelar',
+                showCancelButton: true,
+
                 showDenyButton: true,
                 denyButtonText: 'Eliminar',
                 focusConfirm: false,
@@ -1239,7 +1388,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 info.revert();
                                 return;
                             }
-                            
+
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1292,7 +1441,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 info.revert();
                                 return;
                             }
-                            
+
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1364,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             // Filtrar subservicios del servicio pre-seleccionado
-            const subserviciosFiltrados = servicioIdPreseleccionado 
+            const subserviciosFiltrados = servicioIdPreseleccionado
                 ? subservicios.filter(sub => sub.id_servicio == servicioIdPreseleccionado)
                 : [];
 
@@ -1570,7 +1719,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         if (idServicio) {
                             // Filtrar subservicios por el servicio seleccionado
-                            const subserviciosFiltrados = subservicios.filter(sub => 
+                            const subserviciosFiltrados = subservicios.filter(sub =>
                                 sub.id_servicio == idServicio
                             );
 
@@ -1726,7 +1875,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (errorData && errorData.tipo === 'disponibilidad') {
                                 return; // No mostrar alerta duplicada
                             }
-                            
+
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
@@ -1755,15 +1904,15 @@ document.addEventListener('DOMContentLoaded', function () {
     //  INICIALIZACIÓN: CARGAR VETERINARIOS EN EL SELECT
     // ═══════════════════════════════════════════════════════════════════════
     const selectVeterinario = document.querySelector('.select-veterinario');
-    
+
     if (selectVeterinario) {
         // Cargar veterinarios desde la base de datos
         cargarVeterinarios().then(veterinarios => {
             console.log('Veterinarios cargados:', veterinarios);
-            
+
             // Limpiar el select
             selectVeterinario.innerHTML = '<option value="">Todos los veterinarios</option>';
-            
+
             if (veterinarios && veterinarios.length > 0) {
                 // Agregar cada veterinario al select
                 veterinarios.forEach(vet => {
@@ -1789,19 +1938,19 @@ document.addEventListener('DOMContentLoaded', function () {
     //  FUNCIÓN 1: CAMBIO DE VISTAS DEL CALENDARIO
     // ═══════════════════════════════════════════════════════════════════════
     const botonesVista = document.querySelectorAll('.boton-vista');
-    
+
     botonesVista.forEach(boton => {
-        boton.addEventListener('click', function() {
+        boton.addEventListener('click', function () {
             const vista = this.getAttribute('data-vista');
-            
+
             // Remover clase active de todos los botones
             botonesVista.forEach(btn => btn.classList.remove('active'));
-            
+
             // Agregar clase active al botón clickeado
             this.classList.add('active');
-            
+
             // Cambiar vista del calendario
-            switch(vista) {
+            switch (vista) {
                 case 'calendario':
                     calendar.changeView('dayGridMonth');
                     break;
@@ -1836,36 +1985,36 @@ document.addEventListener('DOMContentLoaded', function () {
     //  FUNCIÓN 2: FILTRO POR VETERINARIO (Con recarga desde servidor)
     // ═══════════════════════════════════════════════════════════════════════
     if (selectVeterinario) {
-        selectVeterinario.addEventListener('change', async function() {
+        selectVeterinario.addEventListener('change', async function () {
             const veterinarioId = this.value;
-            
+
             console.log('🔄 Filtrando por veterinario:', veterinarioId || 'Todos');
-            
+
             try {
                 // Construir URL con o sin filtro
                 let url = URLS.LOAD;
                 if (veterinarioId) {
                     url += '?id_usuario=' + veterinarioId;
                 }
-                
+
                 console.log('📡 Cargando eventos desde:', url);
-                
+
                 // Hacer petición al servidor
                 const response = await fetch(url);
                 const eventos = await response.json();
-                
+
                 console.log('📦 Eventos recibidos:', eventos.length);
-                
+
                 // Limpiar todos los eventos del calendario
                 calendar.removeAllEvents();
-                
+
                 // Agregar los nuevos eventos filtrados
                 eventos.forEach(evento => {
                     calendar.addEvent(evento);
                 });
-                
+
                 console.log('✅ Calendario actualizado con', eventos.length, 'eventos');
-                
+
             } catch (error) {
                 console.error('❌ Error al filtrar eventos:', error);
                 Swal.fire({
@@ -1881,42 +2030,42 @@ document.addEventListener('DOMContentLoaded', function () {
     // ═══════════════════════════════════════════════════════════════════════
     //  FUNCIÓN 3: ABRIR MODAL NUEVA CITA (Botón "Nueva Cita")
     // ═══════════════════════════════════════════════════════════════════════
-    window.abrirModalNuevaCita = async function() {
+    window.abrirModalNuevaCita = async function () {
         // Obtener fecha y hora actual
         const ahora = new Date();
-        
+
         // Establecer hora de inicio (redondear a la próxima hora)
         const fechaInicio = new Date(ahora);
         fechaInicio.setMinutes(0, 0, 0);
         if (ahora.getMinutes() > 0) {
             fechaInicio.setHours(fechaInicio.getHours() + 1);
         }
-        
+
         // Establecer hora de fin (1 hora después)
         const fechaFin = new Date(fechaInicio);
         fechaFin.setHours(fechaFin.getHours() + 1);
-        
+
         // Formatear fechas para los inputs
         const fechaInicioStr = formatDateForInput(fechaInicio);
         const fechaFinStr = formatDateForInput(fechaFin);
-        
+
         // Cargar datos desde el servidor
         const propietarios = await cargarPropietarios();
         const servicios = await cargarServicios();
         const subservicios = await cargarSubservicios();
-        
+
         // Crear opciones HTML para propietarios
         let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
         propietarios.forEach(prop => {
             propietariosOptions += `<option value="${prop.id_propietario}">${prop.nombres} ${prop.apellidos}</option>`;
         });
-        
+
         // Crear opciones HTML para servicios
         let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
         servicios.forEach(servicio => {
             serviciosOptions += `<option value="${servicio.id_servicio}">${servicio.nombre}</option>`;
         });
-        
+
         // Mostrar SweetAlert con formulario
         Swal.fire({
             title: '<i class="bi bi-calendar-plus" style="color: #0a932c;"></i> Nueva Cita',
@@ -2133,21 +2282,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Evento para cargar mascotas cuando se seleccione propietario
                 const selectPropietario = document.getElementById('swal-propietario');
                 const selectMascota = document.getElementById('swal-mascota');
-                
-                selectPropietario.addEventListener('change', async function() {
+
+                selectPropietario.addEventListener('change', async function () {
                     const idPropietario = this.value;
-                    
+
                     if (idPropietario) {
                         selectMascota.disabled = true;
                         selectMascota.innerHTML = '<option value="">Cargando mascotas...</option>';
-                        
+
                         const mascotas = await cargarMascotasPorPropietario(idPropietario);
-                        
+
                         let mascotasOptions = '<option value="">Selecciona una mascota...</option>';
                         mascotas.forEach(mascota => {
                             mascotasOptions += `<option value="${mascota.id_paciente}">${mascota.nombre} (${mascota.especie})</option>`;
                         });
-                        
+
                         selectMascota.innerHTML = mascotasOptions;
                         selectMascota.disabled = false;
                     } else {
@@ -2165,7 +2314,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (idServicio) {
                         // Filtrar subservicios por el servicio seleccionado
-                        const subserviciosFiltrados = subservicios.filter(sub => 
+                        const subserviciosFiltrados = subservicios.filter(sub =>
                             sub.id_servicio == idServicio
                         );
 
@@ -2200,7 +2349,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const fechaInicio = document.getElementById('swal-fecha-inicio').value;
                 const fechaFin = document.getElementById('swal-fecha-fin').value;
                 const observaciones = document.getElementById('swal-observaciones').value;
-                
+
                 // Validaciones
                 if (!propietario) {
                     Swal.showValidationMessage('Debes seleccionar un propietario');
@@ -2255,7 +2404,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Otro': '#6c757d'
                 };
                 const color = servicioColores[servicioNombre] || '#6c757d';
-                
+
                 return {
                     propietario: propietario,
                     mascota: mascota,
@@ -2272,13 +2421,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }).then((result) => {
             if (result.isConfirmed && result.value) {
                 const datos = result.value;
-                
+
                 console.log('Datos del formulario:', datos);
-                
+
                 // Convertir fechas a formato MySQL (hora local, no UTC)
                 const fechaInicioMySQL = formatDateForMySQL(new Date(datos.fechaInicio));
                 const fechaFinMySQL = formatDateForMySQL(new Date(datos.fechaFin));
-                
+
                 // Preparar datos a enviar al servidor
                 var newEventData = {
                     id_paciente: parseInt(datos.mascota),
@@ -2292,9 +2441,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     estado: 'Pendiente',
                     allDay: 0
                 };
-                
+
                 console.log('Datos a enviar al servidor:', newEventData);
-                
+
                 // Llamada AJAX para guardar en la base de datos
                 sendEventData(URLS.CREATE, newEventData,
                     function (response) {
@@ -2308,7 +2457,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             borderColor: datos.color,
                             allDay: false
                         });
-                        
+
                         Swal.fire({
                             icon: 'success',
                             title: '¡Cita Creada!',
@@ -2323,7 +2472,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (errorData && errorData.tipo === 'disponibilidad') {
                             return; // No mostrar alerta duplicada
                         }
-                        
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',

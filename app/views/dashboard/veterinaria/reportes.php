@@ -52,332 +52,267 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
         <!-- ÁREA DE CONTENIDO -->
         <div class="area-contenido">
-            <!-- FILTROS DE PERIODO -->
-            <div class="filtros-reporte">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button class="boton-periodo active" data-periodo="hoy">Hoy</button>
-                        <button class="boton-periodo" data-periodo="semana">Esta Semana</button>
-                        <button class="boton-periodo" data-periodo="mes">Este Mes</button>
-                        <button class="boton-periodo" data-periodo="ano">Este Año</button>
-                        <button class="boton-periodo" data-periodo="personalizado">
-                            <i class="bi bi-calendar3"></i> Personalizado
-                        </button>
+
+            <!-- ENCABEZADO DE PÁGINA -->
+            <div class="encabezado-pagina mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="titulo-pagina">
+                            <i class="bi bi-bar-chart-line-fill me-2"></i>
+                            Reportes y Análisis
+                        </h1>
+                        <p class="subtitulo-pagina mb-0">Visualiza el rendimiento de tu práctica veterinaria</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <button class="boton-exportar" onclick="exportarPDF()">
-                            <i class="bi bi-file-earmark-pdf"></i> PDF
+                        <button class="boton-exportar boton-pdf" onclick="exportarPDF()">
+                            <i class="bi bi-file-earmark-pdf-fill"></i>
+                            <span class="d-none d-md-inline">Exportar PDF</span>
                         </button>
-                        <button class="boton-exportar" onclick="exportarExcel()">
-                            <i class="bi bi-file-earmark-excel"></i> Excel
+                        <button class="boton-exportar boton-excel" onclick="exportarExcel()">
+                            <i class="bi bi-file-earmark-excel-fill"></i>
+                            <span class="d-none d-md-inline">Exportar Excel</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- TARJETAS DE RESUMEN -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="tarjeta-reporte">
-                        <div class="icono-reporte bg-success-soft">
-                            <i class="bi bi-currency-dollar text-success"></i>
-                        </div>
-                        <div class="info-reporte">
-                            <p class="etiqueta-reporte">Ingresos Totales</p>
-                            <h3 class="valor-reporte">$45,280</h3>
-                            <span class="cambio-positivo">
-                                <i class="bi bi-arrow-up"></i> +12.5%
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="tarjeta-reporte">
-                        <div class="icono-reporte bg-primary-soft">
-                            <i class="bi bi-calendar-check text-primary"></i>
-                        </div>
-                        <div class="info-reporte">
-                            <p class="etiqueta-reporte">Citas Atendidas</p>
-                            <h3 class="valor-reporte">342</h3>
-                            <span class="cambio-positivo">
-                                <i class="bi bi-arrow-up"></i> +8.2%
-                            </span>
+            <!-- BARRA DE FILTROS -->
+            <div class="barra-filtros-reporte">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="grupo-filtros">
+                        <label class="etiqueta-filtro">
+                            <i class="bi bi-funnel-fill"></i> Periodo
+                        </label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="boton-periodo active" data-periodo="hoy">
+                                <i class="bi bi-calendar-day"></i> Hoy
+                            </button>
+                            <button class="boton-periodo" data-periodo="semana">
+                                <i class="bi bi-calendar-week"></i> Semana
+                            </button>
+                            <button class="boton-periodo" data-periodo="mes">
+                                <i class="bi bi-calendar-month"></i> Mes
+                            </button>
+                            <button class="boton-periodo" data-periodo="ano">
+                                <i class="bi bi-calendar-range"></i> Año
+                            </button>
+                            <button class="boton-periodo boton-personalizado" data-periodo="personalizado">
+                                <i class="bi bi-calendar3"></i> Personalizado
+                            </button>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="tarjeta-reporte">
-                        <div class="icono-reporte bg-warning-soft">
-                            <i class="bi bi-heart-pulse text-warning"></i>
-                        </div>
-                        <div class="info-reporte">
-                            <p class="etiqueta-reporte">Nuevos Pacientes</p>
-                            <h3 class="valor-reporte">89</h3>
-                            <span class="cambio-positivo">
-                                <i class="bi bi-arrow-up"></i> +15.3%
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="tarjeta-reporte">
-                        <div class="icono-reporte bg-danger-soft">
-                            <i class="bi bi-star-fill text-danger"></i>
-                        </div>
-                        <div class="info-reporte">
-                            <p class="etiqueta-reporte">Satisfacción</p>
-                            <h3 class="valor-reporte">4.8/5</h3>
-                            <span class="cambio-positivo">
-                                <i class="bi bi-arrow-up"></i> +0.3
-                            </span>
-                        </div>
+                    <div class="periodo-seleccionado">
+                        <i class="bi bi-calendar-check-fill"></i>
+                        <span id="textoperiodoSeleccionado">Hoy</span>
                     </div>
                 </div>
             </div>
 
-            <!-- GRÁFICOS -->
+            <!-- TARJETAS DE RESUMEN MEJORADAS -->
             <div class="row g-3 mb-4">
-                <!-- Gráfico de Ingresos -->
-                <div class="col-lg-8">
-                    <div class="tarjeta-grafico">
-                        <div class="encabezado-grafico">
-                            <div>
-                                <h5>Ingresos Mensuales</h5>
-                                <p class="text-muted mb-0">Comparativa últimos 6 meses</p>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="tarjeta-metrica tarjeta-ingresos">
+                        <div class="contenido-tarjeta">
+                            <div class="icono-metrica">
+                                <i class="bi bi-currency-dollar"></i>
                             </div>
-                            <select class="select-grafico">
-                                <option>2024</option>
-                                <option>2023</option>
-                            </select>
+                            <div class="info-metrica">
+                                <p class="etiqueta-metrica">Ingresos Totales</p>
+                                <h3 class="valor-metrica" id="reporteIngresosTotales">$0</h3>
+                                <span class="badge-periodo" id="reportePeriodoEtiqueta1">
+                                    <i class="bi bi-clock"></i> Cargando...
+                                </span>
+                            </div>
                         </div>
-                        <div class="contenedor-grafico">
+                        <div class="decoracion-tarjeta">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="tarjeta-metrica tarjeta-citas">
+                        <div class="contenido-tarjeta">
+                            <div class="icono-metrica">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="info-metrica">
+                                <p class="etiqueta-metrica">Citas Atendidas</p>
+                                <h3 class="valor-metrica" id="reporteCitasAtendidas">0</h3>
+                                <span class="badge-periodo" id="reportePeriodoEtiqueta2">
+                                    <i class="bi bi-clock"></i> Cargando...
+                                </span>
+                            </div>
+                        </div>
+                        <div class="decoracion-tarjeta">
+                            <i class="bi bi-activity"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="tarjeta-metrica tarjeta-pacientes">
+                        <div class="contenido-tarjeta">
+                            <div class="icono-metrica">
+                                <i class="bi bi-heart-pulse"></i>
+                            </div>
+                            <div class="info-metrica">
+                                <p class="etiqueta-metrica">Nuevos Pacientes</p>
+                                <h3 class="valor-metrica" id="reporteNuevosPacientes">0</h3>
+                                <span class="badge-periodo" id="reportePeriodoEtiqueta3">
+                                    <i class="bi bi-clock"></i> Cargando...
+                                </span>
+                            </div>
+                        </div>
+                        <div class="decoracion-tarjeta">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="tarjeta-metrica tarjeta-cumplimiento">
+                        <div class="contenido-tarjeta">
+                            <div class="icono-metrica">
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                            <div class="info-metrica">
+                                <p class="etiqueta-metrica">Cumplimiento</p>
+                                <h3 class="valor-metrica" id="reporteCumplimiento">0%</h3>
+                                <span class="badge-periodo" id="reporteTotalCitas">
+                                    <i class="bi bi-list-check"></i> 0 citas
+                                </span>
+                            </div>
+                        </div>
+                        <div class="decoracion-tarjeta">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE GRÁFICOS PRINCIPALES -->
+            <div class="row g-3 mb-4">
+                <!-- Gráfico de Ingresos Mensuales -->
+                <div class="col-12 col-lg-8">
+                    <div class="tarjeta-grafico-principal">
+                        <div class="encabezado-grafico-principal">
+                            <div class="info-grafico">
+                                <div class="icono-titulo-grafico">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                                <div>
+                                    <h5 class="titulo-grafico">Evolución de Ingresos</h5>
+                                    <p class="subtitulo-grafico">Comparativa últimos 6 meses</p>
+                                </div>
+                            </div>
+                            <div class="controles-grafico">
+                                <select class="select-grafico-year" id="selectorAnioReporte">
+                                    <option value="2026">2026</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="contenedor-canvas-principal">
                             <canvas id="graficoIngresos"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- Distribución por Servicio -->
-                <div class="col-lg-4">
-                    <div class="tarjeta-grafico">
-                        <div class="encabezado-grafico">
-                            <h5>Servicios Más Solicitados</h5>
+                <!-- Gráfico de Servicios (Doughnut) -->
+                <div class="col-12 col-lg-4">
+                    <div class="tarjeta-grafico-lateral">
+                        <div class="encabezado-grafico-lateral">
+                            <div class="icono-titulo-grafico">
+                                <i class="bi bi-pie-chart-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="titulo-grafico">Distribución de Servicios</h5>
+                                <p class="subtitulo-grafico">Top servicios solicitados</p>
+                            </div>
                         </div>
-                        <div class="contenedor-grafico">
+                        <div class="contenedor-canvas-lateral">
                             <canvas id="graficoServicios"></canvas>
                         </div>
-                        <div class="leyenda-servicios">
-                            <div class="item-leyenda">
-                                <span class="punto-leyenda" style="background: #22c55e;"></span>
-                                <span>Consultas (45%)</span>
-                            </div>
-                            <div class="item-leyenda">
-                                <span class="punto-leyenda" style="background: #3b82f6;"></span>
-                                <span>Vacunación (28%)</span>
-                            </div>
-                            <div class="item-leyenda">
-                                <span class="punto-leyenda" style="background: #f59e0b;"></span>
-                                <span>Cirugías (18%)</span>
-                            </div>
-                            <div class="item-leyenda">
-                                <span class="punto-leyenda" style="background: #ef4444;"></span>
-                                <span>Emergencias (9%)</span>
-                            </div>
+                        <div class="leyenda-grafico-servicios" id="leyendaServiciosReporte">
+                            <!-- Leyenda dinámica -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Estadísticas Detalladas -->
+            <!-- ESTADÍSTICAS DETALLADAS -->
             <div class="row g-3 mb-4">
                 <!-- Top Tratamientos -->
-                <div class="col-lg-6">
-                    <div class="tarjeta-estadisticas">
-                        <h5 class="mb-3">Tratamientos Más Realizados</h5>
-                        <div class="lista-estadisticas">
-                            <div class="item-estadistica">
-                                <div class="info-estadistica">
-                                    <span class="nombre-estadistica">Vacunación Antirrábica</span>
-                                    <span class="valor-estadistica">156 pacientes</span>
-                                </div>
-                                <div class="barra-progreso-estadistica">
-                                    <div class="progreso-estadistica" style="width: 85%;"></div>
-                                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="tarjeta-lista-estadisticas">
+                        <div class="encabezado-lista">
+                            <div class="icono-titulo-lista">
+                                <i class="bi bi-clipboard2-pulse-fill"></i>
                             </div>
-                            <div class="item-estadistica">
-                                <div class="info-estadistica">
-                                    <span class="nombre-estadistica">Desparasitación</span>
-                                    <span class="valor-estadistica">132 pacientes</span>
-                                </div>
-                                <div class="barra-progreso-estadistica">
-                                    <div class="progreso-estadistica" style="width: 72%;"></div>
-                                </div>
+                            <div>
+                                <h5 class="titulo-lista">Tratamientos Más Realizados</h5>
+                                <p class="subtitulo-lista">Top 5 procedimientos</p>
                             </div>
-                            <div class="item-estadistica">
-                                <div class="info-estadistica">
-                                    <span class="nombre-estadistica">Control de Peso</span>
-                                    <span class="valor-estadistica">98 pacientes</span>
-                                </div>
-                                <div class="barra-progreso-estadistica">
-                                    <div class="progreso-estadistica" style="width: 54%;"></div>
-                                </div>
-                            </div>
-                            <div class="item-estadistica">
-                                <div class="info-estadistica">
-                                    <span class="nombre-estadistica">Limpieza Dental</span>
-                                    <span class="valor-estadistica">76 pacientes</span>
-                                </div>
-                                <div class="barra-progreso-estadistica">
-                                    <div class="progreso-estadistica" style="width: 42%;"></div>
-                                </div>
-                            </div>
-                            <div class="item-estadistica">
-                                <div class="info-estadistica">
-                                    <span class="nombre-estadistica">Esterilización</span>
-                                    <span class="valor-estadistica">54 pacientes</span>
-                                </div>
-                                <div class="barra-progreso-estadistica">
-                                    <div class="progreso-estadistica" style="width: 30%;"></div>
-                                </div>
-                            </div>
+                        </div>
+                        <div class="contenedor-lista-items" id="listaTratamientosReporte">
+                            <!-- Lista dinámica -->
                         </div>
                     </div>
                 </div>
 
                 <!-- Distribución por Especie -->
-                <div class="col-lg-6">
-                    <div class="tarjeta-estadisticas">
-                        <h5 class="mb-3">Pacientes por Especie</h5>
-                        <div class="lista-estadisticas">
-                            <div class="item-estadistica-especie">
-                                <div class="icono-especie bg-warning-soft">
-                                    <i class="bi bi-heart-fill text-warning"></i>
-                                </div>
-                                <div class="info-especie">
-                                    <span class="nombre-especie">Perros</span>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="barra-mini">
-                                            <div class="progreso-mini" style="width: 68%;"></div>
-                                        </div>
-                                        <span class="porcentaje-especie">68%</span>
-                                    </div>
-                                </div>
-                                <span class="cantidad-especie">168</span>
+                <div class="col-12 col-lg-6">
+                    <div class="tarjeta-lista-estadisticas">
+                        <div class="encabezado-lista">
+                            <div class="icono-titulo-lista">
+                                <i class="bi bi-diagram-3-fill"></i>
                             </div>
-                            <div class="item-estadistica-especie">
-                                <div class="icono-especie bg-info-soft">
-                                    <i class="bi bi-heart-fill text-info"></i>
-                                </div>
-                                <div class="info-especie">
-                                    <span class="nombre-especie">Gatos</span>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="barra-mini">
-                                            <div class="progreso-mini" style="width: 45%;"></div>
-                                        </div>
-                                        <span class="porcentaje-especie">25%</span>
-                                    </div>
-                                </div>
-                                <span class="cantidad-especie">62</span>
+                            <div>
+                                <h5 class="titulo-lista">Pacientes por Especie</h5>
+                                <p class="subtitulo-lista">Clasificación de atenciones</p>
                             </div>
-                            <div class="item-estadistica-especie">
-                                <div class="icono-especie bg-success-soft">
-                                    <i class="bi bi-heart-fill text-success"></i>
-                                </div>
-                                <div class="info-especie">
-                                    <span class="nombre-especie">Aves</span>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="barra-mini">
-                                            <div class="progreso-mini" style="width: 12%;"></div>
-                                        </div>
-                                        <span class="porcentaje-especie">5%</span>
-                                    </div>
-                                </div>
-                                <span class="cantidad-especie">12</span>
-                            </div>
-                            <div class="item-estadistica-especie">
-                                <div class="icono-especie bg-danger-soft">
-                                    <i class="bi bi-heart-fill text-danger"></i>
-                                </div>
-                                <div class="info-especie">
-                                    <span class="nombre-especie">Otros</span>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="barra-mini">
-                                            <div class="progreso-mini" style="width: 8%;"></div>
-                                        </div>
-                                        <span class="porcentaje-especie">2%</span>
-                                    </div>
-                                </div>
-                                <span class="cantidad-especie">6</span>
-                            </div>
+                        </div>
+                        <div class="contenedor-lista-items" id="listaEspeciesReporte">
+                            <!-- Lista dinámica -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tabla de Resumen Financiero -->
-            <div class="tarjeta-tabla-financiera">
-                <div class="encabezado-tabla-financiera">
-                    <h5>Resumen Financiero Mensual</h5>
-                    <button class="boton-ver-mas">Ver Detalle <i class="bi bi-arrow-right"></i></button>
+            <!-- TABLA FINANCIERA MENSUAL -->
+            <div class="tarjeta-tabla-financiera-mejorada">
+                <div class="encabezado-tabla-principal">
+                    <div class="info-tabla">
+                        <div class="icono-titulo-tabla">
+                            <i class="bi bi-table"></i>
+                        </div>
+                        <div>
+                            <h5 class="titulo-tabla">Resumen Financiero Mensual</h5>
+                            <p class="subtitulo-tabla">Desglose detallado por concepto</p>
+                        </div>
+                    </div>
+                    <button class="boton-detalle-tabla">
+                        <span>Ver Detalle Completo</span>
+                        <i class="bi bi-arrow-right-circle-fill"></i>
+                    </button>
                 </div>
-                <div class="tabla-responsive">
-                    <table class="tabla-financiera">
+                <div class="contenedor-tabla-scroll">
+                    <table class="tabla-financiera-moderna">
                         <thead>
                             <tr>
-                                <th>Concepto</th>
-                                <th>Enero</th>
-                                <th>Febrero</th>
-                                <th>Marzo</th>
-                                <th>Abril</th>
-                                <th>Mayo</th>
-                                <th>Total</th>
+                                <th class="columna-concepto">Concepto</th>
+                                <th class="columna-mes" id="reporteMes1">Enero</th>
+                                <th class="columna-mes" id="reporteMes2">Febrero</th>
+                                <th class="columna-mes" id="reporteMes3">Marzo</th>
+                                <th class="columna-mes" id="reporteMes4">Abril</th>
+                                <th class="columna-mes" id="reporteMes5">Mayo</th>
+                                <th class="columna-total">Total</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td class="concepto">Consultas</td>
-                                <td>$8,450</td>
-                                <td>$9,200</td>
-                                <td>$8,900</td>
-                                <td>$9,500</td>
-                                <td>$10,230</td>
-                                <td class="total">$46,280</td>
-                            </tr>
-                            <tr>
-                                <td class="concepto">Cirugías</td>
-                                <td>$12,300</td>
-                                <td>$11,800</td>
-                                <td>$13,200</td>
-                                <td>$12,900</td>
-                                <td>$14,100</td>
-                                <td class="total">$64,300</td>
-                            </tr>
-                            <tr>
-                                <td class="concepto">Vacunación</td>
-                                <td>$5,600</td>
-                                <td>$6,100</td>
-                                <td>$5,800</td>
-                                <td>$6,400</td>
-                                <td>$6,900</td>
-                                <td class="total">$30,800</td>
-                            </tr>
-                            <tr>
-                                <td class="concepto">Laboratorio</td>
-                                <td>$3,200</td>
-                                <td>$3,500</td>
-                                <td>$3,800</td>
-                                <td>$3,600</td>
-                                <td>$4,100</td>
-                                <td class="total">$18,200</td>
-                            </tr>
-                            <tr class="fila-total">
-                                <td class="concepto"><strong>Total Mensual</strong></td>
-                                <td><strong>$29,550</strong></td>
-                                <td><strong>$30,600</strong></td>
-                                <td><strong>$31,700</strong></td>
-                                <td><strong>$32,400</strong></td>
-                                <td><strong>$35,330</strong></td>
-                                <td class="total"><strong>$159,580</strong></td>
-                            </tr>
+                        <tbody id="tablaFinancieraBody">
+                            <!-- Datos dinámicos -->
                         </tbody>
                     </table>
                 </div>
@@ -394,6 +329,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <!-- Chart.js -->
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        window.REPORTES_API_URL = '<?= BASE_URL ?>/veterinaria/reportes/data';
+        window.REPORTES_PDF_URL = '<?= BASE_URL ?>/veterinaria/reportes/pdf';
+    </script>
 
     <!-- Propio -->
 

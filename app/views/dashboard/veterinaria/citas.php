@@ -381,7 +381,7 @@ $datos = mostrarVeterinarios();
                 </div>
 
                 <div class="cita-acciones">
-                    <button class="btn-accion btn-editar" style="background: #6c757d;">
+                    <button class="btn-accion btn-editar btn-accion-neutral">
                         <i class="bi bi-eye"></i>
                         Ver Detalles
                     </button>

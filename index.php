@@ -101,6 +101,9 @@ switch ($request) {
     case '/veterinario/eliminar-disponibilidad-agenda':
         require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
         break;
+    case '/veterinario/suscripcion':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/suscripcion.php';
+        break;
 
     // RUTAS DEL CONTROLADOR DE CALENDARIO
     case '/calendario/cargar':
@@ -170,6 +173,14 @@ switch ($request) {
 
     case '/veterinaria/reportes':
         require BASE_PATH . '/app/views/dashboard/veterinaria/reportes.php';
+        break;
+
+    case '/veterinaria/reportes/data':
+        require BASE_PATH . '/app/controllers/reportesController.php';
+        break;
+
+    case '/veterinaria/reportes/pdf':
+        require BASE_PATH . '/app/controllers/reportesController.php';
         break;
 
     // RUTA COMENTADA: Registrar veterinarios
@@ -423,6 +434,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
+
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
     case '/reporte-veterinarios':
@@ -602,5 +614,13 @@ switch ($request) {
 
     case '/representante/eliminar-subservicio':
         require BASE_PATH . '/app/controllers/subservicioController.php';
+        break;
+
+    // pasarela de pago
+    case '/pasarela-pago':
+        require BASE_PATH . '/app/views/payments/pasarelaPago.php';
+        break;
+    case '/pagos/confirmacion':
+        require BASE_PATH . '/app/views/payments/confirmacion.php';
         break;
 }
