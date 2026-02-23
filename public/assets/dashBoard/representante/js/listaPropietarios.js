@@ -226,7 +226,7 @@ class ListaPropietarios {
 
     eliminarPropietario(id) {
         Swal.fire({
-            title: '¿Estás seguro?',
+            title: '¿Estás seguro de eliminar este propietario?',
             text: "¡No podrás revertir esto!",
             icon: 'warning',
             showCancelButton: true,
