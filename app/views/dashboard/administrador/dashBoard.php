@@ -7,8 +7,6 @@ $totalVeterinarias = getTotalVeterinarias();
 // Aquí puedes usar $dashboardInfo para mostrar la información en el dashboard, por ejemplo:
 // echo "Total Veterinarias Activas: " . $dashboardInfo;
 
-echo $totalUsuarios;
-
 ?>
 
 <!DOCTYPE html>
