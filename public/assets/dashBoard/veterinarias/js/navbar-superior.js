@@ -94,6 +94,7 @@ if (btnCancelar) {
     btnCancelar.addEventListener("click", cerrarModalSoporte);
 }
 
+
 function cerrarModalSoporte() {
     modalSoporte.classList.remove("active");
 }
@@ -110,14 +111,64 @@ if (formularioSoporte) {
 
         const descripcion = document.getElementById("descripcionProblema").value;
 
-        if (descripcion.length < 20) {
-            alert("La descripción debe tener al menos 20 caracteres.");
+        if (descripcion.length > 250) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La descripción no debe exceder los 250 caracteres.'
+            });
             return;
         }
 
-        alert("✅ Solicitud enviada correctamente.");
-        formularioSoporte.reset();
-        cerrarModalSoporte();
+
+        // Validamos que el usuario haya seleccionado una categoría
+        const tipoProblema = document.getElementById("tipoProblema").value;
+        const asunto = document.getElementById("asunto").value.trim();
+        if (!tipoProblema || !asunto) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor, Ingrese los campos obligatorios'
+            });
+            return;
+        }
+
+        // Enviamos el formulario (aquí iría la lógica real de envío, como una petición AJAX)
+        const formData = new FormData(formularioSoporte);
+
+        fetch('/vetwilling/soporte/api/crear-ticket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(Object.fromEntries(formData))
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: `${data.message}`
+                    });
+                    formularioSoporte.reset();
+                    cerrarModalSoporte();
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al enviar la solicitud.'
+                });
+            });
+
     });
 }
 
