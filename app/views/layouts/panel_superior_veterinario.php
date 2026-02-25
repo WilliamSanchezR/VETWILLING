@@ -7,13 +7,13 @@ $usuario    = mostrarPerfil($id);
 $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 
 // Suscripción: Free | Basic | Pro | Enterprise
-$suscripcion     = $usuario['suscripcion'] ?? 'basic';
+$suscripcion     = $usuario['suscripcion'] ?? 'pro';
 $sub_slug        = strtolower($suscripcion);
 
 $sub_icons = [
     'Essential'       => 'bi-gift',
     'basic'      => 'bi-lightning-charge-fill',
-    'ProCare'        => 'bi-stars',
+    'Pro'        => 'bi-stars',
     'MasterVet' => 'bi-gem',
 ];
 $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
@@ -348,6 +348,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                 </div>
 
                 <form id="formularioSoporte" class="soporte-form">
+                    <input type="hidden" name="id_usuario" value="<?= $usuario['id_usuario'] ?>">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="nombreSoporte" class="form-label">
@@ -357,9 +358,11 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             </label>
                             <input
                                 type="text"
+                                disabled
                                 class="form-input"
                                 id="nombreSoporte"
                                 placeholder="Tu nombre completo"
+                                value="<?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?>"
                                 required>
                         </div>
 
@@ -371,12 +374,28 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             </label>
                             <input
                                 type="email"
+                                disabled
                                 class="form-input"
                                 id="emailSoporte"
                                 placeholder="correo@ejemplo.com"
+                                value="<?= htmlspecialchars($usuario['email']) ?>"
                                 required>
                         </div>
                     </div>
+
+                        <div class="form-group">
+                            <label for="telefonoSoporte" class="form-label">
+                                Asunto
+                                <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                class="form-input"
+                                id="asunto"
+                                placeholder="Asunto del problema"
+                                name="asunto"
+                                required>
+                        </div>
 
                     <div class="form-group">
                         <label for="tipoProblema" class="form-label">
@@ -384,7 +403,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             Categoría del Problema
                             <span class="required">*</span>
                         </label>
-                        <select class="form-select" id="tipoProblema" required>
+                        <select class="form-select" id="tipoProblema" name="categoria" required>
                             <option value="">Selecciona una categoría</option>
                             <option value="tecnico">🔧 Problema Técnico</option>
                             <option value="cuenta">👤 Gestión de Cuenta</option>
@@ -405,6 +424,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             id="descripcionProblema"
                             rows="5"
                             placeholder="Describe tu problema con el mayor detalle posible…"
+                            name="descripcion"
                             required></textarea>
                         <span class="form-hint">Mínimo 20 caracteres</span>
                     </div>
@@ -414,7 +434,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             <i class="bi bi-x-circle"></i>
                             Cancelar
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="btnEnviarSoporte">
                             <i class="bi bi-send-fill"></i>
                             Enviar Solicitud
                         </button>
@@ -427,3 +447,4 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 </div>
 
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/navbar-superior.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>

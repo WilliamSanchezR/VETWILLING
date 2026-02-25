@@ -238,11 +238,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/veterinarioController.php';
         break;
 
-    case 'soporte':
-        require_once 'controllers/soporteControllers.php';
-        $controller = new SoporteController();
-        // $controller->index();
-        break;
+
     // ---------------------------------------ADMINISTRADOR-------------------------------------//
 
     case '/admin/dashBoard':
@@ -438,10 +434,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
-    // pasarela de pago
-    case '/cliente/pasarela-pago':
-        require BASE_PATH . '/app/views/dashboard/cliente/pasarelaPago.php';
-        break;
+
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
     case '/reporte-veterinarios':
@@ -621,5 +614,19 @@ switch ($request) {
 
     case '/representante/eliminar-subservicio':
         require BASE_PATH . '/app/controllers/subservicioController.php';
+        break;
+
+    // pasarela de pago
+    case '/pasarela-pago':
+        require BASE_PATH . '/app/views/payments/pasarelaPago.php';
+        break;
+    case '/pagos/confirmacion':
+        require BASE_PATH . '/app/views/payments/confirmacion.php';
+        break;
+
+    // ------------------------- SOPORTE TECNICO ------------------------- //
+    /// crear ticket
+    case '/soporte/api/crear-ticket':
+        require BASE_PATH . '/app/controllers/ticketController.php';
         break;
 }

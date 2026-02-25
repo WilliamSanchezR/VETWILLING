@@ -36,155 +36,174 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         <?php
         include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php';
         ?>
-        <div class="area-contenido">
 
-            <!-- Header -->
-            <div class="planes-header">
-                <div class="planes-eyebrow">Suscripción</div>
-                <h1 class="planes-titulo">Elige tu plan<br>ideal</h1>
-                <p class="planes-subtitulo">Sin contratos, sin sorpresas. Cancela cuando quieras. Comienza gratis hoy mismo.</p>
+        <div class="wrap">
 
-                <!-- Billing toggle -->
-                <div class="billing-toggle">
-                    <span class="billing-label active" onclick="toggleBilling('mensual', this)">Mensual</span>
-                    <span class="billing-label" onclick="toggleBilling('anual', this)">
-                        Anual <span class="billing-badge">−20%</span>
-                    </span>
+            <!-- ══ HEADER ══════════════════════════════════ -->
+            <div class="header">
+                <div class="eyebrow">Suscripción</div>
+                <h1>Elige tu plan <em>ideal</em></h1>
+                <p class="subtitle">Sin contratos, sin sorpresas. Cancela cuando quieras. Comienza gratis hoy mismo.</p>
+
+                <!-- Toggle Mensual / Anual -->
+                <div class="toggle-wrap">
+                    <button class="toggle-btn active" onclick="setMode('mensual', this)">Mensual</button>
+                    <button class="toggle-btn" onclick="setMode('anual', this)">
+                        Anual <span class="badge-save">−20%</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Plans Grid -->
-            <div class="planes-grid">
+
+            <!-- ══ GRID DE PLANES ══════════════════════════ -->
+            <div class="grid">
 
                 <!-- Plan Essential -->
-                <div class="plan-card">
-                    <div class="plan-icono">🌱</div>
-                    <div class="plan-nombre">Essential</div>
-                    <div class="plan-descripcion">
-                        Ideal para pequeñas y medianas clínicas que están comenzando su crecimiento.
-                    </div>
+                <div class="plan">
+                    <div class="plan-name">Essential</div>
+                    <p class="plan-desc">Ideal para pequeñas y medianas clínicas que están comenzando su crecimiento.</p>
 
-                    <div class="plan-precio-wrap">
-                        <div class="plan-precio">
-                            <span class="precio-moneda">$</span>
-                            <span class="precio-numero" id="precio-essential">7.9</span>
-                            <span class="precio-periodo">/mes</span>
+                    <div class="price-block">
+                        <div class="price">
+                            <span class="price-symbol">$</span>
+                            <span class="price-num" id="p-essential">7.9</span>
+                            <span class="price-period">/mes</span>
                         </div>
-                        <div class="precio-anual" id="ahorro-essential"></div>
+                        <div class="price-annual-note" id="n-essential"></div>
                     </div>
 
-                    <ul class="plan-features">
-                        <li><span class="feature-icon check">✓</span> Cuentas limitadas</li>
-                        <li><span class="feature-icon check">✓</span> Registros limitados</li>
-                        <li><span class="feature-icon check">✓</span> Funciones básicas</li>
-                        <li><span class="feature-icon check">✓</span> Gestión básica de citas</li>
-                        <li><span class="feature-icon check">✓</span> Historial clínico básico</li>
-                        <li class="disabled"><span class="feature-icon cross">✕</span> Soporte 24/7</li>
-                        <li class="disabled"><span class="feature-icon cross">✕</span> API Access</li>
+                    <ul class="features">
+                        <li><span class="fi yes">✓</span> Cuentas limitadas</li>
+                        <li><span class="fi yes">✓</span> Registros limitados</li>
+                        <li><span class="fi yes">✓</span> Funciones básicas</li>
+                        <li><span class="fi yes">✓</span> Gestión básica de citas</li>
+                        <li><span class="fi yes">✓</span> Historial clínico básico</li>
+                        <li class="off"><span class="fi no">✕</span> Soporte 24/7</li>
+                        <li class="off"><span class="fi no">✕</span> API Access</li>
                     </ul>
 
-                    <button class="plan-btn outline">Solicitar prueba</button>
+                    <div class="plan-divider"></div>
+                    <a class="btn btn-outline" href="<?= BASE_URL ?>/pasarela-pago?origen=suscripcion&plan=basico">
+                        Solicitar prueba
+                    </a>
                 </div>
 
 
-                <!-- Plan ProCare (Popular) -->
-                <div class="plan-card popular">
-                    <div class="plan-badge">⭐ Popular</div>
-                    <div class="plan-icono">🚀</div>
-                    <div class="plan-nombre">ProCare</div>
-                    <div class="plan-descripcion">
-                        Diseñado para clínicas medianas que necesitan mayor control y funcionalidades avanzadas.
-                    </div>
+                <!-- Plan ProCare (POPULAR) -->
+                <div class="plan popular">
+                    <div class="pop-badge">⭐ Más popular</div>
+                    <div class="plan-name">ProCare</div>
+                    <p class="plan-desc">Diseñado para clínicas medianas que necesitan mayor control y funcionalidades avanzadas.</p>
 
-                    <div class="plan-precio-wrap">
-                        <div class="plan-precio">
-                            <span class="precio-moneda">$</span>
-                            <span class="precio-numero" id="precio-procare">14.9</span>
-                            <span class="precio-periodo">/mes</span>
+                    <div class="price-block">
+                        <div class="price">
+                            <span class="price-symbol">$</span>
+                            <span class="price-num" id="p-procare">14.9</span>
+                            <span class="price-period">/mes</span>
                         </div>
-                        <div class="precio-anual" id="ahorro-procare"></div>
+                        <div class="price-annual-note" id="n-procare"></div>
                     </div>
 
-                    <ul class="plan-features">
-                        <li><span class="feature-icon check">✓</span> Cuentas limitadas</li>
-                        <li><span class="feature-icon check">✓</span> Registros ilimitados</li>
-                        <li><span class="feature-icon check">✓</span> Funciones avanzadas</li>
-                        <li><span class="feature-icon check">✓</span> Gestión completa de citas</li>
-                        <li><span class="feature-icon check">✓</span> Reportes avanzados</li>
-                        <li><span class="feature-icon check">✓</span> Panel administrativo mejorado</li>
-                        <li class="disabled"><span class="feature-icon cross">✕</span> API Access</li>
+                    <ul class="features">
+                        <li><span class="fi yes">✓</span> Cuentas limitadas</li>
+                        <li><span class="fi yes">✓</span> Registros ilimitados</li>
+                        <li><span class="fi yes">✓</span> Funciones avanzadas</li>
+                        <li><span class="fi yes">✓</span> Gestión completa de citas</li>
+                        <li><span class="fi yes">✓</span> Reportes avanzados</li>
+                        <li><span class="fi yes">✓</span> Panel administrativo mejorado</li>
+                        <li class="off"><span class="fi no">✕</span> API Access</li>
                     </ul>
 
-                    <button class="plan-btn primary">Solicitar prueba</button>
+                    <div class="plan-divider"></div>
+                    <a class="btn btn-outline" href="<?= BASE_URL ?>/pasarela-pago?origen=suscripcion&plan=procare">
+                        Solicitar prueba
+                    </a>
                 </div>
 
 
                 <!-- Plan MasterVet -->
-                <div class="plan-card">
-                    <div class="plan-icono">🏢</div>
-                    <div class="plan-nombre">MasterVet</div>
-                    <div class="plan-descripcion">
-                        Solución completa para clínicas grandes con alto volumen de pacientes.
-                    </div>
+                <div class="plan">
+                    <div class="plan-name">MasterVet</div>
+                    <p class="plan-desc">Solución completa para clínicas grandes con alto volumen de pacientes.</p>
 
-                    <div class="plan-precio-wrap">
-                        <div class="plan-precio">
-                            <span class="precio-moneda">$</span>
-                            <span class="precio-numero" id="precio-mastervet">40.9</span>
-                            <span class="precio-periodo">/mes</span>
+                    <div class="price-block">
+                        <div class="price">
+                            <span class="price-symbol">$</span>
+                            <span class="price-num" id="p-mastervet">40.9</span>
+                            <span class="price-period">/mes</span>
                         </div>
-                        <div class="precio-anual" id="ahorro-mastervet"></div>
+                        <div class="price-annual-note" id="n-mastervet"></div>
                     </div>
 
-                    <ul class="plan-features">
-                        <li><span class="feature-icon check">✓</span> Cuentas ilimitadas</li>
-                        <li><span class="feature-icon check">✓</span> Registros ilimitados</li>
-                        <li><span class="feature-icon check">✓</span> Soporte 24/7</li>
-                        <li><span class="feature-icon check">✓</span> Gestión multi-sucursal</li>
-                        <li><span class="feature-icon check">✓</span> Reportes personalizados</li>
-                        <li><span class="feature-icon check">✓</span> Acceso completo al sistema</li>
-                        <li><span class="feature-icon check">✓</span> API Access completo</li>
+                    <ul class="features">
+                        <li><span class="fi yes">✓</span> Cuentas ilimitadas</li>
+                        <li><span class="fi yes">✓</span> Registros ilimitados</li>
+                        <li><span class="fi yes">✓</span> Soporte 24/7</li>
+                        <li><span class="fi yes">✓</span> Gestión multi-sucursal</li>
+                        <li><span class="fi yes">✓</span> Reportes personalizados</li>
+                        <li><span class="fi yes">✓</span> Acceso completo al sistema</li>
+                        <li><span class="fi yes">✓</span> API Access completo</li>
                     </ul>
 
-                    <button class="plan-btn outline">Solicitar prueba</button>
+                    <div class="plan-divider"></div>
+                    <a class="btn btn-outline" href="<?= BASE_URL ?>/pasarela-pago?origen=suscripcion&plan=mastervet">
+                        Solicitar prueba
+                    </a>
                 </div>
 
             </div>
 
 
-            <!-- Garantía -->
-            <div class="garantia">
-                <div class="garantia-icon">🛡️</div>
-                <div class="garantia-texto">
+            <!-- ══ GARANTÍA ════════════════════════════════ -->
+            <div class="guarantee">
+                <div class="guarantee-icon">🛡️</div>
+                <div>
                     <h4>Garantía de devolución 30 días</h4>
                     <p>Si no estás satisfecho, te reembolsamos sin preguntas.</p>
                 </div>
             </div>
 
-            <!-- FAQ -->
-            <div class="faq-section">
-                <h2 class="faq-titulo">Preguntas frecuentes</h2>
-                <div class="faq-list">
-                    <div class="faq-item">
-                        <div class="faq-pregunta">¿Puedo cambiar de plan en cualquier momento? <span>↓</span></div>
-                        <div class="faq-respuesta">Sí, puedes actualizar o bajar tu plan cuando quieras. Los cambios se aplican de inmediato.</div>
+
+            <!-- ══ FAQ ═════════════════════════════════════ -->
+            <h2 class="faq-title">Preguntas frecuentes</h2>
+            <div class="faq-list">
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        ¿Puedo cambiar de plan en cualquier momento?
+                        <span class="faq-arrow">↓</span>
                     </div>
-                    <div class="faq-item">
-                        <div class="faq-pregunta">¿Cómo funciona el período de prueba? <span>↓</span></div>
-                        <div class="faq-respuesta">El plan Básico es gratuito para siempre. Los planes de pago tienen 14 días de prueba gratis.</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-pregunta">¿Qué métodos de pago aceptan? <span>↓</span></div>
-                        <div class="faq-respuesta">Aceptamos tarjetas de crédito/débito, PayPal y transferencias bancarias para Enterprise.</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-pregunta">¿Puedo cancelar en cualquier momento? <span>↓</span></div>
-                        <div class="faq-respuesta">Sí, sin penalizaciones. Tu cuenta seguirá activa hasta el final del período pagado.</div>
-                    </div>
+                    <div class="faq-a">Sí, puedes actualizar o bajar tu plan cuando quieras. Los cambios se aplican de inmediato.</div>
                 </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        ¿Cómo funciona el período de prueba?
+                        <span class="faq-arrow">↓</span>
+                    </div>
+                    <div class="faq-a">El plan Básico es gratuito para siempre. Los planes de pago tienen 14 días de prueba gratis.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        ¿Qué métodos de pago aceptan?
+                        <span class="faq-arrow">↓</span>
+                    </div>
+                    <div class="faq-a">Aceptamos tarjetas de crédito/débito, PayPal y transferencias bancarias para Enterprise.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">
+                        ¿Puedo cancelar en cualquier momento?
+                        <span class="faq-arrow">↓</span>
+                    </div>
+                    <div class="faq-a">Sí, sin penalizaciones. Tu cuenta seguirá activa hasta el final del período pagado.</div>
+                </div>
+
             </div>
 
         </div>
+
     </div>
 
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/suscripcion.js"></script>

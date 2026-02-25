@@ -327,7 +327,7 @@ class Usuario
                 if ($ok) {
                     return true;
                 }
-            } else if($user['id_rol'] == '4') {
+            } else if ($user['id_rol'] == '4') {
 
                 // SI NO ES ADMIN, INTENTAMOS CON REPRESENTANTE LEGAL
                 $sqlRep = "UPDATE representante_legal SET img_perfil = :img_perfil
@@ -354,7 +354,7 @@ class Usuario
 
             // ADMIN
             $sqlAdmin = "SELECT adm.id_usuario, adm.tipo_documento, adm.numero_documento,
-                adm.nombres, adm.apellidos, adm.telefono, us.email, us.estado, rol.id_rol, rol.nombre as rol_name, adm.direccion
+                adm.nombres, adm.apellidos, adm.telefono, us.email, us.estado, rol.id_rol, rol.nombre as rol_name, adm.direccion, '' as especialidad
                 FROM usuario us
                 INNER JOIN administrador adm ON us.id_usuario = adm.id_usuario
                 INNER JOIN rol ON us.id_rol = rol.id_rol
@@ -369,18 +369,38 @@ class Usuario
 
             // REPRESENTANTE LEGAL
             $sqlRep = "SELECT rep.id_usuario, rep.tipo_documento, rep.numero_documento,
-                rep.nombres, rep.apellidos, rep.telefono, us.email, us.estado, rol.id_rol, rol.nombre as rol_name, rep.id_veterinaria, rep.direccion, vet.nombre as nombre_veterinaria
+                rep.nombres, rep.apellidos, rep.telefono, us.email, us.estado, rol.id_rol, rol.nombre as rol_name, rep.id_veterinaria, rep.direccion, vet.nombre as nombre_veterinaria, esp.nombre as especialidad
                 FROM usuario us
                 INNER JOIN representante_legal rep ON us.id_usuario = rep.id_usuario
                 INNER JOIN rol ON us.id_rol = rol.id_rol
                 INNER JOIN veterinaria vet on rep.id_veterinaria = vet.id_veterinaria
+                LEFT JOIN profesional_especialidad pe ON us.id_usuario = pe.id_usuario
+                LEFT JOIN especialidad esp ON pe.id_especialidad = esp.id_especialidad 
                 WHERE us.id_usuario = :id LIMIT 1";
 
             // Preparar y ejecutar la consulta
             $stmt2 = $this->conexion->prepare($sqlRep);
             $stmt2->bindParam(':id', $id);
             $stmt2->execute();
-            return $stmt2->fetch();
+            $representante = $stmt2->fetch();
+            if ($representante) return $representante;
+            // SI NO ES ADMIN NI REPRESENTANTE LEGAL, INTENTAMOS CON PROFESIONAL
+            $sqlProf = "SELECT pr.id_usuario, pr.tipo_documento, pr.numero_documento,
+                pr.nombres, pr.apellidos, pr.telefono, us.email, us.estado, rol.id_rol, rol.nombre as rol_name, vet.id_veterinaria, pr.direccion, vet.nombre as nombre_veterinaria, esp.nombre as especialidad
+                FROM usuario us
+                INNER JOIN profesional pr ON us.id_usuario = pr.id_usuario
+                INNER JOIN rol ON us.id_rol = rol.id_rol
+                INNER JOIN profesional_veterinaria pv ON pr.id_profesional = pv.id_profesional
+                INNER JOIN veterinaria vet ON pv.id_veterinaria = vet.id_veterinaria
+                LEFT JOIN profesional_especialidad pe ON us.id_usuario = pe.id_usuario
+                LEFT JOIN especialidad esp ON pe.id_especialidad = esp.id_especialidad 
+                WHERE us.id_usuario = :id LIMIT 1";
+            // Preparar y ejecutar la consulta
+            $stmt3 = $this->conexion->prepare($sqlProf);
+            $stmt3->bindParam(':id', $id);
+            $stmt3->execute();
+            $profesional = $stmt3->fetch();
+            return $profesional;
         } catch (PDOException $e) {
             error_log("Error en Usuario::consultarUsuario -> " . $e->getMessage());
             return false;
