@@ -524,6 +524,7 @@ function abrirModalNuevoPaciente() {
 
             return fetch('/vetwilling/veterinario/guardar-paciente', {
                 method: 'POST',
+                credentials: 'same-origin',
                 body: formData
             })
                 .then(response => response.json())

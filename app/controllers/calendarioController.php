@@ -170,12 +170,12 @@ function crearAgendamientoAjax()
             $id_subservicio = (int)$data['id_subservicio'];
         }
 
-        $id_especialidad = !empty($data['id_especialidad']) ? (int)$data['id_especialidad'] : 1;
+        $id_especialidad = !empty($data['id_especialidad']) ? (int)$data['id_especialidad'] : null;
 
         // Validamos que los campos requeridos no esten vacios
-        if (empty($tipo) || empty($fecha_hora) || empty($id_subservicio)) {
+        if (empty($tipo) || empty($fecha_hora) || empty($id_servicio) || empty($id_subservicio)) {
             http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Tipo, fecha_hora y subservicio son obligatorios']);
+            echo json_encode(['status' => 'error', 'message' => 'Tipo, fecha_hora, servicio y subservicio son obligatorios']);
             exit();
         }
 
@@ -207,6 +207,23 @@ function crearAgendamientoAjax()
             ]);
             exit();
         }
+
+        $id_especialidad_resuelta = resolverEspecialidadActivaPorServicio(
+            $id_servicio,
+            $id_veterinaria,
+            $id_especialidad
+        );
+
+        if (empty($id_especialidad_resuelta)) {
+            http_response_code(400);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'No hay una especialidad activa configurada para el servicio seleccionado en esta veterinaria'
+            ]);
+            exit();
+        }
+
+        $id_especialidad = (int)$id_especialidad_resuelta;
 
         // Validar que la cita esté dentro de la disponibilidad
         $validacionDisponibilidad = $disponibilidadModel->validarCitaDentroDisponibilidad(
@@ -799,6 +816,49 @@ function resolverIdVeterinaria()
 
     $disponibilidadModel = new DisponibilidadUsuario();
     return $disponibilidadModel->obtenerVeterinariaPorUsuario($id_usuario);
+}
+
+// Helper para resolver una especialidad activa por servicio y veterinaria
+function resolverEspecialidadActivaPorServicio($id_servicio, $id_veterinaria, $id_especialidad = null)
+{
+    if (empty($id_servicio) || empty($id_veterinaria)) {
+        return null;
+    }
+
+    try {
+        $db = new conexion();
+        $pdo = $db->getConexion();
+
+        $consulta = "SELECT esp.id_especialidad
+                    FROM especialidad esp
+                    INNER JOIN esps_por_veterinaria epv
+                        ON epv.id_especialidad = esp.id_especialidad
+                    WHERE esp.id_servicio_esp = :id_servicio
+                      AND epv.id_veterinaria = :id_veterinaria
+                      AND epv.estado = 'Activo'";
+
+        if (!empty($id_especialidad)) {
+            $consulta .= " AND esp.id_especialidad = :id_especialidad";
+        }
+
+        $consulta .= " ORDER BY esp.id_especialidad ASC LIMIT 1";
+
+        $stmt = $pdo->prepare($consulta);
+        $stmt->bindValue(':id_servicio', (int)$id_servicio, PDO::PARAM_INT);
+        $stmt->bindValue(':id_veterinaria', (int)$id_veterinaria, PDO::PARAM_INT);
+
+        if (!empty($id_especialidad)) {
+            $stmt->bindValue(':id_especialidad', (int)$id_especialidad, PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $fila ? (int)$fila['id_especialidad'] : null;
+    } catch (PDOException $e) {
+        error_log('Error en resolverEspecialidadActivaPorServicio -> ' . $e->getMessage());
+        return null;
+    }
 }
 
 // FUNCION PARA OBTENER SERVICIOS DESDE BASE DE DATOS FILTRADOS POR VETERINARIA
