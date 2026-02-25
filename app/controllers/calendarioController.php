@@ -943,7 +943,7 @@ function rfs36_validarEstadoCita()
         $id_agendamiento = $_POST['id_agendamiento'] ?? null;
 
         if (!$id_agendamiento) {
-            alertaModal('error', 'Error', 'ID de cita no proporcionado');
+            mostrarSweetAlert('error', 'Error', 'ID de cita no proporcionado');
             return;
         }
 
@@ -951,13 +951,13 @@ function rfs36_validarEstadoCita()
         $resultado = $calendario->validarEstadoCita($id_agendamiento);
 
         if ($resultado['valido']) {
-            alertaModal('success', 'Validación Exitosa', $resultado['mensaje']);
+            mostrarSweetAlert('success', 'Validación Exitosa', $resultado['mensaje']);
         } else {
-            alertaModal('error', 'Validación Fallida', $resultado['mensaje']);
+            mostrarSweetAlert('error', 'Validación Fallida', $resultado['mensaje']);
         }
     } catch (Exception $e) {
         error_log("Error en rfs36_validarEstadoCita -> " . $e->getMessage());
-        alertaModal('error', 'Error del Sistema', 'Error al validar el estado de la cita');
+        mostrarSweetAlert('error', 'Error del Sistema', 'Error al validar el estado de la cita');
     }
 }
 
@@ -1010,12 +1010,12 @@ function rfs36_registrarMotivoCancelacion()
         $motivo_cancelacion = $_POST['motivo_cancelacion'] ?? null;
 
         if (!$id_agendamiento) {
-            alertaModal('error', 'Error', 'ID de cita no proporcionado');
+            mostrarSweetAlert('error', 'Error', 'ID de cita no proporcionado');
             return;
         }
 
         if (!$motivo_cancelacion) {
-            alertaModal('error', 'Error', 'Motivo de cancelación es requerido');
+            mostrarSweetAlert('error', 'Error', 'Motivo de cancelación es requerido');
             return;
         }
 
@@ -1024,7 +1024,7 @@ function rfs36_registrarMotivoCancelacion()
         $validacion = $calendario->validarEstadoCita($id_agendamiento);
 
         if (!$validacion['valido']) {
-            alertaModal('error', 'Error', $validacion['mensaje']);
+            mostrarSweetAlert('error', 'Error', $validacion['mensaje']);
             return;
         }
 
@@ -1033,13 +1033,13 @@ function rfs36_registrarMotivoCancelacion()
         $resultado = $calendario->registrarMotivoCancelacion($id_agendamiento, $motivo_cancelacion, $id_usuario);
 
         if ($resultado['exito']) {
-            alertaModal('success', 'Éxito', $resultado['mensaje']);
+            mostrarSweetAlert('success', 'Éxito', $resultado['mensaje']);
         } else {
-            alertaModal('error', 'Error', $resultado['mensaje']);
+            mostrarSweetAlert('error', 'Error', $resultado['mensaje']);
         }
     } catch (Exception $e) {
         error_log("Error en rfs36_registrarMotivoCancelacion -> " . $e->getMessage());
-        alertaModal('error', 'Error del Sistema', 'Error al registrar el motivo');
+        mostrarSweetAlert('error', 'Error del Sistema', 'Error al registrar el motivo');
     }
 }
 
@@ -1195,7 +1195,7 @@ function rfs36_cancelarCita()
         $motivo_cancelacion = $_POST['motivo_cancelacion'] ?? null;
 
         if (!$id_agendamiento) {
-            alertaModal('error', 'Error', 'ID de cita no proporcionado');
+            mostrarSweetAlert('error', 'Error', 'ID de cita no proporcionado');
             return;
         }
 
@@ -1204,13 +1204,13 @@ function rfs36_cancelarCita()
         $validacion = $calendario->validarEstadoCita($id_agendamiento);
 
         if (!$validacion['valido']) {
-            alertaModal('error', 'Error', $validacion['mensaje']);
+            mostrarSweetAlert('error', 'Error', $validacion['mensaje']);
             return;
         }
 
         // SUBTAREA 2: Registrar motivo de cancelación
         if (!$motivo_cancelacion) {
-            alertaModal('error', 'Error', 'Motivo de cancelación es requerido');
+            mostrarSweetAlert('error', 'Error', 'Motivo de cancelación es requerido');
             return;
         }
 
@@ -1218,7 +1218,7 @@ function rfs36_cancelarCita()
         $registroMotivo = $calendario->registrarMotivoCancelacion($id_agendamiento, $motivo_cancelacion, $id_usuario);
 
         if (!$registroMotivo['exito']) {
-            alertaModal('error', 'Error', $registroMotivo['mensaje']);
+            mostrarSweetAlert('error', 'Error', $registroMotivo['mensaje']);
             return;
         }
 
@@ -1226,7 +1226,7 @@ function rfs36_cancelarCita()
         $actualizarEstado = $calendario->actualizarEstadoCancelada($id_agendamiento);
 
         if (!$actualizarEstado['exito']) {
-            alertaModal('error', 'Error', $actualizarEstado['mensaje']);
+            mostrarSweetAlert('error', 'Error', $actualizarEstado['mensaje']);
             return;
         }
 
@@ -1245,10 +1245,10 @@ function rfs36_cancelarCita()
             error_log("No se pudo enviar notificación: propietario sin email registrado o datos incompletos");
         }
 
-        alertaModal('success', 'Éxito', 'Cita cancelada correctamente. Notificación enviada al propietario.');
+        mostrarSweetAlert('success', 'Éxito', 'Cita cancelada correctamente. Notificación enviada al propietario.');
     } catch (Exception $e) {
         error_log("Error en rfs36_cancelarCita -> " . $e->getMessage());
-        alertaModal('error', 'Error del Sistema', 'Error al procesar la cancelación');
+        mostrarSweetAlert('error', 'Error del Sistema', 'Error al procesar la cancelación');
     }
 }
 

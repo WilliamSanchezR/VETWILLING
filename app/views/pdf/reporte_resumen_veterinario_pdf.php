@@ -145,6 +145,64 @@
             <?php endif; ?>
         </tbody>
     </table>
+
+    <h2>Pacientes asignados activos</h2>
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>Paciente</th>
+                <th>Especie / Raza</th>
+                <th>Propietario</th>
+                <th>Fecha inicio asignación</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($payload['asignaciones_activas'])): ?>
+                <?php foreach ($payload['asignaciones_activas'] as $item): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($item['paciente_nombre']) ?></td>
+                        <td><?= htmlspecialchars(($item['especie'] ?? 'N/A') . ' / ' . ($item['raza'] ?? 'N/A')) ?></td>
+                        <td><?= htmlspecialchars($item['propietario_nombre'] ?? 'N/A') ?></td>
+                        <td><?= htmlspecialchars($item['fecha_inicio'] ?? 'N/A') ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="4">Sin pacientes asignados activos.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+    <h2>Historial de asignaciones (periodo)</h2>
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>Paciente</th>
+                <th>Estado</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Motivo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($payload['historial_asignaciones'])): ?>
+                <?php foreach ($payload['historial_asignaciones'] as $item): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($item['paciente_nombre']) ?></td>
+                        <td><?= htmlspecialchars($item['estado']) ?></td>
+                        <td><?= htmlspecialchars($item['fecha_inicio'] ?? 'N/A') ?></td>
+                        <td><?= htmlspecialchars($item['fecha_fin'] ?? 'Activo') ?></td>
+                        <td><?= htmlspecialchars($item['motivo_cambio'] ?? 'N/A') ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="5">Sin historial de asignaciones en el periodo.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 </body>
 
 </html>
