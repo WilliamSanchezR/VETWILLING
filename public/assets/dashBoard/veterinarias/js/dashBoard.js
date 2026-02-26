@@ -355,8 +355,8 @@ function abrirModalNuevoPaciente() {
                         <label class="form-label-paciente">Unidad de edad *</label>
                         <select id="pac-edad-unidad" class="form-control-paciente">
                             <option value="">Seleccione...</option>
-                            <option value="Anios">Anios</option>
-                            <option value="Meses">Meses</option>
+                            <option value="años">Años</option>
+                            <option value="meses">Meses</option>
                         </select>
                     </div>
                 </div>
