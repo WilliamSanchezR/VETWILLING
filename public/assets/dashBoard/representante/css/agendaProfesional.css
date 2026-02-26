@@ -1,702 +1,499 @@
-*{
-    scrollbar-width: none;
+/* ============================================================
+   MODALES DE AGENDA · VetWilling
+   agendaProfesional.css — versión limpia y profesional
+   ============================================================ */
+
+/* ── VARIABLES ──────────────────────────────────────────── */
+:root {
+    --am-green:         #0f8f3a;
+    --am-green-dark:    #0c7a32;
+    --am-green-deep:    #1b5e20;
+    --am-green-glow:    rgba(15, 143, 58, 0.18);
+    --am-text:          #1a1a2e;
+    --am-text-muted:    #6b7280;
+    --am-border:        #e2e8f0;
+    --am-bg-input:      #f8fafc;
+    --am-bg-footer:     #f8fafc;
+    --am-gray-btn:      #64748b;
+    --am-gray-hover:    #475569;
+    --am-radius-modal:  20px;
+    --am-radius-input:  10px;
+    --am-radius-btn:    10px;
+    --am-shadow-modal:  0 25px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.08);
 }
+
+
+/* ============================================================
+   PÁGINA — info del profesional y controles
+   ============================================================ */
+
 .contenedor-agenda-profesional {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 28px;
 }
 
-.agenda-veterinario .contenido-principal {
-    padding-top: 60px;
-    overflow: visible;
-}
-
-.agenda-veterinario .area-contenido {
-    overflow: visible;
-}
-
-.agenda-veterinario .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    z-index: 1000;
-}
-
-.agenda-veterinario .navbar-superior {
-    background: #ffffff !important;
-    backdrop-filter: none !important;
-}
-
+/* Tarjeta info profesional */
 .info-profesional {
-    background: #0f8f3a;
+    background: linear-gradient(135deg, #0f8f3a 0%, #0c7a32 60%, #1b5e20 100%);
     color: #ffffff;
     border-radius: 18px;
     padding: 30px 40px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-    max-width: 100%;
+    box-shadow: 0 15px 40px rgba(15, 143, 58, 0.3);
+    position: relative;
+    overflow: hidden;
 }
 
-.agenda-veterinario .btn-agregar,
-.agenda-veterinario .btn-control,
-.agenda-veterinario .btn-primary {
-    background: #0f8f3a;
-    border-color: #0f8f3a;
-    background-image: none;
+/* Detalle decorativo */
+.info-profesional::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+    pointer-events: none;
 }
 
-.agenda-veterinario .btn-agregar:hover,
-.agenda-veterinario .btn-control:hover,
-.agenda-veterinario .btn-primary:hover {
-    background: #0c7a32;
-    border-color: #0c7a32;
+.info-profesional::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    right: 80px;
+    width: 140px;
+    height: 140px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+    pointer-events: none;
 }
 
-/* HEADER */
 .info-header h3 {
     margin: 0;
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: -0.3px;
 }
 
 .info-header .rol {
-    font-size: 0.9rem;
-    opacity: 0.85;
+    font-size: 0.875rem;
+    opacity: 0.8;
+    margin-top: 3px;
+    display: block;
 }
 
-/* BODY */
 .info-body {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    margin-top: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
 }
 
-/* ITEMS */
 .info-item {
     background: rgba(255, 255, 255, 0.12) !important;
-    padding: 15px 18px !important;
+    backdrop-filter: blur(4px);
+    padding: 14px 18px !important;
     border-radius: 12px !important;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: background 0.2s ease;
+}
+
+.info-item:hover {
+    background: rgba(255, 255, 255, 0.18) !important;
 }
 
 .info-item .label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    opacity: 0.8;
-    margin-bottom: 6px;
+    letter-spacing: 0.1em;
+    opacity: 0.75;
+    margin-bottom: 5px;
+    font-weight: 600;
 }
 
 .info-item .value {
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-/* Aca es la parte del modal */
-
-#modalAgregarAgenda .modal-dialog {
-    max-width: 480px;
-}
-
-/* ---- Contenido con animación de entrada ---- */
-#modalAgregarAgenda .modal-content {
-    border-radius: 18px;
-    border: none;
-    box-shadow: 0 12px 40px rgba(16, 24, 40, 0.18);
-    overflow: hidden;
-    transform: translateY(10px);
-    opacity: 0;
-    transition: transform 0.25s ease, opacity 0.25s ease;
-}
-
-#modalAgregarAgenda.show .modal-content {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-#modalAgregarAgenda .modal-header {
-    background: linear-gradient(135deg, var(--vet-primary), var(--vet-primary-dark));
-    color: white;
-    border-bottom: none;
-    padding: 20px 24px;
-}
-
-#modalAgregarAgenda .modal-title {
+    font-size: 0.95rem;
     font-weight: 600;
-    font-size: 18px;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
 }
 
-#modalAgregarAgenda .modal-title i {
-    font-size: 20px;
+
+/* ============================================================
+   1. DIALOG Y CONTENIDO
+   ============================================================ */
+
+#modalAgregarAgenda .modal-dialog,
+#modalEditarAgenda  .modal-dialog {
+    max-width: 520px;
 }
 
-#modalAgregarAgenda .btn-close {
-    filter: brightness(0) invert(1);
-    opacity: 0.8;
-    transition: opacity 0.2s;
+#modalAgregarAgenda .modal-content,
+#modalEditarAgenda  .modal-content {
+    border:        none !important;
+    border-radius: var(--am-radius-modal) !important;
+    overflow:      hidden !important;
+    box-shadow:    var(--am-shadow-modal) !important;
+    opacity:       0;
+    transform:     translateY(16px) scale(0.98);
+    transition:    opacity 0.28s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-#modalAgregarAgenda .btn-close:hover {
-    opacity: 1;
+#modalAgregarAgenda.show .modal-content,
+#modalEditarAgenda.show  .modal-content {
+    opacity:   1;
+    transform: translateY(0) scale(1);
 }
 
-#modalAgregarAgenda .modal-body {
-    padding: 28px 24px;
-    background-color: #ffffff;
+
+/* ============================================================
+   2. HEADER
+   ============================================================ */
+
+#modalAgregarAgenda .modal-header,
+#modalEditarAgenda  .modal-header {
+    background:    linear-gradient(135deg, var(--am-green) 0%, var(--am-green-dark) 100%) !important;
+    border-bottom: none !important;
+    padding:       22px 28px !important;
+    position:      relative;
+    overflow:      hidden;
 }
 
-/* ---- Labels ---- */
-.am-label {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--vet-text-dark);
+/* Decoración header */
+#modalAgregarAgenda .modal-header::after,
+#modalEditarAgenda  .modal-header::after {
+    content:       '';
+    position:      absolute;
+    top:           -30px;
+    right:         -30px;
+    width:         120px;
+    height:        120px;
+    background:    rgba(255,255,255,0.07);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+#modalAgregarAgenda .modal-title,
+#modalEditarAgenda  .modal-title {
+    font-size:   17px !important;
+    font-weight: 700 !important;
+    color:       #ffffff !important;
+    display:     flex !important;
+    align-items: center !important;
+    gap:         10px !important;
+    margin:      0 !important;
+    letter-spacing: -0.2px;
+}
+
+#modalAgregarAgenda .modal-title i,
+#modalEditarAgenda  .modal-title i {
+    font-size:        19px;
+    background:       rgba(255,255,255,0.2);
+    width:            34px;
+    height:           34px;
+    border-radius:    8px;
+    display:          flex;
+    align-items:      center;
+    justify-content:  center;
+    flex-shrink:      0;
+}
+
+#modalAgregarAgenda .btn-close,
+#modalEditarAgenda  .btn-close {
+    filter:     brightness(0) invert(1) !important;
+    opacity:    0.7 !important;
+    transition: opacity 0.2s, transform 0.2s !important;
+    z-index:    1;
+}
+
+#modalAgregarAgenda .btn-close:hover,
+#modalEditarAgenda  .btn-close:hover {
+    opacity:   1 !important;
+    transform: rotate(90deg) !important;
+}
+
+
+/* ============================================================
+   3. BODY
+   ============================================================ */
+
+#modalAgregarAgenda .modal-body,
+#modalEditarAgenda  .modal-body {
+    background:     #ffffff !important;
+    padding:        26px 28px 18px !important;
+    display:        flex !important;
+    flex-direction: column !important;
+    gap:            2px !important;
+}
+
+
+/* ============================================================
+   4. GRUPOS DE CAMPO
+   ============================================================ */
+
+#modalAgregarAgenda .mb-3,
+#modalEditarAgenda  .mb-3 {
+    margin-bottom: 18px !important;
+}
+
+
+/* ============================================================
+   5. LABELS
+   ============================================================ */
+
+#modalAgregarAgenda .am-label,
+#modalEditarAgenda  .am-label {
+    font-size:     12.5px;
+    font-weight:   700;
+    color:         var(--am-text);
+    display:       flex;
+    align-items:   center;
+    gap:           6px;
     margin-bottom: 6px;
-    display: flex;
-    align-items: center;
+    letter-spacing: 0.01em;
 }
 
-.am-label i {
-    font-size: 14px;
+#modalAgregarAgenda .am-label i,
+#modalEditarAgenda  .am-label i {
+    font-size:        13px;
+    color:            var(--am-green);
+    background:       rgba(15, 143, 58, 0.1);
+    width:            22px;
+    height:           22px;
+    border-radius:    6px;
+    display:          flex;
+    align-items:      center;
+    justify-content:  center;
+    flex-shrink:      0;
 }
 
-/* ---- Inputs y Selects ---- */
-.am-input,
-.am-select,
-.am-textarea {
-    width: 100%;
-    padding: 9px 14px;
-    border-radius: 10px;
-    border: 1.5px solid var(--vet-border);
-    font-size: 14px;
-    color: var(--vet-text-dark);
-    background-color: #ffffff;
-    transition: all 0.2s ease;
-    outline: none;
-    box-sizing: border-box;
-}
-
-.am-input:focus,
-.am-select:focus,
-.am-textarea:focus {
-    border-color: var(--vet-primary);
-    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
-    background-color: #ffffff;
-}
-
-.am-input::placeholder,
-.am-textarea::placeholder {
-    color: #9ca3af;
-    font-size: 13px;
-}
-
-.am-input:disabled,
-.am-select:disabled {
-    background-color: #f3f4f6;
-    color: #9ca3af;
-    border-color: #e5e7eb;
-    cursor: not-allowed;
-}
-
-/* ---- Fila de horas ---- */
-.am-time-row {
-    display: flex;
-    gap: 16px;
-}
-
-.am-time-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-#modalAgregarAgenda .modal-footer {
-    border-top: none;
-    padding: 16px 24px 20px;
-    background-color: var(--vet-gray-light, #f9fafb);
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-/* ---- Botones ---- */
-.am-btn {
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.am-btn-primary {
-    background: red !important;
-    color: #ffffff;
-}
-
-.am-btn-primary:hover {
-    background-color: var(--vet-primary-dark);
-    box-shadow: 0 4px 14px rgba(46, 125, 50, 0.35);
-    transform: translateY(-1px);
-}
-
-.am-btn-secondary {
-    background-color: #e5e7eb;
-    color: var(--vet-text-dark);
-}
-
-.am-btn-secondary:hover {
-    background-color: #d1d5db;
-    transform: translateY(-1px);
-}
-
-@media (max-width: 500px) {
-    #modalAgregarAgenda .modal-dialog {
-        margin: 10px;
-    }
-
-    #modalAgregarAgenda .modal-body {
-        padding: 20px 18px;
-    }
-
-    #modalAgregarAgenda .modal-footer {
-        padding: 14px 18px;
-        flex-direction: column;
-    }
-
-    .am-time-row {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .am-btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-
-/* ESA ES LA PARTE DEL EDITAR */
-
-/* ---- Dialog y contenido ---- */
-#modalAgregarAgenda .modal-dialog {
-    max-width: 480px;
-}
-
-#modalAgregarAgenda .modal-content {
-    border: none;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-}
-
-#modalAgregarAgenda .modal-header {
-    background: #ffffff;
-    border-bottom: 1.5px solid #f0f4f0;
-    padding: 22px 28px 18px;
-}
-
-#modalAgregarAgenda .modal-title {
-    font-size: 19px;
-    font-weight: 700;
-    color: #1a1a2e;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0;
-}
-
-#modalAgregarAgenda .modal-title i {
-    color: #2e7d32;
-    font-size: 21px;
-}
-
-#modalAgregarAgenda .btn-close {
-    opacity: 0.45;
-    transition: opacity 0.2s;
-}
-
-#modalAgregarAgenda .btn-close:hover {
-    opacity: 1;
-}
-
-#modalAgregarAgenda .modal-body {
-    background: #ffffff;
-    padding: 22px 28px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-/* ---- Labels ---- */
-#modalAgregarAgenda .form-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #1a1a2e;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 5px;
-}
-
-#modalAgregarAgenda .form-label i {
-    color: #2e7d32;
-    font-size: 14px;
-}
-
-#modalAgregarAgenda .form-label .req {
-    color: #e53935;
+#modalAgregarAgenda .am-label .text-danger,
+#modalEditarAgenda  .am-label .text-danger {
+    color: #ef4444 !important;
     font-size: 14px;
     line-height: 1;
 }
 
-#modalAgregarAgenda .form-label .opt {
-    font-weight: 400;
+#modalAgregarAgenda small.text-muted,
+#modalEditarAgenda  small.text-muted {
+    font-size:  11.5px;
+    color:      #94a3b8 !important;
+    margin-top: 5px;
+    display:    flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#modalAgregarAgenda small.text-muted::before,
+#modalEditarAgenda  small.text-muted::before {
+    content: "ⓘ";
     font-size: 11px;
-    color: #9ca3af;
+    opacity: 0.7;
 }
 
-/* ---- Sublabel ---- */
-#modalAgregarAgenda .am-sublabel {
-    display: block;
-    font-size: 11.5px;
-    font-weight: 600;
-    color: #6b7280;
-    margin-bottom: 4px;
+
+/* ============================================================
+   6. INPUTS Y SELECTS
+   ============================================================ */
+
+#modalAgregarAgenda .am-input,
+#modalAgregarAgenda .am-select,
+#modalEditarAgenda  .am-input,
+#modalEditarAgenda  .am-select {
+    width:         100%;
+    padding:       10px 14px;
+    border:        1.5px solid var(--am-border) !important;
+    border-radius: var(--am-radius-input) !important;
+    font-size:     14px;
+    font-weight:   500;
+    color:         var(--am-text);
+    background:    var(--am-bg-input) !important;
+    box-shadow:    none !important;
+    outline:       none;
+    box-sizing:    border-box;
+    transition:    border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    appearance:    auto;
 }
 
-/* ---- Hint ---- */
-#modalAgregarAgenda .am-hint {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11.5px;
-    color: #6b7280;
-    margin-top: 5px;
+#modalAgregarAgenda .am-input:hover,
+#modalAgregarAgenda .am-select:hover,
+#modalEditarAgenda  .am-input:hover,
+#modalEditarAgenda  .am-select:hover {
+    border-color: #cbd5e1 !important;
 }
 
-#modalAgregarAgenda .am-hint i {
-    color: #9ca3af;
-    font-size: 12px;
+#modalAgregarAgenda .am-input:focus,
+#modalAgregarAgenda .am-select:focus,
+#modalEditarAgenda  .am-input:focus,
+#modalEditarAgenda  .am-select:focus {
+    border-color: var(--am-green) !important;
+    background:   #ffffff !important;
+    box-shadow:   0 0 0 3px var(--am-green-glow) !important;
 }
 
-/* ---- Inputs y Selects ---- */
-#modalAgregarAgenda .form-control,
-#modalAgregarAgenda .form-select {
-    padding: 9px 14px;
-    border: 1.5px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #1a1a2e;
-    background: #f9fafb;
-    box-shadow: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+#modalAgregarAgenda .am-input::placeholder,
+#modalEditarAgenda  .am-input::placeholder {
+    color:       #94a3b8;
+    font-size:   13px;
+    font-weight: 400;
 }
 
-#modalAgregarAgenda .form-control:focus,
-#modalAgregarAgenda .form-select:focus {
-    border-color: #2e7d32;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
-    outline: none;
+#modalAgregarAgenda .am-input:disabled,
+#modalAgregarAgenda .am-select:disabled,
+#modalEditarAgenda  .am-input:disabled,
+#modalEditarAgenda  .am-select:disabled {
+    background:   #f1f5f9 !important;
+    color:        #94a3b8 !important;
+    border-color: #e2e8f0 !important;
+    cursor:       not-allowed;
 }
 
-#modalAgregarAgenda .form-control::placeholder {
-    color: #9ca3af;
-    font-size: 13px;
-}
 
-#modalAgregarAgenda .form-control:disabled,
-#modalAgregarAgenda .form-select:disabled {
-    background: #f3f4f6;
-    color: #9ca3af;
-    border-color: #e5e7eb;
-    cursor: not-allowed;
-}
+/* ============================================================
+   7. FILA DE HORAS
+   ============================================================ */
 
-/* ---- Fila de horarios ---- */
-#modalAgregarAgenda .am-time-row {
-    display: flex;
+#modalAgregarAgenda .am-time-row,
+#modalEditarAgenda  .am-time-row {
+    display:     flex;
     align-items: flex-end;
-    gap: 10px;
+    gap:         10px;
 }
 
-#modalAgregarAgenda .am-time-col {
-    flex: 1;
-    display: flex;
+#modalAgregarAgenda .am-time-group,
+#modalEditarAgenda  .am-time-group {
+    flex:           1;
+    display:        flex;
     flex-direction: column;
 }
 
-#modalAgregarAgenda .am-arrow {
-    color: #9ca3af;
-    font-size: 14px;
+/* Flecha separadora generada por CSS */
+#modalAgregarAgenda .am-time-row::after,
+#modalEditarAgenda  .am-time-row::after {
+    content:        "→";
+    font-size:      15px;
+    color:          #cbd5e1;
     padding-bottom: 11px;
-    flex-shrink: 0;
+    flex-shrink:    0;
+    font-weight:    300;
 }
 
-#modalAgregarAgenda .modal-footer {
-    background: #ffffff;
-    border-top: 1.5px solid #f0f0f0;
-    padding: 16px 28px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+
+/* ============================================================
+   8. FOOTER
+   ============================================================ */
+
+#modalAgregarAgenda .modal-footer,
+#modalEditarAgenda  .modal-footer {
+    background:      var(--am-bg-footer) !important;
+    border-top:      1px solid #f1f5f9 !important;
+    padding:         18px 28px 22px !important;
+    display:         flex !important;
+    justify-content: flex-end !important;
+    gap:             10px !important;
 }
 
-#modalAgregarAgenda .btn-secondary {
-    background: #6b7280;
-    border-color: #6b7280;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 10px 22px;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    transition: all 0.2s ease;
+
+/* ============================================================
+   9. BOTONES
+   ============================================================ */
+
+#modalAgregarAgenda .am-btn,
+#modalEditarAgenda  .am-btn {
+    padding:       10px 22px !important;
+    border-radius: var(--am-radius-btn) !important;
+    font-size:     14px !important;
+    font-weight:   600 !important;
+    border:        none !important;
+    display:       inline-flex !important;
+    align-items:   center !important;
+    gap:           7px !important;
+    cursor:        pointer !important;
+    transition:    all 0.2s ease !important;
+    letter-spacing: 0.01em;
 }
 
-#modalAgregarAgenda .btn-secondary:hover {
-    background: #4b5563;
-    border-color: #4b5563;
-    transform: translateY(-1px);
+/* Cancelar */
+#modalAgregarAgenda .am-btn-secondary,
+#modalEditarAgenda  .am-btn-secondary {
+    background: #f1f5f9 !important;
+    color:      var(--am-text) !important;
 }
 
-#modalAgregarAgenda .btn-primary {
-    background: #2e7d32;
-    border-color: #2e7d32;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 10px 22px;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background-image: none;
-    transition: all 0.2s ease;
+#modalAgregarAgenda .am-btn-secondary:hover,
+#modalEditarAgenda  .am-btn-secondary:hover {
+    background: #e2e8f0 !important;
+    transform:  translateY(-1px) !important;
 }
 
-#modalAgregarAgenda .btn-primary:hover {
-    background: #1b5e20;
-    border-color: #1b5e20;
-    box-shadow: 0 4px 16px rgba(46, 125, 50, 0.3);
-    transform: translateY(-1px);
+#modalAgregarAgenda .am-btn-secondary:active,
+#modalEditarAgenda  .am-btn-secondary:active {
+    transform: translateY(0) !important;
 }
 
-#modalEditarAgenda .modal-dialog {
-    max-width: 480px;
+/* Guardar / Agregar */
+#modalAgregarAgenda .am-btn-primary,
+#modalEditarAgenda  .am-btn-primary {
+    background:       linear-gradient(135deg, var(--am-green), var(--am-green-dark)) !important;
+    background-image: linear-gradient(135deg, var(--am-green), var(--am-green-dark)) !important;
+    color:            #ffffff !important;
+    box-shadow:       0 2px 8px var(--am-green-glow) !important;
 }
 
-#modalEditarAgenda .modal-content {
-    border: none;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+#modalAgregarAgenda .am-btn-primary:hover,
+#modalEditarAgenda  .am-btn-primary:hover {
+    background:  linear-gradient(135deg, var(--am-green-dark), var(--am-green-deep)) !important;
+    box-shadow:  0 6px 20px rgba(15, 143, 58, 0.4) !important;
+    transform:   translateY(-2px) !important;
 }
 
-#modalEditarAgenda .modal-header {
-    background: #ffffff;
-    border-bottom: 1.5px solid #f0f4f0;
-    padding: 22px 28px 18px;
+#modalAgregarAgenda .am-btn-primary:active,
+#modalEditarAgenda  .am-btn-primary:active {
+    transform:  translateY(0) !important;
+    box-shadow: 0 2px 6px var(--am-green-glow) !important;
 }
 
-#modalEditarAgenda .modal-title {
-    font-size: 19px;
-    font-weight: 700;
-    color: #1a1a2e;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0;
-}
 
-#modalEditarAgenda .modal-title i {
-    color: #2e7d32;
-    font-size: 21px;
-}
+/* ============================================================
+   10. RESPONSIVE
+   ============================================================ */
 
-#modalEditarAgenda .btn-close {
-    opacity: 0.45;
-    transition: opacity 0.2s;
-}
+@media (max-width: 575px) {
 
-#modalEditarAgenda .btn-close:hover {
-    opacity: 1;
-}
-
-#modalEditarAgenda .modal-body {
-    background: #ffffff;
-    padding: 22px 28px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-#modalEditarAgenda .form-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #1a1a2e;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 5px;
-}
-
-#modalEditarAgenda .form-label i {
-    color: #2e7d32;
-    font-size: 14px;
-}
-
-#modalEditarAgenda .form-label .req {
-    color: #e53935;
-    font-size: 14px;
-    line-height: 1;
-}
-
-#modalEditarAgenda .am-sublabel {
-    display: block;
-    font-size: 11.5px;
-    font-weight: 600;
-    color: #6b7280;
-    margin-bottom: 4px;
-}
-
-#modalEditarAgenda .am-hint {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11.5px;
-    color: #6b7280;
-    margin-top: 5px;
-}
-
-#modalEditarAgenda .am-hint i {
-    color: #9ca3af;
-    font-size: 12px;
-}
-
-#modalEditarAgenda .form-control,
-#modalEditarAgenda .form-select {
-    padding: 9px 14px;
-    border: 1.5px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #1a1a2e;
-    background: #f9fafb;
-    box-shadow: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-#modalEditarAgenda .form-control:focus,
-#modalEditarAgenda .form-select:focus {
-    border-color: #2e7d32;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
-    outline: none;
-}
-
-#modalEditarAgenda .am-time-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-}
-
-#modalEditarAgenda .am-time-col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-#modalEditarAgenda .am-arrow {
-    color: #9ca3af;
-    font-size: 14px;
-    padding-bottom: 11px;
-    flex-shrink: 0;
-}
-
-#modalEditarAgenda .modal-footer {
-    background: #ffffff;
-    border-top: 1.5px solid #f0f0f0;
-    padding: 16px 28px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-#modalEditarAgenda .btn-secondary {
-    background: #6b7280;
-    border-color: #6b7280;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 10px 22px;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    transition: all 0.2s ease;
-    color: #fff;
-}
-
-#modalEditarAgenda .btn-secondary:hover {
-    background: #4b5563;
-    border-color: #4b5563;
-    transform: translateY(-1px);
-    color: #fff;
-}
-
-#modalEditarAgenda .btn-primary {
-    background: #2e7d32;
-    border-color: #2e7d32;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 10px 22px;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background-image: none;
-    transition: all 0.2s ease;
-}
-
-#modalEditarAgenda .btn-primary:hover {
-    background: #1b5e20;
-    border-color: #1b5e20;
-    box-shadow: 0 4px 16px rgba(46, 125, 50, 0.3);
-    transform: translateY(-1px);
-}
-
-@media (max-width: 500px) {
     #modalAgregarAgenda .modal-dialog,
-    #modalEditarAgenda .modal-dialog {
-        margin: 10px;
+    #modalEditarAgenda  .modal-dialog {
+        margin: 12px !important;
     }
 
     #modalAgregarAgenda .modal-header,
     #modalAgregarAgenda .modal-body,
     #modalAgregarAgenda .modal-footer,
-    #modalEditarAgenda .modal-header,
-    #modalEditarAgenda .modal-body,
-    #modalEditarAgenda .modal-footer {
-        padding-left: 18px;
-        padding-right: 18px;
+    #modalEditarAgenda  .modal-header,
+    #modalEditarAgenda  .modal-body,
+    #modalEditarAgenda  .modal-footer {
+        padding-left:  18px !important;
+        padding-right: 18px !important;
     }
 
     #modalAgregarAgenda .am-time-row,
-    #modalEditarAgenda .am-time-row {
+    #modalEditarAgenda  .am-time-row {
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
     }
 
-    #modalAgregarAgenda .am-arrow,
-    #modalEditarAgenda .am-arrow {
+    #modalAgregarAgenda .am-time-row::after,
+    #modalEditarAgenda  .am-time-row::after {
         display: none;
+    }
+
+    #modalAgregarAgenda .modal-footer,
+    #modalEditarAgenda  .modal-footer {
+        flex-direction: column !important;
+    }
+
+    #modalAgregarAgenda .am-btn,
+    #modalEditarAgenda  .am-btn {
+        width:           100% !important;
+        justify-content: center !important;
     }
 }
