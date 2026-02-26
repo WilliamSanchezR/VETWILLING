@@ -2,6 +2,7 @@
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
 require_once BASE_PATH . '/app/controllers/dashboardsAdminControllers.php';
 
+$totalUsuarios = getTotalUsuarios();
 $totalVeterinarias = getTotalVeterinarias();
 // Aquí puedes usar $dashboardInfo para mostrar la información en el dashboard, por ejemplo:
 // echo "Total Veterinarias Activas: " . $dashboardInfo;
@@ -72,7 +73,10 @@ $totalVeterinarias = getTotalVeterinarias();
                 </div>
             </div>
 
+
             <!-- ESTADÍSTICAS -->
+
+            <!-- Estadistica total usuarios -->
             <div class="stats-grid">
                 <div class="stat-card primary">
                     <div class="stat-header">
@@ -81,16 +85,17 @@ $totalVeterinarias = getTotalVeterinarias();
                         </div>
                         <div class="stat-trend up">
                             <i class="bi bi-arrow-up"></i>
-                            12%
+                            <?= $totalUsuarios['porcentaje_activos'] ?>%
                         </div>
                     </div>
-                    <div class="stat-value">1,248</div>
+                    <div class="stat-value"><?= $totalUsuarios['total_activos'] ?></div>
                     <div class="stat-label">Total Usuarios</div>
                     <div class="stat-footer">
-                        <i class="bi bi-person-plus"></i> 24 nuevos esta semana
+                        <i class="bi bi-person-plus"></i> <?= $totalUsuarios['registrados_ultima_semana'] ?> nuevos esta semana
                     </div>
                 </div>
 
+                <!-- Estadistica total veterinarias -->
                 <div class="stat-card success">
                     <div class="stat-header">
                         <div class="stat-icon">
@@ -108,6 +113,7 @@ $totalVeterinarias = getTotalVeterinarias();
                     </div>
                 </div>
 
+                <!-- Estadistica total profesionales -->
                 <div class="stat-card warning">
                     <div class="stat-header">
                         <div class="stat-icon">
@@ -119,12 +125,13 @@ $totalVeterinarias = getTotalVeterinarias();
                         </div>
                     </div>
                     <div class="stat-value">3,567</div>
-                    <div class="stat-label">Productos</div>
+                    <div class="stat-label">Total profesionales</div>
                     <div class="stat-footer">
-                        <i class="bi bi-clock"></i> 89 Productos agregados esta semana
+                        <i class="bi bi-clock"></i> 89 profesionales agregados esta semana
                     </div>
                 </div>
 
+                <!-- Estadistica total nuevos usuarioseste mes -->
                 <div class="stat-card danger">
                     <div class="stat-header">
                         <div class="stat-icon">
@@ -136,9 +143,9 @@ $totalVeterinarias = getTotalVeterinarias();
                         </div>
                     </div>
                     <div class="stat-value">23</div>
-                    <div class="stat-label">Nuevos este mes</div>
+                    <div class="stat-label">Usuarios que usaron el sistema este mes</div>
                     <div class="stat-footer">
-                        <i class="bi bi-eye"></i> Requieren atención
+                        <i class="bi bi-eye"></i> 1,234 usuarios activos este mes
                     </div>
                 </div>
             </div>

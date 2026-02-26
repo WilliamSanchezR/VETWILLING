@@ -131,6 +131,10 @@ $usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
                             <span class="label-ticket">Veterinaria:</span>
                             <span><?= $usuarioData['nombre_veterinaria'] ?></span>
                         </div>
+                        <div>
+                            <span class="label-ticket">Especialidad:</span>
+                            <span><?= $usuarioData['especialidad'] ?></span>
+                        </div>
                     </div>
                 </div>
             </div>

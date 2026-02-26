@@ -613,8 +613,13 @@
     animation: fadeIn 0.25s ease;
 }
 
-.modal-soporte.active {
+.panel-footer {
+    border-top: 1px solid var(--border);
+}
+
+.btn-link {
     display: flex;
+    align-items: center;
     justify-content: center;
     align-items: flex-start;
 }

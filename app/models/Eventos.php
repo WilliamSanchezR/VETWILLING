@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/PacienteProfesionalAsignacion.php';
 
 class Eventos
 {
@@ -54,8 +55,23 @@ class Eventos
                 return false;
             }
 
-            // Retornar el ID del último registro insertado
-            return $this->conexion->lastInsertId();
+            $idAgendamiento = (int) $this->conexion->lastInsertId();
+
+            if (!empty($data['id_paciente']) && !empty($data['id_usuario'])) {
+                $asignacionModel = new PacienteProfesionalAsignacion();
+                $okAsignacion = $asignacionModel->asegurarAsignacionActiva(
+                    (int) $data['id_paciente'],
+                    (int) $data['id_usuario'],
+                    (int) $data['id_usuario'],
+                    'Asignación automática desde agendamiento'
+                );
+
+                if (!$okAsignacion) {
+                    error_log('Advertencia en Eventos::registrar -> no se pudo sincronizar asignación en paciente_profesional_asignacion');
+                }
+            }
+
+            return $idAgendamiento;
         } catch (PDOException $e) {
             error_log("Error en Eventos::registrar -> " . $e->getMessage());
             error_log("Datos recibidos: " . print_r($data, true));

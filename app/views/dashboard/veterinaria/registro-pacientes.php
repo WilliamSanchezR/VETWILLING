@@ -152,6 +152,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 <!-- Paso 2: Datos de la Mascota -->
                 <div class="step">
                     <h3><i class="bi bi-heart me-2"></i>Datos de la Mascota</h3>
+                    <p class="text-muted mb-4">Puedes registrar varias mascotas para el mismo propietario.</p>
 
                     <div class="row">
                         <div class="col-md-6">
@@ -213,6 +214,19 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                     <option value="días">Días</option>
                                 </select>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="mascotas-acciones">
+                        <button type="button" class="btn btn-outline-success" id="btnAgregarMascota">
+                            <i class="bi bi-plus-circle"></i> Agregar mascota
+                        </button>
+                    </div>
+
+                    <div class="mascotas-agregadas" id="mascotasAgregadasContainer">
+                        <h4><i class="bi bi-list-check me-2"></i>Mascotas agregadas</h4>
+                        <div id="listaMascotasAgregadas" class="lista-mascotas-agregadas">
+                            <div class="empty-mascotas">Aún no hay mascotas agregadas.</div>
                         </div>
                     </div>
 

@@ -195,6 +195,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/registroPacienteController.php';
         break;
 
+    case '/veterinario/pacientes-asignacion':
+        require BASE_PATH . '/app/controllers/pacienteProfesionalAsignacionController.php';
+        break;
+
     case '/veterinario/guardar-veterinario':
         require BASE_PATH . '/app/controllers/veterinarioController.php';
         break;
@@ -234,11 +238,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/veterinarioController.php';
         break;
 
-    case 'soporte':
-        require_once 'controllers/soporteControllers.php';
-        $controller = new SoporteController();
-        // $controller->index();
-        break;
+
     // ---------------------------------------ADMINISTRADOR-------------------------------------//
 
     case '/admin/dashBoard':
@@ -622,5 +622,11 @@ switch ($request) {
         break;
     case '/pagos/confirmacion':
         require BASE_PATH . '/app/views/payments/confirmacion.php';
+        break;
+
+    // ------------------------- SOPORTE TECNICO ------------------------- //
+    /// crear ticket
+    case '/soporte/api/crear-ticket':
+        require BASE_PATH . '/app/controllers/ticketController.php';
         break;
 }

@@ -121,7 +121,7 @@ $agendaVeterinario = !empty($id_veterinaria)
                 </div>
 
                 <div class="contenedor-tabla">
-                    <table id="tablaListaAgenda" class="display tabla-admin" style="width:100%">
+                    <table id="tablaListaAgenda" class="display tabla-admin agenda-table-full">
                         <thead>
                             <tr>
                                 <th>Día</th>
@@ -160,27 +160,25 @@ $agendaVeterinario = !empty($id_veterinaria)
             <!-- Modal Registro Agenda -->
 
             <div class="modal fade" id="modalAgregarAgenda" tabindex="-1" aria-labelledby="modalAgregarAgendaLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+                <div class="modal-dialog modal-dialog-centered modal-agenda-dialog">
                     <form id="formAgenda" method="POST" action="<?= BASE_URL ?>/veterinario/agregar-disponibilidad-agenda" enctype="multipart/form-data">
                         <input type="hidden" name="id_usuario" value="<?= htmlspecialchars($id) ?>">
                         <input type="hidden" name="id_veterinaria" value="<?= htmlspecialchars($id_veterinaria) ?>">
                         <input type="hidden" name="redirect" value="<?= htmlspecialchars(BASE_URL . $_SERVER['REQUEST_URI']) ?>">
 
-                        <div class="modal-content" style="border:none; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+                        <div class="modal-content modal-agenda-content">
 
                             <!-- ── HEADER ── -->
-                            <div class="modal-header" style="background:#fff; border-bottom:1.5px solid #f0f4f0; padding:22px 28px 18px;">
-                                <h5 class="modal-title" id="modalAgregarAgendaLabel"
-                                    style="font-size:19px; font-weight:700; color:#1a1a2e; display:flex; align-items:center; gap:10px; margin:0;">
-                                    <i class="bi bi-calendar2-plus" style="color:#2e7d32; font-size:21px;"></i>
+                            <div class="modal-header modal-agenda-header">
+                                <h5 class="modal-title modal-agenda-title" id="modalAgregarAgendaLabel">
+                                    <i class="bi bi-calendar2-plus modal-agenda-title-icon"></i>
                                     Agregar Disponibilidad
                                 </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"
-                                    style="opacity:0.45;"></button>
+                                <button type="button" class="btn-close modal-agenda-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                             </div>
 
                             <!-- ── BODY ── -->
-                            <div class="modal-body" style="background:#fff; padding:22px 28px 12px; display:flex; flex-direction:column; gap:16px;">
+                            <div class="modal-body modal-agenda-body">
 
                                 <!-- Especialidad -->
                                 <div>
@@ -275,7 +273,7 @@ $agendaVeterinario = !empty($id_veterinaria)
                             </div>
 
                             <!-- ── FOOTER ── -->
-                            <div class="modal-footer" style="background:#fff; border-top:1.5px solid #f0f0f0; padding:16px 28px; gap:10px;">
+                            <div class="modal-footer modal-agenda-footer">
                                 <button type="button" class="am-btn am-btn-cancel" data-bs-dismiss="modal">
                                     <i class="bi bi-x-circle"></i> Cancelar
                                 </button>
@@ -294,7 +292,7 @@ $agendaVeterinario = !empty($id_veterinaria)
 
         <!-- Modal Editar Agenda -->
         <div class="modal fade" id="modalEditarAgenda" tabindex="-1" aria-labelledby="modalEditarAgendaLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+            <div class="modal-dialog modal-dialog-centered modal-agenda-dialog">
                 <form id="formEditAgenda" method="POST" action="<?= BASE_URL ?>/veterinario/editar-disponibilidad-agenda" enctype="multipart/form-data">
                     <input type="hidden" name="id_usuario" value="<?= htmlspecialchars($id) ?>">
                     <input type="hidden" name="id_veterinaria" value="<?= htmlspecialchars($id_veterinaria) ?>">
@@ -302,21 +300,19 @@ $agendaVeterinario = !empty($id_veterinaria)
                     <input type="hidden" name="action" value="editar">
                     <input type="hidden" name="redirect" value="<?= htmlspecialchars(BASE_URL . $_SERVER['REQUEST_URI']) ?>">
 
-                    <div class="modal-content" style="border:none; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+                    <div class="modal-content modal-agenda-content">
 
                         <!-- ── HEADER ── -->
-                        <div class="modal-header" style="background:#fff; border-bottom:1.5px solid #f0f4f0; padding:22px 28px 18px;">
-                            <h5 class="modal-title" id="modalEditarAgendaLabel"
-                                style="font-size:19px; font-weight:700; color:#1a1a2e; display:flex; align-items:center; gap:10px; margin:0;">
-                                <i class="bi bi-calendar2-check" style="color:#2e7d32; font-size:21px;"></i>
+                        <div class="modal-header modal-agenda-header">
+                            <h5 class="modal-title modal-agenda-title" id="modalEditarAgendaLabel">
+                                <i class="bi bi-calendar2-check modal-agenda-title-icon"></i>
                                 Editar Disponibilidad
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"
-                                style="opacity:0.45;"></button>
+                            <button type="button" class="btn-close modal-agenda-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
 
                         <!-- ── BODY ── -->
-                        <div class="modal-body" style="background:#fff; padding:22px 28px 12px; display:flex; flex-direction:column; gap:16px;">
+                        <div class="modal-body modal-agenda-body">
 
                             <!-- Especialidad -->
                             <div>
@@ -395,7 +391,7 @@ $agendaVeterinario = !empty($id_veterinaria)
                         </div>
 
                         <!-- ── FOOTER ── -->
-                        <div class="modal-footer" style="background:#fff; border-top:1.5px solid #f0f0f0; padding:16px 28px; gap:10px;">
+                        <div class="modal-footer modal-agenda-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                 <i class="bi bi-x-circle"></i> Cancelar
                             </button>
