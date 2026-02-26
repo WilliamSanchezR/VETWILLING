@@ -58,14 +58,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         <i class="bi bi-gear-fill"></i>
                         <span class="nav-text">Veterinaria</span>
                     </a>
-                    <a href="<?= BASE_URL ?>/representante/propietarios"
-                        class="nav-item <?= $final_path == 'propietarios' ? 'active' : '' ?>"
-                        data-section="Propietarios" data-tooltip="Propietarios">
-                        <i class="bi bi-person-lines-fill"></i>
-                        <span class="nav-text">Propietarios</span>
-                    </a>
-
-
+                    
                     <!-- Sessión con submenu Servicios y costos-->
                     <li>
 
@@ -84,7 +77,6 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             </ul>
                         </div>
                     </li>
-
 
                     <!-- Sección con submenú Profesionales  -->
                     <li>
