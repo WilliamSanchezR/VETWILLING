@@ -181,6 +181,163 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function inicializarEventosModalAgendamiento(subservicios) {
+        const propietarioSelect = document.getElementById('swal-propietario');
+        const mascotaSelect = document.getElementById('swal-mascota');
+
+        if (propietarioSelect && mascotaSelect) {
+            propietarioSelect.addEventListener('change', async function () {
+                const idPropietario = this.value;
+
+                if (idPropietario) {
+                    mascotaSelect.disabled = true;
+                    mascotaSelect.innerHTML = '<option value="">Cargando mascotas...</option>';
+
+                    const mascotas = await cargarMascotasPorPropietario(idPropietario);
+
+                    let mascotasOptions = '<option value="">Selecciona una mascota...</option>';
+                    mascotas.forEach(mascota => {
+                        mascotasOptions += `<option value="${mascota.id_paciente}">${mascota.nombre} (${mascota.especie})</option>`;
+                    });
+
+                    mascotaSelect.innerHTML = mascotasOptions;
+                    mascotaSelect.disabled = false;
+                } else {
+                    mascotaSelect.innerHTML = '<option value="">Primero selecciona un propietario...</option>';
+                    mascotaSelect.disabled = true;
+                }
+            });
+        }
+
+        const servicioSelect = document.getElementById('swal-servicio');
+        const subservicioSelect = document.getElementById('swal-subservicio');
+
+        if (servicioSelect && subservicioSelect) {
+            servicioSelect.addEventListener('change', function () {
+                const idServicio = this.value;
+
+                if (idServicio) {
+                    const subserviciosFiltrados = subservicios.filter(sub =>
+                        sub.id_servicio == idServicio
+                    );
+
+                    if (subserviciosFiltrados.length > 0) {
+                        let subserviciosOptions = '<option value="">Selecciona un subservicio...</option>';
+                        subserviciosFiltrados.forEach(sub => {
+                            const costoCOP = new Intl.NumberFormat('es-CO', {
+                                style: 'currency',
+                                currency: 'COP',
+                                minimumFractionDigits: 0
+                            }).format(sub.costo);
+                            subserviciosOptions += `<option value="${sub.id_subservicio}">${sub.nombre_subservicio} - ${costoCOP}</option>`;
+                        });
+
+                        subservicioSelect.innerHTML = subserviciosOptions;
+                        subservicioSelect.disabled = false;
+                    } else {
+                        subservicioSelect.innerHTML = '<option value="">No hay subservicios para este servicio</option>';
+                        subservicioSelect.disabled = true;
+                    }
+                } else {
+                    subservicioSelect.innerHTML = '<option value="">Primero selecciona un servicio...</option>';
+                    subservicioSelect.disabled = true;
+                }
+            });
+        }
+    }
+
+    function obtenerDatosFormularioAgendamiento() {
+        const propietario = document.getElementById('swal-propietario')?.value;
+        const mascota = document.getElementById('swal-mascota')?.value;
+        const servicio = document.getElementById('swal-servicio')?.value;
+        const subservicio = document.getElementById('swal-subservicio')?.value;
+        const fechaInicio = document.getElementById('swal-fecha-inicio')?.value;
+        const fechaFin = document.getElementById('swal-fecha-fin')?.value;
+        const observaciones = document.getElementById('swal-observaciones')?.value;
+
+        if (!propietario) {
+            Swal.showValidationMessage('Debes seleccionar un propietario');
+            return false;
+        }
+
+        if (!mascota) {
+            Swal.showValidationMessage('Debes seleccionar una mascota');
+            return false;
+        }
+
+        if (!servicio) {
+            Swal.showValidationMessage('Debes seleccionar un servicio');
+            return false;
+        }
+
+        if (!subservicio) {
+            Swal.showValidationMessage('Debes seleccionar un subservicio');
+            return false;
+        }
+
+        if (!fechaInicio) {
+            Swal.showValidationMessage('Debes ingresar la fecha y hora de inicio');
+            return false;
+        }
+
+        if (!fechaFin) {
+            Swal.showValidationMessage('Debes ingresar la fecha y hora de fin');
+            return false;
+        }
+
+        if (new Date(fechaFin) <= new Date(fechaInicio)) {
+            Swal.showValidationMessage('La fecha de fin debe ser posterior a la fecha de inicio');
+            return false;
+        }
+
+        const selectSubservicio = document.getElementById('swal-subservicio');
+        const selectedSubservicio = selectSubservicio.options[selectSubservicio.selectedIndex];
+        const subservicioNombre = selectedSubservicio.text.split(' - ')[0];
+
+        const selectServicio = document.getElementById('swal-servicio');
+        const servicioNombre = selectServicio.options[selectServicio.selectedIndex].text;
+        const color = obtenerColorServicio(servicioNombre);
+
+        return {
+            propietario: propietario,
+            mascota: mascota,
+            servicio: servicio,
+            subservicio: subservicio,
+            servicioNombre: servicioNombre,
+            subservicioNombre: subservicioNombre,
+            fechaInicio: fechaInicio,
+            fechaFin: fechaFin,
+            observaciones: observaciones,
+            color: color
+        };
+    }
+
+    function mostrarErrorCreacionAgendamiento(errorMessage, errorData, textoDefault) {
+        if (errorData && errorData.tipo === 'disponibilidad') {
+            return;
+        }
+
+        const mensaje = (errorMessage || errorData?.message || '').toString();
+        const mensajeLower = mensaje.toLowerCase();
+
+        if (mensajeLower.includes('especialidad activa')) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Configuración pendiente',
+                html: 'Este servicio no tiene una especialidad activa configurada para la veterinaria.<br><br>Por favor valida la configuración en <b>Especialidades</b>.',
+                confirmButtonText: 'Entendido'
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `${textoDefault}${mensaje || 'Error desconocido'}`,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
     // --- Funciones para cargar datos del servidor ---
     async function cargarPropietarios() {
         try {
@@ -250,11 +407,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Mapeo de servicios a colores
     const servicioColores = {
-        'Consulta general': '#0A932C',
-        'Exámenes de laboratorio': '#93BEDF',
-        'Baño y peluquería': '#9DE795',
-        'Otro': '#6c757d'
+        'consulta general': '#0A932C',
+        'examenes de laboratorio': '#93BEDF',
+        'bano y peluqueria': '#9DE795',
+        'otro': '#3B82F6'
     };
+
+    function normalizarTexto(texto) {
+        return (texto || '')
+            .toString()
+            .trim()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function obtenerColorServicio(nombreServicio) {
+        const nombreNormalizado = normalizarTexto(nombreServicio);
+
+        if (servicioColores[nombreNormalizado]) {
+            return servicioColores[nombreNormalizado];
+        }
+
+        if (nombreNormalizado.includes('consulta')) return servicioColores['consulta general'];
+        if (nombreNormalizado.includes('laboratorio') || nombreNormalizado.includes('examen')) return servicioColores['examenes de laboratorio'];
+        if (nombreNormalizado.includes('peluqueria') || nombreNormalizado.includes('bano')) return servicioColores['bano y peluqueria'];
+        if (nombreNormalizado.includes('otro')) return servicioColores['otro'];
+
+        return '#0A932C';
+    }
 
     // Función para calcular luminosidad de un color y determinar si necesita texto oscuro
     function getTextColor(bgColor) {
@@ -328,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Crear grupos colapsables por cada servicio
             servicios.forEach((servicio, index) => {
-                const color = servicioColores[servicio.nombre] || '#6c757d';
+                const color = obtenerColorServicio(servicio.nombre);
                 const emoji = servicioEmojis[servicio.nombre] || '📌';
                 const subsDelServicio = subserviciosPorServicio[servicio.id_servicio] || [];
 
@@ -830,144 +1011,9 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
                     document.head.appendChild(style);
 
-                    // Agregar evento al cambiar el propietario
-                    const propietarioSelect = document.getElementById('swal-propietario');
-                    const mascotaSelect = document.getElementById('swal-mascota');
-
-                    propietarioSelect.addEventListener('change', async function () {
-                        const idPropietario = this.value;
-
-                        if (idPropietario) {
-                            mascotaSelect.disabled = true;
-                            mascotaSelect.innerHTML = '<option value="">Cargando mascotas...</option>';
-
-                            const mascotas = await cargarMascotasPorPropietario(idPropietario);
-
-                            let mascotasOptions = '<option value="">Selecciona una mascota...</option>';
-                            mascotas.forEach(mascota => {
-                                mascotasOptions += `<option value="${mascota.id_paciente}">${mascota.nombre} (${mascota.especie})</option>`;
-                            });
-
-                            mascotaSelect.innerHTML = mascotasOptions;
-                            mascotaSelect.disabled = false;
-                        } else {
-                            mascotaSelect.innerHTML = '<option value="">Primero selecciona un propietario...</option>';
-                            mascotaSelect.disabled = true;
-                        }
-                    });
-
-                    // Agregar evento al cambiar el servicio para filtrar subservicios
-                    const servicioSelect = document.getElementById('swal-servicio');
-                    const subservicioSelect = document.getElementById('swal-subservicio');
-
-                    servicioSelect.addEventListener('change', function () {
-                        const idServicio = this.value;
-
-                        if (idServicio) {
-                            // Filtrar subservicios por el servicio seleccionado
-                            const subserviciosFiltrados = subservicios.filter(sub =>
-                                sub.id_servicio == idServicio
-                            );
-
-                            if (subserviciosFiltrados.length > 0) {
-                                let subserviciosOptions = '<option value="">Selecciona un subservicio...</option>';
-                                subserviciosFiltrados.forEach(sub => {
-                                    const costoCOP = new Intl.NumberFormat('es-CO', {
-                                        style: 'currency',
-                                        currency: 'COP',
-                                        minimumFractionDigits: 0
-                                    }).format(sub.costo);
-                                    subserviciosOptions += `<option value="${sub.id_subservicio}">${sub.nombre_subservicio} - ${costoCOP}</option>`;
-                                });
-
-                                subservicioSelect.innerHTML = subserviciosOptions;
-                                subservicioSelect.disabled = false;
-                            } else {
-                                subservicioSelect.innerHTML = '<option value="">No hay subservicios para este servicio</option>';
-                                subservicioSelect.disabled = true;
-                            }
-                        } else {
-                            subservicioSelect.innerHTML = '<option value="">Primero selecciona un servicio...</option>';
-                            subservicioSelect.disabled = true;
-                        }
-                    });
+                    inicializarEventosModalAgendamiento(subservicios);
                 },
-                preConfirm: () => {
-                    const propietario = document.getElementById('swal-propietario').value;
-                    const mascota = document.getElementById('swal-mascota').value;
-                    const servicio = document.getElementById('swal-servicio').value;
-                    const subservicio = document.getElementById('swal-subservicio').value;
-                    const fechaInicio = document.getElementById('swal-fecha-inicio').value;
-                    const fechaFin = document.getElementById('swal-fecha-fin').value;
-                    const observaciones = document.getElementById('swal-observaciones').value;
-
-                    if (!propietario) {
-                        Swal.showValidationMessage('Debes seleccionar un propietario');
-                        return false;
-                    }
-
-                    if (!mascota) {
-                        Swal.showValidationMessage('Debes seleccionar una mascota');
-                        return false;
-                    }
-
-                    if (!servicio) {
-                        Swal.showValidationMessage('Debes seleccionar un servicio');
-                        return false;
-                    }
-
-                    if (!subservicio) {
-                        Swal.showValidationMessage('Debes seleccionar un subservicio');
-                        return false;
-                    }
-
-                    if (!fechaInicio) {
-                        Swal.showValidationMessage('Debes ingresar la fecha y hora de inicio');
-                        return false;
-                    }
-
-                    if (!fechaFin) {
-                        Swal.showValidationMessage('Debes ingresar la fecha y hora de fin');
-                        return false;
-                    }
-
-                    // Validar que la fecha de fin sea posterior a la de inicio
-                    if (new Date(fechaFin) <= new Date(fechaInicio)) {
-                        Swal.showValidationMessage('La fecha de fin debe ser posterior a la fecha de inicio');
-                        return false;
-                    }
-
-                    // Obtener el nombre del servicio seleccionado
-                    const selectElement = document.getElementById('swal-subservicio');
-                    const selectedOption = selectElement.options[selectElement.selectedIndex];
-                    const servicioNombre = selectedOption.text.split(' - ')[0]; // Extraer solo el nombre sin el costo
-
-                    // Obtener el color basado en el nombre del servicio
-                    const servicioColores = {
-                        'Consulta General': '#007832',
-                        'Vacunación': '#17a2b8',
-                        'Cirugía': '#dc3545',
-                        'Control': '#ffc107',
-                        'Emergencia': '#fd7e14',
-                        'Desparasitación': '#6f42c1',
-                        'Peluquería': '#e83e8c',
-                        'Baño': '#20c997',
-                        'Otro': '#6c757d'
-                    };
-                    const color = servicioColores[servicioNombre] || '#6c757d';
-
-                    return {
-                        propietario: propietario,
-                        mascota: mascota,
-                        servicio: servicio,
-                        subservicio: subservicio,
-                        servicioNombre: servicioNombre,
-                        fechaInicio: fechaInicio,
-                        fechaFin: fechaFin,
-                        observaciones: observaciones,
-                        color: color
-                    };
-                }
+                preConfirm: () => obtenerDatosFormularioAgendamiento()
             }).then((result) => {
                 if (result.isConfirmed && result.value) {
                     const datos = result.value;
@@ -981,7 +1027,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         id_paciente: parseInt(datos.mascota),
                         id_servicio: parseInt(datos.servicio), // ID del servicio principal
                         id_subservicio: parseInt(datos.subservicio), // ID del subservicio específico
-                        id_especialidad: 1, // Especialidad por defecto
                         tipo: datos.servicioNombre, // Usar el nombre del subservicio como tipo
                         observaciones: datos.observaciones,
                         fecha_hora: fechaInicioMySQL,
@@ -1027,18 +1072,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         },
                         // Función de Error
                         function (errorMessage, errorData) {
-                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
-                            if (errorData && errorData.tipo === 'disponibilidad') {
-                                return; // No mostrar alerta duplicada
-                            }
-
-                            // Para otros tipos de error, mostrar alerta
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'No se pudo guardar el agendamiento: ' + errorMessage,
-                                confirmButtonText: 'Aceptar'
-                            });
+                            mostrarErrorCreacionAgendamiento(errorMessage, errorData, 'No se pudo guardar el agendamiento: ');
                         }
                     );
                 }
@@ -1684,145 +1718,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 width: '700px',
                 focusConfirm: false,
                 didOpen: () => {
-                    // Agregar evento al cambiar el propietario
-                    const propietarioSelect = document.getElementById('swal-propietario');
-                    const mascotaSelect = document.getElementById('swal-mascota');
-
-                    propietarioSelect.addEventListener('change', async function () {
-                        const idPropietario = this.value;
-
-                        if (idPropietario) {
-                            mascotaSelect.disabled = true;
-                            mascotaSelect.innerHTML = '<option value="">Cargando mascotas...</option>';
-
-                            const mascotas = await cargarMascotasPorPropietario(idPropietario);
-
-                            let mascotasOptions = '<option value="">Selecciona una mascota...</option>';
-                            mascotas.forEach(mascota => {
-                                mascotasOptions += `<option value="${mascota.id_paciente}">${mascota.nombre} (${mascota.especie})</option>`;
-                            });
-
-                            mascotaSelect.innerHTML = mascotasOptions;
-                            mascotaSelect.disabled = false;
-                        } else {
-                            mascotaSelect.innerHTML = '<option value="">Primero selecciona un propietario...</option>';
-                            mascotaSelect.disabled = true;
-                        }
-                    });
-
-                    // Agregar evento al cambiar el servicio para filtrar subservicios
-                    const servicioSelect = document.getElementById('swal-servicio');
-                    const subservicioSelect = document.getElementById('swal-subservicio');
-
-                    servicioSelect.addEventListener('change', function () {
-                        const idServicio = this.value;
-
-                        if (idServicio) {
-                            // Filtrar subservicios por el servicio seleccionado
-                            const subserviciosFiltrados = subservicios.filter(sub =>
-                                sub.id_servicio == idServicio
-                            );
-
-                            if (subserviciosFiltrados.length > 0) {
-                                let subserviciosOptions = '<option value="">Selecciona un subservicio...</option>';
-                                subserviciosFiltrados.forEach(sub => {
-                                    const costoCOP = new Intl.NumberFormat('es-CO', {
-                                        style: 'currency',
-                                        currency: 'COP',
-                                        minimumFractionDigits: 0
-                                    }).format(sub.costo);
-                                    subserviciosOptions += `<option value="${sub.id_subservicio}">${sub.nombre_subservicio} - ${costoCOP}</option>`;
-                                });
-
-                                subservicioSelect.innerHTML = subserviciosOptions;
-                                subservicioSelect.disabled = false;
-                            } else {
-                                subservicioSelect.innerHTML = '<option value="">No hay subservicios para este servicio</option>';
-                                subservicioSelect.disabled = true;
-                            }
-                        } else {
-                            subservicioSelect.innerHTML = '<option value="">Primero selecciona un servicio...</option>';
-                            subservicioSelect.disabled = true;
-                        }
-                    });
+                    inicializarEventosModalAgendamiento(subservicios);
                 },
-                preConfirm: () => {
-                    const propietario = document.getElementById('swal-propietario').value;
-                    const mascota = document.getElementById('swal-mascota').value;
-                    const servicio = document.getElementById('swal-servicio').value;
-                    const subservicio = document.getElementById('swal-subservicio').value;
-                    const fechaInicio = document.getElementById('swal-fecha-inicio').value;
-                    const fechaFin = document.getElementById('swal-fecha-fin').value;
-                    const observaciones = document.getElementById('swal-observaciones').value;
-
-                    if (!propietario) {
-                        Swal.showValidationMessage('Debes seleccionar un propietario');
-                        return false;
-                    }
-
-                    if (!mascota) {
-                        Swal.showValidationMessage('Debes seleccionar una mascota');
-                        return false;
-                    }
-
-                    if (!servicio) {
-                        Swal.showValidationMessage('Debes seleccionar un servicio');
-                        return false;
-                    }
-
-                    if (!subservicio) {
-                        Swal.showValidationMessage('Debes seleccionar un subservicio');
-                        return false;
-                    }
-
-                    if (!fechaInicio) {
-                        Swal.showValidationMessage('Debes seleccionar un servicio');
-                        return false;
-                    }
-
-                    if (!fechaInicio) {
-                        Swal.showValidationMessage('Debes ingresar la fecha y hora de inicio');
-                        return false;
-                    }
-
-                    if (!fechaFin) {
-                        Swal.showValidationMessage('Debes ingresar la fecha y hora de fin');
-                        return false;
-                    }
-
-                    // Validar que la fecha de fin sea posterior a la de inicio
-                    if (new Date(fechaFin) <= new Date(fechaInicio)) {
-                        Swal.showValidationMessage('La fecha de fin debe ser posterior a la fecha de inicio');
-                        return false;
-                    }
-
-                    // Obtener el nombre del subservicio seleccionado
-                    const selectSubservicio = document.getElementById('swal-subservicio');
-                    const selectedSubservicio = selectSubservicio.options[selectSubservicio.selectedIndex];
-                    const subservicioNombre = selectedSubservicio.text.split(' - ')[0]; // Extraer solo el nombre sin el costo
-
-                    // Obtener el color basado en el nombre del servicio
-                    const servicioColores = {
-                        'Consulta general': '#0A932C',
-                        'Exámenes de laboratorio': '#93BEDF',
-                        'Baño y peluquería': '#9DE795',
-                        'Otro': '#6c757d'
-                    };
-                    const color = servicioColores[servicioNombre] || '#6c757d';
-
-                    return {
-                        propietario: propietario,
-                        mascota: mascota,
-                        servicio: servicio,
-                        subservicio: subservicio,
-                        servicioNombre: servicioNombre,
-                        subservicioNombre: subservicioNombre,
-                        fechaInicio: fechaInicio,
-                        fechaFin: fechaFin,
-                        observaciones: observaciones,
-                        color: color
-                    };
-                }
+                preConfirm: () => obtenerDatosFormularioAgendamiento()
             }).then((result) => {
                 if (result.isConfirmed && result.value) {
                     const datos = result.value;
@@ -1836,7 +1734,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         id_paciente: parseInt(datos.mascota),
                         id_servicio: parseInt(datos.servicio), // ID servicio padre
                         id_subservicio: parseInt(datos.subservicio), // ID subservicio
-                        id_especialidad: 1, // Especialidad por defecto
                         tipo: datos.subservicioNombre, // Usar el nombre del subservicio como tipo
                         observaciones: datos.observaciones,
                         fecha_hora: fechaInicioMySQL,
@@ -1871,20 +1768,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             });
                         },
                         function (errorMessage, errorData) {
-                            // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
-                            if (errorData && errorData.tipo === 'disponibilidad') {
-                                return; // No mostrar alerta duplicada
-                            }
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'No se pudo crear el agendamiento: ' + errorMessage,
-                                confirmButtonText: 'Aceptar',
-                                customClass: {
-                                    confirmButton: 'swal2-styled swal2-confirm-custom'
-                                }
-                            });
+                            mostrarErrorCreacionAgendamiento(errorMessage, errorData, 'No se pudo crear el agendamiento: ');
                         }
                     );
                 }
@@ -2279,145 +2163,9 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             focusConfirm: false,
             didOpen: () => {
-                // Evento para cargar mascotas cuando se seleccione propietario
-                const selectPropietario = document.getElementById('swal-propietario');
-                const selectMascota = document.getElementById('swal-mascota');
-
-                selectPropietario.addEventListener('change', async function () {
-                    const idPropietario = this.value;
-
-                    if (idPropietario) {
-                        selectMascota.disabled = true;
-                        selectMascota.innerHTML = '<option value="">Cargando mascotas...</option>';
-
-                        const mascotas = await cargarMascotasPorPropietario(idPropietario);
-
-                        let mascotasOptions = '<option value="">Selecciona una mascota...</option>';
-                        mascotas.forEach(mascota => {
-                            mascotasOptions += `<option value="${mascota.id_paciente}">${mascota.nombre} (${mascota.especie})</option>`;
-                        });
-
-                        selectMascota.innerHTML = mascotasOptions;
-                        selectMascota.disabled = false;
-                    } else {
-                        selectMascota.disabled = true;
-                        selectMascota.innerHTML = '<option value="">Primero selecciona un propietario...</option>';
-                    }
-                });
-
-                // Agregar evento al cambiar el servicio para filtrar subservicios
-                const servicioSelect = document.getElementById('swal-servicio');
-                const subservicioSelect = document.getElementById('swal-subservicio');
-
-                servicioSelect.addEventListener('change', function () {
-                    const idServicio = this.value;
-
-                    if (idServicio) {
-                        // Filtrar subservicios por el servicio seleccionado
-                        const subserviciosFiltrados = subservicios.filter(sub =>
-                            sub.id_servicio == idServicio
-                        );
-
-                        if (subserviciosFiltrados.length > 0) {
-                            let subserviciosOptions = '<option value="">Selecciona un subservicio...</option>';
-                            subserviciosFiltrados.forEach(sub => {
-                                const costoCOP = new Intl.NumberFormat('es-CO', {
-                                    style: 'currency',
-                                    currency: 'COP',
-                                    minimumFractionDigits: 0
-                                }).format(sub.costo);
-                                subserviciosOptions += `<option value="${sub.id_subservicio}">${sub.nombre_subservicio} - ${costoCOP}</option>`;
-                            });
-
-                            subservicioSelect.innerHTML = subserviciosOptions;
-                            subservicioSelect.disabled = false;
-                        } else {
-                            subservicioSelect.innerHTML = '<option value="">No hay subservicios para este servicio</option>';
-                            subservicioSelect.disabled = true;
-                        }
-                    } else {
-                        subservicioSelect.innerHTML = '<option value="">Primero selecciona un servicio...</option>';
-                        subservicioSelect.disabled = true;
-                    }
-                });
+                inicializarEventosModalAgendamiento(subservicios);
             },
-            preConfirm: () => {
-                const propietario = document.getElementById('swal-propietario').value;
-                const mascota = document.getElementById('swal-mascota').value;
-                const servicio = document.getElementById('swal-servicio').value;
-                const subservicio = document.getElementById('swal-subservicio').value;
-                const fechaInicio = document.getElementById('swal-fecha-inicio').value;
-                const fechaFin = document.getElementById('swal-fecha-fin').value;
-                const observaciones = document.getElementById('swal-observaciones').value;
-
-                // Validaciones
-                if (!propietario) {
-                    Swal.showValidationMessage('Debes seleccionar un propietario');
-                    return false;
-                }
-
-                if (!mascota) {
-                    Swal.showValidationMessage('Debes seleccionar una mascota');
-                    return false;
-                }
-
-                if (!servicio) {
-                    Swal.showValidationMessage('Debes seleccionar un servicio');
-                    return false;
-                }
-
-                if (!subservicio) {
-                    Swal.showValidationMessage('Debes seleccionar un subservicio');
-                    return false;
-                }
-
-                if (!fechaInicio) {
-                    Swal.showValidationMessage('Debes ingresar la fecha y hora de inicio');
-                    return false;
-                }
-
-                if (!fechaFin) {
-                    Swal.showValidationMessage('Debes ingresar la fecha y hora de fin');
-                    return false;
-                }
-
-                // Validar que la fecha de fin sea posterior a la de inicio
-                if (new Date(fechaFin) <= new Date(fechaInicio)) {
-                    Swal.showValidationMessage('La fecha de fin debe ser posterior a la fecha de inicio');
-                    return false;
-                }
-
-                // Obtener el nombre del subservicio seleccionado
-                const selectSubservicio = document.getElementById('swal-subservicio');
-                const selectedSubservicio = selectSubservicio.options[selectSubservicio.selectedIndex];
-                const subservicioNombre = selectedSubservicio.text.split(' - ')[0];
-
-                // Obtener el nombre del servicio para el color
-                const selectServicio = document.getElementById('swal-servicio');
-                const servicioNombre = selectServicio.options[selectServicio.selectedIndex].text;
-
-                // Obtener el color basado en el nombre del servicio
-                const servicioColores = {
-                    'Consulta general': '#0A932C',
-                    'Exámenes de laboratorio': '#93BEDF',
-                    'Baño y peluquería': '#9DE795',
-                    'Otro': '#6c757d'
-                };
-                const color = servicioColores[servicioNombre] || '#6c757d';
-
-                return {
-                    propietario: propietario,
-                    mascota: mascota,
-                    servicio: servicio,
-                    subservicio: subservicio,
-                    servicioNombre: servicioNombre,
-                    subservicioNombre: subservicioNombre,
-                    fechaInicio: fechaInicio,
-                    fechaFin: fechaFin,
-                    observaciones: observaciones,
-                    color: color
-                };
-            }
+            preConfirm: () => obtenerDatosFormularioAgendamiento()
         }).then((result) => {
             if (result.isConfirmed && result.value) {
                 const datos = result.value;
@@ -2433,7 +2181,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     id_paciente: parseInt(datos.mascota),
                     id_servicio: parseInt(datos.servicio), // ID del servicio principal
                     id_subservicio: parseInt(datos.subservicio), // ID del subservicio específico
-                    id_especialidad: 1, // Especialidad por defecto
                     tipo: datos.subservicioNombre, // Usar el nombre del subservicio como tipo
                     observaciones: datos.observaciones,
                     fecha_hora: fechaInicioMySQL,
@@ -2468,17 +2215,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                     },
                     function (errorMessage, errorData) {
-                        // Si es un error de disponibilidad, ya se mostró en mostrarErrorDisponibilidad()
-                        if (errorData && errorData.tipo === 'disponibilidad') {
-                            return; // No mostrar alerta duplicada
-                        }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'No se pudo crear la cita: ' + errorMessage,
-                            confirmButtonText: 'Aceptar'
-                        });
+                        mostrarErrorCreacionAgendamiento(errorMessage, errorData, 'No se pudo crear la cita: ');
                     }
                 );
             }

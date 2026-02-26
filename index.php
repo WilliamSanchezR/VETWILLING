@@ -195,6 +195,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/registroPacienteController.php';
         break;
 
+    case '/veterinario/pacientes-asignacion':
+        require BASE_PATH . '/app/controllers/pacienteProfesionalAsignacionController.php';
+        break;
+
     case '/veterinario/guardar-veterinario':
         require BASE_PATH . '/app/controllers/veterinarioController.php';
         break;

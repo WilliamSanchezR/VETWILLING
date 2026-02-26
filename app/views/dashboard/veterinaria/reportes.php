@@ -317,6 +317,40 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </table>
                 </div>
             </div>
+
+            <div class="row g-3 mt-2">
+                <div class="col-12 col-lg-6">
+                    <div class="tarjeta-lista-estadisticas">
+                        <div class="encabezado-lista">
+                            <div class="icono-titulo-lista">
+                                <i class="bi bi-person-check-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="titulo-lista">Pacientes Asignados Activos</h5>
+                                <p class="subtitulo-lista">Fuente: paciente_profesional_asignacion</p>
+                            </div>
+                        </div>
+                        <div class="contenedor-lista-items" id="listaAsignacionesActivasReporte">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="tarjeta-lista-estadisticas">
+                        <div class="encabezado-lista">
+                            <div class="icono-titulo-lista">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div>
+                                <h5 class="titulo-lista">Historial de Asignaciones</h5>
+                                <p class="subtitulo-lista">Movimientos del periodo seleccionado</p>
+                            </div>
+                        </div>
+                        <div class="contenedor-lista-items" id="listaHistorialAsignacionesReporte">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
