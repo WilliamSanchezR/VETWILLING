@@ -6,17 +6,7 @@ $id         = $_SESSION['user']['id_usuario'];
 $usuario    = mostrarPerfil($id);
 $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 
-// Suscripción: Free | Basic | Pro | Enterprise
-$suscripcion     = $usuario['suscripcion'] ?? 'pro';
-$sub_slug        = strtolower($suscripcion);
 
-$sub_icons = [
-    'Essential'       => 'bi-gift',
-    'basic'      => 'bi-lightning-charge-fill',
-    'Pro'        => 'bi-stars',
-    'MasterVet' => 'bi-gem',
-];
-$sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
@@ -228,11 +218,6 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                         <span>
 
                         </span>
-                        <!-- Badge suscripción en botón -->
-                        <span class="sub-badge sub-<?= $sub_slug ?>">
-                            <i class="bi <?= $sub_icon ?>"></i>
-                            <?= $suscripcion ?>
-                        </span>
                     </div>
 
                     <i class="bi bi-chevron-down profile-arrow"></i>
@@ -255,10 +240,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             <div class="profile-badges-row">
                                 <span class="profile-badge"><?= htmlspecialchars($usuario['rol']) ?></span>
                                 <!-- Badge suscripción en dropdown -->
-                                <span class="sub-plan-chip sub-<?= $sub_slug ?>">
-                                    <i class="bi <?= $sub_icon ?>"></i>
-                                    <?= $suscripcion ?>
-                                </span>
+                              
                             </div>
                         </div>
                     </div>
@@ -286,17 +268,8 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             </div>
                         </a>
                     </div>
-
-                    <div class="panel-body">
-                        <a href="<?= BASE_URL ?>/veterinario/suscripcion" class="dropdown-item">
-                            <div class="item-icon">
-                                <i class="bi bi-person-circle"></i>
-                            </div>
-                            <div class="item-content">
-                                <span class="item-title">Mi Suscripción</span>
-                                <span class="item-subtitle">Ver y cambiar mi suscripción</span>
-                            </div>
-                        </a>
+                    
+          
 
                         <div class="panel-divider"></div>
 

@@ -51,6 +51,10 @@
        width: 40px;
        height: auto;
    }
+   .sidebar.collapsed .sidebar-header {
+    padding: 16px 8px;
+    min-height: 68px; /* igual que --nav-height del navbar */
+}
 
    .sidebar.collapsed .sidebar-logo-full {
        display: none;
