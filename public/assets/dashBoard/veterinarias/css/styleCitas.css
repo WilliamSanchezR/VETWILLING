@@ -94,6 +94,14 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 6px 16px rgba(10, 147, 44, 0.4);
 }
 
+.btn-accion-neutral {
+    background: #6c757d;
+}
+
+.btn-accion-neutral:hover {
+    background: #5a6268;
+}
+
 /* ESTADÍSTICAS */
 .stats-container {
     display: grid;

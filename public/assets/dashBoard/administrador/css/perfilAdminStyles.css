@@ -1,6 +1,7 @@
 /* ============================================
    VARIABLES CSS - SISTEMA DE DISEÑO
    ============================================ */
+
 :root {
     /* Tamaños de fuente */
     --fs-titulo1: 32px;
@@ -9,7 +10,6 @@
     --fs-titulo4: 14px;
     --fs-texto: 20px;
     --fs-texto1: 12px;
-
     /* Espaciado */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
@@ -17,19 +17,16 @@
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-xxl: 3rem;
-
     /* Bordes */
     --border-radius-sm: 8px;
     --border-radius-md: 12px;
     --border-radius-lg: 16px;
     --border-radius-circle: 50%;
-
     /* Sombras */
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
     --shadow-hover: 0 6px 20px rgba(10, 147, 44, 0.15);
-
     /* Transiciones */
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
@@ -37,19 +34,21 @@
 }
 
 
-
-
 /* ============================================
    CONTENEDOR PRINCIPAL
    ============================================ */
+
 .area-contenido {
     padding: var(--spacing-xl) 0;
     min-height: 100vh;
+    margin-top: 50px;
 }
+
 
 /* ================================
    ESTILOS GENERALES DE LOS CAMPOS
    ================================ */
+
 .container.clave {
     background: #ffffff;
     padding: 25px 30px;
@@ -58,7 +57,9 @@
     margin-top: 20px;
 }
 
+
 /* LABELS */
+
 .container.clave label {
     font-weight: 600;
     color: #333;
@@ -67,7 +68,9 @@
     font-size: 0.95rem;
 }
 
+
 /* INPUTS */
+
 .container.clave input[type="password"] {
     width: 100%;
     border: 1.7px solid #d5d9e0;
@@ -83,15 +86,19 @@
     outline: none;
 }
 
+
 /* ================================
    CONTENEDOR DEL INPUT + ICONO
    ================================ */
+
 .form-group.password {
     position: relative;
     margin-bottom: 22px;
 }
 
+
 /* Check de mostrar contraseña */
+
 .form-group.password .ver {
     position: absolute;
     right: 45px;
@@ -105,9 +112,11 @@
     z-index: 3;
 }
 
+
 /* ================================
    BOTÓN DEL OJO (VER / OCULTAR)
    ================================ */
+
 .icon-view {
     position: absolute;
     right: 12px;
@@ -130,9 +139,11 @@
     color: #0ea5a4;
 }
 
+
 /* ================================
    EFECTO DE ERROR / VALIDACIÓN
    ================================ */
+
 input.is-invalid {
     border-color: #dc3545 !important;
     box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2) !important;
@@ -143,9 +154,11 @@ input.is-valid {
     box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2) !important;
 }
 
+
 /* ================================
    SECCIÓN DE ANIMACIÓN SUAVE
    ================================ */
+
 .form-group.password {
     animation: fadeIn 0.6s ease;
 }
@@ -155,31 +168,31 @@ input.is-valid {
         opacity: 0;
         transform: translateY(8px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
+
 /* ================================
    RESPONSIVE
    ================================ */
+
 @media (max-width: 480px) {
     .container.clave {
         padding: 20px;
     }
-
     .icon-view i {
         font-size: 1rem;
     }
 }
 
 
-
 /* ============================================
    TARJETAS BASE
    ============================================ */
+
 .foto,
 .info,
 .especialidades,
@@ -212,6 +225,7 @@ input.is-valid {
 /* ============================================
    SECCIÓN: FOTO Y DATOS BÁSICOS
    ============================================ */
+
 .foto {
     text-align: center;
     display: flex;
@@ -272,7 +286,9 @@ input.is-valid {
     margin-bottom: var(--spacing-lg);
 }
 
+
 /* Botón en la foto */
+
 .foto .actions {
     width: 100%;
     margin-top: var(--spacing-md);
@@ -286,6 +302,7 @@ input.is-valid {
 /* ============================================
    SECCIÓN: INFORMACIÓN GENERAL Y HORARIOS
    ============================================ */
+
 .info,
 .horarios {
     display: flex;
@@ -362,6 +379,7 @@ input.is-valid {
 /* ============================================
    SECCIÓN: ESPECIALIDADES
    ============================================ */
+
 .especialidades {
     background: linear-gradient(135deg, var(--white-color) 0%, #f0f9f4 100%);
 }
@@ -395,6 +413,7 @@ input.is-valid {
 /* ============================================
    SECCIÓN: ESTADÍSTICAS
    ============================================ */
+
 .estadisticas {
     background: linear-gradient(135deg, var(--white-color) 0%, #f5f9ff 100%);
 }
@@ -457,6 +476,7 @@ input.is-valid {
 /* ============================================
    BOTÓN CAMBIAR CONTRASEÑA
    ============================================ */
+
 .btn_change_password {
     width: 100%;
     background: linear-gradient(135deg, var(--primary-color) 0%, #087d24 100%);
@@ -508,11 +528,14 @@ input.is-valid {
 /* ============================================
    SECCIÓN: CITAS Y AGENDA
    ============================================ */
+
 .citas {
     padding: var(--spacing-xl);
 }
 
+
 /* Pestañas */
+
 .nav-pills {
     background: var(--color-fondo);
     padding: var(--spacing-xs);
@@ -581,7 +604,9 @@ input.is-valid {
     background: rgba(255, 255, 255, 0.25);
 }
 
+
 /* Contenido de las pestañas */
+
 .tab-content {
     margin-top: var(--spacing-lg);
 }
@@ -590,6 +615,7 @@ input.is-valid {
 /* ============================================
    SECCIÓN: DOCUMENTOS Y CERTIFICACIONES
    ============================================ */
+
 .consultas-notas {
     padding: 0;
     background: transparent;
@@ -655,7 +681,9 @@ input.is-valid {
     box-shadow: var(--shadow-md);
 }
 
+
 /* Lista de documentos */
+
 .list-group-item {
     padding: var(--spacing-md) 0;
     transition: all var(--transition-fast);
@@ -704,6 +732,7 @@ input.is-valid {
 /* ============================================
    MODAL: CAMBIAR CONTRASEÑA
    ============================================ */
+
 .modal-notificacion .modal-content {
     border-radius: var(--border-radius-md);
     border: none;
@@ -739,7 +768,9 @@ input.is-valid {
     background: linear-gradient(135deg, #ffffff 0%, #f8fcfa 100%);
 }
 
+
 /* Formulario de contraseña */
+
 .form-group {
     margin-bottom: var(--spacing-xl);
     position: relative;
@@ -787,12 +818,16 @@ input.is-valid {
     border-color: var(--primary-green);
 }
 
+
 /* Checkbox oculto para ver contraseña */
+
 .form-group.password input[type="checkbox"].ver {
     display: none;
 }
 
+
 /* Botón de mostrar/ocultar contraseña */
+
 .form-group.password .icon-view {
     position: absolute;
     right: var(--spacing-md);
@@ -814,12 +849,13 @@ input.is-valid {
     color: var(--primary-color);
 }
 
-
 .form-group.password .icon-view i {
     display: block;
 }
 
+
 /* Footer del modal */
+
 .modal-footer {
     background: var(--white-color);
     border: none;
@@ -868,7 +904,6 @@ input.is-valid {
     font-size: 1rem;
 }
 
-
 .contenedor-foto {
     position: relative;
 }
@@ -900,12 +935,12 @@ input.is-valid {
 }
 
 
-
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
+
 @media (max-width: 1200px) {
-    :root {
+     :root {
         --fs-titulo1: 28px;
         --fs-titulo2: 22px;
         --fs-titulo3: 15px;
@@ -918,7 +953,6 @@ input.is-valid {
     .area-contenido {
         padding: var(--spacing-lg) 0;
     }
-
     .foto,
     .info,
     .especialidades,
@@ -929,34 +963,29 @@ input.is-valid {
         padding: var(--spacing-lg);
         margin-bottom: var(--spacing-md);
     }
-
     .foto .fotito {
         width: 120px;
         height: 120px;
     }
-
     .nav-pills {
         flex-direction: column;
     }
-
     .nav-pills .nav-item {
         width: 100%;
     }
-
     .stat-card {
         margin-bottom: var(--spacing-md);
     }
 }
 
 @media (max-width: 768px) {
-    :root {
+     :root {
         --fs-titulo1: 24px;
         --fs-titulo2: 20px;
         --fs-titulo3: 14px;
         --fs-titulo4: 12px;
         --fs-texto: 16px;
     }
-
     .foto .fotito {
         width: 100px;
         height: 100px;

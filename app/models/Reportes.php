@@ -355,4 +355,100 @@ class Reportes
             ];
         }
     }
+
+    public function obtenerPacientesAsignadosActivos($idUsuario)
+    {
+        try {
+            if (!$this->tablaAsignacionExiste()) {
+                return [];
+            }
+
+            $sql = "SELECT
+                        ppa.id_paciente,
+                        ppa.fecha_inicio,
+                        p.nombre AS paciente_nombre,
+                        p.especie,
+                        p.raza,
+                        CONCAT(prop.nombres, ' ', prop.apellidos) AS propietario_nombre,
+                        (
+                            SELECT MAX(a.fecha_hora)
+                            FROM agendamiento a
+                            WHERE a.id_usuario = :id_usuario
+                              AND a.id_paciente = ppa.id_paciente
+                        ) AS ultima_visita
+                    FROM paciente_profesional_asignacion ppa
+                    INNER JOIN paciente p ON p.id_paciente = ppa.id_paciente
+                    INNER JOIN propietario prop ON prop.id_propietario = p.id_propietario
+                    WHERE ppa.id_usuario_profesional = :id_usuario
+                      AND ppa.estado = 'Activo'
+                      AND ppa.fecha_fin IS NULL
+                    ORDER BY ppa.fecha_inicio DESC, ppa.id_asignacion DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerPacientesAsignadosActivos - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function obtenerHistorialAsignacionesPeriodo($idUsuario, $fechaInicio, $fechaFin, $limite = 10)
+    {
+        try {
+            if (!$this->tablaAsignacionExiste()) {
+                return [];
+            }
+
+            $sql = "SELECT
+                        ppa.id_asignacion,
+                        ppa.id_paciente,
+                        ppa.fecha_inicio,
+                        ppa.fecha_fin,
+                        ppa.estado,
+                        ppa.motivo_cambio,
+                        ppa.observacion,
+                        p.nombre AS paciente_nombre,
+                        CONCAT(prop.nombres, ' ', prop.apellidos) AS propietario_nombre
+                    FROM paciente_profesional_asignacion ppa
+                    INNER JOIN paciente p ON p.id_paciente = ppa.id_paciente
+                    INNER JOIN propietario prop ON prop.id_propietario = p.id_propietario
+                    WHERE ppa.id_usuario_profesional = :id_usuario
+                      AND (
+                          DATE(ppa.fecha_inicio) BETWEEN :fecha_inicio AND :fecha_fin
+                          OR (ppa.fecha_fin IS NOT NULL AND DATE(ppa.fecha_fin) BETWEEN :fecha_inicio AND :fecha_fin)
+                      )
+                    ORDER BY ppa.fecha_inicio DESC, ppa.id_asignacion DESC
+                    LIMIT :limite";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->bindParam(':limite', $limite, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerHistorialAsignacionesPeriodo - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    private function tablaAsignacionExiste()
+    {
+        try {
+            $sql = "SELECT COUNT(*)
+                    FROM information_schema.TABLES
+                    WHERE TABLE_SCHEMA = DATABASE()
+                      AND TABLE_NAME = 'paciente_profesional_asignacion'";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute();
+            return ((int) $stmt->fetchColumn() > 0);
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::tablaAsignacionExiste - ' . $e->getMessage());
+            return false;
+        }
+    }
 }

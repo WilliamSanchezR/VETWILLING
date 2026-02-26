@@ -2,7 +2,7 @@
 
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
-require_once __DIR__ . '/../models/especialidad.php';
+require_once __DIR__ . '/../models/Especialidad.php';
 
 
 //CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR

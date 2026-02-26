@@ -50,9 +50,10 @@ class Mascota
 
             if (!$resultado) {
                 error_log("Error PDO: " . print_r($stmt->errorInfo(), true));
+                return false;
             }
 
-            return $resultado;
+            return (int) $this->conexion->lastInsertId();
         } catch (PDOException $e) {
             error_log("❌ ERROR SQL: " . $e->getMessage());
             error_log("❌ CÓDIGO ERROR: " . $e->getCode());
@@ -192,6 +193,22 @@ class Mascota
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
             $mascota = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $sqlExisteAsignacion = "SELECT COUNT(*)
+                                    FROM information_schema.TABLES
+                                    WHERE TABLE_SCHEMA = DATABASE()
+                                      AND TABLE_NAME = 'paciente_profesional_asignacion'";
+            $stmtExiste = $this->conexion->prepare($sqlExisteAsignacion);
+            $stmtExiste->execute();
+            $existeAsignacion = ((int) $stmtExiste->fetchColumn() > 0);
+
+            if ($existeAsignacion) {
+                $deleteAsignacion = $this->conexion->prepare(
+                    "DELETE FROM paciente_profesional_asignacion WHERE id_paciente = :id"
+                );
+                $deleteAsignacion->bindParam(':id', $id, PDO::PARAM_INT);
+                $deleteAsignacion->execute();
+            }
 
             // 2. Eliminar registro
             $delete = $this->conexion->prepare(

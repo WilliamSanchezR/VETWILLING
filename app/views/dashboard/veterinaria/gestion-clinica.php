@@ -318,7 +318,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
 
             <!-- SECCIÓN SALAS -->
-            <div class="seccion-gestion" id="seccionSalas" style="display: none;">
+            <div class="seccion-gestion seccion-oculta" id="seccionSalas">
                 <div class="encabezado-seccion">
                     <h4>Gestión de Salas</h4>
                     <button class="boton-agregar" onclick="nuevaSala()">
@@ -417,7 +417,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             </div>
                             <div class="progreso-limpieza">
                                 <div class="barra-limpieza">
-                                    <div class="fill-limpieza" style="width: 60%;"></div>
+                                    <div class="fill-limpieza fill-limpieza-60"></div>
                                 </div>
                                 <span>60%</span>
                             </div>
@@ -468,7 +468,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
 
             <!-- SECCIÓN INVENTARIO -->
-            <div class="seccion-gestion" id="seccionInventario" style="display: none;">
+            <div class="seccion-gestion seccion-oculta" id="seccionInventario">
                 <div class="encabezado-seccion">
                     <h4>Gestión de Inventario</h4>
                     <button class="boton-agregar" onclick="nuevoItem()">

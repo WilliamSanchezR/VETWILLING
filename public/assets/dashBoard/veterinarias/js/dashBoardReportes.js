@@ -235,6 +235,53 @@ function renderFinanciero(financiero) {
     `;
 }
 
+function renderAsignacionesActivas(asignaciones) {
+    const contenedor = document.getElementById('listaAsignacionesActivasReporte');
+    if (!contenedor) return;
+
+    if (!asignaciones || !asignaciones.length) {
+        contenedor.innerHTML = '<div class="text-muted small p-3">No hay pacientes asignados activos.</div>';
+        return;
+    }
+
+    contenedor.innerHTML = asignaciones.map(item => {
+        const ultimaVisita = item.ultima_visita ? new Date(item.ultima_visita).toLocaleDateString('es-CO') : 'Sin visitas';
+        const especie = item.especie || 'N/A';
+        const raza = item.raza || 'N/A';
+        return `
+            <div class="item-estadistica">
+                <span class="nombre-item">${item.paciente_nombre} (${especie} - ${raza})</span>
+                <span class="valor-item">${item.propietario_nombre || 'Sin propietario'}</span>
+                <div class="text-muted small mt-1">Última visita: ${ultimaVisita}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderHistorialAsignaciones(historial) {
+    const contenedor = document.getElementById('listaHistorialAsignacionesReporte');
+    if (!contenedor) return;
+
+    if (!historial || !historial.length) {
+        contenedor.innerHTML = '<div class="text-muted small p-3">Sin movimientos de asignación en el periodo.</div>';
+        return;
+    }
+
+    contenedor.innerHTML = historial.map(item => {
+        const inicio = item.fecha_inicio ? new Date(item.fecha_inicio).toLocaleDateString('es-CO') : 'N/A';
+        const fin = item.fecha_fin ? new Date(item.fecha_fin).toLocaleDateString('es-CO') : 'Activo';
+        const motivo = item.motivo_cambio || 'Sin motivo';
+        return `
+            <div class="item-estadistica">
+                <span class="nombre-item">${item.paciente_nombre}</span>
+                <span class="valor-item">${item.estado}</span>
+                <div class="text-muted small mt-1">Inicio: ${inicio} | Fin: ${fin}</div>
+                <div class="text-muted small">Motivo: ${motivo}</div>
+            </div>
+        `;
+    }).join('');
+}
+
 async function cargarDashboardReportes() {
     try {
         const selectorAnio = document.getElementById('selectorAnioReporte');
@@ -260,6 +307,8 @@ async function cargarDashboardReportes() {
         renderTratamientos(payload.tratamientos || []);
         renderEspecies(payload.especies || []);
         renderFinanciero(payload.financiero || {});
+        renderAsignacionesActivas(payload.asignaciones_activas || []);
+        renderHistorialAsignaciones(payload.historial_asignaciones || []);
     } catch (error) {
         console.error(error);
     }

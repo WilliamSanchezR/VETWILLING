@@ -22,13 +22,13 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 
             <!-- Logo veterinaria -->
             <?php if (!empty($veterinaria['foto'])): ?>
-            <div class="vet-logo-wrap">
-                <img
-                    src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>"
-                    alt="<?= htmlspecialchars($veterinaria['nombre']) ?>"
-                    class="vet-logo"
-                    title="<?= htmlspecialchars($veterinaria['nombre']) ?>">
-            </div>
+                <div class="vet-logo-wrap">
+                    <img
+                        src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>"
+                        alt="<?= htmlspecialchars($veterinaria['nombre']) ?>"
+                        class="vet-logo"
+                        title="<?= htmlspecialchars($veterinaria['nombre']) ?>">
+                </div>
             <?php endif; ?>
 
             <!-- Botón menú móvil -->
@@ -75,14 +75,14 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                         placeholder="Buscar pacientes, citas, historiales…"
                         autocomplete="off"
                         aria-label="Buscar">
-                    <button class="btn-clear" id="btnClearSearch" style="display:none" aria-label="Limpiar">
+                    <button class="btn-clear is-hidden" id="btnClearSearch" aria-label="Limpiar">
                         <i class="bi bi-x"></i>
                     </button>
                     <kbd class="search-shortcut">Ctrl K</kbd>
                 </div>
 
                 <!-- Panel de resultados -->
-                <div class="search-results-panel" id="searchResults" style="display:none">
+                <div class="search-results-panel is-hidden" id="searchResults">
                     <div class="search-results-header">
                         <span class="results-title">Resultados</span>
                         <span class="results-count" id="resultsCount">0 resultados</span>
@@ -115,7 +115,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                     <span class="notification-badge" id="notificationBadge">3</span>
                 </button>
 
-                <div class="dropdown-panel notifications-panel" id="notificationsPanel" style="display:none">
+                <div class="dropdown-panel notifications-panel is-hidden" id="notificationsPanel">
                     <div class="panel-header">
                         <div class="panel-title">
                             <div>
@@ -224,7 +224,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                 </button>
 
                 <!-- ── Dropdown perfil ── -->
-                <div class="dropdown-panel profile-panel" id="perfilDropdown" style="display:none">
+                <div class="dropdown-panel profile-panel is-hidden" id="perfilDropdown">
 
                     <!-- Cabecera con avatar grande -->
                     <div class="profile-header">
@@ -268,27 +268,41 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             </div>
                         </a>
                     </div>
+<<<<<<< HEAD
                     
           
+=======
 
-                    <div class="panel-divider"></div>
-
-                    <div class="panel-footer">
-                        <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item logout-item">
+                    <div class="panel-body">
+                        <a href="<?= BASE_URL ?>/veterinario/suscripcion" class="dropdown-item">
                             <div class="item-icon">
-                                <i class="bi bi-box-arrow-right"></i>
+                                <i class="bi bi-person-circle"></i>
                             </div>
-                            <span class="item-title">Cerrar Sesión</span>
+                            <div class="item-content">
+                                <span class="item-title">Mi Suscripción</span>
+                                <span class="item-subtitle">Ver y cambiar mi suscripción</span>
+                            </div>
                         </a>
+>>>>>>> f52acdee8657354c2074de59b0a9437e34cfb67b
+
+                        <div class="panel-divider"></div>
+
+                        <div class="panel-footer">
+                            <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item logout-item">
+                                <div class="item-icon">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </div>
+                                <span class="item-title">Cerrar Sesión</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
+                <!-- ─── FIN PERFIL ─────────────────────────────── -->
+
             </div>
-            <!-- ─── FIN PERFIL ─────────────────────────────── -->
+            <!-- ─── FIN DERECHA ───────────────────────────────── -->
 
         </div>
-        <!-- ─── FIN DERECHA ───────────────────────────────── -->
-
-    </div>
 </nav>
 
 
@@ -321,6 +335,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                 </div>
 
                 <form id="formularioSoporte" class="soporte-form">
+                    <input type="hidden" name="id_usuario" value="<?= $usuario['id_usuario'] ?>">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="nombreSoporte" class="form-label">
@@ -330,9 +345,11 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             </label>
                             <input
                                 type="text"
+                                disabled
                                 class="form-input"
                                 id="nombreSoporte"
                                 placeholder="Tu nombre completo"
+                                value="<?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?>"
                                 required>
                         </div>
 
@@ -344,12 +361,28 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             </label>
                             <input
                                 type="email"
+                                disabled
                                 class="form-input"
                                 id="emailSoporte"
                                 placeholder="correo@ejemplo.com"
+                                value="<?= htmlspecialchars($usuario['email']) ?>"
                                 required>
                         </div>
                     </div>
+
+                        <div class="form-group">
+                            <label for="telefonoSoporte" class="form-label">
+                                Asunto
+                                <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                class="form-input"
+                                id="asunto"
+                                placeholder="Asunto del problema"
+                                name="asunto"
+                                required>
+                        </div>
 
                     <div class="form-group">
                         <label for="tipoProblema" class="form-label">
@@ -357,7 +390,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             Categoría del Problema
                             <span class="required">*</span>
                         </label>
-                        <select class="form-select" id="tipoProblema" required>
+                        <select class="form-select" id="tipoProblema" name="categoria" required>
                             <option value="">Selecciona una categoría</option>
                             <option value="tecnico">🔧 Problema Técnico</option>
                             <option value="cuenta">👤 Gestión de Cuenta</option>
@@ -378,6 +411,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             id="descripcionProblema"
                             rows="5"
                             placeholder="Describe tu problema con el mayor detalle posible…"
+                            name="descripcion"
                             required></textarea>
                         <span class="form-hint">Mínimo 20 caracteres</span>
                     </div>
@@ -387,7 +421,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             <i class="bi bi-x-circle"></i>
                             Cancelar
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="btnEnviarSoporte">
                             <i class="bi bi-send-fill"></i>
                             Enviar Solicitud
                         </button>
@@ -400,3 +434,4 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 </div>
 
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/navbar-superior.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>

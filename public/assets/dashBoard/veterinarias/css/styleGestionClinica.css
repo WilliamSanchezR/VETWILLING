@@ -43,6 +43,14 @@ VARIABLES GLOBALES
     scrollbar-width: none;
 }
 
+.seccion-oculta {
+    display: none;
+}
+
+.fill-limpieza-60 {
+    width: 60%;
+}
+
 /* ========================================
 CONTENIDO PRINCIPAL
 ======================================== */

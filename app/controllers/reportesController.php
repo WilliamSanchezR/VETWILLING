@@ -64,7 +64,9 @@ function construirPayloadReportes($idUsuario)
         'servicios' => $reportesModel->obtenerServiciosMasSolicitados($idUsuario, $inicio, $fin),
         'tratamientos' => $reportesModel->obtenerTopTratamientos($idUsuario, $inicio, $fin),
         'especies' => $reportesModel->obtenerPacientesPorEspecie($idUsuario, $inicio, $fin),
-        'financiero' => $reportesModel->obtenerResumenFinancieroMensual($idUsuario, $anio)
+        'financiero' => $reportesModel->obtenerResumenFinancieroMensual($idUsuario, $anio),
+        'asignaciones_activas' => $reportesModel->obtenerPacientesAsignadosActivos($idUsuario),
+        'historial_asignaciones' => $reportesModel->obtenerHistorialAsignacionesPeriodo($idUsuario, $inicio, $fin)
     ];
 }
 
