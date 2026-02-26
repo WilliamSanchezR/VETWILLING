@@ -2,24 +2,48 @@
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 
-$id      = $_SESSION['user']['id_usuario'];
-$usuario = mostrarPerfil($id);
-$veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 
-$suscripcion = $usuario['suscripcion'] ?? 'Essential';
-$sub_slug    = strtolower($suscripcion);
+// Validamos sesión
+if (!isset($_SESSION['user']['id_usuario'])) {
+    $perfil = [];
+} else {
+    $idUsuario = $_SESSION['user']['id_usuario'];
+    $perfil = mostrarPerfil($idUsuario);
 
-$sub_config = [
-    'essential' => ['icon' => 'bi-gift',               'color' => '#6c757d', 'bg' => '#f0f0f0'],
-    'basic'     => ['icon' => 'bi-lightning-charge-fill','color' => '#0d6efd', 'bg' => '#e7f0ff'],
-    'pro'       => ['icon' => 'bi-stars',               'color' => '#fd7e14', 'bg' => '#fff3e0'],
-    'mastervet' => ['icon' => 'bi-gem',                 'color' => '#6f42c1', 'bg' => '#f0e9ff'],
+    if (!is_array($perfil)) {
+        $perfil = [];
+    }
+}
+
+// Veterinaria segura
+$veterinaria = null;
+if (isset($_SESSION['user']['id_veterinaria'])) {
+    $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
+}
+
+// Suscripción segura
+$suscripcion    = $perfil['suscripcion'] ?? 'Essential';
+$suscripcionKey = strtolower($suscripcion);
+
+$planes = [
+    'essential' => ['icon' => 'bi-gift', 'color' => '#6c757d', 'bg' => '#f0f0f0'],
+    'basic'     => ['icon' => 'bi-lightning-charge-fill', 'color' => '#0d6efd', 'bg' => '#e7f0ff'],
+    'pro'       => ['icon' => 'bi-stars', 'color' => '#fd7e14', 'bg' => '#fff3e0'],
+    'mastervet' => ['icon' => 'bi-gem', 'color' => '#6f42c1', 'bg' => '#f0e9ff'],
 ];
-$sub = $sub_config[$sub_slug] ?? $sub_config['essential'];
 
-// Iniciales del usuario como fallback del avatar
-$iniciales = strtoupper(substr($usuario['nombres'], 0, 1) . substr($usuario['apellidos'], 0, 1));
-$img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
+$planActual = $planes[$suscripcionKey] ?? $planes['essential'];
+
+// Iniciales seguras
+$iniciales = strtoupper(
+    substr($perfil['nombres'] ?? 'U', 0, 1) .
+    substr($perfil['apellidos'] ?? '', 0, 1)
+);
+
+// Avatar seguro
+$avatar = !empty($perfil['img_perfil'])
+    ? BASE_URL . '/public/uploads/usuarios/' . $perfil['img_perfil']
+    : BASE_URL . '/public/assets/img/default.png';
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css">
@@ -147,19 +171,22 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                 aria-label="Menú de perfil"
                 aria-expanded="false">
 
-                <div class="avatar-usuario" title="<?= htmlspecialchars($usuario['nombres']) ?>">
+                <div class="avatar-usuario" title="<?= htmlspecialchars($perfil['nombres']) ?>">
                     <img
-                        src="<?= $img_src ?>"
-                        alt="Foto de <?= htmlspecialchars($usuario['nombres']) ?>"
+                        src="<?= $avatar ?>"
+                        alt="Foto de <?= htmlspecialchars($perfil['nombres']) ?>"
                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                     <span class="avatar-iniciales" style="display:none"><?= $iniciales ?></span>
                 </div>
 
                 <div class="info-usuario">
-                    <span class="nombre-usuario"><?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?></span>
+                    <span class="nombre-usuario">
+                        <?= htmlspecialchars($perfil['nombres']) ?>
+                        <?= htmlspecialchars($perfil['apellidos']) ?>
+                    </span>
                     <span class="rol-usuario">
                         <span class="rol-dot"></span>
-                        <?= htmlspecialchars($usuario['rol']) ?>
+                        <?= htmlspecialchars($perfil['rol']) ?>
                     </span>
                 </div>
 
@@ -173,28 +200,28 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                 <div class="perfil-header">
                     <div class="avatar-usuario grande">
                         <img
-                            src="<?= $img_src ?>"
-                            alt="Avatar"
+                            src="<?= $avatar ?>"
+                            alt="Avatar de <?= htmlspecialchars($perfil['nombres']) ?>"
                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                         <span class="avatar-iniciales" style="display:none"><?= $iniciales ?></span>
                     </div>
                     <div class="perfil-info">
-                        <p class="nombre-completo"><?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?></p>
-                        <p class="email-usuario"><?= htmlspecialchars($usuario['email']) ?></p>
-                        <span class="sub-badge" style="background:<?= $sub['bg'] ?>; color:<?= $sub['color'] ?>">
-                            <i class="bi <?= $sub['icon'] ?>"></i>
-                            <?= $suscripcion ?>
+                        <p class="nombre-completo">
+                            <?= htmlspecialchars($perfil['nombres']) ?>
+                            <?= htmlspecialchars($perfil['apellidos']) ?>
+                        </p>
+                        <p class="email-usuario"><?= htmlspecialchars($perfil['email']) ?></p>
+                        <span class="sub-badge" style="background: <?= $planActual['bg'] ?>; color: <?= $planActual['color'] ?>">
+                            <i class="bi <?= $planActual['icon'] ?>"></i>
+                            <?= ucfirst($suscripcion) ?>
                         </span>
                     </div>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
-                <!-- Links del menú -->
                 <a href="<?= BASE_URL ?>/representante/perfil-representante" class="dropdown-item">
-                    <div class="dropdown-item-icon">
-                        <i class="bi bi-person-fill"></i>
-                    </div>
+                    <div class="dropdown-item-icon"><i class="bi bi-person-fill"></i></div>
                     <div class="dropdown-item-content">
                         <span class="item-title">Mi Perfil</span>
                         <span class="item-subtitle">Ver y editar tu perfil</span>
@@ -203,9 +230,7 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                 </a>
 
                 <a href="<?= BASE_URL ?>/representante/suscripcion" class="dropdown-item">
-                    <div class="dropdown-item-icon">
-                        <i class="bi bi-credit-card-fill"></i>
-                    </div>
+                    <div class="dropdown-item-icon"><i class="bi bi-credit-card-fill"></i></div>
                     <div class="dropdown-item-content">
                         <span class="item-title">Mi Suscripción</span>
                         <span class="item-subtitle">Ver y cambiar tu plan</span>
@@ -214,9 +239,7 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                 </a>
 
                 <a href="#" class="dropdown-item" id="btnAbrirSoporte">
-                    <div class="dropdown-item-icon">
-                        <i class="bi bi-headset"></i>
-                    </div>
+                    <div class="dropdown-item-icon"><i class="bi bi-headset"></i></div>
                     <div class="dropdown-item-content">
                         <span class="item-title">Soporte</span>
                         <span class="item-subtitle">Reportar un problema</span>
@@ -227,9 +250,7 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                 <div class="dropdown-divider"></div>
 
                 <a href="<?= BASE_URL ?>/logout" class="dropdown-item item-danger">
-                    <div class="dropdown-item-icon danger-icon">
-                        <i class="bi bi-box-arrow-right"></i>
-                    </div>
+                    <div class="dropdown-item-icon danger-icon"><i class="bi bi-box-arrow-right"></i></div>
                     <div class="dropdown-item-content">
                         <span class="item-title">Cerrar Sesión</span>
                         <span class="item-subtitle">Salir de tu cuenta</span>
@@ -258,7 +279,6 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
-        <!-- ─── FIN IZQUIERDA ─────────────────────────────── -->
 
         <div class="modal-body">
             <p class="modal-descripcion">
@@ -280,7 +300,7 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                             id="nombreSoporte"
                             name="nombre"
                             placeholder="Tu nombre completo"
-                            value="<?= htmlspecialchars($usuario['nombres'] . ' ' . $usuario['apellidos']) ?>"
+                            value="<?= htmlspecialchars($perfil['nombres'] . ' ' . $perfil['apellidos']) ?>"
                             required>
                         <span class="error-message">Este campo es obligatorio</span>
                     </div>
@@ -296,109 +316,11 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                             id="emailSoporte"
                             name="email"
                             placeholder="ejemplo@correo.com"
-                            value="<?= htmlspecialchars($usuario['email']) ?>"
+                            value="<?= htmlspecialchars($perfil['email']) ?>"
                             required>
                         <span class="error-message">Ingresa un correo válido</span>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- ─── FIN CENTRO ────────────────────────────────── -->
-
-
-        <!-- ─── DERECHA — Acciones ───────────────────────── -->
-        <div class="navbar-right">
-
-            <!-- Tema oscuro/claro -->
-            <button class="btn-icon" onclick="toggleTheme()" aria-label="Cambiar tema">
-                <i class="bi bi-moon-stars" id="themeIcon"></i>
-            </button>
-
-            <!-- Notificaciones -->
-            <div class="navbar-action notifications-wrapper">
-                <button class="btn-icon" onclick="toggleNotificaciones()" aria-label="Notificaciones">
-                    <i class="bi bi-bell"></i>
-                    <span class="notification-badge" id="notificationBadge">3</span>
-                </button>
-
-                <div class="dropdown-panel notifications-panel is-hidden" id="notificationsPanel">
-                    <div class="panel-header">
-                        <div class="panel-title">
-                            <div>
-                                <i class="bi bi-bell-fill"></i>
-                                <h3>Notificaciones</h3>
-                            </div>
-                            <button class="btn-text-sm" onclick="marcarTodasLeidas()">
-                                Marcar todas leídas
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="panel-body">
-                        <div class="notifications-list">
-
-                            <div class="notification-item unread">
-                                <div class="notification-indicator success"></div>
-                                <div class="notification-icon success">
-                                    <i class="bi bi-calendar-check-fill"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h4>Nueva cita agendada</h4>
-                                        <span class="notification-time">Hace 5 min</span>
-                                    </div>
-                                    <p>Max — Consulta general mañana 10:00 AM</p>
-                                </div>
-                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </div>
-
-                            <div class="notification-item">
-                                <div class="notification-indicator warning"></div>
-                                <div class="notification-icon warning">
-                                    <i class="bi bi-exclamation-triangle-fill"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h4>Recordatorio de vacuna</h4>
-                                        <span class="notification-time">Hace 1 h</span>
-                                    </div>
-                                    <p>Luna — Antirrábica con vencimiento próximo</p>
-                                </div>
-                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </div>
-
-                            <div class="notification-item">
-                                <div class="notification-indicator info"></div>
-                                <div class="notification-icon info">
-                                    <i class="bi bi-file-medical-fill"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h4>Resultados disponibles</h4>
-                                        <span class="notification-time">Hace 2 h</span>
-                                    </div>
-                                    <p>Rocky — Análisis de sangre listo para revisar</p>
-                                </div>
-                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="panel-footer">
-                        <a href="#" class="btn-link">
-                            Ver todas las notificaciones
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
 
                 <div class="form-group">
                     <label for="tipoProblema">
@@ -415,13 +337,6 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                     </select>
                     <span class="error-message">Selecciona una opción</span>
                 </div>
-                <!-- ─── FIN PERFIL ─────────────────────────────── -->
-
-            </div>
-            <!-- ─── FIN DERECHA ───────────────────────────────── -->
-
-        </div>
-</nav>
 
                 <div class="form-group">
                     <label for="descripcionProblema">
@@ -438,10 +353,6 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                     <div class="char-counter"><span id="charCount">0</span> / 500 caracteres</div>
                     <span class="error-message">La descripción es obligatoria</span>
                 </div>
-                <button type="button" class="btn-close-modal" id="btnCerrarModal" aria-label="Cerrar">
-                    <i class="bi bi-x"></i>
-                </button>
-            </div>
 
                 <div class="form-actions">
                     <button type="button" class="btn-cancelar" id="btnCancelar">
@@ -452,104 +363,10 @@ $img_src   = BASE_URL . '/public/uploads/usuarios/' . $usuario['img_perfil'];
                     </button>
                 </div>
 
-                <form id="formularioSoporte" class="soporte-form">
-                    <input type="hidden" name="id_usuario" value="<?= $usuario['id_usuario'] ?>">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nombreSoporte" class="form-label">
-                                <i class="bi bi-person"></i>
-                                Nombre Completo
-                                <span class="required">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                disabled
-                                class="form-input"
-                                id="nombreSoporte"
-                                placeholder="Tu nombre completo"
-                                value="<?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?>"
-                                required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="emailSoporte" class="form-label">
-                                <i class="bi bi-envelope"></i>
-                                Correo Electrónico
-                                <span class="required">*</span>
-                            </label>
-                            <input
-                                type="email"
-                                disabled
-                                class="form-input"
-                                id="emailSoporte"
-                                placeholder="correo@ejemplo.com"
-                                value="<?= htmlspecialchars($usuario['email']) ?>"
-                                required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="telefonoSoporte" class="form-label">
-                            Asunto
-                            <span class="required">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            class="form-input"
-                            id="asunto"
-                            placeholder="Asunto del problema"
-                            name="asunto"
-                            required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="tipoProblema" class="form-label">
-                            <i class="bi bi-tags"></i>
-                            Categoría del Problema
-                            <span class="required">*</span>
-                        </label>
-                        <select class="form-select" id="tipoProblema" name="categoria" required>
-                            <option value="">Selecciona una categoría</option>
-                            <option value="tecnico">🔧 Problema Técnico</option>
-                            <option value="cuenta">👤 Gestión de Cuenta</option>
-                            <option value="facturacion">💳 Facturación y Pagos</option>
-                            <option value="funcionalidad">⚡ Funcionalidades</option>
-                            <option value="otro">📋 Otro</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="descripcionProblema" class="form-label">
-                            <i class="bi bi-chat-left-text"></i>
-                            Descripción Detallada
-                            <span class="required">*</span>
-                        </label>
-                        <textarea
-                            class="form-textarea"
-                            id="descripcionProblema"
-                            rows="5"
-                            placeholder="Describe tu problema con el mayor detalle posible…"
-                            name="descripcion"
-                            required></textarea>
-                        <span class="form-hint">Mínimo 20 caracteres</span>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" id="btnCancelar">
-                            <i class="bi bi-x-circle"></i>
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-primary" id="btnEnviarSoporte">
-                            <i class="bi bi-send-fill"></i>
-                            Enviar Solicitud
-                        </button>
-                    </div>
-                </form>
-            </div>
-
+            </form>
         </div>
     </div>
 </div>
 
-
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/panelSuperiorRepresentante.js"></script>
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/panelSuperiorAdmin.js"></script>

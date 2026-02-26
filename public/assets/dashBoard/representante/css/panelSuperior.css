@@ -613,13 +613,8 @@
     animation: fadeIn 0.25s ease;
 }
 
-.panel-footer {
-    border-top: 1px solid var(--border);
-}
-
-.btn-link {
+.modal-soporte.active {
     display: flex;
-    align-items: center;
     justify-content: center;
     align-items: flex-start;
 }
@@ -798,15 +793,9 @@ textarea.form-control { resize: vertical; min-height: 90px; }
 
 .btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-/* ── ANIMACIONES ──────────────────────────── */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+/* ── UTILIDAD ─────────────────────────────── */
+.is-hidden { display: none !important; }
 
-@keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-}
-
-/* ── ACCESIBILIDAD ────────────────────────── */
 .sr-only {
     position: absolute;
     width: 1px; height: 1px;
@@ -817,6 +806,17 @@ textarea.form-control { resize: vertical; min-height: 90px; }
     border-width: 0;
 }
 
+/* ── ANIMACIONES ──────────────────────────── */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
 /* ── RESPONSIVE ───────────────────────────── */
 @media (max-width: 992px) {
     .navbar-centro { max-width: 360px; }
@@ -824,21 +824,20 @@ textarea.form-control { resize: vertical; min-height: 90px; }
 }
 
 @media (max-width: 768px) {
-    .navbar-superior { padding: 0 14px; height: 60px; }
-    .navbar-centro, .info-usuario, .breadcrumb-nav { display: none; }
-
-    .btn-navbar     { width: 36px; height: 36px; font-size: 15px; }
-    .btn-perfil     { padding: 4px; border: none; }
-    .avatar-usuario { width: 32px; height: 32px; }
-    .flecha-perfil  { display: none; }
-
+    .navbar-superior    { padding: 0 14px; height: 60px; }
+    .navbar-centro,
+    .info-usuario,
+    .breadcrumb-nav     { display: none; }
+    .btn-navbar         { width: 36px; height: 36px; font-size: 15px; }
+    .btn-perfil         { padding: 4px; border: none; }
+    .avatar-usuario     { width: 32px; height: 32px; }
+    .flecha-perfil      { display: none; }
     .dropdown-menu              { right: -8px; min-width: 260px; max-width: calc(100vw - 20px); }
     .dropdown-notificaciones    { width: calc(100vw - 20px); }
-
-    .form-row       { grid-template-columns: 1fr; }
-    .modal-soporte  { padding: 16px 12px; }
-    .modal-body     { padding: 18px 16px; }
-    .form-actions   { flex-direction: column; }
+    .form-row           { grid-template-columns: 1fr; }
+    .modal-soporte      { padding: 16px 12px; }
+    .modal-body         { padding: 18px 16px; }
+    .form-actions       { flex-direction: column; }
 }
 
 @media (max-width: 480px) {
