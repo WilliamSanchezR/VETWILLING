@@ -3,7 +3,7 @@
     min-height: 100vh;
     transition: margin-left 0.3s ease;
     background: var(--color-fondo);
-    margin-top: 70px;
+    /* margin-top: 70px; */
 }
 
 .sidebar.collapsed~.contenido-principal {

@@ -269,6 +269,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                         </a>
                     </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
                     
           
 =======
@@ -284,6 +285,10 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             </div>
                         </a>
 >>>>>>> f52acdee8657354c2074de59b0a9437e34cfb67b
+=======
+                    
+          
+>>>>>>> 12e6f487d99fc3c2f956db41b148da21f9af3ee3
 
                         <div class="panel-divider"></div>
 

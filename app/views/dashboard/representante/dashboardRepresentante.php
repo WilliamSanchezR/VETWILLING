@@ -55,7 +55,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
             <!-- HEADER ADMIN -->
             <div class="header-admin">
                 <div class="header-info">
-                    <h1>👋 Bienvenido, Administrador <?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h1>
+                    <h1>👋 Bienvenido, Administrador <?= htmlspecialchars($usuarios['nombres']) ?> <?= $usuario['apellidos'] ?></h1>
                     <p>Panel de control principal - Gestiona todo el sistema VetWilling</p>
                 </div>
                 <div class="header-acciones">
