@@ -225,6 +225,148 @@ class Veterinario
         }
     }
 
+    public function obtenerDetallePacientePorVeterinario($id_usuario, $id_paciente)
+    {
+        try {
+            $sql = "SELECT
+                        p.id_paciente,
+                        p.nombre,
+                        p.especie,
+                        p.raza,
+                        p.edad_numero,
+                        p.edad_unidad,
+                        p.sexo,
+                        p.img_mascota,
+                        p.id_propietario,
+                        CONCAT(pr.nombres, ' ', pr.apellidos) AS propietario_nombre,
+                        pr.telefono AS propietario_telefono,
+                        u.email AS propietario_email
+                    FROM paciente p
+                    INNER JOIN paciente_profesional_asignacion ppa ON ppa.id_paciente = p.id_paciente
+                    INNER JOIN propietario pr ON pr.id_propietario = p.id_propietario
+                    LEFT JOIN usuario u ON u.id_usuario = pr.id_usuario
+                    WHERE p.id_paciente = :id_paciente
+                      AND ppa.id_usuario_profesional = :id_usuario
+                      AND ppa.estado = 'Activo'
+                      AND ppa.fecha_fin IS NULL
+                    ORDER BY ppa.id_asignacion DESC
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $paciente ?: null;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::obtenerDetallePacientePorVeterinario - " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function obtenerHistorialPacientePorVeterinario($id_usuario, $id_paciente, $limite = 10)
+    {
+        try {
+            $limite = max(1, (int) $limite);
+
+            $sql = "SELECT
+                        a.id_agendamiento,
+                        a.fecha_hora,
+                        a.fecha_hora_fin,
+                        a.tipo,
+                        a.estado,
+                        a.observaciones,
+                        s.nombre AS servicio,
+                        ss.nombre AS subservicio
+                    FROM agendamiento a
+                    LEFT JOIN servicio s ON s.id_servicio = a.id_servicio
+                    LEFT JOIN subservicio ss ON ss.id_subservicio = a.id_subservicio
+                    WHERE a.id_usuario = :id_usuario
+                      AND a.id_paciente = :id_paciente
+                    ORDER BY a.fecha_hora DESC, a.id_agendamiento DESC
+                    LIMIT $limite";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::obtenerHistorialPacientePorVeterinario - " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function actualizarDatosPacientePorVeterinario($id_usuario, array $data)
+    {
+        try {
+            $sqlValida = "SELECT COUNT(*)
+                          FROM paciente_profesional_asignacion
+                          WHERE id_paciente = :id_paciente
+                            AND id_usuario_profesional = :id_usuario
+                            AND estado = 'Activo'
+                            AND fecha_fin IS NULL";
+
+            $stmtValida = $this->conexion->prepare($sqlValida);
+            $stmtValida->bindParam(':id_paciente', $data['id_paciente'], PDO::PARAM_INT);
+            $stmtValida->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtValida->execute();
+
+            if ((int) $stmtValida->fetchColumn() === 0) {
+                return false;
+            }
+
+            $sql = "UPDATE paciente
+                    SET nombre = :nombre,
+                        especie = :especie,
+                        raza = :raza,
+                        edad_numero = :edad_numero,
+                        edad_unidad = :edad_unidad,
+                        sexo = :sexo
+                    WHERE id_paciente = :id_paciente";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':nombre', $data['nombre'], PDO::PARAM_STR);
+            $stmt->bindParam(':especie', $data['especie'], PDO::PARAM_STR);
+            $stmt->bindParam(':raza', $data['raza'], PDO::PARAM_STR);
+            $stmt->bindParam(':edad_numero', $data['edad_numero'], PDO::PARAM_INT);
+            $stmt->bindParam(':edad_unidad', $data['edad_unidad'], PDO::PARAM_STR);
+            $stmt->bindParam(':sexo', $data['sexo'], PDO::PARAM_STR);
+            $stmt->bindParam(':id_paciente', $data['id_paciente'], PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::actualizarDatosPacientePorVeterinario - " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function desactivarPacientePorVeterinario($id_usuario, $id_paciente)
+    {
+        try {
+            $sql = "UPDATE paciente_profesional_asignacion
+                    SET estado = 'Inactivo',
+                        fecha_fin = COALESCE(fecha_fin, CURRENT_TIMESTAMP),
+                        motivo_cambio = 'Desactivado desde dashboard veterinario'
+                    WHERE id_paciente = :id_paciente
+                      AND id_usuario_profesional = :id_usuario
+                      AND estado = 'Activo'
+                      AND fecha_fin IS NULL";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::desactivarPacientePorVeterinario - " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function registrar($data)
     {
         try {
