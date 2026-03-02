@@ -101,8 +101,8 @@ switch ($request) {
     case '/veterinario/eliminar-disponibilidad-agenda':
         require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
         break;
-    case '/veterinario/suscripcion':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/suscripcion.php';
+    case '/representante/suscripcion':
+        require BASE_PATH . '/app/views/dashboard/representante/suscripcion.php';
         break;
 
     // RUTAS DEL CONTROLADOR DE CALENDARIO
@@ -197,6 +197,10 @@ switch ($request) {
 
     case '/veterinario/pacientes-asignacion':
         require BASE_PATH . '/app/controllers/pacienteProfesionalAsignacionController.php';
+        break;
+
+    case '/veterinaria/pacientes/acciones':
+        require BASE_PATH . '/app/controllers/pacientesVeterinarioController.php';
         break;
 
     case '/veterinario/guardar-veterinario':
@@ -315,6 +319,10 @@ switch ($request) {
 
     case '/admin/pdf-veterinarias':
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
+        break;
+
+    case '/admin/lista-profesionales':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
     // ---------------------------------------PROPIETARIO-------------------------------------//

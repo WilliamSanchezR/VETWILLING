@@ -694,6 +694,91 @@ body.dark-mode .tabla-pacientes tbody tr:hover {
     width: 100% !important;
 }
 
+#tablaPacientesDashboard th:last-child {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+#tablaPacientesDashboard td.content-action {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+
+#tablaPacientesDashboard .btn-accion {
+    margin: 0 2px;
+    padding: 6px 8px;
+}
+
+#tablaPacientesDashboard .btn-editar,
+#tablaPacientesDashboard .btn-editar a {
+    color: var(--color-primario) !important;
+}
+
+#tablaPacientesDashboard .btn-editar:hover,
+#tablaPacientesDashboard .btn-editar a:hover {
+    background-color: rgba(10, 147, 44, 0.12);
+    transform: scale(1.1);
+}
+
+#tablaPacientesDashboard .btn-ver-detalle,
+#tablaPacientesDashboard .btn-ver-detalle a {
+    color: var(--color-info);
+}
+
+#tablaPacientesDashboard .btn-ver-detalle:hover,
+#tablaPacientesDashboard .btn-ver-detalle a:hover {
+    background-color: rgba(23, 162, 184, 0.12);
+    transform: scale(1.1);
+}
+
+#tablaPacientesDashboard_wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+#tablaPacientesDashboard_wrapper .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#tablaPacientesDashboard_wrapper .col-sm-12,
+#tablaPacientesDashboard_wrapper .col-md-5,
+#tablaPacientesDashboard_wrapper .col-md-7 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+@media (max-width: 768px) {
+    #tablaPacientesDashboard td.content-action {
+        width: 1%;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+
+    #tablaPacientesDashboard .btn-accion {
+        margin: 0 1px;
+    }
+
+    #tablaPacientesDashboard_wrapper .dataTables_info,
+    #tablaPacientesDashboard_wrapper .dataTables_paginate {
+        text-align: center;
+        float: none;
+        width: 100%;
+    }
+
+    #tablaPacientesDashboard_wrapper .dataTables_paginate {
+        margin-top: 10px;
+    }
+}
+
 .carrusel-citas {
     background: var(--bs-body-bg);
     border-radius: 10px;

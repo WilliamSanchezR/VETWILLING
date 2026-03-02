@@ -31,7 +31,8 @@ class Ticket
             FROM tickets tic
             INNER JOIN usuario ON tic.usuario_id = usuario.id_usuario
             INNER JOIN profesional pr ON usuario.id_usuario = pr.id_usuario
-            )";
+            )
+            ORDER by id DESC";
 
             // Preparar y ejecutar la consulta
             $stmt = $this->conexion->prepare($sql);
@@ -50,7 +51,7 @@ class Ticket
     public function obtenerTicketPorId($id)
     {
         try {
-            $sql = "SELECT  tk.id, tk.titulo, tk.fecha_creacion, tk.categoria, tk.prioridad, tk.estado, pr.nombres as nombre_asignado, pr.apellidos as apellido_asignado, tk.descripcion, tk.usuario_id as id_usuario
+            $sql = "SELECT  tk.id, tk.titulo, tk.fecha_creacion, tk.categoria, tk.prioridad, tk.estado, pr.id_usuario as id_asignado, pr.nombres as nombre_asignado, pr.apellidos as apellido_asignado, tk.descripcion, tk.usuario_id as id_usuario
             FROM tickets TK
             LEFT JOIN usuario us ON tk.asignado_a = us.id_usuario
             LEFT JOIN administrador pr ON pr.id_usuario = us.id_usuario

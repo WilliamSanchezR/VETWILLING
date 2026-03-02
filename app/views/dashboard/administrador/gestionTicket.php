@@ -138,114 +138,27 @@ $usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
                     </div>
                 </div>
             </div>
-            <!-- <form id="vetForm" action="<?= BASE_URL ?>/admin/actualizar-ticket" method="POST">
 
-                <input type="hidden" name="accion" value="actualizar">
-                <div class="step active">
-                    <h3><i class="bi bi-motherboard"></i>Datos del ticket</h3>
-
-                    <div class="row">
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-card-text"></i> Titulo*</label>
-                                <input type="text" id="titulo" name="titulo" required placeholder="Ej: Problema con la cuenta" value="<?= $ticketData['titulo'] ?>">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label><i class="bi bi-hash"></i> Descripción *</label>
-                            <input type="text" id="descripcion" name="descripcion" required placeholder="Descripción del problema" value="<?= $ticketData['descripcion'] ?>">
-                        </div>
-                    </div>
-
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label><i class="bi bi-person"></i> Categoria*</label>
-                            <input type="text" id="categoria" name="categoria" required placeholder="Ej: Soporte Técnico" value="<?= $ticketData['categoria'] ?>">
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label><i class="bi bi-person"></i> Prioridad *</label>
-                            <input type="text" id="prioridad" name="prioridad" required placeholder="Ej: Alta" value="<?= $ticketData['prioridad'] ?>">
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="row">
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label><i class="bi bi-envelope"></i> Estado *</label>
-                            <input type="text" id="estado" name="estado" required placeholder="Estado del ticket" value="<?= $ticketData['estado'] ?>">
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="row">
-
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label><i class="bi bi-person-rolodex"></i> Rol *</label>
-                            <select id="rol" name="rol" required disabled>
-                                <option value="" disabled selected>Seleccione un rol</option>
-                                <?php if (!empty($datosRol)) : ?>
-                                    <?php foreach ($datosRol as $rol):  ?>
-                                        <option value="<?= $rol['id_rol'] ?>" <?= $rol['id_rol'] == $usuarioData['id_rol'] ? 'selected' : '' ?>><?= $rol['nombre'] ?></option>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label><i class="bi bi-card-text"></i> Estado *</label>
-                            <select id="estado" name="estado" required>
-                                <option value="<?= $ticketData['estado'] ?>"><?= $ticketData['estado'] ?></option>
-                                <option value="Activo">Abierto</option>
-                                <option value="Inactivo">En proceso</option>
-                                <option value="Bloqueado">En espera</option>
-                                <option value="Cerrado">Cerrado</option>
-
-                            </select>
-                        </div>
-                    </div>
-
-                    <?php if ($ticketData['id_rol'] !== 1 && $usuarioData['id_rol'] !== '1') : ?>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label><i class="bi bi-envelope"></i> Ticket </label>
-                                <select id="ticket" name="ticket" required>
-                                    <option value="" disabled selected>Seleccione una veterinaria</option>
-                                    <?php if (!empty($datosVeterinaria)) : ?>
-                                        <?php foreach ($datosVeterinaria as $veterinaria):  ?>
-                                            <option value="<?= $veterinaria['id_veterinaria'] ?>" <?= $veterinaria['id_veterinaria'] == $usuarioData['id_veterinaria'] ? 'selected' : '' ?>><?= $veterinaria['nombre'] ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-
-                            </div>
+            <div>
+                <div>
+                    <!-- si el ticket no tiene asignado muestre el combo de asignación -->
+                    <?php if ($ticketData['id_asignado'] === null) : ?>
+                        <div class="asignar-ticket">
+                            <h2>Asignar Ticket</h2>
+                            <form id="asignarTicketForm">
+                                <input type="hidden" name="id_ticket" value="<?= $ticketData['id'] ?>">
+                                <div class="mb-3">
+                                    <label for="usuario_asignado" class="form-label">Seleccionar Usuario a asignar:</label>
+                                    <select class="form-select" id="usuario_asignado" name="usuario_asignado" required>
+                                        <option value="" disabled selected>Seleccione un usuario</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary mt-3">Asignar</button>
+                                </div>
+                            </form>
                         </div>
                     <?php endif; ?>
-
                 </div>
-
-                <div class="buttons">
-                    <span></span>
-                    <button type="submit" class="btn btn-success" id="btnGuardarVeterinaria">
-                        Guardar <i class="bi bi-floppy"></i>
-                    </button>
-                </div>
-        </div>
-        </form> -->
+            </div>
         </div>
     </div>
 
@@ -262,5 +175,6 @@ $usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
 
 <!-- Propio -->
 <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/gestionTicket.js"></script>
 
 </html>

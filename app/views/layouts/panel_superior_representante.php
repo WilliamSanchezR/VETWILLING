@@ -2,6 +2,7 @@
 
 // Enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 
 // asignamos el valo id del registro segun la tabla
 $id = $_SESSION['user']['id_usuario'];
@@ -9,231 +10,450 @@ $id = $_SESSION['user']['id_usuario'];
 // Llamamos la funcion especifica que existe en dicho controlador y le pasamos los datos a una variable que podamos manipular en este archivo
 
 $usuario = mostrarPerfil($id);
+$veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 
-// $path = $_SERVER['REQUEST_URI'];
-// // Si quieres la parte del directorio
-// $path_parts = explode('/', $path);
-// $path_parts = array_filter($path_parts); // Elimina elementos vacíos
-// $final_path = end($path_parts);
+// Suscripción: Free | Basic | Pro | Enterprise
+$suscripcion     = $usuario['suscripcion'] ?? 'pro';
+$sub_slug        = strtolower($suscripcion);
 
+$sub_icons = [
+    'Essential'       => 'bi-gift',
+    'basic'      => 'bi-lightning-charge-fill',
+    'Pro'        => 'bi-stars',
+    'MasterVet' => 'bi-gem',
+];
+$sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 ?>
 
-
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
-<div class="barra-navegacion-superior">
-    <div class="navegacion-izquierda">
-        <div class="d-flex align-items-center gap-2">
-            <span class="fw-semibold"></span>
-        </div>
-    </div>
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║         NAVBAR SUPERIOR — VetWilling            ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
 
-    <div class="navbar-centro">
-        <div class="buscador-avanzado">
-            <i class="bi bi-search icono-buscar"></i>
-            <input
-                type="text"
-                placeholder="Buscar ..."
-                class="input-buscar"
-                id="inputBusqueda">
-        </div>
-    </div>
+<nav class="navbar-superior" id="navbarSuperior">
+    <div class="navbar-container">
 
-    <!-- Sección Derecha - Acciones -->
-    <div class="navbar-derecha">
-        <!-- Notificaciones -->
-        <button class="btn-navbar notificaciones" onclick="toggleDropdown('notificaciones')" aria-label="Notificaciones">
-            <i class="bi bi-bell-fill"></i>
-            <span class="badge-notif">3</span>
-        </button>
+        <!-- ─── IZQUIERDA ────────────────────────────────── -->
+        <div class="navbar-left">
 
-        <!-- Dropdown Notificaciones -->
-        <div class="dropdown-menu dropdown-notificaciones" id="dropdownNotificaciones">
-            <div class="dropdown-header">
-                <h6>Notificaciones</h6>
-                <button class="btn-marcar-leidas">Marcar todas como leídas</button>
-            </div>
-            <div class="dropdown-body">
-                <a href="#" class="notificacion-item no-leida">
-                    <div class="notif-icono notif-azul">
-                        <i class="bi bi-bell-fill"></i>
-                    </div>
-                    <div class="notif-contenido">
-                        <p class="notif-texto"></p>
-                        <span class="notif-tiempo">Nuevo ticket</span>
-                    </div>
-                </a>
-                <a href="#" class="notificacion-item">
-                    <div class="notif-icono notif-verde">
-                        <i class="bi bi-check-circle-fill"></i>
-                    </div>
-                    <div class="notif-contenido">
-                        <p class="notif-texto">Se ha registrado un usuario</p>
-                        <span class="notif-tiempo">Hace 1 hora</span>
-                    </div>
-                </a>
-                <a href="#" class="notificacion-item">
-                    <div class="notif-icono notif-naranja">
-                        <i class="bi bi-chat-dots-fill"></i>
-                    </div>
-                    <div class="notif-contenido">
-                        <p class="notif-texto">Se ha generado un nuevo ticket</p>
-                        <span class="notif-tiempo">Hace 3 horas</span>
-                    </div>
-                </a>
-                <a href="#" class="notificacion-item">
-                    <div class="notif-icono notif-rojo">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                    </div>
-                    <div class="notif-contenido">
-                        <p class="notif-texto">Se ha bloqueado una veterinaria</p>
-                        <span class="notif-tiempo">Hace 5 horas</span>
-                    </div>
-                </a>
-            </div>
-            <div class="dropdown-footer">
-                <a href="#" class="btn-ver-todas">Ver todas las notificaciones</a>
-            </div>
-        </div>
+            <!-- Logo veterinaria -->
+            <?php if (!empty($veterinaria['foto'])): ?>
+                <div class="vet-logo-wrap">
+                    <img
+                        src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['foto'] ?>"
+                        alt="<?= htmlspecialchars($veterinaria['nombre']) ?>"
+                        class="vet-logo"
+                        title="<?= htmlspecialchars($veterinaria['nombre']) ?>">
+                </div>
+            <?php endif; ?>
 
-        <!-- Modo Oscuro -->
-        <button class="btn-navbar" onclick="toggleTheme()" aria-label="Cambiar tema">
-            <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-        </button>
+            <!-- Botón menú móvil -->
+            <button class="btn-menu-mobile" onclick="abrirSidebarMovil()" aria-label="Abrir menú">
+                <i class="bi bi-list"></i>
+            </button>
 
-        <!-- Separador -->
-        <div class="navbar-separador"></div>
-
-        <!-- Perfil Usuario -->
-        <button class="btn-perfil" onclick="toggleDropdown('perfil')" aria-label="Perfil">
-            <div class="avatar-usuario">
-                <span> <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
-                </span>
-            </div>
-            <div class="info-usuario">
-                <span class="nombre-usuario"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></span>
-                <span class="rol-usuario"><?= $usuario['rol'] ?></span>
-            </div>
-            <i class="bi bi-chevron-down flecha-perfil"></i>
-        </button>
-
-        <!-- Dropdown Perfil -->
-        <div class="dropdown-menu dropdown-perfil" id="dropdownPerfil">
-            <div class="perfil-header">
-                <div class="avatar-usuario grande">
-                    <span> <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+            <!-- Saludo + reloj -->
+            <div class="greeting-section">
+                <span class="greeting-icon" id="saludoEmoji">👋</span>
+                <div class="greeting-text">
+                    <span class="greeting-label" id="saludoTexto">Bienvenido</span>
+                    <span class="greeting-time">
+                        <i class="bi bi-clock"></i>
+                        <span id="horaActual">00:00:00</span>
                     </span>
                 </div>
-                <div>
-                    <p class="nombre-completo"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></p>
-                    <p class="email-usuario"><?= $usuario['email'] ?></p>
-                </div>
             </div>
-            <div class="dropdown-divider"></div>
-            <a href="<?= BASE_URL ?>/representante/perfil-representante" class="dropdown-item">
-                <i class="bi bi-person-fill"></i>
-                <span>Mi Perfil</span>
-            </a>
-            <a href="#" class="dropdown-item" id="btnAbrirSoporte">
-                <i class="bi bi-question-circle"></i>
-                <span>Soporte</span>
-            </a>
 
+            <div class="nav-sep"></div>
 
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active">
+                        <span id="paginaActual">Dashboard</span>
+                    </li>
+                </ol>
+            </nav>
 
-            <div class="dropdown-divider"></div>
-            <a href="<?= BASE_URL ?>/logout" class="dropdown-item text-danger">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Cerrar Sesión</span>
-            </a>
         </div>
-    </div>
+        <!-- ─── FIN IZQUIERDA ─────────────────────────────── -->
 
-</div>
 
-<!-- Modal de Soporte -->
-<div id="modalSoporte" class="modal-soporte">
-    <div class="modal-contenido">
-        <div class="modal-header">
-            <div class="modal-icon">
-                <i class="bi bi-headset"></i>
-            </div>
-            <h2>Centro de Soporte</h2>
-            <button class="btn-cerrar" id="btnCerrarModal">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-
-        <div class="modal-body">
-            <p class="modal-descripcion">¿Tienes algún problema o sugerencia? Completa el formulario y te responderemos pronto.</p>
-
-            <form id="formularioSoporte">
-                <div class="form-group">
-                    <label for="nombreSoporte">
-                        <i class="bi bi-person"></i> Nombre Completo
-                    </label>
+        <!-- ─── CENTRO — Buscador ────────────────────────── -->
+        <div class="navbar-center">
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <i class="bi bi-search search-icon"></i>
                     <input
                         type="text"
-                        class="form-control"
-                        id="nombreSoporte"
-                        name="nombre"
-                        placeholder="Tu nombre"
-                        required>
-                </div>
-
-                <div class="form-group">
-                    <label for="emailSoporte">
-                        <i class="bi bi-envelope"></i> Correo Electrónico
-                    </label>
-                    <input
-                        type="email"
-                        class="form-control"
-                        id="emailSoporte"
-                        name="email"
-                        placeholder="ejemplo@correo.com"
-                        required>
-                </div>
-
-                <div class="form-group">
-                    <label for="tipoProblema">
-                        <i class="bi bi-tag"></i> Tipo de Consulta
-                    </label>
-                    <select class="form-control" id="tipoProblema" name="tipo_problema" required>
-                        <option value="" disabled selected>Selecciona una opción</option>
-                        <option value="tecnico">🔧 Problema Técnico</option>
-                        <option value="cuenta">👤 Problema con la Cuenta</option>
-                        <option value="funcionalidad">⚙️ Funcionalidad</option>
-                        <option value="sugerencia">💡 Sugerencia</option>
-                        <option value="otro">📋 Otro</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="descripcionProblema">
-                        <i class="bi bi-chat-left-text"></i> Descripción
-                    </label>
-                    <textarea
-                        class="form-control"
-                        id="descripcionProblema"
-                        name="descripcion"
-                        rows="5"
-                        placeholder="Describe tu problema o sugerencia detalladamente..."
-                        required></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn-cancelar" id="btnCancelar">
-                        Cancelar
+                        id="searchInput"
+                        class="search-input"
+                        placeholder="Buscar pacientes, citas, historiales…"
+                        autocomplete="off"
+                        aria-label="Buscar">
+                    <button class="btn-clear is-hidden" id="btnClearSearch" aria-label="Limpiar">
+                        <i class="bi bi-x"></i>
                     </button>
-                    <button type="submit" class="btn-enviar">
-                        <i class="bi bi-send-fill"></i>
-                        Enviar Mensaje
-                    </button>
+                    <kbd class="search-shortcut">Ctrl K</kbd>
                 </div>
-            </form>
+
+                <!-- Panel de resultados -->
+                <div class="search-results-panel is-hidden" id="searchResults">
+                    <div class="search-results-header">
+                        <span class="results-title">Resultados</span>
+                        <span class="results-count" id="resultsCount">0 resultados</span>
+                    </div>
+                    <div class="search-results-body" id="searchItems"></div>
+                    <div class="search-results-footer">
+                        <span class="search-tip">
+                            <i class="bi bi-lightbulb"></i>
+                            Usa <kbd>↑</kbd> <kbd>↓</kbd> para navegar
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ─── FIN CENTRO ────────────────────────────────── -->
+
+
+        <!-- ─── DERECHA — Acciones ───────────────────────── -->
+        <div class="navbar-right">
+
+            <!-- Tema oscuro/claro -->
+            <button class="btn-icon" onclick="toggleTheme()" aria-label="Cambiar tema">
+                <i class="bi bi-moon-stars" id="themeIcon"></i>
+            </button>
+
+            <!-- Notificaciones -->
+            <div class="navbar-action notifications-wrapper">
+                <button class="btn-icon" onclick="toggleNotificaciones()" aria-label="Notificaciones">
+                    <i class="bi bi-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">3</span>
+                </button>
+
+                <div class="dropdown-panel notifications-panel is-hidden" id="notificationsPanel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div>
+                                <i class="bi bi-bell-fill"></i>
+                                <h3>Notificaciones</h3>
+                            </div>
+                            <button class="btn-text-sm" onclick="marcarTodasLeidas()">
+                                Marcar todas leídas
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="notifications-list">
+
+                            <div class="notification-item unread">
+                                <div class="notification-indicator success"></div>
+                                <div class="notification-icon success">
+                                    <i class="bi bi-calendar-check-fill"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-header">
+                                        <h4>Nueva cita agendada</h4>
+                                        <span class="notification-time">Hace 5 min</span>
+                                    </div>
+                                    <p>Max — Consulta general mañana 10:00 AM</p>
+                                </div>
+                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+
+                            <div class="notification-item">
+                                <div class="notification-indicator warning"></div>
+                                <div class="notification-icon warning">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-header">
+                                        <h4>Recordatorio de vacuna</h4>
+                                        <span class="notification-time">Hace 1 h</span>
+                                    </div>
+                                    <p>Luna — Antirrábica con vencimiento próximo</p>
+                                </div>
+                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+
+                            <div class="notification-item">
+                                <div class="notification-indicator info"></div>
+                                <div class="notification-icon info">
+                                    <i class="bi bi-file-medical-fill"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-header">
+                                        <h4>Resultados disponibles</h4>
+                                        <span class="notification-time">Hace 2 h</span>
+                                    </div>
+                                    <p>Rocky — Análisis de sangre listo para revisar</p>
+                                </div>
+                                <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="panel-footer">
+                        <a href="#" class="btn-link">
+                            Ver todas las notificaciones
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-sep-v"></div>
+
+            <!-- Perfil -->
+            <div class="navbar-action user-profile-wrapper">
+                <button class="btn-profile" onclick="togglePerfilMenu()" aria-label="Menú de usuario">
+
+                    <!-- Avatar -->
+                    <div class="profile-avatar">
+                        <img
+                            src="<?= BASE_URL ?>/public/uploads/<?= $usuario['id_rol'] == 4 ? 'usuarios' : 'profesionales' ?>/<?= $usuario['img_perfil'] ?>"
+                            alt="<?= htmlspecialchars($usuario['nombres'] . ' ' . $usuario['apellidos']) ?>"
+                            class="avatar-img">
+                        <span class="status-dot online" title="En línea"></span>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="profile-info">
+                        <span class="profile-name">
+                            <?= htmlspecialchars($usuario['nombres']) ?>
+                            <?= htmlspecialchars($usuario['apellidos']) ?>
+                        </span>
+                        <span>
+
+                        </span>
+                        <!-- Badge suscripción en botón -->
+                        <span class="sub-badge sub-<?= $sub_slug ?>">
+                            <i class="bi <?= $sub_icon ?>"></i>
+                            <?= $suscripcion ?>
+                        </span>
+                    </div>
+
+                    <i class="bi bi-chevron-down profile-arrow"></i>
+                </button>
+
+                <!-- ── Dropdown perfil ── -->
+                <div class="dropdown-panel profile-panel is-hidden" id="perfilDropdown">
+
+                    <!-- Cabecera con avatar grande -->
+                    <div class="profile-header">
+                        <div class="profile-avatar-large">
+                            <img
+                                src="<?= BASE_URL ?>/public/uploads/<?= $usuario['id_rol'] == 4 ? 'usuarios' : 'profesionales' ?>/<?= $usuario['img_perfil'] ?>"
+                                alt="<?= htmlspecialchars($usuario['nombres']) ?>">
+                            <span class="status-dot online"></span>
+                        </div>
+                        <div class="profile-details">
+                            <h3><?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?></h3>
+                            <p><?= htmlspecialchars($usuario['email']) ?></p>
+                            <div class="profile-badges-row">
+                                <span class="profile-badge"><?= htmlspecialchars($usuario['rol']) ?></span>
+                                <!-- Badge suscripción en dropdown -->
+                                <span class="sub-plan-chip sub-<?= $sub_slug ?>">
+                                    <i class="bi <?= $sub_icon ?>"></i>
+                                    <?= $suscripcion ?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-divider"></div>
+
+                    <div class="panel-body">
+                        <a href="<?= BASE_URL ?>/representante/perfil-representante" class="dropdown-item">
+                            <div class="item-icon">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="item-content">
+                                <span class="item-title">Mi Perfil</span>
+                                <span class="item-subtitle">Ver y editar información personal</span>
+                            </div>
+                        </a>
+
+                        <a href="#" class="dropdown-item" id="btnAbrirSoporte">
+                            <div class="item-icon">
+                                <i class="bi bi-headset"></i>
+                            </div>
+                            <div class="item-content">
+                                <span class="item-title">Centro de Soporte</span>
+                                <span class="item-subtitle">Ayuda y asistencia técnica</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="panel-body">
+                        <a href="<?= BASE_URL ?>/veterinario/suscripcion" class="dropdown-item">
+                            <div class="item-icon">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="item-content">
+                                <span class="item-title">Mi Suscripción</span>
+                                <span class="item-subtitle">Ver y cambiar mi suscripción</span>
+                            </div>
+                        </a>
+
+                        <div class="panel-divider"></div>
+
+                        <div class="panel-footer">
+                            <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item logout-item">
+                                <div class="item-icon">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </div>
+                                <span class="item-title">Cerrar Sesión</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- ─── FIN PERFIL ─────────────────────────────── -->
+
+            </div>
+            <!-- ─── FIN DERECHA ───────────────────────────────── -->
+
+        </div>
+</nav>
+
+
+<!-- ╔══════════════════════════════════════════════════╗ -->
+<!-- ║         MODAL DE SOPORTE                        ║ -->
+<!-- ╚══════════════════════════════════════════════════╝ -->
+<div class="modal-overlay" id="modalSoporte">
+    <div class="modal-container">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div class="modal-header-content">
+                    <div class="modal-icon-wrapper">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <div class="modal-title-wrapper">
+                        <h2>Centro de Soporte</h2>
+                        <p>Estamos aquí para ayudarte</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close-modal" id="btnCerrarModal" aria-label="Cerrar">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <p>Completa el formulario y nuestro equipo te responderá en máximo 24 horas.</p>
+                </div>
+
+                <form id="formularioSoporte" class="soporte-form">
+                    <input type="hidden" name="id_usuario" value="<?= $usuario['id_usuario'] ?>">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombreSoporte" class="form-label">
+                                <i class="bi bi-person"></i>
+                                Nombre Completo
+                                <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                disabled
+                                class="form-input"
+                                id="nombreSoporte"
+                                placeholder="Tu nombre completo"
+                                value="<?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?>"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emailSoporte" class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Correo Electrónico
+                                <span class="required">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                disabled
+                                class="form-input"
+                                id="emailSoporte"
+                                placeholder="correo@ejemplo.com"
+                                value="<?= htmlspecialchars($usuario['email']) ?>"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefonoSoporte" class="form-label">
+                            Asunto
+                            <span class="required">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="asunto"
+                            placeholder="Asunto del problema"
+                            name="asunto"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoProblema" class="form-label">
+                            <i class="bi bi-tags"></i>
+                            Categoría del Problema
+                            <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="tipoProblema" name="categoria" required>
+                            <option value="">Selecciona una categoría</option>
+                            <option value="tecnico">🔧 Problema Técnico</option>
+                            <option value="cuenta">👤 Gestión de Cuenta</option>
+                            <option value="facturacion">💳 Facturación y Pagos</option>
+                            <option value="funcionalidad">⚡ Funcionalidades</option>
+                            <option value="otro">📋 Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcionProblema" class="form-label">
+                            <i class="bi bi-chat-left-text"></i>
+                            Descripción Detallada
+                            <span class="required">*</span>
+                        </label>
+                        <textarea
+                            class="form-textarea"
+                            id="descripcionProblema"
+                            rows="5"
+                            placeholder="Describe tu problema con el mayor detalle posible…"
+                            name="descripcion"
+                            required></textarea>
+                        <span class="form-hint">Mínimo 20 caracteres</span>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="btnCancelar">
+                            <i class="bi bi-x-circle"></i>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btnEnviarSoporte">
+                            <i class="bi bi-send-fill"></i>
+                            Enviar Solicitud
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>
 
-<script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/panelSuperiorAdmin.js"></script>
+
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/panelSuperiorRepresentante.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>

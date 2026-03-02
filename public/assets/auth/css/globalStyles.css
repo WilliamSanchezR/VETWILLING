@@ -139,3 +139,245 @@ p{
         margin-top: 12px;
     }
 }
+
+/* ========================================
+   9. TEMA GLOBAL DE MODALES
+======================================== */
+
+:root {
+    --modal-radius: 16px;
+    --modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    --modal-border: #e0e0e0;
+    --modal-title: #00304d;
+}
+
+/* Contenedor base tipo popup-paciente */
+.swal2-popup,
+.swal2-popup.swal2-modal.popup-paciente.swal2-show,
+.popup-paciente,
+.modal .modal-content,
+.modal-overlay .modal-content,
+.modal-overlay .modal-container,
+.modal-soporte .modal-contenido,
+.modal-reloj .modal-reloj-contenido,
+.wompi-modal {
+    border-radius: var(--modal-radius) !important;
+    box-shadow: var(--modal-shadow) !important;
+    background: #ffffff !important;
+}
+
+/* Bootstrap modal (alineado a modal de dashboard veterinario) */
+.modal .modal-dialog {
+    max-width: min(92vw, 700px);
+}
+
+.modal .modal-header {
+    background: #ffffff;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 20px;
+}
+
+.modal .modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--modal-title);
+}
+
+.modal .modal-header .btn-close {
+    opacity: 0.65;
+}
+
+.modal .modal-body {
+    background: #ffffff;
+    padding: 20px;
+}
+
+.modal .modal-footer {
+    border-top: 1px solid #f0f0f0;
+    background: #ffffff;
+    padding: 16px 20px 20px;
+    gap: 12px;
+}
+
+.modal .form-label,
+.modal label {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--modal-title);
+    margin-bottom: 6px;
+}
+
+.modal .form-control,
+.modal .form-select,
+.modal input,
+.modal select,
+.modal textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--modal-border);
+    font-size: 14px;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+.modal .form-control:focus,
+.modal .form-select:focus,
+.modal input:focus,
+.modal select:focus,
+.modal textarea:focus {
+    border-color: #0a932c;
+    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.12);
+}
+
+.modal .btn,
+.swal2-confirm,
+.swal2-cancel,
+.btn-confirmar-paciente,
+.btn-cancelar-paciente {
+    padding: 12px 30px !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+}
+
+.modal .btn-primary,
+.swal2-confirm,
+.btn-confirmar-paciente {
+    background: linear-gradient(135deg, #0a932c 0%, #0a932c 100%) !important;
+    color: #ffffff !important;
+}
+
+.modal .btn-primary:hover,
+.swal2-confirm:hover,
+.btn-confirmar-paciente:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(10, 147, 44, 0.35) !important;
+}
+
+.modal .btn-secondary,
+.swal2-cancel,
+.btn-cancelar-paciente {
+    background: #f0f0f0 !important;
+    color: #666666 !important;
+}
+
+.modal .btn-secondary:hover,
+.swal2-cancel:hover,
+.btn-cancelar-paciente:hover {
+    background: #e0e0e0 !important;
+}
+
+/* SweetAlert2 (mismo look del popup-paciente) */
+.swal2-popup {
+    padding: 24px !important;
+}
+
+.swal2-title,
+.title-paciente {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: var(--modal-title) !important;
+    padding: 20px 20px 10px 20px !important;
+}
+
+.swal2-actions {
+    gap: 12px !important;
+    margin-top: 20px !important;
+}
+
+.swal2-input,
+.swal2-textarea,
+.swal2-select {
+    border-radius: 8px !important;
+    border: 1px solid var(--modal-border) !important;
+    box-shadow: none !important;
+}
+
+.swal2-input:focus,
+.swal2-textarea:focus,
+.swal2-select:focus {
+    border-color: #0a932c !important;
+    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.12) !important;
+}
+
+/* Header de modales personalizados */
+.modal-overlay .modal-header,
+.modal-soporte .modal-header,
+.modal-reloj .modal-header,
+.wompi-header {
+    background: #ffffff;
+    border-bottom: 1px solid #f0f0f0;
+    color: var(--modal-title);
+}
+
+@media (max-width: 575px) {
+    .modal .modal-dialog {
+        margin: 12px;
+        max-width: calc(100% - 24px);
+    }
+
+    .modal .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   10. AJUSTE FINO POR ROL
+======================================== */
+
+/* Cliente */
+body:has(a[href*="/cliente/"]) .modal .modal-dialog {
+    max-width: min(92vw, 660px);
+}
+
+body:has(a[href*="/cliente/"]) .modal .modal-title,
+body:has(a[href*="/cliente/"]) .swal2-title,
+body:has(a[href*="/cliente/"]) .title-paciente {
+    font-size: 22px !important;
+}
+
+body:has(a[href*="/cliente/"]) .modal .modal-body {
+    padding: 18px 20px 14px;
+}
+
+/* Representante */
+body:has(a[href*="/representante/"]) .modal .modal-dialog {
+    max-width: min(92vw, 680px);
+}
+
+body:has(a[href*="/representante/"]) .modal .modal-title,
+body:has(a[href*="/representante/"]) .swal2-title,
+body:has(a[href*="/representante/"]) .title-paciente {
+    font-size: 23px !important;
+}
+
+body:has(a[href*="/representante/"]) .modal .modal-body {
+    padding: 20px 22px 16px;
+}
+
+/* Veterinario */
+body:has(a[href*="/veterinaria/"]) .modal .modal-dialog,
+body:has(a[href*="/veterinario/"]) .modal .modal-dialog {
+    max-width: min(92vw, 700px);
+}
+
+body:has(a[href*="/veterinaria/"]) .modal .modal-title,
+body:has(a[href*="/veterinaria/"]) .swal2-title,
+body:has(a[href*="/veterinaria/"]) .title-paciente,
+body:has(a[href*="/veterinario/"]) .modal .modal-title,
+body:has(a[href*="/veterinario/"]) .swal2-title,
+body:has(a[href*="/veterinario/"]) .title-paciente {
+    font-size: 24px !important;
+}
+
+body:has(a[href*="/veterinaria/"]) .modal .modal-body,
+body:has(a[href*="/veterinario/"]) .modal .modal-body {
+    padding: 20px 24px 16px;
+}
