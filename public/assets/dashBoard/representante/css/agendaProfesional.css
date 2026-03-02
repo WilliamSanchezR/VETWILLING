@@ -22,16 +22,9 @@
     --am-shadow-modal:  0 25px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 12e6f487d99fc3c2f956db41b148da21f9af3ee3
-
 /* ============================================================
    PÁGINA — info del profesional y controles
    ============================================================ */
-<<<<<<< HEAD
-=======
 .agenda-table-full {
     width: 100% !important;
 }
@@ -86,9 +79,6 @@
     padding: 16px 28px;
     gap: 10px;
 }
->>>>>>> f52acdee8657354c2074de59b0a9437e34cfb67b
-=======
->>>>>>> 12e6f487d99fc3c2f956db41b148da21f9af3ee3
 
 .contenedor-agenda-profesional {
     display: flex;
