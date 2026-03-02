@@ -34,7 +34,7 @@ $datos = listaSubserviciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
     <!-- Tus CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/styleTableAdmin.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/listaEspecialidad.styles.css">
@@ -157,10 +157,6 @@ $datos = listaSubserviciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
     <!-- 3. DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-
-    <!-- 5. Script de lista de veterinarias -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
     <!-- Modo dia  y noche -->
     <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->

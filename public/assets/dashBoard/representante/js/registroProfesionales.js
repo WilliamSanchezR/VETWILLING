@@ -1,305 +1,340 @@
 class RegistroProfesionales {
-
     constructor() {
+        this.$$ = (s) => document.querySelectorAll(s);
         document.addEventListener('DOMContentLoaded', () => this.init());
     }
 
     init() {
-        console.log('RegistroProfesionales iniciado');
+        console.log('Registro profesionales Init');
         this.cacheDom();
         this.bindEvents();
     }
 
-    // =============================
-    // CACHEO DE ELEMENTOS
-    // =============================
     cacheDom() {
-        this.form = document.getElementById("registroProfesional");
-
+        this.formRegistroProf = document.getElementById("registroProfesional");
         this.btnAgregarEsp = document.getElementById('agregarEspecialidadBtn');
         this.btnAgregarServ = document.getElementById('agregarServicioBtn');
-
         this.listEspecialidades = document.querySelector('.listEspecialidades');
         this.listServicios = document.querySelector('.listServicios');
-
         this.inputEspecialidades = document.getElementById('especialidadesInput');
         this.inputServicios = document.getElementById('serviciosInput');
-
+        this.especialidades = this.$$('.check-especialidades');
+        this.servicios = this.$$('.check-servicios');
         this.containerEspecialidades = document.getElementById('especialidadesContainer');
         this.containerServicios = document.getElementById('serviciosContainer');
     }
 
-    // =============================
-    // EVENTOS
-    // =============================
     bindEvents() {
+        if (this.btnAgregarEsp) {
+            this.btnAgregarEsp.onclick = () => this.toggleEspecialidades();
+        }
 
-        if (this.btnAgregarEsp && this.listEspecialidades) {
-            this.btnAgregarEsp.addEventListener('click', () => {
-                this.listEspecialidades.classList.toggle('vew-list-esp');
+        if (this.btnAgregarServ) {
+            this.btnAgregarServ.onclick = () => this.toggleServicios();
+        }
+
+        if (this.especialidades) {
+            this.especialidades.forEach(e => {
+                e.addEventListener('change', (event) => {
+                    this.asociarEspecialidades(event);
+                });
             });
         }
 
-        if (this.btnAgregarServ && this.listServicios) {
-            this.btnAgregarServ.addEventListener('click', () => {
-                this.listServicios.classList.toggle('vew-list-serv');
+
+        if (this.servicios) {
+            this.servicios.forEach(e => {
+                e.addEventListener('change', (event) => {
+                    this.asociarServicios(event);
+                    // Cargar especialidades según servicios seleccionados
+                    this.cargarEspecialidadesPorServicios();
+                });
             });
         }
 
-        // Click fuera para cerrar
-        document.addEventListener('click', (e) => {
-
-            if (this.listServicios && this.btnAgregarServ) {
-                const insideServ =
-                    this.listServicios.contains(e.target) ||
-                    this.btnAgregarServ.contains(e.target);
-
-                if (!insideServ) {
+        // Vaidar si le doy por fuera del contenedor this.listServicios se cierre
+        if (this.listServicios) {
+            document.addEventListener('click', (event) => {
+                const isClickInside = this.listServicios.contains(event.target) || this.btnAgregarServ.contains(event.target);
+                if (!isClickInside) {
                     this.listServicios.classList.remove('vew-list-serv');
                 }
-            }
-
-            if (this.listEspecialidades && this.btnAgregarEsp) {
-                const insideEsp =
-                    this.listEspecialidades.contains(e.target) ||
-                    this.btnAgregarEsp.contains(e.target);
-
-                if (!insideEsp) {
-                    this.listEspecialidades.classList.remove('vew-list-esp');
-                }
-            }
-        });
-
-        this.delegateCheckboxEvents();
-    }
-
-    // =============================
-    // DELEGACIÓN DE EVENTOS
-    // =============================
-    delegateCheckboxEvents() {
-
-        document.addEventListener('change', (e) => {
-
-            if (e.target.classList.contains('check-servicios')) {
-                this.handleServicioChange(e.target);
-            }
-
-            if (e.target.classList.contains('check-especialidades')) {
-                this.handleEspecialidadChange(e.target);
-            }
-
-        });
-    }
-
-    // =============================
-    // SERVICIOS
-    // =============================
-    handleServicioChange(checkbox) {
-
-        if (!this.inputServicios) return;
-
-        const servicio = {
-            id: checkbox.value,
-            name: checkbox.dataset.name
-        };
-
-        let servicios = this.getJsonValue(this.inputServicios);
-
-        if (checkbox.checked) {
-            servicios.push(servicio);
-        } else {
-            servicios = servicios.filter(s => s.id !== checkbox.value);
+            });
         }
 
-        this.inputServicios.value = JSON.stringify(servicios);
-        this.renderServicios();
-        this.cargarEspecialidadesPorServicios();
+        if (this.listEspecialidades) {
+            document.addEventListener('click', (event) => {
+                const isClickInside = this.listEspecialidades.contains(event.target) || this.btnAgregarEsp.contains(event.target);
+                if (!isClickInside) {
+                    this.listEspecialidades.classList.remove('vew-list-esp');
+                }
+            });
+        }
     }
 
-    renderServicios() {
+    toggleEspecialidades() {
+        this.listEspecialidades.classList.toggle('vew-list-esp');
 
-        if (!this.containerServicios || !this.inputServicios) return;
+        if (this.inputEspecialidades.value.length > 0) {
+            const listEsp = JSON.parse(this.inputEspecialidades.value);
+            if (listEsp && listEsp.length > 0) {
+                this.especialidades.forEach(e => {
+                    const espId = e.value;
+                    const encontrado = listEsp.find(esp => parseInt(esp.id) === parseInt(espId));
+                    if (encontrado) {
+                        e.checked = true;
+                    } else {
+                        e.checked = false;
+                    }
+                });
+            }
+        } else {
+             this.cargarEspecialidadesPorServicios();
+        }
+    }
 
-        const servicios = this.getJsonValue(this.inputServicios);
-        this.containerServicios.innerHTML = '';
+    toggleServicios() {
+        this.listServicios.classList.toggle('vew-list-serv');
 
-        if (servicios.length === 0) {
-            this.containerServicios.style.display = 'none';
+        if (this.inputServicios.value.length > 0) {
+            const listServ = JSON.parse(this.inputServicios.value);
+            if (listServ && listServ.length > 0) {
+                this.servicios.forEach(e => {
+                    const servId = e.value;
+                    const encontrado = listServ.find(serv => parseInt(serv.id) === parseInt(servId));
+                    if (encontrado) {
+                        e.checked = true;
+                    } else {
+                        e.checked = false;
+                    }
+                });
+            }
+        }
+    }
+
+    asociarEspecialidades(element) {
+        const valueEspecialidad = element.target.value;
+        const nameEspecialidad = element.target.dataset.name;
+        const valorEspSeleccionadas = this.inputEspecialidades.value;
+        const objEspe = { id: valueEspecialidad, name: nameEspecialidad };
+
+        if (valorEspSeleccionadas.length === 0) {
+            const arrayEspecialidades = [objEspe];
+            this.inputEspecialidades.value = JSON.stringify(arrayEspecialidades);
+        } else {
+            const listEspDeserializadas = JSON.parse(valorEspSeleccionadas);
+            if (element.target.checked) {
+                listEspDeserializadas.push(objEspe);
+                this.inputEspecialidades.value = JSON.stringify(listEspDeserializadas);
+            } else {
+                const listaFiltrada = listEspDeserializadas.filter(e => e.id !== valueEspecialidad);
+                this.inputEspecialidades.value = JSON.stringify(listaFiltrada);
+            }
+        }
+
+        this.visualizarEspecialidades();
+    }
+
+    asociarServicios(element) {
+        const valueServicio = element.target.value;
+        const nameServicio = element.target.dataset.name;
+        const valorServSeleccionadas = this.inputServicios.value;
+        const objServ = { id: valueServicio, name: nameServicio };
+        if (valorServSeleccionadas.length === 0) {
+            const arrayServicios = [objServ];
+            this.inputServicios.value = JSON.stringify(arrayServicios);
+        } else {
+            const listServDeserializadas = JSON.parse(valorServSeleccionadas);
+            if (element.target.checked) {
+                listServDeserializadas.push(objServ);
+                this.inputServicios.value = JSON.stringify(listServDeserializadas);
+            } else {
+                const listaFiltrada = listServDeserializadas.filter(e => e.id !== valueServicio);
+                this.inputServicios.value = JSON.stringify(listaFiltrada);
+            }
+        }
+
+        this.visualizarServicios();
+    }
+
+    visualizarEspecialidades() {
+        const especialidadesSeleccionadas = this.inputEspecialidades.value;
+        if (especialidadesSeleccionadas.length > 0) {
+            const listaEspecialidades = JSON.parse(especialidadesSeleccionadas);
+            this.containerEspecialidades.innerHTML = '';
+            listaEspecialidades.forEach(e => {
+                const divEsp = document.createElement('div');
+                const titleEsp = document.createElement('span');
+                divEsp.classList.add('especialidad-seleccionada');
+                titleEsp.textContent = e.name;
+                divEsp.appendChild(titleEsp);
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '<i class="bi bi-trash3"></i>';
+                removeBtn.onclick = () => this.eliminarEspecialidad(e.id);
+                divEsp.appendChild(removeBtn);
+
+                this.containerEspecialidades.appendChild(divEsp);
+            });
+            this.containerEspecialidades.style.display = 'flex';
+        } else {
+            return;
+        }
+    }
+
+    visualizarServicios() {
+        const serviciosSeleccionados = this.inputServicios.value;
+        if (serviciosSeleccionados.length > 0) {
+            const listaServicios = JSON.parse(serviciosSeleccionados);
+            this.containerServicios.innerHTML = '';
+            listaServicios.forEach(e => {
+                const divServ = document.createElement('div');
+                const titleServ = document.createElement('span');
+                divServ.classList.add('servicio-seleccionado');
+                titleServ.textContent = e.name;
+                divServ.appendChild(titleServ);
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '<i class="bi bi-trash3"></i>';
+                removeBtn.onclick = () => this.eliminarServicio(e.id);
+                divServ.appendChild(removeBtn);
+                this.containerServicios.appendChild(divServ);
+            });
+            this.containerServicios.style.display = 'flex';
+        } else {
+            return;
+        }
+    }
+
+    eliminarEspecialidad(idEsp) {
+        const especialidadesSeleccionadas = this.inputEspecialidades.value;
+        if (especialidadesSeleccionadas.length > 0) {
+            const listaEspecialidades = JSON.parse(especialidadesSeleccionadas);
+            const listaActualizada = listaEspecialidades.filter(e => e.id !== idEsp);
+            this.inputEspecialidades.value = JSON.stringify(listaActualizada);
+            this.visualizarEspecialidades();
+        }
+    }
+
+    eliminarServicio(idServ) {
+        const serviciosSeleccionados = this.inputServicios.value;
+        if (serviciosSeleccionados.length > 0) {
+            const listaServicios = JSON.parse(serviciosSeleccionados);
+            const listaActualizada = listaServicios.filter(e => e.id !== idServ);
+            this.inputServicios.value = JSON.stringify(listaActualizada);
+            this.visualizarServicios();
+            // Recargar especialidades al eliminar un servicio
+            this.cargarEspecialidadesPorServicios();
+        }
+    }
+
+    // Método para cargar especialidades según servicios seleccionados
+    cargarEspecialidadesPorServicios() {
+        const serviciosSeleccionados = this.inputServicios.value;
+
+        // Si no hay servicios seleccionados, limpiar especialidades
+        if (!serviciosSeleccionados || serviciosSeleccionados.length === 0) {
+            this.actualizarListaEspecialidades([]);
             return;
         }
 
-        servicios.forEach(s => {
-            const div = document.createElement('div');
-            div.className = 'servicio-seleccionado';
+        // Obtener los IDs de servicios seleccionados
+        const listaServicios = JSON.parse(serviciosSeleccionados);
+        const idsServicios = listaServicios.map(s => s.id).join(',');
 
-            div.innerHTML = `
-                <span>${s.name}</span>
-                <button type="button" data-id="${s.id}">
-                    <i class="bi bi-trash3"></i>
-                </button>
-            `;
-
-            div.querySelector('button').addEventListener('click', () => {
-                this.removeServicio(s.id);
+        // Realizar petición AJAX a la API
+        fetch(`/vetwilling/representante/api/especialidades?action=lista&servicio=${idsServicios}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    this.actualizarListaEspecialidades(data.especialidades);
+                } else {
+                    console.error('Error al cargar especialidades:', data);
+                    this.actualizarListaEspecialidades([]);
+                }
+            })
+            .catch(error => {
+                console.error('Error en la petición:', error);
+                this.actualizarListaEspecialidades([]);
             });
-
-            this.containerServicios.appendChild(div);
-        });
-
-        this.containerServicios.style.display = 'grid';
     }
 
-    removeServicio(id) {
+    // Método para actualizar la lista de especialidades en el DOM
+    actualizarListaEspecialidades(especialidades) {
+        const ulEspecialidades = this.listEspecialidades.querySelector('ul');
 
-        let servicios = this.getJsonValue(this.inputServicios);
-        servicios = servicios.filter(s => s.id !== id);
+        if (!ulEspecialidades) return;
 
-        this.inputServicios.value = JSON.stringify(servicios);
-        this.renderServicios();
-        this.cargarEspecialidadesPorServicios();
-    }
+        // Limpiar la lista actual
+        ulEspecialidades.innerHTML = '';
 
-    // =============================
-    // ESPECIALIDADES
-    // =============================
-    handleEspecialidadChange(checkbox) {
-
-        if (!this.inputEspecialidades) return;
-
-        const especialidad = {
-            id: checkbox.value,
-            name: checkbox.dataset.name
-        };
-
-        let especialidades = this.getJsonValue(this.inputEspecialidades);
-
-        if (checkbox.checked) {
-            especialidades.push(especialidad);
-        } else {
-            especialidades = especialidades.filter(e => e.id !== checkbox.value);
-        }
-
-        this.inputEspecialidades.value = JSON.stringify(especialidades);
-        this.renderEspecialidades();
-    }
-
-    renderEspecialidades() {
-
-        if (!this.containerEspecialidades || !this.inputEspecialidades) return;
-
-        const especialidades = this.getJsonValue(this.inputEspecialidades);
-        this.containerEspecialidades.innerHTML = '';
-
+        // Si no hay especialidades, mostrar mensaje
         if (especialidades.length === 0) {
+            ulEspecialidades.innerHTML = '<li style="padding: 10px; text-align: center; color: #999;">Seleccione un servicio para ver las especialidades disponibles</li>';
+            // Limpiar especialidades seleccionadas
+            this.inputEspecialidades.value = '';
+            this.containerEspecialidades.innerHTML = '';
             this.containerEspecialidades.style.display = 'none';
             return;
         }
 
-        especialidades.forEach(e => {
+        // Obtener las especialidades actualmente seleccionadas
+        const especialidadesSeleccionadas = this.inputEspecialidades.value ?
+            JSON.parse(this.inputEspecialidades.value) : [];
 
-            const div = document.createElement('div');
-            div.className = 'especialidad-seleccionada';
+        // Crear los nuevos items de la lista
+        especialidades.forEach(esp => {
+            const li = document.createElement('li');
+            const checkbox = document.createElement('input');
+            checkbox.className = 'form-check-input check-especialidades';
+            checkbox.type = 'checkbox';
+            checkbox.value = esp.id_especialidad;
+            checkbox.id = `idCheck${esp.id_especialidad}`;
+            checkbox.dataset.name = esp.nombre;
 
-            div.innerHTML = `
-                <span>${e.name}</span>
-                <button type="button">
-                    <i class="bi bi-trash3"></i>
-                </button>
-            `;
-
-            div.querySelector('button').addEventListener('click', () => {
-                this.removeEspecialidad(e.id);
-            });
-
-            this.containerEspecialidades.appendChild(div);
-        });
-
-        this.containerEspecialidades.style.display = 'grid';
-    }
-
-    removeEspecialidad(id) {
-
-        let especialidades = this.getJsonValue(this.inputEspecialidades);
-        especialidades = especialidades.filter(e => e.id !== id);
-
-        this.inputEspecialidades.value = JSON.stringify(especialidades);
-        this.renderEspecialidades();
-    }
-
-    // =============================
-    // FETCH ESPECIALIDADES
-    // =============================
-    async cargarEspecialidadesPorServicios() {
-
-        if (!this.inputServicios) return;
-
-        const servicios = this.getJsonValue(this.inputServicios);
-
-        if (servicios.length === 0) {
-            this.actualizarListaEspecialidades([]);
-            return;
-        }
-
-        const ids = servicios.map(s => s.id).join(',');
-
-        try {
-            const response = await fetch(`/vetwilling/representante/api/especialidades?action=lista&servicio=${ids}`);
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                this.actualizarListaEspecialidades(data.especialidades);
-            } else {
-                this.actualizarListaEspecialidades([]);
+            // Marcar como checked si ya estaba seleccionada
+            const yaSeleccionada = especialidadesSeleccionadas.find(
+                e => parseInt(e.id) === parseInt(esp.id_especialidad)
+            );
+            if (yaSeleccionada) {
+                checkbox.checked = true;
             }
 
-        } catch (error) {
-            console.error('Error cargando especialidades:', error);
-            this.actualizarListaEspecialidades([]);
-        }
-    }
+            // Agregar evento change
+            checkbox.addEventListener('change', (event) => {
+                this.asociarEspecialidades(event);
+            });
 
-    actualizarListaEspecialidades(lista) {
+            const label = document.createElement('label');
+            label.htmlFor = `idCheck${esp.id_especialidad}`;
+            label.textContent = esp.nombre;
 
-        if (!this.listEspecialidades) return;
-
-        const ul = this.listEspecialidades.querySelector('ul');
-        if (!ul) return;
-
-        ul.innerHTML = '';
-
-        if (lista.length === 0) {
-            ul.innerHTML = `<li style="padding:10px;text-align:center;color:#999;">
-                Seleccione un servicio
-            </li>`;
-            return;
-        }
-
-        lista.forEach(esp => {
-
-            const li = document.createElement('li');
-
-            li.innerHTML = `
-                <input type="checkbox"
-                    class="form-check-input check-especialidades"
-                    value="${esp.id_especialidad}"
-                    data-name="${esp.nombre}">
-                <label>${esp.nombre}</label>
-            `;
-
-            ul.appendChild(li);
+            li.appendChild(checkbox);
+            li.appendChild(label);
+            ulEspecialidades.appendChild(li);
         });
+
+        // Actualizar la referencia de los checkboxes
+        this.especialidades = this.$$('.check-especialidades');
+
+        // Filtrar especialidades seleccionadas que ya no están disponibles
+        this.filtrarEspecialidadesNoDisponibles(especialidades);
     }
 
-    // =============================
-    // UTILIDAD
-    // =============================
-    getJsonValue(input) {
-        try {
-            return input.value ? JSON.parse(input.value) : [];
-        } catch {
-            return [];
-        }
+    // Método para eliminar de las seleccionadas las que ya no están disponibles
+    filtrarEspecialidadesNoDisponibles(especialidadesDisponibles) {
+        const especialidadesSeleccionadas = this.inputEspecialidades.value ?
+            JSON.parse(this.inputEspecialidades.value) : [];
+
+        if (especialidadesSeleccionadas.length === 0) return;
+
+        const idsDisponibles = especialidadesDisponibles.map(e => e.id_especialidad.toString());
+        const especialidadesFiltradas = especialidadesSeleccionadas.filter(
+            esp => idsDisponibles.includes(esp.id.toString())
+        );
+
+        this.inputEspecialidades.value = JSON.stringify(especialidadesFiltradas);
+        this.visualizarEspecialidades();
     }
+
 }
 
 new RegistroProfesionales();

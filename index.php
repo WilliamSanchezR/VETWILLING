@@ -321,6 +321,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesPdfControllers.php';
         break;
 
+    case '/admin/lista-profesionales':
+        require BASE_PATH . '/app/controllers/usuarioController.php';
+        break;
+
     // ---------------------------------------PROPIETARIO-------------------------------------//
 
     //PARA LOS CLIENTES Y SUS RUTAS

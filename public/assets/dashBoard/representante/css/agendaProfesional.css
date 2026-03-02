@@ -3,35 +3,32 @@
    agendaProfesional.css — versión limpia y profesional
    ============================================================ */
 
+
 /* ── VARIABLES ──────────────────────────────────────────── */
+
 :root {
-    --am-green:         #0f8f3a;
-    --am-green-dark:    #0c7a32;
-    --am-green-deep:    #1b5e20;
-    --am-green-glow:    rgba(15, 143, 58, 0.18);
-    --am-text:          #1a1a2e;
-    --am-text-muted:    #6b7280;
-    --am-border:        #e2e8f0;
-    --am-bg-input:      #f8fafc;
-    --am-bg-footer:     #f8fafc;
-    --am-gray-btn:      #64748b;
-    --am-gray-hover:    #475569;
-    --am-radius-modal:  20px;
-    --am-radius-input:  10px;
-    --am-radius-btn:    10px;
-    --am-shadow-modal:  0 25px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.08);
+    --am-green: #0f8f3a;
+    --am-green-dark: #0c7a32;
+    --am-green-deep: #1b5e20;
+    --am-green-glow: rgba(15, 143, 58, 0.18);
+    --am-text: #1a1a2e;
+    --am-text-muted: #6b7280;
+    --am-border: #e2e8f0;
+    --am-bg-input: #f8fafc;
+    --am-bg-footer: #f8fafc;
+    --am-gray-btn: #64748b;
+    --am-gray-hover: #475569;
+    --am-radius-modal: 20px;
+    --am-radius-input: 10px;
+    --am-radius-btn: 10px;
+    --am-shadow-modal: 0 25px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 12e6f487d99fc3c2f956db41b148da21f9af3ee3
 
 /* ============================================================
    PÁGINA — info del profesional y controles
    ============================================================ */
-<<<<<<< HEAD
-=======
+
 .agenda-table-full {
     width: 100% !important;
 }
@@ -86,9 +83,6 @@
     padding: 16px 28px;
     gap: 10px;
 }
->>>>>>> f52acdee8657354c2074de59b0a9437e34cfb67b
-=======
->>>>>>> 12e6f487d99fc3c2f956db41b148da21f9af3ee3
 
 .contenedor-agenda-profesional {
     display: flex;
@@ -96,7 +90,9 @@
     gap: 28px;
 }
 
+
 /* Tarjeta info profesional */
+
 .info-profesional {
     background: linear-gradient(135deg, #0f8f3a 0%, #0c7a32 60%, #1b5e20 100%);
     color: #ffffff;
@@ -107,27 +103,29 @@
     overflow: hidden;
 }
 
+
 /* Detalle decorativo */
+
 .info-profesional::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -40px;
     right: -40px;
     width: 200px;
     height: 200px;
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
     border-radius: 50%;
     pointer-events: none;
 }
 
 .info-profesional::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -60px;
     right: 80px;
     width: 140px;
     height: 140px;
-    background: rgba(255,255,255,0.04);
+    background: rgba(255, 255, 255, 0.04);
     border-radius: 50%;
     pointer-events: none;
 }
@@ -158,7 +156,7 @@
     backdrop-filter: blur(4px);
     padding: 14px 18px !important;
     border-radius: 12px !important;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     transition: background 0.2s ease;
 }
 
@@ -187,24 +185,24 @@
    ============================================================ */
 
 #modalAgregarAgenda .modal-dialog,
-#modalEditarAgenda  .modal-dialog {
+#modalEditarAgenda .modal-dialog {
     max-width: 520px;
 }
 
 #modalAgregarAgenda .modal-content,
-#modalEditarAgenda  .modal-content {
-    border:        none !important;
+#modalEditarAgenda .modal-content {
+    border: none !important;
     border-radius: var(--am-radius-modal) !important;
-    overflow:      hidden !important;
-    box-shadow:    var(--am-shadow-modal) !important;
-    opacity:       0;
-    transform:     translateY(16px) scale(0.98);
-    transition:    opacity 0.28s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden !important;
+    box-shadow: var(--am-shadow-modal) !important;
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 #modalAgregarAgenda.show .modal-content,
-#modalEditarAgenda.show  .modal-content {
-    opacity:   1;
+#modalEditarAgenda.show .modal-content {
+    opacity: 1;
     transform: translateY(0) scale(1);
 }
 
@@ -214,64 +212,66 @@
    ============================================================ */
 
 #modalAgregarAgenda .modal-header,
-#modalEditarAgenda  .modal-header {
-    background:    linear-gradient(135deg, var(--am-green) 0%, var(--am-green-dark) 100%) !important;
+#modalEditarAgenda .modal-header {
+    background: linear-gradient( 135deg, var(--am-green) 0%, var(--am-green-dark) 100%) !important;
     border-bottom: none !important;
-    padding:       22px 28px !important;
-    position:      relative;
-    overflow:      hidden;
+    padding: 22px 28px !important;
+    position: relative;
+    overflow: hidden;
 }
 
+
 /* Decoración header */
+
 #modalAgregarAgenda .modal-header::after,
-#modalEditarAgenda  .modal-header::after {
-    content:       '';
-    position:      absolute;
-    top:           -30px;
-    right:         -30px;
-    width:         120px;
-    height:        120px;
-    background:    rgba(255,255,255,0.07);
+#modalEditarAgenda .modal-header::after {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.07);
     border-radius: 50%;
     pointer-events: none;
 }
 
 #modalAgregarAgenda .modal-title,
-#modalEditarAgenda  .modal-title {
-    font-size:   17px !important;
+#modalEditarAgenda .modal-title {
+    font-size: 17px !important;
     font-weight: 700 !important;
-    color:       #ffffff !important;
-    display:     flex !important;
+    color: #ffffff !important;
+    display: flex !important;
     align-items: center !important;
-    gap:         10px !important;
-    margin:      0 !important;
+    gap: 10px !important;
+    margin: 0 !important;
     letter-spacing: -0.2px;
 }
 
 #modalAgregarAgenda .modal-title i,
-#modalEditarAgenda  .modal-title i {
-    font-size:        19px;
-    background:       rgba(255,255,255,0.2);
-    width:            34px;
-    height:           34px;
-    border-radius:    8px;
-    display:          flex;
-    align-items:      center;
-    justify-content:  center;
-    flex-shrink:      0;
+#modalEditarAgenda .modal-title i {
+    font-size: 19px;
+    background: rgba(255, 255, 255, 0.2);
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 #modalAgregarAgenda .btn-close,
-#modalEditarAgenda  .btn-close {
-    filter:     brightness(0) invert(1) !important;
-    opacity:    0.7 !important;
+#modalEditarAgenda .btn-close {
+    filter: brightness(0) invert(1) !important;
+    opacity: 0.7 !important;
     transition: opacity 0.2s, transform 0.2s !important;
-    z-index:    1;
+    z-index: 1;
 }
 
 #modalAgregarAgenda .btn-close:hover,
-#modalEditarAgenda  .btn-close:hover {
-    opacity:   1 !important;
+#modalEditarAgenda .btn-close:hover {
+    opacity: 1 !important;
     transform: rotate(90deg) !important;
 }
 
@@ -281,12 +281,11 @@
    ============================================================ */
 
 #modalAgregarAgenda .modal-body,
-#modalEditarAgenda  .modal-body {
-    background:     #ffffff !important;
-    padding:        26px 28px 18px !important;
-    display:        flex !important;
+#modalEditarAgenda .modal-body {
+    background: #ffffff !important;
+    display: flex !important;
     flex-direction: column !important;
-    gap:            2px !important;
+    gap: 2px !important;
 }
 
 
@@ -295,7 +294,7 @@
    ============================================================ */
 
 #modalAgregarAgenda .mb-3,
-#modalEditarAgenda  .mb-3 {
+#modalEditarAgenda .mb-3 {
     margin-bottom: 18px !important;
 }
 
@@ -305,50 +304,50 @@
    ============================================================ */
 
 #modalAgregarAgenda .am-label,
-#modalEditarAgenda  .am-label {
-    font-size:     12.5px;
-    font-weight:   700;
-    color:         var(--am-text);
-    display:       flex;
-    align-items:   center;
-    gap:           6px;
+#modalEditarAgenda .am-label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--am-text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin-bottom: 6px;
     letter-spacing: 0.01em;
 }
 
 #modalAgregarAgenda .am-label i,
-#modalEditarAgenda  .am-label i {
-    font-size:        13px;
-    color:            var(--am-green);
-    background:       rgba(15, 143, 58, 0.1);
-    width:            22px;
-    height:           22px;
-    border-radius:    6px;
-    display:          flex;
-    align-items:      center;
-    justify-content:  center;
-    flex-shrink:      0;
+#modalEditarAgenda .am-label i {
+    font-size: 13px;
+    color: var(--am-green);
+    background: rgba(15, 143, 58, 0.1);
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 #modalAgregarAgenda .am-label .text-danger,
-#modalEditarAgenda  .am-label .text-danger {
+#modalEditarAgenda .am-label .text-danger {
     color: #ef4444 !important;
     font-size: 14px;
     line-height: 1;
 }
 
 #modalAgregarAgenda small.text-muted,
-#modalEditarAgenda  small.text-muted {
-    font-size:  11.5px;
-    color:      #94a3b8 !important;
+#modalEditarAgenda small.text-muted {
+    font-size: 11.5px;
+    color: #94a3b8 !important;
     margin-top: 5px;
-    display:    flex;
+    display: flex;
     align-items: center;
     gap: 4px;
 }
 
 #modalAgregarAgenda small.text-muted::before,
-#modalEditarAgenda  small.text-muted::before {
+#modalEditarAgenda small.text-muted::before {
     content: "ⓘ";
     font-size: 11px;
     opacity: 0.7;
@@ -361,54 +360,54 @@
 
 #modalAgregarAgenda .am-input,
 #modalAgregarAgenda .am-select,
-#modalEditarAgenda  .am-input,
-#modalEditarAgenda  .am-select {
-    width:         100%;
-    padding:       10px 14px;
-    border:        1.5px solid var(--am-border) !important;
+#modalEditarAgenda .am-input,
+#modalEditarAgenda .am-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--am-border) !important;
     border-radius: var(--am-radius-input) !important;
-    font-size:     14px;
-    font-weight:   500;
-    color:         var(--am-text);
-    background:    var(--am-bg-input) !important;
-    box-shadow:    none !important;
-    outline:       none;
-    box-sizing:    border-box;
-    transition:    border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    appearance:    auto;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--am-text);
+    background: var(--am-bg-input) !important;
+    box-shadow: none !important;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    appearance: auto;
 }
 
 #modalAgregarAgenda .am-input:hover,
 #modalAgregarAgenda .am-select:hover,
-#modalEditarAgenda  .am-input:hover,
-#modalEditarAgenda  .am-select:hover {
+#modalEditarAgenda .am-input:hover,
+#modalEditarAgenda .am-select:hover {
     border-color: #cbd5e1 !important;
 }
 
 #modalAgregarAgenda .am-input:focus,
 #modalAgregarAgenda .am-select:focus,
-#modalEditarAgenda  .am-input:focus,
-#modalEditarAgenda  .am-select:focus {
+#modalEditarAgenda .am-input:focus,
+#modalEditarAgenda .am-select:focus {
     border-color: var(--am-green) !important;
-    background:   #ffffff !important;
-    box-shadow:   0 0 0 3px var(--am-green-glow) !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 3px var(--am-green-glow) !important;
 }
 
 #modalAgregarAgenda .am-input::placeholder,
-#modalEditarAgenda  .am-input::placeholder {
-    color:       #94a3b8;
-    font-size:   13px;
+#modalEditarAgenda .am-input::placeholder {
+    color: #94a3b8;
+    font-size: 13px;
     font-weight: 400;
 }
 
 #modalAgregarAgenda .am-input:disabled,
 #modalAgregarAgenda .am-select:disabled,
-#modalEditarAgenda  .am-input:disabled,
-#modalEditarAgenda  .am-select:disabled {
-    background:   #f1f5f9 !important;
-    color:        #94a3b8 !important;
+#modalEditarAgenda .am-input:disabled,
+#modalEditarAgenda .am-select:disabled {
+    background: #f1f5f9 !important;
+    color: #94a3b8 !important;
     border-color: #e2e8f0 !important;
-    cursor:       not-allowed;
+    cursor: not-allowed;
 }
 
 
@@ -417,28 +416,30 @@
    ============================================================ */
 
 #modalAgregarAgenda .am-time-row,
-#modalEditarAgenda  .am-time-row {
-    display:     flex;
+#modalEditarAgenda .am-time-row {
+    display: flex;
     align-items: flex-end;
-    gap:         10px;
+    gap: 10px;
 }
 
 #modalAgregarAgenda .am-time-group,
-#modalEditarAgenda  .am-time-group {
-    flex:           1;
-    display:        flex;
+#modalEditarAgenda .am-time-group {
+    flex: 1;
+    display: flex;
     flex-direction: column;
 }
 
+
 /* Flecha separadora generada por CSS */
+
 #modalAgregarAgenda .am-time-row::after,
-#modalEditarAgenda  .am-time-row::after {
-    content:        "→";
-    font-size:      15px;
-    color:          #cbd5e1;
+#modalEditarAgenda .am-time-row::after {
+    content: "→";
+    font-size: 15px;
+    color: #cbd5e1;
     padding-bottom: 11px;
-    flex-shrink:    0;
-    font-weight:    300;
+    flex-shrink: 0;
+    font-weight: 300;
 }
 
 
@@ -447,13 +448,13 @@
    ============================================================ */
 
 #modalAgregarAgenda .modal-footer,
-#modalEditarAgenda  .modal-footer {
-    background:      var(--am-bg-footer) !important;
-    border-top:      1px solid #f1f5f9 !important;
-    padding:         18px 28px 22px !important;
-    display:         flex !important;
+#modalEditarAgenda .modal-footer {
+    background: var(--am-bg-footer) !important;
+    border-top: 1px solid #f1f5f9 !important;
+    padding: 18px 28px 22px !important;
+    display: flex !important;
     justify-content: flex-end !important;
-    gap:             10px !important;
+    gap: 10px !important;
 }
 
 
@@ -462,57 +463,61 @@
    ============================================================ */
 
 #modalAgregarAgenda .am-btn,
-#modalEditarAgenda  .am-btn {
-    padding:       10px 22px !important;
+#modalEditarAgenda .am-btn {
+    padding: 10px 22px !important;
     border-radius: var(--am-radius-btn) !important;
-    font-size:     14px !important;
-    font-weight:   600 !important;
-    border:        none !important;
-    display:       inline-flex !important;
-    align-items:   center !important;
-    gap:           7px !important;
-    cursor:        pointer !important;
-    transition:    all 0.2s ease !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
     letter-spacing: 0.01em;
 }
 
+
 /* Cancelar */
+
 #modalAgregarAgenda .am-btn-secondary,
-#modalEditarAgenda  .am-btn-secondary {
+#modalEditarAgenda .am-btn-secondary {
     background: #f1f5f9 !important;
-    color:      var(--am-text) !important;
+    color: var(--am-text) !important;
 }
 
 #modalAgregarAgenda .am-btn-secondary:hover,
-#modalEditarAgenda  .am-btn-secondary:hover {
+#modalEditarAgenda .am-btn-secondary:hover {
     background: #e2e8f0 !important;
-    transform:  translateY(-1px) !important;
+    transform: translateY(-1px) !important;
 }
 
 #modalAgregarAgenda .am-btn-secondary:active,
-#modalEditarAgenda  .am-btn-secondary:active {
+#modalEditarAgenda .am-btn-secondary:active {
     transform: translateY(0) !important;
 }
 
+
 /* Guardar / Agregar */
+
 #modalAgregarAgenda .am-btn-primary,
-#modalEditarAgenda  .am-btn-primary {
-    background:       linear-gradient(135deg, var(--am-green), var(--am-green-dark)) !important;
-    background-image: linear-gradient(135deg, var(--am-green), var(--am-green-dark)) !important;
-    color:            #ffffff !important;
-    box-shadow:       0 2px 8px var(--am-green-glow) !important;
+#modalEditarAgenda .am-btn-primary {
+    background: linear-gradient( 135deg, var(--am-green), var(--am-green-dark)) !important;
+    background-image: linear-gradient( 135deg, var(--am-green), var(--am-green-dark)) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px var(--am-green-glow) !important;
 }
 
 #modalAgregarAgenda .am-btn-primary:hover,
-#modalEditarAgenda  .am-btn-primary:hover {
-    background:  linear-gradient(135deg, var(--am-green-dark), var(--am-green-deep)) !important;
-    box-shadow:  0 6px 20px rgba(15, 143, 58, 0.4) !important;
-    transform:   translateY(-2px) !important;
+#modalEditarAgenda .am-btn-primary:hover {
+    background: linear-gradient( 135deg, var(--am-green-dark), var(--am-green-deep)) !important;
+    box-shadow: 0 6px 20px rgba(15, 143, 58, 0.4) !important;
+    transform: translateY(-2px) !important;
 }
 
 #modalAgregarAgenda .am-btn-primary:active,
-#modalEditarAgenda  .am-btn-primary:active {
-    transform:  translateY(0) !important;
+#modalEditarAgenda .am-btn-primary:active {
+    transform: translateY(0) !important;
     box-shadow: 0 2px 6px var(--am-green-glow) !important;
 }
 
@@ -522,41 +527,44 @@
    ============================================================ */
 
 @media (max-width: 575px) {
-
     #modalAgregarAgenda .modal-dialog,
-    #modalEditarAgenda  .modal-dialog {
+    #modalEditarAgenda .modal-dialog {
         margin: 12px !important;
     }
-
     #modalAgregarAgenda .modal-header,
     #modalAgregarAgenda .modal-body,
     #modalAgregarAgenda .modal-footer,
-    #modalEditarAgenda  .modal-header,
-    #modalEditarAgenda  .modal-body,
-    #modalEditarAgenda  .modal-footer {
-        padding-left:  18px !important;
+    #modalEditarAgenda .modal-header,
+    #modalEditarAgenda .modal-body,
+    #modalEditarAgenda .modal-footer {
+        padding-left: 18px !important;
         padding-right: 18px !important;
     }
-
     #modalAgregarAgenda .am-time-row,
-    #modalEditarAgenda  .am-time-row {
+    #modalEditarAgenda .am-time-row {
         flex-direction: column;
         gap: 10px;
     }
-
     #modalAgregarAgenda .am-time-row::after,
-    #modalEditarAgenda  .am-time-row::after {
+    #modalEditarAgenda .am-time-row::after {
         display: none;
     }
-
     #modalAgregarAgenda .modal-footer,
-    #modalEditarAgenda  .modal-footer {
+    #modalEditarAgenda .modal-footer {
         flex-direction: column !important;
     }
-
     #modalAgregarAgenda .am-btn,
-    #modalEditarAgenda  .am-btn {
-        width:           100% !important;
+    #modalEditarAgenda .am-btn {
+        width: 100% !important;
         justify-content: center !important;
     }
+}
+
+.modal-body {
+    padding: 0px !important;
+}
+
+.form-modal {
+    overflow-y: auto !important;
+    padding: 26px 28px 18px !important;
 }
