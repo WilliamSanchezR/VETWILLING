@@ -1,9 +1,12 @@
-#especialidadesContainer, #serviciosContainer {
+#especialidadesContainer,
+#serviciosContainer {
     display: none;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
-.listEspecialidades, .listServicios {
+.listEspecialidades,
+.listServicios {
     display: none;
     border-radius: 10px;
     padding: 5px;
@@ -14,21 +17,24 @@
     overflow-y: auto;
     box-shadow: 0 0 0 0.2rem rgba(27, 143, 114, 0.25);
     position: absolute;
-    transform: translateY(calc(-100% - 35px));
+    transform: translateY(calc(-100% - 15px));
 }
 
-.vew-list-esp, .vew-list-serv {
+.vew-list-esp,
+.vew-list-serv {
     display: block;
 }
 
-.listEspecialidades ul, .listServicios ul {
+.listEspecialidades ul,
+.listServicios ul {
     display: flex;
     flex-direction: column;
     gap: 10px;
     list-style: none;
 }
 
-.listEspecialidades ul li, .listServicios ul li {
+.listEspecialidades ul li,
+.listServicios ul li {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 10px;
@@ -36,18 +42,21 @@
     align-items: center;
 }
 
-.check-especialidades, .check-servicios {
+.check-especialidades,
+.check-servicios {
     width: 18px !important;
     height: 18px !important;
     cursor: pointer;
 }
 
-.listEspecialidades label, .listServicios label {
+.listEspecialidades label,
+.listServicios label {
     margin: 0px !important;
     cursor: pointer;
 }
 
-.especialidad-seleccionada, .servicio-seleccionado {
+.especialidad-seleccionada,
+.servicio-seleccionado {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -61,7 +70,8 @@
     font-size: 14px;
 }
 
-.especialidad-seleccionada button, .servicio-seleccionado button {
+.especialidad-seleccionada button,
+.servicio-seleccionado button {
     background: none;
     border: none;
     color: #ffffff;
