@@ -26,6 +26,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
 <!-- ╔══════════════════════════════════════════════════╗ -->
 <!-- ║         NAVBAR SUPERIOR — VetWilling            ║ -->

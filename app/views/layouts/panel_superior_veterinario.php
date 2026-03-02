@@ -10,6 +10,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
 <!-- ╔══════════════════════════════════════════════════╗ -->
 <!-- ║         NAVBAR SUPERIOR — VetWilling            ║ -->
