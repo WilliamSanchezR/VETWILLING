@@ -7,10 +7,6 @@
     --fs-texto1: 12px;
 }
 
-.contenido-principal {
-    /* margin-top: 130px; */
-}
-
 .wizard-container h1 {
     font-size: var(--fs-titulo1);
 }
@@ -31,7 +27,7 @@
 
 .wizard-container {
     width: 95%;
-    margin: 30px auto;
+    margin: 100px auto;
     background: #fff;
     border-radius: 20px;
     padding: 40px;
