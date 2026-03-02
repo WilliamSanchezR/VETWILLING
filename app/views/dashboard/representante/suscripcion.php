@@ -18,6 +18,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/suscripcion.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 

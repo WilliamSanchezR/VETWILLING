@@ -199,7 +199,7 @@
    SIDEBAR COLAPSADO
 ================================ */
    .sidebar.collapsed .nav-item {
-       justify-content: center;
+       justify-content: flex-start;
        padding: 12px 8px;
    }
 
@@ -216,7 +216,6 @@
    /* Tooltips para modo colapsado */
    .sidebar.collapsed .nav-item::after,
    .sidebar.collapsed .submenu-toggle::after {
-       content: attr(data-tooltip);
        position: absolute;
        left: 60px;
        margin-top: 20px;

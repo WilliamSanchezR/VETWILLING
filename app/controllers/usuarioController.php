@@ -31,6 +31,8 @@ switch ($method) {
 
         if ($accion === 'eliminar') {
             eliminarUsuario($_GET['id']);
+        } elseif ($accion === 'listarAdmin') {
+            ListaUsuariosAdmin();
         } else if (isset($_GET['id'])) {
             consultarUsuarioId($_GET['id']);
         } else {
@@ -440,5 +442,16 @@ function actualizarFotoPerfil()
         mostrarSweetAlert('error', 'Error', 'No se ha seleccionado ninguna imagen');
     }
 
+    exit();
+}
+
+function ListaUsuariosAdmin()
+{
+    $objUsuario = new Usuario();
+    $listaUsuarios = $objUsuario->ListaUsuariosAdmin();
+    // Retornar la lista de usuarios en formato JSON
+    header('Content-Type: application/json');
+    header('Status: 200 OK');
+    echo json_encode($listaUsuarios);
     exit();
 }

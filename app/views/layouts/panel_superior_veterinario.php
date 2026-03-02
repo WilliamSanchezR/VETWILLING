@@ -10,6 +10,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
 <!-- ╔══════════════════════════════════════════════════╗ -->
 <!-- ║         NAVBAR SUPERIOR — VetWilling            ║ -->
@@ -267,14 +268,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                                 <span class="item-subtitle">Ayuda y asistencia técnica</span>
                             </div>
                         </a>
-                    </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    
-          
-=======
 
-                    <div class="panel-body">
                         <a href="<?= BASE_URL ?>/veterinario/suscripcion" class="dropdown-item">
                             <div class="item-icon">
                                 <i class="bi bi-person-circle"></i>
@@ -284,11 +278,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                                 <span class="item-subtitle">Ver y cambiar mi suscripción</span>
                             </div>
                         </a>
->>>>>>> f52acdee8657354c2074de59b0a9437e34cfb67b
-=======
-                    
-          
->>>>>>> 12e6f487d99fc3c2f956db41b148da21f9af3ee3
+                    </div>
 
                         <div class="panel-divider"></div>
 

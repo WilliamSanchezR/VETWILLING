@@ -406,4 +406,29 @@ class Usuario
             return false;
         }
     }
+
+    public function ListaUsuariosAdmin()
+    {
+        // Listamos los usuarios registrados en la base de datos
+        try {
+            $sql = "SELECT 
+                adm.id_usuario,
+                adm.nombres,
+                adm.apellidos,
+                rol.nombre AS rol
+            FROM usuario us
+            INNER JOIN administrador adm ON us.id_usuario = adm.id_usuario
+            INNER JOIN rol ON us.id_rol = rol.id_rol
+            WHERE rol.id_rol = 1 and us.estado = 'activo'
+            ORDER BY id_usuario ASC";
+            // Preparar y ejecutar la consulta
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::listar -> " . $e->getMessage());
+            return [];
+        }
+    }
 }
