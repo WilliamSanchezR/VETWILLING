@@ -25,6 +25,7 @@ $mascotas = listarMascotas();
     <!-- CSS Personalizados -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
     <style>
         /* ═══════════════════════════════════════════════════════════ */

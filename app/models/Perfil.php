@@ -61,12 +61,12 @@ class Perfil
                 case 3: // PROPIETARIO
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                rl.nombres, rl.apellidos, rl.nivel_acceso, rl.img_perfil, rl.telefono, r.id_rol,
-                                r.nombre AS rol, rl.direccion, rl.fecha_creacion, vet.id_veterinaria, vet.nombre AS nombre_veterinaria
+                                p.nombres, p.apellidos, p.img_perfil, p.telefono, r.id_rol,
+                                r.nombre AS rol, p.direccion, vet.id_veterinaria, vet.nombre AS nombre_veterinaria
                                 FROM usuario u
-                                INNER JOIN representante_legal rl ON u.id_usuario = rl.id_usuario
+                                INNER JOIN propietario p ON u.id_usuario = p.id_usuario
                                 INNER JOIN rol r ON u.id_rol = r.id_rol
-                                INNER JOIN veterinaria vet ON rl.id_veterinaria = vet.id_veterinaria
+                                LEFT JOIN veterinaria vet ON p.id_veterinaria = vet.id_veterinaria
                                 WHERE u.id_usuario = :id";
                     break;
                 // Se agrega el caso para el representante legal
