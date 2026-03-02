@@ -455,3 +455,4 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 
 
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/panelSuperiorRepresentante.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
