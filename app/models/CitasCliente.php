@@ -57,8 +57,9 @@ class CitasCliente
     public function crearCita($datos)
     {
         try {
+            // Nota: la tabla `agendamiento` no almacena `id_propietario` directamente.
+            // Se asocia al propietario a través de `paciente.id_propietario`.
             $sql = "INSERT INTO agendamiento (
-                        id_propietario,
                         id_paciente,
                         id_servicio,
                         id_subservicio,
@@ -70,7 +71,6 @@ class CitasCliente
                         estado,
                         id_usuario
                     ) VALUES (
-                        :id_propietario,
                         :id_paciente,
                         :id_servicio,
                         :id_subservicio,
@@ -87,13 +87,6 @@ class CitasCliente
 
             // ✅ CORRECCIÓN: Usar bindValue para campos que pueden ser NULL
             
-            // id_propietario - puede ser NULL
-            if (isset($datos['id_propietario']) && $datos['id_propietario'] !== null) {
-                $stmt->bindValue(':id_propietario', (int)$datos['id_propietario'], PDO::PARAM_INT);
-            } else {
-                $stmt->bindValue(':id_propietario', null, PDO::PARAM_NULL);
-            }
-
             // Campos requeridos (NOT NULL)
             $stmt->bindValue(':id_paciente', (int)$datos['id_paciente'], PDO::PARAM_INT);
             $stmt->bindValue(':id_servicio', (int)$datos['id_servicio'], PDO::PARAM_INT);
@@ -181,13 +174,13 @@ class CitasCliente
                         COALESCE(CONCAT(v.nombres, ' ', v.apellidos), 'No asignado') as veterinario_nombre
                         
                     FROM agendamiento a
-                    INNER JOIN propietario pr ON a.id_propietario = pr.id_propietario
                     INNER JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                    INNER JOIN propietario pr ON pac.id_propietario = pr.id_propietario
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
                     LEFT JOIN veterinario v ON a.id_usuario = v.id_usuario
                     
-                    WHERE a.id_propietario = :id_propietario";
+                    WHERE pac.id_propietario = :id_propietario";
 
             $params = ['id_propietario' => $id_propietario];
 
@@ -406,14 +399,15 @@ class CitasCliente
     public function verificarCitaPropietario($id_agendamiento, $id_propietario)
     {
         try {
-            $sql = "SELECT COUNT(*) as total
-                    FROM agendamiento
-                    WHERE id_agendamiento = :id_agendamiento
-                    AND id_propietario = :id_propietario";
+                $sql = "SELECT COUNT(*) as total
+                    FROM agendamiento a
+                    INNER JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                    WHERE a.id_agendamiento = :id_agendamiento
+                    AND pac.id_propietario = :id_propietario";
 
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
-            $stmt->bindParam(':id_propietario', $id_propietario, PDO::PARAM_INT);
+                $stmt = $this->conexion->prepare($sql);
+                $stmt->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+                $stmt->bindParam(':id_propietario', $id_propietario, PDO::PARAM_INT);
             $stmt->execute();
 
             $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -517,9 +511,9 @@ class CitasCliente
                         sub.nombre as subservicio_nombre,
                         CONCAT(vet.nombres, ' ', vet.apellidos) as veterinario_nombre
                     FROM agendamiento a
-                    LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
-                    LEFT JOIN usuario u ON pr.id_usuario = u.id_usuario
                     LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                    LEFT JOIN propietario pr ON pac.id_propietario = pr.id_propietario
+                    LEFT JOIN usuario u ON pr.id_usuario = u.id_usuario
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
                     LEFT JOIN usuario vet ON a.id_usuario = vet.id_usuario
@@ -553,9 +547,9 @@ class CitasCliente
                         u.email as email_propietario,
                         pac.nombre as nombre_mascota
                     FROM agendamiento a
-                    LEFT JOIN propietario pr ON a.id_propietario = pr.id_propietario
-                    LEFT JOIN usuario u ON pr.id_usuario = u.id_usuario
                     LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                    LEFT JOIN propietario pr ON pac.id_propietario = pr.id_propietario
+                    LEFT JOIN usuario u ON pr.id_usuario = u.id_usuario
                     WHERE a.id_agendamiento = :id_agendamiento
                     LIMIT 1";
 
