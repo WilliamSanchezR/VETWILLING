@@ -54,17 +54,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                 <i class="bi bi-list"></i>
             </button>
 
-            <!-- Saludo + reloj -->
-            <div class="greeting-section">
-                <span class="greeting-icon" id="saludoEmoji">👋</span>
-                <div class="greeting-text">
-                    <span class="greeting-label" id="saludoTexto">Bienvenido</span>
-                    <span class="greeting-time">
-                        <i class="bi bi-clock"></i>
-                        <span id="horaActual">00:00:00</span>
-                    </span>
-                </div>
-            </div>
+                <!-- Saludo + reloj -->
 
             <div class="nav-sep"></div>
 
