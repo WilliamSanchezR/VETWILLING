@@ -7,28 +7,26 @@
 /* ── VARIABLES ──────────────────────────────────────────── */
 
 :root {
-    --am-green: #0f8f3a;
-    --am-green-dark: #0c7a32;
-    --am-green-deep: #1b5e20;
-    --am-green-glow: rgba(15, 143, 58, 0.18);
-    --am-text: #1a1a2e;
-    --am-text-muted: #6b7280;
-    --am-border: #e2e8f0;
-    --am-bg-input: #f8fafc;
-    --am-bg-footer: #f8fafc;
-    --am-gray-btn: #64748b;
-    --am-gray-hover: #475569;
-    --am-radius-modal: 20px;
-    --am-radius-input: 10px;
-    --am-radius-btn: 10px;
-    --am-shadow-modal: 0 25px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.08);
+    --am-green:         #0f8f3a;
+    --am-green-dark:    #0c7a32;
+    --am-green-deep:    #1b5e20;
+    --am-green-glow:    rgba(15, 143, 58, 0.18);
+    --am-text:          #1a1a2e;
+    --am-text-muted:    #6b7280;
+    --am-border:        #e2e8f0;
+    --am-bg-input:      #f8fafc;
+    --am-bg-footer:     #f8fafc;
+    --am-gray-btn:      #64748b;
+    --am-gray-hover:    #475569;
+    --am-radius-modal:  20px;
+    --am-radius-input:  10px;
+    --am-radius-btn:    10px;
+    --am-shadow-modal:  0 25px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.08);
 }
-
 
 /* ============================================================
    PÁGINA — info del profesional y controles
    ============================================================ */
-
 .agenda-table-full {
     width: 100% !important;
 }
