@@ -3,6 +3,7 @@
     min-height: 100vh;
     transition: margin-left 0.3s ease;
     background: var(--color-fondo);
+    margin-top: 70px;
 }
 
 .contenido-principal #navbarSuperior {
@@ -23,4 +24,8 @@
     position: sticky;
     top: 0;
     z-index: 998;
+}
+
+.wizard-container {
+    margin-top: 100px !important;
 }

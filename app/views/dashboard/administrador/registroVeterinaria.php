@@ -27,8 +27,6 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
-
 
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
@@ -326,7 +324,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
         <!-- JS Propio -->
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/registroPacientes.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/registroVeterinaria.js"></script>
 
 </body>
 

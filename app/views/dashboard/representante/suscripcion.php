@@ -1,5 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_veterinario.php';
+require_once BASE_PATH . '/app/helpers/session_representante.php';
 
 
 ?>
@@ -18,14 +18,17 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/suscripcion.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/suscripcion.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+
 
 </head>
 
 <body>
     <?php
     // <!-- BARRA LATERAL IZQUIERDA -->
-    include_once __DIR__ . '/../../layouts/sidebar_veterinario.php';
+    include_once __DIR__ . '/../../layouts/sidebar_representante.php'
 
     // <!-- PANEL DERECHO -->
     // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php';
@@ -34,12 +37,12 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
         <!-- NAVBAR SUPERIOR -->
         <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php';
+        include_once __DIR__ . '/../../layouts/panel_superior_representante.php'
         ?>
 
         <div class="wrap">
 
-            <!-- ══ HEADER ══════════════════════════════════ -->
+            <!--  HEADER  -->
             <div class="header">
                 <div class="eyebrow">Suscripción</div>
                 <h1>Elige tu plan <em>ideal</em></h1>
@@ -55,7 +58,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
 
 
-            <!-- ══ GRID DE PLANES ══════════════════════════ -->
+            <!--  GRID DE PLANES  -->
             <div class="grid">
 
                 <!-- Plan Essential -->
@@ -115,7 +118,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </ul>
 
                     <div class="plan-divider"></div>
-                    <a class="btn btn-outline" href="<?= BASE_URL ?>/pasarela-pago?origen=suscripcion&plan=procare">
+                    <a class="btn btn-outline Prueba" href="<?= BASE_URL ?>/pasarela-pago?origen=suscripcion&plan=procare">
                         Solicitar prueba
                     </a>
                 </div>
@@ -154,7 +157,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
 
 
-            <!-- ══ GARANTÍA ════════════════════════════════ -->
+            <!--  GARANTÍA  -->
             <div class="guarantee">
                 <div class="guarantee-icon">🛡️</div>
                 <div>
@@ -164,7 +167,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
 
 
-            <!-- ══ FAQ ═════════════════════════════════════ -->
+            <!--  FAQ ═ -->
             <h2 class="faq-title">Preguntas frecuentes</h2>
             <div class="faq-list">
 
@@ -206,7 +209,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     </div>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/suscripcion.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/suscripcion.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+
 </body>
 
 </html>

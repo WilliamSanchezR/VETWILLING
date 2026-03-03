@@ -19,9 +19,11 @@ class Veterinario
     public function contarPacientesPorVeterinario($id_usuario)
     {
         try {
-            $sql = "SELECT COUNT(DISTINCT a.id_paciente)
-                    FROM agendamiento a
-                    WHERE a.id_usuario = :id_usuario";
+            $sql = "SELECT COUNT(*)
+                    FROM paciente_profesional_asignacion ppa
+                    WHERE ppa.id_usuario_profesional = :id_usuario
+                    AND ppa.estado = 'Activo'
+                    AND ppa.fecha_fin IS NULL";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
@@ -40,7 +42,7 @@ class Veterinario
             $sql = "SELECT COUNT(*)
                     FROM agendamiento a
                     WHERE a.id_usuario = :id_usuario
-                      AND DATE(a.fecha_hora) = :fecha";
+                    AND DATE(a.fecha_hora) = :fecha";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
@@ -60,7 +62,7 @@ class Veterinario
             $sql = "SELECT COUNT(DISTINCT a.id_paciente)
                     FROM agendamiento a
                     WHERE a.id_usuario = :id_usuario
-                      AND DATE(a.fecha_hora) = :fecha";
+                    AND DATE(a.fecha_hora) = :fecha";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
@@ -80,8 +82,8 @@ class Veterinario
             $sql = "SELECT COUNT(*)
                     FROM agendamiento a
                     WHERE a.id_usuario = :id_usuario
-                      AND DATE(a.fecha_hora) = :fecha
-                      AND UPPER(a.estado) = 'PENDIENTE'";
+                    AND DATE(a.fecha_hora) = :fecha
+                    AND UPPER(a.estado) = 'PENDIENTE'";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
@@ -101,7 +103,7 @@ class Veterinario
             $sql = "SELECT COUNT(*)
                     FROM agendamiento a
                     WHERE a.id_usuario = :id_usuario
-                      AND YEARWEEK(a.fecha_hora, 1) = YEARWEEK(:fecha, 1)";
+                    AND YEARWEEK(a.fecha_hora, 1) = YEARWEEK(:fecha, 1)";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
@@ -158,7 +160,7 @@ class Veterinario
                     LEFT JOIN propietario prop ON p.id_propietario = prop.id_propietario
                                         LEFT JOIN usuario u ON prop.id_usuario = u.id_usuario
                     WHERE a.id_usuario = :id_usuario
-                      AND DATE(a.fecha_hora) = :fecha
+                    AND DATE(a.fecha_hora) = :fecha
                     ORDER BY a.fecha_hora ASC";
 
             $stmt = $this->conexion->prepare($sql);
@@ -182,37 +184,35 @@ class Veterinario
     {
         try {
             $sql = "SELECT 
-                        p.id_paciente,
-                        p.nombre AS paciente_nombre,
-                        p.especie,
-                        p.raza,
-                        p.edad_numero,
-                        p.edad_unidad,
-                        p.sexo,
-                        CONCAT(pr.nombres, ' ', pr.apellidos) AS propietario_nombre,
-                        (
-                            SELECT MAX(a.fecha_hora)
-                            FROM agendamiento a
-                            WHERE a.id_usuario = :id_usuario
-                              AND a.id_paciente = p.id_paciente
-                        ) AS ultima_visita,
-                        (
-                            SELECT a2.estado
-                            FROM agendamiento a2
-                            WHERE a2.id_usuario = :id_usuario
-                              AND a2.id_paciente = p.id_paciente
-                            ORDER BY a2.fecha_hora DESC, a2.id_agendamiento DESC
-                            LIMIT 1
-                        ) AS estado_ultima_cita
-                    FROM paciente p
-                    INNER JOIN propietario pr ON p.id_propietario = pr.id_propietario
-                    WHERE EXISTS (
-                        SELECT 1
-                        FROM agendamiento a3
-                        WHERE a3.id_usuario = :id_usuario
-                          AND a3.id_paciente = p.id_paciente
-                    )
-                    ORDER BY ultima_visita DESC";
+                                                p.id_paciente,
+                                                p.nombre AS paciente_nombre,
+                                                p.especie,
+                                                p.raza,
+                                                p.edad_numero,
+                                                p.edad_unidad,
+                                                p.sexo,
+                                                CONCAT(pr.nombres, ' ', pr.apellidos) AS propietario_nombre,
+                                                (
+                                                        SELECT MAX(a.fecha_hora)
+                                                        FROM agendamiento a
+                                                        WHERE a.id_usuario = :id_usuario
+                                                            AND a.id_paciente = p.id_paciente
+                                                ) AS ultima_visita,
+                                                (
+                                                        SELECT a2.estado
+                                                        FROM agendamiento a2
+                                                        WHERE a2.id_usuario = :id_usuario
+                                                            AND a2.id_paciente = p.id_paciente
+                                                        ORDER BY a2.fecha_hora DESC, a2.id_agendamiento DESC
+                                                        LIMIT 1
+                                                ) AS estado_ultima_cita
+                                        FROM paciente_profesional_asignacion ppa
+                                        INNER JOIN paciente p ON ppa.id_paciente = p.id_paciente
+                                        INNER JOIN propietario pr ON p.id_propietario = pr.id_propietario
+                                        WHERE ppa.id_usuario_profesional = :id_usuario
+                                            AND ppa.estado = 'Activo'
+                                            AND ppa.fecha_fin IS NULL
+                                        ORDER BY ultima_visita DESC";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
@@ -225,7 +225,147 @@ class Veterinario
         }
     }
 
+    public function obtenerDetallePacientePorVeterinario($id_usuario, $id_paciente)
+    {
+        try {
+            $sql = "SELECT
+                        p.id_paciente,
+                        p.nombre,
+                        p.especie,
+                        p.raza,
+                        p.edad_numero,
+                        p.edad_unidad,
+                        p.sexo,
+                        p.img_mascota,
+                        p.id_propietario,
+                        CONCAT(pr.nombres, ' ', pr.apellidos) AS propietario_nombre,
+                        pr.telefono AS propietario_telefono,
+                        u.email AS propietario_email
+                    FROM paciente p
+                    INNER JOIN paciente_profesional_asignacion ppa ON ppa.id_paciente = p.id_paciente
+                    INNER JOIN propietario pr ON pr.id_propietario = p.id_propietario
+                    LEFT JOIN usuario u ON u.id_usuario = pr.id_usuario
+                    WHERE p.id_paciente = :id_paciente
+                      AND ppa.id_usuario_profesional = :id_usuario
+                      AND ppa.estado = 'Activo'
+                      AND ppa.fecha_fin IS NULL
+                    ORDER BY ppa.id_asignacion DESC
+                    LIMIT 1";
 
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $paciente ?: null;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::obtenerDetallePacientePorVeterinario - " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function obtenerHistorialPacientePorVeterinario($id_usuario, $id_paciente, $limite = 10)
+    {
+        try {
+            $limite = max(1, (int) $limite);
+
+            $sql = "SELECT
+                        a.id_agendamiento,
+                        a.fecha_hora,
+                        a.fecha_hora_fin,
+                        a.tipo,
+                        a.estado,
+                        a.observaciones,
+                        s.nombre AS servicio,
+                        ss.nombre AS subservicio
+                    FROM agendamiento a
+                    LEFT JOIN servicio s ON s.id_servicio = a.id_servicio
+                    LEFT JOIN subservicio ss ON ss.id_subservicio = a.id_subservicio
+                    WHERE a.id_usuario = :id_usuario
+                      AND a.id_paciente = :id_paciente
+                    ORDER BY a.fecha_hora DESC, a.id_agendamiento DESC
+                    LIMIT $limite";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::obtenerHistorialPacientePorVeterinario - " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function actualizarDatosPacientePorVeterinario($id_usuario, array $data)
+    {
+        try {
+            $sqlValida = "SELECT COUNT(*)
+                          FROM paciente_profesional_asignacion
+                          WHERE id_paciente = :id_paciente
+                            AND id_usuario_profesional = :id_usuario
+                            AND estado = 'Activo'
+                            AND fecha_fin IS NULL";
+
+            $stmtValida = $this->conexion->prepare($sqlValida);
+            $stmtValida->bindParam(':id_paciente', $data['id_paciente'], PDO::PARAM_INT);
+            $stmtValida->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtValida->execute();
+
+            if ((int) $stmtValida->fetchColumn() === 0) {
+                return false;
+            }
+
+            $sql = "UPDATE paciente
+                    SET nombre = :nombre,
+                        especie = :especie,
+                        raza = :raza,
+                        edad_numero = :edad_numero,
+                        edad_unidad = :edad_unidad,
+                        sexo = :sexo
+                    WHERE id_paciente = :id_paciente";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':nombre', $data['nombre'], PDO::PARAM_STR);
+            $stmt->bindParam(':especie', $data['especie'], PDO::PARAM_STR);
+            $stmt->bindParam(':raza', $data['raza'], PDO::PARAM_STR);
+            $stmt->bindParam(':edad_numero', $data['edad_numero'], PDO::PARAM_INT);
+            $stmt->bindParam(':edad_unidad', $data['edad_unidad'], PDO::PARAM_STR);
+            $stmt->bindParam(':sexo', $data['sexo'], PDO::PARAM_STR);
+            $stmt->bindParam(':id_paciente', $data['id_paciente'], PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::actualizarDatosPacientePorVeterinario - " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function desactivarPacientePorVeterinario($id_usuario, $id_paciente)
+    {
+        try {
+            $sql = "UPDATE paciente_profesional_asignacion
+                    SET estado = 'Inactivo',
+                        fecha_fin = COALESCE(fecha_fin, CURRENT_TIMESTAMP),
+                        motivo_cambio = 'Desactivado desde dashboard veterinario'
+                    WHERE id_paciente = :id_paciente
+                      AND id_usuario_profesional = :id_usuario
+                      AND estado = 'Activo'
+                      AND fecha_fin IS NULL";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::desactivarPacientePorVeterinario - " . $e->getMessage());
+            return false;
+        }
+    }
 
     public function registrar($data)
     {
@@ -234,7 +374,7 @@ class Veterinario
 
             // INSERT USUARIO
             $sqlUsuario = "INSERT INTO usuario (email, password_hash, estado, id_rol)
-                       VALUES (:email, :password_hash, :estado, :id_rol)";
+                    VALUES (:email, :password_hash, :estado, :id_rol)";
             $stmtUsuario = $this->conexion->prepare($sqlUsuario);
 
             $passwordHash = password_hash($data['password_hash'], PASSWORD_DEFAULT);
@@ -251,10 +391,10 @@ class Veterinario
             // INSERT VETERINARIO
             $sqlVet = "INSERT INTO veterinario 
             (id_usuario, tipo_documento, numero_documento, nombres, apellidos,
-             telefono, img_perfil, numero_licencia_profesional, id_veterinaria, fecha_contratacion)
+            telefono, img_perfil, numero_licencia_profesional, id_veterinaria, fecha_contratacion)
             VALUES
             (:id_usuario, :tipo_documento, :numero_documento, :nombres, :apellidos,
-             :telefono, :img_perfil, :numero_licencia_profesional, :id_veterinaria, :fecha_contratacion)";
+            :telefono, :img_perfil, :numero_licencia_profesional, :id_veterinaria, :fecha_contratacion)";
 
             $stmtVet = $this->conexion->prepare($sqlVet);
 

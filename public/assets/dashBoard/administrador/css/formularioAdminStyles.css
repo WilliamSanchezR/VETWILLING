@@ -1,12 +1,11 @@
 :root {
-   --fs-titulo1: 32px;
+    --fs-titulo1: 32px;
     --fs-titulo2: 24px;
     --fs-titulo3: 16px;
     --fs-titulo4: 14px;
     --fs-texto: 20px;
     --fs-texto1: 12px;
 }
-
 
 .wizard-container h1 {
     font-size: var(--fs-titulo1);
@@ -25,8 +24,6 @@
 .wizard-container h6 {
     font-size: var(--fs-titulo4);
 }
-
-
 
 .wizard-container {
     width: 95%;
@@ -75,18 +72,16 @@
 
 #pills-tab .nav-link.active {
     color: var(--primary-color);
-    background-color:  var(--primary-color);
+    background-color: var(--primary-color);
     border-bottom: 3px solid var(--primary-color);
     color: #fff;
 }
 
 @keyframes pulse {
-
     0%,
     100% {
         transform: scale(1);
     }
-
     50% {
         transform: scale(1.1);
     }
@@ -102,7 +97,9 @@
     margin: 0;
 }
 
+
 /* Barra de progreso */
+
 .progress-wrapper {
     margin-bottom: 40px;
 }
@@ -159,7 +156,9 @@
     font-weight: 700;
 }
 
+
 /* Steps del formulario */
+
 .step {
     display: none;
     animation: fadeIn 0.5s ease;
@@ -174,7 +173,6 @@
         opacity: 0;
         transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -212,7 +210,9 @@
     margin-right: 10px;
 }
 
+
 /* Form groups */
+
 .form-group {
     margin-bottom: 25px;
 }
@@ -258,16 +258,13 @@
 }
 
 @keyframes shake {
-
     0%,
     100% {
         transform: translateX(0);
     }
-
     25% {
         transform: translateX(-10px);
     }
-
     75% {
         transform: translateX(10px);
     }
@@ -303,7 +300,9 @@
     border-radius: 0 10px 10px 0 !important;
 }
 
+
 /* Botones */
+
 .buttons {
     display: flex;
     justify-content: space-between;
@@ -364,8 +363,12 @@
     transform: none;
 }
 
+
 /* Resumen de registro */
+
+
 /* Estilos para el resumen final */
+
 .resumen-final {
     margin: 30px 0;
 }
@@ -409,7 +412,9 @@
     margin-right: 8px;
 }
 
+
 /* Alertas */
+
 .alert {
     padding: 15px 20px;
     border-radius: 10px;
@@ -463,48 +468,41 @@
     display: none;
 }
 
+
 /* Responsive */
+
 @media (max-width: 768px) {
     .wizard-container {
         padding: 25px 20px;
         margin: 15px;
     }
-
     .wizard-header i {
         font-size: 40px;
     }
-
     .wizard-header h2 {
         font-size: var(--fs-titulo2);
     }
-
     .progress-labels {
         font-size: 10px;
     }
-
     .row {
         flex-direction: column;
     }
-
     .row .col-md-4,
     .row .col-md-6 {
         width: 100%;
         margin-bottom: 0;
     }
-
     .buttons {
         flex-direction: column;
     }
-
     .btn-next,
     .btn-submit {
         margin-left: 0;
     }
-
     .resumen-grid {
         grid-template-columns: 1fr;
     }
-
     .step-icon i {
         font-size: 36px;
         padding: 15px;
@@ -515,7 +513,6 @@
     .progress-labels span {
         font-size: 8px;
     }
-
     .form-group input,
     .form-group select,
     .form-group textarea {

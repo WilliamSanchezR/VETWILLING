@@ -2,9 +2,14 @@
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/Propietario.php';
-require_once __DIR__ . '/../models/mascotas.php';
+require_once __DIR__ . '/../models/Mascotas.php';
+require_once __DIR__ . '/../models/PacienteProfesionalAsignacion.php';
+require_once __DIR__ . '/../models/DisponibilidadUsuario.php';
+require_once __DIR__ . '/../models/Veterinario.php';
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -12,13 +17,43 @@ if ($method === 'POST') {
     registrarPacienteConPropietario();
 }
 
+function resolverIdVeterinariaRegistro(): ?int
+{
+    $idVeterinariaSesion = $_SESSION['user']['id_veterinaria'] ?? ($_SESSION['id_veterinaria'] ?? null);
+
+    if (!empty($idVeterinariaSesion)) {
+        if (is_string($idVeterinariaSesion) && strpos($idVeterinariaSesion, ',') !== false) {
+            $idVeterinariaSesion = trim(explode(',', $idVeterinariaSesion)[0]);
+        }
+
+        if (is_numeric($idVeterinariaSesion)) {
+            return (int) $idVeterinariaSesion;
+        }
+    }
+
+    $idUsuario = $_SESSION['user']['id_usuario'] ?? null;
+    if (empty($idUsuario)) {
+        return null;
+    }
+
+    $disponibilidadModel = new DisponibilidadUsuario();
+    $idVeterinariaRelacion = $disponibilidadModel->obtenerVeterinariaPorUsuario((int) $idUsuario);
+    if (!empty($idVeterinariaRelacion)) {
+        return (int) $idVeterinariaRelacion;
+    }
+
+    return null;
+}
+
 function registrarPacienteConPropietario()
 {
     // Establecer header JSON
     header('Content-Type: application/json');
 
+    $id_veterinaria = resolverIdVeterinariaRegistro();
+
     // Verificar que el usuario esté autenticado
-    if (!isset($_SESSION['user']['id_veterinaria'])) {
+    if (empty($id_veterinaria)) {
         echo json_encode([
             'success' => false,
             'message' => 'No se pudo identificar la veterinaria'
@@ -26,13 +61,7 @@ function registrarPacienteConPropietario()
         exit();
     }
 
-    // Manejar múltiples veterinarias (separadas por coma)
-    $id_veterinaria = $_SESSION['user']['id_veterinaria'];
-    if (strpos($id_veterinaria, ',') !== false) {
-        // Si hay múltiples, tomar la primera
-        $id_veterinaria = explode(',', $id_veterinaria)[0];
-        $id_veterinaria = trim($id_veterinaria);
-    }
+    $id_usuario_profesional = isset($_SESSION['user']['id_usuario']) ? (int) $_SESSION['user']['id_usuario'] : null;
 
     // Log para debug
     error_log("ID Veterinaria obtenida: " . $id_veterinaria);
@@ -133,6 +162,7 @@ function registrarPacienteConPropietario()
 
         // 2. Registrar mascotas
         $mascotaModel = new Mascota();
+        $asignacionModel = new PacienteProfesionalAsignacion();
 
         $registradas = 0;
         foreach ($mascotas as $mascota) {
@@ -144,18 +174,37 @@ function registrarPacienteConPropietario()
                 'edad_numero' => (int) $mascota['edad_numero'],
                 'edad_unidad' => trim($mascota['edad_unidad']),
                 'sexo' => trim($mascota['sexo']),
-                'img_mascota' => null
+                'img_mascota' => null,
+                'id_usuario_profesional' => $id_usuario_profesional,
+                'id_usuario_asigno' => $id_usuario_profesional
             ];
 
             error_log("Datos mascota a insertar: " . print_r($dataMascota, true));
-            $resultado = $mascotaModel->registrar($dataMascota);
+            $id_mascota_registrada = $mascotaModel->registrar($dataMascota);
 
-            if (!$resultado) {
+            if (!$id_mascota_registrada) {
                 echo json_encode([
                     'success' => false,
                     'message' => 'No se pudo registrar una de las mascotas'
                 ]);
                 exit();
+            }
+
+            if ($id_usuario_profesional !== null && $asignacionModel->tablaExiste()) {
+                $okAsignacion = $asignacionModel->asegurarAsignacionActiva(
+                    (int) $id_mascota_registrada,
+                    $id_usuario_profesional,
+                    $id_usuario_profesional,
+                    'Asignación inicial desde registro de pacientes'
+                );
+
+                if (!$okAsignacion) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'La mascota se registró pero falló su asignación al profesional'
+                    ]);
+                    exit();
+                }
             }
 
             $registradas++;

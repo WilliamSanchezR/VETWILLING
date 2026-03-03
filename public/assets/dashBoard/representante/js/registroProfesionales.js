@@ -88,6 +88,8 @@ class RegistroProfesionales {
                     }
                 });
             }
+        } else {
+             this.cargarEspecialidadesPorServicios();
         }
     }
 
@@ -173,7 +175,7 @@ class RegistroProfesionales {
 
                 this.containerEspecialidades.appendChild(divEsp);
             });
-            this.containerEspecialidades.style.display = 'grid';
+            this.containerEspecialidades.style.display = 'flex';
         } else {
             return;
         }
@@ -196,7 +198,7 @@ class RegistroProfesionales {
                 divServ.appendChild(removeBtn);
                 this.containerServicios.appendChild(divServ);
             });
-            this.containerServicios.style.display = 'grid';
+            this.containerServicios.style.display = 'flex';
         } else {
             return;
         }
@@ -227,7 +229,7 @@ class RegistroProfesionales {
     // Método para cargar especialidades según servicios seleccionados
     cargarEspecialidadesPorServicios() {
         const serviciosSeleccionados = this.inputServicios.value;
-        
+
         // Si no hay servicios seleccionados, limpiar especialidades
         if (!serviciosSeleccionados || serviciosSeleccionados.length === 0) {
             this.actualizarListaEspecialidades([]);
@@ -258,7 +260,7 @@ class RegistroProfesionales {
     // Método para actualizar la lista de especialidades en el DOM
     actualizarListaEspecialidades(especialidades) {
         const ulEspecialidades = this.listEspecialidades.querySelector('ul');
-        
+
         if (!ulEspecialidades) return;
 
         // Limpiar la lista actual
@@ -275,9 +277,8 @@ class RegistroProfesionales {
         }
 
         // Obtener las especialidades actualmente seleccionadas
-        const especialidadesSeleccionadas = this.inputEspecialidades.value 
-            ? JSON.parse(this.inputEspecialidades.value) 
-            : [];
+        const especialidadesSeleccionadas = this.inputEspecialidades.value ?
+            JSON.parse(this.inputEspecialidades.value) : [];
 
         // Crear los nuevos items de la lista
         especialidades.forEach(esp => {
@@ -320,9 +321,8 @@ class RegistroProfesionales {
 
     // Método para eliminar de las seleccionadas las que ya no están disponibles
     filtrarEspecialidadesNoDisponibles(especialidadesDisponibles) {
-        const especialidadesSeleccionadas = this.inputEspecialidades.value 
-            ? JSON.parse(this.inputEspecialidades.value) 
-            : [];
+        const especialidadesSeleccionadas = this.inputEspecialidades.value ?
+            JSON.parse(this.inputEspecialidades.value) : [];
 
         if (especialidadesSeleccionadas.length === 0) return;
 

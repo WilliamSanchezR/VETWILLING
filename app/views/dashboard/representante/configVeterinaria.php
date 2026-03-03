@@ -29,8 +29,7 @@ $veterinariaData = consultarVeterinariasRegistradas($idVeterinaria);
     <!-- Tus CSS -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
+   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/configVeterinaria.styles.css">

@@ -43,6 +43,7 @@ $datosUsuario = [
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 
 <!-- NAVBAR SUPERIOR -->
 <nav class="navbar-superior" role="navigation" aria-label="Navegación principal">

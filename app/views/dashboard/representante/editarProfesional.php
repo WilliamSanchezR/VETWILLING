@@ -70,7 +70,7 @@ if (count($listaServiciosProfesional) > 0) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Propio -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/formularioAdminStyles.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/regitroProfesionales.styles.css">
@@ -248,7 +248,7 @@ if (count($listaServiciosProfesional) > 0) {
                     <h3><i class="bi bi-motherboard"></i>Servicios del profesional</h3>
 
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <button type="button" class="btn btn-primary btn-sm" id="agregarServicioBtn">
                                     <i class="bi bi-plus-lg"></i> Agregar Servicio
@@ -288,7 +288,7 @@ if (count($listaServiciosProfesional) > 0) {
                     <h3><i class="bi bi-motherboard"></i>Especialidades del profesional</h3>
 
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <button type="button" class="btn btn-primary btn-sm" id="agregarEspecialidadBtn">
                                     <i class="bi bi-plus-lg"></i> Agregar Especialidad
@@ -301,7 +301,7 @@ if (count($listaServiciosProfesional) > 0) {
                             </div>
                         </div>
 
-                        <div class="col-md-12" id="especialidadesContainer" <?= count($listaEspecialidadesProfesional) > 0 ? 'style="display: grid;"' : 'style="display: none;"' ?>>
+                        <div class="col-md-12" id="especialidadesContainer" <?= count($listaEspecialidadesProfesional) > 0 ? 'style="display: flex;"' : 'style="display: none;"' ?>>
                             <?php foreach ($listaEspecialidadesProfesional as $especialidad): ?>
                                 <div class="especialidad-seleccionada">
                                     <span><?= htmlspecialchars($especialidad['nombre']) ?></span>

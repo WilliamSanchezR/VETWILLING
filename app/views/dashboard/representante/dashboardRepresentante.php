@@ -1,9 +1,9 @@
 <?php
 // 
 require_once BASE_PATH . '/app/helpers/session_representante.php';
+require_once BASE_PATH . '/app/controllers/usuarioController.php';
 
-
-
+$usuario = $_SESSION['user'];
 ?>
 
 <!DOCTYPE html>
@@ -27,7 +27,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
 
 </head>
 
@@ -55,7 +55,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
             <!-- HEADER ADMIN -->
             <div class="header-admin">
                 <div class="header-info">
-                    <h1>👋 Bienvenido, Administrador <?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h1>
+                    <h1>👋 Bienvenido, Administrador <?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?></h1>
                     <p>Panel de control principal - Gestiona todo el sistema VetWilling</p>
                 </div>
                 <div class="header-acciones">

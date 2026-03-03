@@ -1,65 +1,52 @@
 /* ================================================
-   SUSCRIPCIÓN — Estilos
-   Archivo: suscripcion.css
+   SUSCRIPCIÓN — Estilos v2.0
    Tema: Fondo blanco · Popular verde #0A932C
    ================================================ */
 
-/* ── VARIABLES GLOBALES ── */
+/* ── VARIABLES ── */
 :root {
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --surface2: #f4f6f8;
-  --border: #e2e6ea;
-  --text: #1a1d23;
-  --muted: #6b7280;
-  --accent: #0A932C;
-  /* Verde principal */
+  --bg:           #ffffff;
+  --surface:      #ffffff;
+  --surface2:     #f4f6f8;
+  --border:       #e2e6ea;
+  --text:         #1a1d23;
+  --muted:        #6b7280;
+  --accent:       #0A932C;
+  --accent-dark:  #087a24;
   --accent-light: rgba(10, 147, 44, 0.10);
-  --accent-mid: rgba(10, 147, 44, 0.25);
-  --green: #0A932C;
+  --accent-mid:   rgba(10, 147, 44, 0.25);
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.07);
+  --radius-card:  24px;
+  --transition:   0.25s ease;
 }
 
-* {
-  font-family: 'Open Sans', sans-serif;
-
-}
+/* ── CONTENEDOR ── */
 
 .contenido-principal {
-  margin-left: var(--sidebar-width);
-  min-height: 100vh;
-  /* background-color: var(--color-fondo); */
-  transition: margin-left var(--transition-normal);
-  position: relative;
-  padding: 20px 10px 10px 20px;
-  position: relative;
-  top: 40px;
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    width: auto;
+    transition: margin-left 0.3s ease;
+    background: var(--color-fondo);
 }
 
-/* Cuando el sidebar está colapsado */
-#sidebar.collapsed~.contenido-principal {
-  margin-left: var(--sidebar-collapsed-width);
+.sidebar.collapsed ~ .contenido-principal {
+  margin-left: var(--sidebar-width-collapsed);
 }
-
-.contenido-expandido {
-  margin-left: var(--sidebar-collapsed-width) !important;
-}
-
-/* ── CONTENEDOR PRINCIPAL ── */
 .wrap {
   position: relative;
   max-width: 1160px;
   margin: 0 auto;
-  padding: 70px 24px 100px;
-
+  padding: 32px 24px 80px;
 }
-
 
 /* ════════════════════════════════════
    HEADER
    ════════════════════════════════════ */
 .header {
   text-align: center;
-  margin-bottom: 56px;
+  margin-bottom: 52px;
+  animation: fadeUp 0.6s ease both;
 }
 
 .eyebrow {
@@ -75,34 +62,40 @@
   border: 1px solid var(--accent-mid);
   border-radius: 100px;
   padding: 6px 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .eyebrow::before {
   content: '●';
   font-size: 8px;
+  animation: pulseDot 2s infinite;
 }
 
-h1 {
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.wrap h1 {
   font-style: italic;
-  font-size: clamp(42px, 6vw, 72px);
+  font-size: clamp(38px, 5.5vw, 68px);
   font-weight: 900;
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: var(--text);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
-h1 em {
+.wrap h1 em {
   font-style: italic;
   color: var(--accent);
 }
 
 .subtitle {
-  font-size: 17px;
+  font-size: 16px;
   color: var(--muted);
-  max-width: 480px;
-  margin: 0 auto 36px;
+  max-width: 460px;
+  margin: 0 auto 32px;
   line-height: 1.65;
 }
 
@@ -117,6 +110,23 @@ h1 em {
   border-radius: 100px;
   padding: 4px;
   gap: 2px;
+  position: relative;
+}
+
+/* Slider animado de fondo — posición controlada por JS via CSS vars */
+.toggle-wrap::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: var(--slider-left, 4px);
+  width: var(--slider-width, 90px);
+  height: calc(100% - 8px);
+  border-radius: 100px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  transition: left  0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 0;
 }
 
 .toggle-btn {
@@ -125,7 +135,6 @@ h1 em {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.25s;
   color: var(--muted);
   border: none;
   background: transparent;
@@ -133,16 +142,19 @@ h1 em {
   align-items: center;
   gap: 7px;
   font-family: 'Open Sans', sans-serif;
-
+  position: relative;
+  z-index: 1;
+  transition: color 0.25s ease;
+  user-select: none;
+  white-space: nowrap;
 }
 
 .toggle-btn.active {
-  background: #ffffff;
   color: var(--text);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  font-weight: 600;
 }
 
-/* Badge "−20%" en el toggle */
+/* Badge "−20%" */
 .badge-save {
   font-size: 11px;
   font-weight: 700;
@@ -150,6 +162,12 @@ h1 em {
   color: #ffffff;
   border-radius: 100px;
   padding: 2px 8px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.toggle-btn.active .badge-save {
+  background: var(--accent);
+  transform: scale(1.05);
 }
 
 
@@ -162,53 +180,57 @@ h1 em {
   gap: 0;
   align-items: stretch;
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: var(--radius-card);
   overflow: hidden;
-  margin-bottom: 64px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  margin-bottom: 56px;
+  box-shadow: var(--shadow-card);
+  animation: fadeUp 0.6s 0.1s ease both;
 }
 
 /* ── Card base ── */
 .plan {
   background: var(--surface);
-  padding: 40px 36px;
+  padding: 40px 32px;
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.plan+.plan {
+.plan + .plan {
   border-left: 1px solid var(--border);
 }
 
-/* ── Card POPULAR (ProCare) ── */
-.plan.popular {
-  background: linear-gradient(160deg, #0A932C 0%, #087a24 55%, #065c1b 100%);
-  border-left: 1px solid rgba(10, 147, 44, 0.4) !important;
-  border-right: 1px solid rgba(10, 147, 44, 0.4) !important;
-  transform: scaleY(1.02);
-  z-index: 2;
-  box-shadow:
-    0 0 0 1px rgba(10, 147, 44, 0.3),
-    0 32px 80px rgba(10, 147, 44, 0.20);
+/* Hover sutil en cards laterales */
+.plan:not(.popular):hover {
+  background: #fafbfc;
 }
 
-/* Línea brillante en la parte superior */
+/* ── Card POPULAR ── */
+.plan.popular {
+  background: linear-gradient(160deg, #0A932C 0%, #087a24 55%, #065c1b 100%);
+  border-left: 1px solid rgba(10,147,44,0.4) !important;
+  border-right: 1px solid rgba(10,147,44,0.4) !important;
+  transform: scaleY(1.025);
+  z-index: 2;
+  box-shadow:
+    0 0 0 1px rgba(10,147,44,0.3),
+    0 24px 64px rgba(10,147,44,0.22);
+}
+
+/* Línea brillante superior */
 .plan.popular::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
 }
 
-/* Badge "⭐ Más popular" flotante */
+/* Badge "Más popular" */
 .pop-badge {
   position: absolute;
-  top: 8px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
   background: #ffffff;
@@ -220,124 +242,124 @@ h1 em {
   padding: 5px 16px;
   border-radius: 100px;
   white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(10, 147, 44, 0.25);
+  box-shadow: 0 4px 16px rgba(10,147,44,0.25);
   border: 1.5px solid var(--accent-mid);
 }
 
-/* Nombre del plan */
+/* ── Plan name ── */
 .plan-name {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  margin-top: 16px;
-  margin-bottom: 10px;
+  margin-top: 18px;
+  margin-bottom: 8px;
   color: var(--text);
 }
 
-.plan.popular .plan-name {
-  color: #ffffff;
-}
+.plan.popular .plan-name { color: #ffffff; }
 
-/* Descripción */
 .plan-desc {
   font-size: 14px;
   color: var(--muted);
   line-height: 1.6;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
-.plan.popular .plan-desc {
-  color: rgba(255, 255, 255, 0.75);
-}
+.plan.popular .plan-desc { color: rgba(255,255,255,0.75); }
 
 
 /* ════════════════════════════════════
-   PRECIOS
+   PRECIOS — Animación al cambiar
    ════════════════════════════════════ */
 .price-block {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .price {
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 3px;
 }
 
 .price-symbol {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   color: var(--muted);
+  transition: color var(--transition);
 }
 
-.plan.popular .price-symbol {
-  color: rgba(255, 255, 255, 0.7);
-}
+.plan.popular .price-symbol { color: rgba(255,255,255,0.7); }
 
+/* El número principal con transición */
 .price-num {
-  font-size: 54px;
+  font-size: 52px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.03em;
   color: var(--text);
-  transition: all 0.4s;
+  transition: all 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  display: inline-block;
 }
 
-.plan.popular .price-num {
-  color: #ffffff;
+/* Clase que JS agrega durante el cambio */
+.price-num.changing {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.95);
 }
+
+.plan.popular .price-num { color: #ffffff; }
 
 .price-period {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--muted);
+  margin-left: 2px;
 }
 
-.plan.popular .price-period {
-  color: rgba(255, 255, 255, 0.65);
-}
+.plan.popular .price-period { color: rgba(255,255,255,0.65); }
 
 /* Nota de ahorro anual */
 .price-annual-note {
   font-size: 13px;
-  color: var(--green);
+  color: var(--accent);
   margin-top: 6px;
-  min-height: 20px;
-  font-weight: 500;
+  min-height: 22px;
+  font-weight: 600;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.plan.popular .price-annual-note {
-  color: rgba(255, 255, 255, 0.85);
+.price-annual-note.hidden-note {
+  opacity: 0;
+  transform: translateY(4px);
 }
+
+.plan.popular .price-annual-note { color: rgba(255,255,255,0.9); }
 
 
 /* ════════════════════════════════════
-   LISTA DE FEATURES
+   FEATURES
    ════════════════════════════════════ */
 .features {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 13px;
-  margin-bottom: 36px;
+  gap: 12px;
+  margin-bottom: 32px;
   flex: 1;
 }
 
 .features li {
   display: flex;
   align-items: center;
-  gap: 11px;
-  font-size: 14.5px;
+  gap: 10px;
+  font-size: 14px;
   color: var(--text);
+  transition: opacity 0.2s ease;
 }
 
-.plan.popular .features li {
-  color: rgba(255, 255, 255, 0.92);
-}
+.plan.popular .features li { color: rgba(255,255,255,0.92); }
 
-.features li.off {
-  opacity: 0.45;
-}
+.features li.off { opacity: 0.4; }
 
-/* Ícono circular (✓ / ✕) */
+/* Íconos */
 .fi {
   width: 22px;
   height: 22px;
@@ -347,90 +369,98 @@ h1 em {
   justify-content: center;
   font-size: 12px;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
 
-/* Checks en cards normales — verde */
+.features li:hover .fi { transform: scale(1.1); }
+
 .fi.yes {
   background: var(--accent-light);
   color: var(--accent);
   border: 1px solid var(--accent-mid);
 }
 
-/* Checks en card popular — blancos */
 .plan.popular .fi.yes {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.2);
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255,255,255,0.35);
 }
 
-/* X en cards normales */
 .fi.no {
   background: #f4f6f8;
   color: var(--muted);
   border: 1px solid var(--border);
 }
 
-/* X en card popular */
 .plan.popular .fi.no {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.4);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.35);
+  border-color: rgba(255,255,255,0.12);
 }
 
-/* Separador antes del botón */
+/* Divider */
 .plan-divider {
   height: 1px;
   background: var(--border);
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
-.plan.popular .plan-divider {
-  background: rgba(255, 255, 255, 0.2);
-}
+.plan.popular .plan-divider { background: rgba(255,255,255,0.2); }
 
 
 /* ════════════════════════════════════
    BOTONES CTA
    ════════════════════════════════════ */
 .btn {
-  width: 100%;
-  padding: 15px;
+  /* width: 100%; */
+  padding: 14px;
   border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   border: none;
-  transition: all 0.25s;
+  transition: all 0.25s ease;
   letter-spacing: 0.02em;
   font-family: 'Open Sans', sans-serif;
-
+  text-align: center;
+  text-decoration: none;
+  display: block;
 }
 
-/* Botón outline — cards normales */
 .btn-outline {
   background: transparent;
   border: 1.5px solid var(--border);
   color: var(--text);
 }
+.Prueba {
+  border-color: var(--accent);
+  color: #fff;
+}
+.Prueba:hover {
+  border-color: var(--accent);
+  color: #fff !important;
+}
+
 
 .btn-outline:hover {
   border-color: var(--accent);
   color: var(--accent);
   background: var(--accent-light);
+  transform: translateY(-1px);
 }
 
-/* Botón primario — blanco sobre verde (ProCare) */
 .btn-primary {
   background: #ffffff;
   color: var(--accent);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   font-weight: 700;
 }
 
 .btn-primary:hover {
-  background: #0a932c;
-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.20);
-  transform: translateY(-1px);
+  background: var(--accent-dark);
+  color: #ffffff;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.20);
+  transform: translateY(-2px);
 }
 
 
@@ -445,23 +475,27 @@ h1 em {
   background: #f0fdf4;
   border: 1px solid var(--accent-mid);
   border-radius: 16px;
-  padding: 24px 32px;
-  margin-bottom: 72px;
+  padding: 22px 32px;
+  margin-bottom: 64px;
+  animation: fadeUp 0.6s 0.2s ease both;
+  transition: box-shadow 0.25s ease;
 }
 
-.guarantee-icon {
-  font-size: 32px;
+.guarantee:hover {
+  box-shadow: 0 4px 20px rgba(10,147,44,0.12);
 }
+
+.guarantee-icon { font-size: 30px; }
 
 .guarantee h4 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   color: var(--text);
 }
 
 .guarantee p {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--muted);
 }
 
@@ -470,19 +504,21 @@ h1 em {
    FAQ
    ════════════════════════════════════ */
 .faq-title {
-  font-size: clamp(28px, 4vw, 42px);
+  font-size: clamp(26px, 4vw, 38px);
   font-weight: 700;
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
   color: var(--text);
+  animation: fadeUp 0.6s 0.3s ease both;
 }
 
 .faq-list {
-  max-width: 680px;
+  max-width: 660px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  animation: fadeUp 0.6s 0.35s ease both;
 }
 
 .faq-item {
@@ -495,11 +531,11 @@ h1 em {
 
 .faq-item:hover {
   border-color: var(--accent-mid);
-  box-shadow: 0 2px 12px rgba(10, 147, 44, 0.08);
+  box-shadow: 0 2px 12px rgba(10,147,44,0.08);
 }
 
 .faq-q {
-  padding: 20px 24px;
+  padding: 18px 22px;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
@@ -509,26 +545,37 @@ h1 em {
   gap: 12px;
   user-select: none;
   color: var(--text);
+  transition: color 0.2s ease;
 }
+
+.faq-item.open .faq-q { color: var(--accent); }
 
 .faq-arrow {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--muted);
-  transition: transform 0.3s;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
   flex-shrink: 0;
+  display: inline-block;
 }
 
+/* Respuesta con animación de altura */
 .faq-a {
-  display: none;
-  padding: 0 24px 20px;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 22px;
   font-size: 14px;
   color: var(--muted);
   line-height: 1.7;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              padding    0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity    0.3s ease;
+  opacity: 0;
 }
 
-/* Estados abiertos */
 .faq-item.open .faq-a {
-  display: block;
+  max-height: 200px;
+  padding: 0 22px 18px;
+  opacity: 1;
 }
 
 .faq-item.open .faq-arrow {
@@ -538,12 +585,38 @@ h1 em {
 
 .faq-item.open {
   border-color: var(--accent-mid);
-  box-shadow: 0 2px 12px rgba(10, 147, 44, 0.08);
+  box-shadow: 0 2px 12px rgba(10,147,44,0.08);
 }
 
 
 /* ════════════════════════════════════
-   RESPONSIVE — Móvil
+   ANIMACIONES GLOBALES
+   ════════════════════════════════════ */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* ════════════════════════════════════
+   RESPONSIVE
    ════════════════════════════════════ */
 @media (max-width: 860px) {
   .grid {
@@ -551,7 +624,7 @@ h1 em {
     border-radius: 20px;
   }
 
-  .plan+.plan {
+  .plan + .plan {
     border-left: none;
     border-top: 1px solid var(--border);
   }
@@ -562,14 +635,25 @@ h1 em {
     border: none !important;
   }
 
-  .plan.popular::before {
-    display: none;
-  }
+  .plan.popular::before { display: none; }
 
   .pop-badge {
     top: 16px;
-    right: 24px;
+    right: 20px;
     left: auto;
     transform: none;
   }
+
+  .guarantee {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .wrap { padding: 24px 16px 60px; }
+}
+
+@media (max-width: 480px) {
+  .plan { padding: 32px 22px; }
+  .price-num { font-size: 42px; }
 }
