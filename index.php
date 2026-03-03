@@ -163,6 +163,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
         break;
 
+    case '/veterinaria/gestion-pacientes':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-pacientes.php';
+        break;
+
     case '/veterinaria/laboratorio':
         require BASE_PATH . '/app/views/dashboard/veterinaria/laboratorio.php';
         break;
