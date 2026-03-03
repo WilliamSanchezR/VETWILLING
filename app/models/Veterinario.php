@@ -367,6 +367,281 @@ class Veterinario
         }
     }
 
+    private function asegurarTablaHistorialClinico(): bool
+    {
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS historial_clinico_paciente (
+                        id_historial INT AUTO_INCREMENT PRIMARY KEY,
+                        id_paciente INT NOT NULL,
+                        id_usuario_profesional INT NOT NULL,
+                        fecha_atencion DATETIME NOT NULL,
+                        motivo_consulta VARCHAR(255) NOT NULL,
+                        diagnostico TEXT NULL,
+                        tratamientos_aplicados TEXT NULL,
+                        medicacion_recetada TEXT NULL,
+                        observaciones_adicionales TEXT NULL,
+                        version_registro INT NOT NULL DEFAULT 1,
+                        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        INDEX idx_hcp_paciente (id_paciente),
+                        INDEX idx_hcp_profesional (id_usuario_profesional),
+                        INDEX idx_hcp_fecha (fecha_atencion)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
+            $this->conexion->exec($sql);
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::asegurarTablaHistorialClinico - " . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function profesionalTienePacienteActivo($id_usuario, $id_paciente): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*)
+                    FROM paciente_profesional_asignacion
+                    WHERE id_usuario_profesional = :id_usuario
+                      AND id_paciente = :id_paciente
+                      AND estado = 'Activo'
+                      AND fecha_fin IS NULL";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return ((int) $stmt->fetchColumn()) > 0;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::profesionalTienePacienteActivo - " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function listarHistorialesClinicosPorProfesional($id_usuario, array $filtros = []): array
+    {
+        try {
+            if (!$this->asegurarTablaHistorialClinico()) {
+                return [];
+            }
+
+            $sql = "SELECT
+                        p.id_paciente,
+                        p.nombre AS paciente_nombre,
+                        p.especie,
+                        p.raza,
+                        h.id_historial,
+                        h.fecha_atencion,
+                        h.motivo_consulta,
+                        h.diagnostico,
+                        h.tratamientos_aplicados,
+                        h.medicacion_recetada,
+                        h.observaciones_adicionales,
+                        h.version_registro,
+                        COALESCE(
+                            NULLIF(TRIM(CONCAT(v.nombres, ' ', v.apellidos)), ''),
+                            NULLIF(TRIM(CONCAT(prf.nombres, ' ', prf.apellidos)), ''),
+                            u.email,
+                            'Profesional'
+                        ) AS veterinario_responsable
+                    FROM paciente_profesional_asignacion ppa
+                    INNER JOIN paciente p ON p.id_paciente = ppa.id_paciente
+                    LEFT JOIN historial_clinico_paciente h ON h.id_historial = (
+                        SELECT h2.id_historial
+                        FROM historial_clinico_paciente h2
+                        WHERE h2.id_paciente = p.id_paciente
+                          AND h2.id_usuario_profesional = ppa.id_usuario_profesional
+                        ORDER BY h2.fecha_atencion DESC, h2.id_historial DESC
+                        LIMIT 1
+                    )
+                    LEFT JOIN usuario u ON u.id_usuario = ppa.id_usuario_profesional
+                    LEFT JOIN veterinario v ON v.id_usuario = ppa.id_usuario_profesional
+                    LEFT JOIN profesional prf ON prf.id_usuario = ppa.id_usuario_profesional
+                    WHERE ppa.id_usuario_profesional = :id_usuario
+                      AND ppa.estado = 'Activo'
+                      AND ppa.fecha_fin IS NULL";
+
+            $params = [':id_usuario' => $id_usuario];
+
+            if (!empty($filtros['paciente'])) {
+                $sql .= " AND p.nombre LIKE :paciente";
+                $params[':paciente'] = '%' . $filtros['paciente'] . '%';
+            }
+
+            if (!empty($filtros['fecha'])) {
+                $sql .= " AND DATE(h.fecha_atencion) = :fecha";
+                $params[':fecha'] = $filtros['fecha'];
+            }
+
+            if (!empty($filtros['veterinario'])) {
+                $sql .= " AND COALESCE(
+                                NULLIF(TRIM(CONCAT(v.nombres, ' ', v.apellidos)), ''),
+                                NULLIF(TRIM(CONCAT(prf.nombres, ' ', prf.apellidos)), ''),
+                                u.email,
+                                'Profesional'
+                            ) = :veterinario";
+                $params[':veterinario'] = $filtros['veterinario'];
+            }
+
+            $sql .= " ORDER BY h.fecha_atencion DESC, h.id_historial DESC, p.nombre ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            $stmt->execute();
+
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as &$row) {
+                $row['acceso'] = 'Autorizado';
+            }
+
+            return $rows;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::listarHistorialesClinicosPorProfesional - " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function guardarHistorialClinicoPorProfesional($id_usuario, array $data)
+    {
+        try {
+            if (!$this->asegurarTablaHistorialClinico()) {
+                return false;
+            }
+
+            $idPaciente = (int) ($data['id_paciente'] ?? 0);
+            $idHistorial = (int) ($data['id_historial'] ?? 0);
+
+            if ($idPaciente <= 0 || !$this->profesionalTienePacienteActivo($id_usuario, $idPaciente)) {
+                return false;
+            }
+
+            $fechaAtencion = trim((string) ($data['fecha_atencion'] ?? ''));
+            if ($fechaAtencion === '') {
+                $fechaAtencion = date('Y-m-d H:i:s');
+            } elseif (strlen($fechaAtencion) === 10) {
+                $fechaAtencion .= ' 00:00:00';
+            }
+
+            if ($idHistorial > 0) {
+                $sqlExiste = "SELECT version_registro
+                              FROM historial_clinico_paciente
+                              WHERE id_historial = :id_historial
+                                AND id_usuario_profesional = :id_usuario
+                                AND id_paciente = :id_paciente
+                              LIMIT 1";
+
+                $stmtExiste = $this->conexion->prepare($sqlExiste);
+                $stmtExiste->bindParam(':id_historial', $idHistorial, PDO::PARAM_INT);
+                $stmtExiste->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+                $stmtExiste->bindParam(':id_paciente', $idPaciente, PDO::PARAM_INT);
+                $stmtExiste->execute();
+
+                $actual = $stmtExiste->fetch(PDO::FETCH_ASSOC);
+                if (!$actual) {
+                    return false;
+                }
+
+                $nuevaVersion = ((int) $actual['version_registro']) + 1;
+
+                $sqlUpdate = "UPDATE historial_clinico_paciente
+                              SET fecha_atencion = :fecha_atencion,
+                                  motivo_consulta = :motivo_consulta,
+                                  diagnostico = :diagnostico,
+                                  tratamientos_aplicados = :tratamientos_aplicados,
+                                  medicacion_recetada = :medicacion_recetada,
+                                  observaciones_adicionales = :observaciones_adicionales,
+                                  version_registro = :version_registro
+                              WHERE id_historial = :id_historial
+                                AND id_usuario_profesional = :id_usuario
+                                AND id_paciente = :id_paciente";
+
+                $stmtUpdate = $this->conexion->prepare($sqlUpdate);
+                $stmtUpdate->bindParam(':fecha_atencion', $fechaAtencion, PDO::PARAM_STR);
+                $stmtUpdate->bindParam(':motivo_consulta', $data['motivo_consulta'], PDO::PARAM_STR);
+                $stmtUpdate->bindParam(':diagnostico', $data['diagnostico'], PDO::PARAM_STR);
+                $stmtUpdate->bindParam(':tratamientos_aplicados', $data['tratamientos_aplicados'], PDO::PARAM_STR);
+                $stmtUpdate->bindParam(':medicacion_recetada', $data['medicacion_recetada'], PDO::PARAM_STR);
+                $stmtUpdate->bindParam(':observaciones_adicionales', $data['observaciones_adicionales'], PDO::PARAM_STR);
+                $stmtUpdate->bindParam(':version_registro', $nuevaVersion, PDO::PARAM_INT);
+                $stmtUpdate->bindParam(':id_historial', $idHistorial, PDO::PARAM_INT);
+                $stmtUpdate->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+                $stmtUpdate->bindParam(':id_paciente', $idPaciente, PDO::PARAM_INT);
+
+                if (!$stmtUpdate->execute()) {
+                    return false;
+                }
+
+                return [
+                    'id_historial' => $idHistorial,
+                    'id_paciente' => $idPaciente,
+                    'version_registro' => $nuevaVersion,
+                ];
+            }
+
+            $sqlVersion = "SELECT COALESCE(MAX(version_registro), 0) + 1
+                           FROM historial_clinico_paciente
+                           WHERE id_paciente = :id_paciente
+                             AND id_usuario_profesional = :id_usuario";
+
+            $stmtVersion = $this->conexion->prepare($sqlVersion);
+            $stmtVersion->bindParam(':id_paciente', $idPaciente, PDO::PARAM_INT);
+            $stmtVersion->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtVersion->execute();
+            $version = (int) $stmtVersion->fetchColumn();
+            if ($version <= 0) {
+                $version = 1;
+            }
+
+            $sqlInsert = "INSERT INTO historial_clinico_paciente (
+                            id_paciente,
+                            id_usuario_profesional,
+                            fecha_atencion,
+                            motivo_consulta,
+                            diagnostico,
+                            tratamientos_aplicados,
+                            medicacion_recetada,
+                            observaciones_adicionales,
+                            version_registro
+                        ) VALUES (
+                            :id_paciente,
+                            :id_usuario,
+                            :fecha_atencion,
+                            :motivo_consulta,
+                            :diagnostico,
+                            :tratamientos_aplicados,
+                            :medicacion_recetada,
+                            :observaciones_adicionales,
+                            :version_registro
+                        )";
+
+            $stmtInsert = $this->conexion->prepare($sqlInsert);
+            $stmtInsert->bindParam(':id_paciente', $idPaciente, PDO::PARAM_INT);
+            $stmtInsert->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtInsert->bindParam(':fecha_atencion', $fechaAtencion, PDO::PARAM_STR);
+            $stmtInsert->bindParam(':motivo_consulta', $data['motivo_consulta'], PDO::PARAM_STR);
+            $stmtInsert->bindParam(':diagnostico', $data['diagnostico'], PDO::PARAM_STR);
+            $stmtInsert->bindParam(':tratamientos_aplicados', $data['tratamientos_aplicados'], PDO::PARAM_STR);
+            $stmtInsert->bindParam(':medicacion_recetada', $data['medicacion_recetada'], PDO::PARAM_STR);
+            $stmtInsert->bindParam(':observaciones_adicionales', $data['observaciones_adicionales'], PDO::PARAM_STR);
+            $stmtInsert->bindParam(':version_registro', $version, PDO::PARAM_INT);
+
+            if (!$stmtInsert->execute()) {
+                return false;
+            }
+
+            return [
+                'id_historial' => (int) $this->conexion->lastInsertId(),
+                'id_paciente' => $idPaciente,
+                'version_registro' => $version,
+            ];
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::guardarHistorialClinicoPorProfesional - " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function registrar($data)
     {
         try {

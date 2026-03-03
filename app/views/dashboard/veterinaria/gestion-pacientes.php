@@ -33,10 +33,10 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <p class="subtitulo-historial mb-0">Historial clínico, control de acceso y trazabilidad por atención</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn-secundario" type="button">
+                        <button id="btnExportarPdf" class="btn-secundario" type="button">
                             <i class="bi bi-download me-1"></i> Exportar reporte
                         </button>
-                        <button class="boton-agregar" type="button">
+                        <button id="btnNuevaAtencion" class="boton-agregar" type="button">
                             <i class="bi bi-plus-circle"></i> Nueva atención
                         </button>
                     </div>
@@ -59,9 +59,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <label class="label-historial">Veterinario</label>
                             <select id="filtroVeterinario" class="select-filtro">
                                 <option value="">Todos</option>
-                                <option value="Dra. María García">Dra. María García</option>
-                                <option value="Dr. Juan Pérez">Dr. Juan Pérez</option>
-                                <option value="Dra. Laura Gómez">Dra. Laura Gómez</option>
                             </select>
                         </div>
                         <div>
@@ -69,7 +66,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <select id="filtroAcceso" class="select-filtro">
                                 <option value="">Todos</option>
                                 <option value="Autorizado">Autorizado</option>
-                                <option value="Restringido">Restringido</option>
                             </select>
                         </div>
                         <div class="acciones-filtro">
@@ -84,7 +80,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <div class="historial-card h-100">
                             <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                                 <h5 class="mb-0"><i class="bi bi-table me-2"></i>Listado de atenciones</h5>
-                                <span class="badge-sync"><i class="bi bi-arrow-repeat"></i> Actualización automática</span>
+                                <span class="badge-sync"><i class="bi bi-arrow-repeat"></i> Datos en tiempo real</span>
                             </div>
                             <div class="table-responsive tabla-wrapper">
                                 <table class="tabla-historial" id="tablaHistoriales">
@@ -99,60 +95,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr class="active" data-paciente="Luna" data-especie="Canino" data-raza="Labrador"
-                                            data-fecha="2026-03-02" data-vet="Dra. María García"
-                                            data-motivo="Control postoperatorio" data-diagnostico="Evolución favorable"
-                                            data-tratamiento="Curación, control de sutura" data-medicacion="Amoxicilina 250mg"
-                                            data-observaciones="Próximo control en 7 días" data-acceso="Autorizado" data-version="v3.2">
-                                            <td class="paciente-cell"><strong>Luna</strong><small>Canino · Labrador</small></td>
-                                            <td>2026-03-02</td>
-                                            <td>Dra. María García</td>
-                                            <td>Control postoperatorio</td>
-                                            <td><span class="badge-acceso permitido"><i class="bi bi-check-circle"></i> Autorizado</span></td>
-                                            <td><span class="badge-version">v3.2</span></td>
-                                            <td>
-                                                <div class="acciones-registro">
-                                                    <button class="btn-mini" title="Ver"><i class="bi bi-eye"></i></button>
-                                                    <button class="btn-mini btn-editar" title="Editar"><i class="bi bi-pencil"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr data-paciente="Milo" data-especie="Felino" data-raza="Criollo"
-                                            data-fecha="2026-03-01" data-vet="Dr. Juan Pérez"
-                                            data-motivo="Vómito persistente" data-diagnostico="Gastroenteritis leve"
-                                            data-tratamiento="Fluidoterapia y dieta blanda" data-medicacion="Omeprazol 5mg"
-                                            data-observaciones="Monitoreo por 48 horas" data-acceso="Autorizado" data-version="v1.6">
-                                            <td class="paciente-cell"><strong>Milo</strong><small>Felino · Criollo</small></td>
-                                            <td>2026-03-01</td>
-                                            <td>Dr. Juan Pérez</td>
-                                            <td>Vómito persistente</td>
-                                            <td><span class="badge-acceso permitido"><i class="bi bi-check-circle"></i> Autorizado</span></td>
-                                            <td><span class="badge-version">v1.6</span></td>
-                                            <td>
-                                                <div class="acciones-registro">
-                                                    <button class="btn-mini" title="Ver"><i class="bi bi-eye"></i></button>
-                                                    <button class="btn-mini btn-editar" title="Editar"><i class="bi bi-pencil"></i></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr data-paciente="Nina" data-especie="Canino" data-raza="Pug"
-                                            data-fecha="2026-02-28" data-vet="Dra. Laura Gómez"
-                                            data-motivo="Dificultad respiratoria" data-diagnostico="Síndrome braquicefálico"
-                                            data-tratamiento="Nebulización y observación" data-medicacion="Prednisolona 10mg"
-                                            data-observaciones="Solo personal autorizado puede modificar" data-acceso="Restringido" data-version="v4.1">
-                                            <td class="paciente-cell"><strong>Nina</strong><small>Canino · Pug</small></td>
-                                            <td>2026-02-28</td>
-                                            <td>Dra. Laura Gómez</td>
-                                            <td>Dificultad respiratoria</td>
-                                            <td><span class="badge-acceso restringido"><i class="bi bi-lock"></i> Restringido</span></td>
-                                            <td><span class="badge-version">v4.1</span></td>
-                                            <td>
-                                                <div class="acciones-registro">
-                                                    <button class="btn-mini" title="Ver"><i class="bi bi-eye"></i></button>
-                                                    <button class="btn-mini btn-editar" title="Editar"><i class="bi bi-pencil"></i></button>
-                                                </div>
-                                            </td>
+                                    <tbody id="tablaHistorialesBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center py-3">Cargando historiales...</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -167,89 +112,81 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <div class="panel-seguridad">
                                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                     <span class="badge-sync"><i class="bi bi-link-45deg"></i> Integrado con consultas</span>
-                                    <span class="badge-version" id="detalleVersion">v3.2</span>
+                                    <span class="badge-version" id="detalleVersion">--</span>
                                 </div>
                                 <div class="small text-muted mt-2">Paciente registrado: <strong id="detallePacienteRegistro">Sí</strong></div>
                                 <div class="small text-muted">Acceso de edición: <strong id="detalleAcceso">Autorizado</strong></div>
-                                <div class="small text-muted">Última actualización: <strong id="detalleActualizacion">03/03/2026 09:42</strong></div>
+                                <div class="small text-muted">Última actualización: <strong id="detalleActualizacion">--</strong></div>
                             </div>
 
                             <form id="formHistorial" class="d-flex flex-column gap-2">
+                                <input type="hidden" id="campoIdHistorial">
+                                <input type="hidden" id="campoIdPaciente">
+
                                 <div class="campos-grid">
                                     <div>
                                         <label class="label-historial">Nombre del paciente</label>
-                                        <input id="campoPaciente" class="input-historial" type="text" value="Luna">
+                                        <input id="campoPaciente" class="input-historial" type="text" readonly>
                                     </div>
                                     <div>
                                         <label class="label-historial">Fecha de atención</label>
-                                        <input id="campoFecha" class="input-historial" type="date" value="2026-03-02">
+                                        <input id="campoFecha" class="input-historial" type="date">
                                     </div>
                                 </div>
 
                                 <div class="campos-grid">
                                     <div>
                                         <label class="label-historial">Especie</label>
-                                        <input id="campoEspecie" class="input-historial" type="text" value="Canino">
+                                        <input id="campoEspecie" class="input-historial" type="text" readonly>
                                     </div>
                                     <div>
                                         <label class="label-historial">Raza</label>
-                                        <input id="campoRaza" class="input-historial" type="text" value="Labrador">
+                                        <input id="campoRaza" class="input-historial" type="text" readonly>
                                     </div>
                                 </div>
 
                                 <div>
                                     <label class="label-historial">Veterinario responsable</label>
-                                    <input id="campoVeterinario" class="input-historial" type="text" value="Dra. María García">
+                                    <input id="campoVeterinario" class="input-historial" type="text" readonly>
                                 </div>
 
                                 <div>
                                     <label class="label-historial">Motivo de la consulta</label>
-                                    <textarea id="campoMotivo" class="textarea-historial">Control postoperatorio</textarea>
+                                    <textarea id="campoMotivo" class="textarea-historial"></textarea>
                                 </div>
 
                                 <div>
                                     <label class="label-historial">Diagnóstico</label>
-                                    <textarea id="campoDiagnostico" class="textarea-historial">Evolución favorable</textarea>
+                                    <textarea id="campoDiagnostico" class="textarea-historial"></textarea>
                                 </div>
 
                                 <div>
                                     <label class="label-historial">Tratamientos aplicados</label>
-                                    <textarea id="campoTratamiento" class="textarea-historial">Curación, control de sutura</textarea>
+                                    <textarea id="campoTratamiento" class="textarea-historial"></textarea>
                                 </div>
 
                                 <div>
                                     <label class="label-historial">Medicación recetada</label>
-                                    <textarea id="campoMedicacion" class="textarea-historial">Amoxicilina 250mg</textarea>
+                                    <textarea id="campoMedicacion" class="textarea-historial"></textarea>
                                 </div>
 
                                 <div>
                                     <label class="label-historial">Observaciones adicionales</label>
-                                    <textarea id="campoObservaciones" class="textarea-historial">Próximo control en 7 días</textarea>
+                                    <textarea id="campoObservaciones" class="textarea-historial"></textarea>
                                 </div>
 
                                 <div class="acciones-panel">
                                     <button id="btnGuardar" type="button" class="boton-agregar">
                                         <i class="bi bi-check2-circle"></i> Guardar cambios
                                     </button>
-                                    <button type="button" class="btn-secundario">
-                                        <i class="bi bi-file-earmark-text"></i> Generar resumen
-                                    </button>
                                 </div>
                             </form>
 
                             <div class="bloque-versionado">
                                 <strong class="small d-block mb-2">Trazabilidad y versionado</strong>
-                                <div class="item-version">
-                                    <i class="bi bi-clock-history"></i>
-                                    <div><strong>v3.2</strong> · 02/03/2026 18:20 · Actualización tras consulta</div>
-                                </div>
-                                <div class="item-version">
-                                    <i class="bi bi-person-check"></i>
-                                    <div><strong>v3.1</strong> · 27/02/2026 09:11 · Editado por Dra. María García</div>
-                                </div>
                                 <div class="item-version mb-0">
-                                    <i class="bi bi-journal-plus"></i>
-                                    <div><strong>v3.0</strong> · 25/02/2026 14:02 · Registro inicial en módulo de consultas</div>
+                                    <i class="bi bi-shield-check"></i>
+                                    <div>Solo puedes editar historiales de pacientes vinculados a tu usuario.</div>
                                 </div>
                             </div>
                         </div>
@@ -265,11 +202,24 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const endpoint = '<?= BASE_URL ?>/veterinaria/pacientes/acciones';
+
+            const tablaBody = document.getElementById('tablaHistorialesBody');
             const tabla = document.getElementById('tablaHistoriales');
-            const filas = tabla ? tabla.querySelectorAll('tbody tr') : [];
+
+            const filtroPaciente = document.getElementById('filtroPaciente');
+            const filtroFecha = document.getElementById('filtroFecha');
+            const filtroVeterinario = document.getElementById('filtroVeterinario');
+            const filtroAcceso = document.getElementById('filtroAcceso');
+
             const btnFiltrar = document.getElementById('btnFiltrar');
             const btnLimpiar = document.getElementById('btnLimpiar');
             const btnGuardar = document.getElementById('btnGuardar');
+            const btnNuevaAtencion = document.getElementById('btnNuevaAtencion');
+            const btnExportarPdf = document.getElementById('btnExportarPdf');
+
+            const campoIdHistorial = document.getElementById('campoIdHistorial');
+            const campoIdPaciente = document.getElementById('campoIdPaciente');
 
             const campos = {
                 paciente: document.getElementById('campoPaciente'),
@@ -288,90 +238,311 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             const detalleVersion = document.getElementById('detalleVersion');
             const detalleActualizacion = document.getElementById('detalleActualizacion');
 
-            function cargarDetalle(fila) {
-                if (!fila) return;
+            let registros = [];
+            let pendingSelectId = null;
 
-                filas.forEach(function(item) {
-                    item.classList.remove('active');
-                });
-                fila.classList.add('active');
-
-                campos.paciente.value = fila.dataset.paciente || '';
-                campos.especie.value = fila.dataset.especie || '';
-                campos.raza.value = fila.dataset.raza || '';
-                campos.fecha.value = fila.dataset.fecha || '';
-                campos.vet.value = fila.dataset.vet || '';
-                campos.motivo.value = fila.dataset.motivo || '';
-                campos.diagnostico.value = fila.dataset.diagnostico || '';
-                campos.tratamiento.value = fila.dataset.tratamiento || '';
-                campos.medicacion.value = fila.dataset.medicacion || '';
-                campos.observaciones.value = fila.dataset.observaciones || '';
-
-                detalleAcceso.textContent = fila.dataset.acceso || 'Autorizado';
-                detalleVersion.textContent = fila.dataset.version || 'v1.0';
+            function escapeHtml(value) {
+                if (value === null || value === undefined) return '';
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
             }
 
-            filas.forEach(function(fila) {
-                fila.addEventListener('click', function() {
-                    cargarDetalle(this);
+            function toDateInput(value) {
+                if (!value) return '';
+                return String(value).slice(0, 10);
+            }
+
+            function fechaHumana(value) {
+                if (!value) return '--';
+                const date = new Date(value.replace(' ', 'T'));
+                if (Number.isNaN(date.getTime())) return String(value).slice(0, 10);
+                return date.toLocaleDateString('es-CO');
+            }
+
+            function fechaHoraHumana(value) {
+                if (!value) return '--';
+                const date = new Date(value.replace(' ', 'T'));
+                if (Number.isNaN(date.getTime())) return String(value);
+                return date.toLocaleDateString('es-CO') + ' ' + date.toLocaleTimeString('es-CO', {
+                    hour: '2-digit',
+                    minute: '2-digit'
                 });
-            });
+            }
 
-            if (btnFiltrar) {
-                btnFiltrar.addEventListener('click', function() {
-                    const paciente = (document.getElementById('filtroPaciente').value || '').toLowerCase().trim();
-                    const fecha = document.getElementById('filtroFecha').value || '';
-                    const vet = document.getElementById('filtroVeterinario').value || '';
-                    const acceso = document.getElementById('filtroAcceso').value || '';
+            function limpiarFormulario() {
+                campoIdHistorial.value = '';
+                campoIdPaciente.value = '';
+                campos.paciente.value = '';
+                campos.especie.value = '';
+                campos.raza.value = '';
+                campos.fecha.value = '';
+                campos.vet.value = '';
+                campos.motivo.value = '';
+                campos.diagnostico.value = '';
+                campos.tratamiento.value = '';
+                campos.medicacion.value = '';
+                campos.observaciones.value = '';
+                detalleAcceso.textContent = 'Autorizado';
+                detalleVersion.textContent = '--';
+                detalleActualizacion.textContent = '--';
+            }
 
-                    filas.forEach(function(fila) {
-                        const coincidePaciente = !paciente || (fila.dataset.paciente || '').toLowerCase().includes(paciente);
-                        const coincideFecha = !fecha || fila.dataset.fecha === fecha;
-                        const coincideVet = !vet || fila.dataset.vet === vet;
-                        const coincideAcceso = !acceso || fila.dataset.acceso === acceso;
+            function cargarDetalle(registro) {
+                if (!registro) return;
 
-                        fila.style.display = coincidePaciente && coincideFecha && coincideVet && coincideAcceso ? '' : 'none';
+                campoIdHistorial.value = registro.id_historial || '';
+                campoIdPaciente.value = registro.id_paciente || '';
+
+                campos.paciente.value = registro.paciente_nombre || '';
+                campos.especie.value = registro.especie || '';
+                campos.raza.value = registro.raza || '';
+                campos.fecha.value = toDateInput(registro.fecha_atencion) || new Date().toISOString().slice(0, 10);
+                campos.vet.value = registro.veterinario_responsable || '';
+                campos.motivo.value = registro.motivo_consulta || '';
+                campos.diagnostico.value = registro.diagnostico || '';
+                campos.tratamiento.value = registro.tratamientos_aplicados || '';
+                campos.medicacion.value = registro.medicacion_recetada || '';
+                campos.observaciones.value = registro.observaciones_adicionales || '';
+
+                detalleAcceso.textContent = registro.acceso || 'Autorizado';
+                detalleVersion.textContent = registro.version_registro ? ('v' + registro.version_registro) : 'Nueva';
+                detalleActualizacion.textContent = fechaHoraHumana(registro.updated_at || registro.fecha_atencion);
+            }
+
+            function renderTabla() {
+                if (!Array.isArray(registros) || registros.length === 0) {
+                    tablaBody.innerHTML = '<tr><td colspan="7" class="text-center py-3">No tienes pacientes vinculados o no hay historiales registrados.</td></tr>';
+                    limpiarFormulario();
+                    return;
+                }
+
+                tablaBody.innerHTML = registros.map(function(item) {
+                    const activo = pendingSelectId && Number(item.id_historial || 0) === Number(pendingSelectId) ? 'active' : '';
+                    const version = item.version_registro ? 'v' + item.version_registro : 'Nueva';
+                    const acceso = item.acceso || 'Autorizado';
+
+                    return '<tr class="' + activo + '" ' +
+                        'data-id-historial="' + escapeHtml(item.id_historial || '') + '" ' +
+                        'data-id-paciente="' + escapeHtml(item.id_paciente || '') + '" ' +
+                        'data-paciente="' + escapeHtml(item.paciente_nombre || '') + '" ' +
+                        'data-especie="' + escapeHtml(item.especie || '') + '" ' +
+                        'data-raza="' + escapeHtml(item.raza || '') + '" ' +
+                        'data-fecha="' + escapeHtml(toDateInput(item.fecha_atencion)) + '" ' +
+                        'data-vet="' + escapeHtml(item.veterinario_responsable || '') + '" ' +
+                        'data-motivo="' + escapeHtml(item.motivo_consulta || '') + '" ' +
+                        'data-diagnostico="' + escapeHtml(item.diagnostico || '') + '" ' +
+                        'data-tratamiento="' + escapeHtml(item.tratamientos_aplicados || '') + '" ' +
+                        'data-medicacion="' + escapeHtml(item.medicacion_recetada || '') + '" ' +
+                        'data-observaciones="' + escapeHtml(item.observaciones_adicionales || '') + '" ' +
+                        'data-acceso="' + escapeHtml(acceso) + '" ' +
+                        'data-version="' + escapeHtml(item.version_registro || '') + '" ' +
+                        'data-updated-at="' + escapeHtml(item.updated_at || item.fecha_atencion || '') + '">' +
+                        '<td class="paciente-cell"><strong>' + escapeHtml(item.paciente_nombre || '--') + '</strong><small>' + escapeHtml((item.especie || '--') + ' · ' + (item.raza || '--')) + '</small></td>' +
+                        '<td>' + escapeHtml(fechaHumana(item.fecha_atencion)) + '</td>' +
+                        '<td>' + escapeHtml(item.veterinario_responsable || '--') + '</td>' +
+                        '<td>' + escapeHtml(item.motivo_consulta || 'Sin registro') + '</td>' +
+                        '<td><span class="badge-acceso permitido"><i class="bi bi-check-circle"></i> ' + escapeHtml(acceso) + '</span></td>' +
+                        '<td><span class="badge-version">' + escapeHtml(version) + '</span></td>' +
+                        '<td><div class="acciones-registro"><button class="btn-mini" title="Seleccionar"><i class="bi bi-eye"></i></button></div></td>' +
+                        '</tr>';
+                }).join('');
+
+                const filas = tablaBody.querySelectorAll('tr[data-id-paciente]');
+                filas.forEach(function(fila) {
+                    fila.addEventListener('click', function() {
+                        filas.forEach(function(item) {
+                            item.classList.remove('active');
+                        });
+                        fila.classList.add('active');
+
+                        const registro = {
+                            id_historial: fila.dataset.idHistorial || '',
+                            id_paciente: fila.dataset.idPaciente || '',
+                            paciente_nombre: fila.dataset.paciente || '',
+                            especie: fila.dataset.especie || '',
+                            raza: fila.dataset.raza || '',
+                            fecha_atencion: fila.dataset.fecha || '',
+                            veterinario_responsable: fila.dataset.vet || '',
+                            motivo_consulta: fila.dataset.motivo || '',
+                            diagnostico: fila.dataset.diagnostico || '',
+                            tratamientos_aplicados: fila.dataset.tratamiento || '',
+                            medicacion_recetada: fila.dataset.medicacion || '',
+                            observaciones_adicionales: fila.dataset.observaciones || '',
+                            acceso: fila.dataset.acceso || 'Autorizado',
+                            version_registro: fila.dataset.version || '',
+                            updated_at: fila.dataset.updatedAt || ''
+                        };
+
+                        cargarDetalle(registro);
                     });
                 });
+
+                let filaInicial = null;
+                if (pendingSelectId) {
+                    filaInicial = tablaBody.querySelector('tr[data-id-historial="' + pendingSelectId + '"]');
+                }
+                if (!filaInicial) {
+                    filaInicial = tablaBody.querySelector('tr[data-id-paciente]');
+                }
+                pendingSelectId = null;
+
+                if (filaInicial) {
+                    filaInicial.click();
+                }
             }
 
-            if (btnLimpiar) {
-                btnLimpiar.addEventListener('click', function() {
-                    document.getElementById('filtroPaciente').value = '';
-                    document.getElementById('filtroFecha').value = '';
-                    document.getElementById('filtroVeterinario').value = '';
-                    document.getElementById('filtroAcceso').value = '';
-                    filas.forEach(function(fila) {
-                        fila.style.display = '';
-                    });
+            function actualizarFiltroVeterinarios() {
+                const actual = filtroVeterinario.value;
+                const values = [];
+
+                registros.forEach(function(item) {
+                    const nombre = (item.veterinario_responsable || '').trim();
+                    if (nombre && values.indexOf(nombre) === -1) {
+                        values.push(nombre);
+                    }
                 });
+
+                filtroVeterinario.innerHTML = '<option value="">Todos</option>' + values.map(function(item) {
+                    return '<option value="' + escapeHtml(item) + '">' + escapeHtml(item) + '</option>';
+                }).join('');
+
+                if (actual && values.indexOf(actual) !== -1) {
+                    filtroVeterinario.value = actual;
+                }
             }
 
-            if (btnGuardar) {
-                btnGuardar.addEventListener('click', function() {
-                    const filaActiva = tabla.querySelector('tbody tr.active');
-                    if (!filaActiva) return;
+            async function cargarHistoriales(filtros) {
+                tablaBody.innerHTML = '<tr><td colspan="7" class="text-center py-3">Cargando historiales...</td></tr>';
 
-                    if ((filaActiva.dataset.acceso || '') === 'Restringido') {
-                        alert('Registro restringido: solo personal autorizado puede modificar este historial.');
-                        return;
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(Object.assign({
+                            accion: 'listar_historiales'
+                        }, filtros || {}))
+                    });
+
+                    const payload = await response.json();
+                    if (!response.ok || payload.status !== 'success') {
+                        throw new Error(payload.message || 'No se pudieron cargar los historiales');
                     }
 
-                    const ahora = new Date();
-                    const fechaHora = ahora.toLocaleDateString('es-CO') + ' ' + ahora.toLocaleTimeString('es-CO', {
-                        hour: '2-digit',
-                        minute: '2-digit'
+                    registros = Array.isArray(payload.data) ? payload.data : [];
+                    actualizarFiltroVeterinarios();
+                    renderTabla();
+                } catch (error) {
+                    tablaBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-3">' + escapeHtml(error.message || 'Error de carga') + '</td></tr>';
+                    limpiarFormulario();
+                }
+            }
+
+            function obtenerFiltrosActuales() {
+                return {
+                    paciente: (filtroPaciente.value || '').trim(),
+                    fecha: filtroFecha.value || '',
+                    veterinario: filtroVeterinario.value || '',
+                    acceso: filtroAcceso.value || ''
+                };
+            }
+
+            btnFiltrar.addEventListener('click', function() {
+                cargarHistoriales(obtenerFiltrosActuales());
+            });
+
+            btnLimpiar.addEventListener('click', function() {
+                filtroPaciente.value = '';
+                filtroFecha.value = '';
+                filtroVeterinario.value = '';
+                filtroAcceso.value = '';
+                cargarHistoriales({});
+            });
+
+            btnNuevaAtencion.addEventListener('click', function() {
+                if (!campoIdPaciente.value) {
+                    alert('Selecciona primero un paciente vinculado en la tabla.');
+                    return;
+                }
+
+                campoIdHistorial.value = '';
+                campos.fecha.value = new Date().toISOString().slice(0, 10);
+                campos.motivo.value = '';
+                campos.diagnostico.value = '';
+                campos.tratamiento.value = '';
+                campos.medicacion.value = '';
+                campos.observaciones.value = '';
+                detalleVersion.textContent = 'Nueva';
+                detalleActualizacion.textContent = '--';
+            });
+
+            btnExportarPdf.addEventListener('click', function() {
+                const filtros = obtenerFiltrosActuales();
+                const params = new URLSearchParams();
+
+                if (filtros.paciente) params.append('paciente', filtros.paciente);
+                if (filtros.fecha) params.append('fecha', filtros.fecha);
+                if (filtros.veterinario) params.append('veterinario', filtros.veterinario);
+                if (filtros.acceso) params.append('acceso', filtros.acceso);
+
+                const url = '<?= BASE_URL ?>/veterinaria/gestion-pacientes/pdf' + (params.toString() ? ('?' + params.toString()) : '');
+                window.open(url, '_blank');
+            });
+
+            btnGuardar.addEventListener('click', async function() {
+                const idPaciente = Number(campoIdPaciente.value || 0);
+                const payload = {
+                    accion: 'guardar_historial',
+                    id_historial: Number(campoIdHistorial.value || 0),
+                    id_paciente: idPaciente,
+                    fecha_atencion: (campos.fecha.value || '').trim(),
+                    motivo_consulta: (campos.motivo.value || '').trim(),
+                    diagnostico: (campos.diagnostico.value || '').trim(),
+                    tratamientos_aplicados: (campos.tratamiento.value || '').trim(),
+                    medicacion_recetada: (campos.medicacion.value || '').trim(),
+                    observaciones_adicionales: (campos.observaciones.value || '').trim()
+                };
+
+                if (idPaciente <= 0) {
+                    alert('Debes seleccionar un paciente vinculado.');
+                    return;
+                }
+
+                if (!payload.fecha_atencion || !payload.motivo_consulta) {
+                    alert('La fecha de atención y el motivo de consulta son obligatorios.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
                     });
 
-                    detalleActualizacion.textContent = fechaHora;
-                    alert('Cambios guardados (modo visual). El historial se marcaría como actualizado automáticamente.');
-                });
-            }
+                    const result = await response.json();
+                    if (!response.ok || result.status !== 'success') {
+                        throw new Error(result.message || 'No se pudo guardar el historial');
+                    }
 
-            const primeraFila = tabla ? tabla.querySelector('tbody tr.active') : null;
-            if (primeraFila) {
-                cargarDetalle(primeraFila);
-            }
+                    pendingSelectId = result.data && result.data.id_historial ? Number(result.data.id_historial) : null;
+                    await cargarHistoriales(obtenerFiltrosActuales());
+                    alert('Historial clínico guardado correctamente.');
+                } catch (error) {
+                    alert(error.message || 'Error al guardar el historial clínico.');
+                }
+            });
+
+            cargarHistoriales({});
         });
     </script>
 
