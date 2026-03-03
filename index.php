@@ -637,4 +637,7 @@ switch ($request) {
     case '/soporte/api/crear-ticket':
         require BASE_PATH . '/app/controllers/ticketController.php';
         break;
+    case '/soporte/api/ticket':
+        require BASE_PATH . '/app/controllers/ticketController.php';
+        break;
 }
