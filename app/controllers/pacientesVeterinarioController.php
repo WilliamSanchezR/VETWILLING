@@ -43,6 +43,14 @@ if ($idUsuario <= 0) {
 $model = new Veterinario();
 
 switch ($accion) {
+    case 'listar_historiales':
+        listarHistorialesClinicos($model, $idUsuario, $payload);
+        break;
+
+    case 'guardar_historial':
+        guardarHistorialClinico($model, $idUsuario, $payload);
+        break;
+
     case 'consultar':
         consultarPaciente($model, $idUsuario, $payload);
         break;
@@ -62,6 +70,81 @@ switch ($accion) {
             'message' => 'Acción no válida'
         ]);
         break;
+}
+
+function listarHistorialesClinicos(Veterinario $model, int $idUsuario, array $payload): void
+{
+    $filtros = [
+        'paciente' => trim((string) ($payload['paciente'] ?? '')),
+        'fecha' => trim((string) ($payload['fecha'] ?? '')),
+        'veterinario' => trim((string) ($payload['veterinario'] ?? '')),
+        'acceso' => trim((string) ($payload['acceso'] ?? '')),
+    ];
+
+    $historiales = $model->listarHistorialesClinicosPorProfesional($idUsuario, $filtros);
+
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Historiales cargados correctamente',
+        'data' => $historiales,
+    ]);
+}
+
+function guardarHistorialClinico(Veterinario $model, int $idUsuario, array $payload): void
+{
+    $idPaciente = (int) ($payload['id_paciente'] ?? 0);
+    $idHistorial = (int) ($payload['id_historial'] ?? 0);
+
+    $fechaAtencion = trim((string) ($payload['fecha_atencion'] ?? ''));
+    $motivoConsulta = trim((string) ($payload['motivo_consulta'] ?? ''));
+    $diagnostico = trim((string) ($payload['diagnostico'] ?? ''));
+    $tratamientos = trim((string) ($payload['tratamientos_aplicados'] ?? ''));
+    $medicacion = trim((string) ($payload['medicacion_recetada'] ?? ''));
+    $observaciones = trim((string) ($payload['observaciones_adicionales'] ?? ''));
+
+    if ($idPaciente <= 0) {
+        http_response_code(422);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Debe seleccionar un paciente válido',
+        ]);
+        return;
+    }
+
+    if ($fechaAtencion === '' || $motivoConsulta === '') {
+        http_response_code(422);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'La fecha de atención y el motivo de consulta son obligatorios',
+        ]);
+        return;
+    }
+
+    $resultado = $model->guardarHistorialClinicoPorProfesional($idUsuario, [
+        'id_historial' => $idHistorial,
+        'id_paciente' => $idPaciente,
+        'fecha_atencion' => $fechaAtencion,
+        'motivo_consulta' => $motivoConsulta,
+        'diagnostico' => $diagnostico,
+        'tratamientos_aplicados' => $tratamientos,
+        'medicacion_recetada' => $medicacion,
+        'observaciones_adicionales' => $observaciones,
+    ]);
+
+    if (!$resultado) {
+        http_response_code(403);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'No fue posible guardar el historial. Verifique permisos y datos.',
+        ]);
+        return;
+    }
+
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Historial clínico guardado correctamente',
+        'data' => $resultado,
+    ]);
 }
 
 function consultarPaciente(Veterinario $model, int $idUsuario, array $payload): void
