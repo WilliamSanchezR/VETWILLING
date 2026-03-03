@@ -104,6 +104,7 @@ $datos = listarTickets();
                             <th>prioridad</th>
                             <th>Estado</th>
                             <th>Usuario</th>
+                            <th>Asignado a</th>
                             <th>fecha creación</th>
                             <th></th>
                         </tr>
@@ -118,6 +119,7 @@ $datos = listarTickets();
                                     <td><?= $ticket['prioridad'] ?></td>
                                     <td><?= $ticket['estado'] ?></td>
                                     <td><?= $ticket['nombres'] ?> <?= $ticket['apellidos'] ?></td>
+                                    <td><?= $ticket['asignado'] ?></td>
                                     <td><?= $ticket['fecha_creacion'] ?></td>
                                     <td>
                                         <button class="btn-accion btn-editar" title="Editar">
