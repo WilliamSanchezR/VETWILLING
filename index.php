@@ -580,6 +580,12 @@ switch ($request) {
     case '/representante/api/propietarios':
         require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
+    
+    //------------------------------INVENTARIO REPRESENTANTE------------------------------//
+    case '/representante/inventario':
+        require BASE_PATH . '/app/views/dashboard/representante/listaInventario.php';
+        break;
+    
 
 
     //---------------------------------------SERVICIOS-------------------------------------//

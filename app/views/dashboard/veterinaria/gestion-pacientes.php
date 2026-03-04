@@ -154,6 +154,13 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 </div>
 
                                 <div>
+                                    <label class="label-historial">Versiones del historial</label>
+                                    <select id="selectVersionHistorial" class="select-filtro">
+                                        <option value="">Selecciona una atención</option>
+                                    </select>
+                                </div>
+
+                                <div>
                                     <label class="label-historial">Motivo de la consulta</label>
                                     <textarea id="campoMotivo" class="textarea-historial"></textarea>
                                 </div>

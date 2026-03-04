@@ -103,6 +103,10 @@ switch ($accion) {
         guardarHistorialClinico($model, $idUsuario, $payload);
         break;
 
+    case 'listar_versiones_historial':
+        listarVersionesHistorialClinico($model, $idUsuario, $payload);
+        break;
+
     case 'consultar':
         consultarPaciente($model, $idUsuario, $payload);
         break;
@@ -670,6 +674,28 @@ function guardarHistorialClinico(Veterinario $model, int $idUsuario, array $payl
         'status' => 'success',
         'message' => 'Historial clínico guardado correctamente',
         'data' => $resultado,
+    ]);
+}
+
+function listarVersionesHistorialClinico(Veterinario $model, int $idUsuario, array $payload): void
+{
+    $idHistorial = (int) ($payload['id_historial'] ?? 0);
+
+    if ($idHistorial <= 0) {
+        http_response_code(422);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Debe indicar un historial válido para consultar versiones',
+        ]);
+        return;
+    }
+
+    $versiones = $model->listarVersionesHistorialClinicoPorProfesional($idUsuario, $idHistorial);
+
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Versiones consultadas correctamente',
+        'data' => $versiones,
     ]);
 }
 
