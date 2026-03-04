@@ -151,6 +151,13 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 </div>
 
                                 <div>
+                                    <label class="label-historial">Versiones del historial</label>
+                                    <select id="selectVersionHistorial" class="select-filtro">
+                                        <option value="">Selecciona una atención</option>
+                                    </select>
+                                </div>
+
+                                <div>
                                     <label class="label-historial">Motivo de la consulta</label>
                                     <textarea id="campoMotivo" class="textarea-historial"></textarea>
                                 </div>
@@ -201,8 +208,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         crossorigin="anonymous"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             const endpoint = '<?= BASE_URL ?>/veterinaria/pacientes/acciones';
+            const endpointDetallesCita = '<?= BASE_URL ?>/calendario/cargar?accion=detalles_completo';
 
             const tablaBody = document.getElementById('tablaHistorialesBody');
             const tabla = document.getElementById('tablaHistoriales');
@@ -217,6 +225,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             const btnGuardar = document.getElementById('btnGuardar');
             const btnNuevaAtencion = document.getElementById('btnNuevaAtencion');
             const btnExportarPdf = document.getElementById('btnExportarPdf');
+            const selectVersionHistorial = document.getElementById('selectVersionHistorial');
 
             const campoIdHistorial = document.getElementById('campoIdHistorial');
             const campoIdPaciente = document.getElementById('campoIdPaciente');
@@ -237,9 +246,30 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             const detalleAcceso = document.getElementById('detalleAcceso');
             const detalleVersion = document.getElementById('detalleVersion');
             const detalleActualizacion = document.getElementById('detalleActualizacion');
+            const detallePacienteRegistro = document.getElementById('detallePacienteRegistro');
 
             let registros = [];
+            let versionesHistorial = [];
             let pendingSelectId = null;
+            let pendingSelectPatientId = null;
+
+            async function postJson(body) {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const payload = await response.json();
+                if (!response.ok || payload.status !== 'success') {
+                    throw new Error(payload.message || 'Error en la solicitud');
+                }
+
+                return payload;
+            }
 
             function escapeHtml(value) {
                 if (value === null || value === undefined) return '';
@@ -289,6 +319,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 detalleAcceso.textContent = 'Autorizado';
                 detalleVersion.textContent = '--';
                 detalleActualizacion.textContent = '--';
+                detallePacienteRegistro.textContent = 'No';
+                selectVersionHistorial.innerHTML = '<option value="">Selecciona una atención</option>';
+                versionesHistorial = [];
             }
 
             function cargarDetalle(registro) {
@@ -311,6 +344,96 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 detalleAcceso.textContent = registro.acceso || 'Autorizado';
                 detalleVersion.textContent = registro.version_registro ? ('v' + registro.version_registro) : 'Nueva';
                 detalleActualizacion.textContent = fechaHoraHumana(registro.updated_at || registro.fecha_atencion);
+                detallePacienteRegistro.textContent = registro.id_paciente ? 'Sí' : 'No';
+            }
+
+            function renderVersionesSelector(selectedId) {
+                if (!Array.isArray(versionesHistorial) || versionesHistorial.length === 0) {
+                    selectVersionHistorial.innerHTML = '<option value="">Sin versiones disponibles</option>';
+                    return;
+                }
+
+                selectVersionHistorial.innerHTML = versionesHistorial.map(function(item) {
+                    const label = 'v' + (item.version_registro || '--') + ' · ' + fechaHumana(item.fecha_atencion);
+                    const selected = Number(item.id_historial || 0) === Number(selectedId || 0) ? ' selected' : '';
+                    return '<option value="' + escapeHtml(item.id_historial || '') + '"' + selected + '>' + escapeHtml(label) + '</option>';
+                }).join('');
+            }
+
+            async function cargarVersionesHistorial(idHistorial, selectedId) {
+                const id = Number(idHistorial || 0);
+                if (id <= 0) {
+                    versionesHistorial = [];
+                    renderVersionesSelector('');
+                    return;
+                }
+
+                try {
+                    const payload = await postJson({
+                        accion: 'listar_versiones_historial',
+                        id_historial: id
+                    });
+
+                    versionesHistorial = Array.isArray(payload.data) ? payload.data : [];
+                    renderVersionesSelector(selectedId || id);
+                } catch (error) {
+                    versionesHistorial = [];
+                    renderVersionesSelector('');
+                }
+            }
+
+            function prepararNuevaAtencionDesdeCita(contextoCita) {
+                if (!contextoCita || Number(contextoCita.id_paciente || 0) <= 0) {
+                    return;
+                }
+
+                if (Number(campoIdPaciente.value || 0) !== Number(contextoCita.id_paciente || 0)) {
+                    return;
+                }
+
+                campoIdHistorial.value = '';
+
+                if (contextoCita.fecha_atencion) {
+                    campos.fecha.value = toDateInput(contextoCita.fecha_atencion);
+                }
+
+                if (contextoCita.motivo_consulta) {
+                    campos.motivo.value = contextoCita.motivo_consulta;
+                }
+
+                detalleVersion.textContent = 'Nueva';
+                detalleActualizacion.textContent = '--';
+            }
+
+            async function obtenerContextoDesdeCita() {
+                const query = new URLSearchParams(window.location.search);
+                const idAgendamiento = Number(query.get('id_agendamiento') || 0);
+
+                if (idAgendamiento <= 0) {
+                    return null;
+                }
+
+                try {
+                    const response = await fetch(endpointDetallesCita + '&id_agendamiento=' + encodeURIComponent(idAgendamiento), {
+                        method: 'GET',
+                        credentials: 'same-origin'
+                    });
+
+                    const payload = await response.json();
+                    if (!response.ok || payload.status !== 'success' || !payload.cita) {
+                        return null;
+                    }
+
+                    const cita = payload.cita;
+
+                    return {
+                        id_paciente: Number(cita.id_paciente || 0),
+                        fecha_atencion: cita.fecha_hora || '',
+                        motivo_consulta: (cita.observaciones || cita.tipo || '').trim(),
+                    };
+                } catch (error) {
+                    return null;
+                }
             }
 
             function renderTabla() {
@@ -324,9 +447,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     const activo = pendingSelectId && Number(item.id_historial || 0) === Number(pendingSelectId) ? 'active' : '';
                     const version = item.version_registro ? 'v' + item.version_registro : 'Nueva';
                     const acceso = item.acceso || 'Autorizado';
+                    const idHistorialBase = item.id_historial_base || item.id_historial || '';
 
                     return '<tr class="' + activo + '" ' +
                         'data-id-historial="' + escapeHtml(item.id_historial || '') + '" ' +
+                        'data-id-historial-base="' + escapeHtml(idHistorialBase) + '" ' +
                         'data-id-paciente="' + escapeHtml(item.id_paciente || '') + '" ' +
                         'data-paciente="' + escapeHtml(item.paciente_nombre || '') + '" ' +
                         'data-especie="' + escapeHtml(item.especie || '') + '" ' +
@@ -378,6 +503,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         };
 
                         cargarDetalle(registro);
+                        cargarVersionesHistorial(registro.id_historial, registro.id_historial);
                     });
                 });
 
@@ -385,10 +511,14 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 if (pendingSelectId) {
                     filaInicial = tablaBody.querySelector('tr[data-id-historial="' + pendingSelectId + '"]');
                 }
+                if (!filaInicial && pendingSelectPatientId) {
+                    filaInicial = tablaBody.querySelector('tr[data-id-paciente="' + pendingSelectPatientId + '"]');
+                }
                 if (!filaInicial) {
                     filaInicial = tablaBody.querySelector('tr[data-id-paciente]');
                 }
                 pendingSelectId = null;
+                pendingSelectPatientId = null;
 
                 if (filaInicial) {
                     filaInicial.click();
@@ -419,21 +549,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 tablaBody.innerHTML = '<tr><td colspan="7" class="text-center py-3">Cargando historiales...</td></tr>';
 
                 try {
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(Object.assign({
-                            accion: 'listar_historiales'
-                        }, filtros || {}))
-                    });
-
-                    const payload = await response.json();
-                    if (!response.ok || payload.status !== 'success') {
-                        throw new Error(payload.message || 'No se pudieron cargar los historiales');
-                    }
+                    const payload = await postJson(Object.assign({
+                        accion: 'listar_historiales'
+                    }, filtros || {}));
 
                     registros = Array.isArray(payload.data) ? payload.data : [];
                     actualizarFiltroVeterinarios();
@@ -482,6 +600,23 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 detalleActualizacion.textContent = '--';
             });
 
+            selectVersionHistorial.addEventListener('change', function() {
+                const idVersion = Number(selectVersionHistorial.value || 0);
+                if (idVersion <= 0 || !Array.isArray(versionesHistorial) || versionesHistorial.length === 0) {
+                    return;
+                }
+
+                const versionSeleccionada = versionesHistorial.find(function(item) {
+                    return Number(item.id_historial || 0) === idVersion;
+                });
+
+                if (!versionSeleccionada) {
+                    return;
+                }
+
+                cargarDetalle(versionSeleccionada);
+            });
+
             btnExportarPdf.addEventListener('click', function() {
                 const filtros = obtenerFiltrosActuales();
                 const params = new URLSearchParams();
@@ -520,19 +655,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 }
 
                 try {
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const result = await response.json();
-                    if (!response.ok || result.status !== 'success') {
-                        throw new Error(result.message || 'No se pudo guardar el historial');
-                    }
+                    const result = await postJson(payload);
 
                     pendingSelectId = result.data && result.data.id_historial ? Number(result.data.id_historial) : null;
                     await cargarHistoriales(obtenerFiltrosActuales());
@@ -542,7 +665,17 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                 }
             });
 
-            cargarHistoriales({});
+            const contextoCita = await obtenerContextoDesdeCita();
+
+            if (contextoCita && Number(contextoCita.id_paciente || 0) > 0) {
+                pendingSelectPatientId = Number(contextoCita.id_paciente);
+            }
+
+            await cargarHistoriales({});
+
+            if (contextoCita && Number(contextoCita.id_paciente || 0) > 0) {
+                prepararNuevaAtencionDesdeCita(contextoCita);
+            }
         });
     </script>
 
