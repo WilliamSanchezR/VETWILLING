@@ -54,7 +54,7 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                 <i class="bi bi-list"></i>
             </button>
 
-                <!-- Saludo + reloj -->
+            <!-- Saludo + reloj -->
 
             <div class="nav-sep"></div>
 
@@ -226,11 +226,8 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                         <span>
 
                         </span>
-                        <!-- Badge suscripción en botón -->
-                        <span class="sub-badge sub-<?= $sub_slug ?>">
-                            <i class="bi <?= $sub_icon ?>"></i>
-                            <?= $suscripcion ?>
-                        </span>
+                        <span class="profile-badge"><?= htmlspecialchars($usuario['rol']) ?></span>
+
                     </div>
 
                     <i class="bi bi-chevron-down profile-arrow"></i>
@@ -448,4 +445,3 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/panelSuperiorRepresentante.js"></script>
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/panelSuperiorAdmin.js"></script>
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/navbar-superior.js"></script>
-
