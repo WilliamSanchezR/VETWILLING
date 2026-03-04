@@ -19,7 +19,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleGestionPacientesHistorial.css">
 </head>
 
-<body>
+<body data-endpoint="<?= BASE_URL ?>/veterinaria/pacientes/acciones" data-base-url="<?= BASE_URL ?>">
     <?php include_once __DIR__ . '/../../layouts/sidebar_veterinario.php' ?>
 
     <div class="contenido-principal" id="contenidoPrincipal">
@@ -35,6 +35,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div class="d-flex gap-2 flex-wrap">
                         <button id="btnExportarPdf" class="btn-secundario" type="button">
                             <i class="bi bi-download me-1"></i> Exportar reporte
+                        </button>
+                        <button id="btnExportarFichaPdf" class="btn-secundario" type="button">
+                            <i class="bi bi-file-earmark-medical me-1"></i> Exportar ficha paciente
                         </button>
                         <button id="btnNuevaAtencion" class="boton-agregar" type="button">
                             <i class="bi bi-plus-circle"></i> Nueva atención
@@ -196,6 +199,162 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                     <div>Solo puedes editar historiales de pacientes vinculados a tu usuario.</div>
                                 </div>
                             </div>
+
+                            <div class="historial-card modulo-fase2 mt-3 p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                                    <h5 class="mb-0"><i class="bi bi-journal-medical me-2"></i>Módulos clínicos (Fase 2)</h5>
+                                    <span class="badge-sync"><i class="bi bi-heart-pulse"></i> Ficha integral</span>
+                                </div>
+
+                                <ul class="nav nav-tabs tabs-ficha" id="tabsFichaClinica" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="tab-vacunas" data-bs-toggle="tab" data-bs-target="#panel-vacunas" type="button" role="tab">Vacunas</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="tab-tratamientos" data-bs-toggle="tab" data-bs-target="#panel-tratamientos" type="button" role="tab">Tratamientos</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="tab-consultas" data-bs-toggle="tab" data-bs-target="#panel-consultas" type="button" role="tab">Consultas</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="tab-notas" data-bs-toggle="tab" data-bs-target="#panel-notas" type="button" role="tab">Notas</button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content pt-3" id="tabContentFichaClinica">
+                                    <div class="tab-pane fade show active" id="panel-vacunas" role="tabpanel">
+                                        <div class="modulo-toolbar mb-2">
+                                            <input id="buscarVacunas" class="input-filtro" type="text" placeholder="Buscar vacuna...">
+                                            <input id="filtroFechaVacunas" class="input-filtro" type="date" title="Filtrar por fecha de aplicación">
+                                        </div>
+                                        <form id="formVacuna" class="d-flex flex-column gap-2">
+                                            <div class="campos-grid">
+                                                <div>
+                                                    <label class="label-historial">Tipo de vacuna</label>
+                                                    <input id="vacunaTipo" class="input-historial" type="text" placeholder="Ej. Rabia">
+                                                </div>
+                                                <div>
+                                                    <label class="label-historial">Dosis</label>
+                                                    <input id="vacunaDosis" class="input-historial" type="text" placeholder="Ej. 1 ml">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="label-historial">Fecha de aplicación</label>
+                                                <input id="vacunaFecha" class="input-historial" type="date">
+                                            </div>
+                                            <div>
+                                                <label class="label-historial">Observaciones</label>
+                                                <textarea id="vacunaObservaciones" class="textarea-historial" placeholder="Observaciones de la vacuna"></textarea>
+                                            </div>
+                                            <div class="acciones-panel">
+                                                <button id="btnGuardarVacuna" type="button" class="boton-agregar"><i class="bi bi-plus-circle"></i> Guardar vacuna</button>
+                                            </div>
+                                        </form>
+                                        <div id="listaVacunas" class="listado-modulo mt-2"></div>
+                                        <div id="paginacionVacunas" class="paginacion-modulo"></div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="panel-tratamientos" role="tabpanel">
+                                        <div class="modulo-toolbar mb-2">
+                                            <input id="buscarTratamientos" class="input-filtro" type="text" placeholder="Buscar tratamiento...">
+                                            <select id="filtroEstadoTratamientos" class="select-filtro" title="Filtrar por estado">
+                                                <option value="">Todos los estados</option>
+                                                <option value="Activo">Activo</option>
+                                                <option value="Finalizado">Finalizado</option>
+                                                <option value="Suspendido">Suspendido</option>
+                                            </select>
+                                            <input id="filtroFechaTratamientos" class="input-filtro" type="date" title="Filtrar por fecha de inicio">
+                                        </div>
+                                        <form id="formTratamiento" class="d-flex flex-column gap-2">
+                                            <div class="campos-grid">
+                                                <div>
+                                                    <label class="label-historial">Medicamento</label>
+                                                    <input id="tratamientoMedicamento" class="input-historial" type="text" placeholder="Nombre del medicamento">
+                                                </div>
+                                                <div>
+                                                    <label class="label-historial">Dosis</label>
+                                                    <input id="tratamientoDosis" class="input-historial" type="text" placeholder="Ej. 5 mg cada 12h">
+                                                </div>
+                                            </div>
+                                            <div class="campos-grid">
+                                                <div>
+                                                    <label class="label-historial">Fecha inicio</label>
+                                                    <input id="tratamientoInicio" class="input-historial" type="date">
+                                                </div>
+                                                <div>
+                                                    <label class="label-historial">Fecha fin</label>
+                                                    <input id="tratamientoFin" class="input-historial" type="date">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="label-historial">Estado</label>
+                                                <select id="tratamientoEstado" class="select-filtro">
+                                                    <option value="Activo">Activo</option>
+                                                    <option value="Finalizado">Finalizado</option>
+                                                    <option value="Suspendido">Suspendido</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="label-historial">Observaciones</label>
+                                                <textarea id="tratamientoObservaciones" class="textarea-historial" placeholder="Notas del tratamiento"></textarea>
+                                            </div>
+                                            <div class="acciones-panel">
+                                                <button id="btnGuardarTratamiento" type="button" class="boton-agregar"><i class="bi bi-plus-circle"></i> Guardar tratamiento</button>
+                                            </div>
+                                        </form>
+                                        <div id="listaTratamientos" class="listado-modulo mt-2"></div>
+                                        <div id="paginacionTratamientos" class="paginacion-modulo"></div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="panel-consultas" role="tabpanel">
+                                        <div class="modulo-toolbar mb-2">
+                                            <input id="buscarConsultas" class="input-filtro" type="text" placeholder="Buscar consulta...">
+                                            <input id="filtroFechaConsultas" class="input-filtro" type="date" title="Filtrar por fecha de consulta">
+                                        </div>
+                                        <form id="formConsulta" class="d-flex flex-column gap-2">
+                                            <div>
+                                                <label class="label-historial">Fecha de consulta</label>
+                                                <input id="consultaFecha" class="input-historial" type="date">
+                                            </div>
+                                            <div>
+                                                <label class="label-historial">Motivo</label>
+                                                <textarea id="consultaMotivo" class="textarea-historial" placeholder="Motivo de consulta"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="label-historial">Diagnóstico</label>
+                                                <textarea id="consultaDiagnostico" class="textarea-historial" placeholder="Diagnóstico de la consulta"></textarea>
+                                            </div>
+                                            <div>
+                                                <label class="label-historial">Observaciones</label>
+                                                <textarea id="consultaObservaciones" class="textarea-historial" placeholder="Observaciones adicionales"></textarea>
+                                            </div>
+                                            <div class="acciones-panel">
+                                                <button id="btnGuardarConsulta" type="button" class="boton-agregar"><i class="bi bi-plus-circle"></i> Guardar consulta</button>
+                                            </div>
+                                        </form>
+                                        <div id="listaConsultas" class="listado-modulo mt-2"></div>
+                                        <div id="paginacionConsultas" class="paginacion-modulo"></div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="panel-notas" role="tabpanel">
+                                        <div class="modulo-toolbar mb-2">
+                                            <input id="buscarNotas" class="input-filtro" type="text" placeholder="Buscar nota...">
+                                            <input id="filtroFechaNotas" class="input-filtro" type="date" title="Filtrar por fecha de creación">
+                                        </div>
+                                        <form id="formNota" class="d-flex flex-column gap-2">
+                                            <div>
+                                                <label class="label-historial">Nota clínica</label>
+                                                <textarea id="notaContenido" class="textarea-historial" placeholder="Escribe una nota breve para el seguimiento"></textarea>
+                                            </div>
+                                            <div class="acciones-panel">
+                                                <button id="btnGuardarNota" type="button" class="boton-agregar"><i class="bi bi-plus-circle"></i> Guardar nota</button>
+                                            </div>
+                                        </form>
+                                        <div id="listaNotas" class="listado-modulo mt-2"></div>
+                                        <div id="paginacionNotas" class="paginacion-modulo"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -207,478 +366,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async function() {
-            const endpoint = '<?= BASE_URL ?>/veterinaria/pacientes/acciones';
-            const endpointDetallesCita = '<?= BASE_URL ?>/calendario/cargar?accion=detalles_completo';
-
-            const tablaBody = document.getElementById('tablaHistorialesBody');
-            const tabla = document.getElementById('tablaHistoriales');
-
-            const filtroPaciente = document.getElementById('filtroPaciente');
-            const filtroFecha = document.getElementById('filtroFecha');
-            const filtroVeterinario = document.getElementById('filtroVeterinario');
-            const filtroAcceso = document.getElementById('filtroAcceso');
-
-            const btnFiltrar = document.getElementById('btnFiltrar');
-            const btnLimpiar = document.getElementById('btnLimpiar');
-            const btnGuardar = document.getElementById('btnGuardar');
-            const btnNuevaAtencion = document.getElementById('btnNuevaAtencion');
-            const btnExportarPdf = document.getElementById('btnExportarPdf');
-            const selectVersionHistorial = document.getElementById('selectVersionHistorial');
-
-            const campoIdHistorial = document.getElementById('campoIdHistorial');
-            const campoIdPaciente = document.getElementById('campoIdPaciente');
-
-            const campos = {
-                paciente: document.getElementById('campoPaciente'),
-                especie: document.getElementById('campoEspecie'),
-                raza: document.getElementById('campoRaza'),
-                fecha: document.getElementById('campoFecha'),
-                vet: document.getElementById('campoVeterinario'),
-                motivo: document.getElementById('campoMotivo'),
-                diagnostico: document.getElementById('campoDiagnostico'),
-                tratamiento: document.getElementById('campoTratamiento'),
-                medicacion: document.getElementById('campoMedicacion'),
-                observaciones: document.getElementById('campoObservaciones')
-            };
-
-            const detalleAcceso = document.getElementById('detalleAcceso');
-            const detalleVersion = document.getElementById('detalleVersion');
-            const detalleActualizacion = document.getElementById('detalleActualizacion');
-            const detallePacienteRegistro = document.getElementById('detallePacienteRegistro');
-
-            let registros = [];
-            let versionesHistorial = [];
-            let pendingSelectId = null;
-            let pendingSelectPatientId = null;
-
-            async function postJson(body) {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(body)
-                });
-
-                const payload = await response.json();
-                if (!response.ok || payload.status !== 'success') {
-                    throw new Error(payload.message || 'Error en la solicitud');
-                }
-
-                return payload;
-            }
-
-            function escapeHtml(value) {
-                if (value === null || value === undefined) return '';
-                return String(value)
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
-            }
-
-            function toDateInput(value) {
-                if (!value) return '';
-                return String(value).slice(0, 10);
-            }
-
-            function fechaHumana(value) {
-                if (!value) return '--';
-                const date = new Date(value.replace(' ', 'T'));
-                if (Number.isNaN(date.getTime())) return String(value).slice(0, 10);
-                return date.toLocaleDateString('es-CO');
-            }
-
-            function fechaHoraHumana(value) {
-                if (!value) return '--';
-                const date = new Date(value.replace(' ', 'T'));
-                if (Number.isNaN(date.getTime())) return String(value);
-                return date.toLocaleDateString('es-CO') + ' ' + date.toLocaleTimeString('es-CO', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            }
-
-            function limpiarFormulario() {
-                campoIdHistorial.value = '';
-                campoIdPaciente.value = '';
-                campos.paciente.value = '';
-                campos.especie.value = '';
-                campos.raza.value = '';
-                campos.fecha.value = '';
-                campos.vet.value = '';
-                campos.motivo.value = '';
-                campos.diagnostico.value = '';
-                campos.tratamiento.value = '';
-                campos.medicacion.value = '';
-                campos.observaciones.value = '';
-                detalleAcceso.textContent = 'Autorizado';
-                detalleVersion.textContent = '--';
-                detalleActualizacion.textContent = '--';
-                detallePacienteRegistro.textContent = 'No';
-                selectVersionHistorial.innerHTML = '<option value="">Selecciona una atención</option>';
-                versionesHistorial = [];
-            }
-
-            function cargarDetalle(registro) {
-                if (!registro) return;
-
-                campoIdHistorial.value = registro.id_historial || '';
-                campoIdPaciente.value = registro.id_paciente || '';
-
-                campos.paciente.value = registro.paciente_nombre || '';
-                campos.especie.value = registro.especie || '';
-                campos.raza.value = registro.raza || '';
-                campos.fecha.value = toDateInput(registro.fecha_atencion) || new Date().toISOString().slice(0, 10);
-                campos.vet.value = registro.veterinario_responsable || '';
-                campos.motivo.value = registro.motivo_consulta || '';
-                campos.diagnostico.value = registro.diagnostico || '';
-                campos.tratamiento.value = registro.tratamientos_aplicados || '';
-                campos.medicacion.value = registro.medicacion_recetada || '';
-                campos.observaciones.value = registro.observaciones_adicionales || '';
-
-                detalleAcceso.textContent = registro.acceso || 'Autorizado';
-                detalleVersion.textContent = registro.version_registro ? ('v' + registro.version_registro) : 'Nueva';
-                detalleActualizacion.textContent = fechaHoraHumana(registro.updated_at || registro.fecha_atencion);
-                detallePacienteRegistro.textContent = registro.id_paciente ? 'Sí' : 'No';
-            }
-
-            function renderVersionesSelector(selectedId) {
-                if (!Array.isArray(versionesHistorial) || versionesHistorial.length === 0) {
-                    selectVersionHistorial.innerHTML = '<option value="">Sin versiones disponibles</option>';
-                    return;
-                }
-
-                selectVersionHistorial.innerHTML = versionesHistorial.map(function(item) {
-                    const label = 'v' + (item.version_registro || '--') + ' · ' + fechaHumana(item.fecha_atencion);
-                    const selected = Number(item.id_historial || 0) === Number(selectedId || 0) ? ' selected' : '';
-                    return '<option value="' + escapeHtml(item.id_historial || '') + '"' + selected + '>' + escapeHtml(label) + '</option>';
-                }).join('');
-            }
-
-            async function cargarVersionesHistorial(idHistorial, selectedId) {
-                const id = Number(idHistorial || 0);
-                if (id <= 0) {
-                    versionesHistorial = [];
-                    renderVersionesSelector('');
-                    return;
-                }
-
-                try {
-                    const payload = await postJson({
-                        accion: 'listar_versiones_historial',
-                        id_historial: id
-                    });
-
-                    versionesHistorial = Array.isArray(payload.data) ? payload.data : [];
-                    renderVersionesSelector(selectedId || id);
-                } catch (error) {
-                    versionesHistorial = [];
-                    renderVersionesSelector('');
-                }
-            }
-
-            function prepararNuevaAtencionDesdeCita(contextoCita) {
-                if (!contextoCita || Number(contextoCita.id_paciente || 0) <= 0) {
-                    return;
-                }
-
-                if (Number(campoIdPaciente.value || 0) !== Number(contextoCita.id_paciente || 0)) {
-                    return;
-                }
-
-                campoIdHistorial.value = '';
-
-                if (contextoCita.fecha_atencion) {
-                    campos.fecha.value = toDateInput(contextoCita.fecha_atencion);
-                }
-
-                if (contextoCita.motivo_consulta) {
-                    campos.motivo.value = contextoCita.motivo_consulta;
-                }
-
-                detalleVersion.textContent = 'Nueva';
-                detalleActualizacion.textContent = '--';
-            }
-
-            async function obtenerContextoDesdeCita() {
-                const query = new URLSearchParams(window.location.search);
-                const idAgendamiento = Number(query.get('id_agendamiento') || 0);
-
-                if (idAgendamiento <= 0) {
-                    return null;
-                }
-
-                try {
-                    const response = await fetch(endpointDetallesCita + '&id_agendamiento=' + encodeURIComponent(idAgendamiento), {
-                        method: 'GET',
-                        credentials: 'same-origin'
-                    });
-
-                    const payload = await response.json();
-                    if (!response.ok || payload.status !== 'success' || !payload.cita) {
-                        return null;
-                    }
-
-                    const cita = payload.cita;
-
-                    return {
-                        id_paciente: Number(cita.id_paciente || 0),
-                        fecha_atencion: cita.fecha_hora || '',
-                        motivo_consulta: (cita.observaciones || cita.tipo || '').trim(),
-                    };
-                } catch (error) {
-                    return null;
-                }
-            }
-
-            function renderTabla() {
-                if (!Array.isArray(registros) || registros.length === 0) {
-                    tablaBody.innerHTML = '<tr><td colspan="7" class="text-center py-3">No tienes pacientes vinculados o no hay historiales registrados.</td></tr>';
-                    limpiarFormulario();
-                    return;
-                }
-
-                tablaBody.innerHTML = registros.map(function(item) {
-                    const activo = pendingSelectId && Number(item.id_historial || 0) === Number(pendingSelectId) ? 'active' : '';
-                    const version = item.version_registro ? 'v' + item.version_registro : 'Nueva';
-                    const acceso = item.acceso || 'Autorizado';
-                    const idHistorialBase = item.id_historial_base || item.id_historial || '';
-
-                    return '<tr class="' + activo + '" ' +
-                        'data-id-historial="' + escapeHtml(item.id_historial || '') + '" ' +
-                        'data-id-historial-base="' + escapeHtml(idHistorialBase) + '" ' +
-                        'data-id-paciente="' + escapeHtml(item.id_paciente || '') + '" ' +
-                        'data-paciente="' + escapeHtml(item.paciente_nombre || '') + '" ' +
-                        'data-especie="' + escapeHtml(item.especie || '') + '" ' +
-                        'data-raza="' + escapeHtml(item.raza || '') + '" ' +
-                        'data-fecha="' + escapeHtml(toDateInput(item.fecha_atencion)) + '" ' +
-                        'data-vet="' + escapeHtml(item.veterinario_responsable || '') + '" ' +
-                        'data-motivo="' + escapeHtml(item.motivo_consulta || '') + '" ' +
-                        'data-diagnostico="' + escapeHtml(item.diagnostico || '') + '" ' +
-                        'data-tratamiento="' + escapeHtml(item.tratamientos_aplicados || '') + '" ' +
-                        'data-medicacion="' + escapeHtml(item.medicacion_recetada || '') + '" ' +
-                        'data-observaciones="' + escapeHtml(item.observaciones_adicionales || '') + '" ' +
-                        'data-acceso="' + escapeHtml(acceso) + '" ' +
-                        'data-version="' + escapeHtml(item.version_registro || '') + '" ' +
-                        'data-updated-at="' + escapeHtml(item.updated_at || item.fecha_atencion || '') + '">' +
-                        '<td class="paciente-cell"><strong>' + escapeHtml(item.paciente_nombre || '--') + '</strong><small>' + escapeHtml((item.especie || '--') + ' · ' + (item.raza || '--')) + '</small></td>' +
-                        '<td>' + escapeHtml(fechaHumana(item.fecha_atencion)) + '</td>' +
-                        '<td>' + escapeHtml(item.veterinario_responsable || '--') + '</td>' +
-                        '<td>' + escapeHtml(item.motivo_consulta || 'Sin registro') + '</td>' +
-                        '<td><span class="badge-acceso permitido"><i class="bi bi-check-circle"></i> ' + escapeHtml(acceso) + '</span></td>' +
-                        '<td><span class="badge-version">' + escapeHtml(version) + '</span></td>' +
-                        '<td><div class="acciones-registro"><button class="btn-mini" title="Seleccionar"><i class="bi bi-eye"></i></button></div></td>' +
-                        '</tr>';
-                }).join('');
-
-                const filas = tablaBody.querySelectorAll('tr[data-id-paciente]');
-                filas.forEach(function(fila) {
-                    fila.addEventListener('click', function() {
-                        filas.forEach(function(item) {
-                            item.classList.remove('active');
-                        });
-                        fila.classList.add('active');
-
-                        const registro = {
-                            id_historial: fila.dataset.idHistorial || '',
-                            id_paciente: fila.dataset.idPaciente || '',
-                            paciente_nombre: fila.dataset.paciente || '',
-                            especie: fila.dataset.especie || '',
-                            raza: fila.dataset.raza || '',
-                            fecha_atencion: fila.dataset.fecha || '',
-                            veterinario_responsable: fila.dataset.vet || '',
-                            motivo_consulta: fila.dataset.motivo || '',
-                            diagnostico: fila.dataset.diagnostico || '',
-                            tratamientos_aplicados: fila.dataset.tratamiento || '',
-                            medicacion_recetada: fila.dataset.medicacion || '',
-                            observaciones_adicionales: fila.dataset.observaciones || '',
-                            acceso: fila.dataset.acceso || 'Autorizado',
-                            version_registro: fila.dataset.version || '',
-                            updated_at: fila.dataset.updatedAt || ''
-                        };
-
-                        cargarDetalle(registro);
-                        cargarVersionesHistorial(registro.id_historial, registro.id_historial);
-                    });
-                });
-
-                let filaInicial = null;
-                if (pendingSelectId) {
-                    filaInicial = tablaBody.querySelector('tr[data-id-historial="' + pendingSelectId + '"]');
-                }
-                if (!filaInicial && pendingSelectPatientId) {
-                    filaInicial = tablaBody.querySelector('tr[data-id-paciente="' + pendingSelectPatientId + '"]');
-                }
-                if (!filaInicial) {
-                    filaInicial = tablaBody.querySelector('tr[data-id-paciente]');
-                }
-                pendingSelectId = null;
-                pendingSelectPatientId = null;
-
-                if (filaInicial) {
-                    filaInicial.click();
-                }
-            }
-
-            function actualizarFiltroVeterinarios() {
-                const actual = filtroVeterinario.value;
-                const values = [];
-
-                registros.forEach(function(item) {
-                    const nombre = (item.veterinario_responsable || '').trim();
-                    if (nombre && values.indexOf(nombre) === -1) {
-                        values.push(nombre);
-                    }
-                });
-
-                filtroVeterinario.innerHTML = '<option value="">Todos</option>' + values.map(function(item) {
-                    return '<option value="' + escapeHtml(item) + '">' + escapeHtml(item) + '</option>';
-                }).join('');
-
-                if (actual && values.indexOf(actual) !== -1) {
-                    filtroVeterinario.value = actual;
-                }
-            }
-
-            async function cargarHistoriales(filtros) {
-                tablaBody.innerHTML = '<tr><td colspan="7" class="text-center py-3">Cargando historiales...</td></tr>';
-
-                try {
-                    const payload = await postJson(Object.assign({
-                        accion: 'listar_historiales'
-                    }, filtros || {}));
-
-                    registros = Array.isArray(payload.data) ? payload.data : [];
-                    actualizarFiltroVeterinarios();
-                    renderTabla();
-                } catch (error) {
-                    tablaBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-3">' + escapeHtml(error.message || 'Error de carga') + '</td></tr>';
-                    limpiarFormulario();
-                }
-            }
-
-            function obtenerFiltrosActuales() {
-                return {
-                    paciente: (filtroPaciente.value || '').trim(),
-                    fecha: filtroFecha.value || '',
-                    veterinario: filtroVeterinario.value || '',
-                    acceso: filtroAcceso.value || ''
-                };
-            }
-
-            btnFiltrar.addEventListener('click', function() {
-                cargarHistoriales(obtenerFiltrosActuales());
-            });
-
-            btnLimpiar.addEventListener('click', function() {
-                filtroPaciente.value = '';
-                filtroFecha.value = '';
-                filtroVeterinario.value = '';
-                filtroAcceso.value = '';
-                cargarHistoriales({});
-            });
-
-            btnNuevaAtencion.addEventListener('click', function() {
-                if (!campoIdPaciente.value) {
-                    alert('Selecciona primero un paciente vinculado en la tabla.');
-                    return;
-                }
-
-                campoIdHistorial.value = '';
-                campos.fecha.value = new Date().toISOString().slice(0, 10);
-                campos.motivo.value = '';
-                campos.diagnostico.value = '';
-                campos.tratamiento.value = '';
-                campos.medicacion.value = '';
-                campos.observaciones.value = '';
-                detalleVersion.textContent = 'Nueva';
-                detalleActualizacion.textContent = '--';
-            });
-
-            selectVersionHistorial.addEventListener('change', function() {
-                const idVersion = Number(selectVersionHistorial.value || 0);
-                if (idVersion <= 0 || !Array.isArray(versionesHistorial) || versionesHistorial.length === 0) {
-                    return;
-                }
-
-                const versionSeleccionada = versionesHistorial.find(function(item) {
-                    return Number(item.id_historial || 0) === idVersion;
-                });
-
-                if (!versionSeleccionada) {
-                    return;
-                }
-
-                cargarDetalle(versionSeleccionada);
-            });
-
-            btnExportarPdf.addEventListener('click', function() {
-                const filtros = obtenerFiltrosActuales();
-                const params = new URLSearchParams();
-
-                if (filtros.paciente) params.append('paciente', filtros.paciente);
-                if (filtros.fecha) params.append('fecha', filtros.fecha);
-                if (filtros.veterinario) params.append('veterinario', filtros.veterinario);
-                if (filtros.acceso) params.append('acceso', filtros.acceso);
-
-                const url = '<?= BASE_URL ?>/veterinaria/gestion-pacientes/pdf' + (params.toString() ? ('?' + params.toString()) : '');
-                window.open(url, '_blank');
-            });
-
-            btnGuardar.addEventListener('click', async function() {
-                const idPaciente = Number(campoIdPaciente.value || 0);
-                const payload = {
-                    accion: 'guardar_historial',
-                    id_historial: Number(campoIdHistorial.value || 0),
-                    id_paciente: idPaciente,
-                    fecha_atencion: (campos.fecha.value || '').trim(),
-                    motivo_consulta: (campos.motivo.value || '').trim(),
-                    diagnostico: (campos.diagnostico.value || '').trim(),
-                    tratamientos_aplicados: (campos.tratamiento.value || '').trim(),
-                    medicacion_recetada: (campos.medicacion.value || '').trim(),
-                    observaciones_adicionales: (campos.observaciones.value || '').trim()
-                };
-
-                if (idPaciente <= 0) {
-                    alert('Debes seleccionar un paciente vinculado.');
-                    return;
-                }
-
-                if (!payload.fecha_atencion || !payload.motivo_consulta) {
-                    alert('La fecha de atención y el motivo de consulta son obligatorios.');
-                    return;
-                }
-
-                try {
-                    const result = await postJson(payload);
-
-                    pendingSelectId = result.data && result.data.id_historial ? Number(result.data.id_historial) : null;
-                    await cargarHistoriales(obtenerFiltrosActuales());
-                    alert('Historial clínico guardado correctamente.');
-                } catch (error) {
-                    alert(error.message || 'Error al guardar el historial clínico.');
-                }
-            });
-
-            const contextoCita = await obtenerContextoDesdeCita();
-
-            if (contextoCita && Number(contextoCita.id_paciente || 0) > 0) {
-                pendingSelectPatientId = Number(contextoCita.id_paciente);
-            }
-
-            await cargarHistoriales({});
-
-            if (contextoCita && Number(contextoCita.id_paciente || 0) > 0) {
-                prepararNuevaAtencionDesdeCita(contextoCita);
-            }
-        });
-    </script>
-
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/gestion-pacientes.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 </body>
 

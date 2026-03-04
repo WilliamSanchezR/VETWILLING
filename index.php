@@ -211,6 +211,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/historialesClinicosController.php';
         break;
 
+    case '/veterinaria/gestion-pacientes/pdf-mascota':
+        require BASE_PATH . '/app/controllers/fichaClinicaPacientePdfController.php';
+        break;
+
     case '/veterinario/guardar-veterinario':
         require BASE_PATH . '/app/controllers/veterinarioController.php';
         break;
