@@ -26,7 +26,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
 </head>
 
-<body>
+<body data-reportes-api-url="<?= BASE_URL ?>/veterinaria/reportes/data" data-reportes-pdf-url="<?= BASE_URL ?>/veterinaria/reportes/pdf">
 
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Aqui va el include -->
@@ -364,14 +364,10 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script>
-        window.REPORTES_API_URL = '<?= BASE_URL ?>/veterinaria/reportes/data';
-        window.REPORTES_PDF_URL = '<?= BASE_URL ?>/veterinaria/reportes/pdf';
-    </script>
-
     <!-- Propio -->
 
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/reportesConfig.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardReportes.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 
