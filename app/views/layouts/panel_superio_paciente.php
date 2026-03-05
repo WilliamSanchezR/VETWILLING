@@ -230,7 +230,7 @@ $datosUsuario = [
 
             <div class="dropdown-divider" role="separator"></div>
 
-            <a href="<?= BASE_URL ?>/logout" class="dropdown-item text-danger" role="menuitem">
+            <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item text-danger" role="menuitem">
                 <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                 <span>Cerrar Sesión</span>
             </a>

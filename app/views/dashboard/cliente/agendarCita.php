@@ -373,56 +373,6 @@ $mascotas = listarMascotas();
             color: #0a932c;
         }
 
-        /* ═══════════════════════════════════════════════════════════ */
-        /*  DARK MODE                                                  */
-        /* ═══════════════════════════════════════════════════════════ */
-
-        body.dark-mode .form-card {
-            background: #1e1e1e;
-        }
-
-        body.dark-mode .form-section-title {
-            color: #ffffff;
-        }
-
-        body.dark-mode .form-label-custom {
-            color: #dddddd;
-        }
-
-        body.dark-mode .form-control-custom {
-            background: #2d2d2d;
-            border-color: #444;
-            color: #ffffff;
-        }
-
-        body.dark-mode .form-control-custom:focus {
-            background: #333;
-            border-color: #0a932c;
-        }
-
-        body.dark-mode .mascota-card-selector {
-            background: #2d2d2d;
-            border-color: #444;
-        }
-
-        body.dark-mode .mascota-card-selector:hover {
-            background: #333;
-        }
-
-        body.dark-mode .mascota-card-selector.selected {
-            background: rgba(10, 147, 44, 0.2);
-            border-color: #0a932c;
-        }
-
-        body.dark-mode .mascota-nombre-selector {
-            color: #ffffff;
-        }
-
-        body.dark-mode .btn-cancelar {
-            background: #2d2d2d;
-            border-color: #444;
-            color: #dddddd;
-        }
 
         body.dark-mode .btn-cancelar:hover {
             background: #3d3d3d;

@@ -588,49 +588,6 @@ $id_usuario = $_SESSION['user']['id_usuario'];
             to { transform: rotate(360deg); }
         }
 
-        /* ═══════════════════════════════════════════════════════════ */
-        /*  DARK MODE                                                 */
-        /* ═══════════════════════════════════════════════════════════ */
-
-        body.dark-mode .stat-item,
-        body.dark-mode .timeline-dia,
-        body.dark-mode .filtros-avanzados,
-        body.dark-mode .estado-vacio {
-            background: #1e1e1e;
-        }
-
-        body.dark-mode .stat-content h3,
-        body.dark-mode .dia-fecha h3,
-        body.dark-mode .cita-titulo,
-        body.dark-mode .estado-vacio h3 {
-            color: #ffffff;
-        }
-
-        body.dark-mode .cita-card {
-            background: #2d2d2d;
-            border-color: #444;
-        }
-
-        body.dark-mode .cita-hora {
-            background: #1e1e1e;
-        }
-
-        body.dark-mode .filtro-grupo select,
-        body.dark-mode .filtro-grupo input {
-            background: #2d2d2d;
-            border-color: #444;
-            color: #ffffff;
-        }
-
-        body.dark-mode .tab-btn {
-            background: #2d2d2d;
-            border-color: #444;
-            color: #dddddd;
-        }
-
-        /* ═══════════════════════════════════════════════════════════ */
-        /*  RESPONSIVE                                                */
-        /* ═══════════════════════════════════════════════════════════ */
 
         @media (max-width: 768px) {
             .header-citas {
