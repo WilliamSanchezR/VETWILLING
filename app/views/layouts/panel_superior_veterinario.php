@@ -268,16 +268,6 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                                 <span class="item-subtitle">Ayuda y asistencia técnica</span>
                             </div>
                         </a>
-
-                        <a href="<?= BASE_URL ?>/veterinario/suscripcion" class="dropdown-item">
-                            <div class="item-icon">
-                                <i class="bi bi-person-circle"></i>
-                            </div>
-                            <div class="item-content">
-                                <span class="item-title">Mi Suscripción</span>
-                                <span class="item-subtitle">Ver y cambiar mi suscripción</span>
-                            </div>
-                        </a>
                     </div>
 
                         <div class="panel-divider"></div>
