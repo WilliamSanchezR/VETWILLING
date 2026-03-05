@@ -202,7 +202,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
                             <div class="historial-card modulo-fase2 mt-3 p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                                    <h5 class="mb-0"><i class="bi bi-journal-medical me-2"></i>Módulos clínicos (Fase 2)</h5>
+                                    <h5 class="mb-0"><i class="bi bi-journal-medical me-2"></i>Módulos clínicos</h5>
                                     <span class="badge-sync"><i class="bi bi-heart-pulse"></i> Ficha integral</span>
                                 </div>
 
