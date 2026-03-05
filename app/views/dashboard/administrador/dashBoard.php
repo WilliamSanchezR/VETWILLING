@@ -3,7 +3,13 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 require_once BASE_PATH . '/app/controllers/dashboardsAdminControllers.php';
 
 $totalUsuarios = getTotalUsuarios();
+$usuariosRegistradosUltimoMes = getUsuariosRegistradosUltimoMes();
 $totalVeterinarias = getTotalVeterinarias();
+$porcentajeVeterinarias = getPorcentajeVeterinarias();
+$totalProfesionales = getTotalProfesionales();
+$profesionalesUltimoMes = getProfesionalesUltimoMes();
+$porcentajeProfesionales = getPorcentajeProfesionales();
+$usuariosUltimoMes = getUsuariosUltimoMes();
 // Aquí puedes usar $dashboardInfo para mostrar la información en el dashboard, por ejemplo:
 // echo "Total Veterinarias Activas: " . $dashboardInfo;
 
@@ -91,7 +97,7 @@ $totalVeterinarias = getTotalVeterinarias();
                     <div class="stat-value"><?= $totalUsuarios['total_activos'] ?></div>
                     <div class="stat-label">Total Usuarios</div>
                     <div class="stat-footer">
-                        <i class="bi bi-person-plus"></i> <?= $totalUsuarios['registrados_ultima_semana'] ?> nuevos esta semana
+                        <i class="bi bi-person-plus"></i> <?= $usuariosRegistradosUltimoMes ?> nuevos usuarios este mes
                     </div>
                 </div>
 
@@ -103,13 +109,13 @@ $totalVeterinarias = getTotalVeterinarias();
                         </div>
                         <div class="stat-trend up">
                             <i class="bi bi-arrow-up"></i>
-                            0%
+                            <?= $porcentajeVeterinarias['porcentaje_activas'] ?>% 
                         </div>
                     </div>
                     <div class="stat-value"><?= $totalVeterinarias ?></div>
                     <div class="stat-label">Veterinarias Activas</div>
                     <div class="stat-footer">
-                        <i class="bi bi-check-circle"></i> 0 pendientes de aprobación
+                        <i class="bi bi-check-circle"></i>  <?= $totalVeterinarias ?> veterinarias activas en el sistema
                     </div>
                 </div>
 
@@ -120,14 +126,14 @@ $totalVeterinarias = getTotalVeterinarias();
                             <i class="bi bi-calendar-check"></i>
                         </div>
                         <div class="stat-trend up">
-                            <i class="bi bi-arrow-up"></i>
-                            15%
+                            <i class="bi bi-arrow-up"></i> 
+                            <?= $porcentajeProfesionales['porcentaje_activas'] ?>%
                         </div>
                     </div>
-                    <div class="stat-value">3,567</div>
+                    <div class="stat-value"><?= $totalProfesionales ?></div>
                     <div class="stat-label">Total profesionales</div>
                     <div class="stat-footer">
-                        <i class="bi bi-clock"></i> 89 profesionales agregados esta semana
+                        <i class="bi bi-clock"></i> <?= $profesionalesUltimoMes ?> profesionales registrados este mes
                     </div>
                 </div>
 
@@ -139,13 +145,13 @@ $totalVeterinarias = getTotalVeterinarias();
                         </div>
                         <div class="stat-trend down">
                             <i class="bi bi-arrow-down"></i>
-                            5%
+                            <?= $usuariosUltimoMes['porcentaje_activos_ultimo_mes'] ?>%
                         </div>
                     </div>
-                    <div class="stat-value">23</div>
+                    <div class="stat-value"><?= $usuariosUltimoMes['usuarios_ultimo_mes'] ?></div>
                     <div class="stat-label">Usuarios que usaron el sistema este mes</div>
                     <div class="stat-footer">
-                        <i class="bi bi-eye"></i> 1,234 usuarios activos este mes
+                        <i class="bi bi-eye"></i> <?= $usuariosUltimoMes['usuarios_ultimo_mes'] ?>  usuarios que se logearon este mes
                     </div>
                 </div>
             </div>
