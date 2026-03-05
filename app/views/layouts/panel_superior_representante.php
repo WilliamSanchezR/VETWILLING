@@ -55,16 +55,6 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
             </button>
 
             <!-- Saludo + reloj -->
-            <div class="greeting-section">
-                <span class="greeting-icon" id="saludoEmoji">👋</span>
-                <div class="greeting-text">
-                    <span class="greeting-label" id="saludoTexto">Bienvenido</span>
-                    <span class="greeting-time">
-                        <i class="bi bi-clock"></i>
-                        <span id="horaActual">00:00:00</span>
-                    </span>
-                </div>
-            </div>
 
             <div class="nav-sep"></div>
 
@@ -236,11 +226,8 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                         <span>
 
                         </span>
-                        <!-- Badge suscripción en botón -->
-                        <span class="sub-badge sub-<?= $sub_slug ?>">
-                            <i class="bi <?= $sub_icon ?>"></i>
-                            <?= $suscripcion ?>
-                        </span>
+                        <span class="profile-badge"><?= htmlspecialchars($usuario['rol']) ?></span>
+
                     </div>
 
                     <i class="bi bi-chevron-down profile-arrow"></i>
@@ -456,4 +443,5 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 
 
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/panelSuperiorRepresentante.js"></script>
-<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/panelSuperiorAdmin.js"></script>
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/navbar-superior.js"></script>
