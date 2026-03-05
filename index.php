@@ -163,6 +163,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
         break;
 
+    case '/veterinaria/gestion-pacientes':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-pacientes.php';
+        break;
+
     case '/veterinaria/laboratorio':
         require BASE_PATH . '/app/views/dashboard/veterinaria/laboratorio.php';
         break;
@@ -201,6 +205,14 @@ switch ($request) {
 
     case '/veterinaria/pacientes/acciones':
         require BASE_PATH . '/app/controllers/pacientesVeterinarioController.php';
+        break;
+
+    case '/veterinaria/gestion-pacientes/pdf':
+        require BASE_PATH . '/app/controllers/historialesClinicosController.php';
+        break;
+
+    case '/veterinaria/gestion-pacientes/pdf-mascota':
+        require BASE_PATH . '/app/controllers/fichaClinicaPacientePdfController.php';
         break;
 
     case '/veterinario/guardar-veterinario':
@@ -568,6 +580,12 @@ switch ($request) {
     case '/representante/api/propietarios':
         require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
+    
+    //------------------------------INVENTARIO REPRESENTANTE------------------------------//
+    case '/representante/inventario':
+        require BASE_PATH . '/app/views/dashboard/representante/listaInventario.php';
+        break;
+    
 
 
     //---------------------------------------SERVICIOS-------------------------------------//
