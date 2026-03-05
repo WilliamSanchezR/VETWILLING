@@ -82,6 +82,11 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/seguimientos.php';
         break;
 
+    // API de seguimientos
+    case '/veterinaria/api/seguimientos':
+        require BASE_PATH . '/app/controllers/seguimientosController.php';
+        break;
+
     case '/veterinaria/calendario':
         require BASE_PATH . '/app/views/dashboard/veterinaria/calendario.php';
         break;
