@@ -133,6 +133,92 @@ class Usuario
         }
     }
 
+    public function ListarTodosUsuarios()
+    {
+        // Listamos los usuarios registrados en la base de datos
+        try {
+            $sql = "SELECT 
+                adm.id_usuario,
+                adm.tipo_documento,
+                adm.numero_documento,
+                adm.nombres,
+                adm.apellidos,
+                adm.telefono,
+                adm.img_perfil,
+                us.email,
+                us.estado,
+                rol.nombre AS rol,
+                rol.id_rol
+            FROM usuario us
+            INNER JOIN administrador adm ON us.id_usuario = adm.id_usuario
+            INNER JOIN rol ON us.id_rol = rol.id_rol
+
+            UNION
+            -- REPRESENTANTE LEGAL
+            SELECT 
+                rep.id_usuario,
+                rep.tipo_documento,
+                rep.numero_documento,
+                rep.nombres,
+                rep.apellidos,
+                rep.telefono,
+                rep.img_perfil,
+                us.email,
+                us.estado,
+                rol.nombre AS rol,
+                rol.id_rol
+            FROM usuario us
+            INNER JOIN representante_legal rep ON us.id_usuario = rep.id_usuario
+            INNER JOIN rol ON us.id_rol = rol.id_rol
+            
+            UNION
+            -- Profesionales
+            SELECT 
+                pro.id_usuario,
+                pro.tipo_documento,
+                pro.numero_documento,
+                pro.nombres,
+                pro.apellidos,
+                pro.telefono,
+                pro.img_perfil,
+                us.email,
+                us.estado,
+                rol.nombre AS rol,
+                rol.id_rol
+            FROM usuario us
+            INNER JOIN profesional pro ON us.id_usuario = pro.id_usuario
+            INNER JOIN rol ON us.id_rol = rol.id_rol
+            
+            UNION
+            -- Propietarios
+            SELECT 
+                pro.id_usuario,
+                pro.tipo_documento,
+                pro.numero_documento,
+                pro.nombres,
+                pro.apellidos,
+                pro.telefono,
+                pro.img_perfil,
+                us.email,
+                us.estado,
+                rol.nombre AS rol,
+                rol.id_rol
+            FROM usuario us
+            INNER JOIN propietario pro ON us.id_usuario = pro.id_usuario
+            INNER JOIN rol ON us.id_rol = rol.id_rol
+
+            ORDER BY id_usuario ASC";
+            // Preparar y ejecutar la consulta
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::listar -> " . $e->getMessage());
+            return [];
+        }
+    }
+
     // FUNCION PARA CONSULTAR UN USUARIO POR ID
     public function consultarUsuario($id)
     {

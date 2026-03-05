@@ -159,10 +159,6 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/calendarioController.php';
         break;
 
-    case '/veterinaria/gestion_clinica':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
-        break;
-
     case '/veterinaria/gestion-pacientes':
         require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-pacientes.php';
         break;
@@ -580,12 +576,16 @@ switch ($request) {
     case '/representante/api/propietarios':
         require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
-    
+
+    case '/representante/gestion_clinica':
+        require BASE_PATH . '/app/views/dashboard/representante/gestion-clinica.php';
+        break;
+
     //------------------------------INVENTARIO REPRESENTANTE------------------------------//
     case '/representante/inventario':
         require BASE_PATH . '/app/views/dashboard/representante/listaInventario.php';
         break;
-    
+
 
 
     //---------------------------------------SERVICIOS-------------------------------------//

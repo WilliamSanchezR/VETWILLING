@@ -57,12 +57,6 @@
                 <span class="nav-text">Mi Disponibilidad</span>
             </a>
 
-            <a href="<?= BASE_URL ?>/veterinaria/gestion_clinica"
-                class="nav-item"
-                data-section="tienda">
-                <i class="bi bi-hospital"></i>
-                <span class="nav-text">Gestion Pacientes</span>
-            </a>
             <a href="<?= BASE_URL ?>/veterinaria/gestion-pacientes"
                 class="nav-item"
                 data-section="tienda">

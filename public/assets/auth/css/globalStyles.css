@@ -91,15 +91,15 @@ p{
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
     background-color: var(--light-color) !important;
-    border-color: var(--color-primario) !important;
+    border-color: var(--primary-color) !important;
     color: var(--white-color) !important;
     transform: translateY(-2px);
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background-color: var(--color-primario) !important;
+    background-color: var(--primary-color) !important;
     color: white !important;
-    border-color: var(--color-primario) !important;
+    border-color: var(--primary-color) !important;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {

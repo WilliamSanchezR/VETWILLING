@@ -148,6 +148,12 @@ function listarUsuarios()
     return $resultado->listar();
 }
 
+function ListarTodosUsuarios()
+{
+    $resultado = new Usuario();
+    return $resultado->ListarTodosUsuarios();
+}
+
 // FUNCION PARA CONSULTAR UN USUARIO POR ID
 function consultarUsuarioId($id)
 {

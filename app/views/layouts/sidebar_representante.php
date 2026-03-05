@@ -107,6 +107,14 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         <span class="nav-text">Propietarios</span>
                     </a>
 
+                    <a href="<?= BASE_URL ?>/representante/gestion_clinica"
+                        class="nav-item <?= $final_path == 'gestion_clinica' ? 'active' : '' ?>"
+                        data-section="tienda">
+                        <i class="bi bi-hospital"></i>
+                        <span class="nav-text">Gestión Clínica</span>
+                    </a>
+
+
 
 
                 </ul>
@@ -140,12 +148,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             <i class="bi bi-calendar-week"></i>
                             <span class="nav-text">Calendario</span>
                         </a></li>
-                    <li><a href="<?= BASE_URL ?>/veterinaria/gestion_clinica"
-                            class="nav-item"
-                            data-section="tienda">
-                            <i class="bi bi-hospital"></i>
-                            <span class="nav-text">Gestion Clinicas</span>
-                        </a></li>
+                   
                     <li><a href="<?= BASE_URL ?>/veterinaria/laboratorio"
                             class="nav-item"
                             data-section="tienda">
