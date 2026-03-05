@@ -61,6 +61,13 @@ class Login
                     return ['error' => 'Rol de usuario no válido'];
             }
 
+            // Registrar la fecha de ingreso al usuario
+            $updateLoginTime = "UPDATE usuario SET ultimo_acceso = NOW() WHERE id_usuario = :id";
+            $stmtUpdate = $this->conexion->prepare($updateLoginTime);
+            $stmtUpdate->bindParam(':id', $user['id_usuario']);
+            $stmtUpdate->execute();                    
+            
+
             $resultado = $this->conexion->prepare($consultar);
             $resultado->bindParam(':id', $user['id_usuario']);
             $resultado->execute();
