@@ -61,7 +61,7 @@ class Perfil
                 case 3: // PROPIETARIO
                     $consultar = "SELECT 
                                 u.id_usuario, u.email, u.estado,
-                                p.nombres, p.apellidos, p.img_perfil, p.telefono, r.id_rol,
+                                p.nombres, p.apellidos, p.img_perfil, p.telefono, p.tipo_documento, p.numero_documento, r.id_rol,
                                 r.nombre AS rol, p.direccion, vet.id_veterinaria, vet.nombre AS nombre_veterinaria
                                 FROM usuario u
                                 INNER JOIN propietario p ON u.id_usuario = p.id_usuario

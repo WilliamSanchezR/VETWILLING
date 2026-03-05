@@ -139,20 +139,24 @@ $usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
                 </div>
             </div>
 
-            <div>
-                <div>
+            <div class="infoTicket">
+                <div class="card">
                     <!-- si el ticket no tiene asignado muestre el combo de asignación -->
                     <?php if ($ticketData['id_asignado'] === null) : ?>
                         <div class="asignar-ticket">
                             <h2>Asignar Ticket</h2>
                             <form id="asignarTicketForm">
-                                <input type="hidden" name="id_ticket" value="<?= $ticketData['id'] ?>">
-                                <div class="mb-3">
-                                    <label for="usuario_asignado" class="form-label">Seleccionar Usuario a asignar:</label>
-                                    <select class="form-select" id="usuario_asignado" name="usuario_asignado" required>
-                                        <option value="" disabled selected>Seleccione un usuario</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary mt-3">Asignar</button>
+                                <input type="hidden" name="id_ticket" id="id_ticket" value="<?= $ticketData['id'] ?>">
+                                <div class="content-ticket">
+                                    <div>
+                                        <label for="usuario_asignado" class="form-label">Seleccionar Usuario a asignar:</label>
+                                        <select class="form-select" id="usuario_asignado" name="usuario_asignado" required>
+                                            <option value="" disabled selected>Seleccione un usuario</option>
+                                        </select>
+                                    </div>
+                                    <div class="btn-asignar">
+                                        <button type="submit" id="btn-asignar-ticket" class="btn btn-success">Asignar</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>

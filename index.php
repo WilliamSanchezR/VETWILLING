@@ -82,6 +82,11 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/seguimientos.php';
         break;
 
+    // API de seguimientos
+    case '/veterinaria/api/seguimientos':
+        require BASE_PATH . '/app/controllers/seguimientosController.php';
+        break;
+
     case '/veterinaria/calendario':
         require BASE_PATH . '/app/views/dashboard/veterinaria/calendario.php';
         break;
@@ -159,8 +164,8 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/calendarioController.php';
         break;
 
-    case '/veterinaria/gestion_clinica':
-        require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-clinica.php';
+    case '/veterinaria/gestion-pacientes':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/gestion-pacientes.php';
         break;
 
     case '/veterinaria/laboratorio':
@@ -201,6 +206,14 @@ switch ($request) {
 
     case '/veterinaria/pacientes/acciones':
         require BASE_PATH . '/app/controllers/pacientesVeterinarioController.php';
+        break;
+
+    case '/veterinaria/gestion-pacientes/pdf':
+        require BASE_PATH . '/app/controllers/historialesClinicosController.php';
+        break;
+
+    case '/veterinaria/gestion-pacientes/pdf-mascota':
+        require BASE_PATH . '/app/controllers/fichaClinicaPacientePdfController.php';
         break;
 
     case '/veterinario/guardar-veterinario':
@@ -569,6 +582,16 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
 
+    case '/representante/gestion_clinica':
+        require BASE_PATH . '/app/views/dashboard/representante/gestion-clinica.php';
+        break;
+
+    //------------------------------INVENTARIO REPRESENTANTE------------------------------//
+    case '/representante/inventario':
+        require BASE_PATH . '/app/views/dashboard/representante/listaInventario.php';
+        break;
+
+
 
     //---------------------------------------SERVICIOS-------------------------------------//
     case '/representante/registro-servicio':
@@ -635,6 +658,9 @@ switch ($request) {
     // ------------------------- SOPORTE TECNICO ------------------------- //
     /// crear ticket
     case '/soporte/api/crear-ticket':
+        require BASE_PATH . '/app/controllers/ticketController.php';
+        break;
+    case '/soporte/api/ticket':
         require BASE_PATH . '/app/controllers/ticketController.php';
         break;
 }

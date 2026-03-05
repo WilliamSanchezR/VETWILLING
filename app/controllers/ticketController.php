@@ -30,6 +30,13 @@ switch ($method) {
         //     listarTickets();
         // }
         break;
+    
+    case 'PUT':
+        $action = $_GET['action'] ?? '';
+        if ($action === 'asignar') {
+            asignarTicket();
+        }
+        break;
 
     default:
         http_response_code(405);
@@ -101,5 +108,33 @@ function crearTicket()
         header('HTTP/1.1 500 Internal Server Error');
         echo json_encode(['status' => 'error', 'message' => 'Excepción: ' . $e->getMessage()]);
         return;
+    }
+}
+
+function asignarTicket()
+{
+    // recibimos los datos del formulario en formato JSON
+    $data = json_decode(file_get_contents('php://input'), true);
+    $ticketId = $data['id_ticket'] ?? null;
+    $adminId = $data['id_usuario'] ?? null;
+
+    if (empty($ticketId) || empty($adminId)) {
+        header('Content-Type: application/json');
+        header('HTTP/1.1 400 Bad Request');
+        echo json_encode(['error' => 'Faltan campos requeridos']);
+        return;
+    }
+
+    $ticketModel = new Ticket();
+    $resultado = $ticketModel->asignarTicket($ticketId, $adminId);
+
+    if ($resultado) {
+        header('Content-Type: application/json');
+        header('HTTP/1.1 200 OK');
+        echo json_encode(['status' => 'success', 'message' => 'Ticket asignado correctamente']);
+    } else {
+        header('Content-Type: application/json');
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode(['status' => 'error', 'message' => 'Error al asignar el ticket']);
     }
 }

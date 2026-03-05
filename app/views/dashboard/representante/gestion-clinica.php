@@ -8,7 +8,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DashBoard Veterinario</title>
+    <title>Gestión clínica</title>
 
     <!-- Bootstrap -->
 
@@ -21,12 +21,8 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <!-- Propio -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
-    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css"> -->
-    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPerfil.css"> -->
-    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardPacientes.css"> -->
-    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoardSeguimientos.css"> -->
-    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/nodoNoche.css"> -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleGestionClinica.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/styleGestionClinica.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
 
 </head>
 
@@ -35,14 +31,14 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Aqui va el include -->
     <?php
-    include_once __DIR__ . '/../../layouts/sidebar_veterinario.php'
+    include_once __DIR__ . '/../../layouts/sidebar_representante.php'
     ?>
 
 
     <!-- PANEL DERECHO -->
     <!-- aqui va el inclunde notifi -->
     <?php
-    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+    // include_once __DIR__ . '/../../layouts/sidebar_notifi_representante.php'
     ?>
 
     <!-- CONTENIDO PRINCIPAL -->
@@ -51,7 +47,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
         <!-- Aqui va el include de navbar superior -->
         <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php'
+        include_once __DIR__ . '/../../layouts/panel_superior_representante.php'
         ?>
 
         <!-- ÁREA DE CONTENIDO -->
@@ -551,11 +547,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <!-- Propio -->
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
-    <script
-        src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardSeguimientos.js"></script>
+    <!-- <script
+        src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardSeguimientos.js"></script> -->
     <script
         src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
 </body>
 

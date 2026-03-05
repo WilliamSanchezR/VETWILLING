@@ -58,7 +58,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                         <i class="bi bi-gear-fill"></i>
                         <span class="nav-text">Veterinaria</span>
                     </a>
-                    
+
                     <!-- Sessión con submenu Servicios y costos-->
                     <li>
 
@@ -100,12 +100,20 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                     </li>
 
                     <!-- Sección con submenú Propietarios -->
-                     <a href="<?= BASE_URL ?>/representante/propietarios"
+                    <a href="<?= BASE_URL ?>/representante/propietarios"
                         class="nav-item <?= $final_path == 'propietarios' ? 'active' : '' ?>"
                         data-section="Propietarios" data-tooltip-menu="Propietarios">
                         <i class="bi bi-person-lines-fill"></i>
                         <span class="nav-text">Propietarios</span>
                     </a>
+
+                    <a href="<?= BASE_URL ?>/representante/gestion_clinica"
+                        class="nav-item <?= $final_path == 'gestion_clinica' ? 'active' : '' ?>"
+                        data-section="tienda">
+                        <i class="bi bi-hospital"></i>
+                        <span class="nav-text">Gestión Clínica</span>
+                    </a>
+
 
 
 
@@ -140,12 +148,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             <i class="bi bi-calendar-week"></i>
                             <span class="nav-text">Calendario</span>
                         </a></li>
-                    <li><a href="<?= BASE_URL ?>/veterinaria/gestion_clinica"
-                            class="nav-item"
-                            data-section="tienda">
-                            <i class="bi bi-hospital"></i>
-                            <span class="nav-text">Gestion Clinicas</span>
-                        </a></li>
+                   
                     <li><a href="<?= BASE_URL ?>/veterinaria/laboratorio"
                             class="nav-item"
                             data-section="tienda">
@@ -191,7 +194,42 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
             </div> -->
 
+
+            <!-- GESTION DE IVENTARIO -->
+            <div class="submenu">
+                <div class="submenu-toggle" data-tooltip-menu="Gestión Administrador">
+                    <i class="bi bi-box-seam"></i>
+                    <span class="texto-item-sidebar">Gestión de inventario</span>
+                    <i class="bi bi-chevron-down flecha"></i>
+
+                </div>
+
+                <ul class="submenu-items">
+
+                    <!-- Sección configuracion veterinaria -->
+                    <a href="<?= BASE_URL ?>/representante/inventario"
+                        class="nav-item <?= $final_path == 'inventario' ? 'active' : '' ?>"
+                        data-section="Veterinaria" data-tooltip-menu="Veterinaria">
+                        <i class="bi bi-gear-fill"></i>
+                        <span class="nav-text">Inventario</span>
+                    </a>
+
+                    <!-- Sección con submenú Propietarios -->
+                    <a href="#"
+                        class="nav-item <?= $final_path == 'propietarios' ? 'active' : '' ?>"
+                        data-section="Propietarios" data-tooltip-menu="Propietarios">
+                        <i class="bi bi-person-lines-fill"></i>
+                        <span class="nav-text">Propietarios</span>
+                    </a>
+
+
+
+                </ul>
+            </div>
+
     </nav>
+
+
 
 
 

@@ -1,10 +1,7 @@
 <?php
 // Enlazamos la ruta para tomar la session del administrador
-require_once BASE_PATH . '/app/helpers/session_administrador.php';
-// Enlazamos el controlador de usuario para listar los usuarios
-require_once BASE_PATH . '/app/controllers/ticketController.php';
-// // Llamamos la función para listar los usuarios
-$datos = listarTickets();
+require_once BASE_PATH . '/app/helpers/session_representante.php'; // Enlazamos el controlador de profesional para listar los profesionales
+$id_veterinaria = $_SESSION['user']['id_veterinaria']; // Obtenemos el ID de la veterinaria desde la sesión
 
 ?>
 
@@ -15,7 +12,8 @@ $datos = listarTickets();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de tickets</title>
+    <title>Lista Propietarios</title>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -33,7 +31,7 @@ $datos = listarTickets();
     <!-- Tus CSS -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/styleTableAdmin.css">
 
@@ -46,8 +44,9 @@ $datos = listarTickets();
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Include de la barra lateral izquierda -->
     <?php
-    include_once __DIR__ . '/../../layouts/sidebar_administrador.php'
+    include_once __DIR__ . '/../../layouts/sidebar_representante.php'
     ?>
+
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="contenido-principal" id="contenidoPrincipal">
@@ -55,17 +54,17 @@ $datos = listarTickets();
 
         <!-- Include de navbar superior -->
         <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_administrador.php'
+        include_once __DIR__ . '/../../layouts/panel_superior_representante.php'
         ?>
 
 
-        <!-- ÁREA DE CONTENIDO - MÓDULO GESTIÓN DE TICKETS -->
+        <!-- ÁREA DE CONTENIDO - MÓDULO GESTIÓN DE profesionales -->
 
-        <div class="area-contenido">
-
+        <div class="area-contenido" data-id-veterinaria="<?= $_SESSION['user']['id_veterinaria'] ?>">
+            <input type="hidden" name="id_veterinaria" id="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
             <!-- Encabezado del Módulo -->
             <div class="encabezado-modulo">
-                <h3>Lista de Tickets</h3>
+                <h3>Lista de items registrados en inventario</h3>
             </div>
 
             <!-- Controles de la Tabla -->
@@ -73,7 +72,7 @@ $datos = listarTickets();
                 <div class="controles-izquierda">
                     <div class="campo-buscar">
                         <i class="bi bi-search"></i>
-                        <input type="text" id="buscarCitas" placeholder="Buscar Usuarios...">
+                        <input type="text" id="buscarPropietarios" placeholder="Buscar...">
                     </div>
                 </div>
                 <div class="controles-derecha">
@@ -89,47 +88,25 @@ $datos = listarTickets();
                     <button class="btn-control" id="btnExport">
                         <i class="bi bi-download"></i> Export
                     </button>
-                   
+
                 </div>
             </div>
 
-            <!-- Tabla de Tickets -->
+            <!-- Tabla de propietarios -->
             <div class="contenedor-tabla">
-                <table id="tablaListaTickets" class="display tabla-admin" style="width:100%">
+                <table id="tablaListaPropietarios" class="display tabla-admin" style="width:100%">
                     <thead>
                         <tr>
-                            <th>Id</th>
-                            <th>Titulo</th>
-                            <th>Categoria</th>
-                            <th>prioridad</th>
+                            <th>Documento</th>
+                            <th>Nombres y Apellidos</th>
+                            <th>Telefono</th>
+                            <th>Email</th>
                             <th>Estado</th>
-                            <th>Usuario</th>
-                            <th>Asignado a</th>
-                            <th>fecha creación</th>
-                            <th></th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (!empty($datos)) : ?>
-                            <?php foreach ($datos as $ticket):  ?>
-                                <tr class="fila-blanca">
-                                    <td><?= $ticket['id'] ?></td>
-                                    <td><?= $ticket['titulo'] ?></td>
-                                    <td><?= $ticket['categoria'] ?></td>
-                                    <td><?= $ticket['prioridad'] ?></td>
-                                    <td><?= $ticket['estado'] ?></td>
-                                    <td><?= $ticket['nombres'] ?> <?= $ticket['apellidos'] ?></td>
-                                    <td><?= $ticket['asignado'] ?></td>
-                                    <td><?= $ticket['fecha_creacion'] ?></td>
-                                    <td>
-                                        <button class="btn-accion btn-editar" title="Editar">
-                                            <a href="<?= BASE_URL ?>/admin/gestion-tickets?id=<?= $ticket['id'] ?>"><i class="bi bi-pencil"></i></a>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-
-                        <?php endif; ?>
+                        <!-- Los datos se cargan dinámicamente desde renderPropietarios.js -->
                     </tbody>
                 </table>
             </div>
@@ -146,12 +123,15 @@ $datos = listarTickets();
         <!-- 3. DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 
         <!-- 5. Tu script de tabla AL FINAL -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaUsuarios.js"></script>
 
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/listaPropietarios.js"></script>
 
 </body>
 
