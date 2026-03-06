@@ -55,7 +55,8 @@ class Ticket
     public function obtenerTicketPorId($id)
     {
         try {
-            $sql = "SELECT  tk.id, tk.titulo, tk.fecha_creacion, tk.categoria, tk.prioridad, tk.estado, pr.id_usuario as id_asignado, pr.nombres as nombre_asignado, pr.apellidos as apellido_asignado, tk.descripcion, tk.usuario_id as id_usuario
+            $sql = "SELECT  tk.id, tk.titulo, tk.fecha_creacion, tk.categoria, tk.prioridad, tk.estado, pr.id_usuario as id_asignado, pr.nombres as nombre_asignado, pr.apellidos as apellido_asignado, tk.descripcion, tk.usuario_id as id_usuario, 
+            (SELECT mensaje FROM historico_tickets WHERE ticket_id = tk.id ORDER BY fecha DESC LIMIT 1) as resultado
             FROM tickets TK
             LEFT JOIN usuario us ON tk.asignado_a = us.id_usuario
             LEFT JOIN administrador pr ON pr.id_usuario = us.id_usuario
@@ -65,7 +66,7 @@ class Ticket
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
             $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             return $ticket;
         } catch (PDOException $e) {
             echo "Error al obtener el ticket: " . $e->getMessage();
@@ -116,6 +117,91 @@ class Ticket
             return true;
         } catch (PDOException $e) {
             echo "Error al asignar el ticket: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function actualizarTicket($ticketId, $nuevoEstado, $solucion, $reasignarA)
+    {
+        try {
+            // consultamos el ticket para verificar su estado actual
+            $sqlConsulta = "SELECT * FROM tickets WHERE id = :ticketId";
+            $stmtConsulta = $this->conexion->prepare($sqlConsulta);
+            $stmtConsulta->bindParam(
+                ':ticketId',
+                $ticketId,
+                PDO::PARAM_INT
+            );
+            $stmtConsulta->execute();
+            $ticket = $stmtConsulta->fetch(PDO::FETCH_ASSOC);
+            if (!$ticket) {
+                echo "Ticket no encontrado.";
+                return false;
+            }
+            $estadoActual = $ticket['estado'];
+            // Validamos si el estado actual es diferente al nuevo estado o si se ha asignado un nuevo usuario para reasignar
+            if ($estadoActual !== $nuevoEstado ||  $reasignarA) {
+                $this->actualizarInformacionTicket($ticketId, $nuevoEstado, $reasignarA ?? $ticket['asignado_a']);
+                return $this->registrarHistoricoTicket($ticketId, $solucion, $reasignarA ?? $ticket['asignado_a']);
+            }
+
+            // consultamos el ultimo registro del historico para verificar si se ha registrado una solución
+            $sqlHistorico = "SELECT mensaje FROM historico_tickets WHERE ticket_id = :ticketId ORDER BY fecha DESC LIMIT 1";
+            $stmtHistorico = $this->conexion->prepare($sqlHistorico);
+            $stmtHistorico->bindParam(':ticketId', $ticketId, PDO::PARAM_INT);
+            $stmtHistorico->execute();
+            $ultimoHistorico = $stmtHistorico->fetch(PDO::FETCH_ASSOC);
+
+            // validamos si se ha registrado una solución y si la solución es diferente a la última solución registrada en el histórico
+            if (!empty($solucion) && (!$ultimoHistorico || $ultimoHistorico['mensaje'] !== $solucion)) {
+                return $this->registrarHistoricoTicket($ticketId, $solucion, $ticket['asignado_a']);
+            }
+
+            return true; // No se realizaron cambios, pero la operación fue exitosa
+
+        } catch (PDOException $e) {
+            echo "Error al actualizar el ticket: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    function actualizarInformacionTicket($ticketId, $nuevoEstado, $reasignarA)
+    {
+        try {
+            $sql = "UPDATE tickets SET estado = :nuevoEstado";
+            if ($reasignarA) {
+                $sql .= ", asignado_a = :reasignarA";
+            }
+            if ($nuevoEstado === 'cerrado') {
+                $sql .= ", fecha_cierre = NOW()";
+            }
+            $sql .= " WHERE id = :ticketId";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':nuevoEstado', $nuevoEstado);
+            if ($reasignarA) {
+                $stmt->bindParam(':reasignarA', $reasignarA, PDO::PARAM_INT);
+            }
+            $stmt->bindParam(':ticketId', $ticketId, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            echo "Error al actualizar el ticket: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    function registrarHistoricoTicket($ticketId, $solucion, $usuarioId)
+    {
+        try {
+            $sql = "INSERT INTO historico_tickets (ticket_id, usuario_id, mensaje, fecha) VALUES (:ticketId, :usuarioId, :mensaje, NOW())";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':ticketId', $ticketId, PDO::PARAM_INT);
+            $stmt->bindParam(':mensaje', $solucion);
+            $stmt->bindParam(':usuarioId', $usuarioId, PDO::PARAM_INT);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            echo "Error al registrar el histórico del ticket: " . $e->getMessage();
             return false;
         }
     }

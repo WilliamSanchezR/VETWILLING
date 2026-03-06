@@ -10,6 +10,26 @@ $id = $_GET['id'];
 $ticketData = consultarTicket($id);
 $usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
 
+// Obtener el ID del usuario logueado
+$usuarioLogueadoId = $_SESSION['user']['id_usuario'];
+
+// Verificar si el usuario logueado es el asignado
+$esAsignado = ($ticketData['id_asignado'] == $usuarioLogueadoId);
+$esAdmin = ($_SESSION['user']['id_rol'] == 1);
+// Solo el usuario asignado puede editar el ticket (incluso si no es admin)
+$puedeEditar = $esAsignado && ($ticketData['estado'] != 'cerrado');
+$ticketCerrado = ($ticketData['estado'] == 'cerrado');
+
+// Relacionar estados internos con etiquetas legibles para UI
+$estadoOpciones = [
+    'abierto' => 'Abierto',
+    'en_proceso' => 'En Proceso',
+    'en_espera' => 'En Espera',
+    'cerrado' => 'Cerrado',
+];
+$estadoActual = $ticketData['estado'] ?? '';
+$estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $estadoActual));
+
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +114,7 @@ $usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
                         </div>
                         <div>
                             <span class="label-ticket">Estado:</span>
-                            <span><?= $ticketData['estado'] ?></span>
+                            <span class="badge rounded-pill estado-badge estado-<?= htmlspecialchars($estadoActual) ?>"><?= htmlspecialchars($estadoLabel) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Asignado a:</span>
@@ -141,8 +161,8 @@ $usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
 
             <div class="infoTicket">
                 <div class="card">
-                    <!-- si el ticket no tiene asignado muestre el combo de asignación -->
-                    <?php if ($ticketData['id_asignado'] === null) : ?>
+                    <!-- si el ticket no tiene asignado muestre el combo de asignación (solo para administradores) -->
+                    <?php if ($ticketData['id_asignado'] === null && $esAdmin) : ?>
                         <div class="asignar-ticket">
                             <h2>Asignar Ticket</h2>
                             <form id="asignarTicketForm">
@@ -160,7 +180,74 @@ $usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
                                 </div>
                             </form>
                         </div>
+                    <?php elseif ($ticketData['id_asignado'] === null && !$esAdmin) : ?>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            Este ticket aún no ha sido asignado. Espere a que un administrador lo asigne.
+                        </div>
                     <?php endif; ?>
+
+                    <div class="container">
+                        <form id="actualizarEstadoForm">
+                            <input type="hidden" name="id_ticket" id="id_ticket" value="<?= $ticketData['id'] ?>">
+                            <input type="hidden" id="estado_actual" value="<?= $ticketData['estado'] ?>">
+                            <input type="hidden" id="puede_editar" value="<?= $puedeEditar ? '1' : '0' ?>">
+                            <input type="hidden" id="ticket_cerrado" value="<?= $ticketCerrado ? '1' : '0' ?>">
+                            
+                            <div class="row title">
+                                <h2>Actualizar Estado del Ticket</h2>
+                                <?php if (!$puedeEditar): ?>
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle"></i> 
+                                        <?php if ($ticketCerrado): ?>
+                                            Este ticket está cerrado y no puede ser modificado.
+                                        <?php elseif (!$esAsignado): ?>
+                                            Este ticket solo puede ser editado por el usuario asignado: <strong><?= $ticketData['nombre_asignado'] . ' ' . $ticketData['apellido_asignado'] ?></strong>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="estado_ticket" class="form-label">Seleccionar nuevo estado:</label>
+                                    <select class="form-select" id="estado_ticket" name="estado_ticket" required <?= !$puedeEditar ? 'disabled' : '' ?>>
+                                        <option value="" disabled selected>Seleccione un estado</option>
+                                        <option value="abierto" <?= $ticketData['estado'] === 'abierto' ? 'selected' : '' ?>>Abierto</option>
+                                        <option value="en_proceso" <?= $ticketData['estado'] === 'en_proceso' ? 'selected' : '' ?>>En Proceso</option>
+                                        <option value="en_espera" <?= $ticketData['estado'] === 'en_espera' ? 'selected' : '' ?>>En Espera</option>
+                                        <option value="cerrado" <?= $ticketData['estado'] === 'cerrado' ? 'selected' : '' ?>>Cerrado</option>
+                                    </select>
+
+
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="reasignar_ticket" class="form-label">Reasignar Ticket:</label>
+                                    <select class="form-select" id="reasignar_ticket" name="reasignar_ticket" <?= (!$puedeEditar || $ticketData['id_asignado'] === null) ? 'disabled' : '' ?>>
+                                        <option value="" disabled selected>Seleccione un usuario para reasignar</option>
+                                    </select>
+                                    <?php if ($ticketData['estado'] === 'en_espera' || $ticketData['estado'] === 'cerrado'): ?>
+                                        <small class="text-muted">No disponible durante "En Espera" o "Cerrado"</small>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="solucion_ticket" class="form-label">
+                                        Solución:
+                                        <span class="text-danger" id="solucion_required" style="display: none;">*</span>
+                                    </label>
+                                    <textarea class="form-control" id="solucion_ticket" name="solucion_ticket" rows="3" placeholder="Ingrese la solución" <?= !$puedeEditar ? 'disabled' : '' ?>><?= htmlspecialchars($ticketData['resultado'] ?? '') ?></textarea>
+                                    <?php if ($ticketData['estado'] === 'en_espera' || $ticketData['estado'] === 'cerrado'): ?>
+                                        <small class="text-muted">Obligatorio</small>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="row btn-actualizar">
+                                    <button type="submit" id="btn-actualizar-estado" class="btn btn-primary" <?= !$puedeEditar ? 'disabled' : '' ?>>
+                                        <i class="bi bi-check-circle"></i> Actualizar Ticket
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
