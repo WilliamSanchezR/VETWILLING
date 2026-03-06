@@ -30,11 +30,13 @@ switch ($method) {
         //     listarTickets();
         // }
         break;
-    
+
     case 'PUT':
         $action = $_GET['action'] ?? '';
         if ($action === 'asignar') {
             asignarTicket();
+        } else {
+            actualizarTicket();
         }
         break;
 
@@ -136,5 +138,45 @@ function asignarTicket()
         header('Content-Type: application/json');
         header('HTTP/1.1 500 Internal Server Error');
         echo json_encode(['status' => 'error', 'message' => 'Error al asignar el ticket']);
+    }
+}
+
+function actualizarTicket()
+{
+    try {
+        // recibimos los datos del formulario en formato JSON
+        $data = json_decode(file_get_contents('php://input'), true);
+        $ticketId = $data['id_ticket'] ?? null;
+        $nuevoEstado = $data['estado'] ?? null;
+        $solucion = $data['solucion'] ?? null;
+        $reasignarA = $data['id_usuario_reasignado'] ?? null;
+
+        if (empty($ticketId) || empty($nuevoEstado)) {
+            header('Content-Type: application/json');
+            header('HTTP/1.1 400 Bad Request');
+            echo json_encode(['error' => 'Faltan campos requeridos']);
+            return;
+        }
+
+        $ticketModel = new Ticket();
+        $resultado = $ticketModel->actualizarTicket($ticketId, $nuevoEstado, $solucion, $reasignarA);
+
+        // Retornar respuesta exitosa
+        if ($resultado) {
+            header('Content-Type: application/json');
+            header('HTTP/1.1 200 OK');
+            echo json_encode(['status' => 'success', 'message' => 'Ticket actualizado correctamente']);
+            return;
+        }
+
+        header('Content-Type: application/json');
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode(['status' => 'error', 'message' => 'Error al actualizar el ticket']);
+        return;
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode(['status' => 'error', 'message' => 'Excepción: ' . $e->getMessage()]);
+        return;
     }
 }
