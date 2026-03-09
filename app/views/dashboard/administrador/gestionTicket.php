@@ -135,7 +135,7 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                     <div class="content-ticket">
                         <div>
                             <span class="label-ticket">Nombre del Usuario:</span>
-                            <span><?= $usuarioData['nombres'] . ' ' . $usuarioData['apellidos'] ?></span>
+                            <span id="nombre_usuario_creado"><?= $usuarioData['nombres'] . ' ' . $usuarioData['apellidos'] ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Correo Electrónico:</span>

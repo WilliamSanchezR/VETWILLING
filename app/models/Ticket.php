@@ -101,7 +101,7 @@ class Ticket
             $nuevoTicketId = $this->conexion->lastInsertId();
 
             // Registramos el histórico del ticket con el mensaje de creación
-            $this->registrarHistoricoTicket($nuevoTicketId, 'creación', '', '', "Ticket creado con título: {$data['titulo']}", $data['id_usuario']);
+            $this->registrarHistoricoTicket($nuevoTicketId, 'creacion', '', '', "Ticket creado con título: {$data['titulo']}", $data['id_usuario']);
 
             return $nuevoTicketId;
         } catch (PDOException $e) {

@@ -331,7 +331,7 @@ class GestionTicket {
         case "modificacion":
           elemento = this.crearItemModificacion(item);
           break;
-        case "creación":
+        case "creacion":
           elemento = this.crearItemCreacion(item);
           break;
         case "asignacion":
@@ -399,8 +399,7 @@ class GestionTicket {
 
     const clone = template.content.cloneNode(true);
     clone.querySelector(".fecha").textContent = this.formatearFecha(data.fecha);
-    clone.querySelector(".usuario").textContent = data.usuario;
-    clone.querySelector(".descripcion").textContent = data.descripcion;
+    clone.querySelector(".usuario").textContent = document.querySelector("#nombre_usuario_creado")?.textContent || "Usuario Desconocido";
     return clone;
   }
 
