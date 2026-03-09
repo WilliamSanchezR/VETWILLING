@@ -83,6 +83,8 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
         ?>
 
         <div class="wizard-container">
+            <input type="hidden" name="id_usuario_auth" id="id_usuario_auth" value="<?= $usuarioLogueadoId ?>">
+
             <div class="wizard-header">
                 <i class="bi bi-person-vcard"></i>
                 <h2>Ticket</h2>
@@ -159,99 +161,207 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                 </div>
             </div>
 
-            <div class="infoTicket">
-                <div class="card">
-                    <!-- si el ticket no tiene asignado muestre el combo de asignación (solo para administradores) -->
-                    <?php if ($ticketData['id_asignado'] === null && $esAdmin) : ?>
-                        <div class="asignar-ticket">
-                            <h2>Asignar Ticket</h2>
-                            <form id="asignarTicketForm">
-                                <input type="hidden" name="id_ticket" id="id_ticket" value="<?= $ticketData['id'] ?>">
-                                <div class="content-ticket">
-                                    <div>
-                                        <label for="usuario_asignado" class="form-label">Seleccionar Usuario a asignar:</label>
-                                        <select class="form-select" id="usuario_asignado" name="usuario_asignado" required>
-                                            <option value="" disabled selected>Seleccione un usuario</option>
-                                        </select>
-                                    </div>
-                                    <div class="btn-asignar">
-                                        <button type="submit" id="btn-asignar-ticket" class="btn btn-success">Asignar</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    <?php elseif ($ticketData['id_asignado'] === null && !$esAdmin) : ?>
-                        <div class="alert alert-warning">
-                            <i class="bi bi-exclamation-triangle"></i> 
-                            Este ticket aún no ha sido asignado. Espere a que un administrador lo asigne.
-                        </div>
-                    <?php endif; ?>
+            <!-- TABS PARA GESTIONAR TICKET E HISTÓRICO -->
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="gestion-tab" data-bs-toggle="tab" data-bs-target="#gestion-content" type="button" role="tab">
+                                <i class="bi bi-tools"></i> Gestionar Ticket
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico-content" type="button" role="tab">
+                                <i class="bi bi-clock-history"></i> Histórico de Cambios
+                            </button>
+                        </li>
+                    </ul>
+                </div>
 
-                    <div class="container">
-                        <form id="actualizarEstadoForm">
-                            <input type="hidden" name="id_ticket" id="id_ticket" value="<?= $ticketData['id'] ?>">
-                            <input type="hidden" id="estado_actual" value="<?= $ticketData['estado'] ?>">
-                            <input type="hidden" id="puede_editar" value="<?= $puedeEditar ? '1' : '0' ?>">
-                            <input type="hidden" id="ticket_cerrado" value="<?= $ticketCerrado ? '1' : '0' ?>">
-                            
-                            <div class="row title">
-                                <h2>Actualizar Estado del Ticket</h2>
-                                <?php if (!$puedeEditar): ?>
-                                    <div class="alert alert-info">
-                                        <i class="bi bi-info-circle"></i> 
-                                        <?php if ($ticketCerrado): ?>
-                                            Este ticket está cerrado y no puede ser modificado.
-                                        <?php elseif (!$esAsignado): ?>
-                                            Este ticket solo puede ser editado por el usuario asignado: <strong><?= $ticketData['nombre_asignado'] . ' ' . $ticketData['apellido_asignado'] ?></strong>
+                <div class="tab-content">
+                    <!-- TAB 1: GESTIONAR TICKET -->
+                    <div class="tab-pane fade show active" id="gestion-content" role="tabpanel">
+                        <!-- si el ticket no tiene asignado muestre el combo de asignación (solo para administradores) -->
+                        <?php if ($ticketData['id_asignado'] === null && $esAdmin) : ?>
+                            <div class="asignar-ticket">
+                                <h2>Asignar Ticket</h2>
+                                <form id="asignarTicketForm">
+                                    <input type="hidden" name="id_ticket" id="id_ticket" value="<?= $ticketData['id'] ?>">
+                                    <div class="content-ticket">
+                                        <div>
+                                            <label for="usuario_asignado" class="form-label">Seleccionar Usuario a asignar:</label>
+                                            <select class="form-select" id="usuario_asignado" name="usuario_asignado" required>
+                                                <option value="" disabled selected>Seleccione un usuario</option>
+                                            </select>
+                                        </div>
+                                        <div class="btn-asignar">
+                                            <button type="submit" id="btn-asignar-ticket" class="btn btn-success">Asignar</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        <?php elseif ($ticketData['id_asignado'] === null && !$esAdmin) : ?>
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Este ticket aún no ha sido asignado. Espere a que un administrador lo asigne.
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Si el ticket tiene asignado muestre el formulario de actualización -->
+                        <?php if ($ticketData['id_asignado'] !== null) : ?>
+                            <div class="container">
+                                <form id="actualizarEstadoForm">
+                                    <input type="hidden" name="id_ticket" id="id_ticket" value="<?= $ticketData['id'] ?>">
+                                    <input type="hidden" id="estado_actual" value="<?= $ticketData['estado'] ?>">
+                                    <input type="hidden" id="puede_editar" value="<?= $puedeEditar ? '1' : '0' ?>">
+                                    <input type="hidden" id="ticket_cerrado" value="<?= $ticketCerrado ? '1' : '0' ?>">
+
+                                    <div class="row title">
+                                        <h2>Actualizar Estado del Ticket</h2>
+                                        <?php if (!$puedeEditar): ?>
+                                            <div class="alert alert-info">
+                                                <i class="bi bi-info-circle"></i>
+                                                <?php if ($ticketCerrado): ?>
+                                                    Este ticket está cerrado y no puede ser modificado.
+                                                <?php elseif (!$esAsignado): ?>
+                                                    Este ticket solo puede ser editado por el usuario asignado: <strong><?= $ticketData['nombre_asignado'] . ' ' . $ticketData['apellido_asignado'] ?></strong>
+                                                <?php endif; ?>
+                                            </div>
                                         <?php endif; ?>
                                     </div>
-                                <?php endif; ?>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="estado_ticket" class="form-label">Seleccionar nuevo estado:</label>
+                                            <select class="form-select" id="estado_ticket" name="estado_ticket" required <?= !$puedeEditar ? 'disabled' : '' ?>>
+                                                <option value="" disabled selected>Seleccione un estado</option>
+                                                <option value="abierto" <?= $ticketData['estado'] === 'abierto' ? 'selected' : '' ?>>Abierto</option>
+                                                <option value="en_proceso" <?= $ticketData['estado'] === 'en_proceso' ? 'selected' : '' ?>>En Proceso</option>
+                                                <option value="en_espera" <?= $ticketData['estado'] === 'en_espera' ? 'selected' : '' ?>>En Espera</option>
+                                                <option value="cerrado" <?= $ticketData['estado'] === 'cerrado' ? 'selected' : '' ?>>Cerrado</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="reasignar_ticket" class="form-label">Reasignar Ticket:</label>
+                                            <select class="form-select" id="reasignar_ticket" name="reasignar_ticket" <?= (!$puedeEditar || $ticketData['id_asignado'] === null) ? 'disabled' : '' ?>>
+                                                <option value="" disabled selected>Seleccione un usuario para reasignar</option>
+                                            </select>
+                                            <?php if ($ticketData['estado'] === 'en_espera' || $ticketData['estado'] === 'cerrado'): ?>
+                                                <small class="text-muted">No disponible durante "En Espera" o "Cerrado"</small>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label for="solucion_ticket" class="form-label">
+                                                Solución:
+                                                <span class="text-danger" id="solucion_required" style="display: none;">*</span>
+                                            </label>
+                                            <textarea class="form-control" id="solucion_ticket" name="solucion_ticket" rows="3" placeholder="Ingrese la solución" <?= !$puedeEditar ? 'disabled' : '' ?>><?= htmlspecialchars($ticketData['resultado'] ?? '') ?></textarea>
+                                            <?php if ($ticketData['estado'] === 'en_espera' || $ticketData['estado'] === 'cerrado'): ?>
+                                                <small class="text-muted">Obligatorio</small>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="row btn-actualizar">
+                                            <button type="submit" id="btn-actualizar-estado" class="btn btn-primary" <?= !$puedeEditar ? 'disabled' : '' ?>>
+                                                <i class="bi bi-check-circle"></i> Actualizar Ticket
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
+                        <?php endif; ?>
+                    </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label for="estado_ticket" class="form-label">Seleccionar nuevo estado:</label>
-                                    <select class="form-select" id="estado_ticket" name="estado_ticket" required <?= !$puedeEditar ? 'disabled' : '' ?>>
-                                        <option value="" disabled selected>Seleccione un estado</option>
-                                        <option value="abierto" <?= $ticketData['estado'] === 'abierto' ? 'selected' : '' ?>>Abierto</option>
-                                        <option value="en_proceso" <?= $ticketData['estado'] === 'en_proceso' ? 'selected' : '' ?>>En Proceso</option>
-                                        <option value="en_espera" <?= $ticketData['estado'] === 'en_espera' ? 'selected' : '' ?>>En Espera</option>
-                                        <option value="cerrado" <?= $ticketData['estado'] === 'cerrado' ? 'selected' : '' ?>>Cerrado</option>
-                                    </select>
+                    <!-- TAB 2: HISTÓRICO DE CAMBIOS -->
+                    <div class="tab-pane fade" id="historico-content" role="tabpanel">
+                        <div class="historico-container">
+                            <h2 class="mb-4">Histórico de Cambios</h2>
+                            <div class="timeline">
 
+                                <!-- Aquí van los cambios dinámicos del histórico -->
+                                <!-- Ejemplo de estructura para cambios -->
+                                <div id="historicoItems"></div>
 
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="reasignar_ticket" class="form-label">Reasignar Ticket:</label>
-                                    <select class="form-select" id="reasignar_ticket" name="reasignar_ticket" <?= (!$puedeEditar || $ticketData['id_asignado'] === null) ? 'disabled' : '' ?>>
-                                        <option value="" disabled selected>Seleccione un usuario para reasignar</option>
-                                    </select>
-                                    <?php if ($ticketData['estado'] === 'en_espera' || $ticketData['estado'] === 'cerrado'): ?>
-                                        <small class="text-muted">No disponible durante "En Espera" o "Cerrado"</small>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-md-12">
-                                    <label for="solucion_ticket" class="form-label">
-                                        Solución:
-                                        <span class="text-danger" id="solucion_required" style="display: none;">*</span>
-                                    </label>
-                                    <textarea class="form-control" id="solucion_ticket" name="solucion_ticket" rows="3" placeholder="Ingrese la solución" <?= !$puedeEditar ? 'disabled' : '' ?>><?= htmlspecialchars($ticketData['resultado'] ?? '') ?></textarea>
-                                    <?php if ($ticketData['estado'] === 'en_espera' || $ticketData['estado'] === 'cerrado'): ?>
-                                        <small class="text-muted">Obligatorio</small>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="row btn-actualizar">
-                                    <button type="submit" id="btn-actualizar-estado" class="btn btn-primary" <?= !$puedeEditar ? 'disabled' : '' ?>>
-                                        <i class="bi bi-check-circle"></i> Actualizar Ticket
-                                    </button>
-                                </div>
+                                <!-- TEMPLATES para agregar dinámicamente con JavaScript -->
+                                <template id="cambio-estado-template">
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker estado">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <h5>Cambio de Estado</h5>
+                                            <p class="text-muted"><small>Fecha: <span class="fecha"></span></small></p>
+                                            <p>Usuario: <strong><span class="usuario"></span></strong></p>
+                                            <p>Estado anterior: <span class="badge bg-secondary estado-anterior"></span> → Estado nuevo: <span class="badge bg-success estado-nuevo"></span></p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template id="reasignacion-template">
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker reasignacion">
+                                            <i class="bi bi-person-check"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <h5>Reasignación de Usuario</h5>
+                                            <p class="text-muted"><small>Fecha: <span class="fecha"></span></small></p>
+                                            <p>Realizado por: <strong><span class="usuario-cambio"></span></strong></p>
+                                            <p>Usuario anterior: <span class="usuario-anterior"></span> → Nuevo usuario: <span class="badge bg-info usuario-nuevo"></span></p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template id="modificacion-template">
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker modificacion">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <h5>Modificación de Descripción</h5>
+                                            <p class="text-muted"><small>Fecha: <span class="fecha"></span></small></p>
+                                            <p>Usuario: <strong><span class="usuario"></span></strong></p>
+                                            <p><strong>Cambios:</strong></p>
+                                            <p class="descripcion-cambio">
+                                                <em>Anterior:</em><br>
+                                                <span class="descripcion-anterior"></span><br><br>
+                                                <em>Nuevo:</em><br>
+                                                <span class="descripcion-nueva"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template id="creacion-template">
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <h5>Ticket Creado</h5>
+                                            <p class="text-muted"><small>Fecha: <span class="fecha"></span></small></p>
+                                            <p>Por: <strong><span class="usuario"></span></strong></p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template id="asignacion-template">
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker asignacion">
+                                            <i class="bi bi-person-check"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <h5>Asignación de Ticket</h5>
+                                            <p class="text-muted"><small>Fecha: <span class="fecha"></span></small></p>
+                                            <p>Realizado por: <strong><span class="usuario-cambio"></span></strong></p>
+                                            <p>Usuario asignado: <span class="badge bg-info usuario-nuevo"></span></p>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
 </body>
 

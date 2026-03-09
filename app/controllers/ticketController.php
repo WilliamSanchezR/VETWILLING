@@ -22,6 +22,10 @@ switch ($method) {
     case 'GET':
         $action = $_GET['action'] ?? '';
 
+        if($action === 'historico' && isset($_GET['id'])) {
+            consultarHistoricoTicket($_GET['id']);
+        }
+
         // if ($action === 'eliminar') {
         //     eliminarUsuario($_GET['id']);
         // } else if (isset($_GET['id'])) {
@@ -119,6 +123,7 @@ function asignarTicket()
     $data = json_decode(file_get_contents('php://input'), true);
     $ticketId = $data['id_ticket'] ?? null;
     $adminId = $data['id_usuario'] ?? null;
+    $usuarioIdAuth = $data['id_usuario_auth'] ?? null;
 
     if (empty($ticketId) || empty($adminId)) {
         header('Content-Type: application/json');
@@ -128,7 +133,7 @@ function asignarTicket()
     }
 
     $ticketModel = new Ticket();
-    $resultado = $ticketModel->asignarTicket($ticketId, $adminId);
+    $resultado = $ticketModel->asignarTicket($ticketId, $adminId, $usuarioIdAuth);
 
     if ($resultado) {
         header('Content-Type: application/json');
@@ -150,6 +155,7 @@ function actualizarTicket()
         $nuevoEstado = $data['estado'] ?? null;
         $solucion = $data['solucion'] ?? null;
         $reasignarA = $data['id_usuario_reasignado'] ?? null;
+        $usuarioIdAuth = $data['id_usuario_auth'] ?? null;
 
         if (empty($ticketId) || empty($nuevoEstado)) {
             header('Content-Type: application/json');
@@ -159,7 +165,7 @@ function actualizarTicket()
         }
 
         $ticketModel = new Ticket();
-        $resultado = $ticketModel->actualizarTicket($ticketId, $nuevoEstado, $solucion, $reasignarA);
+        $resultado = $ticketModel->actualizarTicket($ticketId, $nuevoEstado, $solucion, $reasignarA, $usuarioIdAuth);
 
         // Retornar respuesta exitosa
         if ($resultado) {
@@ -179,4 +185,13 @@ function actualizarTicket()
         echo json_encode(['status' => 'error', 'message' => 'Excepción: ' . $e->getMessage()]);
         return;
     }
+}
+
+function consultarHistoricoTicket($id)
+{
+    $ticketModel = new Ticket();
+    $historial = $ticketModel->consultarHistoricoTicket($id);
+    header('Content-Type: application/json');
+    header('HTTP/1.1 200 OK');
+    echo json_encode(['status' => 'success', 'data' => $historial]);
 }
