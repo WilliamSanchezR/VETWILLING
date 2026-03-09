@@ -81,7 +81,7 @@ $estadoOpciones = [
                 <div class="controles-izquierda">
                     <div class="campo-buscar">
                         <i class="bi bi-search"></i>
-                        <input type="text" id="buscarCitas" placeholder="Buscar Usuarios...">
+                        <input type="text" id="buscarTickets" placeholder="Buscar Ticket...">
                     </div>
                 </div>
                 <div class="controles-derecha">
@@ -162,9 +162,8 @@ $estadoOpciones = [
 
 
         <!-- 5. Tu script de tabla AL FINAL -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaUsuarios.js"></script>
-
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaTickets.js"></script>
 
 </body>
 
