@@ -56,7 +56,7 @@ class Ticket
     {
         try {
             $sql = "SELECT  tk.id, tk.titulo, tk.fecha_creacion, tk.categoria, tk.prioridad, tk.estado, pr.id_usuario as id_asignado, pr.nombres as nombre_asignado, pr.apellidos as apellido_asignado, tk.descripcion, tk.usuario_id as id_usuario, 
-            tk.solucion as resultado
+            tk.solucion as resultado, tk.archivo
             FROM tickets TK
             LEFT JOIN usuario us ON tk.asignado_a = us.id_usuario
             LEFT JOIN administrador pr ON pr.id_usuario = us.id_usuario
@@ -89,7 +89,7 @@ class Ticket
 
             $estado = 'abierto'; // Estado inicial del ticket
 
-            $sql = "INSERT INTO tickets (titulo, descripcion, categoria, usuario_id, prioridad, estado) VALUES (:titulo, :descripcion, :categoria, :usuario_id, :prioridad, :estado)";
+            $sql = "INSERT INTO tickets (titulo, descripcion, categoria, usuario_id, prioridad, estado, archivo) VALUES (:titulo, :descripcion, :categoria, :usuario_id, :prioridad, :estado, :archivo)";
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':titulo', $data['titulo']);
             $stmt->bindParam(':descripcion', $data['descripcion']);
@@ -97,6 +97,7 @@ class Ticket
             $stmt->bindParam(':usuario_id', $data['id_usuario'], PDO::PARAM_INT);
             $stmt->bindParam(':estado', $estado);
             $stmt->bindParam(':prioridad', $prioridad);
+            $stmt->bindParam(':archivo', $data['archivo']); 
             $stmt->execute();
             $nuevoTicketId = $this->conexion->lastInsertId();
 

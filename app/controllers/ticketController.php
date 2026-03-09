@@ -22,7 +22,7 @@ switch ($method) {
     case 'GET':
         $action = $_GET['action'] ?? '';
 
-        if($action === 'historico' && isset($_GET['id'])) {
+        if ($action === 'historico' && isset($_GET['id'])) {
             consultarHistoricoTicket($_GET['id']);
         }
 
@@ -70,13 +70,41 @@ function consultarTicket($id)
 function crearTicket()
 {
     try {
-        // recibir datos del formulario (enviar como JSON desde el frontend)
-        $data = json_decode(file_get_contents('php://input'), true);
+        // recibir datos del formulario (enviar FormData desde el frontend)
+        $data = $_POST;
 
         $titulo = $data['asunto'] ?? '';
         $descripcion = $data['descripcion'] ?? '';
         $categoria = $data['categoria'] ?? '';
         $id_usuario = $data['id_usuario'] ?? null;
+        $archivo = null;
+
+        if (!empty($_FILES['archivo']['name'])) {
+
+            $file = $_FILES['archivo'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $permitidas = ['png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx'];
+            // Validar extensión y tamaño
+            if (!in_array($ext, $permitidas)) {
+                header('Content-Type: application/json');
+                header('HTTP/1.1 400 Bad Request');
+                echo json_encode(['error' => 'Extensión no permitida', 'message' => 'Solo archivos PNG, JPEG, JPG, PDF, DOC, DOCX']);
+
+                exit();
+            }
+            // Validar tamaño
+            if ($file['size'] > 2 * 1024 * 1024) {
+                header('Content-Type: application/json');
+                header('HTTP/1.1 400 Bad Request');
+                echo json_encode(['error' => 'Archivo demasiado grande', 'message' => 'El archivo supera las 2MB']);
+                exit();
+            }
+            // Generar un nombre único para la imagen
+            $ruta_archivo = uniqid('archivo_') . '.' . $ext;
+            $destino = BASE_PATH . '/public/uploads/tickets/' . $ruta_archivo;
+            move_uploaded_file($file['tmp_name'], $destino);
+            $archivo = $ruta_archivo;
+        }
 
 
 
@@ -94,7 +122,8 @@ function crearTicket()
             'titulo' => $titulo,
             'descripcion' => $descripcion,
             'categoria' => $categoria,
-            'id_usuario' => $id_usuario
+            'id_usuario' => $id_usuario,
+            'archivo' => $archivo
         ];
 
         $resultado = $ticketModel->crearTicket($ticketData);

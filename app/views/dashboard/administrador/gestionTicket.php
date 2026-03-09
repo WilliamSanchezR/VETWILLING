@@ -128,6 +128,14 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                             <p><?= $ticketData['descripcion'] ?></p>
                         </div>
 
+                        <?php if (!empty($ticketData['archivo'])) : ?>
+                            <div class="ticket-attachment">
+                                <span class="label-ticket">Archivo Adjunto:</span>
+                                <a href="<?= BASE_URL ?>/public/uploads/tickets/<?= $ticketData['archivo'] ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-paperclip"></i> Ver Archivo
+                                </a>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="card ticket-user-info">

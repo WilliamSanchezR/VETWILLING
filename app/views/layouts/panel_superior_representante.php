@@ -435,6 +435,19 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             required></textarea>
                         <span class="form-hint">Mínimo 20 caracteres</span>
                     </div>
+                    <!-- Campo para el archivo como imagen png,jpg -->
+                    <div class="form-group">
+                        <label for="archivoProblema" class="form-label">
+                            <i class="bi bi-file-earmark-image"></i>
+                            Adjuntar Imagen
+                        </label>
+                        <input
+                            type="file"
+                            class="form-input"
+                            id="archivoProblema"
+                            name="archivo"
+                            accept="image/png, image/jpeg, image/jpg, image/gif, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    </div>
 
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" id="btnCancelar">

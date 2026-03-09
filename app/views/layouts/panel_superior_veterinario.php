@@ -241,7 +241,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             <div class="profile-badges-row">
                                 <span class="profile-badge"><?= htmlspecialchars($usuario['rol']) ?></span>
                                 <!-- Badge suscripción en dropdown -->
-                              
+
                             </div>
                         </div>
                     </div>
@@ -270,24 +270,24 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                         </a>
                     </div>
 
-                        <div class="panel-divider"></div>
+                    <div class="panel-divider"></div>
 
-                        <div class="panel-footer">
-                            <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item logout-item">
-                                <div class="item-icon">
-                                    <i class="bi bi-box-arrow-right"></i>
-                                </div>
-                                <span class="item-title">Cerrar Sesión</span>
-                            </a>
-                        </div>
+                    <div class="panel-footer">
+                        <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item logout-item">
+                            <div class="item-icon">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </div>
+                            <span class="item-title">Cerrar Sesión</span>
+                        </a>
                     </div>
                 </div>
-                <!-- ─── FIN PERFIL ─────────────────────────────── -->
-
             </div>
-            <!-- ─── FIN DERECHA ───────────────────────────────── -->
+            <!-- ─── FIN PERFIL ─────────────────────────────── -->
 
         </div>
+        <!-- ─── FIN DERECHA ───────────────────────────────── -->
+
+    </div>
 </nav>
 
 
@@ -355,19 +355,19 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                         </div>
                     </div>
 
-                        <div class="form-group">
-                            <label for="telefonoSoporte" class="form-label">
-                                Asunto
-                                <span class="required">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                class="form-input"
-                                id="asunto"
-                                placeholder="Asunto del problema"
-                                name="asunto"
-                                required>
-                        </div>
+                    <div class="form-group">
+                        <label for="telefonoSoporte" class="form-label">
+                            Asunto
+                            <span class="required">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            class="form-input"
+                            id="asunto"
+                            placeholder="Asunto del problema"
+                            name="asunto"
+                            required>
+                    </div>
 
                     <div class="form-group">
                         <label for="tipoProblema" class="form-label">
@@ -399,6 +399,19 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                             name="descripcion"
                             required></textarea>
                         <span class="form-hint">Mínimo 20 caracteres</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="archivoProblema" class="form-label">
+                            <i class="bi bi-file-earmark-image"></i>
+                            Adjuntar Imagen
+                        </label>
+                        <input
+                            type="file"
+                            class="form-input"
+                            id="archivoProblema"
+                            name="archivo"
+                            accept="image/png, image/jpeg, image/jpg, image/gif, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
                     </div>
 
                     <div class="form-actions">
