@@ -25,7 +25,10 @@ $sub_icons = [
 $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css">
+<!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css"> -->
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+
 
 <!-- ╔══════════════════════════════════════════════════╗ -->
 <!-- ║         NAVBAR SUPERIOR — VetWilling            ║ -->
@@ -68,13 +71,13 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
             <div class="nav-sep"></div>
 
             <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb">
+            <!-- <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item active">
                         <span id="paginaActual">Dashboard</span>
                     </li>
                 </ol>
-            </nav>
+            </nav> -->
 
         </div>
         <!-- ─── FIN IZQUIERDA ─────────────────────────────── -->

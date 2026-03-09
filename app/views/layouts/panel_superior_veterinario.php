@@ -51,14 +51,7 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 
             <div class="nav-sep"></div>
 
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item active">
-                        <span id="paginaActual">Dashboard</span>
-                    </li>
-                </ol>
-            </nav>
+
 
         </div>
         <!-- ─── FIN IZQUIERDA ─────────────────────────────── -->
