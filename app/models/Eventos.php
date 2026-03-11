@@ -348,16 +348,16 @@ class Eventos
                             a.fecha_hora,
                             a.fecha_hora_fin,
                             a.estado,
-                            p.id_propietario,
-                            CONCAT(p.nombres, ' ', p.apellidos) as nombre_propietario,
+                            prop.id_propietario,
+                            CONCAT(prop.nombres, ' ', prop.apellidos) as nombre_propietario,
                             u.email as email_propietario,
                             pac.id_paciente,
                             pac.nombre as nombre_mascota,
                             s.nombre as nombre_servicio
                         FROM agendamiento a
-                        LEFT JOIN propietario p ON a.id_propietario = p.id_propietario
-                        LEFT JOIN usuario u ON p.id_usuario = u.id_usuario
                         LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                        LEFT JOIN propietario prop ON pac.id_propietario = prop.id_propietario
+                        LEFT JOIN usuario u ON prop.id_usuario = u.id_usuario
                         LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                         WHERE a.id_agendamiento = :id_agendamiento";
 
@@ -463,6 +463,83 @@ class Eventos
         } catch (PDOException $e) {
             error_log("Error en Eventos::filtrarCitas -> " . $e->getMessage());
             return [];
+        }
+    }
+
+    // ╔══════════════════════════════════════════════════════════════════════════════╗
+    // ║                    RFS 37: SISTEMA DE RECORDATORIOS                          ║
+    // ║  Funciones para obtener citas y marcar recordatorios enviados               ║
+    // ╚══════════════════════════════════════════════════════════════════════════════╝
+
+    /**
+     * OBTENER CITAS QUE NECESITAN RECORDATORIO
+     * 
+     * Obtiene todas las citas pendientes dentro de un rango de fechas
+     * que aún no han sido notificadas (para envío de recordatorios 24h antes)
+     * 
+     * @param string $fechaInicio - Fecha y hora de inicio del rango (Y-m-d H:i:s)
+     * @param string $fechaFin - Fecha y hora de fin del rango (Y-m-d H:i:s)
+     * @return array - Array de citas con información del propietario y mascota
+     */
+    public function obtenerCitasParaRecordatorio($fechaInicio, $fechaFin)
+    {
+        try {
+            $sql = "SELECT 
+                        a.id_agendamiento,
+                        a.tipo,
+                        a.fecha_hora,
+                        a.estado,
+                        p.id_propietario,
+                        CONCAT(prop.nombres, ' ', prop.apellidos) as nombre_propietario,
+                        u.email as email_propietario,
+                        u.preferencia_notificacion,
+                        p.id_paciente,
+                        p.nombre as nombre_mascota
+                    FROM agendamiento a
+                    INNER JOIN paciente p ON a.id_paciente = p.id_paciente
+                    INNER JOIN propietario prop ON p.id_propietario = prop.id_propietario
+                    INNER JOIN usuario u ON prop.id_usuario = u.id_usuario
+                    WHERE a.fecha_hora BETWEEN :fecha_inicio AND :fecha_fin
+                    AND a.estado IN ('Pendiente', 'Confirmada')
+                    AND (a.recordatorio_enviado IS NULL OR a.recordatorio_enviado = 0)
+                    ORDER BY a.fecha_hora ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio);
+            $stmt->bindParam(':fecha_fin', $fechaFin);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::obtenerCitasParaRecordatorio -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * MARCAR RECORDATORIO COMO ENVIADO
+     * 
+     * Actualiza el campo recordatorio_enviado de una cita específica
+     * para evitar envíos duplicados
+     * 
+     * @param int $id_agendamiento - ID de la cita
+     * @return bool - True si se actualizó correctamente
+     */
+    public function marcarRecordatorioEnviado($id_agendamiento)
+    {
+        try {
+            $sql = "UPDATE agendamiento 
+                    SET recordatorio_enviado = 1,
+                        fecha_recordatorio = NOW()
+                    WHERE id_agendamiento = :id_agendamiento";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Eventos::marcarRecordatorioEnviado -> " . $e->getMessage());
+            return false;
         }
     }
 }
