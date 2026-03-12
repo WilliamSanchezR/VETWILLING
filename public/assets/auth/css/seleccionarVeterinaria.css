@@ -1,4 +1,6 @@
-            *, *::before, *::after {
+            *,
+            *::before,
+            *::after {
                 box-sizing: border-box;
                 margin: 0;
                 padding: 0;
@@ -81,7 +83,38 @@
                 animation: load 4s linear forwards;
             }
 
-            @keyframes draw    { to { stroke-dashoffset: 0 } }
-            @keyframes pulse   { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.1) } }
-            @keyframes fadeIn  { from { opacity: 0; transform: translateY(20px) } to { opacity: 1; transform: translateY(0) } }
-            @keyframes load    { to { width: 100% } }
+            @keyframes draw {
+                to {
+                    stroke-dashoffset: 0
+                }
+            }
+
+            @keyframes pulse {
+
+                0%,
+                100% {
+                    transform: scale(1)
+                }
+
+                50% {
+                    transform: scale(1.1)
+                }
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px)
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0)
+                }
+            }
+
+            @keyframes load {
+                to {
+                    width: 100%
+                }
+            }
