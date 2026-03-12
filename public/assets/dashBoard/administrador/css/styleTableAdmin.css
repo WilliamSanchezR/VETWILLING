@@ -341,6 +341,40 @@
    color: var(--primary-color);
 }
 
+/* Estado de ticket (consistente con gestionTicket.php) */
+.tabla-admin tbody td.td-estado-ticket {
+    padding: 0;
+}
+
+.estado-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.estado-abierto {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.estado-en_proceso {
+    background-color: #cfe2ff;
+    color: #084298;
+}
+
+.estado-en_espera {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+
+.estado-cerrado {
+    background-color: #e2e3e5;
+    color: #41464b;
+}
+
 /* ========================================
    9. RESPONSIVE - MEDIA QUERIES
 ======================================== */

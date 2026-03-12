@@ -25,8 +25,10 @@ $sub_icons = [
 $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css">
+<!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css"> -->
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+
 
 <!-- ╔══════════════════════════════════════════════════╗ -->
 <!-- ║         NAVBAR SUPERIOR — VetWilling            ║ -->
@@ -55,17 +57,27 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
             </button>
 
             <!-- Saludo + reloj -->
+            <div class="greeting-section">
+                <span class="greeting-icon" id="saludoEmoji">👋</span>
+                <div class="greeting-text">
+                    <span class="greeting-label" id="saludoTexto">Bienvenido</span>
+                    <span class="greeting-time">
+                        <i class="bi bi-clock"></i>
+                        <span id="horaActual">00:00:00</span>
+                    </span>
+                </div>
+            </div>
 
             <div class="nav-sep"></div>
 
             <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb">
+            <!-- <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item active">
                         <span id="paginaActual">Dashboard</span>
                     </li>
                 </ol>
-            </nav>
+            </nav> -->
 
         </div>
         <!-- ─── FIN IZQUIERDA ─────────────────────────────── -->
@@ -226,8 +238,11 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                         <span>
 
                         </span>
-                        <span class="profile-badge"><?= htmlspecialchars($usuario['rol']) ?></span>
-
+                        <!-- Badge suscripción en botón -->
+                        <span class="sub-badge sub-<?= $sub_slug ?>">
+                            <i class="bi <?= $sub_icon ?>"></i>
+                            <?= $suscripcion ?>
+                        </span>
                     </div>
 
                     <i class="bi bi-chevron-down profile-arrow"></i>
@@ -423,6 +438,19 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             required></textarea>
                         <span class="form-hint">Mínimo 20 caracteres</span>
                     </div>
+                    <!-- Campo para el archivo como imagen png,jpg -->
+                    <div class="form-group">
+                        <label for="archivoProblema" class="form-label">
+                            <i class="bi bi-file-earmark-image"></i>
+                            Adjuntar Imagen
+                        </label>
+                        <input
+                            type="file"
+                            class="form-input"
+                            id="archivoProblema"
+                            name="archivo"
+                            accept="image/png, image/jpeg, image/jpg, image/gif, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    </div>
 
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" id="btnCancelar">
@@ -443,5 +471,4 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 
 
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/panelSuperiorRepresentante.js"></script>
-<script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/panelSuperiorAdmin.js"></script>
-<script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/navbar-superior.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
