@@ -6,6 +6,25 @@ $rol = $_SESSION['user']['id_rol'];
 $id = $_SESSION['user']['id_usuario'];
 $usuario = mostrarPerfil($id);
 
+// ── CORRECCIÓN: Lógica de ruta de imagen robusta para Hostinger ──
+$fotoUsuario    = $usuario['img_perfil'] ?? '';
+$carpetaUsuario = 'usuarios';
+
+$nombreCompleto    = trim(($usuario['nombres'] ?? '') . ' ' . ($usuario['apellidos'] ?? ''));
+$fallbackAvatar    = "https://ui-avatars.com/api/?name=" . urlencode($nombreCompleto) . "&background=4e9af1&color=fff&size=128";
+$rutaImagenUsuario = $fallbackAvatar;
+
+if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
+    $rutaAbsoluta = BASE_PATH . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+    if (file_exists($rutaAbsoluta)) {
+        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+    }
+} else {
+    $defaultLocal = BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    if (file_exists($defaultLocal)) {
+        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -64,8 +83,13 @@ $usuario = mostrarPerfil($id);
                             <form class="contenedor-foto" id="form_cambio_imagen" action="<?= BASE_URL ?>/admin/cambiar-foto" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="id_usuario" value="<?= $id ?>">
                                 <input type="hidden" name="accion" value="cambiar-foto">
-                                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" class="fotito"
-                                    alt="Pedro Perez" width="100">
+                                <!-- CORRECCIÓN: usa $rutaImagenUsuario + onerror seguro -->
+                                <img
+                                    src="<?= $rutaImagenUsuario ?>"
+                                    class="fotito"
+                                    alt="<?= htmlspecialchars($nombreCompleto) ?>"
+                                    width="100"
+                                    onerror="this.onerror=null; this.src='<?= $fallbackAvatar ?>'">
                                 <div class="avatar-icon">
                                     <i class="bi bi-camera-fill"></i>
                                 </div>
