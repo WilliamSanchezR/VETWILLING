@@ -6,6 +6,14 @@ require_once BASE_PATH . '/app/controllers/ticketController.php';
 // // Llamamos la función para listar los usuarios
 $datos = listarTickets();
 
+// Relacionar estados internos con etiquetas legibles para UI
+$estadoOpciones = [
+    'abierto' => 'Abierto',
+    'en_proceso' => 'En Proceso',
+    'en_espera' => 'En Espera',
+    'cerrado' => 'Cerrado',
+];
+
 ?>
 
 
@@ -73,7 +81,7 @@ $datos = listarTickets();
                 <div class="controles-izquierda">
                     <div class="campo-buscar">
                         <i class="bi bi-search"></i>
-                        <input type="text" id="buscarCitas" placeholder="Buscar Usuarios...">
+                        <input type="text" id="buscarTickets" placeholder="Buscar Ticket...">
                     </div>
                 </div>
                 <div class="controles-derecha">
@@ -112,12 +120,17 @@ $datos = listarTickets();
                     <tbody>
                         <?php if (!empty($datos)) : ?>
                             <?php foreach ($datos as $ticket):  ?>
+                                <?php
+                                $estadoActual = strtolower(trim((string)($ticket['estado'] ?? '')));
+                                $estadoActual = str_replace(' ', '_', $estadoActual);
+                                $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $estadoActual));
+                                ?>
                                 <tr class="fila-blanca">
                                     <td><?= $ticket['id'] ?></td>
                                     <td><?= $ticket['titulo'] ?></td>
                                     <td><?= $ticket['categoria'] ?></td>
                                     <td><?= $ticket['prioridad'] ?></td>
-                                    <td><?= $ticket['estado'] ?></td>
+                                    <td class="td-estado-ticket"><span class="estado-badge estado-<?= htmlspecialchars($estadoActual) ?>"><?= htmlspecialchars($estadoLabel) ?></span></td>
                                     <td><?= $ticket['nombres'] ?> <?= $ticket['apellidos'] ?></td>
                                     <td><?= $ticket['asignado'] ?></td>
                                     <td><?= $ticket['fecha_creacion'] ?></td>
@@ -149,9 +162,8 @@ $datos = listarTickets();
 
 
         <!-- 5. Tu script de tabla AL FINAL -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaUsuarios.js"></script>
-
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+        <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaTickets.js"></script>
 
 </body>
 
