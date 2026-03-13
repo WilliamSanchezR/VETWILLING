@@ -6,6 +6,26 @@ $rol     = $_SESSION['user']['id_rol'];
 $id      = $_SESSION['user']['id_usuario'];
 $usuario = mostrarPerfil($id);
 $mascotas = listarMascotas();
+
+// ── CORRECCIÓN: Lógica de ruta de imagen robusta para Hostinger ──
+$fotoUsuario    = $usuario['img_perfil'] ?? '';
+$carpetaUsuario = 'usuarios';
+
+$nombreCompleto    = trim(($usuario['nombres'] ?? '') . ' ' . ($usuario['apellidos'] ?? ''));
+$fallbackAvatar    = "https://ui-avatars.com/api/?name=" . urlencode($nombreCompleto) . "&background=4e9af1&color=fff&size=128";
+$rutaImagenUsuario = $fallbackAvatar;
+
+if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
+    $rutaAbsoluta = BASE_PATH . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+    if (file_exists($rutaAbsoluta)) {
+        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+    }
+} else {
+    $defaultLocal = BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    if (file_exists($defaultLocal)) {
+        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -57,8 +77,12 @@ $mascotas = listarMascotas();
                   method="POST" enctype="multipart/form-data">
               <input type="hidden" name="id_usuario" value="<?= $id ?>">
               <input type="hidden" name="accion"     value="cambiar-foto">
-              <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>"
-                   class="fotito" alt="Foto de perfil">
+              <!-- CORRECCIÓN: usa $rutaImagenUsuario + onerror seguro -->
+              <img
+                src="<?= $rutaImagenUsuario ?>"
+                class="fotito"
+                alt="<?= htmlspecialchars($nombreCompleto) ?>"
+                onerror="this.onerror=null; this.src='<?= $fallbackAvatar ?>'">
               <div class="avatar-icon" id="btn-camera" title="Cambiar foto">
                 <i class="bi bi-camera-fill"></i>
               </div>

@@ -23,10 +23,33 @@ $sub_icons = [
     'MasterVet' => 'bi-gem',
 ];
 $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
+
+// ── CORRECCIÓN: Lógica de ruta de imagen robusta para Hostinger ──
+$fotoUsuario   = $usuario['img_perfil'] ?? '';
+$carpetaUsuario = ($usuario['id_rol'] == 4) ? 'usuarios' : 'profesionales';
+
+// Fallback CDN con iniciales del usuario
+$nombreCompleto    = trim(($usuario['nombres'] ?? '') . ' ' . ($usuario['apellidos'] ?? ''));
+$fallbackAvatar    = "https://ui-avatars.com/api/?name=" . urlencode($nombreCompleto) . "&background=4e9af1&color=fff&size=128";
+$rutaImagenUsuario = $fallbackAvatar;
+
+if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
+    $rutaAbsoluta = BASE_PATH . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+    if (file_exists($rutaAbsoluta)) {
+        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+    }
+} else {
+    $defaultLocal = BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    if (file_exists($defaultLocal)) {
+        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    }
+}
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css">
+<!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/panelSuperior.css"> -->
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+
 
 <!-- ╔══════════════════════════════════════════════════╗ -->
 <!-- ║         NAVBAR SUPERIOR — VetWilling            ║ -->
@@ -55,17 +78,27 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
             </button>
 
             <!-- Saludo + reloj -->
+            <div class="greeting-section">
+                <span class="greeting-icon" id="saludoEmoji">👋</span>
+                <div class="greeting-text">
+                    <span class="greeting-label" id="saludoTexto">Bienvenido</span>
+                    <span class="greeting-time">
+                        <i class="bi bi-clock"></i>
+                        <span id="horaActual">00:00:00</span>
+                    </span>
+                </div>
+            </div>
 
             <div class="nav-sep"></div>
 
             <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb">
+            <!-- <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item active">
                         <span id="paginaActual">Dashboard</span>
                     </li>
                 </ol>
-            </nav>
+            </nav> -->
 
         </div>
         <!-- ─── FIN IZQUIERDA ─────────────────────────────── -->
@@ -208,12 +241,13 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
             <div class="navbar-action user-profile-wrapper">
                 <button class="btn-profile" onclick="togglePerfilMenu()" aria-label="Menú de usuario">
 
-                    <!-- Avatar -->
+                    <!-- Avatar — CORRECCIÓN: usa $rutaImagenUsuario + onerror seguro -->
                     <div class="profile-avatar">
                         <img
-                            src="<?= BASE_URL ?>/public/uploads/<?= $usuario['id_rol'] == 4 ? 'usuarios' : 'profesionales' ?>/<?= $usuario['img_perfil'] ?>"
-                            alt="<?= htmlspecialchars($usuario['nombres'] . ' ' . $usuario['apellidos']) ?>"
-                            class="avatar-img">
+                            src="<?= $rutaImagenUsuario ?>"
+                            alt="<?= htmlspecialchars($nombreCompleto) ?>"
+                            class="avatar-img"
+                            onerror="this.onerror=null; this.src='<?= $fallbackAvatar ?>'">
                         <span class="status-dot online" title="En línea"></span>
                     </div>
 
@@ -226,8 +260,11 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                         <span>
 
                         </span>
-                        <span class="profile-badge"><?= htmlspecialchars($usuario['rol']) ?></span>
-
+                        <!-- Badge suscripción en botón -->
+                        <span class="sub-badge sub-<?= $sub_slug ?>">
+                            <i class="bi <?= $sub_icon ?>"></i>
+                            <?= $suscripcion ?>
+                        </span>
                     </div>
 
                     <i class="bi bi-chevron-down profile-arrow"></i>
@@ -236,12 +273,13 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                 <!-- ── Dropdown perfil ── -->
                 <div class="dropdown-panel profile-panel is-hidden" id="perfilDropdown">
 
-                    <!-- Cabecera con avatar grande -->
+                    <!-- Cabecera con avatar grande — CORRECCIÓN: misma imagen y onerror seguro -->
                     <div class="profile-header">
                         <div class="profile-avatar-large">
                             <img
-                                src="<?= BASE_URL ?>/public/uploads/<?= $usuario['id_rol'] == 4 ? 'usuarios' : 'profesionales' ?>/<?= $usuario['img_perfil'] ?>"
-                                alt="<?= htmlspecialchars($usuario['nombres']) ?>">
+                                src="<?= $rutaImagenUsuario ?>"
+                                alt="<?= htmlspecialchars($nombreCompleto) ?>"
+                                onerror="this.onerror=null; this.src='<?= $fallbackAvatar ?>'">
                             <span class="status-dot online"></span>
                         </div>
                         <div class="profile-details">
@@ -423,6 +461,19 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
                             required></textarea>
                         <span class="form-hint">Mínimo 20 caracteres</span>
                     </div>
+                    <!-- Campo para el archivo como imagen png,jpg -->
+                    <div class="form-group">
+                        <label for="archivoProblema" class="form-label">
+                            <i class="bi bi-file-earmark-image"></i>
+                            Adjuntar Imagen
+                        </label>
+                        <input
+                            type="file"
+                            class="form-input"
+                            id="archivoProblema"
+                            name="archivo"
+                            accept="image/png, image/jpeg, image/jpg, image/gif, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    </div>
 
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" id="btnCancelar">
@@ -443,5 +494,4 @@ $sub_icon = $sub_icons[$sub_slug] ?? 'bi-lightning-charge-fill';
 
 
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/panelSuperiorRepresentante.js"></script>
-<script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/panelSuperiorAdmin.js"></script>
-<script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/navbar-superior.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>

@@ -232,10 +232,7 @@ class PanelSuperiorRepresentante {
         try {
             const response = await fetch("/vetwilling/soporte/api/crear-ticket", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(Object.fromEntries(formData)),
+                body: formData,
             });
 
             const data = await response.json();

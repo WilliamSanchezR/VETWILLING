@@ -24,7 +24,7 @@ function obtenerDatosCierreSesion(?string $redirect = null): array
     [$titulo, $msg] = array_pad($entrada, 2, '');
 
     // Validar la URL de redirección para prevenir open redirect y XSS en JS
-    $urlDefault  = '/vetwilling/login';
+    $urlDefault = BASE_URL . '/login';
     $redirectUrl = $urlDefault;
 
     if ($redirect !== null) {

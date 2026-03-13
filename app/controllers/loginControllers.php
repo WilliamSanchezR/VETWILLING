@@ -7,23 +7,31 @@ require __DIR__ . '/../models/Login.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-$accion = $_POST['action'] ?? '';
+    $accion = $_POST['action'] ?? '';
 
 
-if ($accion === 'seleccionarVeterinaria') {
-    // Capturamos el id_veterinaria seleccionado
-    $id_veterinaria = $_POST['id_veterinaria'] ?? '';  
+    if ($accion === 'seleccionarVeterinaria') {
+        // Capturamos el id_veterinaria seleccionado
+        $id_veterinaria = $_POST['id_veterinaria'] ?? '';
 
-     session_start();
-    $_SESSION['user']['id_veterinaria'] = $id_veterinaria;
-    mostrarSweetAlert(
-        "success",
-        "Veterinaria Seleccionada",
-        "Ha seleccionado la veterinaria correctamente.",
-        "/vetwilling/veterinaria/dashboard"
-    );
-    exit();;
-}
+        session_start();
+        $_SESSION['user']['id_veterinaria'] = $id_veterinaria;
+        mostrarSweetAlert(
+            "success",
+            "Veterinaria Seleccionada",
+            "Ha seleccionado la veterinaria correctamente.",      
+            BASE_URL . "/veterinaria/dashboard"
+            // Se utiliza BASE_URL para construir una ruta dinámica del sistema.
+            // BASE_URL contiene automáticamente el dominio y la carpeta base del proyecto.
+            // Esto permite que la ruta funcione correctamente tanto en entorno local
+            // (ej: http://localhost/vetwilling) como en producción
+            // (ej: https://vetwilling.com) sin tener que modificar el código.
+
+
+            //"/veterinaria/dashboard"
+        );
+        exit();;
+    }
 
     // Capturamos en variables los valores enviados a traves de los names de formulario y el metho POST 
 
@@ -50,7 +58,7 @@ if ($accion === 'seleccionarVeterinaria') {
     }
 
     // Si pasa esta linea, el usuario es valido
-    
+
     session_start();
     $_SESSION['user'] = [
         'id_usuario' => $resultado['id_usuario'],
@@ -72,7 +80,7 @@ if ($accion === 'seleccionarVeterinaria') {
             'info',
             'Seleccione Veterinaria',
             'Usted esta asociado a varias veterinarias, por favor seleccione a cual desea ingresar.',
-            '/vetwilling/login/seleccionarVeterinaria'
+            BASE_URL . '/login/seleccionarVeterinaria'
         );
         exit();
     }
@@ -83,7 +91,7 @@ if ($accion === 'seleccionarVeterinaria') {
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido administrador " . $resultado['nombres'],
-                "/vetwilling/admin/dashBoard"
+                BASE_URL . "/admin/dashBoard"
             );
             break;
 
@@ -92,7 +100,7 @@ if ($accion === 'seleccionarVeterinaria') {
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido veterinario " . $resultado['nombres'],
-                "/vetwilling/veterinaria/dashboard"
+                BASE_URL . "/veterinaria/dashboard"
             );
             break;
 
@@ -101,7 +109,7 @@ if ($accion === 'seleccionarVeterinaria') {
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido " . $resultado['nombres'],
-                "/vetwilling/cliente/dashboard"
+                BASE_URL . "/cliente/dashboard"
             );
             break;
 
@@ -110,12 +118,12 @@ if ($accion === 'seleccionarVeterinaria') {
                 "success",
                 "Inicio de Sesión Exitoso",
                 "Bienvenido Representante " . $resultado['nombres'],
-                "/vetwilling/representante/dashboard"
+                BASE_URL . "/representante/dashboard"
             );
             break;
 
         default:
-            mostrarSweetAlert("error", "Rol no reconocido", "Redirigiendo al login...", "/vetwilling/login");
+            mostrarSweetAlert("error", "Rol no reconocido", "Redirigiendo al login...", BASE_URL . "/login");
             break;
     }
 } else {

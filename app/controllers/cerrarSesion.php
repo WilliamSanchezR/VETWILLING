@@ -32,7 +32,7 @@ if ($userData) {
 }
 
 // Mostrar pantalla personalizada
-mostrarCierreSesion('/vetwilling/login');
+mostrarCierreSesion(BASE_URL . '/login');
 
 // Ahora sí destruir completamente
 session_destroy();
