@@ -14,3 +14,7 @@
 
 /.vscode/*
 
+
+config/config.php
+config/database.php
+.htaccess
