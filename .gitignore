@@ -11,6 +11,12 @@
 /public/uploads/veterinaria/*
 
 /public/uploads/veterinarios/*
+/public/uploads/tickets/**.png
+/public/uploads/tickets/**.jpg
+/public/uploads/tickets/**.jpeg
+/public/uploads/tickets/**.pdf
+/public/uploads/tickets/**.doc
+/public/uploads/tickets/**.docx
 
 /.vscode/*
 
