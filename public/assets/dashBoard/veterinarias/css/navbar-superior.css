@@ -349,11 +349,7 @@ body.sidebar-collapsed .navbar-superior {
    04 · SECCIÓN CENTRO — Buscador
 ---------------------------------------------------------------- */
 .navbar-center {
-    flex: 1 1 auto;
-    /* ocupa todo el espacio disponible */
-    max-width: 680px;
-    /* pero no se pasa de este ancho */
-    min-width: 50%;
+    min-width: 38%;
     position: relative;
     right: 20px;
 }

@@ -40,6 +40,30 @@ $datosUsuario = [
     'rol' => safe_echo($usuario['rol'] ?? 'Cliente'),
     'email' => safe_echo($usuario['email'] ?? '')
 ];
+
+// ── CORRECCIÓN 1: Lógica de ruta de imagen robusta para Hostinger ──
+$foto = $datosUsuario['img_perfil'] ?? '';
+
+// Fallback CDN: genera avatar con iniciales, siempre disponible
+$imagenFallback = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario['nombres'] . '+' . $datosUsuario['apellidos']) . "&background=4e9af1&color=fff&size=128";
+$rutaImagen = $imagenFallback;
+
+if (!empty($foto) && $foto !== 'default-avatar.png') {
+    // Verificar si el archivo subido existe usando BASE_PATH (más fiable en hostinger)
+    $rutaAbsoluta = BASE_PATH . "/public/uploads/usuarios/" . $foto;
+    if (file_exists($rutaAbsoluta)) {
+        $rutaImagen = BASE_URL . "/public/uploads/usuarios/" . $foto;
+    }
+} else {
+    // Intentar el default local, si no existe usar CDN
+    $defaultLocal = BASE_PATH . "/public/uploads/usuarios/default-avatar.png";
+    if (file_exists($defaultLocal)) {
+        $rutaImagen = BASE_URL . "/public/uploads/usuarios/default-avatar.png";
+    }
+}
+
+// URL de fallback para onerror en HTML (con iniciales del usuario)
+$fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario['nombres'] . '+' . $datosUsuario['apellidos']) . "&background=4e9af1&color=fff&size=128";
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
@@ -165,11 +189,12 @@ $datosUsuario = [
             aria-haspopup="true"
             aria-expanded="false">
 
+            <!-- ── CORRECCIÓN 2: onerror con this.onerror=null para evitar loop infinito ── -->
             <div class="avatar-usuario">
                 <img
-                    src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $datosUsuario['img_perfil'] ?>"
+                    src="<?= $rutaImagen ?>"
                     alt="Foto de perfil de <?= $datosUsuario['nombres'] ?>"
-                    onerror="this.src='<?= BASE_URL ?>/public/uploads/usuarios/default-avatar.png'">
+                    onerror="this.onerror=null; this.src='<?= $fallbackOnerror ?>'">
             </div>
 
             <div class="info-usuario">
@@ -190,10 +215,11 @@ $datosUsuario = [
             role="menu">
             <div class="perfil-header">
                 <div class="avatar-usuario grande">
+                    <!-- ── CORRECCIÓN 2: misma imagen y mismo onerror seguro ── -->
                     <img
-                        src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $datosUsuario['img_perfil'] ?>"
+                        src="<?= $rutaImagen ?>"
                         alt="Avatar"
-                        onerror="this.src='<?= BASE_URL ?>/public/uploads/usuarios/default-avatar.png'">
+                        onerror="this.onerror=null; this.src='<?= $fallbackOnerror ?>'">
                 </div>
                 <div>
                     <p class="nombre-completo">
