@@ -289,30 +289,11 @@ $veterinariasDetalles = consultarVeterinariasPorArray($veterinariasArray);
 </head>
 <body>
 
-<div class="grain"></div>
-
-<div class="scene">
-    <div class="card">
-
-        <div class="icon-wrap">
-            <div class="icon-aura"></div>
-            <div class="icon-ring"></div>
-            <div class="icon-circle">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/>
-                    <path d="M12 8v8M8 12h8"/>
-                </svg>
-            </div>
-        </div>
-
-
-        <h1>Selecciona tu Veterinaria</h1>
-        <div class="sep"></div>
-
-        <form action="/vetwilling/login/ingresarVeterinaria" method="post">
-            <input type="hidden" name="action" value="seleccionarVeterinaria">
-
-            <div class="select-wrap">
+    <div class="modal-overlay">
+        <div class="modal-content"> 
+            <h1>Seleccione la Veterinaria</h1>
+            <form action="<?= BASE_URL ?>/login/ingresarVeterinaria" method="post">
+                <input type="hidden" name="action" value="seleccionarVeterinaria">
                 <select name="id_veterinaria" required>
                     <option value="" disabled selected>¿En cuál clínica estás hoy?</option>
                     <?php foreach ($veterinariasDetalles as $veterinaria): ?>

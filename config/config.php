@@ -1,32 +1,96 @@
 <?php
 
-// Este archivo se creo para crear menor complicacion al momento de subier el proyecto a un hosting
+// ═══════════════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN GENERAL DEL PROYECTO
+// Este archivo centraliza configuraciones globales para que el sistema
+// funcione correctamente tanto en entorno LOCAL como en PRODUCCIÓN.
+// ═══════════════════════════════════════════════════════════════════════════
+
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  CONFIGURACIÓN DE ZONA HORARIA
+// CONFIGURACIÓN DE ZONA HORARIA
 // ═══════════════════════════════════════════════════════════════════════════
-// Establece la zona horaria para evitar problemas con fechas y horas
-// Ajusta según tu ubicación: América/Bogotá, América/Mexico_City, etc.
+// Define la zona horaria del servidor para evitar errores en fechas,
+// registros de base de datos, logs o funciones como date() y time().
+// Debe coincidir con la ubicación del sistema.
 date_default_timezone_set('America/Bogota');
 
-// Configuracion global del proyecto
 
-// Detectar protocolo (http o https)
-
+// ═══════════════════════════════════════════════════════════════════════════
+// DETECTAR EL PROTOCOLO DEL SITIO (HTTP o HTTPS)
+// ═══════════════════════════════════════════════════════════════════════════
+// Algunos servidores usan HTTPS y otros HTTP.
+// Esta línea detecta automáticamente cuál está usando el servidor.
 $protocolo = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
 
-// nombre de la carpeta del proyecto en local
 
-$baseFolder = '/vetwilling';
-
-// Host casual
-
+// ═══════════════════════════════════════════════════════════════════════════
+// OBTENER EL HOST DEL SERVIDOR
+// ═══════════════════════════════════════════════════════════════════════════
+// Obtiene el dominio o dirección del servidor actual.
+// Ejemplos:
+// localhost
+// vetwilling.com
+// www.vetwilling.com
 $host = $_SERVER['HTTP_HOST'];
 
-// url base dianmica (funcion en local y hosting)
 
+// ═══════════════════════════════════════════════════════════════════════════
+// DETECTAR SI EL PROYECTO SE EJECUTA EN LOCALHOST
+// ═══════════════════════════════════════════════════════════════════════════
+// Si la dirección IP del servidor es 127.0.0.1 o ::1 significa que
+// el proyecto está ejecutándose en el entorno local del desarrollador.
+$isLocal = in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']);
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DEFINIR CARPETA BASE DEL PROYECTO
+// ═══════════════════════════════════════════════════════════════════════════
+// En desarrollo local el proyecto se encuentra dentro de una carpeta
+// llamada "vetwilling", por ejemplo:
+//
+// http://localhost/vetwilling
+//
+// En producción (hosting) el proyecto está en la raíz del dominio:
+//
+// https://vetwilling.com
+//
+// Por lo tanto:
+// - En LOCAL se usa "/vetwilling"
+// - En PRODUCCIÓN se usa ""
+$baseFolder = $isLocal ? '/vetwilling' : '';
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// URL BASE DEL PROYECTO
+// ═══════════════════════════════════════════════════════════════════════════
+// Construye la URL completa del proyecto combinando:
+//
+// protocolo + dominio + carpeta base
+//
+// Ejemplos:
+//
+// LOCAL
+// http://localhost/vetwilling
+//
+// PRODUCCIÓN
+// https://vetwilling.com
+//
+// Esta constante se usa para generar rutas dinámicas en todo el sistema.
 define('BASE_URL', $protocolo . $host . $baseFolder);
 
-// Ruta base del proyecto (para require o include)
 
+// ═══════════════════════════════════════════════════════════════════════════
+// RUTA BASE DEL SISTEMA EN EL SERVIDOR
+// ═══════════════════════════════════════════════════════════════════════════
+// Obtiene la ruta física del proyecto en el servidor.
+// Se usa principalmente para:
+//
+// require
+// include
+// cargar archivos
+// importar controladores o helpers
+//
+// Ejemplo:
+// C:\xampp\htdocs\vetwilling
 define('BASE_PATH', dirname(__DIR__));
