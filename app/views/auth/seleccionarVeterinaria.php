@@ -25,9 +25,9 @@ $veterinariasDetalles = consultarVeterinariasPorArray($veterinariasArray);
 <body>
 
     <div class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content"> 
             <h1>Seleccione la Veterinaria</h1>
-            <form action="/vetwilling/login/ingresarVeterinaria" method="post">
+            <form action="<?= BASE_URL ?>/login/ingresarVeterinaria" method="post">
                 <input type="hidden" name="action" value="seleccionarVeterinaria">
                 <select name="id_veterinaria" required>
                     <option value="" disabled selected>Seleccione una veterinaria</option>
