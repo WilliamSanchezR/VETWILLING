@@ -6,10 +6,16 @@
 
 class Conexion
 {
+    // private $host = "localhost";
+    // private $db = "vetwilling";
+    // private $user = "root";
+    // private $pass = "";
+    // private $conexion;
+
     private $host = "localhost";
-    private $db = "vetwilling";
-    private $user = "root";
-    private $pass = "";
+    private $db = "u267154119_vetwilling";
+    private $user = "u267154119_user";
+    private $pass = "Vetwilling123.";
     private $conexion;
 
     // El constructor (_construct se ejecuta automaticamente cuando creamos un objeto de la clase, y se encarga de abrir la conexion con la base de datos usando PDO.

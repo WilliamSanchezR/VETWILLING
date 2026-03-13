@@ -1,5 +1,5 @@
 RewriteEngine On
-RewriteBase /vetwilling/
+RewriteBase /
 
 #Ignore archivos o carpetas reales
 
