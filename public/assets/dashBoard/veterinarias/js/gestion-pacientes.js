@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const detalleAcceso = document.getElementById('detalleAcceso');
     const detalleVersion = document.getElementById('detalleVersion');
     const detalleActualizacion = document.getElementById('detalleActualizacion');
+    const selectVersionHistorial = document.getElementById('selectVersionHistorial');
 
     const vacunaTipo = document.getElementById('vacunaTipo');
     const vacunaDosis = document.getElementById('vacunaDosis');
@@ -487,7 +488,42 @@ document.addEventListener('DOMContentLoaded', function() {
         detalleAcceso.textContent = 'Autorizado';
         detalleVersion.textContent = '--';
         detalleActualizacion.textContent = '--';
+        selectVersionHistorial.innerHTML = '<option value="">Selecciona una atención</option>';
         limpiarModulos();
+    }
+
+    async function cargarVersionesHistorial(idHistorial) {
+        if (!idHistorial) {
+            selectVersionHistorial.innerHTML = '<option value="">Selecciona una atención</option>';
+            return;
+        }
+
+        try {
+            const result = await postJson({
+                accion: 'listar_versiones_historial',
+                id_historial: idHistorial
+            });
+
+            const versiones = result.data || [];
+            
+            if (versiones.length === 0) {
+                selectVersionHistorial.innerHTML = '<option value="">Sin versiones disponibles</option>';
+                return;
+            }
+
+            selectVersionHistorial.innerHTML = '<option value="">Seleccionar versión...</option>' +
+                versiones.map(function(v) {
+                    const fecha = fechaHumana(v.fecha_atencion);
+                    const version = 'v' + (v.version_registro || '1');
+                    const seleccionado = String(v.id_historial) === String(idHistorial) ? ' selected' : '';
+                    return '<option value="' + escapeHtml(v.id_historial) + '"' + seleccionado + '>' +
+                        version + ' - ' + fecha + ' - ' + escapeHtml(v.veterinario_responsable || 'N/A') +
+                        '</option>';
+                }).join('');
+        } catch (err) {
+            console.error('Error al cargar versiones:', err);
+            selectVersionHistorial.innerHTML = '<option value="">Error al cargar versiones</option>';
+        }
     }
 
     function cargarDetalle(registro) {
@@ -510,6 +546,8 @@ document.addEventListener('DOMContentLoaded', function() {
         detalleAcceso.textContent = registro.acceso || 'Autorizado';
         detalleVersion.textContent = registro.version_registro ? ('v' + registro.version_registro) : 'Nueva';
         detalleActualizacion.textContent = fechaHoraHumana(registro.updated_at || registro.fecha_atencion);
+        
+        cargarVersionesHistorial(registro.id_historial || '');
         cargarFichaClinica(registro.id_paciente || '');
     }
 
@@ -930,6 +968,27 @@ document.addEventListener('DOMContentLoaded', function() {
             paginacionModulo[item.modulo].pagina = 1;
             if (fichaActual) renderFichaClinica(fichaActual);
         });
+    });
+
+    selectVersionHistorial.addEventListener('change', async function() {
+        const idHistorialSeleccionado = this.value;
+        
+        if (!idHistorialSeleccionado) {
+            return;
+        }
+
+        const registroSeleccionado = registros.find(function(r) {
+            return String(r.id_historial) === String(idHistorialSeleccionado);
+        });
+
+        if (registroSeleccionado) {
+            const filaTabla = tablaBody.querySelector('tr[data-id-historial="' + idHistorialSeleccionado + '"]');
+            if (filaTabla) {
+                filaTabla.click();
+            } else {
+                cargarDetalle(registroSeleccionado);
+            }
+        }
     });
 
     cargarHistoriales({});

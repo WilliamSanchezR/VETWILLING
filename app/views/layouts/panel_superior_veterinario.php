@@ -6,7 +6,25 @@ $id         = $_SESSION['user']['id_usuario'];
 $usuario    = mostrarPerfil($id);
 $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
 
+// ── CORRECCIÓN: Lógica de ruta de imagen robusta para Hostinger ──
+$fotoUsuario    = $usuario['img_perfil'] ?? '';
+$carpetaUsuario = ($usuario['id_rol'] == 4) ? 'usuarios' : 'profesionales';
 
+$nombreCompleto    = trim(($usuario['nombres'] ?? '') . ' ' . ($usuario['apellidos'] ?? ''));
+$fallbackAvatar    = "https://ui-avatars.com/api/?name=" . urlencode($nombreCompleto) . "&background=4e9af1&color=fff&size=128";
+$rutaImagenUsuario = $fallbackAvatar;
+
+if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
+    $rutaAbsoluta = BASE_PATH . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+    if (file_exists($rutaAbsoluta)) {
+        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+    }
+} else {
+    $defaultLocal = BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    if (file_exists($defaultLocal)) {
+        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    }
+}
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
@@ -194,12 +212,13 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
             <div class="navbar-action user-profile-wrapper">
                 <button class="btn-profile" onclick="togglePerfilMenu()" aria-label="Menú de usuario">
 
-                    <!-- Avatar -->
+                    <!-- Avatar — CORRECCIÓN: usa $rutaImagenUsuario + onerror seguro -->
                     <div class="profile-avatar">
                         <img
-                            src="<?= BASE_URL ?>/public/uploads/<?= $usuario['id_rol'] == 4 ? 'usuarios' : 'profesionales' ?>/<?= $usuario['img_perfil'] ?>"
-                            alt="<?= htmlspecialchars($usuario['nombres'] . ' ' . $usuario['apellidos']) ?>"
-                            class="avatar-img">
+                            src="<?= $rutaImagenUsuario ?>"
+                            alt="<?= htmlspecialchars($nombreCompleto) ?>"
+                            class="avatar-img"
+                            onerror="this.onerror=null; this.src='<?= $fallbackAvatar ?>'">
                         <span class="status-dot online" title="En línea"></span>
                     </div>
 
@@ -220,12 +239,13 @@ $veterinaria = consultarVeterinariaPorId($_SESSION['user']['id_veterinaria']);
                 <!-- ── Dropdown perfil ── -->
                 <div class="dropdown-panel profile-panel is-hidden" id="perfilDropdown">
 
-                    <!-- Cabecera con avatar grande -->
+                    <!-- Cabecera con avatar grande — CORRECCIÓN: misma imagen y onerror seguro -->
                     <div class="profile-header">
                         <div class="profile-avatar-large">
                             <img
-                                src="<?= BASE_URL ?>/public/uploads/<?= $usuario['id_rol'] == 4 ? 'usuarios' : 'profesionales' ?>/<?= $usuario['img_perfil'] ?>"
-                                alt="<?= htmlspecialchars($usuario['nombres']) ?>">
+                                src="<?= $rutaImagenUsuario ?>"
+                                alt="<?= htmlspecialchars($nombreCompleto) ?>"
+                                onerror="this.onerror=null; this.src='<?= $fallbackAvatar ?>'">
                             <span class="status-dot online"></span>
                         </div>
                         <div class="profile-details">
