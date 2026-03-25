@@ -8,7 +8,7 @@
  * ═══════════════════════════════════════════════════════════════════
  */
 
-require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/database.php'; 
 
 class CitasCliente
 {
@@ -378,7 +378,8 @@ class CitasCliente
             $sql = "SELECT COUNT(*) as total
                     FROM paciente
                     WHERE id_paciente = :id_paciente
-                    AND id_propietario = :id_propietario";
+                    AND id_propietario = :id_propietario
+                    AND estado = 'Activo'";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
@@ -634,6 +635,7 @@ class CitasCliente
                         img_mascota
                     FROM paciente
                     WHERE id_propietario = :id_propietario
+                    AND estado = 'Activo'
                     ORDER BY nombre ASC";
 
             $stmt = $this->conexion->prepare($sql);

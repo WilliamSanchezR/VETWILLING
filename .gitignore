@@ -24,3 +24,6 @@
 config/config.php
 config/database.php
 .htaccess
+database
+
+PROJECT_CONTEXT.md
