@@ -10,7 +10,14 @@ $requestURI = $_SERVER['REQUEST_URI'];
 
 // Quitar le prefijo de la carpeta del proyecto
 
-$request = str_replace('/vetwilling', '', $requestURI);
+#$request = str_replace('/vetwilling', '', $requestURI);
+
+// Elimina de la URL el nombre de la carpeta base del proyecto (si existe).
+// Esto es necesario porque en entorno local el proyecto se ejecuta dentro
+// de la carpeta "/vetwilling" (ej: localhost/vetwilling/login), mientras
+// que en producción se ejecuta desde la raíz del dominio (ej: vetwilling.com/login).
+// De esta manera el router puede trabajar con rutas limpias como "/login".
+$request = str_replace($baseFolder, '', $requestURI);
 
 // Quitar parametros tipo ?id=123
 
@@ -663,4 +670,17 @@ switch ($request) {
     case '/soporte/api/ticket':
         require BASE_PATH . '/app/controllers/ticketController.php';
         break;
+
+
+
+    // ---------------------------REGISTRO--------------------------- //
+    case '/registro':
+        require BASE_PATH . '/app/views/website/registrarse.php';
+        break;
+
+    case '/registro/veterinaria':
+        require BASE_PATH . '/app/controllers/registrarseController.php';
+        break;
+
+
 }

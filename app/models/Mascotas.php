@@ -71,7 +71,8 @@ class Mascota
         try {
             $sql = "SELECT *
                     FROM paciente
-                    WHERE id_propietario = :id_propietario";
+                    WHERE id_propietario = :id_propietario
+                    AND estado = 'Activo'";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_propietario', $id_propietario, PDO::PARAM_INT);
@@ -90,7 +91,7 @@ class Mascota
     public function listar()
     {
         try {
-            $sql = "SELECT * FROM paciente";
+            $sql = "SELECT * FROM paciente WHERE estado = 'Activo'";
             $stmt = $this->conexion->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -107,7 +108,8 @@ class Mascota
         try {
             $sql = "SELECT *
                     FROM paciente
-                    WHERE id_paciente = :id";
+                    WHERE id_paciente = :id
+                    AND estado = 'Activo'";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -144,7 +146,7 @@ class Mascota
                 $campos .= ", img_mascota = :img_mascota";
             }
 
-            $sql = "UPDATE paciente SET $campos WHERE id_paciente = :id_paciente";
+            $sql = "UPDATE paciente SET $campos WHERE id_paciente = :id_paciente AND estado = 'Activo'";
 
             $stmt = $this->conexion->prepare($sql);
 
@@ -186,7 +188,9 @@ class Mascota
     public function eliminar(int $id)
     {
         try {
-            // 1. Obtener imagen antes de eliminar
+            $this->conexion->beginTransaction();
+
+            // 1. Obtener imagen antes de inactivar
             $stmt = $this->conexion->prepare(
                 "SELECT img_mascota FROM paciente WHERE id_paciente = :id"
             );
@@ -203,19 +207,32 @@ class Mascota
             $existeAsignacion = ((int) $stmtExiste->fetchColumn() > 0);
 
             if ($existeAsignacion) {
-                $deleteAsignacion = $this->conexion->prepare(
-                    "DELETE FROM paciente_profesional_asignacion WHERE id_paciente = :id"
+                // Cerrar asignaciones activas asociadas al paciente.
+                $cerrarAsignacion = $this->conexion->prepare(
+                    "UPDATE paciente_profesional_asignacion
+                     SET estado = 'Inactivo', fecha_fin = CURRENT_TIMESTAMP
+                     WHERE id_paciente = :id AND estado = 'Activo'"
                 );
-                $deleteAsignacion->bindParam(':id', $id, PDO::PARAM_INT);
-                $deleteAsignacion->execute();
+                $cerrarAsignacion->bindParam(':id', $id, PDO::PARAM_INT);
+                $cerrarAsignacion->execute();
             }
 
-            // 2. Eliminar registro
+            // 2. Inactivar mascota (borrado lógico)
             $delete = $this->conexion->prepare(
-                "DELETE FROM paciente WHERE id_paciente = :id"
+                "UPDATE paciente
+                 SET estado = 'Inactivo'
+                 WHERE id_paciente = :id
+                 AND estado = 'Activo'"
             );
             $delete->bindParam(':id', $id, PDO::PARAM_INT);
             $resultado = $delete->execute();
+
+            if (!$resultado) {
+                $this->conexion->rollBack();
+                return false;
+            }
+
+            $this->conexion->commit();
 
             // 3. Eliminar imagen del servidor
             // if ($resultado && !empty($mascota['img_mascota'])) {
@@ -227,6 +244,9 @@ class Mascota
 
             return $resultado;
         } catch (PDOException $e) {
+            if ($this->conexion->inTransaction()) {
+                $this->conexion->rollBack();
+            }
             error_log("Error Mascota::eliminar → " . $e->getMessage());
             return false;
         }

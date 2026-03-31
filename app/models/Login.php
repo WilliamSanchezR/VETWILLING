@@ -17,7 +17,7 @@ class Login
     {
 
         try {
-            $consultar = "SELECT * FROM usuario WHERE email = :email AND estado = 'activo' LIMIT 1";
+            $consultar = "SELECT * FROM usuario WHERE email = :email LIMIT 1";
             $resultado = $this->conexion->prepare($consultar);
             $resultado->bindParam(':email', $email);
             $resultado->execute();
@@ -25,13 +25,27 @@ class Login
             $user = $resultado->fetch();
 
             if (!$user) {
-                return ['error' => 'Usuario no encontrado o inactivo'];
+                return ['error' => 'Usuario no encontrado'];
             }
 
             // Verificacion de la contraseña incriptada
 
             if (!password_verify($password, $user['password_hash'])) {
                 return ['error' => 'Contraseña incorrecta'];
+            }
+
+            // Verificar el estado del usuario y mostrar mensajes de alerta correspondientes
+            if ($user['estado'] === 'pendiente') {
+                return [
+                    'error' => 'Tu cuenta esta pendiente de aprobacion. Debes esperar la activacion por parte del administrador.',
+                    'tipo' => 'warning',
+                    'titulo' => 'Cuenta pendiente de aprobacion'
+                ];
+            }
+
+            // Si el estado es inactivo, se muestra un mensaje de error indicando que la cuenta está inactiva
+            if ($user['estado'] !== 'activo') {
+                return ['error' => 'Tu cuenta se encuentra inactiva. Comunicate con el administrador.'];
             }
 
             // Obtenemos datos adicionales según cada rol, mediante switch case 
