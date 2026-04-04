@@ -9,6 +9,7 @@
 // =========================================
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/email_helper.php';
 require_once __DIR__ . '/notificacion_helper.php';
 require_once __DIR__ . '/../models/Eventos.php';
@@ -16,7 +17,11 @@ require_once __DIR__ . '/../models/Eventos.php';
 // =========================================
 // CONFIGURACION Y VARIABLES GLOBALES
 // =========================================
-$horasAntes = 24; // Enviar recordatorio 24 horas antes de la cita
+// Usar la configuración definida en config.php
+$horasAntes = HORAS_ANTICIPACION_RECORDATORIO; // Usar constante del config
+$maxReintentos = MAX_REINTENTOS_NOTIFICACION; // Usar constante
+$intervalReintentos = INTERVALO_REINTENTO_NOTIFICACION; // Usar constante
+
 $fechaInicio = date('Y-m-d H:i:s', strtotime("+{$horasAntes} hours"));
 $fechaFin = date('Y-m-d H:i:s', strtotime("+{$horasAntes} hours +1 hour"));
 
@@ -75,9 +80,18 @@ try {
         // ┌─────────────────────────────────────────────────────────────┐
         // │ PASO 1: VERIFICAR PREFERENCIAS DE NOTIFICACION             │
         // └─────────────────────────────────────────────────────────────┘
-        if ($cita['preferencia_notificacion'] === 'ninguno') {
+        $preferenciaNotif = $cita['preferencia_notificacion'] ?? 'email';
+        
+        if ($preferenciaNotif === 'ninguno') {
             echo "    ⊘ Usuario no desea recibir notificaciones\n";
-            echo "    ⊗ OMITIDO\n\n";
+            echo "    ⊗ OMITIDO - Preferencia: NINGUNO\n\n";
+            $sinPreferencia++;
+            continue;
+        }
+        
+        if ($preferenciaNotif !== 'email') {
+            echo "    ⊘ Preferencia de notificación no soportada: {$preferenciaNotif}\n";
+            echo "    ⊗ OMITIDO - Solo se soporta 'email'\n\n";
             $sinPreferencia++;
             continue;
         }

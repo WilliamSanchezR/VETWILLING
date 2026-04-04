@@ -3,7 +3,8 @@
 require_once __DIR__ . '/../../vendor/PHPMailer/PHPMailer.php';
 require_once __DIR__ . '/../../vendor/PHPMailer/SMTP.php';
 require_once __DIR__ . '/../../vendor/PHPMailer/Exception.php';
-require_once __DIR__ . '/mailer_helper.php'; // Usar la configuración existente
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/mailer_helper.php'; // Usar la configuración centralizada
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -20,7 +21,7 @@ function enviarNotificacionCitaCreada($datosCita)
         $mail = mailer_init();
 
         // Destinatarios
-        $mail->setFrom('vetwillingsoporte@gmail.com', 'VetWilling - Sistema de Citas');
+        $mail->setFrom(SMTP_FROM_EMAIL, 'VetWilling - Sistema de Citas');
         $mail->addAddress($datosCita['email_propietario'], $datosCita['nombre_propietario']);
 
         // Contenido del email
@@ -162,7 +163,7 @@ function enviarNotificacionCitaCancelada($datosCancelacion)
         $mail = mailer_init();
 
         // Destinatarios
-        $mail->setFrom('vetwillingsoporte@gmail.com', 'VetWilling - Sistema de Citas');
+        $mail->setFrom(SMTP_FROM_EMAIL, 'VetWilling - Sistema de Citas');
         $mail->addAddress($datosCancelacion['email_propietario'], $datosCancelacion['nombre_propietario']);
 
         // Contenido del email
