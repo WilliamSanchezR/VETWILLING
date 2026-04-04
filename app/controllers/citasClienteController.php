@@ -9,6 +9,8 @@
 session_start();
 
 require_once __DIR__ . '/../models/CitasCliente.php';
+require_once __DIR__ . '/../helpers/email_helper.php';
+require_once __DIR__ . '/../helpers/notificacion_helper.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -200,6 +202,58 @@ function crearCitaCliente()
         $id_cita = $modeloCitas->crearCita($datosInsert);
 
         if ($id_cita) {
+            // ═══════════════════════════════════════════════════════════════════
+            // RFS 37: ENVIAR EMAIL DE CONFIRMACION AL PROPIETARIO
+            // ═══════════════════════════════════════════════════════════════════
+            
+            try {
+                // Obtener detalles completos de la cita para el email
+                $detallesCita = $modeloCitas->obtenerDetallesCita($id_cita);
+                
+                if ($detallesCita && !empty($detallesCita['email_propietario'])) {
+                    // Preparar datos para enviar al email
+                    $datosCitaEmail = [
+                        'email_propietario' => $detallesCita['email_propietario'],
+                        'nombre_propietario' => $detallesCita['nombre_propietario'],
+                        'nombre_mascota' => $detallesCita['nombre_mascota'] ?? 'su mascota',
+                        'tipo_servicio' => $detallesCita['servicio_nombre'] ?? $detallesCita['tipo'],
+                        'fecha_hora' => $detallesCita['fecha_hora'],
+                        'estado' => $detallesCita['estado'] ?? 'Pendiente'
+                    ];
+                    
+                    // Enviar notificación de confirmación de cita
+                    $emailEnviado = enviarNotificacionCitaCreada($datosCitaEmail);
+                    
+                    // Registrar intento de envío en auditoría
+                    if ($emailEnviado) {
+                        registrarNotificacionEnviada([
+                            'id_agendamiento' => $id_cita,
+                            'medio_notificacion' => 'email',
+                            'destinatario' => $detallesCita['email_propietario'],
+                            'estado_envio' => 'exitoso',
+                            'mensaje_error' => null,
+                            'intentos_envio' => 1
+                        ]);
+                        error_log("✅ Email de confirmación enviado exitosamente - Cita ID: {$id_cita}");
+                    } else {
+                        registrarNotificacionEnviada([
+                            'id_agendamiento' => $id_cita,
+                            'medio_notificacion' => 'email',
+                            'destinatario' => $detallesCita['email_propietario'],
+                            'estado_envio' => 'fallido',
+                            'mensaje_error' => 'Error al enviar email de confirmación - Verificar configuración SMTP',
+                            'intentos_envio' => 1
+                        ]);
+                        error_log("❌ Error al enviar email de confirmación - Cita ID: {$id_cita}");
+                    }
+                } else {
+                    error_log("⚠️ No se pudo obtener datos de propietario para enviar email - Cita ID: {$id_cita}");
+                }
+            } catch (Exception $e) {
+                error_log("⚠️ Excepción al enviar email de confirmación: " . $e->getMessage());
+                // No detenemos el proceso si falla el email, la cita ya fue creada
+            }
+            
             header('Content-Type: application/json');
             http_response_code(201);
             echo json_encode([

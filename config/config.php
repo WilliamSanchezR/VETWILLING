@@ -21,7 +21,8 @@ date_default_timezone_set('America/Bogota');
 // ═══════════════════════════════════════════════════════════════════════════
 // Algunos servidores usan HTTPS y otros HTTP.
 // Esta línea detecta automáticamente cuál está usando el servidor.
-$protocolo = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+// En ejecución CLI (cron), estas variables pueden no existir.
+$protocolo = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -32,7 +33,8 @@ $protocolo = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
 // localhost
 // vetwilling.com
 // www.vetwilling.com
-$host = $_SERVER['HTTP_HOST'];
+// Fallback para ejecución por CLI (cron)
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -40,7 +42,9 @@ $host = $_SERVER['HTTP_HOST'];
 // ═══════════════════════════════════════════════════════════════════════════
 // Si la dirección IP del servidor es 127.0.0.1 o ::1 significa que
 // el proyecto está ejecutándose en el entorno local del desarrollador.
-$isLocal = in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']);
+// En CLI no existe REMOTE_ADDR, por lo que asumimos entorno local.
+$remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+$isLocal = in_array($remoteAddr, ['127.0.0.1', '::1']);
 
 
 // ═══════════════════════════════════════════════════════════════════════════
