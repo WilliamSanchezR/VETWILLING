@@ -658,6 +658,9 @@ switch ($request) {
     case '/pasarela-pago':
         require BASE_PATH . '/app/views/payments/pasarelaPago.php';
         break;
+    case '/pagos/mercadopago':
+        require BASE_PATH . '/app/controllers/pagosMercadoPagoController.php';
+        break;
     case '/pagos/confirmacion':
         require BASE_PATH . '/app/views/payments/confirmacion.php';
         break;

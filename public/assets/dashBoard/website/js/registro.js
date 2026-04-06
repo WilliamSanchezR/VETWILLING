@@ -7,6 +7,12 @@ const formVeterinaria = document.getElementById('vetForm');
 const btnConfirmarVeterinaria = document.getElementById('btnConfirmarVeterinaria');
 const btnVolver = document.getElementById('btnVolver');
 
+const planSelect = document.getElementById('plan');
+
+if (localStorage.getItem('Bawm_Plan_Select')) {
+    planSelect.value = localStorage.getItem('Bawm_Plan_Select');
+}
+
 // Función para mostrar el paso actual y actualizar las barras de progreso y las etiquetas
 function showStep(index) {
     steps.forEach((step, i) => step.classList.toggle('active', i === index));

@@ -24,3 +24,9 @@
 config/config.php
 config/database.php
 .htaccess
+
+.env
+
+composer.lock
+composer.json
+app/logs/*

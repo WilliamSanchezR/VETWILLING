@@ -1,3 +1,45 @@
+<?php
+$origen = $_GET['origen'] ?? 'tienda';
+$plan = $_GET['plan'] ?? 'producto';
+
+$catalogo = [
+    'suscripcion' => [
+        'basico' => [
+            'nombre' => 'Plan Essential',
+            'detalle' => 'Suscripcion mensual para clinicas en crecimiento',
+            'monto' => 7900,
+            'icono' => '🐾',
+            'referencia' => 'SUS-BASICO',
+        ],
+        'procare' => [
+            'nombre' => 'Plan ProCare',
+            'detalle' => 'Suscripcion mensual para operacion avanzada',
+            'monto' => 14900,
+            'icono' => '⭐',
+            'referencia' => 'SUS-PROCARE',
+        ],
+        'mastervet' => [
+            'nombre' => 'Plan MasterVet',
+            'detalle' => 'Suscripcion mensual completa para alta demanda',
+            'monto' => 40900,
+            'icono' => '👑',
+            'referencia' => 'SUS-MASTERVET',
+        ],
+    ],
+    'tienda' => [
+        'producto' => [
+            'nombre' => 'Purina Pro Plan',
+            'detalle' => '1 bolsa de 5kg - Adulto razas medianas',
+            'monto' => 150000,
+            'icono' => '🐶',
+            'referencia' => 'ORD-2024-001',
+        ],
+    ],
+];
+
+$producto = $catalogo[$origen][$plan] ?? $catalogo['tienda']['producto'];
+$checkoutUrl = BASE_URL . '/pagos/mercadopago?action=checkout&origen=' . urlencode($origen) . '&plan=' . urlencode($plan);
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -23,16 +65,16 @@
         <div class="checkout-body">
 
             <div class="producto-box">
-                <div class="producto-icon">🐶</div>
+                <div class="producto-icon"><?= htmlspecialchars($producto['icono'], ENT_QUOTES, 'UTF-8') ?></div>
                 <div class="producto-info">
-                    <div class="nombre">Purina Pro Plan</div>
-                    <div class="detalle">1 bolsa de 5kg · Adulto razas medianas</div>
+                    <div class="nombre"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8') ?></div>
+                    <div class="detalle"><?= htmlspecialchars($producto['detalle'], ENT_QUOTES, 'UTF-8') ?></div>
                 </div>
             </div>
 
             <div class="resumen-fila">
                 <span>Subtotal</span>
-                <span>$ 150.000</span>
+                <span>$ <?= number_format((float) $producto['monto'], 0, ',', '.') ?></span>
             </div>
             <div class="resumen-fila">
                 <span>Envío</span>
@@ -40,21 +82,21 @@
             </div>
             <div class="resumen-fila">
                 <span>Referencia</span>
-                <span>ORD-2024-001</span>
+                <span><?= htmlspecialchars($producto['referencia'], ENT_QUOTES, 'UTF-8') ?></span>
             </div>
 
             <div class="resumen-total">
                 <span>Total</span>
-                <span>$ 150.000 COP</span>
+                <span>$ <?= number_format((float) $producto['monto'], 0, ',', '.') ?> COP</span>
             </div>
 
-            <button class="btn-pagar" onclick="abrirModal()">
+            <a class="btn-pagar" href="<?= htmlspecialchars($checkoutUrl, ENT_QUOTES, 'UTF-8') ?>">
                 <span>🔒</span>
-                Pagar ahora
-            </button>
+                Pagar con Mercado Pago
+            </a>
 
             <div class="secure-badge">
-                🛡️ Pago procesado por Wompi · SSL 256-bit
+                🛡️ Pago procesado por Mercado Pago · SSL 256-bit
             </div>
 
         </div>

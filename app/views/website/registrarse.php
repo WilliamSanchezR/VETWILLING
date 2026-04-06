@@ -55,7 +55,7 @@
 
 
         <form id="vetForm" action="<?= BASE_URL ?>/registro/veterinaria" method="POST" enctype="multipart/form-data">
-
+            <input type="hidden" name="plan" id="plan" value="">
             <!-- Paso 1: Datos de la Veterinaria -->
             <div class="step ">
                 <h3><i class="bi bi-motherboard"></i>Datos de la Veterinaria</h3>

@@ -1,5 +1,42 @@
 <?php
 
+$projectRoot = dirname(__DIR__);
+
+// Carga variables .env si existe el archivo y la libreria esta disponible.
+$autoloadPath = $projectRoot . '/vendor/autoload.php';
+if (file_exists($autoloadPath)) {
+	require_once $autoloadPath;
+	if (class_exists('Dotenv\\Dotenv')) {
+		$dotenvPath = $projectRoot . '/.env';
+		if (file_exists($dotenvPath)) {
+			$dotenv = Dotenv\Dotenv::createImmutable($projectRoot);
+			$dotenv->safeLoad();
+		}
+	}
+}
+
+if (!function_exists('env_value')) {
+	function env_value($key, $default = '')
+	{
+		$fromEnv = $_ENV[$key] ?? null;
+		if ($fromEnv !== null && $fromEnv !== '') {
+			return $fromEnv;
+		}
+
+		$fromServer = $_SERVER[$key] ?? null;
+		if ($fromServer !== null && $fromServer !== '') {
+			return $fromServer;
+		}
+
+		$fromGetEnv = getenv($key);
+		if ($fromGetEnv !== false && $fromGetEnv !== '') {
+			return $fromGetEnv;
+		}
+
+		return $default;
+	}
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN GENERAL DEL PROYECTO
 // Este archivo centraliza configuraciones globales para que el sistema
@@ -32,7 +69,7 @@ $protocolo = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
 // localhost
 // vetwilling.com
 // www.vetwilling.com
-$host = $_SERVER['HTTP_HOST'];
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -40,7 +77,7 @@ $host = $_SERVER['HTTP_HOST'];
 // ═══════════════════════════════════════════════════════════════════════════
 // Si la dirección IP del servidor es 127.0.0.1 o ::1 significa que
 // el proyecto está ejecutándose en el entorno local del desarrollador.
-$isLocal = in_array($_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']);
+$isLocal = in_array($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', ['127.0.0.1', '::1']);
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -93,4 +130,8 @@ define('BASE_URL', $protocolo . $host . $baseFolder);
 //
 // Ejemplo:
 // C:\xampp\htdocs\vetwilling
-define('BASE_PATH', dirname(__DIR__));
+define('BASE_PATH', $projectRoot);
+
+// Token de Mercado Pago (opcional).
+// Prioriza variable de entorno MP_ACCESS_TOKEN y usa este valor solo como respaldo.
+define('MP_ACCESS_TOKEN', env_value('MP_ACCESS_TOKEN', ''));
