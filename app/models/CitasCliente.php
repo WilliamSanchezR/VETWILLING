@@ -509,15 +509,13 @@ class CitasCliente
                         pac.especie as mascota_especie,
                         pac.raza as mascota_raza,
                         s.nombre as servicio_nombre,
-                        sub.nombre as subservicio_nombre,
-                        CONCAT(vet.nombres, ' ', vet.apellidos) as veterinario_nombre
+                        sub.nombre as subservicio_nombre
                     FROM agendamiento a
                     LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
                     LEFT JOIN propietario pr ON pac.id_propietario = pr.id_propietario
                     LEFT JOIN usuario u ON pr.id_usuario = u.id_usuario
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
-                    LEFT JOIN usuario vet ON a.id_usuario = vet.id_usuario
                     WHERE a.id_agendamiento = :id_agendamiento
                     LIMIT 1";
 
