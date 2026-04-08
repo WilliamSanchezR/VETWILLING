@@ -1,44 +1,13 @@
 <?php
-$origen = $_GET['origen'] ?? 'tienda';
-$plan = $_GET['plan'] ?? 'producto';
-
-$catalogo = [
-    'suscripcion' => [
-        'basico' => [
-            'nombre' => 'Plan Essential',
-            'detalle' => 'Suscripcion mensual para clinicas en crecimiento',
-            'monto' => 7900,
-            'icono' => '🐾',
-            'referencia' => 'SUS-BASICO',
-        ],
-        'procare' => [
-            'nombre' => 'Plan ProCare',
-            'detalle' => 'Suscripcion mensual para operacion avanzada',
-            'monto' => 14900,
-            'icono' => '⭐',
-            'referencia' => 'SUS-PROCARE',
-        ],
-        'mastervet' => [
-            'nombre' => 'Plan MasterVet',
-            'detalle' => 'Suscripcion mensual completa para alta demanda',
-            'monto' => 40900,
-            'icono' => '👑',
-            'referencia' => 'SUS-MASTERVET',
-        ],
-    ],
-    'tienda' => [
-        'producto' => [
-            'nombre' => 'Purina Pro Plan',
-            'detalle' => '1 bolsa de 5kg - Adulto razas medianas',
-            'monto' => 150000,
-            'icono' => '🐶',
-            'referencia' => 'ORD-2024-001',
-        ],
-    ],
+$producto = $producto ?? [
+    'nombre' => 'Producto VetWilling',
+    'detalle' => 'Resumen de pago no disponible',
+    'monto' => 0,
+    'icono' => '🐾',
+    'referencia' => 'N/A',
 ];
 
-$producto = $catalogo[$origen][$plan] ?? $catalogo['tienda']['producto'];
-$checkoutUrl = BASE_URL . '/pagos/mercadopago?action=checkout&origen=' . urlencode($origen) . '&plan=' . urlencode($plan);
+$checkoutUrl = $checkoutUrl ?? (BASE_URL . '/pagos/mercadopago?action=checkout');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -88,6 +57,17 @@ $checkoutUrl = BASE_URL . '/pagos/mercadopago?action=checkout&origen=' . urlenco
             <div class="resumen-total">
                 <span>Total</span>
                 <span>$ <?= number_format((float) $producto['monto'], 0, ',', '.') ?> COP</span>
+            </div>
+
+            <div class="payment-test-alert">
+                <div class="payment-test-alert__title">⚠️ Recomendaciones para pruebas en sandbox</div>
+                <ul class="payment-test-alert__list">
+                    <li>Usa una <strong>cuenta comprador de prueba (Buyer)</strong> de Mercado Pago.</li>
+                    <li>No mezcles <strong>cuentas reales</strong> con credenciales o vendedor de prueba.</li>
+                    <li>Haz la prueba en <strong>modo incógnito</strong> y, si es posible, en <strong>Chrome o Edge</strong>.</li>
+                    <li>Desactiva temporalmente <strong>AdBlock, Brave Shields, VPN</strong> o bloqueadores de cookies de terceros.</li>
+                    <li>Utiliza únicamente <strong>tarjetas de prueba</strong> oficiales de Mercado Pago.</li>
+                </ul>
             </div>
 
             <a class="btn-pagar" href="<?= htmlspecialchars($checkoutUrl, ENT_QUOTES, 'UTF-8') ?>">

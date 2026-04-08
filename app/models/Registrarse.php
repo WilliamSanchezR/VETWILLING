@@ -21,6 +21,43 @@ class VeterinariaRegistrarse
         try {
             $this->conexion->beginTransaction();
 
+            // Consultamos si existe el plan
+            $consultaPlan = "SELECT * FROM plan WHERE id_plan = :id";
+            $resultadoPlan = $this->conexion->prepare($consultaPlan);
+            $resultadoPlan->bindParam(':id', $data['plan']);
+            $resultadoPlan->execute();
+            $plan = $resultadoPlan->fetch(PDO::FETCH_ASSOC);
+
+            if (!$plan) {
+                throw new Exception("El plan seleccionado no existe.");
+            }
+
+            // Validamos que la compañía no exista 
+            $consultaCompania = "SELECT * FROM veterinaria WHERE nit = :nit";
+            $resultadoCompania = $this->conexion->prepare($consultaCompania);
+            $resultadoCompania->bindParam(':nit', $data['nit']);
+            $resultadoCompania->execute();
+            $compania = $resultadoCompania->fetch(PDO::FETCH_ASSOC);
+
+            if ($compania) {
+                throw new Exception("La compañía ya existe.");
+            }
+
+
+            // Validamos que el representante legal no exista
+            $consultaRepresentante = "SELECT * FROM usuario WHERE email = :email";
+            $resultadoRepresentante = $this->conexion->prepare($consultaRepresentante); 
+
+            $resultadoRepresentante->bindParam(':email', $data['email']);
+            $resultadoRepresentante->execute();
+            $representante = $resultadoRepresentante->fetch(PDO::FETCH_ASSOC);
+
+            if ($representante) {
+                throw new Exception("El representante legal ya existe.");
+            }
+
+            // Creamos la veterinaria
+
             $consulta = "INSERT INTO veterinaria (nombre, direccion, ciudad, telefono, email, fecha_creacion, nit, estado, foto) 
                          VALUES (:nombre, :direccion, :ciudad, :telefono, :email, NOW(), :nit, 'pendiente', :foto)";
 
@@ -42,23 +79,35 @@ class VeterinariaRegistrarse
                 $resultadoRepresentante = $this->registrarRepresentante($data, $idVeterinaria);
 
                 if ($resultadoRepresentante) {
-                    $this->conexion->commit();
-                    return true;
+                    $resultadoSuscripcion = $this->registrarSuscripcion($data['plan'], $idVeterinaria);
+                    if ($resultadoSuscripcion) {
+                        $this->conexion->commit();
+                        return $resultadoSuscripcion; // Retornamos el ID de la suscripción para redirigir al usuario a la página de pago
+                    } else {
+                        $this->conexion->rollBack();
+                        return 0;
+                    }
                 }
 
                 $this->conexion->rollBack();
-                return false;
+                return 0;
             } else {
                 // Si hubo un error al incertar realizamos el rollback
                 $this->conexion->rollBack();
-                return false;
+                return 0;
             }
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             if ($this->conexion->inTransaction()) {
                 $this->conexion->rollBack();
             }
-            echo "Error al registrar la veterinaria: " . $e->getMessage();
-            return false;
+
+            error_log('Error en VeterinariaRegistrarse::registrarse -> ' . $e->getMessage());
+
+            if ($e instanceof PDOException) {
+                throw new Exception('Ocurrió un error al procesar el registro. Intenta nuevamente.');
+            }
+
+            throw $e;
         }
     }
 
@@ -111,9 +160,29 @@ class VeterinariaRegistrarse
             return $resultado->execute();
 
         } catch (PDOException $e) {
-            echo "Error al registrar el representante: " . $e->getMessage();
-            return false;
+            error_log('Error al registrar el representante legal: ' . $e->getMessage());
+            throw new Exception('No se pudo registrar el representante legal.');
         }
+    }
+
+    private function registrarSuscripcion($idPlan, $idVeterinaria) {
+            try {
+                $consulta = "INSERT INTO suscripcion(id_veterinaria, id_plan, fecha_inicio, fecha_fin, estado, auto_renovacion) 
+                            VALUES(:id_veterinaria, :id_plan, NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), 'pendiente', 0)";
+    
+                $resultado = $this->conexion->prepare($consulta);
+                $resultado->bindParam(':id_veterinaria', $idVeterinaria);
+                $resultado->bindParam(':id_plan', $idPlan);
+    
+                $resultado->execute();
+
+                // Retornamos el ID de la suscripción recién creada
+                return $this->conexion->lastInsertId();
+    
+            } catch (PDOException $e) {
+                error_log('Error al registrar la suscripción: ' . $e->getMessage());
+                throw new Exception('No se pudo crear la suscripción inicial.');
+            }
     }
 
 }

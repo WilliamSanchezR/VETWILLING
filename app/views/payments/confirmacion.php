@@ -1,19 +1,12 @@
 <?php
-$estado = $_GET['estado'] ?? 'pending';
-$paymentId = $_GET['payment_id'] ?? '-';
-$merchantOrderId = $_GET['merchant_order_id'] ?? '-';
-$referencia = $_GET['external_reference'] ?? '-';
-
-$titulo = 'Pago en proceso';
-$mensaje = 'Estamos validando tu transaccion. En breve veras el estado final.';
-
-if ($estado === 'success') {
-    $titulo = 'Pago aprobado';
-    $mensaje = 'Tu pago fue procesado correctamente.';
-} elseif ($estado === 'failure') {
-    $titulo = 'Pago rechazado';
-    $mensaje = 'No fue posible procesar el pago. Intenta nuevamente con otro metodo.';
-}
+$estado = $estado ?? ($_GET['estado'] ?? 'pending');
+$paymentId = $paymentId ?? ($_GET['payment_id'] ?? '-');
+$merchantOrderId = $merchantOrderId ?? ($_GET['merchant_order_id'] ?? '-');
+$referencia = $referencia ?? ($_GET['external_reference'] ?? '-');
+$titulo = $titulo ?? 'Pago en proceso';
+$mensaje = $mensaje ?? 'Estamos validando tu transaccion. En breve veras el estado final.';
+$detalleConfirmacion = $detalleConfirmacion ?? '';
+$reintentarUrl = $reintentarUrl ?? (BASE_URL . '/pasarela-pago?origen=suscripcion&plan=procare');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -110,6 +103,13 @@ if ($estado === 'success') {
         <h1><?= htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8') ?></h1>
         <p><?= htmlspecialchars($mensaje, ENT_QUOTES, 'UTF-8') ?></p>
 
+        <?php if (!empty($detalleConfirmacion)) : ?>
+            <div class="row">
+                <span>Activación</span>
+                <strong><?= htmlspecialchars($detalleConfirmacion, ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+        <?php endif; ?>
+
         <div class="row">
             <span>ID de pago</span>
             <strong><?= htmlspecialchars($paymentId, ENT_QUOTES, 'UTF-8') ?></strong>
@@ -125,7 +125,7 @@ if ($estado === 'success') {
 
         <div class="acciones">
             <a class="btn btn-primary" href="<?= BASE_URL ?>/representante/suscripcion">Volver a suscripcion</a>
-            <a class="btn btn-light" href="<?= BASE_URL ?>/pasarela-pago?origen=suscripcion&plan=procare">Intentar de nuevo</a>
+            <a class="btn btn-light" href="<?= htmlspecialchars($reintentarUrl, ENT_QUOTES, 'UTF-8') ?>">Intentar de nuevo</a>
         </div>
     </section>
 </body>

@@ -1,25 +1,48 @@
 // Se declaran variables globales para controlar el paso actual, los elementos del DOM y los botones
-let currentStep = 0;
+const wizardContainer = document.querySelector('.wizard-container');
 const steps = document.querySelectorAll('.step');
 const bars = document.querySelectorAll('.progress-bar');
 const labels = document.querySelectorAll('.progress-labels span');
 const formVeterinaria = document.getElementById('vetForm');
 const btnConfirmarVeterinaria = document.getElementById('btnConfirmarVeterinaria');
 const btnVolver = document.getElementById('btnVolver');
-
 const planSelect = document.getElementById('plan');
+const currentStepInput = document.getElementById('current_step');
 
-if (localStorage.getItem('Bawm_Plan_Select')) {
+let currentStep = Number.parseInt(wizardContainer?.dataset.initialStep ?? '0', 10);
+if (Number.isNaN(currentStep) || currentStep < 0 || currentStep >= steps.length) {
+    currentStep = 0;
+}
+
+if (localStorage.getItem('Bawm_Plan_Select') && planSelect) {
     planSelect.value = localStorage.getItem('Bawm_Plan_Select');
 }
 
+document.querySelectorAll('select[data-selected]').forEach(select => {
+    const selectedValue = select.dataset.selected ?? '';
+    if (selectedValue !== '') {
+        select.value = selectedValue;
+    }
+});
+
 // Función para mostrar el paso actual y actualizar las barras de progreso y las etiquetas
 function showStep(index) {
-    steps.forEach((step, i) => step.classList.toggle('active', i === index));
-    bars.forEach((bar, i) => bar.classList.toggle('active', i <= index));
-    labels.forEach((label, i) => label.classList.toggle('active', i === index));
+    if (!steps.length) {
+        return;
+    }
 
-    document.querySelector('.wizard-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const safeIndex = Math.max(0, Math.min(index, steps.length - 1));
+    currentStep = safeIndex;
+
+    steps.forEach((step, i) => step.classList.toggle('active', i === safeIndex));
+    bars.forEach((bar, i) => bar.classList.toggle('active', i <= safeIndex));
+    labels.forEach((label, i) => label.classList.toggle('active', i === safeIndex));
+
+    if (currentStepInput) {
+        currentStepInput.value = String(safeIndex);
+    }
+
+    wizardContainer?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Función para obtener el nombre del campo a partir de su etiqueta
@@ -90,6 +113,8 @@ function prevStep() {
         showStep(currentStep);
     }
 }
+
+showStep(currentStep);
 
 btnVolver?.addEventListener('click', event => {
     event.preventDefault();

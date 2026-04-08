@@ -1,12 +1,12 @@
 <?php
 
 require_once BASE_PATH . '/vendor/autoload.php';
+require_once BASE_PATH . '/app/models/PagoSuscripcion.php';
 
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
-
 
 $action = $_GET['action'] ?? 'checkout';
 
@@ -22,14 +22,46 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 switch ($action) {
+    case 'pasarela':
+        mostrarPasarelaPago();
+        break;
+
     case 'checkout':
         crearPreferenciaYRedirigir();
+        break;
+
+    case 'confirmacion':
+        mostrarConfirmacionPago();
         break;
 
     default:
         http_response_code(400);
         echo 'Accion no valida';
         break;
+}
+
+function mostrarPasarelaPago()
+{
+    $origen = $_GET['origen'] ?? 'tienda';
+    $plan = $_GET['plan'] ?? 'producto';
+    $idSuscripcion = isset($_GET['id_suscripcion']) ? (int) $_GET['id_suscripcion'] : 0;
+
+    $modeloPago = new PagoSuscripcion();
+    $producto = $modeloPago->obtenerProducto($origen, $plan, $idSuscripcion);
+
+    $queryCheckout = [
+        'action' => 'checkout',
+        'origen' => $origen,
+        'plan' => $producto['slug'] ?? $plan,
+    ];
+
+    if ($idSuscripcion > 0) {
+        $queryCheckout['id_suscripcion'] = $idSuscripcion;
+    }
+
+    $checkoutUrl = BASE_URL . '/pagos/mercadopago?' . http_build_query($queryCheckout);
+
+    require BASE_PATH . '/app/views/payments/pasarelaPago.php';
 }
 
 function crearPreferenciaYRedirigir()
@@ -46,8 +78,19 @@ function crearPreferenciaYRedirigir()
 
     $origen = $_GET['origen'] ?? 'tienda';
     $plan = $_GET['plan'] ?? 'producto';
+    $idSuscripcion = isset($_GET['id_suscripcion']) ? (int) $_GET['id_suscripcion'] : 0;
 
-    $producto = resolverProducto($origen, $plan);
+    $modeloPago = new PagoSuscripcion();
+    $producto = $modeloPago->obtenerProducto($origen, $plan, $idSuscripcion);
+
+    $queryConfirmacion = [
+        'origen' => $origen,
+        'plan' => $producto['slug'] ?? $plan,
+    ];
+
+    if ($idSuscripcion > 0) {
+        $queryConfirmacion['id_suscripcion'] = $idSuscripcion;
+    }
 
     try {
         MercadoPagoConfig::setAccessToken($accessToken);
@@ -56,24 +99,27 @@ function crearPreferenciaYRedirigir()
         $request = [
             'items' => [
                 [
-                    'title' => 'Mensualidad VetWilling ',
-                    'description' => 'Plan de suscripcion mensual - VetWilling',
+                    'title' => $producto['titulo'],
+                    'description' => $producto['descripcion'],
                     'quantity' => 1,
                     'currency_id' => 'COP',
-                    'unit_price' => (float) 11000,
+                    'unit_price' => (float) $producto['monto'],
                 ],
             ],
-            'external_reference' => 'ref-1204000' . date('YmdHis'),
+            'external_reference' => $producto['referencia'],
             'binary_mode' => true,
+            'metadata' => [
+                'origen' => $origen,
+                'plan' => $producto['slug'] ?? $plan,
+                'id_suscripcion' => $idSuscripcion,
+            ],
             'back_urls' => [
-                'success' => BASE_URL . '/pagos/confirmacion?estado=success',
-                'failure' => BASE_URL . '/pagos/confirmacion?estado=failure',
-                'pending' => BASE_URL . '/pagos/confirmacion?estado=pending',
+                'success' => BASE_URL . '/pagos/confirmacion?' . http_build_query($queryConfirmacion + ['estado' => 'success']),
+                'failure' => BASE_URL . '/pagos/confirmacion?' . http_build_query($queryConfirmacion + ['estado' => 'failure']),
+                'pending' => BASE_URL . '/pagos/confirmacion?' . http_build_query($queryConfirmacion + ['estado' => 'pending']),
             ],
         ];
 
-        // auto_return y notification_url solo funcionan con URLs públicas (producción).
-        // En localhost Mercado Pago las rechaza con error 400.
         $esLocal = str_contains(BASE_URL, 'localhost') || str_contains(BASE_URL, '127.0.0.1');
         if (!$esLocal) {
             $request['auto_return'] = 'approved';
@@ -113,41 +159,63 @@ function crearPreferenciaYRedirigir()
     }
 }
 
-function resolverProducto($origen, $plan)
+function mostrarConfirmacionPago()
 {
-    if ($origen === 'suscripcion') {
-        $planes = [
-            'basico' => [
-                'titulo' => 'Plan Essential',
-                'descripcion' => 'Suscripcion mensual VetWilling - Plan Essential',
-                'monto' => 7900,
-                'referencia' => 'SUS-BASICO-' . date('YmdHis'),
-            ],
-            'procare' => [
-                'titulo' => 'Plan ProCare',
-                'descripcion' => 'Suscripcion mensual VetWilling - Plan ProCare',
-                'monto' => 14900,
-                'referencia' => 'SUS-PROCARE-' . date('YmdHis'),
-            ],
-            'mastervet' => [
-                'titulo' => 'Plan MasterVet',
-                'descripcion' => 'Suscripcion mensual VetWilling - Plan MasterVet',
-                'monto' => 40900,
-                'referencia' => 'SUS-MASTERVET-' . date('YmdHis'),
-            ],
-        ];
+    $estado = $_GET['estado'] ?? 'pending';
+    $origen = $_GET['origen'] ?? 'suscripcion';
+    $plan = $_GET['plan'] ?? 'procare';
+    $idSuscripcion = isset($_GET['id_suscripcion']) ? (int) $_GET['id_suscripcion'] : 0;
+    $paymentId = $_GET['payment_id'] ?? '-';
+    $merchantOrderId = $_GET['merchant_order_id'] ?? '-';
+    $referencia = $_GET['external_reference'] ?? '-';
 
-        if (isset($planes[$plan])) {
-            return $planes[$plan];
+    $titulo = 'Pago en proceso';
+    $mensaje = 'Estamos validando tu transaccion. En breve veras el estado final.';
+    $detalleConfirmacion = '';
+
+    if ($estado === 'success') {
+        $titulo = 'Pago aprobado';
+        $mensaje = 'Tu pago fue procesado correctamente.';
+    } elseif ($estado === 'failure') {
+        $titulo = 'Pago rechazado';
+        $mensaje = 'No fue posible procesar el pago. Intenta nuevamente con otro metodo.';
+    }
+
+    if ($idSuscripcion > 0) {
+        $modeloPago = new PagoSuscripcion();
+        $resultadoConfirmacion = $modeloPago->registrarResultadoPagoSuscripcion($idSuscripcion, $estado, [
+            'payment_id' => $paymentId !== '-' ? $paymentId : null,
+            'merchant_order_id' => $merchantOrderId !== '-' ? $merchantOrderId : null,
+            'external_reference' => $referencia !== '-' ? $referencia : null,
+        ]);
+
+        if (!empty($resultadoConfirmacion['ok'])) {
+            $estadoSuscripcion = $resultadoConfirmacion['estado_suscripcion'] ?? 'pendiente';
+
+            if ($estado === 'success') {
+                $detalleConfirmacion = 'La suscripción quedó ' . $estadoSuscripcion . ', se registró en el histórico y la cuenta fue activada.';
+            } elseif ($estado === 'pending') {
+                $detalleConfirmacion = 'El intento de pago quedó registrado y la suscripción continúa en estado ' . $estadoSuscripcion . '.';
+            } else {
+                $detalleConfirmacion = 'El intento de pago quedó registrado y la suscripción permanece en estado ' . $estadoSuscripcion . '.';
+            }
+        } else {
+            $detalleConfirmacion = 'No fue posible actualizar el estado interno de la suscripción: ' . ($resultadoConfirmacion['message'] ?? 'Error no identificado.');
         }
     }
 
-    return [
-        'titulo' => 'Producto VetWilling',
-        'descripcion' => 'Compra en tienda VetWilling',
-        'monto' => 150000,
-        'referencia' => 'ORD-' . date('YmdHis'),
+    $queryReintentar = [
+        'origen' => $origen,
+        'plan' => $plan,
     ];
+
+    if ($idSuscripcion > 0) {
+        $queryReintentar['id_suscripcion'] = $idSuscripcion;
+    }
+
+    $reintentarUrl = BASE_URL . '/pasarela-pago?' . http_build_query($queryReintentar);
+
+    require BASE_PATH . '/app/views/payments/confirmacion.php';
 }
 
 function procesarWebhookMercadoPago()
@@ -198,6 +266,24 @@ function procesarWebhookMercadoPago()
                 'date_approved' => $payment->date_approved ?? null,
                 'payment_method_id' => $payment->payment_method_id ?? null,
             ];
+
+            $metadata = $payment->metadata ?? [];
+            if (is_object($metadata)) {
+                $metadata = (array) $metadata;
+            }
+
+            $idSuscripcion = (int) ($metadata['id_suscripcion'] ?? ($_GET['id_suscripcion'] ?? 0));
+            $estadoPago = $payment->status ?? null;
+
+            if ($idSuscripcion > 0) {
+                $modeloPago = new PagoSuscripcion();
+                $log['suscripcion_confirmada'] = $modeloPago->registrarResultadoPagoSuscripcion($idSuscripcion, (string) $estadoPago, [
+                    'id' => $payment->id ?? null,
+                    'payment_id' => $payment->id ?? null,
+                    'external_reference' => $payment->external_reference ?? null,
+                    'date_approved' => $payment->date_approved ?? null,
+                ]);
+            }
         } catch (Exception $e) {
             $log['payment_error'] = $e->getMessage();
         }

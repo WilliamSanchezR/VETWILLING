@@ -1,6 +1,21 @@
 <?php
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
+$registroOld = $_SESSION['registro_old'] ?? [];
+unset($_SESSION['registro_old']);
 
+if (!function_exists('oldRegistro')) {
+    function oldRegistro(string $key, string $default = ''): string
+    {
+        global $registroOld;
+        return htmlspecialchars((string) ($registroOld[$key] ?? $default), ENT_QUOTES, 'UTF-8');
+    }
+}
+
+$registroCurrentStep = isset($registroOld['current_step']) ? (int) $registroOld['current_step'] : 0;
+$registroCurrentStep = max(0, min(1, $registroCurrentStep));
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +44,7 @@
 <body>
 
 
-    <div class="wizard-container">
+    <div class="wizard-container" data-initial-step="<?= $registroCurrentStep ?>">
         <div class="wizard-header">
             <i class="bi bi-building-check"></i>
             <h2>Registro de la Veterinaria y Representante Legal</h2>
@@ -45,8 +60,8 @@
                 <div id="bar3" class="progress-bar"></div>
             </div>
             <div class="progress-labels">
-                <span class="active">Representante Legal</span>
-                <span>Veterinaria</span>
+                <span class="active">Veterinaria</span>
+                <span>Representante Legal</span>
                 <span>Confirmar</span>
             </div>
         </div>
@@ -55,9 +70,10 @@
 
 
         <form id="vetForm" action="<?= BASE_URL ?>/registro/veterinaria" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="plan" id="plan" value="">
+            <input type="hidden" name="plan" id="plan" value="<?= oldRegistro('plan') ?>">
+            <input type="hidden" name="current_step" id="current_step" value="<?= $registroCurrentStep ?>">
             <!-- Paso 1: Datos de la Veterinaria -->
-            <div class="step ">
+            <div class="step active">
                 <h3><i class="bi bi-motherboard"></i>Datos de la Veterinaria</h3>
 
                 <div class="row">
@@ -65,14 +81,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-hash"></i> Nit *</label>
-                            <input type="text" id="nit" name="nit" required placeholder="000.123.456-7">
+                            <input type="text" id="nit" name="nit" required placeholder="000.123.456-7" value="<?= oldRegistro('nit') ?>">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-clipboard2-data"></i> Razón Social *</label>
-                            <input type="text" id="nombreVeterinaria" name="nombreVeterinaria" required placeholder="Ej: Mundo Patitas S.A.S">
+                            <input type="text" id="nombreVeterinaria" name="nombreVeterinaria" required placeholder="Ej: Mundo Patitas S.A.S" value="<?= oldRegistro('nombreVeterinaria') ?>">
                         </div>
                     </div>
 
@@ -83,14 +99,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-envelope"></i> Email *</label>
-                            <input type="email" id="emailVeterinaria" name="emailVeterinaria" required placeholder="ejemplo@correo.com">
+                            <input type="email" id="emailVeterinaria" name="emailVeterinaria" required placeholder="ejemplo@correo.com" value="<?= oldRegistro('emailVeterinaria') ?>">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                            <input type="tel" id="telefonoVeterinaria" name="telefonoVeterinaria" required placeholder="+57 300 123 4567">
+                            <input type="tel" id="telefonoVeterinaria" name="telefonoVeterinaria" required placeholder="+57 300 123 4567" value="<?= oldRegistro('telefonoVeterinaria') ?>">
                         </div>
                     </div>
 
@@ -111,7 +127,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-pin-map"></i> Ciudad *</label>
-                            <select name="ciudad" id="ciudad" required>
+                            <select name="ciudad" id="ciudad" required data-selected="<?= oldRegistro('ciudad') ?>">
                                 <option value="">Seleccione una ciudad</option>
 
                                 <!-- Principales ciudades -->
@@ -178,7 +194,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label><i class="bi bi-geo-alt"></i> Dirección *</label>
-                            <input type="text" id="direccionVeterinaria" name="direccionVeterinaria" required placeholder="Calle 12 # 34-56, Barrio Centro">
+                            <input type="text" id="direccionVeterinaria" name="direccionVeterinaria" required placeholder="Calle 12 # 34-56, Barrio Centro" value="<?= oldRegistro('direccionVeterinaria') ?>">
                         </div>
                     </div>
 
@@ -194,7 +210,7 @@
 
             </div>
 
-            <div class="step active">
+            <div class="step">
                 <h3><i class="bi bi-person-badge"></i>Datos del Representante Legal</h3>
 
                 <div class="row">
@@ -202,7 +218,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-card-text"></i> Tipo de documento *</label>
-                            <select id="tipoDocumento" name="tipo_documento" required>
+                            <select id="tipoDocumento" name="tipo_documento" required data-selected="<?= oldRegistro('tipo_documento') ?>">
                                 <option value="">Seleccione...</option>
                                 <option value="CC">Cédula de Ciudadanía</option>
                                 <option value="CE">Cédula de Extranjería</option>
@@ -214,7 +230,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-hash"></i> Número de documento *</label>
-                            <input type="number" id="documento" name="numero_documento" required placeholder="12345678">
+                            <input type="number" id="documento" name="numero_documento" required placeholder="12345678" value="<?= oldRegistro('numero_documento') ?>">
                         </div>
                     </div>
 
@@ -222,14 +238,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-person"></i> Nombres *</label>
-                            <input type="text" id="nombres" name="nombres" required placeholder="Ej: Juan Martin">
+                            <input type="text" id="nombres" name="nombres" required placeholder="Ej: Juan Martin" value="<?= oldRegistro('nombres') ?>">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-person"></i> Apellidos *</label>
-                            <input type="text" id="apellidos" name="apellidos" required placeholder="Ej: Pérez García">
+                            <input type="text" id="apellidos" name="apellidos" required placeholder="Ej: Pérez García" value="<?= oldRegistro('apellidos') ?>">
                         </div>
                     </div>
                 </div>
@@ -240,14 +256,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                            <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com">
+                            <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= oldRegistro('email') ?>">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                            <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567">
+                            <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567" value="<?= oldRegistro('telefono') ?>">
                         </div>
                     </div>
 
@@ -261,7 +277,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label><i class="bi bi-geo-alt"></i> Dirección *</label>
-                            <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67">
+                            <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67" value="<?= oldRegistro('direccion') ?>">
                         </div>
                     </div>
                 </div>

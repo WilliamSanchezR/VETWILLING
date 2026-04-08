@@ -124,6 +124,33 @@ body {
     border-top: 2px solid var(--border);
 }
 
+.payment-test-alert {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #fff8e1;
+    border: 1px solid #f3d37a;
+}
+
+.payment-test-alert__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #8a5a00;
+    margin-bottom: 8px;
+}
+
+.payment-test-alert__list {
+    margin: 0;
+    padding-left: 18px;
+    color: #6b5b2a;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.payment-test-alert__list li + li {
+    margin-top: 4px;
+}
+
 .btn-pagar {
     width: 100%;
     margin-top: 28px;
