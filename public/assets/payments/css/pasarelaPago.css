@@ -180,6 +180,36 @@ body {
     transform: translateY(0);
 }
 
+.btn-verificar {
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: #eef6f0;
+    color: var(--verde);
+    border: 1px solid rgba(46, 125, 50, 0.18);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.btn-verificar:hover {
+    background: #e4f1e7;
+    transform: translateY(-1px);
+}
+
+.payment-help-text {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    text-align: center;
+}
+
 .secure-badge {
     text-align: center;
     font-size: 12px;

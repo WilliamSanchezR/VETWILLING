@@ -3,12 +3,16 @@
 require_once BASE_PATH . '/vendor/autoload.php';
 require_once BASE_PATH . '/app/models/PagoSuscripcion.php';
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 
-$action = $_GET['action'] ?? 'checkout';
+$action = resolverAccionMercadoPago();
 
 if ($action === 'webhook') {
     procesarWebhookMercadoPago();
@@ -30,6 +34,10 @@ switch ($action) {
         crearPreferenciaYRedirigir();
         break;
 
+    case 'verificar':
+        verificarPagoYRedirigirConfirmacion();
+        break;
+
     case 'confirmacion':
         mostrarConfirmacionPago();
         break;
@@ -47,6 +55,12 @@ function mostrarPasarelaPago()
     $idSuscripcion = isset($_GET['id_suscripcion']) ? (int) $_GET['id_suscripcion'] : 0;
 
     $modeloPago = new PagoSuscripcion();
+
+    if ($origen === 'suscripcion' && $idSuscripcion <= 0) {
+        $idVeterinariaSesion = isset($_SESSION['user']['id_veterinaria']) ? (int) $_SESSION['user']['id_veterinaria'] : 0;
+        $idSuscripcion = $modeloPago->obtenerOCrearSuscripcionPendiente($plan, $idVeterinariaSesion);
+    }
+
     $producto = $modeloPago->obtenerProducto($origen, $plan, $idSuscripcion);
 
     $queryCheckout = [
@@ -60,6 +74,18 @@ function mostrarPasarelaPago()
     }
 
     $checkoutUrl = BASE_URL . '/pagos/mercadopago?' . http_build_query($queryCheckout);
+
+    $queryVerificar = [
+        'action' => 'verificar',
+        'origen' => $origen,
+        'plan' => $producto['slug'] ?? $plan,
+    ];
+
+    if ($idSuscripcion > 0) {
+        $queryVerificar['id_suscripcion'] = $idSuscripcion;
+    }
+
+    $verificarUrl = BASE_URL . '/pagos/mercadopago?' . http_build_query($queryVerificar);
 
     require BASE_PATH . '/app/views/payments/pasarelaPago.php';
 }
@@ -81,12 +107,21 @@ function crearPreferenciaYRedirigir()
     $idSuscripcion = isset($_GET['id_suscripcion']) ? (int) $_GET['id_suscripcion'] : 0;
 
     $modeloPago = new PagoSuscripcion();
+
+    if ($origen === 'suscripcion' && $idSuscripcion <= 0) {
+        $idVeterinariaSesion = isset($_SESSION['user']['id_veterinaria']) ? (int) $_SESSION['user']['id_veterinaria'] : 0;
+        $idSuscripcion = $modeloPago->obtenerOCrearSuscripcionPendiente($plan, $idVeterinariaSesion);
+    }
+
     $producto = $modeloPago->obtenerProducto($origen, $plan, $idSuscripcion);
 
     $queryConfirmacion = [
+        'action' => 'confirmacion',
         'origen' => $origen,
         'plan' => $producto['slug'] ?? $plan,
     ];
+
+    $baseRetorno = obtenerBaseUrlRetornoMercadoPago();
 
     if ($idSuscripcion > 0) {
         $queryConfirmacion['id_suscripcion'] = $idSuscripcion;
@@ -114,16 +149,39 @@ function crearPreferenciaYRedirigir()
                 'id_suscripcion' => $idSuscripcion,
             ],
             'back_urls' => [
-                'success' => BASE_URL . '/pagos/confirmacion?' . http_build_query($queryConfirmacion + ['estado' => 'success']),
-                'failure' => BASE_URL . '/pagos/confirmacion?' . http_build_query($queryConfirmacion + ['estado' => 'failure']),
-                'pending' => BASE_URL . '/pagos/confirmacion?' . http_build_query($queryConfirmacion + ['estado' => 'pending']),
+                'success' => $baseRetorno . '/pagos/mercadopago?' . http_build_query($queryConfirmacion + ['estado' => 'success']),
+                'failure' => $baseRetorno . '/pagos/mercadopago?' . http_build_query($queryConfirmacion + ['estado' => 'failure']),
+                'pending' => $baseRetorno . '/pagos/mercadopago?' . http_build_query($queryConfirmacion + ['estado' => 'pending']),
             ],
         ];
 
         $esLocal = str_contains(BASE_URL, 'localhost') || str_contains(BASE_URL, '127.0.0.1');
-        if (!$esLocal) {
+        $retornoPublico = esUrlRetornoPublica($baseRetorno);
+
+        if ($retornoPublico) {
             $request['auto_return'] = 'approved';
-            $request['notification_url'] = BASE_URL . '/pagos/mercadopago?action=webhook';
+        }
+
+        if ($esLocal) {
+            $request['purpose'] = 'wallet_purchase';
+            $request['payment_methods'] = [
+                'excluded_payment_types' => [
+                    ['id' => 'credit_card'],
+                    ['id' => 'debit_card'],
+                    ['id' => 'prepaid_card'],
+                ],
+                'installments' => 1,
+            ];
+        }
+
+        $webhookUrl = function_exists('env_value')
+            ? trim((string) env_value('MP_WEBHOOK_URL', ''))
+            : '';
+
+        if (!empty($webhookUrl)) {
+            $request['notification_url'] = $webhookUrl;
+        } elseif ($retornoPublico) {
+            $request['notification_url'] = $baseRetorno . '/pagos/mercadopago?action=webhook';
         }
 
         $client = new PreferenceClient();
@@ -159,13 +217,88 @@ function crearPreferenciaYRedirigir()
     }
 }
 
-function mostrarConfirmacionPago()
+function verificarPagoYRedirigirConfirmacion()
 {
-    $estado = $_GET['estado'] ?? 'pending';
     $origen = $_GET['origen'] ?? 'suscripcion';
     $plan = $_GET['plan'] ?? 'procare';
     $idSuscripcion = isset($_GET['id_suscripcion']) ? (int) $_GET['id_suscripcion'] : 0;
-    $paymentId = $_GET['payment_id'] ?? '-';
+    $formatoJson = strtolower((string) ($_GET['format'] ?? '')) === 'json';
+
+    $queryConfirmacion = [
+        'action' => 'confirmacion',
+        'origen' => $origen,
+        'plan' => $plan,
+        'id_suscripcion' => $idSuscripcion,
+        'estado' => 'pending',
+    ];
+
+    if ($idSuscripcion > 0) {
+        $queryConfirmacion['id_suscripcion'] = $idSuscripcion;
+    }
+
+    $redirectUrl = BASE_URL . '/pagos/mercadopago?' . http_build_query($queryConfirmacion);
+
+    if ($idSuscripcion <= 0) {
+        responderVerificacionPago($formatoJson, $queryConfirmacion['estado'], $redirectUrl);
+    }
+
+    $accessToken = function_exists('env_value')
+        ? env_value('MP_ACCESS_TOKEN', '')
+        : (getenv('MP_ACCESS_TOKEN') ?: (defined('MP_ACCESS_TOKEN') ? MP_ACCESS_TOKEN : ''));
+
+    if (empty($accessToken)) {
+        responderVerificacionPago($formatoJson, $queryConfirmacion['estado'], $redirectUrl);
+    }
+
+    $modeloPago = new PagoSuscripcion();
+
+    if ($idSuscripcion <= 0 && $origen === 'suscripcion') {
+        $idVeterinariaSesion = isset($_SESSION['user']['id_veterinaria']) ? (int) $_SESSION['user']['id_veterinaria'] : 0;
+        $idSuscripcion = $modeloPago->obtenerOCrearSuscripcionPendiente($plan, $idVeterinariaSesion);
+        $queryConfirmacion['id_suscripcion'] = $idSuscripcion;
+        $redirectUrl = BASE_URL . '/pagos/mercadopago?' . http_build_query($queryConfirmacion);
+    }
+
+    $suscripcion = $modeloPago->obtenerSuscripcionPorId($idSuscripcion);
+
+    if (!$suscripcion) {
+        responderVerificacionPago($formatoJson, $queryConfirmacion['estado'], $redirectUrl);
+    }
+
+    $externalReference = $modeloPago->asegurarReferenciaSuscripcionPorId($idSuscripcion) ?? '';
+    if ($externalReference !== '') {
+        $queryConfirmacion['external_reference'] = $externalReference;
+    }
+
+    $pago = consultarPagoMercadoPagoPorReferencia($accessToken, $externalReference);
+
+    if ($pago !== null) {
+        $queryConfirmacion['estado'] = normalizarEstadoPagoParaVista((string) ($pago['status'] ?? 'pending'));
+
+        if (!empty($pago['id'])) {
+            $queryConfirmacion['payment_id'] = (string) $pago['id'];
+        }
+
+        if (!empty($pago['order']['id'])) {
+            $queryConfirmacion['merchant_order_id'] = (string) $pago['order']['id'];
+        }
+
+        if (!empty($pago['external_reference'])) {
+            $queryConfirmacion['external_reference'] = (string) $pago['external_reference'];
+        }
+    }
+
+    $redirectUrl = BASE_URL . '/pagos/mercadopago?' . http_build_query($queryConfirmacion);
+    responderVerificacionPago($formatoJson, $queryConfirmacion['estado'], $redirectUrl);
+}
+
+function mostrarConfirmacionPago()
+{
+    $estado = resolverEstadoRetornoMercadoPago();
+    $origen = $_GET['origen'] ?? 'suscripcion';
+    $plan = $_GET['plan'] ?? 'procare';
+    $idSuscripcion = isset($_GET['id_suscripcion']) ? (int) $_GET['id_suscripcion'] : 0;
+    $paymentId = $_GET['payment_id'] ?? ($_GET['collection_id'] ?? '-');
     $merchantOrderId = $_GET['merchant_order_id'] ?? '-';
     $referencia = $_GET['external_reference'] ?? '-';
 
@@ -216,6 +349,133 @@ function mostrarConfirmacionPago()
     $reintentarUrl = BASE_URL . '/pasarela-pago?' . http_build_query($queryReintentar);
 
     require BASE_PATH . '/app/views/payments/confirmacion.php';
+}
+
+function obtenerBaseUrlRetornoMercadoPago(): string
+{
+    $basePublica = function_exists('env_value')
+        ? trim((string) env_value('MP_PUBLIC_BASE_URL', env_value('APP_PUBLIC_URL', '')))
+        : '';
+
+    if (!empty($basePublica)) {
+        return rtrim($basePublica, '/');
+    }
+
+    return rtrim(BASE_URL, '/');
+}
+
+function esUrlRetornoPublica(string $baseUrl): bool
+{
+    $host = (string) parse_url($baseUrl, PHP_URL_HOST);
+
+    if ($host === '' || in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+        return false;
+    }
+
+    return true;
+}
+
+function resolverAccionMercadoPago(): string
+{
+    if (!empty($_GET['action'])) {
+        return (string) $_GET['action'];
+    }
+
+    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
+    $baseFolderActual = $GLOBALS['baseFolder'] ?? '';
+
+    if (!empty($baseFolderActual) && str_starts_with($requestPath, $baseFolderActual)) {
+        $requestPath = substr($requestPath, strlen($baseFolderActual));
+    }
+
+    return match ($requestPath) {
+        '/pasarela-pago' => 'pasarela',
+        '/pagos/confirmacion' => 'confirmacion',
+        default => 'checkout',
+    };
+}
+
+function responderVerificacionPago(bool $formatoJson, string $estado, string $redirectUrl): void
+{
+    if ($formatoJson) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'ok' => true,
+            'estado' => $estado,
+            'redirect_url' => $redirectUrl,
+        ]);
+        exit();
+    }
+
+    header('Location: ' . $redirectUrl);
+    exit();
+}
+
+function resolverEstadoRetornoMercadoPago(): string
+{
+    if (!empty($_GET['estado'])) {
+        return (string) $_GET['estado'];
+    }
+
+    $estadoMp = (string) ($_GET['status'] ?? ($_GET['collection_status'] ?? 'pending'));
+    return normalizarEstadoPagoParaVista($estadoMp);
+}
+
+function normalizarEstadoPagoParaVista(string $estadoPago): string
+{
+    return match (strtolower(trim($estadoPago))) {
+        'approved', 'success' => 'success',
+        'rejected', 'cancelled', 'canceled', 'failure', 'failed' => 'failure',
+        default => 'pending',
+    };
+}
+
+function consultarPagoMercadoPagoPorReferencia(string $accessToken, string $externalReference): ?array
+{
+    if ($externalReference === '') {
+        return null;
+    }
+
+    $url = 'https://api.mercadopago.com/v1/payments/search?sort=date_created&criteria=desc&external_reference='
+        . rawurlencode($externalReference)
+        . '&limit=1';
+
+    $headers = [
+        'Authorization: Bearer ' . $accessToken,
+        'Content-Type: application/json',
+    ];
+
+    $response = false;
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+        $response = curl_exec($ch);
+        curl_close($ch);
+    } else {
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'header' => implode("\r\n", $headers),
+                'timeout' => 20,
+            ],
+        ]);
+
+        $response = @file_get_contents($url, false, $context);
+    }
+
+    if ($response === false || $response === '') {
+        return null;
+    }
+
+    $data = json_decode($response, true);
+    if (!is_array($data) || empty($data['results']) || !is_array($data['results'])) {
+        return null;
+    }
+
+    return $data['results'][0] ?? null;
 }
 
 function procesarWebhookMercadoPago()

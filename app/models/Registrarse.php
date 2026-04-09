@@ -1,11 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/dataBase.php';
 
 class VeterinariaRegistrarse
 {
 
     private $conexion;
+    private $columnasSuscripcion = null;
 
     public function __construct()
     {
@@ -165,24 +166,85 @@ class VeterinariaRegistrarse
         }
     }
 
-    private function registrarSuscripcion($idPlan, $idVeterinaria) {
-            try {
-                $consulta = "INSERT INTO suscripcion(id_veterinaria, id_plan, fecha_inicio, fecha_fin, estado, auto_renovacion) 
-                            VALUES(:id_veterinaria, :id_plan, NOW(), DATE_ADD(NOW(), INTERVAL 30 DAY), 'pendiente', 0)";
-    
-                $resultado = $this->conexion->prepare($consulta);
-                $resultado->bindParam(':id_veterinaria', $idVeterinaria);
-                $resultado->bindParam(':id_plan', $idPlan);
-    
-                $resultado->execute();
+    private function registrarSuscripcion($idPlan, $idVeterinaria)
+    {
+        try {
+            $consulta = "INSERT INTO suscripcion(id_veterinaria, id_plan, fecha_inicio, fecha_fin, estado, auto_renovacion) 
+                        VALUES(:id_veterinaria, :id_plan, NULL, NULL, 'pendiente', 0)";
 
-                // Retornamos el ID de la suscripción recién creada
-                return $this->conexion->lastInsertId();
-    
-            } catch (PDOException $e) {
-                error_log('Error al registrar la suscripción: ' . $e->getMessage());
-                throw new Exception('No se pudo crear la suscripción inicial.');
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindValue(':id_veterinaria', (int) $idVeterinaria, PDO::PARAM_INT);
+            $resultado->bindValue(':id_plan', (int) $idPlan, PDO::PARAM_INT);
+            $resultado->execute();
+
+            $idSuscripcion = (int) $this->conexion->lastInsertId();
+            $externalReference = $this->generarReferenciaSuscripcion($idSuscripcion, (int) $idVeterinaria, (int) $idPlan);
+            $this->actualizarDatosInicialesSuscripcion($idSuscripcion, $externalReference);
+
+            return [
+                'id_suscripcion' => $idSuscripcion,
+                'external_reference' => $externalReference,
+            ];
+        } catch (PDOException $e) {
+            error_log('Error al registrar la suscripción: ' . $e->getMessage());
+            throw new Exception('No se pudo crear la suscripción inicial.');
+        }
+    }
+
+    private function generarReferenciaSuscripcion(int $idSuscripcion, int $idVeterinaria, int $idPlan): string
+    {
+        return 'SUSC-' . $idSuscripcion . '-VET' . $idVeterinaria . '-PLAN' . $idPlan;
+    }
+
+    private function actualizarDatosInicialesSuscripcion(int $idSuscripcion, string $externalReference): void
+    {
+        $campos = [];
+        $parametros = [
+            ':id_suscripcion' => $idSuscripcion,
+        ];
+
+        if ($this->columnaSuscripcionExiste('ultimo_estado_pago')) {
+            $campos[] = 'ultimo_estado_pago = :ultimo_estado_pago';
+            $parametros[':ultimo_estado_pago'] = 'pending';
+        }
+
+        if ($this->columnaSuscripcionExiste('external_reference')) {
+            $campos[] = 'external_reference = :external_reference';
+            $parametros[':external_reference'] = $externalReference;
+        }
+
+        if (empty($campos)) {
+            return;
+        }
+
+        $sql = 'UPDATE suscripcion SET ' . implode(', ', $campos) . ' WHERE id_suscripcion = :id_suscripcion';
+        $stmt = $this->conexion->prepare($sql);
+
+        foreach ($parametros as $clave => $valor) {
+            if ($valor === null) {
+                $stmt->bindValue($clave, null, PDO::PARAM_NULL);
+            } elseif ($clave === ':id_suscripcion') {
+                $stmt->bindValue($clave, (int) $valor, PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue($clave, $valor);
             }
+        }
+
+        $stmt->execute();
+    }
+
+    private function columnaSuscripcionExiste(string $nombreColumna): bool
+    {
+        if ($this->columnasSuscripcion === null) {
+            $this->columnasSuscripcion = [];
+            $resultado = $this->conexion->query('SHOW COLUMNS FROM suscripcion');
+
+            foreach ($resultado->fetchAll(PDO::FETCH_ASSOC) as $columna) {
+                $this->columnasSuscripcion[] = $columna['Field'];
+            }
+        }
+
+        return in_array($nombreColumna, $this->columnasSuscripcion, true);
     }
 
 }

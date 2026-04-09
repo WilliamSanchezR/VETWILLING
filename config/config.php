@@ -57,8 +57,10 @@ date_default_timezone_set('America/Bogota');
 // DETECTAR EL PROTOCOLO DEL SITIO (HTTP o HTTPS)
 // ═══════════════════════════════════════════════════════════════════════════
 // Algunos servidores usan HTTPS y otros HTTP.
-// Esta línea detecta automáticamente cuál está usando el servidor.
-$protocolo = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+// También soporta proxys/túneles como ngrok mediante X-Forwarded-Proto.
+$httpsActivo = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+$forwardedProto = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+$protocolo = ($httpsActivo || $forwardedProto === 'https') ? 'https://' : 'http://';
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -114,7 +116,9 @@ $baseFolder = $isLocal ? '/vetwilling' : '';
 // https://vetwilling.com
 //
 // Esta constante se usa para generar rutas dinámicas en todo el sistema.
-define('BASE_URL', $protocolo . $host . $baseFolder);
+$baseUrlDetectada = $protocolo . $host . $baseFolder;
+$baseUrlPublica = rtrim((string) env_value('APP_PUBLIC_URL', ''), '/');
+define('BASE_URL', $baseUrlPublica !== '' ? $baseUrlPublica : $baseUrlDetectada);
 
 
 // ═══════════════════════════════════════════════════════════════════════════

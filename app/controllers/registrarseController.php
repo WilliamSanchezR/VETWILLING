@@ -224,10 +224,13 @@ function registrarseVeterinaria()
     try {
         // Llamamos a la funcion registrarse del modelo VeterinariaRegistrarse
         $resultado = $objVeterinaria->registrarse($data);
+        $idSuscripcion = is_array($resultado)
+            ? (int) ($resultado['id_suscripcion'] ?? 0)
+            : (int) $resultado;
 
         // Verificamos el resultado y redirigimos a la pasarela de pago
-        if ((int) $resultado > 0) {
-            $rutaPago = BASE_URL . '/pasarela-pago?origen=suscripcion&id_suscripcion=' . urlencode((string) $resultado);
+        if ($idSuscripcion > 0) {
+            $rutaPago = BASE_URL . '/pasarela-pago?origen=suscripcion&id_suscripcion=' . urlencode((string) $idSuscripcion);
             limpiarDatosRegistroAnterior();
 
             mostrarSweetAlert(

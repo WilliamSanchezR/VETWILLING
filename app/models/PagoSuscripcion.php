@@ -78,6 +78,7 @@ class PagoSuscripcion
     public function obtenerSuscripcionPorId(int $idSuscripcion)
     {
         $consulta = "SELECT s.id_suscripcion, s.id_plan, s.id_veterinaria, s.fecha_inicio, s.fecha_fin,
+                            s.estado, s.ultimo_estado_pago, s.payment_id, s.external_reference, s.fecha_pago, s.auto_renovacion,
                             v.nombre AS nombre_veterinaria,
                             p.nombre AS nombre_plan,
                             p.descripcion AS descripcion_plan,
@@ -93,6 +94,62 @@ class PagoSuscripcion
         $stmt->execute();
 
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    public function obtenerOCrearSuscripcionPendiente($plan, int $idVeterinaria): int
+    {
+        $idPlan = $this->resolverIdPlanDesdeEntrada($plan);
+        if ($idVeterinaria <= 0 || $idPlan <= 0) {
+            return 0;
+        }
+
+        $consulta = "SELECT id_suscripcion
+                     FROM suscripcion
+                     WHERE id_veterinaria = :id_veterinaria
+                       AND id_plan = :id_plan
+                       AND estado = 'pendiente'
+                     ORDER BY id_suscripcion DESC
+                     LIMIT 1";
+
+        $stmt = $this->conexion->prepare($consulta);
+        $stmt->bindValue(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+        $stmt->bindValue(':id_plan', $idPlan, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $idSuscripcion = (int) ($stmt->fetchColumn() ?: 0);
+        if ($idSuscripcion > 0) {
+            $this->asegurarReferenciaSuscripcionPorId($idSuscripcion);
+            return $idSuscripcion;
+        }
+
+        $consultaInsert = "INSERT INTO suscripcion(id_veterinaria, id_plan, fecha_inicio, fecha_fin, estado, auto_renovacion)
+                           VALUES(:id_veterinaria, :id_plan, NULL, NULL, 'pendiente', 0)";
+
+        $insert = $this->conexion->prepare($consultaInsert);
+        $insert->bindValue(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+        $insert->bindValue(':id_plan', $idPlan, PDO::PARAM_INT);
+        $insert->execute();
+
+        $nuevoId = (int) $this->conexion->lastInsertId();
+        $this->asegurarReferenciaSuscripcionPorId($nuevoId);
+
+        return $nuevoId;
+    }
+
+    public function asegurarReferenciaSuscripcionPorId(int $idSuscripcion): ?string
+    {
+        $suscripcion = $this->obtenerSuscripcionPorId($idSuscripcion);
+        if (!$suscripcion) {
+            return null;
+        }
+
+        $referencia = !empty($suscripcion['external_reference'])
+            ? (string) $suscripcion['external_reference']
+            : $this->generarReferenciaSuscripcion($suscripcion);
+
+        $this->actualizarDatosInicialesSuscripcion($idSuscripcion, $referencia);
+
+        return $referencia;
     }
 
     public function confirmarPagoSuscripcion(int $idSuscripcion, array $datosPago = [])
@@ -171,6 +228,8 @@ class PagoSuscripcion
 
         $slugPlan = $this->resolverSlugPlanDesdeSuscripcion($suscripcion);
         $planes = $this->obtenerCatalogoSuscripciones();
+        $referenciaSuscripcion = $this->asegurarReferenciaSuscripcionPorId($idSuscripcion)
+            ?: $this->generarReferenciaSuscripcion($suscripcion);
 
         $producto = $planes[$slugPlan] ?? [
             'slug' => $slugPlan ?: ('plan-' . (int) ($suscripcion['id_plan'] ?? 0)),
@@ -180,7 +239,7 @@ class PagoSuscripcion
             'detalle' => $suscripcion['descripcion_plan'] ?: 'Suscripción mensual VetWilling',
             'monto' => !empty($suscripcion['precio_plan']) ? (float) $suscripcion['precio_plan'] : 0,
             'icono' => '🐾',
-            'referencia' => 'SUSC-' . (int) $suscripcion['id_suscripcion'] . '-' . date('YmdHis'),
+            'referencia' => $referenciaSuscripcion,
         ];
 
         if (!empty($suscripcion['nombre_plan'])) {
@@ -197,7 +256,7 @@ class PagoSuscripcion
             $producto['monto'] = (float) $suscripcion['precio_plan'];
         }
 
-        $producto['referencia'] = 'SUSC-' . (int) $suscripcion['id_suscripcion'] . '-' . date('YmdHis');
+        $producto['referencia'] = $referenciaSuscripcion;
         $producto['id_veterinaria'] = (int) $suscripcion['id_veterinaria'];
         $producto['id_plan'] = (int) $suscripcion['id_plan'];
 
@@ -209,6 +268,13 @@ class PagoSuscripcion
         return $producto;
     }
 
+    private function generarReferenciaSuscripcion(array $suscripcion)
+    {
+        return 'SUSC-' . (int) ($suscripcion['id_suscripcion'] ?? 0)
+            . '-VET' . (int) ($suscripcion['id_veterinaria'] ?? 0)
+            . '-PLAN' . (int) ($suscripcion['id_plan'] ?? 0);
+    }
+
     private function resolverSlugPlanDesdeSuscripcion(array $suscripcion)
     {
         if (!empty($suscripcion['nombre_plan'])) {
@@ -216,6 +282,22 @@ class PagoSuscripcion
         }
 
         return $this->obtenerSlugPlanPorId((int) ($suscripcion['id_plan'] ?? 0));
+    }
+
+    private function resolverIdPlanDesdeEntrada($plan): int
+    {
+        if (is_numeric($plan)) {
+            return (int) $plan;
+        }
+
+        $slug = $this->normalizarSlugPlan((string) $plan);
+        $mapa = [
+            'basico' => 1,
+            'procare' => 2,
+            'mastervet' => 3,
+        ];
+
+        return $mapa[$slug] ?? 0;
     }
 
     private function obtenerSlugPlanPorId(int $idPlan)
@@ -261,6 +343,43 @@ class PagoSuscripcion
         };
     }
 
+    private function actualizarDatosInicialesSuscripcion(int $idSuscripcion, string $externalReference): void
+    {
+        $campos = [];
+        $parametros = [
+            ':id_suscripcion' => $idSuscripcion,
+        ];
+
+        if ($this->columnaSuscripcionExiste('ultimo_estado_pago')) {
+            $campos[] = 'ultimo_estado_pago = COALESCE(NULLIF(ultimo_estado_pago, \'\'), :ultimo_estado_pago)';
+            $parametros[':ultimo_estado_pago'] = 'pending';
+        }
+
+        if ($this->columnaSuscripcionExiste('external_reference')) {
+            $campos[] = 'external_reference = COALESCE(NULLIF(external_reference, \'\'), :external_reference)';
+            $parametros[':external_reference'] = $externalReference;
+        }
+
+        if (empty($campos)) {
+            return;
+        }
+
+        $sql = 'UPDATE suscripcion SET ' . implode(', ', $campos) . ' WHERE id_suscripcion = :id_suscripcion';
+        $stmt = $this->conexion->prepare($sql);
+
+        foreach ($parametros as $clave => $valor) {
+            if ($valor === null) {
+                $stmt->bindValue($clave, null, PDO::PARAM_NULL);
+            } elseif ($clave === ':id_suscripcion') {
+                $stmt->bindValue($clave, (int) $valor, PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue($clave, $valor);
+            }
+        }
+
+        $stmt->execute();
+    }
+
     private function actualizarEstadoSuscripcion(int $idSuscripcion, string $estadoSuscripcion, string $estadoPago, array $datosPago = [])
     {
         $campos = ['estado = :estado'];
@@ -274,21 +393,35 @@ class PagoSuscripcion
             $parametros[':ultimo_estado_pago'] = mb_substr($estadoPago, 0, 50);
         }
 
-        if ($this->columnaSuscripcionExiste('payment_id')) {
+        $paymentId = $datosPago['payment_id'] ?? $datosPago['id'] ?? null;
+        if ($paymentId !== null && $paymentId !== '' && $this->columnaSuscripcionExiste('payment_id')) {
             $campos[] = 'payment_id = :payment_id';
-            $parametros[':payment_id'] = !empty($datosPago['payment_id']) ? (string) $datosPago['payment_id'] : (!empty($datosPago['id']) ? (string) $datosPago['id'] : null);
+            $parametros[':payment_id'] = (string) $paymentId;
         }
 
-        if ($this->columnaSuscripcionExiste('external_reference')) {
+        $externalReference = $datosPago['external_reference'] ?? null;
+        if ($externalReference !== null && $externalReference !== '' && $this->columnaSuscripcionExiste('external_reference')) {
             $campos[] = 'external_reference = :external_reference';
-            $parametros[':external_reference'] = $datosPago['external_reference'] ?? null;
+            $parametros[':external_reference'] = (string) $externalReference;
         }
 
-        if ($this->columnaSuscripcionExiste('fecha_pago')) {
-            $campos[] = 'fecha_pago = :fecha_pago';
-            $parametros[':fecha_pago'] = $estadoSuscripcion === 'activa'
-                ? (($datosPago['date_approved'] ?? null) ?: date('Y-m-d H:i:s'))
-                : null;
+        if ($estadoSuscripcion === 'activa') {
+            $fechaActivacion = $this->normalizarFechaPago($datosPago['date_approved'] ?? null);
+
+            if ($this->columnaSuscripcionExiste('fecha_inicio')) {
+                $campos[] = 'fecha_inicio = COALESCE(fecha_inicio, :fecha_inicio)';
+                $parametros[':fecha_inicio'] = $fechaActivacion;
+            }
+
+            if ($this->columnaSuscripcionExiste('fecha_fin')) {
+                $campos[] = 'fecha_fin = CASE WHEN fecha_fin IS NULL OR fecha_fin < :fecha_inicio_base THEN DATE_ADD(:fecha_inicio_base, INTERVAL 30 DAY) ELSE fecha_fin END';
+                $parametros[':fecha_inicio_base'] = $fechaActivacion;
+            }
+
+            if ($this->columnaSuscripcionExiste('fecha_pago')) {
+                $campos[] = 'fecha_pago = :fecha_pago';
+                $parametros[':fecha_pago'] = $fechaActivacion;
+            }
         }
 
         $sql = 'UPDATE suscripcion SET ' . implode(', ', $campos) . ' WHERE id_suscripcion = :id_suscripcion';
@@ -297,12 +430,27 @@ class PagoSuscripcion
         foreach ($parametros as $clave => $valor) {
             if ($valor === null) {
                 $stmt->bindValue($clave, null, PDO::PARAM_NULL);
+            } elseif ($clave === ':id_suscripcion') {
+                $stmt->bindValue($clave, (int) $valor, PDO::PARAM_INT);
             } else {
                 $stmt->bindValue($clave, $valor);
             }
         }
 
         $stmt->execute();
+    }
+
+    private function normalizarFechaPago($fecha): string
+    {
+        if (empty($fecha)) {
+            return date('Y-m-d H:i:s');
+        }
+
+        try {
+            return (new DateTime((string) $fecha))->format('Y-m-d H:i:s');
+        } catch (Exception $e) {
+            return date('Y-m-d H:i:s');
+        }
     }
 
     private function columnaSuscripcionExiste(string $nombreColumna)
