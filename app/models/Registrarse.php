@@ -1,11 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/dataBase.php';
 
 class VeterinariaRegistrarse
 {
 
     private $conexion;
+    private $columnasSuscripcion = null;
 
     public function __construct()
     {
@@ -20,6 +21,43 @@ class VeterinariaRegistrarse
         // Insertamos los datos en la base de datos
         try {
             $this->conexion->beginTransaction();
+
+            // Consultamos si existe el plan
+            $consultaPlan = "SELECT * FROM plan WHERE id_plan = :id";
+            $resultadoPlan = $this->conexion->prepare($consultaPlan);
+            $resultadoPlan->bindParam(':id', $data['plan']);
+            $resultadoPlan->execute();
+            $plan = $resultadoPlan->fetch(PDO::FETCH_ASSOC);
+
+            if (!$plan) {
+                throw new Exception("El plan seleccionado no existe.");
+            }
+
+            // Validamos que la compañía no exista 
+            $consultaCompania = "SELECT * FROM veterinaria WHERE nit = :nit";
+            $resultadoCompania = $this->conexion->prepare($consultaCompania);
+            $resultadoCompania->bindParam(':nit', $data['nit']);
+            $resultadoCompania->execute();
+            $compania = $resultadoCompania->fetch(PDO::FETCH_ASSOC);
+
+            if ($compania) {
+                throw new Exception("La compañía ya existe.");
+            }
+
+
+            // Validamos que el representante legal no exista
+            $consultaRepresentante = "SELECT * FROM usuario WHERE email = :email";
+            $resultadoRepresentante = $this->conexion->prepare($consultaRepresentante); 
+
+            $resultadoRepresentante->bindParam(':email', $data['email']);
+            $resultadoRepresentante->execute();
+            $representante = $resultadoRepresentante->fetch(PDO::FETCH_ASSOC);
+
+            if ($representante) {
+                throw new Exception("El representante legal ya existe.");
+            }
+
+            // Creamos la veterinaria
 
             $consulta = "INSERT INTO veterinaria (nombre, direccion, ciudad, telefono, email, fecha_creacion, nit, estado, foto) 
                          VALUES (:nombre, :direccion, :ciudad, :telefono, :email, NOW(), :nit, 'pendiente', :foto)";
@@ -42,23 +80,35 @@ class VeterinariaRegistrarse
                 $resultadoRepresentante = $this->registrarRepresentante($data, $idVeterinaria);
 
                 if ($resultadoRepresentante) {
-                    $this->conexion->commit();
-                    return true;
+                    $resultadoSuscripcion = $this->registrarSuscripcion($data['plan'], $idVeterinaria);
+                    if ($resultadoSuscripcion) {
+                        $this->conexion->commit();
+                        return $resultadoSuscripcion; // Retornamos el ID de la suscripción para redirigir al usuario a la página de pago
+                    } else {
+                        $this->conexion->rollBack();
+                        return 0;
+                    }
                 }
 
                 $this->conexion->rollBack();
-                return false;
+                return 0;
             } else {
                 // Si hubo un error al incertar realizamos el rollback
                 $this->conexion->rollBack();
-                return false;
+                return 0;
             }
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             if ($this->conexion->inTransaction()) {
                 $this->conexion->rollBack();
             }
-            echo "Error al registrar la veterinaria: " . $e->getMessage();
-            return false;
+
+            error_log('Error en VeterinariaRegistrarse::registrarse -> ' . $e->getMessage());
+
+            if ($e instanceof PDOException) {
+                throw new Exception('Ocurrió un error al procesar el registro. Intenta nuevamente.');
+            }
+
+            throw $e;
         }
     }
 
@@ -111,9 +161,90 @@ class VeterinariaRegistrarse
             return $resultado->execute();
 
         } catch (PDOException $e) {
-            echo "Error al registrar el representante: " . $e->getMessage();
-            return false;
+            error_log('Error al registrar el representante legal: ' . $e->getMessage());
+            throw new Exception('No se pudo registrar el representante legal.');
         }
+    }
+
+    private function registrarSuscripcion($idPlan, $idVeterinaria)
+    {
+        try {
+            $consulta = "INSERT INTO suscripcion(id_veterinaria, id_plan, fecha_inicio, fecha_fin, estado, auto_renovacion) 
+                        VALUES(:id_veterinaria, :id_plan, NULL, NULL, 'pendiente', 0)";
+
+            $resultado = $this->conexion->prepare($consulta);
+            $resultado->bindValue(':id_veterinaria', (int) $idVeterinaria, PDO::PARAM_INT);
+            $resultado->bindValue(':id_plan', (int) $idPlan, PDO::PARAM_INT);
+            $resultado->execute();
+
+            $idSuscripcion = (int) $this->conexion->lastInsertId();
+            $externalReference = $this->generarReferenciaSuscripcion($idSuscripcion, (int) $idVeterinaria, (int) $idPlan);
+            $this->actualizarDatosInicialesSuscripcion($idSuscripcion, $externalReference);
+
+            return [
+                'id_suscripcion' => $idSuscripcion,
+                'external_reference' => $externalReference,
+            ];
+        } catch (PDOException $e) {
+            error_log('Error al registrar la suscripción: ' . $e->getMessage());
+            throw new Exception('No se pudo crear la suscripción inicial.');
+        }
+    }
+
+    private function generarReferenciaSuscripcion(int $idSuscripcion, int $idVeterinaria, int $idPlan): string
+    {
+        return 'SUSC-' . $idSuscripcion . '-VET' . $idVeterinaria . '-PLAN' . $idPlan;
+    }
+
+    private function actualizarDatosInicialesSuscripcion(int $idSuscripcion, string $externalReference): void
+    {
+        $campos = [];
+        $parametros = [
+            ':id_suscripcion' => $idSuscripcion,
+        ];
+
+        if ($this->columnaSuscripcionExiste('ultimo_estado_pago')) {
+            $campos[] = 'ultimo_estado_pago = :ultimo_estado_pago';
+            $parametros[':ultimo_estado_pago'] = 'pending';
+        }
+
+        if ($this->columnaSuscripcionExiste('external_reference')) {
+            $campos[] = 'external_reference = :external_reference';
+            $parametros[':external_reference'] = $externalReference;
+        }
+
+        if (empty($campos)) {
+            return;
+        }
+
+        $sql = 'UPDATE suscripcion SET ' . implode(', ', $campos) . ' WHERE id_suscripcion = :id_suscripcion';
+        $stmt = $this->conexion->prepare($sql);
+
+        foreach ($parametros as $clave => $valor) {
+            if ($valor === null) {
+                $stmt->bindValue($clave, null, PDO::PARAM_NULL);
+            } elseif ($clave === ':id_suscripcion') {
+                $stmt->bindValue($clave, (int) $valor, PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue($clave, $valor);
+            }
+        }
+
+        $stmt->execute();
+    }
+
+    private function columnaSuscripcionExiste(string $nombreColumna): bool
+    {
+        if ($this->columnasSuscripcion === null) {
+            $this->columnasSuscripcion = [];
+            $resultado = $this->conexion->query('SHOW COLUMNS FROM suscripcion');
+
+            foreach ($resultado->fetchAll(PDO::FETCH_ASSOC) as $columna) {
+                $this->columnasSuscripcion[] = $columna['Field'];
+            }
+        }
+
+        return in_array($nombreColumna, $this->columnasSuscripcion, true);
     }
 
 }
