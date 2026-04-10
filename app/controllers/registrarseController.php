@@ -4,6 +4,12 @@
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/Registrarse.php';
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+ob_start();
+$GLOBALS['registroErrorMostrado'] = false;
 
 //CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
 $method = $_SERVER['REQUEST_METHOD'];
@@ -23,6 +29,85 @@ switch ($method) {
 // =========================================
 //  FUNCIONES CRUD
 // =========================================
+
+function guardarDatosRegistroAnterior(): void
+{
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+        return;
+    }
+
+    $currentStep = isset($_POST['current_step']) ? (int) $_POST['current_step'] : 0;
+    if ($currentStep > 1) {
+        $currentStep = 1;
+    }
+
+    $_SESSION['registro_old'] = [
+        'nit' => trim((string) ($_POST['nit'] ?? '')),
+        'nombreVeterinaria' => trim((string) ($_POST['nombreVeterinaria'] ?? '')),
+        'direccionVeterinaria' => trim((string) ($_POST['direccionVeterinaria'] ?? '')),
+        'ciudad' => trim((string) ($_POST['ciudad'] ?? '')),
+        'telefonoVeterinaria' => trim((string) ($_POST['telefonoVeterinaria'] ?? '')),
+        'emailVeterinaria' => trim((string) ($_POST['emailVeterinaria'] ?? '')),
+        'tipo_documento' => trim((string) ($_POST['tipo_documento'] ?? '')),
+        'numero_documento' => trim((string) ($_POST['numero_documento'] ?? '')),
+        'nombres' => trim((string) ($_POST['nombres'] ?? '')),
+        'apellidos' => trim((string) ($_POST['apellidos'] ?? '')),
+        'email' => trim((string) ($_POST['email'] ?? '')),
+        'telefono' => trim((string) ($_POST['telefono'] ?? '')),
+        'direccion' => trim((string) ($_POST['direccion'] ?? '')),
+        'plan' => trim((string) ($_POST['plan'] ?? '')),
+        'current_step' => $currentStep,
+    ];
+}
+
+function limpiarDatosRegistroAnterior(): void
+{
+    unset($_SESSION['registro_old']);
+}
+
+function mostrarErrorRegistro(string $titulo, string $mensaje): void
+{
+    if (!empty($GLOBALS['registroErrorMostrado'])) {
+        exit();
+    }
+
+    $GLOBALS['registroErrorMostrado'] = true;
+    guardarDatosRegistroAnterior();
+
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
+    mostrarSweetAlert('error', $titulo, $mensaje, BASE_URL . '/registro');
+}
+
+set_exception_handler(function (Throwable $e): void {
+    error_log('Excepción no controlada en registrarseController: ' . $e->getMessage());
+    mostrarErrorRegistro('Error en el registro', 'Ocurrió un error inesperado. Intenta nuevamente.');
+});
+
+set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
+    if (!(error_reporting() & $severity)) {
+        return false;
+    }
+
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
+
+register_shutdown_function(function (): void {
+    $error = error_get_last();
+
+    if ($error === null) {
+        return;
+    }
+
+    $erroresFatales = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR];
+
+    if (in_array($error['type'], $erroresFatales, true)) {
+        error_log('Error fatal en registrarseController: ' . $error['message'] . ' en ' . $error['file'] . ':' . $error['line']);
+        mostrarErrorRegistro('Error en el registro', 'Ocurrió un error interno al procesar el formulario. Intenta nuevamente.');
+    }
+});
 
 // FUNCION PARA REGISTRAR UNA NUEVA VETERINARIA
 function registrarseVeterinaria()
@@ -51,7 +136,6 @@ function registrarseVeterinaria()
     $nivel_acceso = 'Completo';
     $img_perfil = null;
 
-
     // Validamos que los campos no esten vacios
     if (
         empty($nit) || empty($nombreVeterinaria) || empty($direccionVeterinaria) || empty($ciudad) || empty($telefonoVeterinaria) ||
@@ -61,8 +145,7 @@ function registrarseVeterinaria()
         empty($apellidos) || empty($telefono) || empty($direccion)
     ) {
         // Mostrar un mensaje de error si algún campo está vacío
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
-        exit();
+        mostrarErrorRegistro('Campos vacíos', 'Por favor complete todos los campos');
     }
 
     // Validamos y procesamos la foto de la veterinaria si se ha enviado
@@ -73,18 +156,19 @@ function registrarseVeterinaria()
         $permitidas = ['png', 'jpg', 'jpeg'];
         // Validar extensión y tamaño
         if (!in_array($ext, $permitidas)) {
-            mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
-            exit();
+            mostrarErrorRegistro('Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
         }
         // Validar tamaño
         if ($file['size'] > 2 * 1024 * 1024) {
-            mostrarSweetAlert('error', 'Error', 'La foto supera las 2MB');
-            exit();
+            mostrarErrorRegistro('Archivo no válido', 'La foto supera las 2MB');
         }
         // Generar un nombre único para la imagen
         $fotoVeterinaria = uniqid('veterinaria_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/veterinaria/' . $fotoVeterinaria;
-        move_uploaded_file($file['tmp_name'], $destino);
+
+        if (!move_uploaded_file($file['tmp_name'], $destino)) {
+            mostrarErrorRegistro('Error al subir el archivo', 'No se pudo guardar el logo de la veterinaria.');
+        }
     }
 
     // Imagen de perfil
@@ -95,18 +179,19 @@ function registrarseVeterinaria()
         $permitidas = ['png', 'jpg', 'jpeg'];
         // Validar extensión y tamaño
         if (!in_array($ext, $permitidas)) {
-            mostrarSweetAlert('error', 'Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
-            exit();
+            mostrarErrorRegistro('Extensión no permitida', 'Solo archivos PNG, JPEG, JPG');
         }
         // Validar tamaño
         if ($file['size'] > 2 * 1024 * 1024) {
-            mostrarSweetAlert('error', 'Error', 'La foto supera las 2MB');
-            exit();
+            mostrarErrorRegistro('Archivo no válido', 'La foto supera las 2MB');
         }
         // Generar un nombre único para la imagen
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
-        move_uploaded_file($file['tmp_name'], $destino);
+
+        if (!move_uploaded_file($file['tmp_name'], $destino)) {
+            mostrarErrorRegistro('Error al subir el archivo', 'No se pudo guardar la foto del representante legal.');
+        }
     }
 
     // Creamos el objeto de la clase VeterinariaRegistrarse
@@ -132,21 +217,34 @@ function registrarseVeterinaria()
         'telefono' => $telefono,
         'direccion' => $direccion,
         'img_perfil' => $img_perfil,
-        'nivel_acceso' => $nivel_acceso
+        'nivel_acceso' => $nivel_acceso,
+        'plan' => $_POST['plan'] ?? '1'
     ];
-    // Llamamos a la funcion registrarse del modelo VeterinariaRegistrarse
-    $resultado = $objVeterinaria->registrarse($data);
 
-    // Verificamos el resultado y mostramos una alerta
-    if ($resultado) {
-        mostrarSweetAlert(
-            'success',
-            'Veterinaria registrada',
-            'La veterinaria ha sido creada correctamente',
-            '/vetwilling/login'
-        );
-    } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo registrar la veterinaria');
+    try {
+        // Llamamos a la funcion registrarse del modelo VeterinariaRegistrarse
+        $resultado = $objVeterinaria->registrarse($data);
+        $idSuscripcion = is_array($resultado)
+            ? (int) ($resultado['id_suscripcion'] ?? 0)
+            : (int) $resultado;
+
+        // Verificamos el resultado y redirigimos a la pasarela de pago
+        if ($idSuscripcion > 0) {
+            $rutaPago = BASE_URL . '/pasarela-pago?origen=suscripcion&id_suscripcion=' . urlencode((string) $idSuscripcion);
+            limpiarDatosRegistroAnterior();
+
+            mostrarSweetAlert(
+                'success',
+                'Registro completado',
+                'La compañía fue registrada correctamente. A continuación serás redirigido a la pasarela de pago para activar tu suscripción.',
+                $rutaPago
+            );
+        }
+
+        mostrarErrorRegistro('Error en el registro', 'No se pudo registrar la compañía. Intenta nuevamente.');
+    } catch (Throwable $e) {
+        error_log('Error en registrarseVeterinaria: ' . $e->getMessage());
+        mostrarErrorRegistro('Error en el registro', $e->getMessage());
     }
 
     exit();

@@ -124,6 +124,33 @@ body {
     border-top: 2px solid var(--border);
 }
 
+.payment-test-alert {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #fff8e1;
+    border: 1px solid #f3d37a;
+}
+
+.payment-test-alert__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #8a5a00;
+    margin-bottom: 8px;
+}
+
+.payment-test-alert__list {
+    margin: 0;
+    padding-left: 18px;
+    color: #6b5b2a;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.payment-test-alert__list li + li {
+    margin-top: 4px;
+}
+
 .btn-pagar {
     width: 100%;
     margin-top: 28px;
@@ -141,6 +168,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 10px;
+    text-decoration: none;
 }
 
 .btn-pagar:hover {
@@ -150,6 +178,36 @@ body {
 
 .btn-pagar:active {
     transform: translateY(0);
+}
+
+.btn-verificar {
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: #eef6f0;
+    color: var(--verde);
+    border: 1px solid rgba(46, 125, 50, 0.18);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.btn-verificar:hover {
+    background: #e4f1e7;
+    transform: translateY(-1px);
+}
+
+.payment-help-text {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    text-align: center;
 }
 
 .secure-badge {
