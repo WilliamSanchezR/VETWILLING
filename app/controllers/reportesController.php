@@ -60,6 +60,7 @@ function construirPayloadReportes($idUsuario)
             'anio' => $anio
         ],
         'resumen' => $reportesModel->obtenerResumenGeneral($idUsuario, $inicio, $fin),
+        'resumen_estados' => $reportesModel->obtenerResumenEstadosCitas($idUsuario, $inicio, $fin),
         'ingresos_mensuales' => $reportesModel->obtenerIngresosUltimosSeisMeses($idUsuario),
         'servicios' => $reportesModel->obtenerServiciosMasSolicitados($idUsuario, $inicio, $fin),
         'tratamientos' => $reportesModel->obtenerTopTratamientos($idUsuario, $inicio, $fin),

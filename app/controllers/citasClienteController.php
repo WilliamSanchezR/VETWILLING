@@ -47,6 +47,9 @@ switch ($method) {
             case 'listar':
                 listarCitasCliente();
                 break;
+            case 'historial_paciente':
+                obtenerHistorialPaciente();
+                break;
             case 'detalle':
                 obtenerDetalleCita();
                 break;
@@ -532,6 +535,52 @@ function obtenerDetalleCita()
 
     } catch (Exception $e) {
         error_log("❌ Error en obtenerDetalleCita: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Error del sistema']);
+        exit();
+    }
+}
+
+function obtenerHistorialPaciente()
+{
+    try {
+        if (!isset($_SESSION['user']['id_usuario'])) {
+            http_response_code(401);
+            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado']);
+            exit();
+        }
+
+        $id_propietario = obtenerIdPropietario();
+        if (!$id_propietario) {
+            http_response_code(403);
+            echo json_encode(['status' => 'error', 'message' => 'Acceso denegado']);
+            exit();
+        }
+
+        $id_paciente = isset($_GET['id_paciente']) ? (int)$_GET['id_paciente'] : 0;
+        $limite = isset($_GET['limite']) ? (int)$_GET['limite'] : 20;
+
+        if ($id_paciente <= 0) {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'ID de paciente inválido']);
+            exit();
+        }
+
+        $limite = max(1, min($limite, 100));
+
+        $modeloCitas = new CitasCliente();
+        $historial = $modeloCitas->obtenerHistorialPorPaciente($id_propietario, $id_paciente, $limite);
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'cantidad' => count($historial),
+            'id_paciente' => $id_paciente,
+            'historial' => $historial
+        ]);
+        exit();
+    } catch (Exception $e) {
+        error_log("❌ Error en obtenerHistorialPaciente: " . $e->getMessage());
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'Error del sistema']);
         exit();

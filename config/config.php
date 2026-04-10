@@ -61,9 +61,6 @@ date_default_timezone_set('America/Bogota');
 $httpsActivo = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 $forwardedProto = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
 $protocolo = ($httpsActivo || $forwardedProto === 'https') ? 'https://' : 'http://';
-// Esta línea detecta automáticamente cuál está usando el servidor.
-// En ejecución CLI (cron), estas variables pueden no existir.
-$protocolo = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -83,7 +80,6 @@ $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 // ═══════════════════════════════════════════════════════════════════════════
 // Si la dirección IP del servidor es 127.0.0.1 o ::1 significa que
 // el proyecto está ejecutándose en el entorno local del desarrollador.
-$isLocal = in_array($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', ['127.0.0.1', '::1']);
 // En CLI no existe REMOTE_ADDR, por lo que asumimos entorno local.
 $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 $isLocal = in_array($remoteAddr, ['127.0.0.1', '::1']);
@@ -146,4 +142,3 @@ define('BASE_PATH', $projectRoot);
 // Token de Mercado Pago (opcional).
 // Prioriza variable de entorno MP_ACCESS_TOKEN y usa este valor solo como respaldo.
 define('MP_ACCESS_TOKEN', env_value('MP_ACCESS_TOKEN', ''));
-define('BASE_PATH', dirname(__DIR__));

@@ -6,22 +6,61 @@ class Reportes
 {
     private $conexion;
 
+    private const ESTADOS_ATENDIDOS = [
+        'REALIZADA',
+        'REALIZADO',
+        'ATENDIDA',
+        'ATENDIDO',
+        'COMPLETADA',
+        'COMPLETADO',
+        'FINALIZADA',
+        'FINALIZADO'
+    ];
+
+    private const ESTADOS_CANCELADOS = [
+        'CANCELADA',
+        'CANCELADO',
+        'ANULADA',
+        'ANULADO'
+    ];
+
     public function __construct()
     {
         $db = new conexion();
         $this->conexion = $db->getConexion();
     }
 
+    private function estadoNormalizadoSql($columna)
+    {
+        $atendidos = $this->listaSql(self::ESTADOS_ATENDIDOS);
+        $cancelados = $this->listaSql(self::ESTADOS_CANCELADOS);
+
+        return "CASE
+                    WHEN UPPER(TRIM(COALESCE({$columna}, ''))) IN ({$atendidos}) THEN 'ATENDIDA'
+                    WHEN UPPER(TRIM(COALESCE({$columna}, ''))) IN ({$cancelados}) THEN 'CANCELADA'
+                    ELSE 'PENDIENTE'
+                END";
+    }
+
+    private function listaSql(array $values)
+    {
+        return implode(', ', array_map(function ($valor) {
+            return "'" . str_replace("'", "''", $valor) . "'";
+        }, $values));
+    }
+
     public function obtenerResumenGeneral($idUsuario, $fechaInicio, $fechaFin)
     {
         try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
             $sql = "SELECT
                         COALESCE(SUM(CASE
-                            WHEN UPPER(a.estado) NOT IN ('CANCELADA', 'CANCELADO') THEN COALESCE(sub.costo, 0)
+                            WHEN {$estadoNorm} <> 'CANCELADA' THEN COALESCE(sub.costo, 0)
                             ELSE 0
                         END), 0) AS ingresos_totales,
                         SUM(CASE
-                            WHEN UPPER(a.estado) IN ('REALIZADA', 'ATENDIDA', 'COMPLETADA') THEN 1
+                            WHEN {$estadoNorm} = 'ATENDIDA' THEN 1
                             ELSE 0
                         END) AS citas_atendidas,
                         COUNT(*) AS total_citas
@@ -81,6 +120,7 @@ class Reportes
     {
         try {
             $inicio = (new DateTime('first day of -5 months'))->format('Y-m-01');
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
 
             $sql = "SELECT
                         DATE_FORMAT(a.fecha_hora, '%Y-%m') AS periodo,
@@ -89,7 +129,7 @@ class Reportes
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
                     WHERE a.id_usuario = :id_usuario
                       AND a.fecha_hora >= :inicio
-                      AND UPPER(a.estado) NOT IN ('CANCELADA', 'CANCELADO')
+                                            AND {$estadoNorm} <> 'CANCELADA'
                     GROUP BY DATE_FORMAT(a.fecha_hora, '%Y-%m')
                     ORDER BY periodo ASC";
 
@@ -259,6 +299,7 @@ class Reportes
             $anio = (int)$anio;
             $mesActual = (int)date('n');
             $ultimoMes = ((int)date('Y') === $anio) ? $mesActual : 12;
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
 
             $sql = "SELECT
                         COALESCE(s.nombre, 'Sin servicio') AS concepto,
@@ -270,7 +311,7 @@ class Reportes
                     WHERE a.id_usuario = :id_usuario
                       AND YEAR(a.fecha_hora) = :anio
                       AND MONTH(a.fecha_hora) BETWEEN 1 AND :ultimo_mes
-                      AND UPPER(a.estado) NOT IN ('CANCELADA', 'CANCELADO')
+                                            AND {$estadoNorm} <> 'CANCELADA'
                     GROUP BY COALESCE(s.nombre, 'Sin servicio'), MONTH(a.fecha_hora)
                     ORDER BY concepto ASC, mes ASC";
 
@@ -352,6 +393,60 @@ class Reportes
                 'filas' => [],
                 'totales_mes' => [],
                 'gran_total' => 0
+            ];
+        }
+    }
+
+    public function obtenerResumenEstadosCitas($idUsuario, $fechaInicio, $fechaFin)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        {$estadoNorm} AS estado_normalizado,
+                        COUNT(*) AS total
+                    FROM agendamiento a
+                    WHERE a.id_usuario = :id_usuario
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                    GROUP BY {$estadoNorm}";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->execute();
+
+            $resumen = [
+                'atendidas' => 0,
+                'canceladas' => 0,
+                'pendientes' => 0,
+                'total' => 0
+            ];
+
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            foreach ($rows as $row) {
+                $estado = $row['estado_normalizado'] ?? 'PENDIENTE';
+                $cantidad = (int)($row['total'] ?? 0);
+
+                if ($estado === 'ATENDIDA') {
+                    $resumen['atendidas'] += $cantidad;
+                } elseif ($estado === 'CANCELADA') {
+                    $resumen['canceladas'] += $cantidad;
+                } else {
+                    $resumen['pendientes'] += $cantidad;
+                }
+
+                $resumen['total'] += $cantidad;
+            }
+
+            return $resumen;
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerResumenEstadosCitas - ' . $e->getMessage());
+            return [
+                'atendidas' => 0,
+                'canceladas' => 0,
+                'pendientes' => 0,
+                'total' => 0
             ];
         }
     }
