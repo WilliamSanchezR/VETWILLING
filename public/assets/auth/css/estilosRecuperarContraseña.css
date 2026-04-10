@@ -421,20 +421,60 @@ body::after {
     }
 }
 
-@media (max-width: 480px) {
-    body {
-        padding: 10px;
+@media screen and (min-width:320px) and (max-width:767px) {
+
+    html, body {
+        overflow-x: hidden;
     }
 
-    .cont-left {
-        padding: 30px 20px;
+    .container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        overflow-x: hidden;
     }
 
-    .form-header h2 {
-        font-size: 24px;
+    .cont-right {
+        width: 100%;
+        min-height: auto;
+        overflow: hidden;
     }
 
-    .logo img {
-        max-width: 140px;
+    .cont-rigth {
+        width: 100%;
+        height: 300px; /* antes 116vh */
+        top: 0;        /* antes -46px */
+        padding: 0;
+        overflow: hidden;
+        position: relative;
     }
+
+    .welcome-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 320px;
+        padding: 18px 20px;
+    }
+
+    .welcome-title {
+        font-size: 1.4rem;
+    }
+
+    .welcome-sub {
+        font-size: 0.95rem;
+    }
+
+    #img_info,
+    #icon-datos {
+        display: none;
+    }
+
+    .cont-right::before,
+    .cont-right::after {
+        display: none;
+    }
+
 }
