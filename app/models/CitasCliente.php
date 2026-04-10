@@ -231,6 +231,50 @@ class CitasCliente
     }
 
     /**
+     * Obtiene historial de citas de una mascota específica del propietario autenticado
+     * Ordenado de más reciente a más antiguo.
+     */
+    public function obtenerHistorialPorPaciente($id_propietario, $id_paciente, $limite = 20)
+    {
+        try {
+            $limite = max(1, min((int)$limite, 100));
+
+            $sql = "SELECT
+                        a.id_agendamiento,
+                        a.tipo,
+                        a.estado,
+                        a.fecha_hora,
+                        a.fecha_hora_fin,
+                        a.observaciones,
+                        a.motivo_cancelacion,
+                        pac.id_paciente,
+                        pac.nombre AS mascota_nombre,
+                        s.nombre AS servicio_nombre,
+                        sub.nombre AS subservicio_nombre,
+                        COALESCE(CONCAT(v.nombres, ' ', v.apellidos), 'No asignado') AS veterinario_nombre
+                    FROM agendamiento a
+                    INNER JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    LEFT JOIN veterinario v ON a.id_usuario = v.id_usuario
+                    WHERE pac.id_propietario = :id_propietario
+                    AND a.id_paciente = :id_paciente
+                    ORDER BY a.fecha_hora DESC, a.id_agendamiento DESC
+                    LIMIT {$limite}";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_propietario', (int)$id_propietario, PDO::PARAM_INT);
+            $stmt->bindValue(':id_paciente', (int)$id_paciente, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::obtenerHistorialPorPaciente -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Modifica las fechas de una cita
      */
     public function modificarFechasCita($id_agendamiento, $fecha_hora, $fecha_hora_fin)
