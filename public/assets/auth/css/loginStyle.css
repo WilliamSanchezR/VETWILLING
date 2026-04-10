@@ -175,23 +175,57 @@
 /* SMARTPHONE estilos responsil de cel*/
 @media screen and (min-width:320px) and (max-width:767px) {
 
+    html, body {
+        overflow-x: hidden;
+    }
+
     .container {
         display: flex;
         flex-direction: column;
+        width: 100%;
+        overflow-x: hidden;
     }
 
-    .cont-rigth p {
+    .cont-right {
         width: 100%;
-        margin: 0px;
+        min-height: auto;
+        overflow: hidden;
     }
 
     .cont-rigth {
-        padding: 20px;
+        width: 100%;
+        height: 300px; /* antes 116vh */
+        top: 0;        /* antes -46px */
+        padding: 0;
+        overflow: hidden;
+        position: relative;
     }
 
+    .welcome-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 320px;
+        padding: 18px 20px;
+    }
+
+    .welcome-title {
+        font-size: 1.4rem;
+    }
+
+    .welcome-sub {
+        font-size: 0.95rem;
+    }
 
     #img_info,
     #icon-datos {
+        display: none;
+    }
+
+    .cont-right::before,
+    .cont-right::after {
         display: none;
     }
 }

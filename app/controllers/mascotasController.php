@@ -11,7 +11,7 @@ switch ($method) {
         $accion = $_POST['accion'] ?? '';
 
         if ($accion === 'actualizar') {
-            actualizarMascota();
+            actualizarMascota(); 
         } else {
             registrarMascota();
         }
@@ -321,8 +321,8 @@ function eliminarMascota($id)
     if ($respuesta) {
         mostrarSweetAlert(
             'success',
-            'Eliminación exitosa',
-            'La mascota ha sido eliminada correctamente',
+            'Mascota inactivada',
+            'La mascota fue marcada como inactiva correctamente',
             '/vetwilling/cliente/mascotas'
         );
     } else {

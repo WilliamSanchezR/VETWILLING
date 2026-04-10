@@ -57,3 +57,54 @@
     </button>
 
 </aside>
+
+<script>
+    // ── Toggle sidebar con detección de móvil ──
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle'); // tu botón toggle de escritorio
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+
+    // Este es el toggle de ESCRITORIO (colapsar/expandir)
+    sidebarToggle?.addEventListener('click', () => {
+        if (isMobile()) return; // en móvil no hace nada
+        sidebar.classList.toggle('collapsed');
+        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+    });
+
+    // Cerrar sidebar móvil al tocar el overlay
+    overlay?.addEventListener('click', cerrarSidebarMobile);
+
+    function cerrarSidebarMobile() {
+        sidebar?.classList.remove('show');
+        overlay?.classList.remove('active'); // si usas clase en overlay directamente
+        document.body.style.overflow = '';
+    }
+
+    // Al cambiar de tamaño de ventana, limpiar estados
+    window.addEventListener('resize', () => {
+        if (!isMobile()) {
+            sidebar?.classList.remove('show');
+            document.body.style.overflow = '';
+            // Restaurar estado colapsado guardado
+            const wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            sidebar?.classList.toggle('collapsed', wasCollapsed);
+        } else {
+            // En móvil quitar collapsed para que el panel se vea completo cuando se abra
+            sidebar?.classList.remove('collapsed');
+        }
+    });
+
+    // Al cargar, aplicar estado guardado solo en escritorio
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!isMobile()) {
+            const wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            sidebar?.classList.toggle('collapsed', wasCollapsed);
+        } else {
+            sidebar?.classList.remove('collapsed');
+        }
+    });
+</script>

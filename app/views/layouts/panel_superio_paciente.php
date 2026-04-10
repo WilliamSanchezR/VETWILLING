@@ -19,7 +19,6 @@ $usuario = mostrarPerfil($id);
 
 // Validar que se obtuvieron los datos
 if (!$usuario) {
-    // Manejar error - destruir sesión y redirigir
     session_destroy();
     header('Location: /vetwilling/login');
     exit();
@@ -34,35 +33,31 @@ function safe_echo($value, $default = '')
 // Preparar datos con valores por defecto
 $datosUsuario = [
     'nombre_veterinaria' => safe_echo($usuario['nombre_veterinaria'] ?? 'Veterinaria'),
-    'img_perfil' => safe_echo($usuario['img_perfil'] ?? 'default-avatar.png'),
-    'nombres' => safe_echo($usuario['nombres'] ?? ''),
-    'apellidos' => safe_echo($usuario['apellidos'] ?? ''),
-    'rol' => safe_echo($usuario['rol'] ?? 'Cliente'),
-    'email' => safe_echo($usuario['email'] ?? '')
+    'img_perfil'         => safe_echo($usuario['img_perfil'] ?? 'default-avatar.png'),
+    'nombres'            => safe_echo($usuario['nombres'] ?? ''),
+    'apellidos'          => safe_echo($usuario['apellidos'] ?? ''),
+    'rol'                => safe_echo($usuario['rol'] ?? 'Cliente'),
+    'email'              => safe_echo($usuario['email'] ?? '')
 ];
 
-// ── CORRECCIÓN 1: Lógica de ruta de imagen robusta para Hostinger ──
+// Lógica de ruta de imagen robusta
 $foto = $datosUsuario['img_perfil'] ?? '';
 
-// Fallback CDN: genera avatar con iniciales, siempre disponible
 $imagenFallback = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario['nombres'] . '+' . $datosUsuario['apellidos']) . "&background=4e9af1&color=fff&size=128";
 $rutaImagen = $imagenFallback;
 
 if (!empty($foto) && $foto !== 'default-avatar.png') {
-    // Verificar si el archivo subido existe usando BASE_PATH (más fiable en hostinger)
     $rutaAbsoluta = BASE_PATH . "/public/uploads/usuarios/" . $foto;
     if (file_exists($rutaAbsoluta)) {
         $rutaImagen = BASE_URL . "/public/uploads/usuarios/" . $foto;
     }
 } else {
-    // Intentar el default local, si no existe usar CDN
     $defaultLocal = BASE_PATH . "/public/uploads/usuarios/default-avatar.png";
     if (file_exists($defaultLocal)) {
         $rutaImagen = BASE_URL . "/public/uploads/usuarios/default-avatar.png";
     }
 }
 
-// URL de fallback para onerror en HTML (con iniciales del usuario)
 $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario['nombres'] . '+' . $datosUsuario['apellidos']) . "&background=4e9af1&color=fff&size=128";
 ?>
 
@@ -71,6 +66,44 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
 
 <!-- NAVBAR SUPERIOR -->
 <nav class="navbar-superior" role="navigation" aria-label="Navegación principal">
+
+    <!-- BURBUJA MÓVIL -->
+    <div class="bubble-panel" id="bubblePanel">
+        <div class="bubble-panel-logo">
+            <i class="bi bi-hospital"></i>
+            <span><?= $datosUsuario['nombre_veterinaria'] ?></span>
+        </div>
+
+        <a href="<?= BASE_URL ?>/cliente/perfil" class="bubble-item">
+            <span class="bubble-icon"><i class="bi bi-person-fill"></i></span> Mi Perfil
+        </a>
+        <a href="<?= BASE_URL ?>/cliente/mascotas" class="bubble-item">
+            <span class="bubble-icon"><i class="bi bi-heart-pulse-fill"></i></span> Mis Mascotas
+        </a>
+        <a href="<?= BASE_URL ?>/cliente/citas" class="bubble-item">
+            <span class="bubble-icon"><i class="bi bi-calendar-check-fill"></i></span> Mis Citas
+        </a>
+
+        <div class="bubble-divider"></div>
+
+        <a href="<?= BASE_URL ?>/cliente/configuracion" class="bubble-item">
+            <span class="bubble-icon"><i class="bi bi-gear-fill"></i></span> Configuración
+        </a>
+        <button class="bubble-item" data-modal="soporte">
+            <span class="bubble-icon"><i class="bi bi-question-circle"></i></span> Soporte
+        </button>
+
+        <div class="bubble-spacer"></div>
+        <div class="bubble-divider"></div>
+
+        <a href="<?= BASE_URL ?>/cerrar-sesion" class="bubble-item bubble-danger">
+            <span class="bubble-icon"><i class="bi bi-box-arrow-right"></i></span> Cerrar Sesión
+        </a>
+    </div>
+
+    <button class="bubble-trigger" id="bubbleBtn" aria-label="Abrir menú de navegación">
+        <i class="bi bi-list" id="bubbleIcon"></i>
+    </button>
     <!-- Info Veterinaria -->
     <div class="info-veterinaria">
         <i class="bi bi-hospital" aria-hidden="true"></i>
@@ -94,6 +127,7 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
 
     <!-- Acciones -->
     <div class="navbar-derecha">
+
         <!-- Reloj en Vivo -->
         <button
             class="btn-navbar btn-reloj"
@@ -127,7 +161,6 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
                 </button>
             </div>
             <div class="dropdown-body" id="listaNotificaciones">
-                <!-- Se cargan dinámicamente -->
                 <div class="loading-notificaciones">
                     <div class="spinner"></div>
                     <p>Cargando notificaciones...</p>
@@ -178,7 +211,7 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
             </div>
         </aside>
 
-        <!-- Separador -->
+        <!-- Separador (oculto en móvil via CSS) -->
         <div class="navbar-separador" role="separator"></div>
 
         <!-- Perfil Usuario -->
@@ -189,7 +222,6 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
             aria-haspopup="true"
             aria-expanded="false">
 
-            <!-- ── CORRECCIÓN 2: onerror con this.onerror=null para evitar loop infinito ── -->
             <div class="avatar-usuario">
                 <img
                     src="<?= $rutaImagen ?>"
@@ -207,7 +239,6 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
             <i class="bi bi-chevron-down flecha-perfil" aria-hidden="true"></i>
         </button>
 
-
         <!-- Dropdown Perfil -->
         <div
             class="dropdown-menu dropdown-perfil"
@@ -215,7 +246,6 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
             role="menu">
             <div class="perfil-header">
                 <div class="avatar-usuario grande">
-                    <!-- ── CORRECCIÓN 2: misma imagen y mismo onerror seguro ── -->
                     <img
                         src="<?= $rutaImagen ?>"
                         alt="Avatar"
@@ -245,6 +275,7 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
             </a>
 
             <div class="dropdown-divider" role="separator"></div>
+
             <a href="<?= BASE_URL ?>/cliente/configuracion" class="dropdown-item" role="menuitem">
                 <i class="bi bi-gear-fill" aria-hidden="true"></i>
                 <span>Configuración</span>
@@ -261,8 +292,12 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
                 <span>Cerrar Sesión</span>
             </a>
         </div>
+
     </div>
 </nav>
+
+<!-- Overlay para cerrar sidebar en móvil (fuera del nav) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- Modal de Reloj -->
 <div id="modalReloj" class="modal-reloj" role="dialog" aria-modal="true" aria-labelledby="tituloReloj">
@@ -415,4 +450,24 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
         nombre: <?= json_encode($datosUsuario['nombres'] . ' ' . $datosUsuario['apellidos']) ?>,
         email: <?= json_encode($datosUsuario['email']) ?>
     };
+    // ── Burbuja móvil ──
+    const bubbleBtn = document.getElementById('bubbleBtn');
+    const bubblePanel = document.getElementById('bubblePanel');
+    const bubbleOverlay = document.getElementById('bubbleOverlay');
+    const bubbleIcon = document.getElementById('bubbleIcon');
+
+    function toggleBubble(forceClose = false) {
+        const isOpen = forceClose ? false : !bubblePanel.classList.contains('open');
+        bubblePanel.classList.toggle('open', isOpen);
+        bubbleBtn.classList.toggle('open', isOpen);
+        bubbleOverlay.classList.toggle('open', isOpen);
+        bubbleIcon.className = isOpen ? 'bi bi-x-lg' : 'bi bi-list';
+    }
+
+    bubbleBtn?.addEventListener('click', () => toggleBubble());
+    bubbleOverlay?.addEventListener('click', () => toggleBubble(true));
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') toggleBubble(true);
+    });
 </script>
