@@ -24,3 +24,17 @@
 config/config.php
 config/database.php
 .htaccess
+
+.env
+
+composer.lock
+composer.json
+app/logs/*
+database
+
+PROJECT_CONTEXT.md
+
+Analisis_Requisitos_Funcionales.md
+requisitos_funcionales.md
+
+/public/app/logs/*

@@ -8,7 +8,7 @@
  * ═══════════════════════════════════════════════════════════════════
  */
 
-require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/database.php'; 
 
 class CitasCliente
 {
@@ -231,6 +231,50 @@ class CitasCliente
     }
 
     /**
+     * Obtiene historial de citas de una mascota específica del propietario autenticado
+     * Ordenado de más reciente a más antiguo.
+     */
+    public function obtenerHistorialPorPaciente($id_propietario, $id_paciente, $limite = 20)
+    {
+        try {
+            $limite = max(1, min((int)$limite, 100));
+
+            $sql = "SELECT
+                        a.id_agendamiento,
+                        a.tipo,
+                        a.estado,
+                        a.fecha_hora,
+                        a.fecha_hora_fin,
+                        a.observaciones,
+                        a.motivo_cancelacion,
+                        pac.id_paciente,
+                        pac.nombre AS mascota_nombre,
+                        s.nombre AS servicio_nombre,
+                        sub.nombre AS subservicio_nombre,
+                        COALESCE(CONCAT(v.nombres, ' ', v.apellidos), 'No asignado') AS veterinario_nombre
+                    FROM agendamiento a
+                    INNER JOIN paciente pac ON a.id_paciente = pac.id_paciente
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    LEFT JOIN veterinario v ON a.id_usuario = v.id_usuario
+                    WHERE pac.id_propietario = :id_propietario
+                    AND a.id_paciente = :id_paciente
+                    ORDER BY a.fecha_hora DESC, a.id_agendamiento DESC
+                    LIMIT {$limite}";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_propietario', (int)$id_propietario, PDO::PARAM_INT);
+            $stmt->bindValue(':id_paciente', (int)$id_paciente, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::obtenerHistorialPorPaciente -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Modifica las fechas de una cita
      */
     public function modificarFechasCita($id_agendamiento, $fecha_hora, $fecha_hora_fin)
@@ -378,7 +422,8 @@ class CitasCliente
             $sql = "SELECT COUNT(*) as total
                     FROM paciente
                     WHERE id_paciente = :id_paciente
-                    AND id_propietario = :id_propietario";
+                    AND id_propietario = :id_propietario
+                    AND estado = 'Activo'";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
@@ -508,15 +553,13 @@ class CitasCliente
                         pac.especie as mascota_especie,
                         pac.raza as mascota_raza,
                         s.nombre as servicio_nombre,
-                        sub.nombre as subservicio_nombre,
-                        CONCAT(vet.nombres, ' ', vet.apellidos) as veterinario_nombre
+                        sub.nombre as subservicio_nombre
                     FROM agendamiento a
                     LEFT JOIN paciente pac ON a.id_paciente = pac.id_paciente
                     LEFT JOIN propietario pr ON pac.id_propietario = pr.id_propietario
                     LEFT JOIN usuario u ON pr.id_usuario = u.id_usuario
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
-                    LEFT JOIN usuario vet ON a.id_usuario = vet.id_usuario
                     WHERE a.id_agendamiento = :id_agendamiento
                     LIMIT 1";
 
@@ -634,6 +677,7 @@ class CitasCliente
                         img_mascota
                     FROM paciente
                     WHERE id_propietario = :id_propietario
+                    AND estado = 'Activo'
                     ORDER BY nombre ASC";
 
             $stmt = $this->conexion->prepare($sql);

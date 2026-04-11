@@ -344,13 +344,17 @@ $id_usuario = $_SESSION['user']['id_usuario'];
         /* ── ACCIONES HORIZONTALES (fila inferior) ── */
         .cita-acciones {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             border-top: 1.5px solid #f3f4f6;
             overflow: hidden;
         }
 
         .cita-acciones.solo-ver {
             grid-template-columns: 1fr;
+        }
+
+        .cita-acciones.solo-dos {
+            grid-template-columns: repeat(2, 1fr);
         }
 
         .btn-accion {
@@ -376,6 +380,9 @@ $id_usuario = $_SESSION['user']['id_usuario'];
 
         .btn-ver       { background: #f9fafb; color: #374151; }
         .btn-ver:hover { background: #f3f4f6; }
+
+        .btn-historial       { background: #ecfeff; color: #0e7490; }
+        .btn-historial:hover { background: #cffafe; }
 
         .btn-reagendar       { background: #fffbeb; color: #d97706; }
         .btn-reagendar:hover { background: #fef3c7; }
@@ -441,6 +448,7 @@ $id_usuario = $_SESSION['user']['id_usuario'];
         body.dark-mode .cita-acciones         { border-left-color: #374151; }
         body.dark-mode .btn-accion            { border-bottom-color: #374151; }
         body.dark-mode .btn-ver               { background: #374151; color: #d1d5db; }
+        body.dark-mode .btn-historial         { background: #164e63; color: #bae6fd; }
         body.dark-mode .filtro-grupo select,
         body.dark-mode .filtro-grupo input    { background: #2d2d2d; border-color: #444; color: #fff; }
         body.dark-mode .tab-btn               { background: #2d2d2d; border-color: #444; color: #ddd; }
@@ -554,6 +562,7 @@ $id_usuario = $_SESSION['user']['id_usuario'];
         const BASE_URL = '<?= BASE_URL ?>';
         const URLS = {
             MIS_CITAS:     BASE_URL + '/cliente/api/citas/listar?accion=listar',
+            HISTORIAL_PACIENTE: BASE_URL + '/cliente/api/citas/listar?accion=historial_paciente',
             CANCELAR_CITA: BASE_URL + '/cliente/api/citas/cancelar'
         };
 
@@ -766,10 +775,14 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                     </div>
 
                     <!-- Acciones horizontales debajo -->
-                    <div class="cita-acciones ${esPendiente ? '' : 'solo-ver'}">
+                    <div class="cita-acciones ${esPendiente ? '' : 'solo-dos'}">
                         <button class="btn-accion btn-ver"
                                 onclick="verDetallesCita(${cita.id_agendamiento})">
                             <i class="bi bi-eye"></i> Ver
+                        </button>
+                        <button class="btn-accion btn-historial"
+                                onclick="verHistorialMascota(${cita.id_paciente}, ${JSON.stringify(cita.mascota_nombre || 'Mascota')})">
+                            <i class="bi bi-clock-history"></i> Historial
                         </button>
                         ${esPendiente ? `
                             <button class="btn-accion btn-reagendar"
@@ -805,6 +818,26 @@ $id_usuario = $_SESSION['user']['id_usuario'];
             if (mins < 60) return `${mins} minutos`;
             const h = Math.floor(mins / 60), m = mins % 60;
             return m > 0 ? `${h}h ${m}m` : `${h} hora${h > 1 ? 's' : ''}`;
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatearFechaHistorial(valor) {
+            const f = new Date(valor);
+            return f.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
 
         // ─── ACCIONES ────────────────────────────────────────────────
@@ -847,6 +880,82 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 text: 'Esta función estará disponible próximamente. Por favor, contacta a la veterinaria.',
                 confirmButtonText: 'Entendido'
             });
+        }
+
+        async function verHistorialMascota(idPaciente, nombreMascota) {
+            try {
+                Swal.fire({
+                    title: 'Cargando historial...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                const res = await fetch(`${URLS.HISTORIAL_PACIENTE}&id_paciente=${encodeURIComponent(idPaciente)}&limite=20`);
+                const data = await res.json();
+
+                if (data.status !== 'success') {
+                    throw new Error(data.message || 'No se pudo cargar el historial');
+                }
+
+                const historial = data.historial || [];
+                if (!historial.length) {
+                    await Swal.fire({
+                        icon: 'info',
+                        title: `Sin historial para ${escapeHtml(nombreMascota)}`,
+                        text: 'No hay citas registradas para esta mascota.',
+                        confirmButtonText: 'Cerrar'
+                    });
+                    return;
+                }
+
+                const filas = historial.map(item => {
+                    const estado = escapeHtml(item.estado || 'Pendiente');
+                    const servicio = escapeHtml(item.subservicio_nombre || item.servicio_nombre || item.tipo || 'Sin servicio');
+                    const vet = escapeHtml(item.veterinario_nombre || 'No asignado');
+                    const fecha = formatearFechaHistorial(item.fecha_hora);
+                    const motivoCancelacion = item.estado === 'Cancelada' && item.motivo_cancelacion
+                        ? `<br><small><strong>Motivo:</strong> ${escapeHtml(item.motivo_cancelacion)}</small>`
+                        : '';
+
+                    return `
+                        <tr>
+                            <td style="padding:8px;border-bottom:1px solid #e5e7eb;">${fecha}</td>
+                            <td style="padding:8px;border-bottom:1px solid #e5e7eb;">${servicio}</td>
+                            <td style="padding:8px;border-bottom:1px solid #e5e7eb;">${vet}</td>
+                            <td style="padding:8px;border-bottom:1px solid #e5e7eb;">
+                                <span class="estado-badge ${estado.toLowerCase()}">${estado}</span>${motivoCancelacion}
+                            </td>
+                        </tr>`;
+                }).join('');
+
+                await Swal.fire({
+                    title: `Historial de ${escapeHtml(nombreMascota)}`,
+                    width: 900,
+                    html: `
+                        <div style="max-height:420px;overflow:auto;text-align:left;">
+                            <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                                <thead>
+                                    <tr style="background:#f8fafc;">
+                                        <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Fecha</th>
+                                        <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Servicio</th>
+                                        <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Veterinario</th>
+                                        <th style="padding:10px;border-bottom:1px solid #e5e7eb;">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filas}
+                                </tbody>
+                            </table>
+                        </div>`,
+                    confirmButtonText: 'Cerrar'
+                });
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo cargar el historial de la mascota.'
+                });
+            }
         }
 
         async function cancelarCita(id, nombre) {

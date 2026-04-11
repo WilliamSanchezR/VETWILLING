@@ -656,10 +656,15 @@ switch ($request) {
 
     // pasarela de pago
     case '/pasarela-pago':
-        require BASE_PATH . '/app/views/payments/pasarelaPago.php';
+        $_GET['action'] = 'pasarela';
+        require BASE_PATH . '/app/controllers/pagosMercadoPagoController.php';
+        break;
+    case '/pagos/mercadopago':
+        require BASE_PATH . '/app/controllers/pagosMercadoPagoController.php';
         break;
     case '/pagos/confirmacion':
-        require BASE_PATH . '/app/views/payments/confirmacion.php';
+        $_GET['action'] = 'confirmacion';
+        require BASE_PATH . '/app/controllers/pagosMercadoPagoController.php';
         break;
 
     // ------------------------- SOPORTE TECNICO ------------------------- //
@@ -670,4 +675,17 @@ switch ($request) {
     case '/soporte/api/ticket':
         require BASE_PATH . '/app/controllers/ticketController.php';
         break;
+
+
+
+    // ---------------------------REGISTRO--------------------------- //
+    case '/registro':
+        require BASE_PATH . '/app/views/website/registrarse.php';
+        break;
+
+    case '/registro/veterinaria':
+        require BASE_PATH . '/app/controllers/registrarseController.php';
+        break;
+
+
 }

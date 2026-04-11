@@ -517,4 +517,110 @@ class Usuario
             return [];
         }
     }
+
+    // =========================================
+    // RFS 37: PREFERENCIAS DE NOTIFICACIÓN
+    // =========================================
+
+    /**
+     * Obtiene la preferencia de notificación del usuario
+     * 
+     * @param int $id_usuario ID del usuario
+     * @return string|null Preferencia (email|ninguno) o null si no existe
+     */
+    public function obtenerPreferenciaNotificacion($id_usuario)
+    {
+        try {
+            $sql = "SELECT preferencia_notificacion 
+                    FROM usuario 
+                    WHERE id_usuario = :id_usuario 
+                    LIMIT 1";
+            
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $resultado ? $resultado['preferencia_notificacion'] : 'email';
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::obtenerPreferenciaNotificacion -> " . $e->getMessage());
+            return 'email'; // Default a email
+        }
+    }
+
+    /**
+     * Actualiza la preferencia de notificación del usuario
+     * 
+     * @param int $id_usuario ID del usuario
+     * @param string $preferencia email|ninguno
+     * @return bool True si se actualizó correctamente
+     */
+    public function actualizarPreferenciaNotificacion($id_usuario, $preferencia)
+    {
+        try {
+            // Validar que la preferencia sea válida
+            $preferenciaValida = ['email', 'ninguno'];
+            if (!in_array($preferencia, $preferenciaValida)) {
+                error_log("⚠️ Preferencia inválida: " . $preferencia);
+                return false;
+            }
+
+            $sql = "UPDATE usuario 
+                    SET preferencia_notificacion = :preferencia 
+                    WHERE id_usuario = :id_usuario";
+            
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':preferencia', $preferencia, PDO::PARAM_STR);
+            
+            $resultado = $stmt->execute();
+            if ($resultado) {
+                error_log("✅ Preferencia de notificación actualizada para usuario {$id_usuario} a: {$preferencia}");
+            }
+            return $resultado;
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::actualizarPreferenciaNotificacion -> " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Obtiene historial de notificaciones de un usuario
+     * 
+     * @param int $id_usuario ID del usuario
+     * @param int $limite Número de registros (default: 20)
+     * @return array Array de notificaciones
+     */
+    public function obtenerHistorialNotificaciones($id_usuario, $limite = 20)
+    {
+        try {
+            $sql = "SELECT 
+                        ne.id_notificacion,
+                        ne.fecha_envio,
+                        ne.medio_notificacion,
+                        ne.estado_envio,
+                        ne.destinatario,
+                        ag.tipo as tipo_cita,
+                        pac.nombre as nombre_mascota,
+                        ag.fecha_hora as fecha_cita
+                    FROM notificaciones_enviadas ne
+                    LEFT JOIN agendamiento ag ON ne.id_agendamiento = ag.id_agendamiento
+                    LEFT JOIN paciente pac ON ag.id_paciente = pac.id_paciente
+                    LEFT JOIN propietario pr ON pac.id_propietario = pr.id_propietario
+                    WHERE pr.id_usuario = :id_usuario
+                    ORDER BY ne.fecha_envio DESC
+                    LIMIT :limite";
+            
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $limiteInt = (int)$limite;
+            $stmt->bindParam(':limite', $limiteInt, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::obtenerHistorialNotificaciones -> " . $e->getMessage());
+            return [];
+        }
+    }
 }

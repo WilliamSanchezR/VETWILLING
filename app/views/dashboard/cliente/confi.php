@@ -334,137 +334,87 @@
 
                 <!-- TAB: NOTIFICACIONES -->
                 <div class="tab-content" id="tab-notificaciones" style="display: none;">
-                    <!-- Notificaciones Push -->
                     <div class="config-card">
                         <div class="config-card-header">
                             <div class="config-icon">
                                 <i class="bi bi-bell-fill"></i>
                             </div>
                             <div>
-                                <h3>Notificaciones Push</h3>
-                                <p>Recibe alertas en tiempo real</p>
+                                <h3>Preferencias de Notificación</h3>
+                                <p>Configura cómo deseas recibir recordatorios de tus citas</p>
                             </div>
                         </div>
 
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>
-                                    Activar Notificaciones
-                                    <span class="badge badge-new">Principal</span>
-                                </h4>
-                                <p>Recibir notificaciones en el navegador</p>
-                            </div>
-                            <div class="toggle-switch" data-setting="push-enabled"></div>
+                        <div id="notifAlertContainer" style="margin-bottom: 16px;"></div>
+
+                        <div id="loadingPreferencias" class="alert alert-info" style="display: none;">
+                            Cargando tus preferencias de notificación...
                         </div>
 
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Citas Próximas</h4>
-                                <p>Recordatorios de citas programadas</p>
+                        <div class="config-item" style="align-items: flex-start;">
+                            <div class="config-info" style="flex: 1;">
+                                <h4>Recibir Notificaciones por Email</h4>
+                                <p>Incluye confirmación de cita, recordatorio 24 horas antes y cancelaciones.</p>
                             </div>
-                            <div class="toggle-switch" data-setting="push-appointments"></div>
+                            <div>
+                                <input type="radio" name="preferencia_notificacion" id="pref_email" value="email" checked>
+                            </div>
                         </div>
 
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Vacunas Pendientes</h4>
-                                <p>Alertas de vacunación de tus mascotas</p>
+                        <div class="config-item" style="align-items: flex-start;">
+                            <div class="config-info" style="flex: 1;">
+                                <h4>No Recibir Notificaciones</h4>
+                                <p>Desactiva el envío de correos de notificación.</p>
                             </div>
-                            <div class="toggle-switch" data-setting="push-vaccines"></div>
+                            <div>
+                                <input type="radio" name="preferencia_notificacion" id="pref_ninguno" value="ninguno">
+                            </div>
                         </div>
 
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Mensajes Nuevos</h4>
-                                <p>Notificación de mensajes del veterinario</p>
-                            </div>
-                            <div class="toggle-switch" data-setting="push-messages"></div>
+                        <div class="alert alert-info" style="margin-top: 16px;">
+                            <i class="bi bi-info-circle"></i>
+                            <span>Estas preferencias aplican a tus próximas citas. El sistema no usa SMS.</span>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; margin-top: 16px;">
+                            <button type="button" class="btn-config btn-primary-config" id="btnGuardarPreferenciaNotificacion">
+                                <i class="bi bi-check-lg"></i>
+                                Guardar Preferencia
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Email -->
                     <div class="config-card">
                         <div class="config-card-header">
                             <div class="config-icon">
-                                <i class="bi bi-envelope-fill"></i>
+                                <i class="bi bi-clock-history"></i>
                             </div>
                             <div>
-                                <h3>Notificaciones por Email</h3>
-                                <p>Configura tus preferencias de correo</p>
+                                <h3>Historial de Notificaciones</h3>
+                                <p>Últimos envíos realizados por el sistema</p>
                             </div>
                         </div>
 
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Recordatorios de Citas</h4>
-                                <p>Recibir emails antes de cada cita</p>
-                            </div>
-                            <div class="toggle-switch" data-setting="email-appointments"></div>
+                        <div id="loadingHistorial" class="alert alert-info" style="display: none;">
+                            Cargando historial de notificaciones...
                         </div>
 
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Promociones y Ofertas</h4>
-                                <p>Recibir información sobre descuentos</p>
-                            </div>
-                            <div class="toggle-switch" data-setting="email-promotions"></div>
+                        <div id="sinHistorial" class="alert alert-warning" style="display: none;">
+                            No hay notificaciones registradas todavía.
                         </div>
 
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Newsletter Mensual</h4>
-                                <p>Consejos de cuidado para mascotas</p>
-                            </div>
-                            <div class="toggle-switch" data-setting="email-newsletter"></div>
-                        </div>
-                    </div>
-
-                    <!-- SMS -->
-                    <div class="config-card">
-                        <div class="config-card-header">
-                            <div class="config-icon">
-                                <i class="bi bi-chat-text-fill"></i>
-                            </div>
-                            <div>
-                                <h3>Notificaciones SMS</h3>
-                                <p>Recibe mensajes de texto</p>
-                            </div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Activar SMS</h4>
-                                <p>Recibir mensajes de texto importantes</p>
-                            </div>
-                            <div class="toggle-switch" data-setting="sms-enabled"></div>
-                        </div>
-
-                        <div class="config-item">
-                            <div class="config-info">
-                                <h4>Confirmaciones de Citas</h4>
-                                <p>SMS de confirmación de citas</p>
-                            </div>
-                            <div class="toggle-switch" data-setting="sms-confirmations"></div>
-                        </div>
-
-                        <!-- Estadísticas de notificaciones -->
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-number" id="totalNotifications">0</div>
-                                <div class="stat-label">Notificaciones Activas</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="pushCount">0</div>
-                                <div class="stat-label">Push Activas</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="emailCount">0</div>
-                                <div class="stat-label">Email Activos</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="smsCount">0</div>
-                                <div class="stat-label">SMS Activos</div>
-                            </div>
+                        <div id="historialContent" style="display: none; overflow-x: auto;">
+                            <table class="table" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left;">Fecha</th>
+                                        <th style="text-align: left;">Medio</th>
+                                        <th style="text-align: left;">Mascota</th>
+                                        <th style="text-align: left;">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaHistorialNotificaciones"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -585,6 +535,138 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/confi.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnGuardar = document.getElementById('btnGuardarPreferenciaNotificacion');
+            if (!btnGuardar) return;
+
+            cargarPreferenciasNotificacion();
+            cargarHistorialNotificacionesCliente();
+
+            btnGuardar.addEventListener('click', guardarPreferenciaNotificacion);
+        });
+
+        function mostrarAlertaNotificacion(mensaje, tipo) {
+            const container = document.getElementById('notifAlertContainer');
+            if (!container) return;
+            const clase = tipo === 'success' ? 'alert-success' : (tipo === 'warning' ? 'alert-warning' : 'alert-danger');
+            container.innerHTML = '<div class="alert ' + clase + '">' + mensaje + '</div>';
+            setTimeout(function() { container.innerHTML = ''; }, 4000);
+        }
+
+        function cargarPreferenciasNotificacion() {
+            const loading = document.getElementById('loadingPreferencias');
+            if (loading) loading.style.display = 'block';
+
+            fetch('<?= BASE_URL ?>/app/controllers/preferenciasNotificacionController.php?accion=obtener')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (loading) loading.style.display = 'none';
+                    if (data.status !== 'success') return;
+
+                    const radio = document.querySelector('input[name="preferencia_notificacion"][value="' + data.preferencia + '"]');
+                    if (radio) radio.checked = true;
+                })
+                .catch(function() {
+                    if (loading) loading.style.display = 'none';
+                    mostrarAlertaNotificacion('No se pudo cargar tu preferencia actual.', 'error');
+                });
+        }
+
+        function guardarPreferenciaNotificacion() {
+            const seleccionado = document.querySelector('input[name="preferencia_notificacion"]:checked');
+            if (!seleccionado) {
+                mostrarAlertaNotificacion('Selecciona una preferencia antes de guardar.', 'warning');
+                return;
+            }
+
+            const btnGuardar = document.getElementById('btnGuardarPreferenciaNotificacion');
+            const textoOriginal = btnGuardar ? btnGuardar.innerHTML : '';
+            if (btnGuardar) {
+                btnGuardar.disabled = true;
+                btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
+            }
+
+            fetch('<?= BASE_URL ?>/app/controllers/preferenciasNotificacionController.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    accion: 'actualizar',
+                    preferencia: seleccionado.value
+                })
+            })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (btnGuardar) {
+                        btnGuardar.disabled = false;
+                        btnGuardar.innerHTML = textoOriginal;
+                    }
+
+                    if (data.status === 'success') {
+                        mostrarAlertaNotificacion('Preferencia actualizada correctamente.', 'success');
+                        cargarHistorialNotificacionesCliente();
+                        return;
+                    }
+
+                    mostrarAlertaNotificacion(data.message || 'No se pudo actualizar la preferencia.', 'error');
+                })
+                .catch(function() {
+                    if (btnGuardar) {
+                        btnGuardar.disabled = false;
+                        btnGuardar.innerHTML = textoOriginal;
+                    }
+                    mostrarAlertaNotificacion('Error de comunicación al guardar la preferencia.', 'error');
+                });
+        }
+
+        function cargarHistorialNotificacionesCliente() {
+            const loading = document.getElementById('loadingHistorial');
+            const sinHistorial = document.getElementById('sinHistorial');
+            const historialContent = document.getElementById('historialContent');
+            const tbody = document.getElementById('tablaHistorialNotificaciones');
+
+            if (loading) loading.style.display = 'block';
+            if (sinHistorial) sinHistorial.style.display = 'none';
+            if (historialContent) historialContent.style.display = 'none';
+
+            fetch('<?= BASE_URL ?>/app/controllers/preferenciasNotificacionController.php?accion=historial&limite=10')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (loading) loading.style.display = 'none';
+
+                    if (data.status !== 'success' || !Array.isArray(data.historial) || data.historial.length === 0) {
+                        if (sinHistorial) sinHistorial.style.display = 'block';
+                        return;
+                    }
+
+                    if (tbody) tbody.innerHTML = '';
+
+                    data.historial.forEach(function(notif) {
+                        const fecha = notif.fecha_envio ? new Date(notif.fecha_envio) : null;
+                        const fechaFormato = fecha ? fecha.toLocaleString('es-CO') : 'N/A';
+                        const estadoTexto = notif.estado_envio === 'exitoso' ? 'Entregado' : 'Fallido';
+
+                        const fila = document.createElement('tr');
+                        fila.innerHTML =
+                            '<td>' + fechaFormato + '</td>' +
+                            '<td>' + (notif.medio_notificacion || 'email') + '</td>' +
+                            '<td>' + (notif.nombre_mascota || 'N/A') + '</td>' +
+                            '<td>' + estadoTexto + '</td>';
+
+                        if (tbody) tbody.appendChild(fila);
+                    });
+
+                    if (historialContent) historialContent.style.display = 'block';
+                })
+                .catch(function() {
+                    if (loading) loading.style.display = 'none';
+                    if (sinHistorial) {
+                        sinHistorial.style.display = 'block';
+                        sinHistorial.textContent = 'No se pudo cargar el historial de notificaciones.';
+                    }
+                });
+        }
+    </script>
 </body>
 
 </html>

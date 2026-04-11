@@ -60,6 +60,7 @@ class Calendario
                             CONCAT(p.nombre, ' (', p.especie, ' - ', p.raza, ')') as nombre_descriptivo
                         FROM paciente p
                         WHERE p.id_propietario = :id_propietario
+                        AND p.estado = 'Activo'
                         ORDER BY p.nombre ASC";
 
             $resultado = $this->conexion->prepare($consulta);
@@ -192,6 +193,7 @@ class Calendario
                             CONCAT(p.nombre, ' (', pr.nombres, ' ', pr.apellidos, ')') as nombre_con_propietario
                         FROM paciente p
                         INNER JOIN propietario pr ON p.id_propietario = pr.id_propietario
+                        WHERE p.estado = 'Activo'
                         ORDER BY p.nombre ASC";
 
             $resultado = $this->conexion->prepare($consulta);
