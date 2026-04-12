@@ -119,6 +119,8 @@ function renderResumen(resumen, meta) {
     setText('reportePeriodoEtiqueta1', etiqueta);
     setText('reportePeriodoEtiqueta2', etiqueta);
     setText('reportePeriodoEtiqueta3', etiqueta);
+    setText('reportePeriodoEtiqueta4', etiqueta);
+    setText('reportePeriodoEtiqueta5', etiqueta);
     
     // Actualizar periodo seleccionado en barra de filtros
     const periodoVisual = document.getElementById('textoperiodoSeleccionado');
@@ -282,11 +284,63 @@ function renderHistorialAsignaciones(historial) {
     }).join('');
 }
 
+function renderResumenEstados(resumenEstados) {
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+
+    setText('reporteCitasCanceladas', Number(resumenEstados.canceladas || 0).toLocaleString('es-CO'));
+    setText('reporteCitasPendientes', Number(resumenEstados.pendientes || 0).toLocaleString('es-CO'));
+}
+
+function renderDetalleCitas(detalle) {
+    const tbody = document.getElementById('tablaDetalleCitasBody');
+    if (!tbody) return;
+
+    if (!detalle || !detalle.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-muted text-center p-3">Sin citas para el periodo y filtros seleccionados.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = detalle.map(item => {
+        const estado = (item.estado || 'PENDIENTE').toUpperCase();
+        let claseEstado = 'estado-pendiente';
+        if (estado === 'ATENDIDA') claseEstado = 'estado-atendida';
+        else if (estado === 'CANCELADA') claseEstado = 'estado-cancelada';
+
+        const fecha = item.fecha ? new Date(item.fecha.replace(' ', 'T')).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
+
+        return `
+            <tr>
+                <td>${fecha}</td>
+                <td>${item.paciente || 'Sin paciente'}</td>
+                <td>${item.propietario || 'Sin propietario'}</td>
+                <td>${item.servicio || 'Sin servicio'}</td>
+                <td>${item.subservicio || '-'}</td>
+                <td><span class="badge-estado ${claseEstado}">${estado}</span></td>
+                <td>${item.observaciones || '-'}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function obtenerFiltrosAvanzados() {
+    const params = new URLSearchParams();
+    const estadoCita = document.getElementById('filtroEstadoCita');
+    if (estadoCita && estadoCita.value) {
+        params.set('estado_cita', estadoCita.value);
+    }
+    return params.toString();
+}
+
 async function cargarDashboardReportes() {
     try {
         const selectorAnio = document.getElementById('selectorAnioReporte');
         const anio = selectorAnio ? selectorAnio.value : new Date().getFullYear();
-        const url = `${window.REPORTES_API_URL}?action=data&periodo=${periodoActual}&anio=${anio}`;
+        const filtrosExtra = obtenerFiltrosAvanzados();
+        let url = `${window.REPORTES_API_URL}?action=data&periodo=${periodoActual}&anio=${anio}`;
+        if (filtrosExtra) url += `&${filtrosExtra}`;
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -301,6 +355,7 @@ async function cargarDashboardReportes() {
         const payload = data.payload;
 
         renderResumen(payload.resumen || {}, payload.meta || {});
+        renderResumenEstados(payload.resumen_estados || {});
         crearGraficoIngresos(payload.ingresos_mensuales?.labels || [], payload.ingresos_mensuales?.data || []);
         crearGraficoServicios(payload.servicios || []);
         renderLeyendaServicios(payload.servicios || []);
@@ -309,6 +364,7 @@ async function cargarDashboardReportes() {
         renderFinanciero(payload.financiero || {});
         renderAsignacionesActivas(payload.asignaciones_activas || []);
         renderHistorialAsignaciones(payload.historial_asignaciones || []);
+        renderDetalleCitas(payload.detalle_citas || []);
     } catch (error) {
         console.error(error);
     }
@@ -328,17 +384,30 @@ function configurarEventos() {
     if (selectorAnio) {
         selectorAnio.addEventListener('change', cargarDashboardReportes);
     }
+
+    // Filtro avanzado de estado de cita (RFS 39)
+    const filtroEstado = document.getElementById('filtroEstadoCita');
+    if (filtroEstado) {
+        filtroEstado.addEventListener('change', cargarDashboardReportes);
+    }
 }
 
 function exportarPDF() {
     const selectorAnio = document.getElementById('selectorAnioReporte');
     const anio = selectorAnio ? selectorAnio.value : new Date().getFullYear();
-    const url = `${window.REPORTES_PDF_URL}?action=pdf&periodo=${periodoActual}&anio=${anio}`;
+    const filtrosExtra = obtenerFiltrosAvanzados();
+    let url = `${window.REPORTES_PDF_URL}?action=pdf&periodo=${periodoActual}&anio=${anio}`;
+    if (filtrosExtra) url += `&${filtrosExtra}`;
     window.open(url, '_blank');
 }
 
 function exportarExcel() {
-    alert('Exportación a Excel en construcción.');
+    const selectorAnio = document.getElementById('selectorAnioReporte');
+    const anio = selectorAnio ? selectorAnio.value : new Date().getFullYear();
+    const filtrosExtra = obtenerFiltrosAvanzados();
+    let url = `${window.REPORTES_EXCEL_URL}?action=excel&periodo=${periodoActual}&anio=${anio}`;
+    if (filtrosExtra) url += `&${filtrosExtra}`;
+    window.open(url, '_blank');
 }
 
 document.addEventListener('DOMContentLoaded', function () {

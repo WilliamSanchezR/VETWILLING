@@ -49,10 +49,49 @@ class Reportes
         }, $values));
     }
 
-    public function obtenerResumenGeneral($idUsuario, $fechaInicio, $fechaFin)
+    /**
+     * Construye fragmentos JOIN/WHERE/params para filtros opcionales (RFS 39).
+     */
+    private function construirFiltrosSQL(array $filtros = [])
+    {
+        $joins = '';
+        $where = '';
+        $params = [];
+
+        if (!empty($filtros['id_veterinaria'])) {
+            $joins .= " INNER JOIN profesional prof_f ON a.id_usuario = prof_f.id_usuario
+                         INNER JOIN profesional_veterinaria pv_f ON prof_f.id_profesional = pv_f.id_profesional";
+            $where .= " AND pv_f.id_veterinaria = :filtro_id_veterinaria";
+            $params[':filtro_id_veterinaria'] = ['value' => (int)$filtros['id_veterinaria'], 'type' => PDO::PARAM_INT];
+        }
+
+        if (!empty($filtros['id_propietario'])) {
+            $joins .= " INNER JOIN paciente pac_f ON a.id_paciente = pac_f.id_paciente";
+            $where .= " AND pac_f.id_propietario = :filtro_id_propietario";
+            $params[':filtro_id_propietario'] = ['value' => (int)$filtros['id_propietario'], 'type' => PDO::PARAM_INT];
+        }
+
+        if (!empty($filtros['estado_cita'])) {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+            $where .= " AND {$estadoNorm} = :filtro_estado_cita";
+            $params[':filtro_estado_cita'] = ['value' => $filtros['estado_cita'], 'type' => PDO::PARAM_STR];
+        }
+
+        return [$joins, $where, $params];
+    }
+
+    private function bindFiltros($stmt, array $paramsFiltro)
+    {
+        foreach ($paramsFiltro as $key => $meta) {
+            $stmt->bindValue($key, $meta['value'], $meta['type']);
+        }
+    }
+
+    public function obtenerResumenGeneral($idUsuario, $fechaInicio, $fechaFin, array $filtros = [])
     {
         try {
             $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+            [$joinsFiltro, $whereFiltro, $paramsFiltro] = $this->construirFiltrosSQL($filtros);
 
             $sql = "SELECT
                         COALESCE(SUM(CASE
@@ -66,13 +105,16 @@ class Reportes
                         COUNT(*) AS total_citas
                     FROM agendamiento a
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    {$joinsFiltro}
                     WHERE a.id_usuario = :id_usuario
-                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin";
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                      {$whereFiltro}";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
             $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $this->bindFiltros($stmt, $paramsFiltro);
             $stmt->execute();
             $resumen = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
@@ -80,8 +122,10 @@ class Reportes
                           FROM (
                               SELECT a.id_paciente, MIN(DATE(a.fecha_hora)) AS primera_fecha
                               FROM agendamiento a
+                              {$joinsFiltro}
                               WHERE a.id_usuario = :id_usuario
                                 AND a.id_paciente IS NOT NULL
+                                {$whereFiltro}
                               GROUP BY a.id_paciente
                           ) t
                           WHERE t.primera_fecha BETWEEN :fecha_inicio AND :fecha_fin";
@@ -90,6 +134,7 @@ class Reportes
             $stmtNuevos->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmtNuevos->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
             $stmtNuevos->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $this->bindFiltros($stmtNuevos, $paramsFiltro);
             $stmtNuevos->execute();
             $nuevosPacientes = (int)$stmtNuevos->fetchColumn();
 
@@ -116,26 +161,30 @@ class Reportes
         }
     }
 
-    public function obtenerIngresosUltimosSeisMeses($idUsuario)
+    public function obtenerIngresosUltimosSeisMeses($idUsuario, array $filtros = [])
     {
         try {
             $inicio = (new DateTime('first day of -5 months'))->format('Y-m-01');
             $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+            [$joinsFiltro, $whereFiltro, $paramsFiltro] = $this->construirFiltrosSQL($filtros);
 
             $sql = "SELECT
                         DATE_FORMAT(a.fecha_hora, '%Y-%m') AS periodo,
                         COALESCE(SUM(COALESCE(sub.costo, 0)), 0) AS total
                     FROM agendamiento a
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    {$joinsFiltro}
                     WHERE a.id_usuario = :id_usuario
                       AND a.fecha_hora >= :inicio
-                                            AND {$estadoNorm} <> 'CANCELADA'
+                      AND {$estadoNorm} <> 'CANCELADA'
+                      {$whereFiltro}
                     GROUP BY DATE_FORMAT(a.fecha_hora, '%Y-%m')
                     ORDER BY periodo ASC";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmt->bindParam(':inicio', $inicio, PDO::PARAM_STR);
+            $this->bindFiltros($stmt, $paramsFiltro);
             $stmt->execute();
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -179,16 +228,20 @@ class Reportes
         }
     }
 
-    public function obtenerServiciosMasSolicitados($idUsuario, $fechaInicio, $fechaFin, $limite = 4)
+    public function obtenerServiciosMasSolicitados($idUsuario, $fechaInicio, $fechaFin, $limite = 4, array $filtros = [])
     {
         try {
+            [$joinsFiltro, $whereFiltro, $paramsFiltro] = $this->construirFiltrosSQL($filtros);
+
             $sql = "SELECT
                         COALESCE(s.nombre, 'Sin servicio') AS nombre,
                         COUNT(*) AS total
                     FROM agendamiento a
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    {$joinsFiltro}
                     WHERE a.id_usuario = :id_usuario
                       AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                      {$whereFiltro}
                     GROUP BY COALESCE(s.nombre, 'Sin servicio')
                     ORDER BY total DESC
                     LIMIT :limite";
@@ -198,6 +251,7 @@ class Reportes
             $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
             $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
             $stmt->bindParam(':limite', $limite, PDO::PARAM_INT);
+            $this->bindFiltros($stmt, $paramsFiltro);
             $stmt->execute();
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
@@ -224,16 +278,20 @@ class Reportes
         }
     }
 
-    public function obtenerTopTratamientos($idUsuario, $fechaInicio, $fechaFin, $limite = 5)
+    public function obtenerTopTratamientos($idUsuario, $fechaInicio, $fechaFin, $limite = 5, array $filtros = [])
     {
         try {
+            [$joinsFiltro, $whereFiltro, $paramsFiltro] = $this->construirFiltrosSQL($filtros);
+
             $sql = "SELECT
                         COALESCE(sub.nombre, a.tipo, 'Sin tratamiento') AS nombre,
                         COUNT(*) AS total
                     FROM agendamiento a
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    {$joinsFiltro}
                     WHERE a.id_usuario = :id_usuario
                       AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                      {$whereFiltro}
                     GROUP BY COALESCE(sub.nombre, a.tipo, 'Sin tratamiento')
                     ORDER BY total DESC
                     LIMIT :limite";
@@ -243,6 +301,7 @@ class Reportes
             $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
             $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
             $stmt->bindParam(':limite', $limite, PDO::PARAM_INT);
+            $this->bindFiltros($stmt, $paramsFiltro);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
@@ -251,16 +310,20 @@ class Reportes
         }
     }
 
-    public function obtenerPacientesPorEspecie($idUsuario, $fechaInicio, $fechaFin)
+    public function obtenerPacientesPorEspecie($idUsuario, $fechaInicio, $fechaFin, array $filtros = [])
     {
         try {
+            [$joinsFiltro, $whereFiltro, $paramsFiltro] = $this->construirFiltrosSQL($filtros);
+
             $sql = "SELECT
                         COALESCE(p.especie, 'Sin especie') AS especie,
                         COUNT(DISTINCT a.id_paciente) AS total
                     FROM agendamiento a
                     LEFT JOIN paciente p ON a.id_paciente = p.id_paciente
+                    {$joinsFiltro}
                     WHERE a.id_usuario = :id_usuario
                       AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                      {$whereFiltro}
                     GROUP BY COALESCE(p.especie, 'Sin especie')
                     ORDER BY total DESC";
 
@@ -268,6 +331,7 @@ class Reportes
             $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
             $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $this->bindFiltros($stmt, $paramsFiltro);
             $stmt->execute();
 
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -293,13 +357,14 @@ class Reportes
         }
     }
 
-    public function obtenerResumenFinancieroMensual($idUsuario, $anio)
+    public function obtenerResumenFinancieroMensual($idUsuario, $anio, array $filtros = [])
     {
         try {
             $anio = (int)$anio;
             $mesActual = (int)date('n');
             $ultimoMes = ((int)date('Y') === $anio) ? $mesActual : 12;
             $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+            [$joinsFiltro, $whereFiltro, $paramsFiltro] = $this->construirFiltrosSQL($filtros);
 
             $sql = "SELECT
                         COALESCE(s.nombre, 'Sin servicio') AS concepto,
@@ -308,10 +373,12 @@ class Reportes
                     FROM agendamiento a
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    {$joinsFiltro}
                     WHERE a.id_usuario = :id_usuario
                       AND YEAR(a.fecha_hora) = :anio
                       AND MONTH(a.fecha_hora) BETWEEN 1 AND :ultimo_mes
-                                            AND {$estadoNorm} <> 'CANCELADA'
+                      AND {$estadoNorm} <> 'CANCELADA'
+                      {$whereFiltro}
                     GROUP BY COALESCE(s.nombre, 'Sin servicio'), MONTH(a.fecha_hora)
                     ORDER BY concepto ASC, mes ASC";
 
@@ -319,6 +386,7 @@ class Reportes
             $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmt->bindParam(':anio', $anio, PDO::PARAM_INT);
             $stmt->bindParam(':ultimo_mes', $ultimoMes, PDO::PARAM_INT);
+            $this->bindFiltros($stmt, $paramsFiltro);
             $stmt->execute();
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
@@ -397,23 +465,27 @@ class Reportes
         }
     }
 
-    public function obtenerResumenEstadosCitas($idUsuario, $fechaInicio, $fechaFin)
+    public function obtenerResumenEstadosCitas($idUsuario, $fechaInicio, $fechaFin, array $filtros = [])
     {
         try {
             $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+            [$joinsFiltro, $whereFiltro, $paramsFiltro] = $this->construirFiltrosSQL($filtros);
 
             $sql = "SELECT
                         {$estadoNorm} AS estado_normalizado,
                         COUNT(*) AS total
                     FROM agendamiento a
+                    {$joinsFiltro}
                     WHERE a.id_usuario = :id_usuario
                       AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                      {$whereFiltro}
                     GROUP BY {$estadoNorm}";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
             $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
             $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $this->bindFiltros($stmt, $paramsFiltro);
             $stmt->execute();
 
             $resumen = [
@@ -526,6 +598,47 @@ class Reportes
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             error_log('Error en Reportes::obtenerHistorialAsignacionesPeriodo - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function obtenerDetalleCitas($idUsuario, $fechaInicio, $fechaFin, array $filtros = [], $limite = 50)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+            [$joinsFiltro, $whereFiltro, $paramsFiltro] = $this->construirFiltrosSQL($filtros);
+
+            $sql = "SELECT
+                        a.id_agendamiento,
+                        DATE_FORMAT(a.fecha_hora, '%Y-%m-%d %H:%i') AS fecha,
+                        COALESCE(p.nombre, 'Sin paciente') AS paciente,
+                        COALESCE(CONCAT(prop.nombres, ' ', prop.apellidos), 'Sin propietario') AS propietario,
+                        COALESCE(s.nombre, 'Sin servicio') AS servicio,
+                        COALESCE(sub.nombre, a.tipo, 'Sin subservicio') AS subservicio,
+                        {$estadoNorm} AS estado,
+                        a.observaciones
+                    FROM agendamiento a
+                    LEFT JOIN paciente p ON a.id_paciente = p.id_paciente
+                    LEFT JOIN propietario prop ON p.id_propietario = prop.id_propietario
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    {$joinsFiltro}
+                    WHERE a.id_usuario = :id_usuario
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                      {$whereFiltro}
+                    ORDER BY a.fecha_hora DESC
+                    LIMIT :limite";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->bindParam(':limite', $limite, PDO::PARAM_INT);
+            $this->bindFiltros($stmt, $paramsFiltro);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerDetalleCitas - ' . $e->getMessage());
             return [];
         }
     }
