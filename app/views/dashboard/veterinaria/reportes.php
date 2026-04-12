@@ -26,7 +26,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
 </head>
 
-<body data-reportes-api-url="<?= BASE_URL ?>/veterinaria/reportes/data" data-reportes-pdf-url="<?= BASE_URL ?>/veterinaria/reportes/pdf">
+<body data-reportes-api-url="<?= BASE_URL ?>/veterinaria/reportes/data" data-reportes-pdf-url="<?= BASE_URL ?>/veterinaria/reportes/pdf" data-reportes-excel-url="<?= BASE_URL ?>/veterinaria/reportes/excel">
 
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Aqui va el include -->
@@ -83,7 +83,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <label class="etiqueta-filtro">
                             <i class="bi bi-funnel-fill"></i> Periodo
                         </label>
-                        <div class="d-flex gap-2 flex-wrap">
+                        <div class="d-flex gap-2 flex-wrap align-items-center">
                             <button class="boton-periodo active" data-periodo="hoy">
                                 <i class="bi bi-calendar-day"></i> Hoy
                             </button>
@@ -101,6 +101,19 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             </button>
                         </div>
                     </div>
+                    <div class="grupo-filtros">
+                        <label class="etiqueta-filtro">
+                            <i class="bi bi-funnel-fill"></i> Estado de Cita
+                        </label>
+                        <div class="d-flex gap-2 flex-wrap align-items-center">
+                            <select id="filtroEstadoCita" class="form-select form-select-sm" style="width: auto; min-width: 160px;">
+                                <option value="">Todos los estados</option>
+                                <option value="ATENDIDA">Atendidas</option>
+                                <option value="CANCELADA">Canceladas</option>
+                                <option value="PENDIENTE">Pendientes</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="periodo-seleccionado">
                         <i class="bi bi-calendar-check-fill"></i>
                         <span id="textoperiodoSeleccionado">Hoy</span>
@@ -110,7 +123,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
             <!-- TARJETAS DE RESUMEN MEJORADAS -->
             <div class="row g-3 mb-4">
-                <div class="col-12 col-sm-6 col-xl-3">
+                <div class="col-12 col-sm-6 col-xl-2">
                     <div class="tarjeta-metrica tarjeta-ingresos">
                         <div class="contenido-tarjeta">
                             <div class="icono-metrica">
@@ -130,7 +143,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                 </div>
 
-                <div class="col-12 col-sm-6 col-xl-3">
+                <div class="col-12 col-sm-6 col-xl-2">
                     <div class="tarjeta-metrica tarjeta-citas">
                         <div class="contenido-tarjeta">
                             <div class="icono-metrica">
@@ -150,7 +163,47 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                 </div>
 
-                <div class="col-12 col-sm-6 col-xl-3">
+                <div class="col-12 col-sm-6 col-xl-2">
+                    <div class="tarjeta-metrica tarjeta-canceladas">
+                        <div class="contenido-tarjeta">
+                            <div class="icono-metrica">
+                                <i class="bi bi-calendar-x"></i>
+                            </div>
+                            <div class="info-metrica">
+                                <p class="etiqueta-metrica">Citas Canceladas</p>
+                                <h3 class="valor-metrica" id="reporteCitasCanceladas">0</h3>
+                                <span class="badge-periodo" id="reportePeriodoEtiqueta4">
+                                    <i class="bi bi-clock"></i> Cargando...
+                                </span>
+                            </div>
+                        </div>
+                        <div class="decoracion-tarjeta">
+                            <i class="bi bi-x-circle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-2">
+                    <div class="tarjeta-metrica tarjeta-pendientes">
+                        <div class="contenido-tarjeta">
+                            <div class="icono-metrica">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                            <div class="info-metrica">
+                                <p class="etiqueta-metrica">Citas Pendientes</p>
+                                <h3 class="valor-metrica" id="reporteCitasPendientes">0</h3>
+                                <span class="badge-periodo" id="reportePeriodoEtiqueta5">
+                                    <i class="bi bi-clock"></i> Cargando...
+                                </span>
+                            </div>
+                        </div>
+                        <div class="decoracion-tarjeta">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-2">
                     <div class="tarjeta-metrica tarjeta-pacientes">
                         <div class="contenido-tarjeta">
                             <div class="icono-metrica">
@@ -170,7 +223,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                 </div>
 
-                <div class="col-12 col-sm-6 col-xl-3">
+                <div class="col-12 col-sm-6 col-xl-2">
                     <div class="tarjeta-metrica tarjeta-cumplimiento">
                         <div class="contenido-tarjeta">
                             <div class="icono-metrica">
@@ -349,6 +402,39 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <div class="contenedor-lista-items" id="listaHistorialAsignacionesReporte">
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- TABLA DETALLE DE CITAS (RFS 39) -->
+            <div class="tarjeta-tabla-financiera-mejorada mt-3">
+                <div class="encabezado-tabla-principal">
+                    <div class="info-tabla">
+                        <div class="icono-titulo-tabla">
+                            <i class="bi bi-list-columns-reverse"></i>
+                        </div>
+                        <div>
+                            <h5 class="titulo-tabla">Detalle de Citas</h5>
+                            <p class="subtitulo-tabla">Listado de citas atendidas, canceladas y pendientes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contenedor-tabla-scroll">
+                    <table class="tabla-detalle-citas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Paciente</th>
+                                <th>Propietario</th>
+                                <th>Servicio</th>
+                                <th>Subservicio</th>
+                                <th>Estado</th>
+                                <th>Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaDetalleCitasBody">
+                            <!-- Datos dinámicos -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
