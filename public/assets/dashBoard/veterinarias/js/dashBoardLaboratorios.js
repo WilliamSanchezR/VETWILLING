@@ -1,160 +1,430 @@
-let tabla;
-let tablaLaboratoriosCargados;
-let tableResultadosLab;
+let tabla = null;
+let laboratorioData = [];
+let catalogoPruebas = [];
+let pacientesDisponibles = [];
+let resultadoActual = null;
 
-//Se crea la funcion para crear la tabla de pacientes con laboratorio.
-function CrearTablaPacientes(listaPacientes) {
-    // Se selecciona el cuerpo de la tabla y se limpia su contenido.
-    const tablaBody = document.getElementById("tablaLaboratorioBody");
-    tablaBody.innerHTML = "";
-    // Se recorre la lista de pacientes y se crea las filas en la tabla.
-    listaPacientes.forEach(paciente => {
-        const fila = document.createElement("tr");
+const APP_BASE = window.location.pathname.split('/').filter(Boolean)[0] || '';
+const API_LAB_URL = `/${APP_BASE}/veterinaria/api/laboratorio`;
 
+const buscarPaciente = document.getElementById('buscarPaciente');
+const statTotal = document.getElementById('statTotal');
+const statCompletados = document.getElementById('statCompletados');
+const statPendientes = document.getElementById('statPendientes');
+const statCancelados = document.getElementById('statCancelados');
+const tablaBody = document.getElementById('tablaLaboratorioBody');
+const tablaResultados = document.getElementById('tablaResultados');
+const tablaDetalleResultados = document.getElementById('tablaDetalleResultados');
+const detalleOrdenPaciente = document.getElementById('detalleOrdenPaciente');
+const detalleOrdenMeta = document.getElementById('detalleOrdenMeta');
+const resultadoPacienteInfo = document.getElementById('resultadoPacienteInfo');
+const resultadoPruebaTitulo = document.getElementById('resultadoPruebaTitulo');
+const resultadoOrdenPruebaId = document.getElementById('resultadoOrdenPruebaId');
+const estadoPruebaResultado = document.getElementById('estadoPruebaResultado');
+const observacionesResultado = document.getElementById('observacionesResultado');
+const selectPacienteLaboratorio = document.getElementById('selectPacienteLaboratorio');
+const selectPrioridadLaboratorio = document.getElementById('selectPrioridadLaboratorio');
+const motivoOrdenLaboratorio = document.getElementById('motivoOrdenLaboratorio');
+const observacionesOrdenLaboratorio = document.getElementById('observacionesOrdenLaboratorio');
+const listaPruebasCatalogo = document.getElementById('listaPruebasCatalogo');
+const labCatalogStatus = document.getElementById('labCatalogStatus');
 
+const modalDetalle = new bootstrap.Modal(document.getElementById('exampleModal'));
+const modalResultado = new bootstrap.Modal(document.getElementById('modalResultadoLab'));
+const modalNuevaOrden = new bootstrap.Modal(document.getElementById('modalNuevaOrdenLab'));
+
+function apiGet(action, params = {}) {
+    const url = new URL(API_LAB_URL, window.location.origin);
+    url.searchParams.set('action', action);
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+            url.searchParams.set(key, value);
+        }
+    });
+
+    return fetch(url.toString()).then(async response => {
+        const payload = await response.json();
+        if (!response.ok || payload.status !== 'success') {
+            throw new Error(payload.message || 'Error de API');
+        }
+        return payload.data;
+    });
+}
+
+function apiPost(action, data = {}) {
+    return fetch(API_LAB_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, ...data })
+    }).then(async response => {
+        const payload = await response.json();
+        if (!response.ok || payload.status !== 'success') {
+            throw new Error(payload.message || 'Error de API');
+        }
+        return payload.data;
+    });
+}
+
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function mostrarEstadoIcono(estado) {
+    switch (estado) {
+        case '2':
+            return '<i class="bi bi-check-circle-fill completado-status" title="Completado"></i>';
+        case '3':
+            return '<i class="bi bi-x-circle-fill cancelado-status" title="Cancelado"></i>';
+        default:
+            return '<i class="bi bi-clock-history pendiente-status" title="Pendiente"></i>';
+    }
+}
+
+function mostrarEstadoTexto(estadoVista) {
+    switch (estadoVista) {
+        case '2':
+            return 'Completado';
+        case '3':
+            return 'Cancelado';
+        default:
+            return 'Pendiente';
+    }
+}
+
+function badgeEstadoPrueba(estado) {
+    let clase = 'text-bg-secondary';
+    if (estado === 'Pendiente' || estado === 'En proceso') clase = 'text-bg-warning';
+    if (estado === 'Procesada' || estado === 'Validada') clase = 'text-bg-success';
+    if (estado === 'Cancelada') clase = 'text-bg-danger';
+    return `<span class="badge ${clase}">${escapeHtml(estado)}</span>`;
+}
+
+function badgeMeta(label, value, className = 'text-bg-light') {
+    return `<span class="badge ${className}">${escapeHtml(label)}: ${escapeHtml(value)}</span>`;
+}
+
+function pintarStats(stats) {
+    if (statTotal) statTotal.textContent = Number(stats.total_examenes || 0);
+    if (statCompletados) statCompletados.textContent = Number(stats.completados || 0);
+    if (statPendientes) statPendientes.textContent = Number(stats.pendientes || 0);
+    if (statCancelados) statCancelados.textContent = Number(stats.cancelados || 0);
+}
+
+function renderTablaPacientes(listaPacientes) {
+    tablaBody.innerHTML = '';
+
+    listaPacientes.forEach(item => {
+        const fila = document.createElement('tr');
         fila.innerHTML = `
-            <td class="td-search-icon" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"><i class="bi bi-search"></i></td>
-            <td>${paciente.folio}</td>
-            <td>${paciente.fecha}</td>
-            <td>${paciente.propietario}</td>
-            <td>${paciente.nombreMascota}</td>
-            <td>${paciente.animal}</td>
-            <td>${paciente.raza}</td>
-            <td>${paciente.cantLaboratorios}</td>
-            <td class="td-status">${MostrarEstado(paciente.estado)}</td>
+            <td class="td-search-icon">
+                <button type="button" class="boton-accion-tabla btn-ver-orden" data-id-orden="${item.id_orden_laboratorio}" title="Ver orden">
+                    <i class="bi bi-search"></i>
+                </button>
+            </td>
+            <td>${escapeHtml(item.folio)}</td>
+            <td>${escapeHtml(item.fecha)}</td>
+            <td>${escapeHtml(item.propietario)}</td>
+            <td>${escapeHtml(item.nombreMascota)}</td>
+            <td>${escapeHtml(item.animal)}</td>
+            <td>${escapeHtml(item.raza)}</td>
+            <td>${escapeHtml(item.cantLaboratorios)}</td>
+            <td class="td-status">${mostrarEstadoIcono(item.estado)}</td>
         `;
-        // Se agrega la fila al cuerpo de la tabla.
         tablaBody.appendChild(fila);
     });
 
-    try {
-        tabla = $('#tabla-pacientes').DataTable({
-            // Configuración de idioma en español
-            language: {
-                "decimal": "",
-                "emptyTable": "No hay Laboratorios disponibles",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ Laboratorios",
-                "infoEmpty": "Mostrando 0 a 0 de 0 Laboratorios",
-                "infoFiltered": "(filtrado de _MAX_ Laboratorios totales)",
-                "infoPostFix": "",
-                "thousands": ",",
-                "lengthMenu": "Mostrar _MENU_ Laboratorios",
-                "loadingRecords": "Cargando...",
-                "processing": "Procesando...",
-                "search": "Buscar:",
-                "zeroRecords": "No se encontraron Laboratorios",
-                "paginate": {
-                    "first": "Primera",
-                    "last": "Última",
-                    "next": "Siguiente",
-                    "previous": "Anterior"
-                }
-            },
+    if ($.fn.DataTable.isDataTable('#tabla-pacientes')) {
+        $('#tabla-pacientes').DataTable().destroy();
+    }
 
-            // Configuración de paginación
-            pageLength: 9,
-            lengthMenu: [[9, 15, 25, 50, -1], [9, 15, 25, 50, "Todas"]],
+    tabla = $('#tabla-pacientes').DataTable({
+        language: {
+            decimal: '',
+            emptyTable: 'No hay órdenes de laboratorio disponibles',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ órdenes',
+            infoEmpty: 'Mostrando 0 a 0 de 0 órdenes',
+            infoFiltered: '(filtrado de _MAX_ órdenes totales)',
+            thousands: ',',
+            lengthMenu: 'Mostrar _MENU_ órdenes',
+            loadingRecords: 'Cargando...',
+            processing: 'Procesando...',
+            search: 'Buscar:',
+            zeroRecords: 'No se encontraron órdenes de laboratorio',
+            paginate: {
+                first: 'Primera',
+                last: 'Última',
+                next: 'Siguiente',
+                previous: 'Anterior'
+            }
+        },
+        pageLength: 9,
+        lengthMenu: [[9, 15, 25, 50, -1], [9, 15, 25, 50, 'Todas']],
+        order: [[2, 'desc']],
+        columnDefs: [{ targets: [0, -1], orderable: false, searchable: false }],
+        dom: '<"row"<"col-sm-12"tr>><"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>'
+    });
+}
 
-            // Configuración de ordenamiento
-            order: [[2, 'desc']], // Ordenar por fecha por defecto
+function pintarPacienteInfo(container, data) {
+    container.innerHTML = `
+        <span>Fecha: ${escapeHtml(data.fecha || data.fecha_orden || '—')}</span>
+        <span>Propietario: ${escapeHtml(data.propietario || '—')}</span>
+        <span>Nombre Paciente: ${escapeHtml(data.nombreMascota || '—')}</span>
+        <span>Tipo de Animal: ${escapeHtml(data.animal || '—')}</span>
+        <span>Raza: ${escapeHtml(data.raza || '—')}</span>
+        <span>Sexo: ${escapeHtml(data.sexo || '—')}</span>
+    `;
+}
 
-            // Configuración de columnas
-            columnDefs: [
-                {
-                    targets: -1, // Última columna (Operación)
-                    orderable: false,
-                    searchable: false
-                }
-            ],
+function renderDetalleOrden(detalle) {
+    pintarPacienteInfo(detalleOrdenPaciente, {
+        fecha: detalle.fecha,
+        propietario: detalle.propietario,
+        nombreMascota: detalle.nombreMascota,
+        animal: detalle.animal,
+        raza: detalle.raza,
+        sexo: detalle.sexo
+    });
 
-            // DOM personalizado
-            dom: '<"row"<"col-sm-12"tr>>' +
-                '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+    detalleOrdenMeta.innerHTML = [
+        badgeMeta('Estado', detalle.estado_orden, 'text-bg-success'),
+        badgeMeta('Prioridad', detalle.prioridad, 'text-bg-primary'),
+        badgeMeta('Motivo', detalle.motivo || 'Sin motivo', 'text-bg-light')
+    ].join('');
 
-        });
+    tablaResultados.innerHTML = '';
+    detalle.pruebas.forEach(prueba => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>
+                <button type="button" class="boton-accion-tabla btn-ver-prueba" data-id-orden-prueba="${prueba.id_orden_prueba}" title="Ver resultado">
+                    <i class="bi bi-search"></i>
+                </button>
+            </td>
+            <td>${escapeHtml(prueba.nombre_prueba)}</td>
+            <td>${badgeEstadoPrueba(prueba.estado_prueba)}</td>
+            <td>${escapeHtml(prueba.fecha || detalle.fecha)}</td>
+        `;
+        tablaResultados.appendChild(fila);
+    });
+}
 
-        console.log('✅ Tabla inicializada exitosamente');
+function renderResultadoFila(data) {
+    const rango = data.rango_referencia_texto || (
+        data.valor_referencia_min !== null && data.valor_referencia_max !== null
+            ? `${data.valor_referencia_min} - ${data.valor_referencia_max}`
+            : 'Sin referencia'
+    );
 
-    } catch (error) {
-        console.error('❌ Error al inicializar DataTables:', error);
-        alert('Error al inicializar la tabla. Revisa la consola para más detalles.');
+    let inputResultado = '';
+    if (data.tipo_resultado === 'NUMERICO') {
+        inputResultado = `<input type="number" step="0.01" id="inputResultadoNumerico" class="input-historial" value="${escapeHtml(data.resultado_numerico ?? '')}">`;
+    } else if (data.tipo_resultado === 'BOOLEANO') {
+        inputResultado = `
+            <select id="inputResultadoBooleano" class="select-filtro">
+                <option value="">Seleccione</option>
+                <option value="1" ${(String(data.resultado_booleano) === '1') ? 'selected' : ''}>Positivo</option>
+                <option value="0" ${(String(data.resultado_booleano) === '0') ? 'selected' : ''}>Negativo</option>
+            </select>`;
+    } else {
+        inputResultado = `<input type="text" id="inputResultadoTexto" class="input-historial" value="${escapeHtml(data.resultado_texto ?? '')}">`;
+    }
+
+    tablaDetalleResultados.innerHTML = `
+        <tr>
+            <td>${escapeHtml(data.nombre_prueba)}</td>
+            <td>${inputResultado}</td>
+            <td><input type="text" id="inputUnidadResultado" class="input-historial" value="${escapeHtml(data.unidad_resultado || data.unidad_default || '')}"></td>
+            <td>${escapeHtml(rango)}</td>
+        </tr>
+    `;
+}
+
+function renderResultadoModal(data) {
+    resultadoActual = data;
+    resultadoOrdenPruebaId.value = data.id_orden_prueba;
+    pintarPacienteInfo(resultadoPacienteInfo, {
+        fecha: data.fecha_orden,
+        propietario: data.propietario,
+        nombreMascota: data.nombreMascota,
+        animal: data.animal,
+        raza: data.raza,
+        sexo: data.sexo
+    });
+    resultadoPruebaTitulo.textContent = `Laboratorio: ${data.nombre_prueba}`;
+    estadoPruebaResultado.value = data.estado_prueba || 'Procesada';
+    observacionesResultado.value = data.observaciones || '';
+    renderResultadoFila(data);
+}
+
+function renderPacientesSelect() {
+    selectPacienteLaboratorio.innerHTML = '<option value="">Seleccione un paciente</option>';
+    pacientesDisponibles.forEach(paciente => {
+        const option = document.createElement('option');
+        option.value = paciente.id_paciente;
+        option.textContent = `${paciente.nombre_mascota} · ${paciente.propietario} · ${paciente.especie}`;
+        selectPacienteLaboratorio.appendChild(option);
+    });
+}
+
+function renderCatalogoPruebas() {
+    listaPruebasCatalogo.innerHTML = '';
+
+    if (catalogoPruebas.length === 0) {
+        labCatalogStatus.textContent = 'No hay pruebas cargadas en el catálogo';
+        listaPruebasCatalogo.innerHTML = '<div class="text-muted">No hay pruebas disponibles. Agrega registros al catálogo para crear órdenes.</div>';
         return;
     }
+
+    labCatalogStatus.textContent = `${catalogoPruebas.length} pruebas disponibles`;
+    catalogoPruebas.forEach(prueba => {
+        const item = document.createElement('label');
+        item.className = 'lab-check-item';
+        item.innerHTML = `
+            <input type="checkbox" class="check-prueba-lab" value="${prueba.id_prueba_catalogo}">
+            <div>
+                <strong>${escapeHtml(prueba.nombre_prueba)}</strong>
+                <small>${escapeHtml(prueba.categoria || 'Sin categoría')} · ${escapeHtml(prueba.codigo_prueba)}</small>
+                <small>${escapeHtml(prueba.unidad_default || 'Sin unidad')} · ${escapeHtml(prueba.rango_referencia_texto || 'Sin rango')}</small>
+            </div>
+        `;
+        listaPruebasCatalogo.appendChild(item);
+    });
 }
 
-// Función para mostrar el estado con íconos
-function MostrarEstado(estado) {
-    switch (estado) {
-        case "1":
-            return `<i class="bi bi-clock-history pendiente-status" title="Pendiente"></i>`;
-        case "2":
-            return `<i class="bi bi-check-circle-fill completado-status" title="Completado"></i>`;
-        default:
-            return `<i class="bi bi-x-circle-fill cancelado-status" title="Cancelado"></i>`;
-    }
+function obtenerPruebasSeleccionadas() {
+    return Array.from(document.querySelectorAll('.check-prueba-lab:checked')).map(input => Number(input.value));
 }
 
+function resetModalNuevaOrden() {
+    selectPacienteLaboratorio.value = '';
+    selectPrioridadLaboratorio.value = 'Normal';
+    motivoOrdenLaboratorio.value = '';
+    observacionesOrdenLaboratorio.value = '';
+    document.querySelectorAll('.check-prueba-lab').forEach(input => {
+        input.checked = false;
+    });
+}
 
-// Botón "ordenar" - ordenar la tabla
-$('#btnOrdenar').on('click', function () {
-    const opciones = [
-        '📅 Fecha (más antigua primero)',
-        '📅 Fecha (más reciente primero)',
-        '👤 Propietario (A-Z)',
-        '👤 Propietario (Z-A)',
-        '🐾 Mascota (A-Z)'
-    ];
+function cargarListado() {
+    return apiGet('listar').then(data => {
+        laboratorioData = Array.isArray(data) ? data : [];
+        renderTablaPacientes(laboratorioData);
+    });
+}
 
-    const mensaje = '⬆️⬇️ Selecciona el ordenamiento:\n\n' +
-        opciones.map((o, i) => `${i + 1} - ${o}`).join('\n');
+function cargarStats() {
+    return apiGet('estadisticas').then(pintarStats);
+}
 
-    const opcion = prompt(mensaje);
+function cargarCatalogosModal() {
+    return Promise.all([
+        apiGet('pacientes').then(data => {
+            pacientesDisponibles = Array.isArray(data) ? data : [];
+            renderPacientesSelect();
+        }),
+        apiGet('catalogo').then(data => {
+            catalogoPruebas = Array.isArray(data) ? data : [];
+            renderCatalogoPruebas();
+        })
+    ]);
+}
 
-    switch (opcion) {
-        case '1':
-            tabla.order([2, 'asc']).draw();
-            console.log('📅 Ordenado por fecha ascendente');
-            break;
-        case '2':
-            tabla.order([2, 'desc']).draw();
-            console.log('📅 Ordenado por fecha descendente');
-            break;
-        case '3':
-            tabla.order([3, 'asc']).draw();
-            console.log('👤 Ordenado por propietario A-Z');
-            break;
-        case '4':
-            tabla.order([3, 'desc']).draw();
-            console.log('👤 Ordenado por propietario Z-A');
-            break;
-        case '5':
-            tabla.order([4, 'asc']).draw();
-            console.log('🐾 Ordenado por mascota A-Z');
-            break;
-        default:
-            if (opcion !== null) {
-                alert('❌ Opción no válida');
-            }
+function abrirDetalleOrden(idOrden) {
+    apiGet('detalle', { id_orden_laboratorio: idOrden })
+        .then(detalle => {
+            renderDetalleOrden(detalle);
+            modalDetalle.show();
+        })
+        .catch(error => {
+            console.error(error);
+            alert(error.message || 'No se pudo cargar la orden');
+        });
+}
+
+function abrirResultadoPrueba(idOrdenPrueba) {
+    apiGet('resultado', { id_orden_prueba: idOrdenPrueba })
+        .then(data => {
+            renderResultadoModal(data);
+            modalResultado.show();
+        })
+        .catch(error => {
+            console.error(error);
+            alert(error.message || 'No se pudo cargar el resultado');
+        });
+}
+
+function guardarResultadoActual() {
+    if (!resultadoActual) {
+        return;
     }
-});
 
+    const payload = {
+        id_orden_prueba: Number(resultadoOrdenPruebaId.value),
+        estado_prueba: estadoPruebaResultado.value,
+        observaciones: observacionesResultado.value.trim(),
+    };
 
-// Botón "exportar" - exportar a CSV la tabla 
-$('#btnExport').on('click', function () {
-    console.log('📥 Exportando a CSV...');
-    exportarACSV();
-});
+    if (resultadoActual.tipo_resultado === 'NUMERICO') {
+        payload.resultado_numerico = document.getElementById('inputResultadoNumerico')?.value ?? '';
+    } else if (resultadoActual.tipo_resultado === 'BOOLEANO') {
+        payload.resultado_booleano = document.getElementById('inputResultadoBooleano')?.value ?? '';
+    } else {
+        payload.resultado_texto = document.getElementById('inputResultadoTexto')?.value ?? '';
+    }
 
+    payload.unidad_resultado = document.getElementById('inputUnidadResultado')?.value ?? '';
 
-// Función para exportar la tabla a CSV
+    apiPost('guardar-resultado', payload)
+        .then(() => Promise.all([cargarListado(), cargarStats(), apiGet('detalle', { id_orden_laboratorio: resultadoActual.id_orden_laboratorio })]))
+        .then(([, , detalle]) => {
+            renderDetalleOrden(detalle);
+            modalResultado.hide();
+            alert('Resultado guardado correctamente');
+        })
+        .catch(error => {
+            console.error(error);
+            alert(error.message || 'No se pudo guardar el resultado');
+        });
+}
+
+function crearNuevaOrden() {
+    const payload = {
+        id_paciente: Number(selectPacienteLaboratorio.value),
+        prioridad: selectPrioridadLaboratorio.value,
+        motivo: motivoOrdenLaboratorio.value.trim(),
+        observaciones: observacionesOrdenLaboratorio.value.trim(),
+        pruebas: obtenerPruebasSeleccionadas(),
+    };
+
+    apiPost('crear-orden', payload)
+        .then(() => Promise.all([cargarListado(), cargarStats()]))
+        .then(() => {
+            resetModalNuevaOrden();
+            modalNuevaOrden.hide();
+            alert('Orden de laboratorio creada correctamente');
+        })
+        .catch(error => {
+            console.error(error);
+            alert(error.message || 'No se pudo crear la orden');
+        });
+}
+
 function exportarACSV() {
+    if (!tabla) return;
+
     try {
         const data = tabla.rows({ search: 'applied' }).data();
         let csv = 'No.,Fecha,Propietario,Nombre Mascota,Animal,Raza,Laboratorios,Estado\n';
 
         data.each(function (fila) {
             const filaLimpia = [];
-            for (let i = 0; i < fila.length - 1; i++) {
+            for (let i = 1; i < fila.length; i++) {
                 let valor = fila[i].toString().replace(/<[^>]*>/g, '');
                 valor = valor.replace(/"/g, '""');
                 filaLimpia.push(`"${valor}"`);
@@ -174,167 +444,81 @@ function exportarACSV() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
-        alert('✅ Archivo CSV descargado correctamente');
-        console.log('✅ CSV exportado:', `citas_veterinaria_${fecha}.csv`);
     } catch (error) {
-        console.error('❌ Error al exportar CSV:', error);
+        console.error(error);
         alert('Error al exportar CSV. Revisa la consola.');
     }
 }
 
+$('#btnOrdenar').on('click', function () {
+    if (!tabla) return;
 
-// Búsqueda en la tabla
-$('#buscarPaciente').on('keyup change', function () {
-    const valorBusqueda = this.value;
-    console.log('🔍 Buscando:', valorBusqueda);
-    tabla.search(valorBusqueda).draw();
+    const opciones = [
+        '1 - Fecha (más antigua primero)',
+        '2 - Fecha (más reciente primero)',
+        '3 - Propietario (A-Z)',
+        '4 - Propietario (Z-A)',
+        '5 - Mascota (A-Z)'
+    ];
+
+    const opcion = prompt('Selecciona el ordenamiento:\n\n' + opciones.join('\n'));
+
+    switch (opcion) {
+        case '1':
+            tabla.order([2, 'asc']).draw();
+            break;
+        case '2':
+            tabla.order([2, 'desc']).draw();
+            break;
+        case '3':
+            tabla.order([3, 'asc']).draw();
+            break;
+        case '4':
+            tabla.order([3, 'desc']).draw();
+            break;
+        case '5':
+            tabla.order([4, 'asc']).draw();
+            break;
+        default:
+            if (opcion !== null) alert('Opción no válida');
+            break;
+    }
 });
 
-
-// Limpiar búsqueda al hacer clic en el icono de búsqueda
-$('.campo-buscar i').on('click', function () {
-    $('#buscarPaciente').val('').trigger('keyup');
-});
-
-
+$('#btnExport').on('click', exportarACSV);
 $('#btnAgregarNuevo').on('click', function () {
-    document.location.href = "../../../../dashBoard/veterinarias/registroPacientesLaboratorio.html";
+    resetModalNuevaOrden();
+    modalNuevaOrden.show();
+});
+$('#btnGuardarOrdenLab').on('click', crearNuevaOrden);
+$('#btn-guardar-resultados').on('click', guardarResultadoActual);
+
+$('#buscarPaciente').on('keyup change', function () {
+    if (!tabla) return;
+    tabla.search(this.value).draw();
 });
 
-// Cerrar modal de resultados de laboratorio al guardar
-$('#btn-guardar-resultados').on('click', function () {
-    $('#modalResultadoLab').modal('hide');
+$('.campo-buscar i').on('click', function () {
+    if (!buscarPaciente) return;
+    buscarPaciente.value = '';
+    $('#buscarPaciente').trigger('keyup');
 });
 
-
-// Funcion para inicializar DataTable para la lista de laboratorios asociados
-function dataTableListLaboratorios() {
-    try {
-        tablaUsuarios = $('#list-laboratorios-asociados').DataTable({
-            // Configuración de idioma en español
-            language: {
-                "decimal": "",
-                "emptyTable": "No hay Laboratorios disponibles",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ Laboratorios",
-                "infoEmpty": "Mostrando 0 a 0 de 0 Laboratorios",
-                "infoFiltered": "(filtrado de _MAX_ Laboratorios totales)",
-                "infoPostFix": "",
-                "thousands": ",",
-                "lengthMenu": "Mostrar _MENU_ Laboratorios",
-                "loadingRecords": "Cargando...",
-                "processing": "Procesando...",
-                "search": "Buscar:",
-                "zeroRecords": "No se encontraron Laboratorios",
-                "paginate": {
-                    "first": "Primera",
-                    "last": "Última",
-                    "next": "Siguiente",
-                    "previous": "Anterior"
-                }
-            },
-
-            // Configuración de paginación
-            pageLength: 9,
-            lengthMenu: [[9, 15, 25, 50, -1], [9, 15, 25, 50, "Todas"]],
-
-            // Configuración de ordenamiento
-            order: [[2, 'desc']], // Ordenar por fecha por defecto
-
-            // Configuración de columnas
-            columnDefs: [
-                {
-                    targets: -1, // Última columna (Operación)
-                    orderable: false,
-                    searchable: false
-                }
-            ],
-
-            // DOM personalizado
-            dom: '<"row"<"col-sm-12"tr>>' +
-                '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-
-        });
-
-        console.log('✅ Tabla inicializada exitosamente');
-
-    } catch (error) {
-        console.error('❌ Error al inicializar DataTables:', error);
-        alert('Error al inicializar la tabla. Revisa la consola para más detalles.');
+document.addEventListener('click', event => {
+    const detailButton = event.target.closest('.btn-ver-orden');
+    if (detailButton) {
+        abrirDetalleOrden(Number(detailButton.dataset.idOrden));
         return;
     }
-}
 
-// Funcion para inicializar DataTable para la lista de resultados de laboratorio
-function dataTableResultadosLaboratorio() {
-    try {
-        tableResultadosLab = $('#lista-resultados').DataTable({
-            // Configuración de idioma en español
-            language: {
-                "decimal": "",
-                "emptyTable": "No hay Laboratorios disponibles",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ Laboratorios",
-                "infoEmpty": "Mostrando 0 a 0 de 0 Laboratorios",
-                "infoFiltered": "(filtrado de _MAX_ Laboratorios totales)",
-                "infoPostFix": "",
-                "thousands": ",",
-                "lengthMenu": "Mostrar _MENU_ Laboratorios",
-                "loadingRecords": "Cargando...",
-                "processing": "Procesando...",
-                "search": "Buscar:",
-                "zeroRecords": "No se encontraron Laboratorios",
-                "paginate": {
-                    "first": "Primera",
-                    "last": "Última",
-                    "next": "Siguiente",
-                    "previous": "Anterior"
-                }
-            },
-
-            // Configuración de paginación
-            pageLength: 9,
-            lengthMenu: [[9, 15, 25, 50, -1], [9, 15, 25, 50, "Todas"]],
-
-            // Configuración de ordenamiento
-            order: [[2, 'desc']], // Ordenar por fecha por defecto
-
-            // Configuración de columnas
-            columnDefs: [
-                {
-                    targets: -1, // Última columna (Operación)
-                    orderable: false,
-                    searchable: false
-                }
-            ],
-
-            // DOM personalizado
-            dom: '<"row"<"col-sm-12"tr>>' +
-                '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-
-        });
-
-        console.log('✅ Tabla inicializada exitosamente');
-
-    } catch (error) {
-        console.error('❌ Error al inicializar DataTables:', error);
-        alert('Error al inicializar la tabla. Revisa la consola para más detalles.');
-        return;
+    const resultButton = event.target.closest('.btn-ver-prueba');
+    if (resultButton) {
+        abrirResultadoPrueba(Number(resultButton.dataset.idOrdenPrueba));
     }
-}
+});
 
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    fetch("../../assets/data/laboratorioPacientes.json")
-        .then(response => response.json())
-        .then(data => {
-            CrearTablaPacientes(data);
-        })
-        .catch(error => {
-            console.error("Error al cargar el JSON:", error);
-
-        });
-
-    dataTableListLaboratorios();
-    dataTableResultadosLaboratorio();
-})
+document.addEventListener('DOMContentLoaded', () => {
+    Promise.all([cargarListado(), cargarStats(), cargarCatalogosModal()]).catch(error => {
+        console.error(error);
+    });
+});

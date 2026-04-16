@@ -1,132 +1,276 @@
 // Variables globales
 let listaPacientes = [];
 let pacientesSeleccionado = null;
-const buscarPaciente = document.getElementById("buscarPacientes");
+
+const APP_BASE = window.location.pathname.split('/').filter(Boolean)[0] || '';
+const API_RECETAS_URL = `/${APP_BASE}/veterinaria/api/recetas`;
+
+const buscarPaciente   = document.getElementById("buscarPacientes");
 const listaSugerencias = document.getElementById("listaSugerencias");
-const contPlaques = document.getElementById("plaque-paciente");
-const textReceta = document.getElementById("descripcion-receta");
+const emptyState       = document.getElementById("emptyState");
+const plaqueFilledDiv  = document.getElementById("plaque-paciente");
 const plaquePacienteModal = document.getElementById("plaque-paciente-modal");
+const textReceta       = document.getElementById("descripcion-receta");
+const charCount        = document.getElementById("charCount");
+const btnGuardar       = document.getElementById("btn-guardar-receta");
+const patientBar       = document.getElementById("receta-pad-patient-bar");
+const patientBarName   = document.getElementById("receta-pad-patient-name");
+const statRecetas      = document.getElementById("statRecetas");
+const statPacientes    = document.getElementById("statPacientes");
+const statHoy          = document.getElementById("statHoy");
+const statImpresiones  = document.getElementById("statImpresiones");
 
-// Funcion para llamar al json de pacientes
+// ── Fecha en cabecera del taco ──
+(function setFechaTaco() {
+    const el = document.getElementById("receta-pad-fecha");
+    if (!el) return;
+    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    el.textContent = new Date().toLocaleDateString('es-ES', opciones);
+})();
+
+// ── Indicadores de pasos ──
+function setStep(n) {
+    for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById("step" + i);
+        if (!el) continue;
+        el.classList.remove("active", "done");
+        if (i < n)  el.classList.add("done");
+        if (i === n) el.classList.add("active");
+    }
+}
+
+// ── Carga pacientes asignados desde BD ──
 function consultarPacientes() {
-
-    fetch('../../../assets/data/pacientes.json')
-        .then(response => response.json())
-        .then(data => {
-            listaPacientes = data;
+    fetch(`${API_RECETAS_URL}?action=pacientes`)
+        .then(r => r.json())
+        .then(payload => {
+            if (payload.status !== 'success' || !Array.isArray(payload.data)) {
+                throw new Error('Respuesta invalida de pacientes');
+            }
+            listaPacientes = payload.data;
         })
-        .catch(error => {
-            console.error('Error al consultar pacientes:', error);
+        .catch(err => console.error('Error al consultar pacientes:', err));
+}
+
+// ── Carga estadísticas de mini-stat desde BD ──
+function consultarEstadisticas() {
+    fetch(`${API_RECETAS_URL}?action=estadisticas`)
+        .then(r => r.json())
+        .then(payload => {
+            if (payload.status !== 'success' || !payload.data) {
+                throw new Error('Respuesta invalida de estadisticas');
+            }
+
+            const data = payload.data;
+            if (statRecetas) statRecetas.textContent = Number(data.total_recetas || 0);
+            if (statPacientes) statPacientes.textContent = Number(data.pacientes_atendidos || 0);
+            if (statHoy) statHoy.textContent = Number(data.emitidas_hoy || 0);
+            if (statImpresiones) statImpresiones.textContent = Number(data.impresiones_hoy || 0);
+        })
+        .catch(err => {
+            console.error('Error al consultar estadisticas:', err);
+            if (statRecetas) statRecetas.textContent = '0';
+            if (statPacientes) statPacientes.textContent = '0';
+            if (statHoy) statHoy.textContent = '0';
+            if (statImpresiones) statImpresiones.textContent = '0';
         });
 }
 
-// Funcion para cargar los datos del ppropetasrio y los de la mascota
+// ── Crea la ficha del paciente para el modal ──
 function crearPlaquePaciente(paciente) {
     return `
-            <div>
-                <span>Fecha: ${paciente.fecha}</span>
-                <span>No. Documento Propietario: ${paciente.documento}</span>
-                <span>Propietario: ${paciente.nombrePropietario}</span>
-                <span>Télefono: ${paciente.telefono}</span>
-                </div>
-            <div>
-                <span>Nombre Paciente: ${paciente.nombre}</span>
-                <span>Especie: ${paciente.especie}</span>
-                <span>Raza: ${paciente.raza}</span>
-                <span>Sexo: ${paciente.sexo}</span>
+        <div>
+            <span><strong>Fecha:</strong> ${paciente.fecha}</span>
+            <span><strong>N.º Documento:</strong> ${paciente.documento}</span>
+            <span><strong>Propietario:</strong> ${paciente.nombrePropietario}</span>
+            <span><strong>Teléfono:</strong> ${paciente.telefono}</span>
+        </div>
+        <div>
+            <span><strong>Paciente:</strong> ${paciente.nombre}</span>
+            <span><strong>Especie:</strong> ${paciente.especie}</span>
+            <span><strong>Raza:</strong> ${paciente.raza}</span>
+            <span><strong>Sexo:</strong> ${paciente.sexo}</span>
+        </div>`;
+}
 
+// ── Crea la ficha bonita del paciente para el panel lateral ──
+function crearFichaLateral(paciente) {
+    return `
+        <div class="receta-patient-header">
+            <div class="receta-patient-header-icon">
+                <i class="bi bi-paw"></i>
             </div>
-    `;
+            <div>
+                <h6>${paciente.nombre}</h6>
+                <small>${paciente.especie} · ${paciente.raza}</small>
+            </div>
+        </div>
+        <div class="receta-patient-fields">
+            <div class="receta-field-row">
+                <span class="receta-field-label">N.º Documento</span>
+                <span class="receta-field-value">${paciente.documento}</span>
+            </div>
+            <div class="receta-field-row">
+                <span class="receta-field-label">Propietario</span>
+                <span class="receta-field-value">${paciente.nombrePropietario}</span>
+            </div>
+            <div class="receta-field-row">
+                <span class="receta-field-label">Teléfono</span>
+                <span class="receta-field-value">${paciente.telefono}</span>
+            </div>
+            <div class="receta-field-row">
+                <span class="receta-field-label">Sexo</span>
+                <span class="receta-field-value">${paciente.sexo}</span>
+            </div>
+            <div class="receta-field-row">
+                <span class="receta-field-label">Fecha</span>
+                <span class="receta-field-value">${paciente.fecha}</span>
+            </div>
+        </div>`;
 }
 
-// Funcion para mostrar el formulario del paciente seleccionado
+// ── Muestra la info del paciente seleccionado ──
 function mostrarContForm() {
-    contPlaques.innerHTML = '';
-    const contForm = document.querySelector('.cont-form');
-    contForm.style.display = 'flex';
-    contPlaques.innerHTML = crearPlaquePaciente(pacientesSeleccionado);
+    // Panel lateral
+    emptyState.style.display   = 'none';
+    plaqueFilledDiv.style.display = 'flex';
+    plaqueFilledDiv.innerHTML  = crearFichaLateral(pacientesSeleccionado);
+
+    // Barra inline en el editor
+    if (patientBar) {
+        patientBarName.textContent = `${pacientesSeleccionado.nombre} — ${pacientesSeleccionado.nombrePropietario}`;
+        patientBar.style.display = 'flex';
+    }
+
+    // Limpiar y preparar textarea
     textReceta.value = 'RP/\n\n';
+    actualizarContador();
+    actualizarBoton();
+    setStep(2);
+    textReceta.focus();
 }
 
-// Funcion para buscar el paciente por nuero de documento del propietario
+// ── Deseleccionar paciente ──
+function deseleccionarPaciente() {
+    pacientesSeleccionado = null;
+    buscarPaciente.value  = '';
+    emptyState.style.display   = 'flex';
+    plaqueFilledDiv.style.display = 'none';
+    plaqueFilledDiv.innerHTML  = '';
+    if (patientBar) patientBar.style.display = 'none';
+    textReceta.value = '';
+    actualizarContador();
+    actualizarBoton();
+    setStep(1);
+    buscarPaciente.focus();
+}
+
+// ── Contador de caracteres ──
+function actualizarContador() {
+    if (charCount) charCount.textContent = textReceta.value.length;
+}
+
+// ── Habilita / deshabilita el botón de imprimir ──
+function actualizarBoton() {
+    if (!btnGuardar) return;
+    const activo = !!pacientesSeleccionado && textReceta.value.trim().length > 3;
+    btnGuardar.disabled = !activo;
+}
+
+// ── Búsqueda / filtrado de pacientes ──
 function buscarPacientes(valorInput) {
     listaSugerencias.innerHTML = '';
 
     if (valorInput.trim() === '') {
-        listaSugerencias.style.display = "none";
+        listaSugerencias.classList.remove('visible');
         return;
     }
 
-    const valorBusqueda = valorInput.toLowerCase();
+    const q = valorInput.toLowerCase();
+    const filtrados = listaPacientes.filter(p => {
+        const documento = String(p.documento || '').toLowerCase();
+        const propietario = String(p.nombrePropietario || '').toLowerCase();
+        return documento.includes(q) || propietario.includes(q);
+    });
 
-    const pacientesFiltrados = listaPacientes.filter(paciente =>
-        paciente.documento.toLowerCase().includes(valorBusqueda)
-    );
-
-    if (pacientesFiltrados.length === 0) {
-        listaSugerencias.style.display = "none";
+    if (filtrados.length === 0) {
+        listaSugerencias.classList.remove('visible');
         return;
-    } else {
-        listaSugerencias.style.display = "block";
     }
 
-    pacientesFiltrados.forEach(item => {
-        const listItem = document.createElement("li");
-        listItem.textContent = `${item.documento} - ${item.nombre}`;
-        listItem.addEventListener("click", () => {
-            buscarPaciente.value = `${item.documento} - ${item.nombre}`;
+    filtrados.forEach(item => {
+        const li = document.createElement("li");
+        li.innerHTML = `<i class="bi bi-person-circle"></i> ${item.documento} — ${item.nombrePropietario} (${item.nombre})`;
+        li.addEventListener("click", () => {
+            buscarPaciente.value = `${item.documento} — ${item.nombrePropietario}`;
             pacientesSeleccionado = item;
-            listaSugerencias.innerHTML = "";
-            listaSugerencias.style.display = "none";
+            listaSugerencias.innerHTML = '';
+            listaSugerencias.classList.remove('visible');
             mostrarContForm();
         });
-        listaSugerencias.appendChild(listItem);
+        listaSugerencias.appendChild(li);
     });
+
+    listaSugerencias.classList.add('visible');
 }
 
-// Evento del input de búsqueda de pacientes
-buscarPaciente.addEventListener("input", (e) => {
-    const valorInput = e.target.value;
-    buscarPacientes(valorInput);
+// ── Eventos ──
+buscarPaciente.addEventListener("input", e => buscarPacientes(e.target.value));
+
+document.addEventListener("click", e => {
+    if (!buscarPaciente.contains(e.target) && !listaSugerencias.contains(e.target)) {
+        listaSugerencias.classList.remove('visible');
+    }
 });
 
-// Guardar receta y mostrar previsualizacion de la misma
+textReceta.addEventListener("input", () => {
+    actualizarContador();
+    actualizarBoton();
+});
+
+document.getElementById("btn-limpiar-receta")?.addEventListener("click", () => {
+    if (!pacientesSeleccionado) return;
+    textReceta.value = 'RP/\n\n';
+    actualizarContador();
+    actualizarBoton();
+    textReceta.focus();
+});
+
+document.getElementById("btn-deselect-patient")?.addEventListener("click", deseleccionarPaciente);
+
+// ── Vista previa e imprimir ──
 $('#btn-guardar-receta').on('click', function () {
+    if (!pacientesSeleccionado) return;
+    setStep(3);
     $('#vistaImprimir').modal('show');
     plaquePacienteModal.innerHTML = crearPlaquePaciente(pacientesSeleccionado);
     document.getElementById("receta-paciente").innerText = textReceta.value;
 
-    // Mostrar fecha pie de firma de la receta a imprimnir
-    const fechaActual = new Date();
-    const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById("fecha_report").innerText = fechaActual.toLocaleDateString('es-ES', opcionesFecha);
+    const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById("fecha_report").innerText = new Date().toLocaleDateString('es-ES', opciones);
 });
 
-// Funcion para imprimer la receta medica
-function imprimirDiv(idDiv) {
-  // Guarda el contenido actual del body
-  var contenidoOriginal = document.body.innerHTML;
-  document.title = 'Veterinario - Recetas';
-  // Obtiene el div que se va a imprimir
-  var divParaImprimir = document.getElementById(idDiv).innerHTML;
-  divParaImprimir
+$('#vistaImprimir').on('hidden.bs.modal', function () {
+    if (pacientesSeleccionado) setStep(2);
+});
 
-  // Reemplaza el contenido del body con el del div
-  document.body.innerHTML = divParaImprimir;
-  // 4. Abre el diálogo de impresión
-  window.print();
-  // Restaura el contenido original del body
-  document.body.innerHTML = contenidoOriginal;
-  // Recarga la página para volver a la vista original
-  window.location.reload();
+function imprimirDiv(idDiv) {
+    const contenidoOriginal = document.body.innerHTML;
+    document.title = 'Veterinario - Recetas';
+    const divParaImprimir = document.getElementById(idDiv).innerHTML;
+    document.body.innerHTML = divParaImprimir;
+    window.print();
+    document.body.innerHTML = contenidoOriginal;
+    window.location.reload();
 }
 
-// Boton de imprimir
-$('#btn-guardar-resultados').on('click', function() {
+$('#btn-guardar-resultados').on('click', function () {
     imprimirDiv('cont-imprimir');
 });
 
-// Inicialización al cargar el DOM
+// ── Init ──
 document.addEventListener("DOMContentLoaded", () => {
+    consultarEstadisticas();
     consultarPacientes();
+    setStep(1);
 });
