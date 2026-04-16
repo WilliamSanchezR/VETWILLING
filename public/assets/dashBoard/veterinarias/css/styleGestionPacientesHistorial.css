@@ -36,11 +36,94 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
     margin-bottom: 0;
 }
 
+.workspace-tabs {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.workspace-tab {
+    border: 1px solid #dce5ec;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--gray-dark);
+    padding: 8px 13px;
+    font-size: var(--fs-title4);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.workspace-tab:hover {
+    border-color: rgba(10, 147, 44, 0.35);
+    color: var(--primary-color);
+}
+
+.workspace-tab.active {
+    border-color: var(--primary-color);
+    background: rgba(10, 147, 44, 0.12);
+    color: var(--primary-color);
+}
+
+.ventana-oculta {
+    display: none;
+}
+
 .subtitulo-historial {
     margin-top: 6px;
     font-size: var(--fs-title4);
     color: var(--gray-dark);
     opacity: 0.85;
+}
+
+.atajos-card {
+    background: linear-gradient(120deg, rgba(10, 147, 44, 0.08), rgba(147, 190, 223, 0.16));
+    border: 1px solid rgba(10, 147, 44, 0.12);
+}
+
+.atajos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.atajo-item {
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 10px;
+    border: 1px solid rgba(10, 147, 44, 0.08);
+    padding: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.atajo-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.atajo-item strong {
+    display: block;
+    font-size: var(--fs-title4);
+    color: var(--gray-dark);
+    margin-bottom: 2px;
+}
+
+.atajo-item small {
+    color: #55616d;
+    line-height: 1.35;
 }
 
 .mini-stat {
@@ -269,6 +352,42 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
     background: rgba(10, 147, 44, 0.04);
 }
 
+.resumen-paciente {
+    border: 1px solid rgba(10, 147, 44, 0.12);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #f7fcf8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.resumen-paciente-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.resumen-paciente-head i {
+    color: var(--primary-color);
+    font-size: 20px;
+    margin-top: 2px;
+}
+
+.resumen-paciente-head strong {
+    display: block;
+    color: var(--gray-dark);
+    font-size: 15px;
+    line-height: 1.2;
+}
+
+.resumen-paciente-head small {
+    color: #5d6a77;
+    line-height: 1.35;
+}
+
 .campos-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -474,6 +593,10 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 }
 
 @media (max-width: 1200px) {
+    .atajos-grid {
+        grid-template-columns: 1fr;
+    }
+
     .filtros-grid {
         grid-template-columns: 1fr 1fr;
     }
@@ -484,6 +607,15 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 }
 
 @media (max-width: 768px) {
+    .workspace-tabs {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .workspace-tab {
+        justify-content: center;
+    }
+
     .filtros-grid,
     .campos-grid {
         grid-template-columns: 1fr;
