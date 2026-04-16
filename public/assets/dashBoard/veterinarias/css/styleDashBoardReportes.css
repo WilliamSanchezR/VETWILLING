@@ -356,6 +356,7 @@
 
 .info-metrica {
     flex: 1;
+    min-width: 0;
 }
 
 .etiqueta-metrica {
@@ -373,6 +374,27 @@
     color: var(--color-texto-oscuro);
     margin: 0;
     line-height: 1.2;
+    max-width: 100%;
+    white-space: nowrap;
+    transition: font-size var(--transition-fast);
+}
+
+.tarjeta-ingresos.tarjeta-metrica-compacta .icono-metrica {
+    width: 50px;
+    height: 50px;
+    font-size: 1.35rem;
+}
+
+.tarjeta-ingresos.tarjeta-metrica-compacta .info-metrica {
+    padding-right: 0.25rem;
+}
+
+.tarjeta-ingresos.tarjeta-metrica-compacta {
+    padding: 1rem;
+}
+
+.tarjeta-ingresos.tarjeta-metrica-compacta .contenido-tarjeta {
+    gap: 0.625rem;
 }
 
 .badge-periodo {
@@ -386,6 +408,10 @@
     font-weight: 600;
     color: var(--color-texto-medio);
     margin-top: var(--spacing-xs);
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .decoracion-tarjeta {

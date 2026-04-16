@@ -179,8 +179,16 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/laboratorio.php';
         break;
 
+    case '/veterinaria/api/laboratorio':
+        require BASE_PATH . '/app/controllers/laboratorioController.php';
+        break;
+
     case '/veterinaria/recetas':
         require BASE_PATH . '/app/views/dashboard/veterinaria/recetas.php';
+        break;
+
+    case '/veterinaria/api/recetas':
+        require BASE_PATH . '/app/controllers/recetasController.php';
         break;
 
     case '/veterinaria/reportes':

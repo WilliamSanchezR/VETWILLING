@@ -29,7 +29,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             <section class="historial-shell">
                 <div class="encabezado-seccion encabezado-historial mb-0">
                     <div>
-                        <h4>Gestión de Pacientes</h4>
+                        <h4><i class="bi bi-clipboard2-pulse me-2"></i>Gestión de Pacientes</h4>
                         <p class="subtitulo-historial mb-0">Historial clínico, control de acceso y trazabilidad por atención</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap">
@@ -42,6 +42,74 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <button id="btnNuevaAtencion" class="boton-agregar" type="button">
                             <i class="bi bi-plus-circle"></i> Nueva atención
                         </button>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-6 col-md-3">
+                        <div class="mini-stat">
+                            <span class="mini-stat-icon" style="background: rgba(10, 147, 44, 0.12); color: #0a932c;"><i class="bi bi-journal-text"></i></span>
+                            <div>
+                                <strong id="statTotalAtenciones">0</strong>
+                                <small>Atenciones</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mini-stat">
+                            <span class="mini-stat-icon" style="background: rgba(59, 130, 246, 0.12); color: #2563eb;"><i class="bi bi-people"></i></span>
+                            <div>
+                                <strong id="statPacientesUnicos">0</strong>
+                                <small>Pacientes únicos</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mini-stat">
+                            <span class="mini-stat-icon" style="background: rgba(245, 158, 11, 0.14); color: #b45309;"><i class="bi bi-person-badge"></i></span>
+                            <div>
+                                <strong id="statVeterinariosActivos">0</strong>
+                                <small>Veterinarios</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mini-stat">
+                            <span class="mini-stat-icon" style="background: rgba(20, 184, 166, 0.14); color: #0f766e;"><i class="bi bi-clock-history"></i></span>
+                            <div>
+                                <strong id="statUltimaAtencion">--</strong>
+                                <small>Última atención</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="historial-card mt-3 atajos-card">
+                    <div class="bloque-titulo mb-2">
+                        <h5><i class="bi bi-signpost-split me-2"></i>Flujo recomendado</h5>
+                    </div>
+                    <div class="atajos-grid">
+                        <div class="atajo-item">
+                            <span class="atajo-num">1</span>
+                            <div>
+                                <strong>Filtra o busca paciente</strong>
+                                <small>Ubica rápidamente el historial que necesitas revisar.</small>
+                            </div>
+                        </div>
+                        <div class="atajo-item">
+                            <span class="atajo-num">2</span>
+                            <div>
+                                <strong>Selecciona una atención</strong>
+                                <small>El panel derecho carga detalles y versiones automáticamente.</small>
+                            </div>
+                        </div>
+                        <div class="atajo-item">
+                            <span class="atajo-num">3</span>
+                            <div>
+                                <strong>Edita y guarda</strong>
+                                <small>Registra cambios, vacunas, tratamientos, consultas y notas clínicas.</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -78,8 +146,20 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                 </div>
 
+                <div class="workspace-tabs" role="tablist" aria-label="Ventanas de gestión clínica">
+                    <button type="button" class="workspace-tab active" data-workspace-tab="listado" aria-selected="true">
+                        <i class="bi bi-table me-1"></i> Listado de atenciones
+                    </button>
+                    <button type="button" class="workspace-tab" data-workspace-tab="detalle" aria-selected="false">
+                        <i class="bi bi-file-earmark-medical me-1"></i> Detalle y edición
+                    </button>
+                    <button type="button" class="workspace-tab" data-workspace-tab="modulos" aria-selected="false">
+                        <i class="bi bi-journal-medical me-1"></i> Módulos clínicos
+                    </button>
+                </div>
+
                 <div class="row g-3 mt-1">
-                    <div class="col-xl-7">
+                    <div class="col-xl-7" id="panelListadoAtenciones">
                         <div class="historial-card h-100">
                             <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                                 <h5 class="mb-0"><i class="bi bi-table me-2"></i>Listado de atenciones</h5>
@@ -108,99 +188,112 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         </div>
                     </div>
 
-                    <div class="col-xl-5">
+                    <div class="col-xl-5 ventana-oculta" id="panelEdicionClinica">
                         <div class="historial-card h-100">
-                            <h5><i class="bi bi-file-medical me-2"></i>Detalle y edición del historial</h5>
+                            <div id="detalleContenidoHistorial">
+                                <h5><i class="bi bi-file-medical me-2"></i>Detalle y edición del historial</h5>
 
-                            <div class="panel-seguridad">
-                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                    <span class="badge-sync"><i class="bi bi-link-45deg"></i> Integrado con consultas</span>
-                                    <span class="badge-version" id="detalleVersion">--</span>
+                                <div class="resumen-paciente mt-3 mb-2">
+                                    <div class="resumen-paciente-head">
+                                        <i class="bi bi-heart-pulse"></i>
+                                        <div>
+                                            <strong id="detallePacienteTitulo">Sin paciente seleccionado</strong>
+                                            <small id="detallePacienteMeta">Selecciona un registro en la tabla para iniciar la edición.</small>
+                                        </div>
+                                    </div>
+                                    <span class="badge-acceso permitido" id="detalleEstadoEdicion"><i class="bi bi-check-circle"></i> Listo para editar</span>
                                 </div>
-                                <div class="small text-muted mt-2">Paciente registrado: <strong id="detallePacienteRegistro">Sí</strong></div>
-                                <div class="small text-muted">Acceso de edición: <strong id="detalleAcceso">Autorizado</strong></div>
-                                <div class="small text-muted">Última actualización: <strong id="detalleActualizacion">--</strong></div>
+
+                                <div class="panel-seguridad">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <span class="badge-sync"><i class="bi bi-link-45deg"></i> Integrado con consultas</span>
+                                        <span class="badge-version" id="detalleVersion">--</span>
+                                    </div>
+                                    <div class="small text-muted mt-2">Paciente registrado: <strong id="detallePacienteRegistro">Sí</strong></div>
+                                    <div class="small text-muted">Acceso de edición: <strong id="detalleAcceso">Autorizado</strong></div>
+                                    <div class="small text-muted">Última actualización: <strong id="detalleActualizacion">--</strong></div>
+                                </div>
+
+                                <form id="formHistorial" class="d-flex flex-column gap-2">
+                                    <input type="hidden" id="campoIdHistorial">
+                                    <input type="hidden" id="campoIdPaciente">
+
+                                    <div class="campos-grid">
+                                        <div>
+                                            <label class="label-historial">Nombre del paciente</label>
+                                            <input id="campoPaciente" class="input-historial" type="text" readonly>
+                                        </div>
+                                        <div>
+                                            <label class="label-historial">Fecha de atención</label>
+                                            <input id="campoFecha" class="input-historial" type="date">
+                                        </div>
+                                    </div>
+
+                                    <div class="campos-grid">
+                                        <div>
+                                            <label class="label-historial">Especie</label>
+                                            <input id="campoEspecie" class="input-historial" type="text" readonly>
+                                        </div>
+                                        <div>
+                                            <label class="label-historial">Raza</label>
+                                            <input id="campoRaza" class="input-historial" type="text" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="label-historial">Veterinario responsable</label>
+                                        <input id="campoVeterinario" class="input-historial" type="text" readonly>
+                                    </div>
+
+                                    <div>
+                                        <label class="label-historial">Versiones del historial</label>
+                                        <select id="selectVersionHistorial" class="select-filtro">
+                                            <option value="">Selecciona una atención</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="label-historial">Motivo de la consulta</label>
+                                        <textarea id="campoMotivo" class="textarea-historial"></textarea>
+                                    </div>
+
+                                    <div>
+                                        <label class="label-historial">Diagnóstico</label>
+                                        <textarea id="campoDiagnostico" class="textarea-historial"></textarea>
+                                    </div>
+
+                                    <div>
+                                        <label class="label-historial">Tratamientos aplicados</label>
+                                        <textarea id="campoTratamiento" class="textarea-historial"></textarea>
+                                    </div>
+
+                                    <div>
+                                        <label class="label-historial">Medicación recetada</label>
+                                        <textarea id="campoMedicacion" class="textarea-historial"></textarea>
+                                    </div>
+
+                                    <div>
+                                        <label class="label-historial">Observaciones adicionales</label>
+                                        <textarea id="campoObservaciones" class="textarea-historial"></textarea>
+                                    </div>
+
+                                    <div class="acciones-panel">
+                                        <button id="btnGuardar" type="button" class="boton-agregar">
+                                            <i class="bi bi-check2-circle"></i> Guardar cambios
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <div class="bloque-versionado">
+                                    <strong class="small d-block mb-2">Trazabilidad y versionado</strong>
+                                    <div class="item-version mb-0">
+                                        <i class="bi bi-shield-check"></i>
+                                        <div>Solo puedes editar historiales de pacientes vinculados a tu usuario.</div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <form id="formHistorial" class="d-flex flex-column gap-2">
-                                <input type="hidden" id="campoIdHistorial">
-                                <input type="hidden" id="campoIdPaciente">
-
-                                <div class="campos-grid">
-                                    <div>
-                                        <label class="label-historial">Nombre del paciente</label>
-                                        <input id="campoPaciente" class="input-historial" type="text" readonly>
-                                    </div>
-                                    <div>
-                                        <label class="label-historial">Fecha de atención</label>
-                                        <input id="campoFecha" class="input-historial" type="date">
-                                    </div>
-                                </div>
-
-                                <div class="campos-grid">
-                                    <div>
-                                        <label class="label-historial">Especie</label>
-                                        <input id="campoEspecie" class="input-historial" type="text" readonly>
-                                    </div>
-                                    <div>
-                                        <label class="label-historial">Raza</label>
-                                        <input id="campoRaza" class="input-historial" type="text" readonly>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="label-historial">Veterinario responsable</label>
-                                    <input id="campoVeterinario" class="input-historial" type="text" readonly>
-                                </div>
-
-                                <div>
-                                    <label class="label-historial">Versiones del historial</label>
-                                    <select id="selectVersionHistorial" class="select-filtro">
-                                        <option value="">Selecciona una atención</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="label-historial">Motivo de la consulta</label>
-                                    <textarea id="campoMotivo" class="textarea-historial"></textarea>
-                                </div>
-
-                                <div>
-                                    <label class="label-historial">Diagnóstico</label>
-                                    <textarea id="campoDiagnostico" class="textarea-historial"></textarea>
-                                </div>
-
-                                <div>
-                                    <label class="label-historial">Tratamientos aplicados</label>
-                                    <textarea id="campoTratamiento" class="textarea-historial"></textarea>
-                                </div>
-
-                                <div>
-                                    <label class="label-historial">Medicación recetada</label>
-                                    <textarea id="campoMedicacion" class="textarea-historial"></textarea>
-                                </div>
-
-                                <div>
-                                    <label class="label-historial">Observaciones adicionales</label>
-                                    <textarea id="campoObservaciones" class="textarea-historial"></textarea>
-                                </div>
-
-                                <div class="acciones-panel">
-                                    <button id="btnGuardar" type="button" class="boton-agregar">
-                                        <i class="bi bi-check2-circle"></i> Guardar cambios
-                                    </button>
-                                </div>
-                            </form>
-
-                            <div class="bloque-versionado">
-                                <strong class="small d-block mb-2">Trazabilidad y versionado</strong>
-                                <div class="item-version mb-0">
-                                    <i class="bi bi-shield-check"></i>
-                                    <div>Solo puedes editar historiales de pacientes vinculados a tu usuario.</div>
-                                </div>
-                            </div>
-
-                            <div class="historial-card modulo-fase2 mt-3 p-3">
+                            <div class="historial-card modulo-fase2 mt-3 p-3 ventana-oculta" id="panelModulosClinicos">
                                 <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                                     <h5 class="mb-0"><i class="bi bi-journal-medical me-2"></i>Módulos clínicos</h5>
                                     <span class="badge-sync"><i class="bi bi-heart-pulse"></i> Ficha integral</span>
