@@ -96,9 +96,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <button class="boton-periodo" data-periodo="ano">
                                 <i class="bi bi-calendar-range"></i> Año
                             </button>
-                            <button class="boton-periodo boton-personalizado" data-periodo="personalizado">
-                                <i class="bi bi-calendar3"></i> Personalizado
-                            </button>
                         </div>
                     </div>
                     <div class="grupo-filtros">

@@ -4,8 +4,60 @@ let periodoActual = 'hoy';
 
 const coloresServicios = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'];
 
+function ajustarTextoAlContenedor(elemento, opciones = {}) {
+    if (!elemento) return;
+
+    const minPx = opciones.minPx ?? 20;
+    const maxPx = opciones.maxPx ?? 32;
+    const stepPx = opciones.stepPx ?? 0.25;
+
+    elemento.style.fontSize = `${maxPx}px`;
+
+    let fontSizeActual = maxPx;
+    while (fontSizeActual > minPx && elemento.scrollWidth > elemento.clientWidth) {
+        fontSizeActual -= stepPx;
+        elemento.style.fontSize = `${fontSizeActual}px`;
+    }
+
+    const tarjeta = elemento.closest('.tarjeta-ingresos');
+    if (tarjeta) {
+        tarjeta.classList.toggle('tarjeta-metrica-compacta', fontSizeActual < 30);
+    }
+}
+
+function ajustarMetricaIngresosTotales() {
+    const elIngresos = document.getElementById('reporteIngresosTotales');
+    if (!elIngresos) return;
+
+    requestAnimationFrame(() => {
+        ajustarTextoAlContenedor(elIngresos, {
+            minPx: 20,
+            maxPx: 32,
+            stepPx: 0.25
+        });
+    });
+}
+
 function formatoMoneda(valor) {
     return '$' + Number(valor || 0).toLocaleString('es-CO');
+}
+
+function obtenerEtiquetaPeriodoCorta(meta = {}) {
+    const periodo = (meta.periodo || periodoActual || '').toLowerCase();
+
+    switch (periodo) {
+        case 'hoy':
+            return 'Hoy';
+        case 'semana':
+            return 'Semana';
+        case 'ano':
+            return 'Año';
+        case 'personalizado':
+            return 'Personalizado';
+        case 'mes':
+        default:
+            return 'Mes';
+    }
 }
 
 function crearGraficoIngresos(labels, data) {
@@ -116,15 +168,18 @@ function renderResumen(resumen, meta) {
     setText('reporteTotalCitas', `${Number(resumen.total_citas || 0).toLocaleString('es-CO')} citas`);
 
     const etiqueta = meta.etiqueta_periodo || 'Cargando...';
-    setText('reportePeriodoEtiqueta1', etiqueta);
-    setText('reportePeriodoEtiqueta2', etiqueta);
-    setText('reportePeriodoEtiqueta3', etiqueta);
-    setText('reportePeriodoEtiqueta4', etiqueta);
-    setText('reportePeriodoEtiqueta5', etiqueta);
+    const etiquetaCorta = obtenerEtiquetaPeriodoCorta(meta);
+    setText('reportePeriodoEtiqueta1', etiquetaCorta);
+    setText('reportePeriodoEtiqueta2', etiquetaCorta);
+    setText('reportePeriodoEtiqueta3', etiquetaCorta);
+    setText('reportePeriodoEtiqueta4', etiquetaCorta);
+    setText('reportePeriodoEtiqueta5', etiquetaCorta);
     
     // Actualizar periodo seleccionado en barra de filtros
     const periodoVisual = document.getElementById('textoperiodoSeleccionado');
     if (periodoVisual) periodoVisual.textContent = etiqueta;
+
+    ajustarMetricaIngresosTotales();
 }
 
 function renderTratamientos(tratamientos) {
@@ -390,6 +445,8 @@ function configurarEventos() {
     if (filtroEstado) {
         filtroEstado.addEventListener('change', cargarDashboardReportes);
     }
+
+    window.addEventListener('resize', ajustarMetricaIngresosTotales);
 }
 
 function exportarPDF() {

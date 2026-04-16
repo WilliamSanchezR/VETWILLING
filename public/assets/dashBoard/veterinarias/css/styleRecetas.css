@@ -1,424 +1,509 @@
-/* ========================================
-   VARIABLES GLOBALES
+﻿/* ========================================
+   RECETAS MÃ‰DICAS â€” ESTILOS ESPECÃFICOS
+   Compatible con el design system del dashboard
 ======================================== */
+
+/* â”€â”€ VARIABLES LOCALES â”€â”€ */
 :root {
-    /* Colores principales */
     --primary-color: #0A932c;
     --green-light: #9DE795;
     --gray-dark: #424B54;
-    --blue-light: #93BEDF;
-    
-    /* Colores adicionales */
     --white: #ffffff;
     --gray-light: #f8f9fa;
     --gray-medium: #e9ecef;
-    --success: #22c55e;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    --info: #3b82f6;
-    
-    /* Tipografías */
     --font-titles: 'Fredoka', sans-serif;
     --font-body: 'Open Sans', sans-serif;
-    
-    /* Tamaños de fuente */
-    --fs-title1: 32px;
     --fs-title2: 24px;
     --fs-title3: 16px;
     --fs-title4: 14px;
-    --fs-text: 20px;
-    --fs-text1: 12px;
-    
-    /* Sombras */
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
     --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
     --shadow-lg: 0 12px 32px rgba(0,0,0,0.15);
-    
-    /* Bordes */
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 16px;
 }
-*{
-    scrollbar-width: none;
-}
-/* ========================================
-   CONTENIDO PRINCIPAL
-======================================== */
-.contenido-principal {
-    margin-left: var(--sidebar-width);
-    min-height: 100vh;
-    background-color: var(--color-fondo);
-    transition: margin-left var(--transition-normal);
-    position: relative;
-    padding: 20px 1 0px 20px 20px;
-    position: relative;
-    top: 40px;
-}
 
-/* Cuando el sidebar está colapsado */
-#sidebar.collapsed~.contenido-principal {
-    margin-left: var(--sidebar-collapsed-width);
-}
-
-/* Área de contenido interna */
-.area-contenido {
-    padding: var(--spacing-xl);
-    width: 100%;
-    max-width: 90%;
-}
-
-
-/* ========================================
-   CONTENEDOR DE RECETAS
-======================================== */
-.cont-receta {
-    padding: 30px;
-    margin: 0 auto;
-}
-
-.cont-receta > div:first-child {
-    margin-bottom: 30px;
-}
-
-.cont-receta h2 {
-    font-family: var(--font-titles);
-    font-size: var(--fs-title1);
-    color: var(--gray-dark);
-    margin: 0;
-    font-weight: 700;
+/* â”€â”€ INDICADOR DE PASOS â”€â”€ */
+.receta-steps {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 6px;
 }
 
-.cont-receta h2::before {
-    content: '📋';
-    font-size: 36px;
-}
-
-/* ========================================
-   CAMPO DE BÚSQUEDA
-======================================== */
-.campo-buscar {
-    position: relative;
-    margin-bottom: 30px;
-    max-width: 600px;
-}
-
-.campo-buscar i {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--primary-color);
-    font-size: 20px;
-    z-index: 1;
-}
-
-.campo-buscar input {
-    width: 100%;
-    padding: 16px 20px 16px 55px;
-    border: 2px solid var(--gray-medium);
-    border-radius: var(--radius-lg);
+.receta-step {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    background: var(--gray-medium);
+    border: 1.5px solid transparent;
     font-family: var(--font-body);
     font-size: var(--fs-title4);
     color: var(--gray-dark);
-    background: var(--white);
+    opacity: 0.55;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+    cursor: default;
 }
 
-.campo-buscar input:focus {
-    outline: none;
+.receta-step.active {
+    background: rgba(10, 147, 44, 0.1);
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1), var(--shadow-md);
+    color: var(--primary-color);
+    opacity: 1;
+    font-weight: 600;
 }
 
-.campo-buscar input::placeholder {
+.receta-step.done {
+    background: rgba(10, 147, 44, 0.08);
+    border-color: rgba(10, 147, 44, 0.3);
+    color: var(--primary-color);
+    opacity: 0.85;
+}
+
+.step-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: currentColor;
+    color: var(--white) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.receta-step-arrow {
     color: var(--gray-dark);
-    opacity: 0.5;
+    opacity: 0.3;
+    font-size: 12px;
 }
 
-/* ========================================
-   LISTA DE SUGERENCIAS (AUTOCOMPLETE)
-======================================== */
+/* â”€â”€ BUSCADOR DE PACIENTES â”€â”€ */
+.receta-search-wrapper {
+    position: relative;
+}
+
+.receta-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    font-size: 15px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.receta-search-input {
+    padding-left: 40px !important;
+}
+
+.receta-search-hint {
+    font-size: var(--fs-title4);
+    color: var(--gray-dark);
+    opacity: 0.6;
+}
+
+/* Lista autocomplete */
 .lista-sugerencias {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 6px);
     left: 0;
     right: 0;
     background: var(--white);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
-    max-height: 300px;
+    max-height: 260px;
     overflow-y: auto;
-    z-index: 1000;
+    z-index: 1050;
     list-style: none;
-    padding: 8px;
+    padding: 6px;
     margin: 0;
     display: none;
+    border: 1px solid rgba(10, 147, 44, 0.15);
 }
 
-.lista-sugerencias.active {
+.lista-sugerencias.visible {
     display: block;
+    animation: fadeIn 0.15s ease;
 }
 
 .lista-sugerencias li {
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-family: var(--font-body);
     font-size: var(--fs-title4);
     color: var(--gray-dark);
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    transition: all 0.18s ease;
 }
 
 .lista-sugerencias li:hover {
-    background: var(--green-light);
+    background: rgba(10, 147, 44, 0.08);
     color: var(--primary-color);
-    transform: translateX(5px);
+    padding-left: 18px;
 }
 
-.lista-sugerencias li::before {
-    content: '👤';
-    font-size: 18px;
+.lista-sugerencias li i {
+    opacity: 0.5;
+    flex-shrink: 0;
 }
 
-/* ========================================
-   FORMULARIO DE RECETA
-======================================== */
-.cont-form {
-    background: var(--white);
-    padding: 35px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    transition: all 0.3s ease;
-}
-
-.cont-form:hover {
-    box-shadow: var(--shadow-lg);
-}
-
-/* ========================================
-   INFO PACIENTE
-======================================== */
-.info-paciente {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
-    padding: 25px;
-    border-radius: var(--radius-lg);
-    margin-bottom: 25px;
-    box-shadow: 0 8px 20px rgba(10, 147, 44, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-
-.info-paciente::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 250px;
-    height: 250px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-}
-
-.info-paciente::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -10%;
-    width: 180px;
-    height: 180px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 50%;
-}
-
-.info-paciente > * {
-    position: relative;
-    z-index: 1;
-}
-
-.info-paciente h3 {
-    font-family: var(--font-titles);
-    font-size: var(--fs-title2);
-    color: var(--white);
-    margin: 0 0 15px 0;
-    font-weight: 700;
+/* â”€â”€ TARJETA INFO PACIENTE â”€â”€ */
+.receta-info-card {
+    min-height: 200px;
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
 }
 
-.info-paciente h3::before {
-    content: '🐾';
-    font-size: 28px;
-}
-
-.info-paciente p,
-.info-paciente span {
-    font-family: var(--font-body);
-    font-size: var(--fs-title4);
-    color: var(--white);
-    margin: 8px 0;
+.receta-info-empty {
+    flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
-}
-
-.info-paciente strong {
-    font-weight: 700;
-    opacity: 0.9;
-}
-
-/* Estado vacío */
-.info-paciente:empty::before {
-    content: 'Selecciona un paciente para comenzar';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: var(--font-body);
-    font-size: var(--fs-title3);
-    color: rgba(255, 255, 255, 0.7);
+    justify-content: center;
+    gap: 12px;
+    padding: 30px 20px;
     text-align: center;
-    width: 100%;
-    z-index: 1;
+    color: var(--gray-dark);
+    opacity: 0.5;
 }
 
-.info-paciente:empty {
+.receta-empty-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
     background: var(--gray-medium);
-    min-height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* ========================================
-   TEXTAREA RECETA
-======================================== */
-#descripcion-receta {
-    width: 100%;
-    min-height: 400px;
-    padding: 20px;
-    border: 2px solid var(--gray-medium);
-    border-radius: var(--radius-lg);
-    font-family: 'Courier New', monospace;
-    font-size: 16px;
+    font-size: 24px;
     color: var(--gray-dark);
-    line-height: 1.8;
-    resize: vertical;
-    transition: all 0.3s ease;
-    background: var(--white);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    opacity: 0.6;
 }
 
-#descripcion-receta:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1), inset 0 2px 4px rgba(0,0,0,0.05);
-}
-
-#descripcion-receta::placeholder {
-    color: var(--gray-dark);
-    opacity: 0.4;
-}
-
-/* ========================================
-   BOTÓN GUARDAR
-======================================== */
-.cont-btn-guardar {
-    margin-top: 25px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.btn-guardar {
-    padding: 14px 40px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius-lg);
+.receta-info-empty p {
     font-family: var(--font-body);
-    font-size: var(--fs-title3);
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(10, 147, 44, 0.3);
+    font-size: var(--fs-title4);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Ficha rellena del paciente */
+.receta-info-filled {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    font-family: var(--font-body);
+    animation: fadeIn 0.25s ease;
+}
+
+.receta-patient-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding: 16px 20px;
+    color: var(--white);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    margin: -18px -18px 0 -18px;
 }
 
-.btn-guardar::before {
-    content: '💾';
+.receta-patient-header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 20px;
+    flex-shrink: 0;
 }
 
-.btn-guardar:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(10, 147, 44, 0.4);
-}
-
-.btn-guardar:active {
-    transform: translateY(-1px);
-}
-
-.btn-guardar:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* ========================================
-   MODAL VISTA PREVIA
-======================================== */
-.modal-content {
-    border-radius: var(--radius-lg);
-    border: none;
-    box-shadow: var(--shadow-lg);
-}
-
-.modal-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
+.receta-patient-header h6 {
+    font-family: var(--font-titles);
+    font-size: var(--fs-title3);
+    font-weight: 700;
+    margin: 0 0 2px 0;
     color: var(--white);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding: 20px 30px;
+}
+
+.receta-patient-header small {
+    font-size: var(--fs-title4);
+    opacity: 0.85;
+}
+
+.receta-patient-fields {
+    padding: 16px 0 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.receta-field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--gray-medium);
+    font-size: var(--fs-title4);
+}
+
+.receta-field-row:last-child {
     border-bottom: none;
 }
 
-.modal-title {
+.receta-field-label {
+    color: var(--gray-dark);
+    opacity: 0.6;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+    min-width: 110px;
+}
+
+.receta-field-value {
+    color: var(--gray-dark);
+    font-weight: 600;
+    text-align: right;
+}
+
+/* â”€â”€ TACO DE RECETAS (editor) â”€â”€ */
+.receta-pad-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.receta-pad-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.receta-pad-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--white);
     font-family: var(--font-titles);
-    font-size: var(--fs-title2);
+    font-size: 20px;
     font-weight: 700;
 }
 
-.modal-header .btn-close {
-    filter: brightness(0) invert(1);
-    opacity: 0.8;
+.receta-pad-logo i {
+    font-size: 22px;
 }
 
-.modal-header .btn-close:hover {
+.receta-pad-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.receta-pad-fecha {
+    font-family: var(--font-body);
+    font-size: var(--fs-title4);
+    color: rgba(255,255,255,0.85);
+}
+
+.receta-pad-badge {
+    background: rgba(255,255,255,0.2);
+    color: var(--white);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: var(--fs-title4);
+    font-family: var(--font-body);
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Barra del paciente seleccionado (inline en el editor) */
+.receta-pad-patient-bar {
+    background: rgba(10, 147, 44, 0.07);
+    border-bottom: 1px solid rgba(10, 147, 44, 0.15);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: var(--fs-title4);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.receta-pad-patient-bar span {
+    flex: 1;
+}
+
+.receta-pad-patient-clear {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.receta-pad-patient-clear:hover {
     opacity: 1;
+    background: rgba(10, 147, 44, 0.12);
 }
 
-.modal-body {
-    padding: 30px;
+.receta-pad-body {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-/* ========================================
-   CONTENIDO PARA IMPRIMIR
-======================================== */
+.receta-rp-label {
+    font-family: var(--font-titles);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed rgba(10, 147, 44, 0.25);
+}
+
+.receta-textarea {
+    flex: 1;
+    width: 100%;
+    min-height: 320px;
+    padding: 16px 18px;
+    border: 1.5px solid var(--gray-medium);
+    border-radius: var(--radius-md);
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 15px;
+    color: var(--gray-dark);
+    line-height: 1.9;
+    resize: vertical;
+    background: #fafffe;
+    transition: all 0.25s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.receta-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.1), inset 0 2px 4px rgba(0,0,0,0.04);
+    background: var(--white);
+}
+
+.receta-textarea::placeholder {
+    color: var(--gray-dark);
+    opacity: 0.35;
+    font-style: italic;
+}
+
+.receta-pad-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--gray-medium);
+    background: #f9f9f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.receta-char-counter {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--gray-dark);
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+}
+
+/* â”€â”€ MODAL RECETA â”€â”€ */
+.receta-modal-content {
+    border-radius: var(--radius-lg);
+    border: none;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.receta-modal-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
+    padding: 18px 24px;
+    border-bottom: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.receta-modal-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--white);
+    flex-shrink: 0;
+}
+
+.receta-modal-header .modal-title {
+    font-family: var(--font-titles);
+    font-size: var(--fs-title2);
+    color: var(--white);
+    margin: 0;
+}
+
+.receta-modal-header small {
+    color: rgba(255,255,255,0.8);
+    font-family: var(--font-body);
+    font-size: var(--fs-title4);
+}
+
+.receta-modal-footer {
+    background: var(--gray-light);
+    padding: 16px 24px;
+    border-top: 1px solid var(--gray-medium);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* â”€â”€ DOCUMENTO IMPRIMIBLE â”€â”€ */
 #cont-imprimir {
     position: relative;
     background: var(--white);
     padding: 40px;
     border-radius: var(--radius-md);
     min-height: 800px;
+    border: 1px solid var(--gray-medium);
 }
 
 .modal-fondo {
@@ -432,6 +517,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .modal-fondo img {
@@ -439,26 +525,19 @@
     height: auto;
 }
 
-/* ========================================
-   HEADER RECETA (Logo y Médico)
-======================================== */
 .cont-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding-bottom: 25px;
-    margin-bottom: 25px;
+    padding-bottom: 22px;
+    margin-bottom: 22px;
     border-bottom: 3px solid var(--primary-color);
     position: relative;
     z-index: 1;
 }
 
-.logo {
-    flex-shrink: 0;
-}
-
 .logo img {
-    width: 180px;
+    width: 170px;
     height: auto;
 }
 
@@ -466,7 +545,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 5px;
+    gap: 4px;
 }
 
 .info-medico span {
@@ -482,33 +561,43 @@
     color: var(--primary-color);
 }
 
-/* ========================================
-   INFO PACIENTE EN MODAL
-======================================== */
-#plaque-paciente-modal {
+.info-paciente {
     background: var(--gray-light);
     border-left: 4px solid var(--primary-color);
-    margin-bottom: 30px;
+    padding: 16px 20px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 20px;
 }
 
-#plaque-paciente-modal h3,
-#plaque-paciente-modal p,
-#plaque-paciente-modal span {
+.info-paciente div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-paciente span {
+    font-family: var(--font-body);
+    font-size: var(--fs-title4);
     color: var(--gray-dark);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-/* ========================================
-   CONTENIDO DE LA RECETA
-======================================== */
 .cont-receta-preview {
     position: relative;
     z-index: 1;
     background: var(--white);
-    padding: 30px;
+    padding: 28px;
     border: 2px dashed var(--gray-medium);
     border-radius: var(--radius-md);
-    min-height: 300px;
-    margin-bottom: 40px;
+    min-height: 280px;
+    margin-bottom: 36px;
 }
 
 .cont-receta-preview p {
@@ -520,15 +609,12 @@
     margin: 0;
 }
 
-/* ========================================
-   FOOTER PREVIEW (Fecha y Firma)
-======================================== */
 .footer_preview {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    padding-top: 30px;
-    margin-top: 40px;
+    padding-top: 24px;
+    margin-top: 36px;
     border-top: 2px solid var(--gray-medium);
     position: relative;
     z-index: 1;
@@ -539,7 +625,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .footer-fecha span,
@@ -551,164 +637,61 @@
 }
 
 .pie-firma {
-    padding-top: 10px;
+    padding-top: 8px;
     border-top: 2px solid var(--gray-dark);
     min-width: 200px;
     text-align: center;
 }
 
 .firma img {
-    width: 150px;
+    width: 140px;
     height: auto;
 }
 
-/* ========================================
-   FOOTER DEL MODAL
-======================================== */
-.modal-footer {
-    background: var(--gray-light);
-    padding: 20px 30px;
-    border-top: 1px solid var(--gray-medium);
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-}
-
-.modal-footer .btn {
-    padding: 12px 30px;
-    font-family: var(--font-body);
-    font-size: var(--fs-title4);
-    font-weight: 600;
-    border-radius: var(--radius-sm);
-    transition: all 0.3s ease;
-}
-
-.modal-footer .btn-secondary {
-    background: var(--gray-medium);
-    color: var(--gray-dark);
-    border: none;
-}
-
-.modal-footer .btn-secondary:hover {
-    background: var(--gray-dark);
-    color: var(--white);
-}
-
-.modal-footer .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0db83e 100%);
-    border: none;
-    box-shadow: 0 4px 12px rgba(10, 147, 44, 0.3);
-}
-
-.modal-footer .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(10, 147, 44, 0.4);
-}
-
-/* ========================================
-   ESTILOS PARA IMPRESIÓN
-======================================== */
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    
-    #cont-imprimir,
-    #cont-imprimir * {
-        visibility: visible;
-    }
-    
-    #cont-imprimir {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        padding: 20px;
-    }
-    
-    .modal-fondo {
-        opacity: 0.05;
-    }
-}
-
-/* ========================================
-   ANIMACIONES
-======================================== */
+/* â”€â”€ ANIMACIÃ“N â”€â”€ */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-.lista-sugerencias.active {
-    animation: fadeIn 0.3s ease;
-}
-
-/* ========================================
-   RESPONSIVE
-======================================== */
-@media (max-width: 992px) {
-    .contenido-principal {
-        margin-left: 0;
-    }
-    
-    .cont-receta {
-        padding: 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    .cont-receta h2 {
-        font-size: var(--fs-title2);
-    }
-    
-    .campo-buscar {
-        max-width: 100%;
-    }
-    
-    .cont-form {
-        padding: 20px;
-    }
-    
-    #descripcion-receta {
-        min-height: 300px;
-        font-size: 14px;
-    }
-    
-    .cont-header {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
-    }
-    
-    .info-medico {
-        align-items: center;
-    }
-    
-    .footer_preview {
-        flex-direction: column;
-        gap: 30px;
-    }
-    
-    #cont-imprimir {
-        padding: 20px;
+/* â”€â”€ RESPONSIVE â”€â”€ */
+@media (max-width: 991px) {
+    .receta-pad-wrapper {
+        min-height: 500px;
     }
 }
 
 @media (max-width: 576px) {
-    .cont-receta {
-        padding: 15px;
+    .receta-pad-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
-    
-    .btn-guardar {
-        width: 100%;
-        justify-content: center;
+
+    .receta-pad-footer {
+        flex-direction: column;
+        align-items: stretch;
     }
-    
-    .modal-body {
-        padding: 15px;
+
+    .receta-modal-footer {
+        flex-direction: column;
+    }
+
+    .info-paciente {
+        grid-template-columns: 1fr;
     }
 }
+
+/* â”€â”€ PRINT â”€â”€ */
+@media print {
+    body > *:not(#cont-imprimir) {
+        display: none !important;
+    }
+
+    #cont-imprimir {
+        padding: 20mm;
+        min-height: unset;
+        border: none;
+        box-shadow: none;
+    }
+}
+

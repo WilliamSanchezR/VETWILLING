@@ -1,6 +1,7 @@
-*{
+* {
     scrollbar-width: none;
 }
+
 .contenido-principal {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
@@ -18,14 +19,27 @@
     padding-top: calc(70px + var(--spacing-xl));
 }
 
-/* ========================================
-   CONTROLES DE LA TABLA
-======================================== */
+.laboratorio-shell {
+    gap: 14px;
+}
+
+/* Barra superior de tabla */
+.tabla-header-strip {
+    background: linear-gradient(120deg, rgba(10, 147, 44, 0.12), rgba(147, 190, 223, 0.2));
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(10, 147, 44, 0.1);
+}
+
+.tabla-header-strip h5 {
+    color: var(--color-texto-oscuro);
+    font-size: var(--fs-titulo2);
+}
+
+/* Controles */
 .controles-tabla {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
     gap: 16px;
     flex-wrap: wrap;
 }
@@ -38,105 +52,65 @@
     align-items: center;
 }
 
-/* Campo de búsqueda */
 .campo-buscar {
     position: relative;
-    width: 280px;
+    width: min(420px, 88vw);
 }
 
 .campo-buscar i {
     position: absolute;
-    left: 12px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--color-gris);
+    color: var(--color-primario);
     font-size: 16px;
 }
 
 .campo-buscar input {
     width: 100%;
-    padding: 10px 12px 10px 40px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
+    height: 44px;
+    padding: 10px 14px 10px 42px;
+    border: 1px solid rgba(66, 75, 84, 0.2);
+    border-radius: 12px;
     font-size: 14px;
-    font-family: 'Open Sans', sans-serif;
-    background-color: #f8fafc;
-    transition: all 0.3s ease;
+    font-family: var(--font-body);
+    background-color: #ffffff;
+    transition: all 0.25s ease;
 }
 
 .campo-buscar input:focus {
     outline: none;
     border-color: var(--color-primario);
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.1);
+    box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1);
 }
 
-/* Botones de control */
 .btn-control {
     padding: 10px 16px;
     background-color: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
+    border: 1px solid rgba(66, 75, 84, 0.2);
+    border-radius: 12px;
     font-size: 14px;
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--font-body);
     font-weight: 600;
     color: var(--color-gris);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
 }
 
 .btn-control:hover {
-    background-color: #f8fafc;
-    border-color: var(--color-primario);
+    border-color: rgba(10, 147, 44, 0.5);
     color: var(--color-primario);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
 }
 
-.btn-control i {
-    font-size: 16px;
-}
-
-/* Botón agregar nuevo */
-.btn-agregar {
-    padding: 10px 20px;
-    background-color: var(--color-primario);
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 700;
-    color: white;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-
-.btn-agregar:hover {
-    background-color: #087523;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(10, 147, 44, 0.3);
-}
-
-.btn-agregar i {
-    font-size: 16px;
-}
-
-
-
-/* Tabla de laboratorio */
+/* Tabla */
 .contenedor-tabla-laboratorio {
     background: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 0;
     overflow-x: auto;
-    margin-bottom: 24px;
 }
 
 .tabla-laboratorio {
@@ -145,26 +119,33 @@
 }
 
 .tabla-laboratorio thead {
-    background: var(--color-verde);
+    background: rgba(157, 231, 149, 0.3);
 }
 
 .tabla-laboratorio th {
-    padding: 16px;
+    padding: 14px;
     text-align: left;
-    font-weight: 600;
-    color: var(--color-gris);
-    font-size: var(--fs-titulo4);
-    border-bottom: 2px solid #e2e8f0;
+    font-weight: 700;
+    color: var(--color-texto-oscuro);
+    font-size: 13px;
+    border-bottom: 1px solid rgba(66, 75, 84, 0.15);
+    white-space: nowrap;
 }
 
 .tabla-laboratorio tbody tr {
-    border-bottom: 1px solid #e0e2e4;
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.tabla-laboratorio tbody tr:hover {
+    background: rgba(10, 147, 44, 0.03);
 }
 
 .tabla-laboratorio td {
-    padding: 16px;
-    font-size: var(--fs-titulo4);
+    padding: 14px;
+    font-size: 14px;
     color: var(--color-gris);
+    vertical-align: middle;
 }
 
 .td-status {
@@ -172,247 +153,217 @@
 }
 
 .completado-status {
-    color: var(--color-primario);
+    color: #16a34a;
     font-size: 18px;
 }
 
 .pendiente-status {
-    color: var(--light-color);
+    color: #f59e0b;
     font-size: 18px;
 }
 
 .cancelado-status {
-    color: #a53e3b;
+    color: #dc3545;
     font-size: 18px;
 }
 
 .td-search-icon {
-    cursor: pointer;    
+    cursor: pointer;
 }
 
 .td-search-icon i {
     font-size: 18px;
+    color: #3b82f6;
 }
 
 .td-search-icon i:hover {
-    color: #0c20ce;
+    color: #1d4ed8;
 }
 
-.tabla-laboratorio tbody tr {
-    transition: background-color 0.3s ease;
+/* DataTables custom */
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    padding: 14px 16px;
+    font-size: 13px;
 }
 
-.tabla-laboratorio tbody tr:hover {
-    background: var(--color-hover);
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: 8px !important;
+    border: 1px solid rgba(66, 75, 84, 0.2) !important;
+    margin: 0 2px;
 }
 
-.info-laboratorio {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--color-primario) !important;
+    border-color: var(--color-primario) !important;
+    color: #fff !important;
 }
 
-.avatar-tabla-laboratorio {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #e2e8f0;
-}
-
-.nombre-laboratorio {
-    font-weight: 600;
-    color: var(--color-gris);
-    font-size: var(--fs-titulo4);
-}
-
-.info-laboratorio small {
-    font-size: var(--fs-texto1);
-}
-
-/* Acciones de tabla */
-.acciones-tabla {
-    display: flex;
-    gap: 8px;
-}
-
-.boton-accion-tabla {
-    width: 35px;
-    height: 35px;
+/* Modales */
+.modal-content {
     border: none;
-    background: #f1f5f9;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    color: var(--color-gris);
-    font-size: var(--fs-titulo4);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
 }
 
-.boton-accion-tabla:hover {
-    background: var(--color-verde);
-    color: var(--color-primario);
-    transform: translateY(-2px);
+.modal-header {
+    background: linear-gradient(120deg, var(--color-primario), #0db83e);
+    color: #fff;
+    border-bottom: none;
 }
 
-/* Paginación */
-.paginacion-contenedor {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+.modal-header .modal-title {
+    font-family: var(--font-titles);
+    font-size: 20px;
 }
 
-.info-paginacion {
-    color: var(--color-gris);
-    font-size: var(--fs-titulo4);
+.modal-header .btn-close {
+    filter: invert(1);
+    opacity: 0.85;
 }
 
-.pagination {
-    display: flex;
-    gap: 4px;
-}
-
-.page-link {
-    color: var(--color-gris);
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 8px 12px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: var(--fs-titulo4);
-}
-
-.page-link:hover {
-    background: var(--color-verde);
-    color: var(--color-primario);
-    border-color: var(--color-verde);
-}
-
-.page-item.active .page-link {
-    background: var(--color-primario);
-    color: white;
-    border-color: var(--color-primario);
-}
-
-.page-item.disabled .page-link {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.info-paciente{
-    padding: 15px;
+.info-paciente {
+    padding: 16px;
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
     margin-bottom: 18px;
-    box-shadow:
-    inset 0 -3em 3em #8582821a,
-    0 0 0 2px #ffffff,
-    0.3em 0.3em 1em #0000002d;
+    background: #f8f9fa;
+    border: 1px solid rgba(66, 75, 84, 0.12);
+    border-left: 4px solid var(--color-primario);
+    border-radius: 10px;
 }
 
-.info-paciente span{
+.info-paciente span {
     font-size: 14px;
+    color: var(--color-gris);
 }
 
-.list-examenes{
+.list-examenes {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.btn-guardar{
-    background-color: var(--color-primario);
-    color: white;
+.lab-order-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.btn-guardar:hover{
+.lab-order-meta .badge {
+    font-size: 12px;
+    border-radius: 999px;
+    padding: 7px 12px;
+}
+
+.resultado-toolbar {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 12px;
+    align-items: start;
+}
+
+.lab-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 14px;
+}
+
+.lab-form-span-2 {
+    grid-column: 1 / -1;
+}
+
+.lab-checklist-wrapper {
+    border: 1px solid rgba(66, 75, 84, 0.12);
+    border-radius: 12px;
+    padding: 14px;
+    background: #fbfcfd;
+}
+
+.lab-checklist {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.lab-check-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid rgba(66, 75, 84, 0.12);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.lab-check-item input {
+    margin-top: 4px;
+}
+
+.lab-check-item strong {
+    display: block;
+    font-size: 14px;
+    color: var(--color-texto-oscuro);
+}
+
+.lab-check-item small {
+    display: block;
+    color: var(--color-gris);
+    font-size: 12px;
+}
+
+.btn-guardar {
+    background-color: var(--color-primario);
+    color: white;
+    border: none;
+}
+
+.btn-guardar:hover {
     background-color: #087523 !important;
     color: white;
 }
 
+@media (max-width: 992px) {
+    .contenido-principal {
+        margin-left: 0;
+    }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-
-    .contenedor-tabla-veterinaria {
+    .area-contenido {
         padding: 16px;
-    }
-
-    .tabla-veterinaria {
-        font-size: var(--fs-texto1);
-    }
-
-    .tabla-veterinaria th,
-    .tabla-veterinaria td {
-        padding: 12px 8px;
-    }
-
-    .nombre-laboratorio {
-        font-size: var(--fs-texto1);
-    }
-
-    .paginacion-contenedor {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .pagination {
-        justify-content: center;
+        padding-top: calc(70px + 16px);
     }
 }
 
-@media (max-width: 576px) {
-    .tarjeta-estadistica h3 {
-        font-size: var(--fs-titulo3);
+@media (max-width: 768px) {
+    .controles-tabla {
+        align-items: stretch;
     }
 
-    .tarjeta-estadistica p {
-        font-size: var(--fs-texto1);
-    }
-
-    .boton-accion-primario,
-    .boton-accion-secundario {
+    .controles-izquierda,
+    .controles-derecha {
         width: 100%;
+    }
+
+    .controles-derecha {
+        justify-content: stretch;
+    }
+
+    .controles-derecha button {
+        flex: 1;
         justify-content: center;
-        font-size: var(--fs-texto1);
     }
 
-    .filtro-select {
-        width: 100%;
-        font-size: var(--fs-texto1);
+    .info-paciente {
+        grid-template-columns: 1fr;
     }
 
-    .tabla-veterinaria {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-
-    .avatar-tabla-laboratorio {
-        width: 35px;
-        height: 35px;
-    }
-
-    .boton-accion-tabla {
-        width: 30px;
-        height: 30px;
-        font-size: var(--fs-texto1);
-    }
-
-    .info-paginacion {
-        font-size: var(--fs-texto1);
-    }
-
-    .page-link {
-        font-size: var(--fs-texto1);
-        padding: 6px 10px;
+    .resultado-toolbar,
+    .lab-form-grid,
+    .lab-checklist {
+        grid-template-columns: 1fr;
     }
 }
