@@ -39,6 +39,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const detalleVersion = document.getElementById('detalleVersion');
     const detalleActualizacion = document.getElementById('detalleActualizacion');
     const selectVersionHistorial = document.getElementById('selectVersionHistorial');
+    const detallePacienteTitulo = document.getElementById('detallePacienteTitulo');
+    const detallePacienteMeta = document.getElementById('detallePacienteMeta');
+    const detalleEstadoEdicion = document.getElementById('detalleEstadoEdicion');
+
+    const statTotalAtenciones = document.getElementById('statTotalAtenciones');
+    const statPacientesUnicos = document.getElementById('statPacientesUnicos');
+    const statVeterinariosActivos = document.getElementById('statVeterinariosActivos');
+    const statUltimaAtencion = document.getElementById('statUltimaAtencion');
 
     const vacunaTipo = document.getElementById('vacunaTipo');
     const vacunaDosis = document.getElementById('vacunaDosis');
@@ -82,6 +90,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const paginacionTratamientos = document.getElementById('paginacionTratamientos');
     const paginacionConsultas = document.getElementById('paginacionConsultas');
     const paginacionNotas = document.getElementById('paginacionNotas');
+
+    const workspaceTabs = Array.from(document.querySelectorAll('[data-workspace-tab]'));
+    const panelListadoAtenciones = document.getElementById('panelListadoAtenciones');
+    const panelEdicionClinica = document.getElementById('panelEdicionClinica');
+    const detalleContenidoHistorial = document.getElementById('detalleContenidoHistorial');
+    const panelModulosClinicos = document.getElementById('panelModulosClinicos');
 
     let registros = [];
     let pendingSelectId = null;
@@ -150,6 +164,99 @@ document.addEventListener('DOMContentLoaded', function() {
             hour: '2-digit',
             minute: '2-digit'
         });
+    }
+
+    function actualizarMiniStats(data) {
+        if (!statTotalAtenciones || !statPacientesUnicos || !statVeterinariosActivos || !statUltimaAtencion) {
+            return;
+        }
+
+        const listado = Array.isArray(data) ? data : [];
+        statTotalAtenciones.textContent = String(listado.length);
+
+        const pacientes = new Set();
+        const veterinarios = new Set();
+        let fechaMaxima = null;
+
+        listado.forEach(function(item) {
+            if (item && item.id_paciente) {
+                pacientes.add(String(item.id_paciente));
+            }
+
+            if (item && item.veterinario_responsable) {
+                veterinarios.add(String(item.veterinario_responsable).trim());
+            }
+
+            const cruda = item && item.fecha_atencion ? String(item.fecha_atencion).replace(' ', 'T') : '';
+            const fecha = cruda ? new Date(cruda) : null;
+            if (fecha && !Number.isNaN(fecha.getTime())) {
+                if (!fechaMaxima || fecha > fechaMaxima) {
+                    fechaMaxima = fecha;
+                }
+            }
+        });
+
+        statPacientesUnicos.textContent = String(pacientes.size);
+        statVeterinariosActivos.textContent = String(veterinarios.size);
+        statUltimaAtencion.textContent = fechaMaxima
+            ? fechaMaxima.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: '2-digit' })
+            : '--';
+    }
+
+    function actualizarResumenPaciente(registro) {
+        if (!detallePacienteTitulo || !detallePacienteMeta || !detalleEstadoEdicion) {
+            return;
+        }
+
+        if (!registro) {
+            detallePacienteTitulo.textContent = 'Sin paciente seleccionado';
+            detallePacienteMeta.textContent = 'Selecciona un registro en la tabla para iniciar la edición.';
+            detalleEstadoEdicion.innerHTML = '<i class="bi bi-check-circle"></i> Listo para editar';
+            return;
+        }
+
+        detallePacienteTitulo.textContent = registro.paciente_nombre || 'Paciente sin nombre';
+        detallePacienteMeta.textContent = (registro.especie || 'Especie no registrada') + ' · ' + (registro.raza || 'Raza no registrada') + ' · Atención ' + fechaHumana(registro.fecha_atencion);
+        detalleEstadoEdicion.innerHTML = '<i class="bi bi-pencil-square"></i> Modo edición activo';
+    }
+
+    function activarVentana(nombreVentana) {
+        if (!panelListadoAtenciones || !panelEdicionClinica || !detalleContenidoHistorial || !panelModulosClinicos) {
+            return;
+        }
+
+        workspaceTabs.forEach(function(tab) {
+            const activa = tab.getAttribute('data-workspace-tab') === nombreVentana;
+            tab.classList.toggle('active', activa);
+            tab.setAttribute('aria-selected', activa ? 'true' : 'false');
+        });
+
+        panelListadoAtenciones.classList.add('ventana-oculta');
+        panelEdicionClinica.classList.add('ventana-oculta');
+        detalleContenidoHistorial.classList.add('ventana-oculta');
+        panelModulosClinicos.classList.add('ventana-oculta');
+
+        if (nombreVentana === 'listado') {
+            panelListadoAtenciones.classList.remove('ventana-oculta');
+            panelListadoAtenciones.classList.add('col-12');
+            panelListadoAtenciones.classList.remove('col-xl-7');
+            panelEdicionClinica.classList.remove('col-12');
+            panelEdicionClinica.classList.add('col-xl-5');
+            return;
+        }
+
+        panelEdicionClinica.classList.remove('ventana-oculta');
+        panelEdicionClinica.classList.add('col-12');
+        panelEdicionClinica.classList.remove('col-xl-5');
+        panelListadoAtenciones.classList.remove('col-12');
+        panelListadoAtenciones.classList.add('col-xl-7');
+
+        if (nombreVentana === 'modulos') {
+            panelModulosClinicos.classList.remove('ventana-oculta');
+            return;
+        }
+
+        detalleContenidoHistorial.classList.remove('ventana-oculta');
     }
 
     async function postJson(payload) {
@@ -489,6 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
         detalleVersion.textContent = '--';
         detalleActualizacion.textContent = '--';
         selectVersionHistorial.innerHTML = '<option value="">Selecciona una atención</option>';
+        actualizarResumenPaciente(null);
         limpiarModulos();
     }
 
@@ -546,6 +654,8 @@ document.addEventListener('DOMContentLoaded', function() {
         detalleAcceso.textContent = registro.acceso || 'Autorizado';
         detalleVersion.textContent = registro.version_registro ? ('v' + registro.version_registro) : 'Nueva';
         detalleActualizacion.textContent = fechaHoraHumana(registro.updated_at || registro.fecha_atencion);
+        actualizarResumenPaciente(registro);
+        activarVentana('detalle');
         
         cargarVersionesHistorial(registro.id_historial || '');
         cargarFichaClinica(registro.id_paciente || '');
@@ -662,10 +772,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }, filtros || {}));
 
             registros = Array.isArray(payload.data) ? payload.data : [];
+            actualizarMiniStats(registros);
             actualizarFiltroVeterinarios();
             renderTabla();
         } catch (error) {
             tablaBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-3">' + escapeHtml(error.message || 'Error de carga') + '</td></tr>';
+            actualizarMiniStats([]);
             limpiarFormulario();
             showToast(error.message || 'No se pudieron cargar los historiales.', 'error');
         }
@@ -697,6 +809,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showToast('Selecciona primero un paciente vinculado en la tabla.', 'error');
             return;
         }
+
+        activarVentana('detalle');
 
         campoIdHistorial.value = '';
         campos.fecha.value = new Date().toISOString().slice(0, 10);
@@ -768,6 +882,18 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             showToast(error.message || 'Error al guardar el historial clínico.', 'error');
         }
+    });
+
+    workspaceTabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            const nombre = tab.getAttribute('data-workspace-tab') || 'listado';
+            if ((nombre === 'detalle' || nombre === 'modulos') && !campoIdPaciente.value) {
+                showToast('Selecciona primero una atención en el listado.', 'error');
+                activarVentana('listado');
+                return;
+            }
+            activarVentana(nombre);
+        });
     });
 
     btnGuardarVacuna.addEventListener('click', async function() {
@@ -991,5 +1117,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    activarVentana('listado');
     cargarHistoriales({});
 });
