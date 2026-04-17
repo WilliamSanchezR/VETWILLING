@@ -6,6 +6,8 @@ require_once __DIR__ . '/../models/Mascotas.php';
 require_once __DIR__ . '/../models/PacienteProfesionalAsignacion.php';
 require_once __DIR__ . '/../models/DisponibilidadUsuario.php';
 require_once __DIR__ . '/../models/Veterinario.php';
+require_once __DIR__ . '/../helpers/mailer_helper.php';
+require_once __DIR__ . '/../helpers/email_helper.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -160,6 +162,22 @@ function registrarPacienteConPropietario()
             exit();
         }
 
+        $emailEnviado = false;
+        $emailAviso = '';
+        if (validarFormatoEmail($email)) {
+            $emailEnviado = enviarBienvenidaPropietario([
+                'email' => $email,
+                'nombres' => $nombres,
+                'apellidos' => $apellidos,
+                'numero_documento' => $numero_documento
+            ]);
+            if (!$emailEnviado) {
+                $emailAviso = 'No se pudo enviar el correo de bienvenida.';
+            }
+        } else {
+            $emailAviso = 'El correo registrado no tiene un formato valido para enviar notificaciones.';
+        }
+
         // 2. Registrar mascotas
         $mascotaModel = new Mascota();
         $asignacionModel = new PacienteProfesionalAsignacion();
@@ -210,9 +228,15 @@ function registrarPacienteConPropietario()
             $registradas++;
         }
 
+        $mensaje = "Registro exitoso: propietario y {$registradas} mascota(s) guardadas correctamente";
+        if ($emailAviso !== '') {
+            $mensaje .= " {$emailAviso}";
+        }
+
         echo json_encode([
             'success' => true,
-            'message' => "Registro exitoso: propietario y {$registradas} mascota(s) guardadas correctamente"
+            'message' => $mensaje,
+            'email_enviado' => $emailEnviado
         ]);
     } catch (Exception $e) {
         error_log("Error en registroPacienteController: " . $e->getMessage());
@@ -223,4 +247,81 @@ function registrarPacienteConPropietario()
     }
 
     exit();
+}
+
+function enviarBienvenidaPropietario(array $datos): bool
+{
+    try {
+        $mail = mailer_init();
+
+        $nombreCompleto = trim(($datos['nombres'] ?? '') . ' ' . ($datos['apellidos'] ?? ''));
+        $email = $datos['email'] ?? '';
+        $numeroDocumento = (string) ($datos['numero_documento'] ?? '');
+
+        $mail->setFrom(SMTP_FROM_EMAIL, 'VetWilling - Sistema de Gestion Veterinaria');
+        $mail->addAddress($email, $nombreCompleto);
+        $mail->isHTML(true);
+        $mail->Subject = 'Bienvenido a VetWilling';
+
+        $nombreSeguro = htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8');
+        $emailSeguro = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+        $documentoSeguro = htmlspecialchars($numeroDocumento, ENT_QUOTES, 'UTF-8');
+        $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+
+        $mail->Body = "
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #007832; color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background-color: #f9f9f9; padding: 30px; border: 1px solid #ddd; }
+                .credenciales { background-color: #ffffff; padding: 16px; margin: 20px 0; border-left: 4px solid #007832; border-radius: 5px; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+                .btn { background-color: #007832; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>VetWilling</h1>
+                    <p>Bienvenido al sistema</p>
+                </div>
+                <div class='content'>
+                    <h2>Hola {$nombreSeguro}!</h2>
+                    <p>Tu cuenta ha sido registrada correctamente en VetWilling.</p>
+
+                    <div class='credenciales'>
+                        <h3>Credenciales de acceso</h3>
+                        <p><strong>Correo:</strong> {$emailSeguro}</p>
+                        <p><strong>Contrasena:</strong> {$documentoSeguro}</p>
+                        <p>Recuerda que tu contrasena inicial es el numero de tu documento.</p>
+                    </div>
+
+                    <p>Puedes iniciar sesion desde el siguiente enlace:</p>
+                    <a class='btn' href='{$baseUrl}'>Ir al sistema</a>
+                </div>
+                <div class='footer'>
+                    <p>Este es un correo automatico, por favor no respondas a este mensaje.</p>
+                    <p>&copy; 2025 VetWilling</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+
+        $mail->AltBody = "Hola {$nombreCompleto},\n\n"
+            . "Tu cuenta fue registrada en VetWilling.\n"
+            . "Correo: {$email}\n"
+            . "Contrasena: {$numeroDocumento}\n"
+            . "Recuerda que tu contrasena inicial es el numero de tu documento.\n\n"
+            . "Accede desde: {$baseUrl}\n\n"
+            . "VetWilling";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Error al enviar bienvenida propietario: " . $e->getMessage());
+        return false;
+    }
 }

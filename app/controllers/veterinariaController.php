@@ -3,6 +3,8 @@
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/veterinaria.php';
+require_once __DIR__ . '/../helpers/mailer_helper.php';
+require_once __DIR__ . '/../helpers/email_helper.php';
 
 
 //CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
@@ -61,7 +63,7 @@ function registrarVeterinaria()
 
     // Validamos los campos recibidos de representante legal
     $email = $_POST['email'] ?? '';
-    $password = $_POST['numero_documento'] ?? '123';
+    $password = $nit !== '' ? $nit : ($_POST['numero_documento'] ?? '123');
     $estado = 'activo';
     $id_rol = '4'; // Rol de representante legal
     $tipo_documento = $_POST['tipo_documento'] ?? '';
@@ -161,10 +163,22 @@ function registrarVeterinaria()
 
     // Verificamos el resultado y mostramos una alerta
     if ($resultado) {
+        $emailEnviado = false;
+        if (validarFormatoEmail($emailVeterinaria)) {
+            $emailEnviado = enviarBienvenidaVeterinaria([
+                'email' => $emailVeterinaria,
+                'razon_social' => $nombreVeterinaria,
+                'nit' => $nit,
+                'representante' => trim($nombres . ' ' . $apellidos)
+            ]);
+        }
+
         mostrarSweetAlert(
             'success',
             'Veterinaria registrada',
-            'La veterinaria ha sido creada correctamente',
+            $emailEnviado
+                ? 'La veterinaria ha sido creada correctamente y el correo fue enviado.'
+                : 'La veterinaria ha sido creada correctamente, pero no se pudo enviar el correo.',
             '/vetwilling/admin/listar-veterinarias'
         );
     } else {
@@ -172,6 +186,85 @@ function registrarVeterinaria()
     }
 
     exit();
+}
+
+function enviarBienvenidaVeterinaria(array $datos): bool
+{
+    try {
+        $mail = mailer_init();
+
+        $email = $datos['email'] ?? '';
+        $razonSocial = $datos['razon_social'] ?? '';
+        $nit = (string) ($datos['nit'] ?? '');
+        $representante = $datos['representante'] ?? '';
+
+        $mail->setFrom(SMTP_FROM_EMAIL, 'VetWilling - Sistema de Gestion Veterinaria');
+        $mail->addAddress($email, $razonSocial);
+        $mail->isHTML(true);
+        $mail->Subject = 'Registro exitoso de su veterinaria en VetWilling';
+
+        $razonSeguro = htmlspecialchars($razonSocial, ENT_QUOTES, 'UTF-8');
+        $representanteSeguro = htmlspecialchars($representante, ENT_QUOTES, 'UTF-8');
+        $emailSeguro = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+        $nitSeguro = htmlspecialchars($nit, ENT_QUOTES, 'UTF-8');
+        $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+
+        $mail->Body = "
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #0a932c; color: white; padding: 24px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background-color: #f9f9f9; padding: 28px; border: 1px solid #ddd; }
+                .card { background-color: #ffffff; padding: 18px; margin: 18px 0; border-left: 4px solid #0a932c; border-radius: 6px; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+                .btn { background-color: #0a932c; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>VetWilling</h1>
+                    <p>Registro de Veterinaria</p>
+                </div>
+                <div class='content'>
+                    <h2>Estimado equipo de {$razonSeguro},</h2>
+                    <p>Su veterinaria ha sido registrada exitosamente en nuestro sistema.</p>
+                    <div class='card'>
+                        <h3>Datos de acceso</h3>
+                        <p><strong>Correo:</strong> {$emailSeguro}</p>
+                        <p><strong>Contrasena inicial:</strong> {$nitSeguro}</p>
+                        <p>Por seguridad, recuerde cambiar la contrasena en el primer ingreso.</p>
+                    </div>
+                    <p><strong>Representante legal:</strong> {$representanteSeguro}</p>
+                    <p>Puede iniciar sesion desde el siguiente enlace:</p>
+                    <a class='btn' href='{$baseUrl}'>Acceder al sistema</a>
+                </div>
+                <div class='footer'>
+                    <p>Este es un correo automatico, por favor no responda a este mensaje.</p>
+                    <p>&copy; 2025 VetWilling</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+
+        $mail->AltBody = "Estimado equipo de {$razonSocial},\n\n"
+            . "Su veterinaria fue registrada exitosamente en VetWilling.\n"
+            . "Correo: {$email}\n"
+            . "Contrasena inicial: {$nit}\n"
+            . "Recuerde cambiar la contrasena en el primer ingreso.\n"
+            . "Representante legal: {$representante}\n\n"
+            . "Acceda desde: {$baseUrl}\n\n"
+            . "VetWilling";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Error al enviar bienvenida veterinaria: " . $e->getMessage());
+        return false;
+    }
 }
 
 // FUNCION PARA LISTAR LAS VETERINARIAS REGISTRADAS
