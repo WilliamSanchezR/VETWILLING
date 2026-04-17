@@ -50,10 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login = new Login();
     $resultado =  $login->autenticar($email, $password);
 
-    // Verificar si el modelo devolvio un error
-
+    // Verificar si el modelo devolvio un error y mostrar la alerta correspondiente segun el tipo de error
     if (isset($resultado['error'])) {
-        mostrarSweetAlert('error', 'Error de autenticacion', $resultado['error']);
+        $tipoAlerta = $resultado['tipo'] ?? 'error';
+        $tituloAlerta = $resultado['titulo'] ?? 'Error de autenticacion';
+        mostrarSweetAlert($tipoAlerta, $tituloAlerta, $resultado['error']);
         exit();
     }
 

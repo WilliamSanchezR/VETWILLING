@@ -1,3 +1,15 @@
+<?php
+$producto = $producto ?? [
+    'nombre' => 'Producto VetWilling',
+    'detalle' => 'Resumen de pago no disponible',
+    'monto' => 0,
+    'icono' => '🐾',
+    'referencia' => 'N/A',
+];
+
+$checkoutUrl = $checkoutUrl ?? (BASE_URL . '/pagos/mercadopago?action=checkout');
+$verificarUrl = $verificarUrl ?? '';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,219 +29,101 @@
 
         <div class="checkout-header">
             <div class="logo">🐾 VetWilling</div>
-            <div class="subtitle">Checkout seguro</div>
+            <div class="subtitle">Checkout de Mercado Pago</div>
         </div>
 
         <div class="checkout-body">
 
             <div class="producto-box">
-                <div class="producto-icon">🐶</div>
+                <div class="producto-icon"><?= htmlspecialchars($producto['icono'], ENT_QUOTES, 'UTF-8') ?></div>
                 <div class="producto-info">
-                    <div class="nombre">Purina Pro Plan</div>
-                    <div class="detalle">1 bolsa de 5kg · Adulto razas medianas</div>
+                    <div class="nombre"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8') ?></div>
+                    <div class="detalle"><?= htmlspecialchars($producto['detalle'], ENT_QUOTES, 'UTF-8') ?></div>
                 </div>
             </div>
 
             <div class="resumen-fila">
                 <span>Subtotal</span>
-                <span>$ 150.000</span>
-            </div>
-            <div class="resumen-fila">
-                <span>Envío</span>
-                <span style="color: #2e7d32; font-weight:600;">Gratis</span>
+                <span>$ <?= number_format((float) $producto['monto'], 0, ',', '.') ?></span>
             </div>
             <div class="resumen-fila">
                 <span>Referencia</span>
-                <span>ORD-2024-001</span>
+                <span><?= htmlspecialchars($producto['referencia'], ENT_QUOTES, 'UTF-8') ?></span>
             </div>
 
             <div class="resumen-total">
                 <span>Total</span>
-                <span>$ 150.000 COP</span>
+                <span>$ <?= number_format((float) $producto['monto'], 0, ',', '.') ?> COP</span>
             </div>
 
-            <button class="btn-pagar" onclick="abrirModal()">
+            <a class="btn-pagar" href="<?= htmlspecialchars($checkoutUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">
                 <span>🔒</span>
-                Pagar ahora
-            </button>
+                Abrir Mercado Pago
+            </a>
+
+            <?php if (!empty($verificarUrl)) : ?>
+                <a class="btn-verificar" href="<?= htmlspecialchars($verificarUrl, ENT_QUOTES, 'UTF-8') ?>">
+                    Ya pagué, verificar estado
+                </a>
+                <p class="payment-help-text">Si Mercado Pago no regresa automáticamente a la aplicación, vuelve a esta pestaña y usa este botón para procesar la confirmación.</p>
+            <?php endif; ?>
 
             <div class="secure-badge">
-                🛡️ Pago procesado por Wompi · SSL 256-bit
+                🛡️ Pago procesado por Mercado Pago · SSL 256-bit
             </div>
 
         </div>
     </div>
 </div>
 
-<!-- ===== PÁGINA CONFIRMACIÓN ===== -->
-<div id="pagina-confirmacion">
-    <div class="confirmacion-card">
+<script>
+(function () {
+    const verificarUrl = <?= json_encode($verificarUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+    const botonPagar = document.querySelector('.btn-pagar');
 
-        <div class="confirmacion-header">
-            <div class="checkmark">✓</div>
-            <h2>¡Pago Aprobado!</h2>
-            <p>Tu transacción fue procesada exitosamente</p>
-        </div>
+    if (!verificarUrl || !botonPagar) {
+        return;
+    }
 
-        <div class="confirmacion-body">
-            <div class="detalle-fila">
-                <span class="key">Estado</span>
-                <span class="val"><span class="estado-badge">APROBADO</span></span>
-            </div>
-            <div class="detalle-fila">
-                <span class="key">ID Transacción</span>
-                <span class="val" id="conf-id">-</span>
-            </div>
-            <div class="detalle-fila">
-                <span class="key">Referencia</span>
-                <span class="val">ORD-2024-001</span>
-            </div>
-            <div class="detalle-fila">
-                <span class="key">Concepto</span>
-                <span class="val">Purina Pro Plan</span>
-            </div>
-            <div class="detalle-fila">
-                <span class="key">Monto pagado</span>
-                <span class="val" style="color: var(--verde);">$ 150.000 COP</span>
-            </div>
-            <div class="detalle-fila">
-                <span class="key">Método</span>
-                <span class="val" id="conf-metodo">-</span>
-            </div>
-            <div class="detalle-fila">
-                <span class="key">Fecha</span>
-                <span class="val" id="conf-fecha">-</span>
-            </div>
-        </div>
+    let intervalo = null;
 
-        <button class="btn-volver" onclick="volverInicio()">← Volver al inicio</button>
+    const revisarEstado = async () => {
+        try {
+            const separador = verificarUrl.includes('?') ? '&' : '?';
+            const respuesta = await fetch(verificarUrl + separador + 'format=json', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                cache: 'no-store'
+            });
 
-        <div class="wompi-footer">
-            Procesado por <strong>WOMPI</strong> · Transacción simulada para proyecto educativo
-        </div>
+            if (!respuesta.ok) {
+                return;
+            }
 
-    </div>
-</div>
+            const data = await respuesta.json();
+            if (data && (data.estado === 'success' || data.estado === 'failure') && data.redirect_url) {
+                if (intervalo) {
+                    clearInterval(intervalo);
+                }
 
-<!-- ===== MODAL WOMPI SIMULADO ===== -->
-<div class="overlay" id="overlay">
-    <div class="wompi-modal">
+                window.location.href = data.redirect_url;
+            }
+        } catch (error) {
+            console.debug('No fue posible verificar el pago automáticamente.', error);
+        }
+    };
 
-        <div class="wompi-header">
-            <div class="wompi-brand">WOM<span>PI</span></div>
-            <div class="monto-header">
-                <div class="label">Total a pagar</div>
-                <div class="valor">$ 150.000 COP</div>
-            </div>
-            <button class="btn-cerrar" onclick="cerrarModal()">✕</button>
-        </div>
+    const iniciarSeguimiento = () => {
+        if (intervalo) {
+            return;
+        }
 
-        <div class="steps-indicator">
-            <div class="step-dot active" id="dot-1"></div>
-            <div class="step-dot" id="dot-2"></div>
-            <div class="step-dot" id="dot-3"></div>
-        </div>
+        revisarEstado();
+        intervalo = setInterval(revisarEstado, 8000);
+    };
 
-        <!-- STEP 1: Elegir método de pago -->
-        <div class="step active" id="step-1">
-            <div style="padding: 20px 24px 12px">
-                <p class="metodos-title">Elige tu método de pago</p>
-
-                <div class="metodo-item" onclick="seleccionarMetodo(this, 'Tarjeta de crédito/débito')">
-                    <div class="metodo-icon">💳</div>
-                    <div>
-                        <div class="metodo-nombre">Tarjeta crédito / débito</div>
-                        <div class="metodo-desc">Visa, Mastercard, Amex</div>
-                    </div>
-                </div>
-
-                <div class="metodo-item" onclick="seleccionarMetodo(this, 'PSE - Débito bancario')">
-                    <div class="metodo-icon">🏦</div>
-                    <div>
-                        <div class="metodo-nombre">PSE</div>
-                        <div class="metodo-desc">Débito desde tu cuenta bancaria</div>
-                    </div>
-                </div>
-
-                <div class="metodo-item" onclick="seleccionarMetodo(this, 'Nequi')">
-                    <div class="metodo-icon">📱</div>
-                    <div>
-                        <div class="metodo-nombre">Nequi</div>
-                        <div class="metodo-desc">Paga desde tu app Nequi</div>
-                    </div>
-                </div>
-
-                <div class="metodo-item" onclick="seleccionarMetodo(this, 'Bancolombia QR')">
-                    <div class="metodo-icon">⬛</div>
-                    <div>
-                        <div class="metodo-nombre">Bancolombia QR</div>
-                        <div class="metodo-desc">Escanea y paga</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- STEP 2: Formulario -->
-        <div class="step" id="step-2">
-            <div style="padding: 20px 24px 12px">
-
-                <div class="tarjeta-preview">
-                    <div style="font-size:11px; opacity:0.7">TARJETA DE PAGO</div>
-                    <div class="numero" id="preview-numero">•••• •••• •••• ••••</div>
-                    <div class="fila">
-                        <span id="preview-nombre">NOMBRE TITULAR</span>
-                        <span id="preview-exp">MM/AA</span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Número de tarjeta</label>
-                    <input class="form-input" type="text" maxlength="19" placeholder="0000 0000 0000 0000"
-                        oninput="formatCard(this)" />
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Nombre del titular</label>
-                    <input class="form-input" type="text" placeholder="Como aparece en la tarjeta"
-                        oninput="document.getElementById('preview-nombre').textContent = this.value.toUpperCase() || 'NOMBRE TITULAR'" />
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Vencimiento</label>
-                        <input class="form-input" type="text" maxlength="5" placeholder="MM/AA"
-                            oninput="formatExp(this)" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">CVV</label>
-                        <input class="form-input" type="password" maxlength="3" placeholder="•••" />
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- STEP 3: Procesando -->
-        <div class="step" id="step-3">
-            <div style="padding: 30px 24px">
-                <div class="procesando">
-                    <div class="spinner"></div>
-                    <h3>Procesando pago...</h3>
-                    <p>No cierres esta ventana.<br>Estamos verificando tu transacción.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer botones -->
-        <div class="modal-footer" id="modal-footer">
-            <button class="btn-modal-back" id="btn-back" onclick="pasoAnterior()" style="display:none">← Atrás</button>
-            <button class="btn-modal-next" id="btn-next" onclick="pasoContinuar()" disabled>Continuar →</button>
-        </div>
-
-    </div>
-</div>
-
-<script src="<?= BASE_URL ?>/public/assets/payments/js/pasarelaPago.js"></script>
-
+    botonPagar.addEventListener('click', iniciarSeguimiento);
+})();
+</script>
 </body>
 </html>

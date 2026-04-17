@@ -9,6 +9,8 @@
 session_start();
 
 require_once __DIR__ . '/../models/CitasCliente.php';
+require_once __DIR__ . '/../helpers/email_helper.php';
+require_once __DIR__ . '/../helpers/notificacion_helper.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -44,6 +46,9 @@ switch ($method) {
         switch ($accion) {
             case 'listar':
                 listarCitasCliente();
+                break;
+            case 'historial_paciente':
+                obtenerHistorialPaciente();
                 break;
             case 'detalle':
                 obtenerDetalleCita();
@@ -200,6 +205,58 @@ function crearCitaCliente()
         $id_cita = $modeloCitas->crearCita($datosInsert);
 
         if ($id_cita) {
+            // ═══════════════════════════════════════════════════════════════════
+            // RFS 37: ENVIAR EMAIL DE CONFIRMACION AL PROPIETARIO
+            // ═══════════════════════════════════════════════════════════════════
+            
+            try {
+                // Obtener detalles completos de la cita para el email
+                $detallesCita = $modeloCitas->obtenerDetallesCita($id_cita);
+                
+                if ($detallesCita && !empty($detallesCita['email_propietario'])) {
+                    // Preparar datos para enviar al email
+                    $datosCitaEmail = [
+                        'email_propietario' => $detallesCita['email_propietario'],
+                        'nombre_propietario' => $detallesCita['nombre_propietario'],
+                        'nombre_mascota' => $detallesCita['nombre_mascota'] ?? 'su mascota',
+                        'tipo_servicio' => $detallesCita['servicio_nombre'] ?? $detallesCita['tipo'],
+                        'fecha_hora' => $detallesCita['fecha_hora'],
+                        'estado' => $detallesCita['estado'] ?? 'Pendiente'
+                    ];
+                    
+                    // Enviar notificación de confirmación de cita
+                    $emailEnviado = enviarNotificacionCitaCreada($datosCitaEmail);
+                    
+                    // Registrar intento de envío en auditoría
+                    if ($emailEnviado) {
+                        registrarNotificacionEnviada([
+                            'id_agendamiento' => $id_cita,
+                            'medio_notificacion' => 'email',
+                            'destinatario' => $detallesCita['email_propietario'],
+                            'estado_envio' => 'exitoso',
+                            'mensaje_error' => null,
+                            'intentos_envio' => 1
+                        ]);
+                        error_log("✅ Email de confirmación enviado exitosamente - Cita ID: {$id_cita}");
+                    } else {
+                        registrarNotificacionEnviada([
+                            'id_agendamiento' => $id_cita,
+                            'medio_notificacion' => 'email',
+                            'destinatario' => $detallesCita['email_propietario'],
+                            'estado_envio' => 'fallido',
+                            'mensaje_error' => 'Error al enviar email de confirmación - Verificar configuración SMTP',
+                            'intentos_envio' => 1
+                        ]);
+                        error_log("❌ Error al enviar email de confirmación - Cita ID: {$id_cita}");
+                    }
+                } else {
+                    error_log("⚠️ No se pudo obtener datos de propietario para enviar email - Cita ID: {$id_cita}");
+                }
+            } catch (Exception $e) {
+                error_log("⚠️ Excepción al enviar email de confirmación: " . $e->getMessage());
+                // No detenemos el proceso si falla el email, la cita ya fue creada
+            }
+            
             header('Content-Type: application/json');
             http_response_code(201);
             echo json_encode([
@@ -478,6 +535,52 @@ function obtenerDetalleCita()
 
     } catch (Exception $e) {
         error_log("❌ Error en obtenerDetalleCita: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Error del sistema']);
+        exit();
+    }
+}
+
+function obtenerHistorialPaciente()
+{
+    try {
+        if (!isset($_SESSION['user']['id_usuario'])) {
+            http_response_code(401);
+            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado']);
+            exit();
+        }
+
+        $id_propietario = obtenerIdPropietario();
+        if (!$id_propietario) {
+            http_response_code(403);
+            echo json_encode(['status' => 'error', 'message' => 'Acceso denegado']);
+            exit();
+        }
+
+        $id_paciente = isset($_GET['id_paciente']) ? (int)$_GET['id_paciente'] : 0;
+        $limite = isset($_GET['limite']) ? (int)$_GET['limite'] : 20;
+
+        if ($id_paciente <= 0) {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'ID de paciente inválido']);
+            exit();
+        }
+
+        $limite = max(1, min($limite, 100));
+
+        $modeloCitas = new CitasCliente();
+        $historial = $modeloCitas->obtenerHistorialPorPaciente($id_propietario, $id_paciente, $limite);
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'cantidad' => count($historial),
+            'id_paciente' => $id_paciente,
+            'historial' => $historial
+        ]);
+        exit();
+    } catch (Exception $e) {
+        error_log("❌ Error en obtenerHistorialPaciente: " . $e->getMessage());
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'Error del sistema']);
         exit();

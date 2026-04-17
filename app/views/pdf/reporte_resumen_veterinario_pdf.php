@@ -45,13 +45,73 @@
             background: #f3f4f6;
         }
 
-        .chip {
-            display: inline-block;
-            padding: 4px 8px;
+        .resumen-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 14px;
+        }
+
+        .resumen-table td {
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .resumen-table .label {
+            color: #6b7280;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .resumen-table .valor {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .bg-green {
             background: #ecfdf3;
-            border: 1px solid #86efac;
-            border-radius: 4px;
-            margin-right: 6px;
+        }
+
+        .bg-red {
+            background: #fef2f2;
+        }
+
+        .bg-yellow {
+            background: #fffbeb;
+        }
+
+        .bg-blue {
+            background: #f0f4ff;
+        }
+
+        .bg-gray {
+            background: #f9fafb;
+        }
+
+        .badge-estado {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .badge-atendida {
+            background: #ecfdf3;
+            color: #059669;
+        }
+
+        .badge-cancelada {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .badge-pendiente {
+            background: #fffbeb;
+            color: #d97706;
         }
     </style>
 </head>
@@ -61,14 +121,46 @@
     <div class="meta">
         Periodo: <strong><?= htmlspecialchars($payload['meta']['etiqueta_periodo']) ?></strong>
         (<?= htmlspecialchars($payload['meta']['fecha_inicio']) ?> a <?= htmlspecialchars($payload['meta']['fecha_fin']) ?>)
+        <?php if (!empty($payload['meta']['filtros']['estado_cita'])): ?>
+            &nbsp;| Filtro estado: <strong><?= htmlspecialchars($payload['meta']['filtros']['estado_cita']) ?></strong>
+        <?php endif; ?>
     </div>
 
-    <div>
-        <span class="chip">Ingresos: $<?= number_format((float)$payload['resumen']['ingresos_totales'], 0, ',', '.') ?></span>
-        <span class="chip">Citas atendidas: <?= (int)$payload['resumen']['citas_atendidas'] ?></span>
-        <span class="chip">Nuevos pacientes: <?= (int)$payload['resumen']['nuevos_pacientes'] ?></span>
-        <span class="chip">Cumplimiento: <?= number_format((float)$payload['resumen']['cumplimiento'], 1) ?>%</span>
-    </div>
+    <table class="resumen-table">
+        <tr>
+            <td class="bg-green">
+                <div class="label">Ingresos</div>
+                <div class="valor">$<?= number_format((float)$payload['resumen']['ingresos_totales'], 0, ',', '.') ?></div>
+            </td>
+            <td class="bg-green">
+                <div class="label">Citas atendidas</div>
+                <div class="valor"><?= (int)$payload['resumen']['citas_atendidas'] ?></div>
+            </td>
+            <td class="bg-red">
+                <div class="label">Citas canceladas</div>
+                <div class="valor"><?= (int)($payload['resumen_estados']['canceladas'] ?? 0) ?></div>
+            </td>
+            <td class="bg-yellow">
+                <div class="label">Citas pendientes</div>
+                <div class="valor"><?= (int)($payload['resumen_estados']['pendientes'] ?? 0) ?></div>
+            </td>
+        </tr>
+        <tr>
+            <td class="bg-blue">
+                <div class="label">Total citas</div>
+                <div class="valor"><?= (int)($payload['resumen_estados']['total'] ?? 0) ?></div>
+            </td>
+            <td class="bg-gray">
+                <div class="label">Nuevos pacientes</div>
+                <div class="valor"><?= (int)$payload['resumen']['nuevos_pacientes'] ?></div>
+            </td>
+            <td class="bg-gray">
+                <div class="label">Cumplimiento</div>
+                <div class="valor"><?= number_format((float)$payload['resumen']['cumplimiento'], 1) ?>%</div>
+            </td>
+            <td></td>
+        </tr>
+    </table>
 
     <h2>Servicios más solicitados</h2>
     <table class="grid">
@@ -199,6 +291,42 @@
             <?php else: ?>
                 <tr>
                     <td colspan="5">Sin historial de asignaciones en el periodo.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+    <h2>Detalle de citas</h2>
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Paciente</th>
+                <th>Propietario</th>
+                <th>Servicio</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($payload['detalle_citas'])): ?>
+                <?php foreach ($payload['detalle_citas'] as $cita): ?>
+                    <?php
+                    $estado = strtoupper($cita['estado'] ?? 'PENDIENTE');
+                    $claseEstado = 'badge-pendiente';
+                    if ($estado === 'ATENDIDA') $claseEstado = 'badge-atendida';
+                    elseif ($estado === 'CANCELADA') $claseEstado = 'badge-cancelada';
+                    ?>
+                    <tr>
+                        <td><?= htmlspecialchars($cita['fecha'] ?? 'N/A') ?></td>
+                        <td><?= htmlspecialchars($cita['paciente'] ?? 'Sin paciente') ?></td>
+                        <td><?= htmlspecialchars($cita['propietario'] ?? 'Sin propietario') ?></td>
+                        <td><?= htmlspecialchars($cita['servicio'] ?? 'Sin servicio') ?></td>
+                        <td><span class="badge-estado <?= $claseEstado ?>"><?= $estado ?></span></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="5">Sin citas para el periodo seleccionado.</td>
                 </tr>
             <?php endif; ?>
         </tbody>

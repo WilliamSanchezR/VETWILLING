@@ -387,7 +387,10 @@ class Veterinario
                         INDEX idx_hcp_base (id_historial_base),
                         INDEX idx_hcp_paciente (id_paciente),
                         INDEX idx_hcp_profesional (id_usuario_profesional),
-                        INDEX idx_hcp_fecha (fecha_atencion)
+                        INDEX idx_hcp_fecha (fecha_atencion),
+                        CONSTRAINT fk_hcp_paciente FOREIGN KEY (id_paciente) REFERENCES paciente (id_paciente) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                        CONSTRAINT fk_hcp_usuario FOREIGN KEY (id_usuario_profesional) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                        CONSTRAINT fk_hcp_historial_base FOREIGN KEY (id_historial_base) REFERENCES historial_clinico_paciente (id_historial) ON DELETE RESTRICT ON UPDATE RESTRICT
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
             $this->conexion->exec($sql);
@@ -820,7 +823,9 @@ class Veterinario
                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         INDEX idx_pv_paciente (id_paciente),
-                        INDEX idx_pv_profesional (id_usuario_profesional)
+                        INDEX idx_pv_profesional (id_usuario_profesional),
+                        CONSTRAINT fk_pv_paciente FOREIGN KEY (id_paciente) REFERENCES paciente (id_paciente) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                        CONSTRAINT fk_pv_usuario FOREIGN KEY (id_usuario_profesional) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
             $this->conexion->exec($sql);
             return true;
@@ -846,7 +851,9 @@ class Veterinario
                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         INDEX idx_pt_paciente (id_paciente),
-                        INDEX idx_pt_profesional (id_usuario_profesional)
+                        INDEX idx_pt_profesional (id_usuario_profesional),
+                        CONSTRAINT fk_pt_paciente FOREIGN KEY (id_paciente) REFERENCES paciente (id_paciente) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                        CONSTRAINT fk_pt_usuario FOREIGN KEY (id_usuario_profesional) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
             $this->conexion->exec($sql);
             return true;
@@ -870,7 +877,9 @@ class Veterinario
                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         INDEX idx_pcc_paciente (id_paciente),
-                        INDEX idx_pcc_profesional (id_usuario_profesional)
+                        INDEX idx_pcc_profesional (id_usuario_profesional),
+                        CONSTRAINT fk_pcc_paciente FOREIGN KEY (id_paciente) REFERENCES paciente (id_paciente) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                        CONSTRAINT fk_pcc_usuario FOREIGN KEY (id_usuario_profesional) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
             $this->conexion->exec($sql);
             return true;
@@ -891,7 +900,9 @@ class Veterinario
                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         INDEX idx_pnc_paciente (id_paciente),
-                        INDEX idx_pnc_profesional (id_usuario_profesional)
+                        INDEX idx_pnc_profesional (id_usuario_profesional),
+                        CONSTRAINT fk_pnc_paciente FOREIGN KEY (id_paciente) REFERENCES paciente (id_paciente) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                        CONSTRAINT fk_pnc_usuario FOREIGN KEY (id_usuario_profesional) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
             $this->conexion->exec($sql);
             return true;

@@ -21,8 +21,10 @@
     /* Colores de métricas */
     --color-ingresos: #10b981;
     --color-citas: #3b82f6;
-    --color-pacientes: #f59e0b;
+    --color-pacientes: #5d0bf5;
     --color-cumplimiento: #ec4899;
+    --color-canceladas: #f02828;
+    --color-pendientes: #f59e0b;
     
     /* Estados */
     --color-success: #28a745;
@@ -167,12 +169,38 @@
     margin-bottom: var(--spacing-xl);
     box-shadow: var(--shadow-md);
     border: 1px solid var(--color-borde);
+    overflow: hidden;
+}
+
+.barra-filtros-reporte > .d-flex {
+    align-items: stretch;
 }
 
 .grupo-filtros {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-borde);
+    border-radius: 12px;
+    background: var(--color-blanco);
+    transition: all 0.25s ease;
+}
+
+.grupo-filtros:hover {
+    border-color: rgba(10, 147, 44, 0.4);
+    box-shadow: 0 4px 16px rgba(10, 147, 44, 0.1);
+    transform: translateY(-1px);
+}
+
+.grupo-filtros:nth-child(1) {
+    border-left: 3px solid var(--color-primario);
+}
+
+.grupo-filtros:nth-child(2) {
+    border-left: 3px solid var(--color-verde);
 }
 
 .etiqueta-filtro {
@@ -289,6 +317,14 @@
     color: var(--color-cumplimiento);
 }
 
+.tarjeta-canceladas {
+    color: var(--color-canceladas);
+}
+
+.tarjeta-pendientes {
+    color: var(--color-pendientes);
+}
+
 .contenido-tarjeta {
     display: flex;
     align-items: flex-start;
@@ -320,6 +356,7 @@
 
 .info-metrica {
     flex: 1;
+    min-width: 0;
 }
 
 .etiqueta-metrica {
@@ -337,6 +374,27 @@
     color: var(--color-texto-oscuro);
     margin: 0;
     line-height: 1.2;
+    max-width: 100%;
+    white-space: nowrap;
+    transition: font-size var(--transition-fast);
+}
+
+.tarjeta-ingresos.tarjeta-metrica-compacta .icono-metrica {
+    width: 50px;
+    height: 50px;
+    font-size: 1.35rem;
+}
+
+.tarjeta-ingresos.tarjeta-metrica-compacta .info-metrica {
+    padding-right: 0.25rem;
+}
+
+.tarjeta-ingresos.tarjeta-metrica-compacta {
+    padding: 1rem;
+}
+
+.tarjeta-ingresos.tarjeta-metrica-compacta .contenido-tarjeta {
+    gap: 0.625rem;
 }
 
 .badge-periodo {
@@ -350,6 +408,10 @@
     font-weight: 600;
     color: var(--color-texto-medio);
     margin-top: var(--spacing-xs);
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .decoracion-tarjeta {
@@ -929,4 +991,103 @@
         width: 100%;
         justify-content: center;
     }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTROS AVANZADOS (RFS 39)
+   ═══════════════════════════════════════════════════════════════ */
+
+.filtros-avanzados-reporte {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.filtros-avanzados-reporte .grupo-filtro-avanzado {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.filtros-avanzados-reporte .grupo-filtro-avanzado label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-texto-claro);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filtros-avanzados-reporte select {
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: var(--color-superficie);
+    color: var(--color-texto);
+    min-width: 160px;
+    transition: border-color 0.2s;
+}
+
+.filtros-avanzados-reporte select:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TABLA DETALLE CITAS (RFS 39)
+   ═══════════════════════════════════════════════════════════════ */
+
+.tabla-detalle-citas {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.tabla-detalle-citas thead th {
+    background: var(--color-superficie);
+    padding: 0.65rem 0.75rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-texto-claro);
+    border-bottom: 2px solid var(--color-borde);
+    white-space: nowrap;
+}
+
+.tabla-detalle-citas tbody td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--color-borde);
+    vertical-align: middle;
+}
+
+.tabla-detalle-citas tbody tr:hover {
+    background: rgba(10, 147, 44, 0.04);
+}
+
+.badge-estado {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-estado.estado-atendida {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.badge-estado.estado-cancelada {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+}
+
+.badge-estado.estado-pendiente {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
 }

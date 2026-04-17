@@ -740,3 +740,48 @@ body {
         margin-left: 0;
     }
 }
+/* ── FIX MÓVIL: eliminar espacio vacío ── */
+@media (max-width: 768px) {
+
+    /* El sidebar sale por la izquierda, no ocupa espacio */
+    .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width) !important; /* no colapsar en móvil */
+        box-shadow: none;
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* Sin margen en móvil, siempre */
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    /* Ocultar el botón toggle flotante */
+    .sidebar-toggle {
+        display: none !important;
+    }
+
+    /* Overlay activo cuando sidebar está abierto */
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(2px);
+        z-index: var(--z-overlay);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity var(--transition-base), visibility var(--transition-base);
+        pointer-events: none;
+    }
+
+    .sidebar.show ~ .sidebar-overlay {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+}

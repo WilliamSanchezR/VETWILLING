@@ -4,8 +4,60 @@ let periodoActual = 'hoy';
 
 const coloresServicios = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'];
 
+function ajustarTextoAlContenedor(elemento, opciones = {}) {
+    if (!elemento) return;
+
+    const minPx = opciones.minPx ?? 20;
+    const maxPx = opciones.maxPx ?? 32;
+    const stepPx = opciones.stepPx ?? 0.25;
+
+    elemento.style.fontSize = `${maxPx}px`;
+
+    let fontSizeActual = maxPx;
+    while (fontSizeActual > minPx && elemento.scrollWidth > elemento.clientWidth) {
+        fontSizeActual -= stepPx;
+        elemento.style.fontSize = `${fontSizeActual}px`;
+    }
+
+    const tarjeta = elemento.closest('.tarjeta-ingresos');
+    if (tarjeta) {
+        tarjeta.classList.toggle('tarjeta-metrica-compacta', fontSizeActual < 30);
+    }
+}
+
+function ajustarMetricaIngresosTotales() {
+    const elIngresos = document.getElementById('reporteIngresosTotales');
+    if (!elIngresos) return;
+
+    requestAnimationFrame(() => {
+        ajustarTextoAlContenedor(elIngresos, {
+            minPx: 20,
+            maxPx: 32,
+            stepPx: 0.25
+        });
+    });
+}
+
 function formatoMoneda(valor) {
     return '$' + Number(valor || 0).toLocaleString('es-CO');
+}
+
+function obtenerEtiquetaPeriodoCorta(meta = {}) {
+    const periodo = (meta.periodo || periodoActual || '').toLowerCase();
+
+    switch (periodo) {
+        case 'hoy':
+            return 'Hoy';
+        case 'semana':
+            return 'Semana';
+        case 'ano':
+            return 'Año';
+        case 'personalizado':
+            return 'Personalizado';
+        case 'mes':
+        default:
+            return 'Mes';
+    }
 }
 
 function crearGraficoIngresos(labels, data) {
@@ -116,13 +168,18 @@ function renderResumen(resumen, meta) {
     setText('reporteTotalCitas', `${Number(resumen.total_citas || 0).toLocaleString('es-CO')} citas`);
 
     const etiqueta = meta.etiqueta_periodo || 'Cargando...';
-    setText('reportePeriodoEtiqueta1', etiqueta);
-    setText('reportePeriodoEtiqueta2', etiqueta);
-    setText('reportePeriodoEtiqueta3', etiqueta);
+    const etiquetaCorta = obtenerEtiquetaPeriodoCorta(meta);
+    setText('reportePeriodoEtiqueta1', etiquetaCorta);
+    setText('reportePeriodoEtiqueta2', etiquetaCorta);
+    setText('reportePeriodoEtiqueta3', etiquetaCorta);
+    setText('reportePeriodoEtiqueta4', etiquetaCorta);
+    setText('reportePeriodoEtiqueta5', etiquetaCorta);
     
     // Actualizar periodo seleccionado en barra de filtros
     const periodoVisual = document.getElementById('textoperiodoSeleccionado');
     if (periodoVisual) periodoVisual.textContent = etiqueta;
+
+    ajustarMetricaIngresosTotales();
 }
 
 function renderTratamientos(tratamientos) {
@@ -282,11 +339,63 @@ function renderHistorialAsignaciones(historial) {
     }).join('');
 }
 
+function renderResumenEstados(resumenEstados) {
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+
+    setText('reporteCitasCanceladas', Number(resumenEstados.canceladas || 0).toLocaleString('es-CO'));
+    setText('reporteCitasPendientes', Number(resumenEstados.pendientes || 0).toLocaleString('es-CO'));
+}
+
+function renderDetalleCitas(detalle) {
+    const tbody = document.getElementById('tablaDetalleCitasBody');
+    if (!tbody) return;
+
+    if (!detalle || !detalle.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-muted text-center p-3">Sin citas para el periodo y filtros seleccionados.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = detalle.map(item => {
+        const estado = (item.estado || 'PENDIENTE').toUpperCase();
+        let claseEstado = 'estado-pendiente';
+        if (estado === 'ATENDIDA') claseEstado = 'estado-atendida';
+        else if (estado === 'CANCELADA') claseEstado = 'estado-cancelada';
+
+        const fecha = item.fecha ? new Date(item.fecha.replace(' ', 'T')).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
+
+        return `
+            <tr>
+                <td>${fecha}</td>
+                <td>${item.paciente || 'Sin paciente'}</td>
+                <td>${item.propietario || 'Sin propietario'}</td>
+                <td>${item.servicio || 'Sin servicio'}</td>
+                <td>${item.subservicio || '-'}</td>
+                <td><span class="badge-estado ${claseEstado}">${estado}</span></td>
+                <td>${item.observaciones || '-'}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function obtenerFiltrosAvanzados() {
+    const params = new URLSearchParams();
+    const estadoCita = document.getElementById('filtroEstadoCita');
+    if (estadoCita && estadoCita.value) {
+        params.set('estado_cita', estadoCita.value);
+    }
+    return params.toString();
+}
+
 async function cargarDashboardReportes() {
     try {
         const selectorAnio = document.getElementById('selectorAnioReporte');
         const anio = selectorAnio ? selectorAnio.value : new Date().getFullYear();
-        const url = `${window.REPORTES_API_URL}?action=data&periodo=${periodoActual}&anio=${anio}`;
+        const filtrosExtra = obtenerFiltrosAvanzados();
+        let url = `${window.REPORTES_API_URL}?action=data&periodo=${periodoActual}&anio=${anio}`;
+        if (filtrosExtra) url += `&${filtrosExtra}`;
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -301,6 +410,7 @@ async function cargarDashboardReportes() {
         const payload = data.payload;
 
         renderResumen(payload.resumen || {}, payload.meta || {});
+        renderResumenEstados(payload.resumen_estados || {});
         crearGraficoIngresos(payload.ingresos_mensuales?.labels || [], payload.ingresos_mensuales?.data || []);
         crearGraficoServicios(payload.servicios || []);
         renderLeyendaServicios(payload.servicios || []);
@@ -309,6 +419,7 @@ async function cargarDashboardReportes() {
         renderFinanciero(payload.financiero || {});
         renderAsignacionesActivas(payload.asignaciones_activas || []);
         renderHistorialAsignaciones(payload.historial_asignaciones || []);
+        renderDetalleCitas(payload.detalle_citas || []);
     } catch (error) {
         console.error(error);
     }
@@ -328,17 +439,32 @@ function configurarEventos() {
     if (selectorAnio) {
         selectorAnio.addEventListener('change', cargarDashboardReportes);
     }
+
+    // Filtro avanzado de estado de cita (RFS 39)
+    const filtroEstado = document.getElementById('filtroEstadoCita');
+    if (filtroEstado) {
+        filtroEstado.addEventListener('change', cargarDashboardReportes);
+    }
+
+    window.addEventListener('resize', ajustarMetricaIngresosTotales);
 }
 
 function exportarPDF() {
     const selectorAnio = document.getElementById('selectorAnioReporte');
     const anio = selectorAnio ? selectorAnio.value : new Date().getFullYear();
-    const url = `${window.REPORTES_PDF_URL}?action=pdf&periodo=${periodoActual}&anio=${anio}`;
+    const filtrosExtra = obtenerFiltrosAvanzados();
+    let url = `${window.REPORTES_PDF_URL}?action=pdf&periodo=${periodoActual}&anio=${anio}`;
+    if (filtrosExtra) url += `&${filtrosExtra}`;
     window.open(url, '_blank');
 }
 
 function exportarExcel() {
-    alert('Exportación a Excel en construcción.');
+    const selectorAnio = document.getElementById('selectorAnioReporte');
+    const anio = selectorAnio ? selectorAnio.value : new Date().getFullYear();
+    const filtrosExtra = obtenerFiltrosAvanzados();
+    let url = `${window.REPORTES_EXCEL_URL}?action=excel&periodo=${periodoActual}&anio=${anio}`;
+    if (filtrosExtra) url += `&${filtrosExtra}`;
+    window.open(url, '_blank');
 }
 
 document.addEventListener('DOMContentLoaded', function () {
