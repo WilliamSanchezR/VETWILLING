@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/Profesional.php';
+require_once __DIR__ . '/../helpers/mailer_helper.php';
+require_once __DIR__ . '/../helpers/email_helper.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -38,11 +40,11 @@ function registrarProfesional()
 {
     // Obtener los datos del formulario
     $email = $_POST['email'] ?? '';
-    $password = '123';
     $estado = 'Activo';
     $id_rol = $_POST['rol'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
+    $password = $numero_documento !== '' ? $numero_documento : '123';
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
@@ -134,10 +136,23 @@ function registrarProfesional()
     $resultado = $objProfesional->registrarProfesional($data);
     // Verificamos el resultado y mostramos una alerta
     if ($resultado) {
+        $emailEnviado = false;
+        if (validarFormatoEmail($email)) {
+            $emailEnviado = enviarBienvenidaProfesional([
+                'email' => $email,
+                'nombres' => $nombres,
+                'apellidos' => $apellidos,
+                'numero_documento' => $numero_documento,
+                'registro_medico' => $_POST['registro_medico'] ?? ''
+            ]);
+        }
+
         mostrarSweetAlert(
             'success',
             'Profesional registrado',
-            'El profesional ha sido creado correctamente',
+            $emailEnviado
+                ? 'El profesional ha sido creado correctamente y el correo fue enviado.'
+                : 'El profesional ha sido creado correctamente, pero no se pudo enviar el correo.',
             '/vetwilling/representante/listar-profesionales'
         );
     } else {
@@ -145,6 +160,89 @@ function registrarProfesional()
     }
 
     exit();
+}
+
+function enviarBienvenidaProfesional(array $datos): bool
+{
+    try {
+        $mail = mailer_init();
+
+        $email = $datos['email'] ?? '';
+        $nombreCompleto = trim(($datos['nombres'] ?? '') . ' ' . ($datos['apellidos'] ?? ''));
+        $numeroDocumento = (string) ($datos['numero_documento'] ?? '');
+        $registroMedico = (string) ($datos['registro_medico'] ?? '');
+
+        $mail->setFrom(SMTP_FROM_EMAIL, 'VetWilling - Sistema de Gestion Veterinaria');
+        $mail->addAddress($email, $nombreCompleto);
+        $mail->isHTML(true);
+        $mail->Subject = 'Registro profesional en VetWilling';
+
+        $nombreSeguro = htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8');
+        $emailSeguro = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+        $documentoSeguro = htmlspecialchars($numeroDocumento, ENT_QUOTES, 'UTF-8');
+        $registroSeguro = htmlspecialchars($registroMedico, ENT_QUOTES, 'UTF-8');
+        $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+
+        $registroHtml = $registroSeguro !== ''
+            ? "<p><strong>Registro medico:</strong> {$registroSeguro}</p>"
+            : "";
+
+        $mail->Body = "
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #0a932c; color: white; padding: 24px; text-align: center; border-radius: 10px 10px 0 0; }
+                .content { background-color: #f9f9f9; padding: 28px; border: 1px solid #ddd; }
+                .card { background-color: #ffffff; padding: 18px; margin: 18px 0; border-left: 4px solid #0a932c; border-radius: 6px; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+                .btn { background-color: #0a932c; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>VetWilling</h1>
+                    <p>Registro de profesional</p>
+                </div>
+                <div class='content'>
+                    <h2>Hola {$nombreSeguro},</h2>
+                    <p>Tu cuenta profesional ha sido registrada exitosamente en VetWilling.</p>
+                    <div class='card'>
+                        <h3>Credenciales de acceso</h3>
+                        <p><strong>Correo:</strong> {$emailSeguro}</p>
+                        <p><strong>Contrasena inicial:</strong> {$documentoSeguro}</p>
+                        <p>Recuerda cambiar la contrasena en el primer ingreso.</p>
+                        {$registroHtml}
+                    </div>
+                    <p>Puedes iniciar sesion desde el siguiente enlace:</p>
+                    <a class='btn' href='{$baseUrl}'>Acceder al sistema</a>
+                </div>
+                <div class='footer'>
+                    <p>Este es un correo automatico, por favor no respondas a este mensaje.</p>
+                    <p>&copy; 2025 VetWilling</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+
+        $mail->AltBody = "Hola {$nombreCompleto},\n\n"
+            . "Tu cuenta profesional fue registrada en VetWilling.\n"
+            . "Correo: {$email}\n"
+            . "Contrasena inicial: {$numeroDocumento}\n"
+            . "Recuerda cambiar la contrasena en el primer ingreso.\n"
+            . ($registroMedico !== '' ? "Registro medico: {$registroMedico}\n" : "")
+            . "\nAccede desde: {$baseUrl}\n\n"
+            . "VetWilling";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Error al enviar bienvenida profesional: " . $e->getMessage());
+        return false;
+    }
 }
 
 // FUNCION PARA LISTAR LOS USUARIOS REGISTRADOS

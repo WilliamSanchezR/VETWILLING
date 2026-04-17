@@ -35,7 +35,8 @@ class Login
             }
 
             // Verificar el estado del usuario y mostrar mensajes de alerta correspondientes
-            if ($user['estado'] === 'pendiente') {
+            $estadoUsuario = mb_strtolower(trim((string) $user['estado']));
+            if ($estadoUsuario === 'pendiente') {
                 return [
                     'error' => 'Tu cuenta esta pendiente de aprobacion. Debes esperar la activacion por parte del administrador.',
                     'tipo' => 'warning',
@@ -44,7 +45,7 @@ class Login
             }
 
             // Si el estado es inactivo, se muestra un mensaje de error indicando que la cuenta está inactiva
-            if ($user['estado'] !== 'activo') {
+            if ($estadoUsuario !== 'activo') {
                 return ['error' => 'Tu cuenta se encuentra inactiva. Comunicate con el administrador.'];
             }
 
