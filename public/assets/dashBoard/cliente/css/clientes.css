@@ -1,24 +1,45 @@
-/* =============================
-   DASHBOARD CLIENTE - CSS CORREGIDO
-   TOTALMENTE FUNCIONAL Y OPTIMIZADO
-   ============================= */
+/* ========================================================================
+   DASHBOARD CLIENTE
+   Author: VetWilling Dashboard
+   Version: 4.0 - FINAL UNIFICADO
+   Description: Estilos del área principal del dashboard del cliente.
+                Corrige el espacio en blanco en móvil usando !important
+                para garantizar que margin-left:0 siempre gane sin
+                importar el orden de carga de sidebar.css.
+======================================================================== */
 
-/* ===== VARIABLES ===== */
+
+/* ========================================================================
+   1. VARIABLES CSS
+   — --color-principal-hover: verde oscuro para hovers (nuevo).
+   — --color-secundario: corregido a rgba() legible (antes era #087a2562
+     con alfa embebido que causaba botones semitransparentes en hover).
+   — --sidebar-width y --sidebar-width-collapsed deben coincidir
+     exactamente con sidebar.css para que los márgenes cuadren.
+======================================================================== */
 :root {
-    --color-principal: #087a24;
-    --color-secundario: #087a2562;
-    --color-fondo: #f5f7fb;
-    --color-texto: #333;
-    --sidebar-width: 250px;
+    --color-principal:         #087a24;
+    --color-principal-hover:   #065c1b;
+    --color-secundario:        rgba(8, 122, 37, 0.38);
+    --color-fondo:             #f5f7fb;
+    --color-texto:             #333333;
+    --sidebar-width:           260px;
     --sidebar-width-collapsed: 80px;
 }
 
-/* ===== RESETEO GENERAL ===== */
-* {
+
+/* ========================================================================
+   2. RESET GENERAL
+   — Normaliza márgenes, padding y box-model en todos los elementos.
+   — overflow-x: hidden evita scroll horizontal en móvil.
+======================================================================== */
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -26,126 +47,59 @@ body {
     overflow-x: hidden;
 }
 
-/* Ocultar scrollbar solo en body si es necesario */
-body::-webkit-scrollbar {
-    width: 8px;
+html, body {
+    height: 100%;
 }
 
-body::-webkit-scrollbar-track {
-    background: #f1f1f1;
+/* Scrollbar personalizado del body en Webkit (Chrome, Safari) */
+body::-webkit-scrollbar       { width: 8px; }
+body::-webkit-scrollbar-track { background: #f1f1f1; }
+body::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+
+
+/* ========================================================================
+   3. CONTENIDO PRINCIPAL — PC
+   — Tiene margen izquierdo igual al ancho del sidebar para no quedar
+     tapado por él.
+   — La transición suaviza el cambio al colapsar/expandir el sidebar.
+   — Cuando el sidebar colapsa, el margen se reduce al ancho colapsado.
+======================================================================== */
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    background: var(--color-fondo);
+    transition: margin-left 0.3s ease;
 }
 
-body::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+.sidebar.collapsed ~ .contenido-principal {
+    margin-left: var(--sidebar-width-collapsed);
 }
 
-/* =============================
-   SIDEBAR
-   ============================= */
-.sidebar {
-    width: var(--sidebar-width);
-    height: 100vh;
-    background: #fff;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 20px 15px;
-    border-right: 1px solid #ddd;
-    transition: width 0.3s ease;
-    z-index: 1000;
-    overflow-y: auto;
+
+/* ========================================================================
+   4. CONTENEDORES INTERNOS — PC
+   — .area-contenido: envuelve todo el contenido con ancho máximo.
+   — .container-dashboard: agrega el padding interno de 30px.
+   — Ambos centrados con margin: 0 auto.
+======================================================================== */
+.area-contenido {
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-.sidebar.collapsed {
-    width: var(--sidebar-width-collapsed);
+.container-dashboard {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-/* Ocultar textos cuando colapsa */
-.sidebar.collapsed .text {
-    display: none;
-}
 
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #ecf0f1;
-}
-
-.sidebar-logo {
-    width: 45px;
-    height: 45px;
-    background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 24px;
-    flex-shrink: 0;
-}
-
-.sidebar-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--color-texto);
-    transition: opacity 0.3s, visibility 0.3s;
-}
-
-.sidebar.collapsed .sidebar-title {
-    opacity: 0;
-    visibility: hidden;
-}
-
-.sidebar-menu {
-    list-style: none;
-}
-
-.menu-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 12px 15px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    color: #6c757d;
-    text-decoration: none;
-    transition: all 0.3s;
-    cursor: pointer;
-}
-
-.menu-item:hover {
-    background: #f8f9fa;
-    color: var(--color-principal);
-    transform: translateX(5px);
-}
-
-.menu-item.active {
-    background: #e8f5f1;
-    color: var(--color-principal);
-    font-weight: 600;
-}
-
-.menu-item i {
-    font-size: 20px;
-    width: 20px;
-    flex-shrink: 0;
-}
-
-.menu-text {
-    transition: opacity 0.3s, visibility 0.3s;
-    white-space: nowrap;
-}
-
-.sidebar.collapsed .menu-text {
-    opacity: 0;
-    visibility: hidden;
-}
-
-/* ===== NAVBAR SUPERIOR ===== */
+/* ========================================================================
+   5. NAVBAR SUPERIOR
+   — Barra pegada al tope del scroll gracias a position: sticky.
+   — NOTA: sticky falla si algún ancestro tiene overflow: hidden.
+     Si la navbar deja de funcionar, revisar overflow en .contenido-principal.
+======================================================================== */
 .navbar-superior {
     display: flex;
     justify-content: space-between;
@@ -164,6 +118,13 @@ body::-webkit-scrollbar-thumb {
     gap: 20px;
 }
 
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Botón hamburguesa (toggle sidebar PC) */
 .toggle-btn {
     background: none;
     border: none;
@@ -177,12 +138,7 @@ body::-webkit-scrollbar-thumb {
     transform: scale(1.1);
 }
 
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
+/* Botón de notificaciones */
 .notification-btn {
     position: relative;
     background: none;
@@ -197,6 +153,7 @@ body::-webkit-scrollbar-thumb {
     color: var(--color-principal);
 }
 
+/* Badge numérico sobre el ícono de notificaciones */
 .notification-badge {
     position: absolute;
     top: -5px;
@@ -209,6 +166,7 @@ body::-webkit-scrollbar-thumb {
     font-weight: 600;
 }
 
+/* Perfil del usuario en la navbar */
 .user-profile {
     display: flex;
     align-items: center;
@@ -223,11 +181,12 @@ body::-webkit-scrollbar-thumb {
     background: #f8f9fa;
 }
 
+/* Avatar circular con iniciales */
 .user-avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-principal), var(--color-secundario));
+    background: linear-gradient(135deg, var(--color-principal), var(--color-principal-hover));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -241,35 +200,14 @@ body::-webkit-scrollbar-thumb {
     color: var(--color-texto);
 }
 
-/* ===== CONTENIDO PRINCIPAL ===== */
-.contenido-principal {
-    margin-left: var(--sidebar-width);
-    min-height: 100vh;
-    width: auto;
-    transition: margin-left 0.3s ease;
-    background: var(--color-fondo);
-}
 
-.sidebar.collapsed ~ .contenido-principal {
-    margin-left: var(--sidebar-width-collapsed);
-}
-
-.area-contenido {
-    /* padding: 30px; */
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-/* ===== CONTAINER DASHBOARD ===== */
-.container-dashboard {
-    padding: 30px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-/* ===== BIENVENIDA ===== */
+/* ========================================================================
+   6. CARD DE BIENVENIDA
+   — Bloque verde con el saludo al usuario.
+   — Ocupa el 100% del ancho disponible.
+======================================================================== */
 .bienvenida-card {
-    background: linear-gradient(135deg, #0A932C, #087a24);
+    background: linear-gradient(135deg, #0a932c, #087a24);
     border-radius: 16px;
     padding: 40px;
     color: white;
@@ -298,7 +236,11 @@ body::-webkit-scrollbar-thumb {
     opacity: 1;
 }
 
-/* ===== ALERTAS ===== */
+
+/* ========================================================================
+   7. ALERTAS
+   — Caja amarilla de advertencia con borde izquierdo.
+======================================================================== */
 .alert-box {
     background: #fff3cd;
     border-left: 4px solid #ffc107;
@@ -328,7 +270,11 @@ body::-webkit-scrollbar-thumb {
     margin: 0;
 }
 
-/* ===== SECCIÓN TÍTULO ===== */
+
+/* ========================================================================
+   8. TÍTULO DE SECCIÓN
+   — Encabezado antes de cada grupo de contenido.
+======================================================================== */
 .seccion-titulo {
     font-size: 22px;
     color: #2c3e50;
@@ -336,7 +282,11 @@ body::-webkit-scrollbar-thumb {
     font-weight: 600;
 }
 
-/* ===== MASCOTAS GRID ===== */
+
+/* ========================================================================
+   9. GRID DE MASCOTAS
+   — Rejilla que se adapta: 3 columnas en PC, 1 en móvil.
+======================================================================== */
 .mascotas-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -344,6 +294,7 @@ body::-webkit-scrollbar-thumb {
     margin-bottom: 30px;
 }
 
+/* Tarjeta individual de mascota */
 .mascota-card {
     background: white;
     border-radius: 15px;
@@ -373,7 +324,7 @@ body::-webkit-scrollbar-thumb {
     align-items: center;
     justify-content: center;
     font-size: 38px;
-    background: linear-gradient(135deg, #0A932C, #087a24);
+    background: linear-gradient(135deg, #0a932c, #087a24);
     flex-shrink: 0;
 }
 
@@ -402,14 +353,8 @@ body::-webkit-scrollbar-thumb {
     border-top: 1px solid #ecf0f1;
 }
 
-.detalle-label {
-    color: #7f8c8d;
-}
-
-.detalle-valor {
-    color: #2c3e50;
-    font-weight: 500;
-}
+.detalle-label { color: #7f8c8d; }
+.detalle-valor { color: #2c3e50; font-weight: 500; }
 
 .mascota-footer {
     margin-top: 20px;
@@ -431,16 +376,20 @@ body::-webkit-scrollbar-thumb {
     font-weight: 500;
 }
 
+/* Botón verde principal
+   CORRECCIÓN: hover usa --color-principal-hover (sólido)
+   en vez del antiguo --color-secundario (semitransparente) */
 .btn-primary {
     background: var(--color-principal);
     color: white;
 }
 
 .btn-primary:hover {
-    background: var(--color-secundario);
+    background: var(--color-principal-hover);
     transform: translateY(-2px);
 }
 
+/* Botón gris secundario */
 .btn-secondary {
     background: #ecf0f1;
     color: #2c3e50;
@@ -451,7 +400,12 @@ body::-webkit-scrollbar-thumb {
     transform: translateY(-2px);
 }
 
-/* ===== CONTENT GRID ===== */
+
+/* ========================================================================
+   10. CONTENT GRID
+   — Dos columnas para citas y recordatorios en PC.
+   — Colapsa a una columna en tablet y móvil.
+======================================================================== */
 .content-grid {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
@@ -459,6 +413,7 @@ body::-webkit-scrollbar-thumb {
     margin-bottom: 30px;
 }
 
+/* Card genérica (citas, recordatorios, etc.) */
 .card {
     background: white;
     border-radius: 15px;
@@ -478,15 +433,12 @@ body::-webkit-scrollbar-thumb {
     font-weight: 600;
     color: #2c3e50;
 }
-.card-title .bi-calendar2-week{
-    color: var(--color-principal);
-    margin-right: 8px;
-}
-.card-title .bi-bell-fill{
-    color: var(--color-principal);
-    margin-right: 8px;
-}
 
+.card-title .bi-calendar2-week,
+.card-title .bi-bell-fill {
+    color: var(--color-principal);
+    margin-right: 8px;
+}
 
 .card-action {
     color: var(--color-principal);
@@ -497,11 +449,15 @@ body::-webkit-scrollbar-thumb {
 }
 
 .card-action:hover {
-    color: var(--color-secundario);
+    color: var(--color-principal-hover);
     text-decoration: underline;
 }
 
-/* ===== CITAS ===== */
+
+/* ========================================================================
+   11. CITAS
+   — Lista de citas próximas con fecha, info y hora.
+======================================================================== */
 .cita-item {
     display: flex;
     align-items: center;
@@ -550,9 +506,7 @@ body::-webkit-scrollbar-thumb {
     margin-top: 2px;
 }
 
-.cita-info {
-    flex: 1;
-}
+.cita-info   { flex: 1; }
 
 .cita-mascota {
     font-size: 16px;
@@ -573,9 +527,15 @@ body::-webkit-scrollbar-thumb {
     flex-shrink: 0;
 }
 
-/* ===== RECORDATORIOS ===== */
-/* ===== RECORDATORIOS MEJORADOS ===== */
 
+/* ========================================================================
+   12. RECORDATORIOS
+   — CORRECCIÓN: eliminados los bloques duplicados que pisaban los estilos
+     (había 2 definiciones de .recordatorio-item, .recordatorio-icon
+     y .recordatorio-texto con valores distintos entre sí).
+   — CORRECCIÓN: eliminado el selector inválido "-syringe { }" que
+     rompía el parseo CSS y silenciaba todos los estilos que venían después.
+======================================================================== */
 .recordatorio-item {
     display: flex;
     align-items: center;
@@ -591,7 +551,7 @@ body::-webkit-scrollbar-thumb {
     overflow: hidden;
 }
 
-/* Línea de acento izquierda */
+/* Barra verde a la izquierda de cada recordatorio */
 .recordatorio-item::before {
     content: '';
     position: absolute;
@@ -603,15 +563,14 @@ body::-webkit-scrollbar-thumb {
     border-radius: 4px 0 0 4px;
 }
 
-/* Hover */
 .recordatorio-item:hover {
-    background: #fff;
+    background: #ffffff;
     border-color: #a5d6a7;
     transform: translateX(4px);
     box-shadow: 0 4px 16px rgba(76, 175, 80, 0.12);
 }
 
-/* Icono */
+/* Ícono del recordatorio */
 .recordatorio-icon {
     flex-shrink: 0;
     width: 44px;
@@ -640,7 +599,7 @@ body::-webkit-scrollbar-thumb {
     color: #2e7d32;
 }
 
-/* Texto */
+/* Texto del recordatorio */
 .recordatorio-texto {
     flex: 1;
 }
@@ -660,7 +619,7 @@ body::-webkit-scrollbar-thumb {
     line-height: 1.4;
 }
 
-/* Badge de urgencia opcional por ítem */
+/* Badge rojo "!" para recordatorios urgentes */
 .recordatorio-item.urgente::after {
     content: '!';
     position: absolute;
@@ -677,78 +636,82 @@ body::-webkit-scrollbar-thumb {
     display: flex;
     align-items: center;
     justify-content: center;
-}-syringe {
-    color: var(--color-principal);
-    font-size: 22px;
 }
 
 
-.recordatorio-item:hover {
-    background: #e9ecef;
-    transform: translateX(5px);
-}
-
-.recordatorio-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    background: #0a9b4247;
-    flex-shrink: 0;
-}
-
-.recordatorio-texto h4 {
-    font-size: 15px;
-    color: #2c3e50;
-    margin-bottom: 5px;
-    font-weight: 600;
-}
-
-.recordatorio-texto p {
-    font-size: 13px;
-    color: #7f8c8d;
-    margin: 0;
-}
-
-/* ===== RESPONSIVE ===== */
+/* ========================================================================
+   13. RESPONSIVE — Tablets (769px – 1024px)
+   — Las dos columnas de content-grid colapsan a una sola.
+   — Las mascotas siguen en grid pero con columnas más angostas.
+======================================================================== */
 @media (max-width: 1024px) {
     .content-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .mascotas-grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
 }
 
+
+/* ========================================================================
+   14. RESPONSIVE — Móvil (hasta 768px)
+   — El sidebar se oculta: la burbuja FAB lo reemplaza (ver sidebar.css).
+   — CORRECCIÓN DEL ESPACIO EN BLANCO: margin-left usa !important para
+     garantizar que gane sobre cualquier regla de sidebar.css sin importar
+     el orden en que se carguen los archivos CSS.
+   — min-height usa 100dvh (dynamic viewport height) que es más preciso
+     en móvil porque descuenta la barra del navegador.
+   — Los contenedores usan display:flex para que el contenido ocupe
+     el 100% de la altura de la pantalla sin zonas vacías.
+======================================================================== */
 @media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
 
-    .sidebar.active {
-        transform: translateX(0);
-    }
-
+    /* FIX ESPACIO EN BLANCO:
+       !important garantiza que margin-left:0 gane siempre,
+       sin importar qué regla de sidebar.css se haya cargado antes */
     .contenido-principal {
-        margin-left: 0;
+        margin-left: 0 !important;
+        min-height: 100vh;
+        min-height: 100dvh; /* dvh descuenta la barra del navegador en móvil */
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        background: var(--color-fondo);
     }
 
-    .container-dashboard {
-        padding: 20px;
-    }
-
+    /* El área crece para llenar el espacio sin zonas blancas */
     .area-contenido {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
         padding: 20px;
     }
 
+    /* El container también se estira para ocupar la altura completa */
+    .container-dashboard {
+        flex: 1;
+        padding: 20px;
+    }
+
+    /* Navbar más compacta */
+    .navbar-superior {
+        padding: 15px 20px;
+    }
+
+    /* El nombre se oculta para ahorrar espacio en la navbar */
+    .user-name {
+        display: none;
+    }
+
+    /* Mascotas en columna única */
     .mascotas-grid {
         grid-template-columns: 1fr;
     }
 
+    /* Bienvenida más compacta */
     .bienvenida-card {
         padding: 25px;
     }
@@ -757,33 +720,36 @@ body::-webkit-scrollbar-thumb {
         font-size: 24px;
     }
 
-    .navbar-superior {
-        padding: 15px 20px;
-    }
-
-    .user-name {
-        display: none;
-    }
-    
+    /* Menos gap en el grid de citas/recordatorios */
     .content-grid {
         gap: 20px;
     }
 }
 
+
+/* ========================================================================
+   15. RESPONSIVE — Móviles pequeños (hasta 480px)
+   — Ajustes adicionales para pantallas muy pequeñas (menos de 5").
+======================================================================== */
 @media (max-width: 480px) {
-    .bienvenida-card h2 {
-        font-size: 20px;
+    .bienvenida-card         { padding: 25px; }
+    .bienvenida-card h2      { font-size: 20px; }
+    .bienvenida-card p       { font-size: 14px; }
+    .mascota-card            { padding: 20px; }
+    .card                    { padding: 20px; }
+}
+
+
+/* ========================================================================
+   16. ESTILOS DE IMPRESIÓN
+   — Al imprimir se elimina el margen del sidebar y la navbar.
+======================================================================== */
+@media print {
+    .contenido-principal {
+        margin-left: 0 !important;
     }
-    
-    .bienvenida-card p {
-        font-size: 14px;
-    }
-    
-    .mascota-card {
-        padding: 20px;
-    }
-    
-    .card {
-        padding: 20px;
+
+    .navbar-superior {
+        display: none;
     }
 }

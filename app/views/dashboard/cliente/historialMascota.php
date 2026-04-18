@@ -4,7 +4,7 @@ require_once BASE_PATH . '/app/controllers/mascotasController.php';
 $id_mascota = $_GET['id'];
 $mascota = consultarMascotaId($id_mascota);
 
-
+require_once BASE_PATH . '/app/helpers/session_propietario.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">

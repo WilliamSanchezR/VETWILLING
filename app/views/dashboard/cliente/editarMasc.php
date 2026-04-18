@@ -6,6 +6,8 @@ $id_mascota = $_GET['id'];
 $mascota = consultarMascotaId($id_mascota);
 
 
+require_once BASE_PATH . '/app/helpers/session_propietario.php';
+
 
 ?>
 <!DOCTYPE html>
