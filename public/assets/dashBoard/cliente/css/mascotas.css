@@ -1,91 +1,90 @@
-/* ===================================
-   VARIABLES CSS - SISTEMA DE DISEÑO
-   =================================== */
+/* ========================================================================
+   MASCOTAS - CLIENTE
+   VetWilling Dashboard v3.0
+   Rediseño completo con Bootstrap Icons y adaptación móvil.
+======================================================================== */
+
+
+/* ========================================================================
+   1. VARIABLES CSS
+======================================================================== */
 :root {
-    /* Colores Primarios */
-    --color-primary: #0A932C;
-    --color-primary-dark: #087a24;
-    --color-primary-light: #e8f5ec;
-    
-    /* Colores de Estado */
-    --color-danger: #dc3545;
-    --color-danger-dark: #c82333;
-    --color-danger-light: #fee2e2;
-    --color-danger-hover: #fecaca;
-    
-    --color-success: #28a745;
-    --color-success-dark: #218838;
-    
-    --color-info: #17a2b8;
-    --color-info-dark: #138496;
-    
-    --color-warning: #ffc107;
-    --color-warning-dark: #e0a800;
-    
-    /* Colores de PDF */
-    --color-pdf: #c62828;
-    --color-pdf-dark: #b71c1c;
-    
-    /* Colores de Texto */
-    --color-text-primary: #1f2937;
-    --color-text-secondary: #2c3e50;
-    --color-text-muted: #7f8c8d;
-    --color-text-light: #6c757d;
-    
-    /* Colores de Fondo */
-    --color-bg-body: #f5f7fb;
-    --color-bg-white: #ffffff;
-    --color-bg-light: #f8f9fa;
-    --color-bg-gray: #e9ecef;
-    --color-bg-gray-dark: #dee2e6;
-    
-    /* Colores de Borde */
-    --color-border: #e9ecef;
-    
-    /* Estados de Salud */
-    --color-estado-al-dia-bg: #d4edda;
-    --color-estado-al-dia-text: #155724;
-    --color-estado-pendiente-bg: #fff3cd;
-    --color-estado-pendiente-text: #856404;
-    --color-estado-vencido-bg: #f8d7da;
-    --color-estado-vencido-text: #721c24;
-    
-    /* Espaciado */
-    --spacing-xs: 8px;
-    --spacing-sm: 12px;
-    --spacing-md: 15px;
-    --spacing-lg: 20px;
-    --spacing-xl: 25px;
-    --spacing-2xl: 30px;
-    
-    /* Border Radius */
-    --radius-sm: 8px;
-    --radius-md: 10px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
-    --radius-pill: 20px;
+    --color-primary:              #639922;
+    --color-primary-dark:         #4a7c1f;
+    --color-primary-light:        #EAF3DE;
+    --color-primary-text:         #3B6D11;
+
+    --color-blue:                 #378ADD;
+    --color-blue-dark:            #185FA5;
+    --color-blue-light:           #E6F1FB;
+    --color-blue-text:            #185FA5;
+
+    --color-amber:                #BA7517;
+    --color-amber-dark:           #854F0B;
+    --color-amber-light:          #FAEEDA;
+    --color-amber-text:           #854F0B;
+
+    --color-purple:               #7F77DD;
+    --color-purple-dark:          #534AB7;
+    --color-purple-light:         #EEEDFE;
+    --color-purple-text:          #534AB7;
+
+    --color-coral:                #D85A30;
+    --color-coral-dark:           #993C1D;
+    --color-coral-light:          #FAECE7;
+    --color-coral-text:           #993C1D;
+
+    --color-danger:               #A32D2D;
+    --color-danger-dark:          #791F1F;
+    --color-danger-light:         #FCEBEB;
+    --color-danger-hover:         #F7C1C1;
+
+    --color-info:                 #185FA5;
+    --color-info-light:           #E6F1FB;
+    --color-info-hover:           #B5D4F4;
+
+    --color-success-light:        #EAF3DE;
+    --color-success-hover:        #C0DD97;
+
+    --color-text-primary:         #1f2937;
+    --color-text-secondary:       #4B5563;
+    --color-text-muted:           #9CA3AF;
+
+    --color-bg-body:              #F3F4F6;
+    --color-bg-white:             #ffffff;
+    --color-bg-light:             #F9FAFB;
+    --color-bg-gray:              #F3F4F6;
+    --color-bg-gray-dark:         #E5E7EB;
+    --color-border:               #E5E7EB;
+    --color-border-subtle:        #F3F4F6;
+
+    --spacing-xs:  6px;
+    --spacing-sm:  10px;
+    --spacing-md:  14px;
+    --spacing-lg:  18px;
+    --spacing-xl:  22px;
+    --spacing-2xl: 28px;
+
+    --radius-sm:     6px;
+    --radius-md:     8px;
+    --radius-lg:     12px;
+    --radius-xl:     16px;
+    --radius-pill:   99px;
     --radius-circle: 50%;
-    
-    /* Sombras */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 2px 12px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
-    --shadow-xl: 0 4px 18px rgba(0, 0, 0, 0.15);
-    --shadow-primary: 0 6px 20px rgba(10, 147, 44, 0.35);
-    --shadow-danger: 0 6px 20px rgba(198, 40, 40, 0.35);
-    
-    /* Transiciones */
-    --transition-base: all 0.3s ease;
-    --transition-fast: all 0.2s ease;
-    
-    /* Fuentes */
+
+    --shadow-sm:  0 1px 4px rgba(0,0,0,0.06);
+    --shadow-md:  0 2px 10px rgba(0,0,0,0.07);
+    --shadow-lg:  0 8px 24px rgba(0,0,0,0.10);
+
+    --transition: all 0.2s ease;
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ===================================
-   RESET Y CONFIGURACIÓN BASE
-   =================================== */
-* {
+
+/* ========================================================================
+   2. RESET Y BASE
+======================================================================== */
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -96,6 +95,10 @@ body {
     background: var(--color-bg-body);
 }
 
+
+/* ========================================================================
+   3. ÁREA DE CONTENIDO
+======================================================================== */
 .area-contenido {
     padding: var(--spacing-2xl);
     max-width: 1400px;
@@ -103,70 +106,76 @@ body {
     width: 100%;
 }
 
-/* ===================================
-   HEADER DE MASCOTAS
-   =================================== */
+
+/* ========================================================================
+   4. HEADER
+======================================================================== */
 .header-mascotas {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 16px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
 }
 
-/* Título */
 .header-titulo {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 10px;
     margin-right: auto;
 }
 
+.header-icon {
+    font-size: 22px;
+    color: var(--color-primary);
+}
+
 .header-titulo h1 {
-    margin: 0;
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 600;
     color: var(--color-text-primary);
+    margin: 0;
 }
 
-/* Badge Contador */
 .badge-count {
     background: var(--color-primary-light);
-    color: var(--color-primary);
-    padding: 6px 12px;
+    color: var(--color-primary-text);
+    padding: 4px 12px;
     border-radius: var(--radius-pill);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
+    white-space: nowrap;
 }
 
-/* ===================================
-   BOTONES BASE
-   =================================== */
+
+/* ========================================================================
+   5. BOTONES DE ACCIÓN (header)
+======================================================================== */
 .btn-action {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    background: var(--color-primary);
     color: var(--color-bg-white);
-    padding: 12px 22px;
+    padding: 9px 18px;
     border-radius: var(--radius-md);
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 500;
     display: inline-flex;
     align-items: center;
-    gap: var(--spacing-xs);
+    gap: 6px;
     cursor: pointer;
     text-decoration: none;
     border: none;
-    transition: var(--transition-base);
+    transition: var(--transition);
     white-space: nowrap;
 }
 
 .btn-action i {
-    font-size: 18px;
+    font-size: 15px;
 }
 
 .btn-action:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-primary);
+    background: var(--color-primary-dark);
+    color: var(--color-bg-white);
+    transform: translateY(-1px);
 }
 
 .btn-action:focus-visible {
@@ -174,78 +183,97 @@ body {
     outline-offset: 2px;
 }
 
-/* Botón PDF */
+/* Variante PDF */
 .btn-pdf {
-    background: linear-gradient(135deg, var(--color-pdf), var(--color-pdf-dark));
+    background: var(--color-danger-light);
+    color: var(--color-danger);
+    border: 0.5px solid var(--color-danger-hover);
 }
 
 .btn-pdf:hover {
-    box-shadow: var(--shadow-danger);
+    background: var(--color-danger-hover);
+    color: var(--color-danger-dark);
 }
 
-/* Botón Agregar */
-.btn-agregar {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+/* Variante cita (azul) */
+.btn-cita {
+    background: var(--color-blue-dark);
 }
 
-/* ===================================
-   FILTROS
-   =================================== */
+.btn-cita:hover {
+    background: #0C447C;
+}
+
+
+/* ========================================================================
+   6. FILTROS
+======================================================================== */
 .filtros-container {
     background: var(--color-bg-white);
-    padding: var(--spacing-lg);
+    border: 0.5px solid var(--color-border);
+    padding: 14px 18px;
     border-radius: var(--radius-lg);
     margin-bottom: var(--spacing-2xl);
     box-shadow: var(--shadow-sm);
     display: flex;
-    gap: var(--spacing-md);
+    gap: 10px;
     flex-wrap: wrap;
     align-items: center;
 }
 
+/* Caja de búsqueda */
 .search-box {
     flex: 1;
-    min-width: 250px;
+    min-width: 220px;
     position: relative;
 }
 
 .search-box input {
     width: 100%;
-    padding: 12px 40px 12px 15px;
-    border: 2px solid var(--color-border);
+    padding: 9px 14px 9px 36px;
+    border: 0.5px solid var(--color-border);
     border-radius: var(--radius-md);
     font-size: 14px;
-    transition: var(--transition-base);
+    background: var(--color-bg-light);
+    color: var(--color-text-primary);
+    transition: var(--transition);
 }
 
 .search-box input:focus {
     outline: none;
     border-color: var(--color-primary);
-}
-
-.search-box input:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    background: var(--color-bg-white);
 }
 
 .search-box i {
     position: absolute;
-    right: 15px;
+    left: 11px;
     top: 50%;
     transform: translateY(-50%);
+    font-size: 14px;
     color: var(--color-text-muted);
     pointer-events: none;
 }
 
+/* Botones de filtro */
 .filter-btn {
-    padding: 12px 20px;
-    border: 2px solid var(--color-border);
-    background: var(--color-bg-white);
-    border-radius: var(--radius-md);
+    padding: 8px 15px;
+    border: 0.5px solid var(--color-border);
+    background: var(--color-bg-light);
+    border-radius: var(--radius-pill);
     cursor: pointer;
-    transition: var(--transition-base);
-    font-size: 14px;
-    color: var(--color-text-light);
+    transition: var(--transition);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.filter-btn i {
+    font-size: 13px;
 }
 
 .filter-btn:hover,
@@ -260,245 +288,224 @@ body {
     outline-offset: 2px;
 }
 
-/* ===================================
-   GRID DE MASCOTAS
-   =================================== */
+
+/* ========================================================================
+   7. GRID DE MASCOTAS
+======================================================================== */
 .mascotas-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
     margin-bottom: var(--spacing-2xl);
 }
 
-/* ===================================
-   TARJETA DE MASCOTA
-   =================================== */
+
+/* ========================================================================
+   8. TARJETA DE MASCOTA
+======================================================================== */
 .mascota-card {
     background: var(--color-bg-white);
+    border: 0.5px solid var(--color-border);
     border-radius: var(--radius-xl);
     overflow: hidden;
     box-shadow: var(--shadow-md);
-    transition: var(--transition-base);
-    position: relative;
-    animation: fadeInUp 0.5s ease-out;
+    transition: var(--transition);
+    animation: fadeInUp 0.45s ease-out both;
 }
 
 .mascota-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
 }
 
-/* Header de Tarjeta */
+
+/* ── Colores de header ── */
 .mascota-card-header {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-    padding: var(--spacing-2xl) var(--spacing-xl);
+    padding: 22px 20px;
     position: relative;
     display: flex;
     align-items: center;
-    gap: var(--spacing-lg);
+    gap: 14px;
 }
 
+.hero-green  { background: linear-gradient(135deg, #4a7c1f, #639922); }
+.hero-blue   { background: linear-gradient(135deg, #185FA5, #378ADD); }
+.hero-amber  { background: linear-gradient(135deg, #854F0B, #BA7517); }
+.hero-purple { background: linear-gradient(135deg, #534AB7, #7F77DD); }
+.hero-coral  { background: linear-gradient(135deg, #993C1D, #D85A30); }
+
+
+/* ── Avatar ── */
 .mascota-avatar-grande {
-    width: 90px;
-    height: 90px;
+    width: 68px;
+    height: 68px;
     border-radius: var(--radius-circle);
-    background: var(--color-bg-white);
+    background: rgba(255,255,255,0.2);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 45px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
     overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.35);
 }
 
 .mascota-avatar-grande img {
     object-fit: cover;
     width: 100%;
     height: 100%;
-    border-radius: var(--radius-circle);
 }
 
-.mascota-info-header {
-    flex: 1;
-    color: var(--color-bg-white);
-}
-
-.mascota-info-header h3 {
-    font-size: 26px;
-    margin-bottom: 5px;
-    font-weight: 600;
-}
-
-.mascota-info-header p {
-    font-size: 15px;
-    opacity: 0.9;
-    margin-bottom: var(--spacing-xs);
-}
-
-.mascota-chip {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 12px;
-    margin-right: var(--spacing-xs);
-}
-
-/* ===================================
-   MENÚ DE OPCIONES
-   =================================== */
-.mascota-menu {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-}
-
-.menu-btn {
-    background: rgba(255, 255, 255, 0.3);
-    color: var(--color-bg-white);
-    border: none;
-    width: 35px;
-    height: 35px;
-    border-radius: var(--radius-circle);
-    cursor: pointer;
-    font-size: 18px;
+.avatar-fallback {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition-base);
 }
 
-.menu-btn:hover {
-    background: rgba(255, 255, 255, 0.5);
+.avatar-fallback i {
+    font-size: 28px;
+    color: rgba(255,255,255,0.85);
 }
 
-.menu-btn:focus-visible {
-    outline: 2px solid var(--color-bg-white);
-    outline-offset: 2px;
+
+/* ── Info del header ── */
+.mascota-info-header {
+    flex: 1;
+    color: var(--color-bg-white);
+    min-width: 0;
 }
 
-/* Menú Flotante */
-.menu-flotante {
+.mascota-info-header h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hero-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.mascota-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    color: #fff;
+}
+
+.mascota-chip i {
+    font-size: 11px;
+}
+
+
+/* ── Badge de estado ── */
+.status-badge {
     position: absolute;
-    top: 45px;
-    right: 0;
-    background: var(--color-bg-white);
-    width: 160px;
-    padding: var(--spacing-xs) 0;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-xl);
-    display: none;
-    z-index: 10;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: var(--transition-fast);
-}
-
-.menu-flotante.active {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.menu-item {
+    top: 12px;
+    right: 12px;
     display: flex;
     align-items: center;
-    padding: var(--spacing-xs) var(--spacing-md);
-    gap: var(--spacing-xs);
-    color: #333;
-    text-decoration: none;
-    font-size: 14px;
-    transition: var(--transition-fast);
+    gap: 5px;
+    background: rgba(0,0,0,0.18);
+    border-radius: var(--radius-pill);
+    padding: 4px 10px;
 }
 
-.menu-item:hover {
-    background: var(--color-bg-light);
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: var(--radius-circle);
+    flex-shrink: 0;
 }
 
-.menu-item:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: -2px;
+.dot-green  { background: #a8e063; }
+.dot-yellow { background: #fbbf24; }
+.dot-red    { background: #fc8181; }
+
+.status-badge span {
+    font-size: 11px;
+    color: #fff;
+    font-weight: 500;
 }
 
-/* ===================================
-   CUERPO DE TARJETA
-   =================================== */
+
+/* ========================================================================
+   9. CUERPO DE TARJETA
+======================================================================== */
 .mascota-card-body {
-    padding: var(--spacing-xl);
+    padding: 20px;
 }
 
+
+/* ========================================================================
+   10. GRID DE INFORMACIÓN
+======================================================================== */
 .info-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-bottom: 24px;
-    background: var(--color-bg-light);
+    gap: 9px;
+    margin-bottom: 16px;
 }
+
 .info-item {
     display: flex;
-    align-items: center;   /* 🔥 ESTA ES LA CLAVE */
-    gap: 12px;
-}
-
-.info-item:hover {
-    background: #f1f5f9;
-    transform: translateY(-2px);
-}
-.info-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2; /* 👈 reduce el aire */
-}
-
-
-/* .info-item {
-    display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-sm);
+    gap: 10px;
+    padding: 10px 11px;
     background: var(--color-bg-light);
     border-radius: var(--radius-md);
-    transition: var(--transition-base);
+    transition: var(--transition);
 }
 
 .info-item:hover {
     background: var(--color-bg-gray);
 }
 
+/* Cuadro de ícono — con color según el hero de la card */
 .info-icon {
-    width: 35px;
-    height: 35px;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-    color: var(--color-bg-white);
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
     border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-} */
- .info-icon {
-    width: 100%;
-    height: 42px;
-    background: #16a34a;
-    color: #fff;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
     flex-shrink: 0;
 }
-
 
 .info-icon i {
-    color: var(--color-bg-white);
+    font-size: 15px;
 }
 
+.ico-green  { background: var(--color-primary-light); }
+.ico-green i { color: var(--color-primary-text); }
+
+.ico-blue   { background: var(--color-blue-light); }
+.ico-blue i  { color: var(--color-blue-text); }
+
+.ico-amber  { background: var(--color-amber-light); }
+.ico-amber i { color: var(--color-amber-text); }
+
+.ico-purple { background: var(--color-purple-light); }
+.ico-purple i{ color: var(--color-purple-text); }
+
+.ico-coral  { background: var(--color-coral-light); }
+.ico-coral i { color: var(--color-coral-text); }
+
+/* Texto */
 .info-content {
+    display: flex;
+    flex-direction: column;
     flex: 1;
-    text-align: center;
     min-width: 0;
 }
 
@@ -507,106 +514,58 @@ body {
     color: var(--color-text-muted);
     text-transform: uppercase;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
+    margin-bottom: 2px;
 }
 
 .info-value {
-    font-size: 15px;
-    color: var(--color-text-secondary);
+    font-size: 13px;
+    color: var(--color-text-primary);
     font-weight: 600;
-    margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* ===================================
-   SECCIÓN DE ESTADO
-   =================================== */
-.estado-section {
-    padding: var(--spacing-md);
-    background: var(--color-bg-light);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--spacing-lg);
+
+/* ========================================================================
+   11. DIVISOR
+======================================================================== */
+.card-divider {
+    height: 0.5px;
+    background: var(--color-border);
+    margin-bottom: 16px;
 }
 
-.estado-title {
-    font-size: 13px;
-    color: var(--color-text-muted);
-    margin-bottom: var(--spacing-md);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
 
-.estado-items {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.estado-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-}
-
-.estado-item span:first-child {
-    color: var(--color-text-light);
-    font-weight: 500;
-}
-
-.estado-badge {
-    padding: 4px 10px;
-    border-radius: var(--radius-lg);
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.estado-badge.al-dia {
-    background: var(--color-estado-al-dia-bg);
-    color: var(--color-estado-al-dia-text);
-}
-
-.estado-badge.pendiente {
-    background: var(--color-estado-pendiente-bg);
-    color: var(--color-estado-pendiente-text);
-}
-
-.estado-badge.vencido {
-    background: var(--color-estado-vencido-bg);
-    color: var(--color-estado-vencido-text);
-}
-
-/* ===================================
-   ACCIONES DE TARJETA
-   =================================== */
+/* ========================================================================
+   12. BOTONES DE ACCIÓN DE TARJETA
+======================================================================== */
 .mascota-actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-md);
+    gap: 8px;
 }
 
 .action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    font-size: 14px;
+    gap: 6px;
+    padding: 10px;
+    font-size: 13px;
     font-weight: 500;
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: var(--transition);
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .action-btn i {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .action-btn:focus-visible {
@@ -614,215 +573,148 @@ body {
     outline-offset: 2px;
 }
 
-/* Variantes de Botones de Acción */
-.action-btn-primary {
-    color: #b91c1c;
-    background-color: var(--color-danger-light);
-}
-.action-btn-primary:hover {
-    background: var(--color-danger-hover);
-    transform: translateY(-2px);
-    color: #fff;
+.action-btn:hover {
+    transform: translateY(-1px);
 }
 
-.action-btn-primary i {
-    animation: shake 0.3s ease;
+/* Historial — azul */
+.action-btn-info {
+    background: var(--color-info-light);
+    color: var(--color-info);
+}
+.action-btn-info:hover {
+    background: var(--color-info-hover);
+    color: var(--color-info);
 }
 
+/* Vacunas — verde */
+.action-btn-success {
+    background: var(--color-success-light);
+    color: var(--color-primary-text);
+}
+.action-btn-success:hover {
+    background: var(--color-success-hover);
+    color: var(--color-primary-text);
+}
+
+/* Editar — gris */
 .action-btn-secondary {
     background: var(--color-bg-gray);
-    color: #495057;
+    color: var(--color-text-secondary);
+    border: 0.5px solid var(--color-border);
 }
-
 .action-btn-secondary:hover {
     background: var(--color-bg-gray-dark);
-    transform: translateY(-2px);
+    color: var(--color-text-primary);
 }
 
-.action-btn-success {
-    background: #0a9b4247;
-    color: #0a9b42;
-}
-
-
-.action-btn-success:hover {
-    background: #0a9b42;
-    transform: translateY(-2px);
-    color: var(--color-bg-white);}
-
-.action-btn-info {
-    background: #17a2b82e;
-    color: #17a2b8;
-}
-
-.action-btn-info:hover {
-    background: var(--color-info-dark);
-    transform: translateY(-2px);
-    color: var(--color-bg-white);
-}
-
+/* Eliminar — rojo */
 .action-btn-danger {
-    background: var(--color-danger);
-    color: var(--color-bg-white);
+    background: var(--color-danger-light);
+    color: var(--color-danger);
 }
-
 .action-btn-danger:hover {
-    background: var(--color-danger-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    background: var(--color-danger-hover);
+    color: var(--color-danger-dark);
 }
 
-.action-btn-warning {
-    background: var(--color-warning);
-    color: #212529;
-}
 
-.action-btn-warning:hover {
-    background: var(--color-warning-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
-}
-
-/* ===================================
-   SIN MASCOTAS (ESTADO VACÍO)
-   =================================== */
+/* ========================================================================
+   13. ESTADO VACÍO
+======================================================================== */
 .sin-mascotas {
     text-align: center;
-    padding: 60px var(--spacing-lg);
+    padding: 60px 20px;
     background: var(--color-bg-white);
+    border: 0.5px solid var(--color-border);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-md);
+    grid-column: 1 / -1;
 }
 
 .sin-mascotas-icon {
-    font-size: 80px;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: 16px;
+}
+
+.sin-mascotas-icon i {
+    font-size: 56px;
+    color: var(--color-text-muted);
     opacity: 0.5;
 }
 
 .sin-mascotas h3 {
-    font-size: 24px;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-md);
+    font-size: 20px;
+    color: var(--color-text-primary);
+    margin-bottom: 10px;
     font-weight: 600;
 }
 
 .sin-mascotas p {
     color: var(--color-text-muted);
-    margin-bottom: 25px;
-    font-size: 16px;
+    margin-bottom: 22px;
+    font-size: 15px;
 }
 
-/* ===================================
-   ANIMACIONES
-   =================================== */
+
+/* ========================================================================
+   14. ANIMACIONES
+======================================================================== */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-}
 
-@keyframes shake {
-    0%, 100% {
-        transform: translateX(0);
-    }
-    25% {
-        transform: translateX(-2px);
-    }
-    75% {
-        transform: translateX(2px);
-    }
-}
-
-/* ===================================
-   UTILIDADES
-   =================================== */
-.text-center {
-    text-align: center;
-}
-
-.mt-3 {
-    margin-top: 1rem;
-}
-
-.mb-3 {
-    margin-bottom: 1rem;
-}
-
-.hidden {
-    display: none !important;
-}
-
-.visible {
-    display: block !important;
-}
-
-.fade-in {
-    animation: fadeInUp 0.5s ease-out;
-}
-
-.pulse {
-    animation: pulse 2s infinite;
-}
-
-/* ===================================
-   RESPONSIVE DESIGN
-   =================================== */
-
-/* Tablets grandes y escritorios pequeños */
+/* ========================================================================
+   15. RESPONSIVE — Escritorios medianos (hasta 1200px)
+======================================================================== */
 @media (max-width: 1200px) {
     .mascotas-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     }
 }
 
-/* Tablets */
+
+/* ========================================================================
+   16. RESPONSIVE — Tablets (hasta 768px)
+======================================================================== */
 @media (max-width: 768px) {
+
     .area-contenido {
-        padding: var(--spacing-lg);
+        padding: 16px;
     }
 
+    /* Header en columna */
     .header-mascotas {
         flex-direction: column;
         align-items: stretch;
-        gap: var(--spacing-md);
+        gap: 10px;
     }
 
     .header-titulo {
-        width: 100%;
         margin-right: 0;
     }
 
     .header-titulo h1 {
-        font-size: 24px;
+        font-size: 18px;
     }
 
-    .btn-agregar,
-    .btn-pdf {
+    /* Botones a ancho completo */
+    .btn-action {
         width: 100%;
         justify-content: center;
     }
 
+    /* Grid a una columna */
     .mascotas-grid {
         grid-template-columns: 1fr;
+        gap: 14px;
     }
 
+    /* Filtros en columna */
     .filtros-container {
         flex-direction: column;
+        align-items: stretch;
     }
 
     .search-box {
@@ -832,95 +724,99 @@ body {
 
     .filter-btn {
         width: 100%;
+        justify-content: center;
     }
 
-    .mascota-card-header {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--spacing-md);
-    }
-
-    .mascota-avatar-grande {
-        width: 80px;
-        height: 80px;
-        font-size: 40px;
-    }
-
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
-
+    /* Acciones en una columna */
     .mascota-actions {
         grid-template-columns: 1fr;
     }
 }
 
-/* Móviles */
+
+/* ========================================================================
+   17. RESPONSIVE — Móviles pequeños (hasta 480px)
+======================================================================== */
 @media (max-width: 480px) {
+
     .area-contenido {
-        padding: var(--spacing-md);
+        padding: 12px;
     }
 
     .header-titulo h1 {
-        font-size: 20px;
+        font-size: 16px;
     }
 
     .badge-count {
         font-size: 12px;
-        padding: 6px 12px;
+        padding: 3px 10px;
     }
 
-    .mascota-card-body {
-        padding: var(--spacing-lg);
+    .mascota-card-header {
+        padding: 16px 14px;
+    }
+
+    .mascota-avatar-grande {
+        width: 58px;
+        height: 58px;
     }
 
     .mascota-info-header h3 {
-        font-size: 22px;
+        font-size: 16px;
     }
 
-    .sin-mascotas-icon {
-        font-size: 60px;
+    .mascota-card-body {
+        padding: 14px;
     }
 
-    .sin-mascotas h3 {
-        font-size: 20px;
+    /* Info en una columna en móvil muy pequeño */
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-btn {
+        padding: 9px;
+        font-size: 12px;
     }
 }
 
-/* ===================================
-   MODO OSCURO (OPCIONAL)
-   =================================== */
-@media (prefers-color-scheme: dark) {
-    /* Puedes agregar estilos de modo oscuro aquí si lo deseas */
-    /* Ejemplo:
-    :root {
-        --color-bg-body: #1a1a1a;
-        --color-bg-white: #2d2d2d;
-        --color-text-primary: #ffffff;
-    }
-    */
-}
 
-/* ===================================
-   MEJORAS DE ACCESIBILIDAD
-   =================================== */
-
-/* Reducir movimiento para usuarios con preferencias de accesibilidad */
+/* ========================================================================
+   18. ACCESIBILIDAD — Movimiento reducido
+======================================================================== */
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
         animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
 }
 
-/* Mejorar contraste para usuarios con preferencias de alto contraste */
+
+/* ========================================================================
+   19. ACCESIBILIDAD — Alto contraste
+======================================================================== */
 @media (prefers-contrast: high) {
     .btn-action,
     .filter-btn,
     .action-btn {
         border: 2px solid currentColor;
+    }
+}
+
+
+/* ========================================================================
+   20. IMPRESIÓN
+======================================================================== */
+@media print {
+    .mascota-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .mascota-actions,
+    .header-mascotas .btn-action,
+    .filtros-container {
+        display: none;
     }
 }

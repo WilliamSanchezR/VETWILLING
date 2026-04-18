@@ -1,33 +1,53 @@
 <?php
 require_once BASE_PATH . '/app/controllers/mascotasController.php';
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+require_once BASE_PATH . '/app/services/SessionManager.php';
 
-$rol     = $_SESSION['user']['id_rol'];
-$id      = $_SESSION['user']['id_usuario'];
-$usuario = mostrarPerfil($id);
+$rol      = $_SESSION['user']['id_rol'];
+$id       = $_SESSION['user']['id_usuario'];
+$usuario  = mostrarPerfil($id);
 $mascotas = listarMascotas();
 
-// ── CORRECCIÓN: Lógica de ruta de imagen robusta para Hostinger ──
+// ── Gestor de sesiones ────────────────────────────────────────────────────
+$sm = new SessionManager($id);
+$sm->registrar();                    // Registra / actualiza la sesión actual
+$sesiones  = $sm->listar();          // Lista para mostrar en la vista
+$sesionNueva = $sm->esNueva();       // ¿Primer login desde este dispositivo?
+
+// ── Ruta de imagen de perfil ──────────────────────────────────────────────
 $fotoUsuario    = $usuario['img_perfil'] ?? '';
 $carpetaUsuario = 'usuarios';
-
-$nombreCompleto    = trim(($usuario['nombres'] ?? '') . ' ' . ($usuario['apellidos'] ?? ''));
-$fallbackAvatar    = "https://ui-avatars.com/api/?name=" . urlencode($nombreCompleto) . "&background=4e9af1&color=fff&size=128";
-$rutaImagenUsuario = $fallbackAvatar;
+$nombreCompleto = trim(($usuario['nombres'] ?? '') . ' ' . ($usuario['apellidos'] ?? ''));
+$fallbackAvatar = "https://ui-avatars.com/api/?name=" . urlencode($nombreCompleto) . "&background=4e9af1&color=fff&size=128";
+$rutaImagen     = $fallbackAvatar;
 
 if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
-    $rutaAbsoluta = BASE_PATH . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
-    if (file_exists($rutaAbsoluta)) {
-        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+    $rutaAbs = BASE_PATH . "/public/uploads/{$carpetaUsuario}/{$fotoUsuario}";
+    if (file_exists($rutaAbs)) {
+        $rutaImagen = BASE_URL . "/public/uploads/{$carpetaUsuario}/{$fotoUsuario}";
     }
 } else {
-    $defaultLocal = BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
-    if (file_exists($defaultLocal)) {
-        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    $defLocal = BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    if (file_exists($defLocal)) {
+        $rutaImagen = BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    }
+}
+
+// ── Acción AJAX: cerrar sesión específica ────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
+    header('Content-Type: application/json');
+    switch ($_POST['accion']) {
+        case 'cerrar_sesion':
+            $ok = $sm->cerrar($_POST['token'] ?? '');
+            echo json_encode(['ok' => $ok]);
+            exit;
+        case 'cerrar_todas':
+            $n = $sm->cerrarTodas();
+            echo json_encode(['ok' => true, 'cerradas' => $n]);
+            exit;
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -35,54 +55,42 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mi Perfil – VetCare</title>
 
-  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  <!-- Favicon -->
   <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
-  <!-- CSS existentes -->
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
-
-  <!-- NUEVO CSS DE PERFIL -->
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/perfil.css">
 </head>
 
 <body>
 
-  <!-- SIDEBAR -->
   <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <main class="contenido-principal" id="contenidoPrincipal">
 
-    <!-- NAVBAR SUPERIOR -->
     <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
 
     <div class="area-contenido">
       <div class="container-dashboard">
 
-        <!-- ═══════════════════════════════════
+        <!-- ══════════════════════════════════════
              HERO HEADER
-        ═══════════════════════════════════ -->
+        ══════════════════════════════════════ -->
         <div class="header-perfil">
-
-          <!-- Avatar con cambio de foto -->
           <div class="avatar-grande">
             <form class="contenedor-foto avatar-ring" id="form_cambio_imagen"
                   action="<?= BASE_URL ?>/cliente/cambiar-foto"
                   method="POST" enctype="multipart/form-data">
               <input type="hidden" name="id_usuario" value="<?= $id ?>">
-              <input type="hidden" name="accion"     value="cambiar-foto">
-              <!-- CORRECCIÓN: usa $rutaImagenUsuario + onerror seguro -->
+              <input type="hidden" name="accion" value="cambiar-foto">
               <img
-                src="<?= $rutaImagenUsuario ?>"
+                src="<?= $rutaImagen ?>"
                 class="fotito"
                 alt="<?= htmlspecialchars($nombreCompleto) ?>"
-                onerror="this.onerror=null; this.src='<?= $fallbackAvatar ?>'">
+                onerror="this.onerror=null;this.src='<?= $fallbackAvatar ?>'">
               <div class="avatar-icon" id="btn-camera" title="Cambiar foto">
                 <i class="bi bi-camera-fill"></i>
               </div>
@@ -90,7 +98,6 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
             </form>
           </div>
 
-          <!-- Info header -->
           <div class="info-perfil-header">
             <h1><?= htmlspecialchars($usuario['nombres']) ?> <?= htmlspecialchars($usuario['apellidos']) ?></h1>
             <p>
@@ -103,13 +110,12 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
               <span class="badge-item"><i class="bi bi-heart-fill"></i> <?= count($mascotas) ?> Mascotas</span>
             </div>
           </div>
+        </div>
 
-        </div><!-- /header-perfil -->
 
-
-        <!-- ═══════════════════════════════════
+        <!-- ══════════════════════════════════════
              STATS BAR
-        ═══════════════════════════════════ -->
+        ══════════════════════════════════════ -->
         <div class="stats-bar">
           <div class="stat-card">
             <div class="stat-card-icon"><i class="bi bi-heart-fill"></i></div>
@@ -142,28 +148,28 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
         </div>
 
 
-        <!-- ═══════════════════════════════════
+        <!-- ══════════════════════════════════════
              TABS
-        ═══════════════════════════════════ -->
+        ══════════════════════════════════════ -->
         <div class="tabs-perfil">
           <button class="tab-perfil active" data-tab="personal">
-            <i class="bi bi-person-fill"></i>Información Personal
+            <i class="bi bi-person-fill"></i><span>Información Personal</span>
           </button>
           <button class="tab-perfil" data-tab="mascotas">
-            <i class="bi bi-heart-pulse"></i>Mis Mascotas
+            <i class="bi bi-heart-pulse"></i><span>Mis Mascotas</span>
           </button>
           <button class="tab-perfil" data-tab="historial">
-            <i class="bi bi-clock-history"></i>Historial
+            <i class="bi bi-clock-history"></i><span>Historial</span>
           </button>
         </div>
 
 
-        <!-- ═══════════════════════════════════
+        <!-- ══════════════════════════════════════
              TAB: PERSONAL
-        ═══════════════════════════════════ -->
+        ══════════════════════════════════════ -->
         <div class="perfil-grid tab-content" id="tab-personal">
 
-          <!-- Datos Personales -->
+          <!-- ── Datos Personales ── -->
           <div class="card-perfil">
             <div class="card-header-perfil">
               <h2 class="card-titulo">
@@ -218,7 +224,7 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                   <div class="info-valor">+57 <?= htmlspecialchars($usuario['telefono']) ?></div>
                 </div>
               </div>
-              <div class="info-item" style="grid-column: 1 / -1;">
+              <div class="info-item full-col">
                 <div class="info-item-icon"><i class="bi bi-geo-alt-fill"></i></div>
                 <div class="info-content">
                   <div class="info-label">Dirección</div>
@@ -228,7 +234,8 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
             </div>
           </div>
 
-          <!-- Seguridad de la Cuenta -->
+
+          <!-- ── Seguridad ── -->
           <div class="card-perfil">
             <div class="card-header-perfil">
               <h2 class="card-titulo">
@@ -236,6 +243,14 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                 Seguridad
               </h2>
             </div>
+
+            <!-- Alerta dispositivo nuevo -->
+            <?php if ($sesionNueva): ?>
+            <div class="alerta-nuevo-dispositivo">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>Inicio de sesión desde un nuevo dispositivo detectado.</span>
+            </div>
+            <?php endif; ?>
 
             <!-- Cambiar contraseña -->
             <div class="security-section">
@@ -283,38 +298,77 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                 </div>
               </div>
 
-              <button class="btn-guardar" style="width:100%; margin-top:4px;">
+              <button class="btn-guardar btn-full">
                 <i class="bi bi-check-circle-fill me-2"></i>Actualizar Contraseña
               </button>
             </div>
 
             <!-- Sesiones activas -->
-            <div class="security-section" style="margin-bottom:0;">
+            <div class="security-section mb-0">
               <div class="security-section-title">
-                <i class="bi bi-display"></i> Sesiones Activas
+                <i class="bi bi-shield-lock"></i> Sesiones Activas
               </div>
 
-              <div class="session-item current">
-                <div class="session-device-icon"><i class="bi bi-laptop-fill"></i></div>
-                <div class="session-info">
-                  <div class="session-name">Chrome – Windows 11</div>
-                  <div class="session-meta">
-                    <i class="bi bi-geo-alt-fill"></i> Bogotá, Colombia
-                    <span class="session-badge-current">Sesión actual</span>
+              <div class="sesiones-lista" id="sesiones-lista">
+                <?php foreach ($sesiones as $s): ?>
+                  <?php
+                    $esCurrent = $s['is_current'] ?? false;
+                    $esNuevaSes = $s['es_nueva'] ?? false;
+                    $diff = time() - ($s['last_seen'] ?? time());
+
+                    if ($diff < 60)           $tiempo = 'Ahora';
+                    elseif ($diff < 3600)     $tiempo = 'Hace ' . floor($diff/60) . ' min';
+                    elseif ($diff < 86400)    $tiempo = 'Hace ' . floor($diff/3600) . ' h';
+                    elseif ($diff < 604800)   $tiempo = 'Hace ' . floor($diff/86400) . ' días';
+                    else                      $tiempo = 'Hace ' . floor($diff/604800) . ' sem';
+
+                    $inactiva = $diff > 86400 * 3;
+                  ?>
+                  <div class="session-item <?= $esCurrent ? 'current' : '' ?>"
+                       data-token="<?= htmlspecialchars($s['token'] ?? '') ?>">
+
+                    <div class="session-device-icon <?= $esCurrent ? 'active' : '' ?>">
+                      <i class="bi <?= htmlspecialchars($s['tipo']['icono'] ?? 'bi-display') ?>"></i>
+                    </div>
+
+                    <div class="session-info">
+                      <div class="session-name">
+                        <?= htmlspecialchars(($s['navegador']['nombre'] ?? 'Navegador') . ' · ' . ($s['marca']['nombre'] ?? 'Dispositivo')) ?>
+                        <?php if ($esCurrent): ?>
+                          <span class="session-pill session-pill-current">Sesión actual</span>
+                        <?php elseif ($esNuevaSes): ?>
+                          <span class="session-pill session-pill-new">Nuevo</span>
+                        <?php elseif ($inactiva): ?>
+                          <span class="session-pill session-pill-warn">Inactiva</span>
+                        <?php endif; ?>
+                      </div>
+                      <div class="session-meta">
+                        <span><i class="bi bi-geo-alt-fill"></i> <?= htmlspecialchars($s['ciudad'] ?? 'Desconocida') ?></span>
+                        <span><i class="bi bi-clock"></i> <?= $tiempo ?></span>
+                        <span class="session-os-badge">
+                          <i class="bi <?= htmlspecialchars($s['so']['icono'] ?? 'bi-display') ?>"></i>
+                          <?= htmlspecialchars($s['so']['nombre'] ?? 'SO') ?>
+                        </span>
+                      </div>
+                    </div>
+
+                    <?php if (!$esCurrent): ?>
+                      <button class="btn-cerrar-sesion"
+                              data-token="<?= htmlspecialchars($s['token'] ?? '') ?>">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span class="d-none d-sm-inline">Cerrar</span>
+                      </button>
+                    <?php endif; ?>
+
                   </div>
-                </div>
+                <?php endforeach; ?>
               </div>
 
-              <div class="session-item">
-                <div class="session-device-icon"><i class="bi bi-phone-fill"></i></div>
-                <div class="session-info">
-                  <div class="session-name">App móvil – Android</div>
-                  <div class="session-meta"><i class="bi bi-clock"></i> Hace 2 días</div>
-                </div>
-                <button class="btn-cerrar-sesion">
-                  <i class="bi bi-box-arrow-right"></i> Cerrar
+              <?php if (count($sesiones) > 1): ?>
+                <button class="btn-cerrar-todas" id="btn-cerrar-todas">
+                  <i class="bi bi-shield-x"></i> Cerrar todas las otras sesiones
                 </button>
-              </div>
+              <?php endif; ?>
 
             </div>
           </div>
@@ -322,9 +376,9 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
         </div><!-- /tab-personal -->
 
 
-        <!-- ═══════════════════════════════════
+        <!-- ══════════════════════════════════════
              TAB: MASCOTAS
-        ═══════════════════════════════════ -->
+        ══════════════════════════════════════ -->
         <div class="perfil-grid tab-content d-none" id="tab-mascotas">
           <div class="card-perfil full">
             <div class="card-header-perfil">
@@ -333,33 +387,39 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                 Mis Mascotas (<?= count($mascotas) ?>)
               </h2>
               <a href="<?= BASE_URL ?>/cliente/registrar-mascota" class="btn-editar">
-                <i class="bi bi-plus-circle-fill"></i> Agregar Mascota
+                <i class="bi bi-plus-circle-fill"></i> Agregar
               </a>
             </div>
 
             <div class="mascotas-lista">
-              <?php foreach ($mascotas as $m) : ?>
+              <?php foreach ($mascotas as $m): ?>
                 <div class="mascota-mini-item">
                   <div class="mascota-mini-avatar">
-                    <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= $m['img_mascota'] ?>" alt="<?= htmlspecialchars($m['nombre']) ?>">
+                    <img
+                      src="<?= BASE_URL ?>/public/uploads/mascotas/<?= htmlspecialchars($m['img_mascota']) ?>"
+                      alt="<?= htmlspecialchars($m['nombre']) ?>"
+                      onerror="this.onerror=null;this.src='<?= BASE_URL ?>/public/assets/webSite/img/default-pet.png'">
                   </div>
                   <div class="mascota-mini-info">
                     <div class="mascota-mini-nombre"><?= htmlspecialchars($m['nombre']) ?></div>
-                    <div class="mascota-mini-raza"><?= htmlspecialchars($m['raza']) ?> &bull; <?= $m['edad_numero'] ?> <?= $m['edad_unidad'] ?></div>
+                    <div class="mascota-mini-raza">
+                      <?= htmlspecialchars($m['raza']) ?> &bull;
+                      <?= $m['edad_numero'] ?> <?= $m['edad_unidad'] ?>
+                    </div>
                   </div>
                   <a href="<?= BASE_URL ?>/cliente/mascotas" class="btn-editar">
-                    <i class="bi bi-eye-fill"></i> Ver
+                    <i class="bi bi-eye-fill"></i> <span class="d-none d-sm-inline">Ver</span>
                   </a>
                 </div>
               <?php endforeach; ?>
             </div>
           </div>
-        </div><!-- /tab-mascotas -->
+        </div>
 
 
-        <!-- ═══════════════════════════════════
+        <!-- ══════════════════════════════════════
              TAB: HISTORIAL
-        ═══════════════════════════════════ -->
+        ══════════════════════════════════════ -->
         <div class="perfil-grid tab-content d-none" id="tab-historial">
           <div class="card-perfil full">
             <div class="card-header-perfil">
@@ -368,86 +428,48 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                 Historial Reciente
               </h2>
               <button class="btn-editar">
-                <i class="bi bi-list-ul"></i> Ver Todo
+                <i class="bi bi-list-ul"></i> <span class="d-none d-sm-inline">Ver Todo</span>
               </button>
             </div>
 
             <div class="historial-lista">
-
-              <div class="historial-item">
-                <div class="historial-fecha">
-                  <div class="historial-dia">15</div>
-                  <div class="historial-mes">Nov</div>
-                </div>
-                <div class="historial-info">
-                  <div class="historial-titulo">Consulta General – Max</div>
-                  <div class="historial-detalle">
-                    <span><i class="bi bi-person-fill"></i> Dr. Juan Martínez</span>
-                    <span><i class="bi bi-door-closed-fill"></i> Consultorio 2</span>
+              <?php
+              $historial = [
+                ['dia'=>'15','mes'=>'Nov','titulo'=>'Consulta General – Max',   'doctor'=>'Dr. Juan Martínez',     'lugar'=>'Consultorio 2',    'precio'=>'$45.000'],
+                ['dia'=>'10','mes'=>'Nov','titulo'=>'Vacunación – Luna',         'doctor'=>'Dra. Ana García',       'lugar'=>'Consultorio 1',    'precio'=>'$35.000'],
+                ['dia'=>'08','mes'=>'Nov','titulo'=>'Control Postoperatorio – Rocky','doctor'=>'Dr. Carlos Rodríguez','lugar'=>'Consultorio 3', 'precio'=>'$30.000'],
+                ['dia'=>'05','mes'=>'Nov','titulo'=>'Baño y Peluquería – Luna',  'doctor'=>'María López',           'lugar'=>'Sala de Estética', 'precio'=>'$40.000'],
+              ];
+              foreach ($historial as $h): ?>
+                <div class="historial-item">
+                  <div class="historial-fecha">
+                    <div class="historial-dia"><?= $h['dia'] ?></div>
+                    <div class="historial-mes"><?= $h['mes'] ?></div>
                   </div>
-                </div>
-                <div class="historial-precio">$45.000</div>
-              </div>
-
-              <div class="historial-item">
-                <div class="historial-fecha">
-                  <div class="historial-dia">10</div>
-                  <div class="historial-mes">Nov</div>
-                </div>
-                <div class="historial-info">
-                  <div class="historial-titulo">Vacunación – Luna</div>
-                  <div class="historial-detalle">
-                    <span><i class="bi bi-person-fill"></i> Dra. Ana García</span>
-                    <span><i class="bi bi-door-closed-fill"></i> Consultorio 1</span>
+                  <div class="historial-info">
+                    <div class="historial-titulo"><?= htmlspecialchars($h['titulo']) ?></div>
+                    <div class="historial-detalle">
+                      <span><i class="bi bi-person-fill"></i> <?= htmlspecialchars($h['doctor']) ?></span>
+                      <span><i class="bi bi-door-closed-fill"></i> <?= htmlspecialchars($h['lugar']) ?></span>
+                    </div>
                   </div>
+                  <div class="historial-precio"><?= $h['precio'] ?></div>
                 </div>
-                <div class="historial-precio">$35.000</div>
-              </div>
-
-              <div class="historial-item">
-                <div class="historial-fecha">
-                  <div class="historial-dia">08</div>
-                  <div class="historial-mes">Nov</div>
-                </div>
-                <div class="historial-info">
-                  <div class="historial-titulo">Control Postoperatorio – Rocky</div>
-                  <div class="historial-detalle">
-                    <span><i class="bi bi-person-fill"></i> Dr. Carlos Rodríguez</span>
-                    <span><i class="bi bi-door-closed-fill"></i> Consultorio 3</span>
-                  </div>
-                </div>
-                <div class="historial-precio">$30.000</div>
-              </div>
-
-              <div class="historial-item">
-                <div class="historial-fecha">
-                  <div class="historial-dia">05</div>
-                  <div class="historial-mes">Nov</div>
-                </div>
-                <div class="historial-info">
-                  <div class="historial-titulo">Baño y Peluquería – Luna</div>
-                  <div class="historial-detalle">
-                    <span><i class="bi bi-person-fill"></i> María López</span>
-                    <span><i class="bi bi-stars"></i> Sala de Estética</span>
-                  </div>
-                </div>
-                <div class="historial-precio">$40.000</div>
-              </div>
-
+              <?php endforeach; ?>
             </div>
           </div>
-        </div><!-- /tab-historial -->
+        </div>
 
       </div><!-- /container-dashboard -->
     </div><!-- /area-contenido -->
 
   </main>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
-  <!-- NUEVO JS DE PERFIL -->
   <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/perfil.js"></script>
 
+  <!-- URL base para el JS -->
+  <script>window.BASE_URL = '<?= BASE_URL ?>';</script>
 </body>
 </html>

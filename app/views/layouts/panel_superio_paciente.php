@@ -17,39 +17,38 @@ require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 $id = $_SESSION['user']['id_usuario'];
 $usuario = mostrarPerfil($id);
 
-// Validar que se obtuvieron los datos
-if (!$usuario) {
-    session_destroy();
-    header('Location: /vetwilling/login');
-    exit();
-}
-
-// Función helper para sanitizar output
+// Función helper para sanitizar output (solo para imprimir en HTML)
 function safe_echo($value, $default = '')
 {
     return htmlspecialchars($value ?? $default, ENT_QUOTES, 'UTF-8');
 }
 
-// Preparar datos con valores por defecto
+// Preparar datos usando los valores crudos del array $usuario
+// CORRECCIÓN: safe_echo solo se aplica aquí, no al imprimir con <?=
 $datosUsuario = [
     'nombre_veterinaria' => safe_echo($usuario['nombre_veterinaria'] ?? 'Veterinaria'),
-    'img_perfil'         => safe_echo($usuario['img_perfil'] ?? 'default-avatar.png'),
-    'nombres'            => safe_echo($usuario['nombres'] ?? ''),
-    'apellidos'          => safe_echo($usuario['apellidos'] ?? ''),
-    'rol'                => safe_echo($usuario['rol'] ?? 'Cliente'),
-    'email'              => safe_echo($usuario['email'] ?? '')
+    'img_perfil'         => safe_echo($usuario['img_perfil']         ?? 'default-avatar.png'),
+    'nombres'            => safe_echo($usuario['nombres']            ?? ''),
+    'apellidos'          => safe_echo($usuario['apellidos']          ?? ''),
+    'rol'                => safe_echo($usuario['rol']                ?? 'Cliente'),
+    'email'              => safe_echo($usuario['email']              ?? '')
 ];
 
-// Lógica de ruta de imagen robusta
-$foto = $datosUsuario['img_perfil'] ?? '';
+// CORRECCIÓN: Usar el valor crudo para verificar rutas del sistema de archivos,
+// evitando que htmlspecialchars corrompa el nombre del archivo (ej: & → &amp;)
+$fotoRaw = $usuario['img_perfil'] ?? '';
 
-$imagenFallback = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario['nombres'] . '+' . $datosUsuario['apellidos']) . "&background=4e9af1&color=fff&size=128";
+$imagenFallback = "https://ui-avatars.com/api/?name="
+    . urlencode(($usuario['nombres'] ?? '') . '+' . ($usuario['apellidos'] ?? ''))
+    . "&background=4e9af1&color=fff&size=128";
+
 $rutaImagen = $imagenFallback;
 
-if (!empty($foto) && $foto !== 'default-avatar.png') {
-    $rutaAbsoluta = BASE_PATH . "/public/uploads/usuarios/" . $foto;
+if (!empty($fotoRaw) && $fotoRaw !== 'default-avatar.png') {
+    $rutaAbsoluta = BASE_PATH . "/public/uploads/usuarios/" . $fotoRaw;
     if (file_exists($rutaAbsoluta)) {
-        $rutaImagen = BASE_URL . "/public/uploads/usuarios/" . $foto;
+        // Al imprimir en HTML usamos safe_echo implícitamente ya que $datosUsuario['img_perfil'] fue escapado
+        $rutaImagen = BASE_URL . "/public/uploads/usuarios/" . $datosUsuario['img_perfil'];
     }
 } else {
     $defaultLocal = BASE_PATH . "/public/uploads/usuarios/default-avatar.png";
@@ -58,7 +57,9 @@ if (!empty($foto) && $foto !== 'default-avatar.png') {
     }
 }
 
-$fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario['nombres'] . '+' . $datosUsuario['apellidos']) . "&background=4e9af1&color=fff&size=128";
+$fallbackOnerror = "https://ui-avatars.com/api/?name="
+    . urlencode(($usuario['nombres'] ?? '') . '+' . ($usuario['apellidos'] ?? ''))
+    . "&background=4e9af1&color=fff&size=128";
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
@@ -89,7 +90,8 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
         <a href="<?= BASE_URL ?>/cliente/configuracion" class="bubble-item">
             <span class="bubble-icon"><i class="bi bi-gear-fill"></i></span> Configuración
         </a>
-        <button class="bubble-item" data-modal="soporte">
+        <!-- CORRECCIÓN: type="button" para evitar submit accidental dentro de formularios -->
+        <button type="button" class="bubble-item" data-modal="soporte">
             <span class="bubble-icon"><i class="bi bi-question-circle"></i></span> Soporte
         </button>
 
@@ -101,9 +103,7 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
         </a>
     </div>
 
-    <button class="bubble-trigger" id="bubbleBtn" aria-label="Abrir menú de navegación">
-        <i class="bi bi-list" id="bubbleIcon"></i>
-    </button>
+
     <!-- Info Veterinaria -->
     <div class="info-veterinaria">
         <i class="bi bi-hospital" aria-hidden="true"></i>
@@ -129,7 +129,9 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
     <div class="navbar-derecha">
 
         <!-- Reloj en Vivo -->
+        <!-- CORRECCIÓN: type="button" explícito -->
         <button
+            type="button"
             class="btn-navbar btn-reloj"
             data-modal="reloj"
             aria-label="Ver reloj y fecha"
@@ -138,12 +140,15 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
         </button>
 
         <!-- Notificaciones -->
+        <!-- CORRECCIÓN: type="button" explícito -->
         <button
+            type="button"
             class="btn-navbar notificaciones"
             data-dropdown="notificaciones"
             aria-label="Notificaciones"
             aria-haspopup="true"
-            aria-expanded="false">
+            aria-expanded="false"
+            id="btnNotificaciones">
             <i class="bi bi-bell-fill" aria-hidden="true"></i>
             <span class="badge-notif" id="badgeNotificaciones" aria-label="3 notificaciones sin leer">3</span>
         </button>
@@ -153,10 +158,11 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
             class="dropdown-menu dropdown-notificaciones"
             id="dropdownNotificaciones"
             role="menu"
-            aria-labelledby="notificaciones">
+            aria-labelledby="btnNotificaciones">
             <div class="dropdown-header">
                 <h6>Notificaciones</h6>
-                <button class="btn-marcar-leidas" data-action="marcar-leidas">
+                <!-- CORRECCIÓN: type="button" explícito -->
+                <button type="button" class="btn-marcar-leidas" data-action="marcar-leidas">
                     Marcar todas como leídas
                 </button>
             </div>
@@ -173,50 +179,15 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
             </div>
         </div>
 
-        <!-- Carrito -->
-        <button
-            class="btn-navbar tienda"
-            aria-label="Carrito de compras"
-            data-action="toggle-carrito">
-            <i class="bi bi-cart-fill" aria-hidden="true"></i>
-            <span id="contadorCarrito" class="badge-notif" style="display: none;">0</span>
-        </button>
-
-        <!-- Carrito Sidebar -->
-        <aside
-            id="carritoSidebar"
-            class="carrito-sidebar"
-            role="complementary"
-            aria-label="Carrito de compras">
-            <div class="carrito-header">
-                <h3>Mi Carrito</h3>
-                <button
-                    data-action="toggle-carrito"
-                    class="cerrar-btn"
-                    aria-label="Cerrar carrito">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-
-            <div id="carritoItems" class="carrito-items">
-                <div class="carrito-vacio">
-                    <i class="bi bi-cart-x"></i>
-                    <p>Tu carrito está vacío</p>
-                </div>
-            </div>
-
-            <div class="carrito-footer">
-                <p>Total: <span id="totalCarrito">$0</span></p>
-                <a class="btn-pagar" href="<?= BASE_URL ?>/pasarela-pago?origen=tienda" disabled>Proceder al pago</a>
-            </div>
-        </aside>
-
         <!-- Separador (oculto en móvil via CSS) -->
         <div class="navbar-separador" role="separator"></div>
 
         <!-- Perfil Usuario -->
+        <!-- CORRECCIÓN: type="button" explícito + id para aria-labelledby -->
         <button
+            type="button"
             class="btn-perfil"
+            id="btnPerfil"
             data-dropdown="perfil"
             aria-label="Menú de perfil"
             aria-haspopup="true"
@@ -243,7 +214,8 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
         <div
             class="dropdown-menu dropdown-perfil"
             id="dropdownPerfil"
-            role="menu">
+            role="menu"
+            aria-labelledby="btnPerfil">
             <div class="perfil-header">
                 <div class="avatar-usuario grande">
                     <img
@@ -280,7 +252,8 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
                 <i class="bi bi-gear-fill" aria-hidden="true"></i>
                 <span>Configuración</span>
             </a>
-            <button class="dropdown-item" data-modal="soporte" role="menuitem">
+            <!-- CORRECCIÓN: type="button" explícito -->
+            <button type="button" class="dropdown-item" data-modal="soporte" role="menuitem">
                 <i class="bi bi-question-circle" aria-hidden="true"></i>
                 <span>Soporte</span>
             </button>
@@ -296,13 +269,15 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
     </div>
 </nav>
 
-<!-- Overlay para cerrar sidebar en móvil (fuera del nav) -->
+<!-- Overlay para cerrar sidebar en móvil -->
+<!-- CORRECCIÓN: id corregido de "bubbleOverlay" (inexistente) a "sidebarOverlay" -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- Modal de Reloj -->
 <div id="modalReloj" class="modal-reloj" role="dialog" aria-modal="true" aria-labelledby="tituloReloj">
     <div class="modal-reloj-contenido">
-        <button class="btn-cerrar-reloj" data-modal-close="reloj" aria-label="Cerrar reloj">
+        <!-- CORRECCIÓN: type="button" explícito -->
+        <button type="button" class="btn-cerrar-reloj" data-modal-close="reloj" aria-label="Cerrar reloj">
             <i class="bi bi-x-lg"></i>
         </button>
 
@@ -343,7 +318,8 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
                 <i class="bi bi-headset" aria-hidden="true"></i>
             </div>
             <h2 id="tituloSoporte">Centro de Soporte</h2>
-            <button class="btn-cerrar" data-modal-close="soporte" aria-label="Cerrar modal">
+            <!-- CORRECCIÓN: type="button" explícito -->
+            <button type="button" class="btn-cerrar" data-modal-close="soporte" aria-label="Cerrar modal">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
@@ -353,7 +329,9 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
                 ¿Tienes algún problema o sugerencia? Completa el formulario y te responderemos pronto.
             </p>
 
-            <form id="formularioSoporte" novalidate>
+            <!-- CORRECCIÓN: Se elimina <form> y se usa <div> para evitar submit accidental.
+                 El envío se maneja 100% por JS desde nav.js mediante el botón #btnEnviarSoporte -->
+            <div id="formularioSoporte">
                 <div class="form-group">
                     <label for="nombreSoporte">
                         <i class="bi bi-person" aria-hidden="true"></i>
@@ -366,7 +344,6 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
                         name="nombre"
                         placeholder="Tu nombre"
                         value="<?= $datosUsuario['nombres'] ?> <?= $datosUsuario['apellidos'] ?>"
-                        required
                         aria-required="true">
                     <span class="error-message" role="alert"></span>
                 </div>
@@ -383,7 +360,6 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
                         name="email"
                         placeholder="ejemplo@correo.com"
                         value="<?= $datosUsuario['email'] ?>"
-                        required
                         aria-required="true">
                     <span class="error-message" role="alert"></span>
                 </div>
@@ -393,7 +369,7 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
                         <i class="bi bi-tag" aria-hidden="true"></i>
                         Tipo de Consulta <span class="required">*</span>
                     </label>
-                    <select class="form-control" id="tipoProblema" name="tipo_problema" required aria-required="true">
+                    <select class="form-control" id="tipoProblema" name="tipo_problema" aria-required="true">
                         <option value="" disabled selected>Selecciona una opción</option>
                         <option value="tecnico">Problema Técnico</option>
                         <option value="cuenta">Problema con la Cuenta</option>
@@ -415,23 +391,23 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
                         name="descripcion"
                         rows="5"
                         placeholder="Describe tu problema o sugerencia detalladamente..."
-                        required
                         aria-required="true"
                         minlength="10"></textarea>
                     <span class="error-message" role="alert"></span>
                 </div>
 
                 <div class="form-actions">
+                    <!-- CORRECCIÓN: type="button" explícito en ambos -->
                     <button type="button" class="btn-cancelar" data-modal-close="soporte">
                         Cancelar
                     </button>
-                    <button type="submit" class="btn-enviar">
+                    <button type="button" id="btnEnviarSoporte" class="btn-enviar">
                         <i class="bi bi-send-fill" aria-hidden="true"></i>
                         <span>Enviar Mensaje</span>
                         <span class="loading-spinner" style="display: none;"></span>
                     </button>
                 </div>
-            </form>
+            </div>
 
             <div class="mensaje-exito" style="display: none;" role="alert">
                 <i class="bi bi-check-circle-fill"></i>
@@ -444,30 +420,56 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name=" . urlencode($datosUsuario
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/nav.js" defer></script>
 
 <!-- Datos del usuario para JavaScript -->
+<!-- CORRECCIÓN: Solo se expone el id y el nombre; el email se elimina del objeto global
+     para no exponerlo a scripts de terceros. Si nav.js lo necesita, pasarlo por otro medio. -->
 <script>
     window.usuarioData = {
         id: <?= (int)$id ?>,
-        nombre: <?= json_encode($datosUsuario['nombres'] . ' ' . $datosUsuario['apellidos']) ?>,
-        email: <?= json_encode($datosUsuario['email']) ?>
+        nombre: <?= json_encode($datosUsuario['nombres'] . ' ' . $datosUsuario['apellidos']) ?>
     };
-    // ── Burbuja móvil ──
-    const bubbleBtn = document.getElementById('bubbleBtn');
-    const bubblePanel = document.getElementById('bubblePanel');
-    const bubbleOverlay = document.getElementById('bubbleOverlay');
-    const bubbleIcon = document.getElementById('bubbleIcon');
+</script>
 
-    function toggleBubble(forceClose = false) {
-        const isOpen = forceClose ? false : !bubblePanel.classList.contains('open');
-        bubblePanel.classList.toggle('open', isOpen);
-        bubbleBtn.classList.toggle('open', isOpen);
-        bubbleOverlay.classList.toggle('open', isOpen);
-        bubbleIcon.className = isOpen ? 'bi bi-x-lg' : 'bi bi-list';
-    }
+<!-- CORRECCIÓN: Todo el código que manipula el DOM se envuelve en DOMContentLoaded
+     para garantizar que los elementos existen antes de referenciarlos.
+     Además se corrige bubbleOverlay: el id real en el HTML es "sidebarOverlay". -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
 
-    bubbleBtn?.addEventListener('click', () => toggleBubble());
-    bubbleOverlay?.addEventListener('click', () => toggleBubble(true));
+        const bubbleBtn     = document.getElementById('bubbleBtn');
+        const bubblePanel   = document.getElementById('bubblePanel');
+        const bubbleOverlay = document.getElementById('sidebarOverlay'); // CORRECCIÓN: id corregido
+        const bubbleIcon    = document.getElementById('bubbleIcon');
 
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') toggleBubble(true);
+        function toggleBubble(forceClose = false) {
+            const isOpen = forceClose ? false : !bubblePanel.classList.contains('open');
+            bubblePanel.classList.toggle('open', isOpen);
+            bubbleBtn.classList.toggle('open', isOpen);
+            bubbleOverlay.classList.toggle('open', isOpen);
+            bubbleIcon.className = isOpen ? 'bi bi-x-lg' : 'bi bi-list';
+
+            // CORRECCIÓN: Actualizar aria-expanded dinámicamente
+            bubbleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
+        bubbleBtn?.addEventListener('click', () => toggleBubble());
+        bubbleOverlay?.addEventListener('click', () => toggleBubble(true));
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') toggleBubble(true);
+        });
+
+        // CORRECCIÓN: Actualizar aria-expanded en los dropdowns de la navbar
+        document.querySelectorAll('[data-dropdown]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const expanded = this.getAttribute('aria-expanded') === 'true';
+                // Cerrar todos primero
+                document.querySelectorAll('[data-dropdown]').forEach(function (b) {
+                    b.setAttribute('aria-expanded', 'false');
+                });
+                // Abrir/cerrar el clickeado
+                this.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+            });
+        });
+
     });
 </script>
