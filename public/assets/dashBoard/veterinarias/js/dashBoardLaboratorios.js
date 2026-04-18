@@ -1,14 +1,17 @@
-let tabla = null;
-let laboratorioData = [];
-let catalogoPruebas = [];
-let pacientesDisponibles = [];
-let resultadoActual = null;
+(function () {
+    'use strict';
 
-const baseUrl = window.BASE_URL || (() => {
-    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
-    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
-})();
-const API_LAB_URL = `${baseUrl}/veterinaria/api/laboratorio`;
+    let tabla = null;
+    let laboratorioData = [];
+    let catalogoPruebas = [];
+    let pacientesDisponibles = [];
+    let resultadoActual = null;
+
+    const baseUrl = window.BASE_URL || (() => {
+        const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+        return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+    })();
+    const API_LAB_URL = `${baseUrl}/veterinaria/api/laboratorio`;
 
 const buscarPaciente = document.getElementById('buscarPaciente');
 const statTotal = document.getElementById('statTotal');
@@ -525,3 +528,5 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error(error);
     });
 });
+
+})();

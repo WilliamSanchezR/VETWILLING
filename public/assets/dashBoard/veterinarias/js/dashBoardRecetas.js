@@ -1,12 +1,15 @@
-// Variables globales
-let listaPacientes = [];
-let pacientesSeleccionado = null;
+(function () {
+    'use strict';
 
-const baseUrl = window.BASE_URL || (() => {
-    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
-    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
-})();
-const API_RECETAS_URL = `${baseUrl}/veterinaria/api/recetas`;
+    // Variables globales
+    let listaPacientes = [];
+    let pacientesSeleccionado = null;
+
+    const baseUrl = window.BASE_URL || (() => {
+        const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+        return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+    })();
+    const API_RECETAS_URL = `${baseUrl}/veterinaria/api/recetas`;
 
 const buscarPaciente   = document.getElementById("buscarPacientes");
 const listaSugerencias = document.getElementById("listaSugerencias");
@@ -277,3 +280,5 @@ document.addEventListener("DOMContentLoaded", () => {
     consultarPacientes();
     setStep(1);
 });
+
+})();
