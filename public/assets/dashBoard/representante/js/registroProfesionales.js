@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class RegistroProfesionales {
     constructor() {
         this.$$ = (s) => document.querySelectorAll(s);
@@ -241,7 +246,7 @@ class RegistroProfesionales {
         const idsServicios = listaServicios.map(s => s.id).join(',');
 
         // Realizar petición AJAX a la API
-        fetch(`/vetwilling/representante/api/especialidades?action=lista&servicio=${idsServicios}`)
+        fetch(`${baseUrl}/representante/api/especialidades?action=lista&servicio=${idsServicios}`)
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {

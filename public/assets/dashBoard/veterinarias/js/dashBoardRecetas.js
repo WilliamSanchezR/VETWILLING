@@ -2,8 +2,11 @@
 let listaPacientes = [];
 let pacientesSeleccionado = null;
 
-const APP_BASE = window.location.pathname.split('/').filter(Boolean)[0] || '';
-const API_RECETAS_URL = `/${APP_BASE}/veterinaria/api/recetas`;
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+const API_RECETAS_URL = `${baseUrl}/veterinaria/api/recetas`;
 
 const buscarPaciente   = document.getElementById("buscarPacientes");
 const listaSugerencias = document.getElementById("listaSugerencias");

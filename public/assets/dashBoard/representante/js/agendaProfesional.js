@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class AgendaProfesional {
     constructor() {
         document.addEventListener('DOMContentLoaded', () => this.init());
@@ -166,8 +171,8 @@ class AgendaProfesional {
                 // Eliminar del servidor
                 const redirect = encodeURIComponent(window.location.href);
                 const basePath = window.location.pathname.includes('/veterinaria/mi-agenda')
-                    ? `${window.location.origin}/vetwilling/veterinario/eliminar-disponibilidad-agenda`
-                    : `${window.location.origin}/vetwilling/representante/eliminar-agenda-usuario`;
+                    ? `${baseUrl}/veterinario/eliminar-disponibilidad-agenda`
+                    : `${baseUrl}/representante/eliminar-agenda-usuario`;
 
                 window.location.href = `${basePath}?action=eliminar&id=${$id}&redirect=${redirect}`;
             }
@@ -238,7 +243,7 @@ class AgendaProfesional {
         }
 
         // Enviar datos al servidor para registrar la disponibilidad
-        fetch(`${window.location.origin}/vetwilling/representante/agregar-disponibilidad-agenda`, {
+        fetch(`${baseUrl}/representante/agregar-disponibilidad-agenda`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

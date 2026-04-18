@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+  const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+  return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class EditarProfesional {
   constructor() {
     this.$$ = (s) => document.querySelectorAll(s);
@@ -301,7 +306,7 @@ class EditarProfesional {
       const ruta = window.location.href;
       const idProfesional = ruta.split("id=")[1].split("&")[0];
 
-      const eliminarUrl = `${window.location.origin}/vetwilling/representante/eliminar-esp-profesional?action=eliminarEspProfesional&id_profesional=${idProfesional}&id_especialidad=${idEsp}`;
+      const eliminarUrl = `${baseUrl}/representante/eliminar-esp-profesional?action=eliminarEspProfesional&id_profesional=${idProfesional}&id_especialidad=${idEsp}`;
 
       window.location.href = eliminarUrl;
     }
@@ -391,7 +396,7 @@ class EditarProfesional {
       const ruta = window.location.href;
       const idProfesional = ruta.split("id=")[1].split("&")[0];
 
-      const eliminarUrl = `${window.location.origin}/vetwilling/representante/eliminar-serv-profesional?action=eliminarServProfesional&id_usuario=${idProfesional}&id_servicio=${idServ}`;
+      const eliminarUrl = `${baseUrl}/representante/eliminar-serv-profesional?action=eliminarServProfesional&id_usuario=${idProfesional}&id_servicio=${idServ}`;
 
       window.location.href = eliminarUrl;
     }
@@ -412,7 +417,7 @@ class EditarProfesional {
 
     // Realizar petición AJAX a la API
     fetch(
-      `/vetwilling/representante/api/especialidades?action=lista&servicio=${idsServicios}`,
+      `${baseUrl}/representante/api/especialidades?action=lista&servicio=${idsServicios}`,
     )
       .then((response) => response.json())
       .then((data) => {
