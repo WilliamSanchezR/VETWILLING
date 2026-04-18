@@ -322,6 +322,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         crossorigin="anonymous"></script>
 
     <!-- Propio -->
+    <script>
+        window.BASE_URL = "<?= BASE_URL ?>";
+    </script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardLaboratorios.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
