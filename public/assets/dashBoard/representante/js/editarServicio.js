@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class EditarServicio {
     constructor() {
 
@@ -37,7 +42,7 @@ class EditarServicio {
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const idServicio = urlParams.get('id');
-            const response = await fetch(`/vetwilling/representante/obtener-horarios-servicio?action=obtener_horarios&id=${idServicio}`);
+            const response = await fetch(`${baseUrl}/representante/obtener-horarios-servicio?action=obtener_horarios&id=${idServicio}`);
             const result = await response.json();
 
             if (result.status === 'success') {
@@ -338,7 +343,7 @@ class EditarServicio {
     async eliminarHorarioServidor(dia) {
         try {
             for (const id_horario of dia.id) {
-                const response = await fetch(`/vetwilling/representante/actualizar-servicio?action=eliminar_horarios&id=${id_horario}`, {
+                const response = await fetch(`${baseUrl}/representante/actualizar-servicio?action=eliminar_horarios&id=${id_horario}`, {
                     method: 'GET',
                 });
                 const result = await response.json();

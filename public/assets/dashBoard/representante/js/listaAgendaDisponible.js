@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class ListaDisponibilidadProfesionales {
     constructor() {
         document.addEventListener('DOMContentLoaded', () => this.init());
@@ -42,7 +47,7 @@ class ListaDisponibilidadProfesionales {
             this.btnVerAgenda.forEach(boton => {
                 boton.onclick = (event) => {
                     const idUsuario = event.currentTarget.getAttribute('data-id');
-                    window.location.href = `${window.location.origin}/vetwilling/representante/agenda-usuario?id=${idUsuario}`;
+                    window.location.href = `${baseUrl}/representante/agenda-usuario?id=${idUsuario}`;
                 };
             });
         }

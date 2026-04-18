@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class ListaPropietarios {
     constructor() {
         document.addEventListener("DOMContentLoaded", () => this.init());
@@ -196,8 +201,8 @@ class ListaPropietarios {
 
     listaPropietariosVeterinaria() {
         fetch(
-                `${window.location.origin}/vetwilling/representante/propietarios/api/listar?accion=listar-veterinaria&id=${this.idVeterinaria}`,
-            )
+            `${baseUrl}/representante/propietarios/api/listar?accion=listar-veterinaria&id=${this.idVeterinaria}`,
+        )
             .then((response) => response.json())
             .then((data) => {
                 // Aquí puedes actualizar la tabla con los datos recibidos
@@ -262,10 +267,10 @@ class ListaPropietarios {
 
     desactivarPropietario(id) {
         fetch(
-                `${window.location.origin}/vetwilling/representante/api/propietarios?id=${id}`, {
-                    method: "DELETE",
-                },
-            )
+            `${baseUrl}/representante/api/propietarios?id=${id}`, {
+                method: "DELETE",
+            },
+        )
             .then((response) => response.json())
             .then((data) => {
                 if (data.status === "success") {

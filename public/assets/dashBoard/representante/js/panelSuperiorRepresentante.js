@@ -2,6 +2,11 @@
    PANEL SUPERIOR REPRESENTANTE - ESTRUCTURA DE CLASE
    ====================================================== */
 
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class PanelSuperiorRepresentante {
     constructor() {
         // Selector rápido
@@ -230,7 +235,7 @@ class PanelSuperiorRepresentante {
         const formData = new FormData(this.forms.soporte);
 
         try {
-            const response = await fetch("/vetwilling/soporte/api/crear-ticket", {
+            const response = await fetch(`${baseUrl}/soporte/api/crear-ticket`, {
                 method: "POST",
                 body: formData,
             });

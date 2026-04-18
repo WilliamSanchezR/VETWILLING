@@ -20,6 +20,9 @@ $usuario = mostrarPerfil($id);
 
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
+<script>
+    window.BASE_URL = "<?= BASE_URL ?>";
+</script>
 
 <div class="barra-navegacion-superior">
     <div class="navegacion-izquierda">

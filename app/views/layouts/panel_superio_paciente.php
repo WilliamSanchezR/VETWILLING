@@ -62,6 +62,10 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name="
     . "&background=4e9af1&color=fff&size=128";
 ?>
 
+<script>
+    window.BASE_URL = "<?= BASE_URL ?>";
+</script>
+
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 

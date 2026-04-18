@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 // ========== INICIALIZACIÓN ==========
 document.addEventListener('DOMContentLoaded', function () {
     inicializarDashboard();
@@ -522,7 +527,7 @@ function abrirModalNuevoPaciente() {
                 formData.append(key, value);
             });
 
-            return fetch('/vetwilling/veterinario/guardar-paciente', {
+            return fetch(`${baseUrl}/veterinario/guardar-paciente`, {
                 method: 'POST',
                 credentials: 'same-origin',
                 body: formData

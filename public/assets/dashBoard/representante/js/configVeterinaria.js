@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class ConfigVeterinaria {
     constructor() {
         this.$$ = (s) => document.querySelectorAll(s);
@@ -234,7 +239,7 @@ class ConfigVeterinaria {
 
     async consultarHorariosExistentes() {
         try {
-            const response = await fetch(`/vetwilling/representante/obtener-horarios-veterinaria?action=obtener_horarios&id=${this.idVeterinaria}`);
+            const response = await fetch(`${baseUrl}/representante/obtener-horarios-veterinaria?action=obtener_horarios&id=${this.idVeterinaria}`);
             const result = await response.json();
 
             if (result.status === 'success') {
@@ -380,7 +385,7 @@ class ConfigVeterinaria {
         try {
             for (const id_horario of dia.id) {
 
-                const response = await fetch(`/vetwilling/representante/actualizar-horario-veterinaria?action=eliminar_horarios&id=${id_horario}`, {
+                const response = await fetch(`${baseUrl}/representante/actualizar-horario-veterinaria?action=eliminar_horarios&id=${id_horario}`, {
                     method: 'GET',
                 });
                 const result = await response.json();
