@@ -1,3 +1,4 @@
+ (function () {
 const baseUrl = window.BASE_URL || (() => {
     const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
     return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
@@ -723,3 +724,4 @@ estilosAnimacion.textContent = `
     }
 `;
 document.head.appendChild(estilosAnimacion);
+})();

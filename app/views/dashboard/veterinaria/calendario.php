@@ -3,6 +3,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 require_once BASE_PATH . '/app/models/Veterinario.php';
 
 $idUsuario = $_SESSION['user']['id_usuario'] ?? null;
+$idVeterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
 $fechaHoy = date('Y-m-d');
 $statsVeterinario = new Veterinario();
 
@@ -47,7 +48,7 @@ $totalCitasSemana = $idUsuario ? $statsVeterinario->contarCitasSemanaPorVeterina
 
 </head>
 
-<body>
+<body data-user-id="<?= htmlspecialchars((string)$idUsuario) ?>" data-vet-id="<?= htmlspecialchars((string)$idVeterinaria) ?>">
 
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Aqui va el include -->
