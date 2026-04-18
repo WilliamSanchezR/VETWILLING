@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class ListaSubservicios {
     constructor() {
         document.addEventListener('DOMContentLoaded', () => this.init());
@@ -197,7 +202,7 @@ class ListaSubservicios {
 
     crearSubservicio() {
         // Lógica para crear un nuevo servicio
-        const eliminarUrl = `${window.location.origin}/vetwilling/representante/registro-subservicio`;
+        const eliminarUrl = `${baseUrl}/representante/registro-subservicio`;
 
         window.location.href = eliminarUrl;
     }
@@ -213,7 +218,7 @@ class ListaSubservicios {
         }).then((deleteResult) => {
             if (deleteResult.isConfirmed) {
                 // Eliminar del servidor
-                window.location.href = `${window.location.origin}/vetwilling/representante/eliminar-subservicio?action=eliminar&id=${$id}`;
+                window.location.href = `${baseUrl}/representante/eliminar-subservicio?action=eliminar&id=${$id}`;
             }
         });
     }

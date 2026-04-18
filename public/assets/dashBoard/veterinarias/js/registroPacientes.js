@@ -6,6 +6,11 @@ const btnConfirmarRegistr = document.getElementById('btnConfirmar');
 const btnAgregarMascota = document.getElementById('btnAgregarMascota');
 const listaMascotasAgregadas = document.getElementById('listaMascotasAgregadas');
 
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 const mascotaFields = {
     nombre: document.getElementById('nombreMascota'),
     especie: document.getElementById('especie'),
@@ -260,7 +265,7 @@ btnConfirmarRegistr?.addEventListener('click', event => {
         }
     });
 
-    fetch('/vetwilling/veterinario/guardar-paciente', {
+    fetch(`${baseUrl}/veterinario/guardar-paciente`, {
         method: 'POST',
         body: formData
     })
@@ -274,7 +279,7 @@ btnConfirmarRegistr?.addEventListener('click', event => {
                     confirmButtonColor: '#0a932c',
                     confirmButtonText: 'Aceptar'
                 }).then(() => {
-                    window.location.href = '/vetwilling/veterinario/registrar-pacientes';
+                    window.location.href = `${baseUrl}/veterinario/registrar-pacientes`;
                 });
             } else {
                 Swal.fire({

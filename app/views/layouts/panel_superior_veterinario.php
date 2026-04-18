@@ -27,6 +27,10 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
 }
 ?>
 
+<script>
+    window.BASE_URL = "<?= BASE_URL ?>";
+</script>
+
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
 

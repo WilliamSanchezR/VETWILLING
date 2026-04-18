@@ -8,6 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
   inicializarEventosGlobales();
 });
 
+const baseUrl = window.BASE_URL || (() => {
+  const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+  return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 /* ======================================================
    RELOJ Y SALUDO
    ====================================================== */
@@ -134,7 +139,7 @@ if (formularioSoporte) {
     // Enviamos el formulario (aquí iría la lógica real de envío, como una petición AJAX)
     const formData = new FormData(formularioSoporte);
 
-    fetch("/vetwilling/soporte/api/crear-ticket", {
+    fetch(`${baseUrl}/soporte/api/crear-ticket`, {
       method: "POST",
       body: formData,
     })
