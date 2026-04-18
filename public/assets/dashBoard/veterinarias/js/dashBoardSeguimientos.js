@@ -11,8 +11,11 @@
     // ============================================
     // CONFIGURACIÓN
     // ============================================
-    const BASE_URL = window.location.origin + '/vetwilling';
-    const API_URL = BASE_URL + '/veterinaria/api/seguimientos';
+    const baseUrl = window.BASE_URL || (() => {
+        const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+        return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+    })();
+    const API_URL = `${baseUrl}/veterinaria/api/seguimientos`;
     
     let currentView = 'list';
     let searchTimeout = null;
@@ -240,7 +243,7 @@
                 </div>
 
                 <div class="footer-seguimiento">
-                    <button class="btn-accion-seg btn-actualizar" onclick="location.href='${BASE_URL}/veterinaria/calendario'">
+                    <button class="btn-accion-seg btn-actualizar" onclick="location.href='${baseUrl}/veterinaria/calendario'">
                         <i class="bi bi-arrow-clockwise"></i> Programar Cita
                     </button>
                     <button class="btn-accion-seg btn-detalles" data-action="ver" data-id="${seg.id_seguimiento}">
@@ -354,7 +357,7 @@
 
         switch(action) {
             case 'ver':
-                window.location.href = `${BASE_URL}/veterinaria/calendario?id=${id}`;
+                window.location.href = `${baseUrl}/veterinaria/calendario?id=${id}`;
                 break;
             case 'editar':
                 showToast(`Función de edición en desarrollo`, 'info');

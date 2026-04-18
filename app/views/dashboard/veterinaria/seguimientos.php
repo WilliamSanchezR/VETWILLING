@@ -242,11 +242,14 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         console.log('BASE_URL PHP:', '<?= BASE_URL ?>');
         console.log('Usuario sesión:', <?= json_encode($_SESSION['user'] ?? null) ?>);
         console.log('URL actual:', window.location.href);
-        console.log('API URL esperada:', window.location.origin + '/vetwilling/veterinaria/api/seguimientos');
+        console.log('API URL esperada:', '<?= BASE_URL ?>/veterinaria/api/seguimientos');
         console.log('===================================');
     </script>
 
     <!-- Scripts propios -->
+    <script>
+        window.BASE_URL = "<?= BASE_URL ?>";
+    </script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardSeguimientos.js"></script>
 
 </body>

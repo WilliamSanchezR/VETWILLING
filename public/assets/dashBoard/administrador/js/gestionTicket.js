@@ -1,3 +1,8 @@
+const baseUrl = window.BASE_URL || (() => {
+  const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+  return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 class GestionTicket {
   constructor() {
     this.init();
@@ -128,7 +133,7 @@ class GestionTicket {
   }
 
   listarUsuarios() {
-    fetch("/vetwilling/admin/lista-profesionales?accion=listarAdmin")
+    fetch(`${baseUrl}/admin/lista-profesionales?accion=listarAdmin`)
       .then((response) => response.json())
       .then((data) => {
         this.renderListaUsuarios(data);
@@ -169,7 +174,7 @@ class GestionTicket {
     const usuarioId = this.selectUsuario.value;
     const usuarioIdAuth = this.usuarioIdAuth.value;
 
-    fetch("/vetwilling/soporte/api/ticket?action=asignar", {
+    fetch(`${baseUrl}/soporte/api/ticket?action=asignar`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -244,7 +249,7 @@ class GestionTicket {
 
     console.log(datos);
 
-    fetch("/vetwilling/soporte/api/ticket", {
+    fetch(`${baseUrl}/soporte/api/ticket`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -290,7 +295,7 @@ class GestionTicket {
     const ticketId = this.ticketId?.value;
     if (!ticketId) return;
 
-    fetch(`/vetwilling/soporte/api/ticket?action=historico&id=${ticketId}`)
+    fetch(`${baseUrl}/soporte/api/ticket?action=historico&id=${ticketId}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "success") {

@@ -2,36 +2,40 @@
 
 // --- DEFINICIÓN DE RUTAS LÓGICAS ---
 // Basado en tu archivo 'calendarioController.php', las rutas deben apuntar a ese controlador.
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
 const URLS = {
     // 1. CARGAR EVENTOS (GET): Llama al método que trae todos los agendamientos.
-    LOAD: '/vetwilling/calendario/loadEvents',
+    LOAD: `${baseUrl}/calendario/loadEvents`,
 
     // 2. CREAR EVENTO (POST): Llama al método para insertar un nuevo agendamiento.
-    CREATE: '/vetwilling/calendario/storeEvent',
+    CREATE: `${baseUrl}/calendario/storeEvent`,
 
     // 3. MODIFICAR EVENTO (POST): Llama al método para actualizar fechas/horas.
-    UPDATE: '/vetwilling/calendario/updateEvent',
+    UPDATE: `${baseUrl}/calendario/updateEvent`,
 
     // 4. ELIMINAR EVENTO (DELETE): Llama al método para eliminar un agendamiento.
-    DELETE: '/vetwilling/calendario/deleteEvent',
+    DELETE: `${baseUrl}/calendario/deleteEvent`,
 
     // 5. OBTENER PROPIETARIOS: Lista de propietarios
-    GET_PROPIETARIOS: '/vetwilling/calendario/getPropietarios',
+    GET_PROPIETARIOS: `${baseUrl}/calendario/getPropietarios`,
 
     // 6. OBTENER MASCOTAS: Lista de mascotas por propietario
-    GET_MASCOTAS: '/vetwilling/calendario/getMascotas',
+    GET_MASCOTAS: `${baseUrl}/calendario/getMascotas`,
 
     // 7. OBTENER SERVICIOS: Lista de servicios disponibles
-    GET_SERVICIOS: '/vetwilling/calendario/getServicios',
+    GET_SERVICIOS: `${baseUrl}/calendario/getServicios`,
 
     // 7b. OBTENER SUBSERVICIOS: Lista de subservicios disponibles
-    GET_SUBSERVICIOS: '/vetwilling/calendario/getSubservicios',
+    GET_SUBSERVICIOS: `${baseUrl}/calendario/getSubservicios`,
 
     // 8. OBTENER VETERINARIOS: Lista de veterinarios de la veterinaria
-    GET_VETERINARIOS: '/vetwilling/calendario/getVeterinarios',
+    GET_VETERINARIOS: `${baseUrl}/calendario/getVeterinarios`,
 
     // 9. OBTENER DISPONIBILIDAD DEL PROFESIONAL
-    GET_DISPONIBILIDAD: '/vetwilling/disponibilidad/horarios'
+    GET_DISPONIBILIDAD: `${baseUrl}/disponibilidad/horarios`
 };
 
 

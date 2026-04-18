@@ -1,11 +1,16 @@
 let pasoActual = 1;
 let metodoSeleccionado = '';
 
+const baseUrl = window.BASE_URL || (() => {
+    const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
+    return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
+})();
+
 // ← NUEVO: mapa de rutas
 const rutasVolver = {
-    'suscripcion': '/vetwilling/veterinario/suscripcion',
-    'tienda':      '/vetwilling/cliente/tienda',
-    'inicio':      '/',
+    'suscripcion': `${baseUrl}/veterinario/suscripcion`,
+    'tienda': `${baseUrl}/cliente/tienda`,
+    'inicio': `${baseUrl}/`,
 };
 
 function abrirModal() {
