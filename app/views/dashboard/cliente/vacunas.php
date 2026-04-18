@@ -1,4 +1,5 @@
 <?php
+require_once BASE_PATH . '/app/helpers/session_propietario.php';
 require_once BASE_PATH . '/app/controllers/mascotasController.php';
 
 $id_mascota = $_GET['id'];

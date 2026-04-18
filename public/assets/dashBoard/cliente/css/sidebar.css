@@ -1,70 +1,81 @@
 /* ========================================================================
    SIDEBAR NAVIGATION - PROFESSIONAL EDITION
    Author: VetWinsy Dashboard
-   Version: 2.0
+   Version: 3.0
    Description: Sistema de navegación lateral profesional con animaciones
-                suaves, tooltips inteligentes y diseño responsivo
+                suaves, tooltips inteligentes y diseño responsivo.
+                En PC: sidebar fijo colapsable.
+                En móvil: burbuja flotante (FAB) + panel lateral deslizante.
 ======================================================================== */
 
+
 /* ========================================================================
-   VARIABLES CSS - Sistema de Design Tokens
+   1. VARIABLES CSS
+   — Define todos los colores, tamaños, sombras y transiciones del sistema.
+   — Cambiar un valor aquí lo actualiza en todo el archivo automáticamente.
 ======================================================================== */
 :root {
-    /* Dimensiones */
+    /* Dimensiones del sidebar */
     --sidebar-width: 260px;
     --sidebar-collapsed-width: 80px;
     --sidebar-header-height: 80px;
-    
-    /* Colores Primarios */
+
+    /* Colores principales (verde de marca) */
     --primary-green: #0a9b42;
     --primary-green-hover: #087726;
     --primary-green-light: #f0f9f4;
     --primary-green-shadow: rgba(10, 155, 66, 0.2);
-    
-    /* Colores de Superficie */
+
+    /* Fondos de superficies */
     --bg-sidebar: #ffffff;
     --bg-main: #f5f7fb;
     --bg-hover: #f8f9fa;
     --bg-active: #f0f9f4;
     --bg-danger-light: #fff5f5;
-    
-    /* Colores de Texto */
+
+    /* Colores de texto */
     --text-primary: #333333;
     --text-secondary: #6c757d;
     --text-muted: #999999;
     --text-white: #ffffff;
-    
-    /* Colores de Estado */
+
+    /* Colores de estado */
     --color-danger: #dc3545;
     --color-danger-hover: #c82333;
     --color-warning: #ffc107;
     --color-success: var(--primary-green);
     --color-info: #17a2b8;
-    
-    /* Bordes y Sombras */
+
+    /* Bordes y radios */
     --border-color: #e9ecef;
     --border-radius-sm: 6px;
     --border-radius-md: 10px;
     --border-radius-lg: 16px;
+
+    /* Sombras */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
     --shadow-button: 0 4px 12px var(--primary-green-shadow);
-    
-    /* Transiciones */
+
+    /* Velocidades de transición */
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Z-index Scale */
-    --z-sidebar: 1000;
-    --z-toggle: 1100;
-    --z-tooltip: 1200;
-    --z-overlay: 999;
+
+    /* Capas Z-index (orden visual de elementos apilados) */
+    --z-sidebar: 1000;   /* sidebar PC */
+    --z-overlay: 1040;   /* fondo oscuro detrás del panel móvil */
+    --z-panel: 1050;     /* panel lateral móvil */
+    --z-fab: 1060;       /* burbuja flotante (siempre encima de todo) */
+    --z-toggle: 1070;    /* botón toggle PC */
+    --z-tooltip: 1200;   /* tooltips del sidebar colapsado */
 }
 
+
 /* ========================================================================
-   RESETEO Y ESTILOS BASE
+   2. RESET Y ESTILOS BASE
+   — Normaliza márgenes, padding y box-model en todos los elementos.
 ======================================================================== */
 * {
     margin: 0;
@@ -78,8 +89,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+
 /* ========================================================================
-   SIDEBAR - Estructura Principal
+   3. SIDEBAR PC — Estructura principal
+   — Barra fija a la izquierda, visible solo en pantallas >= 769px.
+   — En móvil se oculta completamente; lo reemplaza el panel móvil.
 ======================================================================== */
 .sidebar {
     position: fixed;
@@ -97,13 +111,16 @@ body {
     overflow: hidden;
 }
 
-/* Estado Colapsado */
+/* Estado colapsado: el sidebar se estrecha a solo íconos */
 .sidebar.collapsed {
     width: var(--sidebar-collapsed-width);
 }
 
+
 /* ========================================================================
-   SIDEBAR HEADER - Logo y Branding
+   4. SIDEBAR HEADER — Logo y branding
+   — Muestra el logo completo cuando está expandido,
+     y el logo icono cuando está colapsado.
 ======================================================================== */
 .sidebar-header {
     padding: 24px 20px;
@@ -125,12 +142,14 @@ body {
     transition: all var(--transition-base);
 }
 
+/* Logo horizontal (visible cuando expandido) */
 .sidebar-logo-full {
     max-width: 180px;
     height: auto;
     transition: opacity var(--transition-base);
 }
 
+/* Logo ícono cuadrado (visible cuando colapsado) */
 .sidebar-logo-icon {
     display: none;
     width: 40px;
@@ -138,7 +157,6 @@ body {
     transition: opacity var(--transition-base);
 }
 
-/* Logos en estado colapsado */
 .sidebar.collapsed .sidebar-logo-full {
     display: none;
 }
@@ -147,8 +165,10 @@ body {
     display: block;
 }
 
+
 /* ========================================================================
-   NAVEGACIÓN - Contenedor Principal
+   5. NAVEGACIÓN — Contenedor principal
+   — Área scrolleable que contiene todas las secciones y links.
 ======================================================================== */
 .sidebar-nav {
     flex: 1;
@@ -159,7 +179,7 @@ body {
     scrollbar-color: #d0d0d0 transparent;
 }
 
-/* Scrollbar Personalizado - Webkit */
+/* Scrollbar personalizado en navegadores Webkit (Chrome, Safari) */
 .sidebar-nav::-webkit-scrollbar {
     width: 6px;
 }
@@ -179,13 +199,16 @@ body {
     background: #b0b0b0;
 }
 
+
 /* ========================================================================
-   SECCIONES DE NAVEGACIÓN
+   6. SECCIONES DE NAVEGACIÓN
+   — Agrupan los links bajo un título de categoría (ej: "General").
 ======================================================================== */
 .nav-section {
     margin-bottom: 28px;
 }
 
+/* Título de sección (ej: "GENERAL") */
 .nav-section-title {
     display: block;
     font-size: 11px;
@@ -199,7 +222,7 @@ body {
     user-select: none;
 }
 
-/* Título en estado colapsado */
+/* En modo colapsado el título desaparece con animación */
 .sidebar.collapsed .nav-section-title {
     opacity: 0;
     height: 0;
@@ -209,8 +232,10 @@ body {
     visibility: hidden;
 }
 
+
 /* ========================================================================
-   ITEMS DE NAVEGACIÓN
+   7. ITEMS DE NAVEGACIÓN
+   — Cada link del menú: ícono + texto.
 ======================================================================== */
 .nav-item {
     display: flex;
@@ -229,7 +254,7 @@ body {
     outline: none;
 }
 
-/* Icono del Item */
+/* Ícono del item */
 .nav-item i {
     font-size: 20px;
     min-width: 24px;
@@ -240,7 +265,7 @@ body {
     justify-content: center;
 }
 
-/* Texto del Item */
+/* Texto del item */
 .nav-text {
     white-space: nowrap;
     opacity: 1;
@@ -248,11 +273,7 @@ body {
     overflow: hidden;
 }
 
-/* ========================================================================
-   ESTADOS DE LOS ITEMS
-======================================================================== */
-
-/* Hover State */
+/* Hover: fondo gris suave + color verde + leve desplazamiento */
 .nav-item:hover {
     background: var(--bg-hover);
     color: var(--primary-green);
@@ -263,14 +284,14 @@ body {
     transform: scale(1.1);
 }
 
-/* Active State */
+/* Activo: fondo verde claro + texto verde + barra lateral izquierda */
 .nav-item.active {
     background: var(--bg-active);
     color: var(--primary-green);
     font-weight: 600;
 }
 
-/* Indicador de Item Activo */
+/* Barra verde a la izquierda del item activo */
 .nav-item.active::before {
     content: '';
     position: absolute;
@@ -284,17 +305,18 @@ body {
     animation: slideInLeft 0.3s ease;
 }
 
-/* Focus State (Accesibilidad) */
+/* Focus accesible con teclado */
 .nav-item:focus-visible {
     outline: 2px solid var(--primary-green);
     outline-offset: 2px;
 }
 
+
 /* ========================================================================
-   ITEMS ESPECIALES
+   8. ITEMS ESPECIALES
 ======================================================================== */
 
-/* Item de Logout */
+/* Item de cerrar sesión (color rojo) */
 .nav-logout {
     color: var(--color-danger);
 }
@@ -308,7 +330,7 @@ body {
     color: var(--color-danger);
 }
 
-/* Badge de Notificaciones */
+/* Badge de notificaciones (número sobre el ícono) */
 .nav-item .nav-badge {
     margin-left: auto;
     background: var(--primary-green);
@@ -322,7 +344,7 @@ body {
     transition: all var(--transition-fast);
 }
 
-/* Indicador de Nueva Feature */
+/* Punto rojo animado para funcionalidades nuevas */
 .nav-item .new-indicator {
     position: absolute;
     top: 10px;
@@ -335,8 +357,10 @@ body {
     box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
 }
 
+
 /* ========================================================================
-   MODO COLAPSADO
+   9. MODO COLAPSADO
+   — Cuando el sidebar está estrecho solo se ven los íconos, sin texto.
 ======================================================================== */
 .sidebar.collapsed .nav-item {
     justify-content: center;
@@ -351,6 +375,7 @@ body {
     min-width: auto;
 }
 
+/* Texto, badge y punto rojo se ocultan */
 .sidebar.collapsed .nav-text {
     opacity: 0;
     width: 0;
@@ -362,6 +387,7 @@ body {
     display: none;
 }
 
+/* Sin barra izquierda ni desplazamiento en hover cuando está colapsado */
 .sidebar.collapsed .nav-item.active::before {
     display: none;
 }
@@ -370,8 +396,11 @@ body {
     transform: translateX(0);
 }
 
+
 /* ========================================================================
-   TOOLTIPS - Solo en Modo Colapsado
+   10. TOOLTIPS — Solo en modo colapsado
+   — Al pasar el mouse sobre un ícono, aparece un tooltip con el nombre.
+   — Se activan solo si el elemento tiene el atributo data-tooltip="Nombre".
 ======================================================================== */
 .sidebar.collapsed .nav-item[data-tooltip]::after {
     content: attr(data-tooltip);
@@ -393,7 +422,7 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-/* Flecha del Tooltip */
+/* Flecha del tooltip */
 .sidebar.collapsed .nav-item[data-tooltip]::before {
     content: '';
     position: absolute;
@@ -408,7 +437,7 @@ body {
     z-index: var(--z-tooltip);
 }
 
-/* Mostrar Tooltip en Hover */
+/* Mostrar tooltip al hacer hover */
 .sidebar.collapsed .nav-item:hover::after {
     opacity: 1;
     transform: translateY(-50%) translateX(0);
@@ -418,8 +447,11 @@ body {
     opacity: 1;
 }
 
+
 /* ========================================================================
-   BOTÓN TOGGLE
+   11. BOTÓN TOGGLE — Solo PC
+   — Botón circular que colapsa/expande el sidebar.
+   — Se oculta automáticamente en móvil.
 ======================================================================== */
 .sidebar-toggle {
     position: fixed;
@@ -441,11 +473,11 @@ body {
     outline: none;
 }
 
+/* El botón se mueve cuando el sidebar colapsa */
 .sidebar.collapsed .sidebar-toggle {
     left: calc(var(--sidebar-collapsed-width) - 16px);
 }
 
-/* Toggle Button States */
 .sidebar-toggle:hover {
     background: var(--primary-green-hover);
     transform: scale(1.1);
@@ -461,6 +493,7 @@ body {
     outline-offset: 4px;
 }
 
+/* El ícono rota 180° cuando el sidebar está colapsado */
 .sidebar-toggle i {
     transition: transform var(--transition-base);
     font-size: 14px;
@@ -470,8 +503,10 @@ body {
     transform: rotate(180deg);
 }
 
+
 /* ========================================================================
-   SEPARADOR VISUAL
+   12. SEPARADOR VISUAL
+   — Línea horizontal para dividir grupos de items en el menú.
 ======================================================================== */
 .nav-divider {
     height: 1px;
@@ -484,8 +519,10 @@ body {
     margin: 20px 24px;
 }
 
+
 /* ========================================================================
-   FOOTER DEL SIDEBAR
+   13. FOOTER DEL SIDEBAR
+   — Sección inferior del sidebar con info del usuario logueado.
 ======================================================================== */
 .sidebar-footer {
     padding: 20px;
@@ -507,6 +544,7 @@ body {
     background: var(--bg-hover);
 }
 
+/* Avatar circular con iniciales del usuario */
 .sidebar-user-avatar {
     width: 40px;
     height: 40px;
@@ -544,6 +582,7 @@ body {
     text-overflow: ellipsis;
 }
 
+/* En modo colapsado se oculta el texto del usuario */
 .sidebar.collapsed .sidebar-user-info {
     opacity: 0;
     width: 0;
@@ -554,8 +593,11 @@ body {
     justify-content: center;
 }
 
+
 /* ========================================================================
-   CONTENIDO PRINCIPAL
+   14. CONTENIDO PRINCIPAL
+   — El área de contenido se desplaza a la derecha del sidebar en PC.
+   — En móvil ocupa todo el ancho (margin-left: 0).
 ======================================================================== */
 .main-content {
     margin-left: var(--sidebar-width);
@@ -564,82 +606,270 @@ body {
     transition: margin-left var(--transition-base);
 }
 
+/* Cuando el sidebar está colapsado el contenido se expande */
 .sidebar.collapsed ~ .main-content {
     margin-left: var(--sidebar-collapsed-width);
 }
 
-/* ========================================================================
-   RESPONSIVE DESIGN
-======================================================================== */
 
-/* Tablets */
+/* ========================================================================
+   15. RESPONSIVE — Tablets (769px – 1024px)
+   — El sidebar se hace un poco más estrecho para ganar espacio.
+======================================================================== */
 @media (max-width: 1024px) {
     :root {
         --sidebar-width: 240px;
     }
 }
 
-/* Mobile */
+
+/* ========================================================================
+   16. RESPONSIVE — Móvil (hasta 768px)
+   — El sidebar PC desaparece completamente.
+   — El margen del contenido se elimina (ocupa toda la pantalla).
+   — El botón toggle PC se oculta.
+   — Aparecen: burbuja FAB + panel lateral + overlay.
+======================================================================== */
 @media (max-width: 768px) {
+
+    /* Ocultar sidebar PC */
     .sidebar {
-        transform: translateX(-100%);
+        display: none !important;
     }
-    
-    .sidebar.show {
-        transform: translateX(0);
-        box-shadow: var(--shadow-lg);
-    }
-    
+
+    /* Ocultar botón toggle PC */
     .sidebar-toggle {
-        display: none;
+        display: none !important;
     }
-    
+
+    /* El contenido ocupa toda la pantalla */
     .main-content {
-        margin-left: 0;
-    }
-    
-    /* Overlay para cerrar sidebar */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: var(--z-overlay);
-        transition: opacity var(--transition-base);
-        backdrop-filter: blur(2px);
-    }
-    
-    .sidebar.show ~ .sidebar-overlay {
-        display: block;
+        margin-left: 0 !important;
     }
 }
 
+
 /* ========================================================================
-   ANIMACIONES
+   17. OVERLAY MÓVIL
+   — Fondo oscuro semitransparente que aparece detrás del panel lateral.
+   — Al tocarlo, cierra el panel.
+   — Técnica visibility+opacity para que la transición funcione
+     correctamente (con display:none la animación no se ejecuta).
+======================================================================== */
+.mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: var(--z-overlay);
+
+    /* Empieza invisible e inaccesible */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity var(--transition-base),
+        visibility var(--transition-base);
+}
+
+/* Cuando está activo se hace visible y bloquea interacción */
+.mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+
+/* ========================================================================
+   18. PANEL LATERAL MÓVIL
+   — Menú que desliza desde la izquierda al abrir la burbuja FAB.
+   — Contiene logo + links de navegación.
+   — Usa el mismo verde oscuro que contrasta con el fondo blanco del contenido.
+======================================================================== */
+.mobile-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 270px;
+    max-width: 85vw;
+    z-index: var(--z-panel);
+
+    background: #0a3d20;  /* verde oscuro de marca */
+    color: var(--text-white);
+
+    /* Empieza fuera de la pantalla hacia la izquierda */
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Cuando está abierto desliza hacia adentro */
+.mobile-panel.open {
+    transform: translateX(0);
+}
+
+/* Header del panel: logo + botón cerrar */
+.mobile-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.mobile-panel-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Botón X para cerrar el panel */
+.mobile-panel-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: var(--border-radius-sm);
+    line-height: 1;
+    transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.mobile-panel-close:hover,
+.mobile-panel-close:focus-visible {
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+}
+
+/* Contenedor de los links de navegación */
+.mobile-panel-nav {
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+/* Título de sección dentro del panel (ej: "GENERAL") */
+.mobile-nav-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 0 8px 8px;
+    display: block;
+}
+
+/* Cada link del menú móvil */
+.mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--border-radius-md);
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.mobile-nav-item i {
+    font-size: 18px;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.mobile-nav-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-white);
+}
+
+/* Item activo: resaltado con fondo claro */
+.mobile-nav-item.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-white);
+    font-weight: 600;
+}
+
+
+/* ========================================================================
+   19. BURBUJA FAB (Floating Action Button)
+   — Botón circular verde fijo en la esquina inferior derecha.
+   — Solo visible en móvil (display:none en PC).
+   — Al tocarlo abre/cierra el panel lateral.
+======================================================================== */
+
+/* Oculto por defecto en PC */
+.fab-menu {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .fab-menu {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        /* Posición fija en esquina inferior derecha */
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: var(--z-fab);
+
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+
+        background: var(--primary-green);
+        color: var(--text-white);
+        font-size: 22px;
+
+        box-shadow: var(--shadow-button);
+        transition: transform var(--transition-fast), background var(--transition-fast);
+    }
+
+    .fab-menu:hover,
+    .fab-menu:focus-visible {
+        background: var(--primary-green-hover);
+        transform: scale(1.08);
+        outline: none;
+    }
+
+    .fab-menu:active {
+        transform: scale(0.95);
+    }
+}
+
+
+/* ========================================================================
+   20. ANIMACIONES
+   — slideIn: entrada de items del sidebar de izquierda a derecha.
+   — slideInLeft: crecimiento de la barra del item activo.
+   — pulse: punto rojo pulsante para "nueva funcionalidad".
+   — fadeIn: aparición suave de elementos.
+   — spin: spinner de carga del sidebar.
 ======================================================================== */
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideInLeft {
-    from {
-        width: 0;
-        opacity: 0;
-    }
-    to {
-        width: 4px;
-        opacity: 1;
-    }
+    from { width: 0; opacity: 0; }
+    to   { width: 4px; opacity: 1; }
 }
 
 @keyframes pulse {
@@ -654,33 +884,36 @@ body {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
-/* Aplicar animaciones a items */
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Animación escalonada en la entrada de los items del sidebar */
 .sidebar-nav .nav-item {
     animation: slideIn 0.4s ease-out backwards;
 }
 
 .sidebar-nav .nav-item:nth-child(1) { animation-delay: 0.05s; }
-.sidebar-nav .nav-item:nth-child(2) { animation-delay: 0.1s; }
+.sidebar-nav .nav-item:nth-child(2) { animation-delay: 0.10s; }
 .sidebar-nav .nav-item:nth-child(3) { animation-delay: 0.15s; }
-.sidebar-nav .nav-item:nth-child(4) { animation-delay: 0.2s; }
+.sidebar-nav .nav-item:nth-child(4) { animation-delay: 0.20s; }
 .sidebar-nav .nav-item:nth-child(5) { animation-delay: 0.25s; }
-.sidebar-nav .nav-item:nth-child(6) { animation-delay: 0.3s; }
+.sidebar-nav .nav-item:nth-child(6) { animation-delay: 0.30s; }
 .sidebar-nav .nav-item:nth-child(7) { animation-delay: 0.35s; }
-.sidebar-nav .nav-item:nth-child(8) { animation-delay: 0.4s; }
+.sidebar-nav .nav-item:nth-child(8) { animation-delay: 0.40s; }
+
 
 /* ========================================================================
-   ESTADOS ESPECIALES
+   21. ESTADOS ESPECIALES
 ======================================================================== */
 
-/* Loading State */
+/* Estado de carga: bloquea interacción y muestra spinner centrado */
+
+
 .sidebar.loading {
     pointer-events: none;
     opacity: 0.7;
@@ -700,11 +933,7 @@ body {
     animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-/* Desactivar animaciones */
+/* Clase utilitaria para deshabilitar todas las animaciones y transiciones */
 .no-transition,
 .no-transition *,
 .no-transition *::before,
@@ -713,8 +942,11 @@ body {
     animation: none !important;
 }
 
+
 /* ========================================================================
-   MODO OSCURO (Opcional)
+   22. MODO OSCURO (Opcional)
+   — Se activa automáticamente si el sistema del usuario está en dark mode
+     Y el sidebar tiene el atributo data-theme="auto".
 ======================================================================== */
 @media (prefers-color-scheme: dark) {
     .sidebar[data-theme="auto"] {
@@ -727,61 +959,25 @@ body {
     }
 }
 
+
 /* ========================================================================
-   PRINT STYLES
+   23. ESTILOS DE IMPRESIÓN
+   — Al imprimir, oculta el sidebar y expande el contenido a pantalla completa.
 ======================================================================== */
 @media print {
     .sidebar,
-    .sidebar-toggle {
-        display: none;
-    }
-    
-    .main-content {
-        margin-left: 0;
-    }
-}
-/* ── FIX MÓVIL: eliminar espacio vacío ── */
-@media (max-width: 768px) {
-
-    /* El sidebar sale por la izquierda, no ocupa espacio */
-    .sidebar {
-        transform: translateX(-100%);
-        width: var(--sidebar-width) !important; /* no colapsar en móvil */
-        box-shadow: none;
-    }
-
-    .sidebar.show {
-        transform: translateX(0);
-        box-shadow: var(--shadow-lg);
-    }
-
-    /* Sin margen en móvil, siempre */
-    .main-content {
-        margin-left: 0 !important;
-    }
-
-    /* Ocultar el botón toggle flotante */
-    .sidebar-toggle {
+    .sidebar-toggle,
+    .fab-menu,
+    .mobile-panel,
+    .mobile-overlay {
         display: none !important;
     }
 
-    /* Overlay activo cuando sidebar está abierto */
-    .sidebar-overlay {
-        display: block;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.45);
-        backdrop-filter: blur(2px);
-        z-index: var(--z-overlay);
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity var(--transition-base), visibility var(--transition-base);
-        pointer-events: none;
+    .main-content {
+        margin-left: 0 !important;
     }
+}
 
-    .sidebar.show ~ .sidebar-overlay {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-    }
+.sidebar-toggle {
+    position: fixed;
 }

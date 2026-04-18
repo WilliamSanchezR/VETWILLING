@@ -1,0 +1,164 @@
+[
+    {
+        "ip": "::1",
+        "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/147.0.0.0 Safari\/537.36",
+        "navegador": {
+            "nombre": "Chrome 147",
+            "icono": "bi-browser-chrome"
+        },
+        "so": {
+            "nombre": "Windows 11\/10",
+            "icono": "bi-windows"
+        },
+        "tipo": {
+            "nombre": "Escritorio",
+            "icono": "bi-laptop-fill"
+        },
+        "marca": {
+            "nombre": "Desconocida",
+            "icono": "bi-display"
+        },
+        "ciudad": "Local \/ Desarrollo",
+        "fingerprint": "5e224c7153e75a8a",
+        "token": "1c6ce10cfc02b34fc9b1cb5080ed26562a191e2ea46d5a95",
+        "created_at": 1776475767,
+        "last_seen": 1776477483,
+        "is_current": false,
+        "es_nueva": true
+    },
+    {
+        "ip": "::1",
+        "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/147.0.0.0 Safari\/537.36",
+        "navegador": {
+            "nombre": "Chrome 147",
+            "icono": "bi-browser-chrome"
+        },
+        "so": {
+            "nombre": "Windows 11\/10",
+            "icono": "bi-windows"
+        },
+        "tipo": {
+            "nombre": "Escritorio",
+            "icono": "bi-laptop-fill"
+        },
+        "marca": {
+            "nombre": "Desconocida",
+            "icono": "bi-display"
+        },
+        "ciudad": "Local \/ Desarrollo",
+        "fingerprint": "5e224c7153e75a8a",
+        "token": "1c6ce10cfc02b34fc9b1cb5080ed26562a191e2ea46d5a95",
+        "created_at": 1776475785,
+        "last_seen": 1776475785,
+        "is_current": false,
+        "es_nueva": false
+    },
+    {
+        "ip": "::1",
+        "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/147.0.0.0 Safari\/537.36",
+        "navegador": {
+            "nombre": "Chrome 147",
+            "icono": "bi-browser-chrome"
+        },
+        "so": {
+            "nombre": "Windows 11\/10",
+            "icono": "bi-windows"
+        },
+        "tipo": {
+            "nombre": "Escritorio",
+            "icono": "bi-laptop-fill"
+        },
+        "marca": {
+            "nombre": "Desconocida",
+            "icono": "bi-display"
+        },
+        "ciudad": "Local \/ Desarrollo",
+        "fingerprint": "5e224c7153e75a8a",
+        "token": "1c6ce10cfc02b34fc9b1cb5080ed26562a191e2ea46d5a95",
+        "created_at": 1776475796,
+        "last_seen": 1776475796,
+        "is_current": false,
+        "es_nueva": false
+    },
+    {
+        "ip": "::1",
+        "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/147.0.0.0 Safari\/537.36",
+        "navegador": {
+            "nombre": "Chrome 147",
+            "icono": "bi-browser-chrome"
+        },
+        "so": {
+            "nombre": "Windows 11\/10",
+            "icono": "bi-windows"
+        },
+        "tipo": {
+            "nombre": "Escritorio",
+            "icono": "bi-laptop-fill"
+        },
+        "marca": {
+            "nombre": "Desconocida",
+            "icono": "bi-display"
+        },
+        "ciudad": "Local \/ Desarrollo",
+        "fingerprint": "5e224c7153e75a8a",
+        "token": "1c6ce10cfc02b34fc9b1cb5080ed26562a191e2ea46d5a95",
+        "created_at": 1776476155,
+        "last_seen": 1776476155,
+        "is_current": false,
+        "es_nueva": false
+    },
+    {
+        "ip": "::1",
+        "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/147.0.0.0 Safari\/537.36",
+        "navegador": {
+            "nombre": "Chrome 147",
+            "icono": "bi-browser-chrome"
+        },
+        "so": {
+            "nombre": "Windows 11\/10",
+            "icono": "bi-windows"
+        },
+        "tipo": {
+            "nombre": "Escritorio",
+            "icono": "bi-laptop-fill"
+        },
+        "marca": {
+            "nombre": "Desconocida",
+            "icono": "bi-display"
+        },
+        "ciudad": "Local \/ Desarrollo",
+        "fingerprint": "5e224c7153e75a8a",
+        "token": "1c6ce10cfc02b34fc9b1cb5080ed26562a191e2ea46d5a95",
+        "created_at": 1776476157,
+        "last_seen": 1776476157,
+        "is_current": false,
+        "es_nueva": false
+    },
+    {
+        "ip": "::1",
+        "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/147.0.0.0 Safari\/537.36",
+        "navegador": {
+            "nombre": "Chrome 147",
+            "icono": "bi-browser-chrome"
+        },
+        "so": {
+            "nombre": "Windows 11\/10",
+            "icono": "bi-windows"
+        },
+        "tipo": {
+            "nombre": "Escritorio",
+            "icono": "bi-laptop-fill"
+        },
+        "marca": {
+            "nombre": "Desconocida",
+            "icono": "bi-display"
+        },
+        "ciudad": "Local \/ Desarrollo",
+        "fingerprint": "5e224c7153e75a8a",
+        "token": "1c6ce10cfc02b34fc9b1cb5080ed26562a191e2ea46d5a95",
+        "created_at": 1776476169,
+        "last_seen": 1776476169,
+        "is_current": false,
+        "es_nueva": false
+    }
+]
