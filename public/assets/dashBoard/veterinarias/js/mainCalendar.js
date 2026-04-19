@@ -1,4 +1,5 @@
 // calendar.js - Lógica de FullCalendar y manejo de Agendamiento (MVC)
+(function () {
 
 // --- DEFINICIÓN DE RUTAS LÓGICAS ---
 // Basado en tu archivo 'calendarioController.php', las rutas deben apuntar a ese controlador.
@@ -606,7 +607,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function cargarDisponibilidad() {
         try {
-            const response = await fetch(`${URLS.GET_DISPONIBILIDAD}?action=horarios`);
+            const body = document.body;
+            const userId = body?.dataset?.userId || '';
+            const vetId = body?.dataset?.vetId || '';
+            const params = new URLSearchParams({ action: 'horarios' });
+            if (userId) {
+                params.set('id_usuario', userId);
+            }
+            if (vetId) {
+                params.set('id_veterinaria', vetId);
+            }
+            const response = await fetch(`${URLS.GET_DISPONIBILIDAD}?${params.toString()}`);
             if (!response.ok) {
                 return [];
             }
@@ -1851,7 +1862,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
     // Cargar disponibilidad y aplicarla al calendario
     cargarDisponibilidad().then((businessHours) => {
         if (businessHours.length > 0) {
@@ -2227,3 +2237,4 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
 });
+})();
