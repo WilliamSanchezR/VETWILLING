@@ -1,5 +1,5 @@
 {
-    "45a41c126ab533689ed9ad544dc3c5f248f5a35d3af89422": {
+    "4053d32ceb9f610b5254327cbe229b71d16f6f6f3935ef12": {
         "ip": "::1",
         "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
         "navegador": {
@@ -20,9 +20,9 @@
         },
         "ciudad": "Local / Desarrollo",
         "fingerprint": "5e224c7153e75a8a",
-        "token": "45a41c126ab533689ed9ad544dc3c5f248f5a35d3af89422",
+        "token": "4053d32ceb9f610b5254327cbe229b71d16f6f6f3935ef12",
         "created_at": 1776617618,
-        "last_seen": 1776617729,
+        "last_seen": 1776621436,
         "activa": true,
         "is_current": true,
         "es_nueva": false

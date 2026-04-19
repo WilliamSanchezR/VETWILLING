@@ -1,45 +1,44 @@
-/*
- * ============================================
- * VetWilling - Configuración CSS
- * Versión: 2.0
- * ============================================
- */
+/* ========================================================================
+   CONFIGURACIÓN - CSS
+   Author: VetWilling Dashboard
+   Version: 3.0 - CORREGIDO Y ADAPTADO PARA MÓVIL
+   Correcciones:
+   - .alert, .faq-item, .faq-question, .faq-answer definidos una sola vez
+   - Sistema unificado de FAQ: solo .faq-item.active (no .faq-answer.active)
+   - .tab-content--hidden reemplaza style="display:none" en el HTML
+   - Adaptación móvil completa: formularios, tabs, sesiones
+   - Estilos de sesiones activas integrados
+======================================================================== */
 
-/*
- * 1. VARIABLES CSS
- */
+
+/* ========================================================================
+   1. VARIABLES CSS
+======================================================================== */
 :root {
-    /* Colores Principales */
-    --primary-color: #0A932C;
-    --primary-dark: #087a24;
-    --primary-light: #9DE795;
+    /* Colores principales */
+    --primary-color:    #0a932c;
+    --primary-dark:     #087a24;
+    --primary-light:    #e8f5ec;
 
-    /* Colores de Fondo */
-    --bg-light: #f8f9fa;
-    --bg-dark: #1a1a2e;
-    --bg-sidebar: #ffffff;
+    /* Fondos */
+    --bg-light:    #f8f9fa;
+    --bg-sidebar:  #ffffff;
+    --card-light:  #ffffff;
 
-    /* Colores de Tarjetas */
-    --card-light: #ffffff;
-    --card-dark: #16213e;
-
-    /* Colores de Texto */
-    --text-light: #1a1a2e;
-    --text-dark: #ffffff;
+    /* Texto */
+    --text-light:           #1a1a2e;
     --text-secondary-light: #6b7280;
-    --text-secondary-dark: #9ca3af;
 
     /* Bordes */
-    --border-light: #e5e7eb;
-    --border-dark: #374151;
-    --border-radius: 12px;
+    --border-light:    #e5e7eb;
+    --border-radius:   12px;
     --border-radius-lg: 16px;
 
     /* Estados */
     --success: #10b981;
-    --error: #ef4444;
+    --error:   #ef4444;
     --warning: #f59e0b;
-    --info: #3b82f6;
+    --info:    #3b82f6;
 
     /* Sombras */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -49,54 +48,57 @@
 
     /* Transiciones */
     --transition-fast: all 0.15s ease;
-    --transition: all 0.3s ease;
-    --transition-slow: all 0.5s ease;
+    --transition:      all 0.3s ease;
 
-    /* Tamaños de Fuente */
-    --font-size-base: 16px;
-    --font-size-xs: 12px;
-    --font-size-sm: 14px;
-    --font-size-lg: 18px;
-    --font-size-xl: 20px;
-    --font-size-2xl: 24px;
-    --font-size-3xl: 32px;
+    /* Tipografía */
+    --font-xs:   12px;
+    --font-sm:   14px;
+    --font-base: 16px;
+    --font-lg:   18px;
+    --font-xl:   20px;
+    --font-2xl:  24px;
+    --font-3xl:  32px;
 }
 
-/*
- * 2. TEMA OSCURO
- */
+
+/* ========================================================================
+   2. TEMA OSCURO
+======================================================================== */
 body.dark-theme {
-    --bg-light: #1a1a2e;
-    --bg-sidebar: #16213e;
-    --card-light: #16213e;
-    --text-light: #ffffff;
+    --bg-light:             #1a1a2e;
+    --bg-sidebar:           #16213e;
+    --card-light:           #16213e;
+    --text-light:           #ffffff;
     --text-secondary-light: #9ca3af;
-    --border-light: #374151;
+    --border-light:         #374151;
 }
 
-/*
- * 3. RESET Y BASE
- */
-* {
+
+/* ========================================================================
+   3. RESET Y BASE
+======================================================================== */
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg-light);
     color: var(--text-light);
-    font-size: var(--font-size-base);
+    font-size: var(--font-base);
     line-height: 1.6;
     transition: var(--transition);
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
-/*
- * 4. CONTAINER Y LAYOUT
- */
+
+/* ========================================================================
+   4. LAYOUT
+======================================================================== */
 .container-dashboard {
     max-width: 1200px;
     margin: 0 auto;
@@ -107,9 +109,10 @@ body {
     transition: var(--transition);
 }
 
-/*
- * 5. NOTIFICACIONES TOAST
- */
+
+/* ========================================================================
+   5. TOAST — Notificaciones flotantes
+======================================================================== */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -121,11 +124,11 @@ body {
     pointer-events: none;
 }
 
-/* Estilos para toast-notification (usado en JS) */
 .toast-notification {
-    min-width: 300px;
+    min-width: 280px;
+    max-width: 380px;
     padding: 14px 18px;
-    background: white;
+    background: var(--card-light);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-lg);
     display: flex;
@@ -143,106 +146,77 @@ body {
     transform: translateX(0);
 }
 
-.toast-notification i {
-    font-size: var(--font-size-xl);
-    flex-shrink: 0;
-}
+.toast-notification i { font-size: var(--font-xl); flex-shrink: 0; }
 
-/* Tipos de toast */
-.toast-success {
-    border-color: var(--success);
-}
+.toast-success { border-color: var(--success); }
+.toast-success i { color: var(--success); }
+.toast-error   { border-color: var(--error); }
+.toast-error i { color: var(--error); }
+.toast-warning { border-color: var(--warning); }
+.toast-warning i { color: var(--warning); }
+.toast-info    { border-color: var(--info); }
+.toast-info i { color: var(--info); }
 
-.toast-success i {
-    color: var(--success);
-}
-
-.toast-error {
-    border-color: var(--error);
-}
-
-.toast-error i {
-    color: var(--error);
-}
-
-.toast-warning {
-    border-color: var(--warning);
-}
-
-.toast-warning i {
-    color: var(--warning);
-}
-
-.toast-info {
-    border-color: var(--info);
-}
-
-.toast-info i {
-    color: var(--info);
-}
-
-/* Dark theme para toasts */
 body.dark-theme .toast-notification {
-    background: var(--card-dark);
-    color: var(--text-dark);
+    background: #1f2937;
+    color: #f9fafb;
 }
 
-/*
- * 6. HEADER DE CONFIGURACIÓN
- */
+
+/* ========================================================================
+   6. HEADER DE CONFIGURACIÓN
+======================================================================== */
 .header-config {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 36px;
     animation: fadeInDown 0.6s ease;
 }
 
 .header-config h1 {
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-3xl);
     font-weight: 700;
     margin-bottom: 8px;
     color: var(--text-light);
 }
 
 .header-config p {
-    font-size: var(--font-size-base);
+    font-size: var(--font-base);
     color: var(--text-secondary-light);
 }
 
-/*
- * 7. TABS DE NAVEGACIÓN
- */
+
+/* ========================================================================
+   7. TABS DE NAVEGACIÓN
+   — En móvil se hace más compacto y permite scroll horizontal sin
+     scrollbar visible.
+======================================================================== */
 .tabs-config {
     display: flex;
-    gap: 12px;
-    margin-bottom: 30px;
+    gap: 10px;
+    margin-bottom: 28px;
     overflow-x: auto;
-    padding-bottom: 5px;
-    animation: fadeIn 0.5s ease;
+    padding-bottom: 4px;
+    scrollbar-width: none;          /* Firefox */
+    -webkit-overflow-scrolling: touch;
 }
 
-.tabs-config::-webkit-scrollbar {
-    height: 4px;
-}
-
-.tabs-config::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 4px;
-}
+.tabs-config::-webkit-scrollbar { display: none; }  /* Chrome/Safari */
 
 .tab-config {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 24px;
+    padding: 11px 20px;
     background: var(--card-light);
     border: 2px solid var(--border-light);
     border-radius: var(--border-radius);
-    font-size: var(--font-size-base);
+    font-size: var(--font-sm);
     font-weight: 600;
     color: var(--text-secondary-light);
     cursor: pointer;
     transition: var(--transition);
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .tab-config:hover {
@@ -259,28 +233,33 @@ body.dark-theme .toast-notification {
     box-shadow: var(--shadow-lg);
 }
 
-.tab-config i {
-    font-size: var(--font-size-lg);
-}
+.tab-config i { font-size: var(--font-lg); }
 
-/*
- * 8. CONTENIDO DE TABS
- */
+
+/* ========================================================================
+   8. CONTENIDO DE TABS
+   — CORRECCIÓN: .tab-content--hidden reemplaza style="display:none"
+     en el HTML para evitar el flash de contenido al cargar la página.
+======================================================================== */
 .tab-content {
-    animation: fadeIn 0.5s ease;
+    animation: fadeIn 0.4s ease;
 }
 
-/*
- * 9. TARJETAS DE CONFIGURACIÓN
- */
+.tab-content--hidden {
+    display: none !important;
+}
+
+
+/* ========================================================================
+   9. TARJETAS DE CONFIGURACIÓN
+======================================================================== */
 .config-card {
     background: var(--card-light);
     border-radius: var(--border-radius-lg);
-    padding: 30px;
-    margin-bottom: 24px;
+    padding: 28px;
+    margin-bottom: 22px;
     box-shadow: var(--shadow-md);
     transition: var(--transition);
-    animation: slideUp 0.5s ease;
 }
 
 .config-card:hover {
@@ -288,62 +267,56 @@ body.dark-theme .toast-notification {
     transform: translateY(-2px);
 }
 
-/* Header de Tarjeta - Unificado */
-.config-card-header,
-.card-header {
+/* Header de la tarjeta */
+.config-card-header {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
     border-bottom: 2px solid var(--border-light);
 }
 
-.card-header {
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-}
-
+/* Ícono cuadrado verde */
 .config-icon {
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     border-radius: var(--border-radius);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-2xl);
     flex-shrink: 0;
     box-shadow: var(--shadow-md);
 }
 
-.config-card-header h3,
-.card-header h2 {
-    font-size: var(--font-size-xl);
+.config-card-header h3 {
+    font-size: var(--font-xl);
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     color: var(--text-light);
 }
 
-.config-card-header p,
-.card-header p {
-    font-size: var(--font-size-sm);
+.config-card-header p {
+    font-size: var(--font-sm);
     color: var(--text-secondary-light);
     margin: 0;
 }
 
-/*
- * 10. ITEMS DE CONFIGURACIÓN
- */
+
+/* ========================================================================
+   10. ITEMS DE CONFIGURACIÓN
+======================================================================== */
 .config-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0;
+    padding: 18px 0;
     border-bottom: 1px solid var(--border-light);
     transition: var(--transition);
+    gap: 16px;
 }
 
 .config-item:last-child {
@@ -353,48 +326,48 @@ body.dark-theme .toast-notification {
 
 .config-item:hover {
     background: rgba(10, 147, 44, 0.03);
-    margin: 0 -15px;
-    padding-left: 15px;
-    padding-right: 15px;
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
     border-radius: var(--border-radius);
 }
 
 .config-info h4 {
-    font-size: var(--font-size-base);
+    font-size: var(--font-base);
     font-weight: 600;
     margin-bottom: 4px;
     color: var(--text-light);
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
 .config-info p {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-sm);
     color: var(--text-secondary-light);
     margin: 0;
 }
 
-/*
- * 11. FORMULARIOS
- */
+
+/* ========================================================================
+   11. FORMULARIOS
+======================================================================== */
+
+/* Grid de dos columnas — colapsa a una en móvil (ver responsive) */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
+    gap: 18px;
+    margin-bottom: 18px;
 }
 
 .form-group-config {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .form-group-config label {
     display: block;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-sm);
     font-weight: 600;
     color: var(--text-light);
-    margin-bottom: 8px;
+    margin-bottom: 7px;
 }
 
 .form-group-config input,
@@ -404,10 +377,10 @@ body.dark-theme .toast-notification {
 .config-textarea,
 .config-select {
     width: 100%;
-    padding: 12px 16px;
+    padding: 11px 15px;
     border: 2px solid var(--border-light);
     border-radius: var(--border-radius);
-    font-size: var(--font-size-base);
+    font-size: var(--font-base);
     color: var(--text-light);
     background: var(--bg-light);
     transition: var(--transition);
@@ -422,54 +395,48 @@ body.dark-theme .toast-notification {
 .config-textarea:focus,
 .config-select:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1);
+    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.1);
     background: var(--card-light);
-}
-
-.form-group-config input::placeholder,
-.form-group-config textarea::placeholder,
-.config-input::placeholder,
-.config-textarea::placeholder {
-    color: var(--text-secondary-light);
 }
 
 .form-group-config textarea,
 .config-textarea {
     resize: vertical;
-    min-height: 100px;
+    min-height: 96px;
 }
 
-/* Select personalizado */
-.config-select {
-    cursor: pointer;
-    min-width: 180px;
+/* Fila de botones del formulario */
+.form-acciones {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
 }
 
-.config-select:hover {
-    border-color: var(--primary-color);
-}
-
-/* Dark mode para formularios */
+/* Dark mode formularios */
+body.dark-theme .form-group-config input,
+body.dark-theme .form-group-config select,
+body.dark-theme .form-group-config textarea,
 body.dark-theme .config-input,
-body.dark-theme .config-textarea,
 body.dark-theme .config-select {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: var(--border-dark);
-    color: var(--text-dark);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #374151;
+    color: #f9fafb;
 }
 
-/*
- * 12. BOTONES
- */
+
+/* ========================================================================
+   12. BOTONES
+======================================================================== */
 .btn-config {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 24px;
+    padding: 11px 22px;
     border: none;
     border-radius: var(--border-radius);
-    font-size: var(--font-size-base);
+    font-size: var(--font-base);
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
@@ -487,10 +454,6 @@ body.dark-theme .config-select {
     box-shadow: var(--shadow-lg);
 }
 
-.btn-primary-config:active:not(:disabled) {
-    transform: translateY(0);
-}
-
 .btn-primary-config:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -503,27 +466,23 @@ body.dark-theme .config-select {
 }
 
 .btn-secondary-config:hover {
-    background: var(--card-light);
     border-color: var(--primary-color);
-}
-
-.btn-upload,
-.btn-remove {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: var(--border-radius);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
+    color: var(--primary-color);
 }
 
 .btn-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
     background: var(--primary-color);
     color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: var(--font-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
 }
 
 .btn-upload:hover {
@@ -532,9 +491,18 @@ body.dark-theme .config-select {
 }
 
 .btn-remove {
-    background: #fee;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: #fee2e2;
     color: var(--error);
     border: 1px solid var(--error);
+    border-radius: var(--border-radius);
+    font-size: var(--font-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
 }
 
 .btn-remove:hover {
@@ -542,19 +510,21 @@ body.dark-theme .config-select {
     color: white;
 }
 
-/*
- * 13. FOTO DE PERFIL
- */
+
+/* ========================================================================
+   13. FOTO DE PERFIL
+======================================================================== */
 .foto-perfil-container {
     display: flex;
     align-items: center;
-    gap: 30px;
-    padding: 20px 0;
+    gap: 28px;
+    padding: 16px 0;
+    flex-wrap: wrap;
 }
 
 .avatar-grande {
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
     overflow: hidden;
     border: 4px solid var(--border-light);
@@ -569,75 +539,62 @@ body.dark-theme .config-select {
 }
 
 .foto-acciones h4 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-lg);
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: var(--text-light);
 }
 
 .foto-acciones p {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-sm);
     color: var(--text-secondary-light);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .foto-btns {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
-.input-file {
-    display: none;
-}
+.input-file { display: none; }
 
-/*
- * 14. CONTRASEÑAS
- */
+
+/* ========================================================================
+   14. CONTRASEÑAS
+======================================================================== */
 .password-input-wrapper {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.password-input-wrapper input {
-    padding-right: 50px;
-}
+.password-input-wrapper input { padding-right: 48px; }
 
 .toggle-password {
     position: absolute;
-    right: 16px;
+    right: 14px;
     background: none;
     border: none;
     cursor: pointer;
     color: var(--text-secondary-light);
-    font-size: var(--font-size-xl);
+    font-size: var(--font-xl);
     transition: var(--transition);
     padding: 4px;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
-.toggle-password:hover {
-    color: var(--primary-color);
-    transform: scale(1.1);
-}
+.toggle-password:hover { color: var(--primary-color); }
 
-.toggle-password:active {
-    transform: scale(0.95);
-}
-
-.password-strength {
-    margin-top: 8px;
-}
+.password-strength { margin-top: 8px; }
 
 .strength-bar {
     height: 4px;
     background: var(--border-light);
     border-radius: 4px;
     overflow: hidden;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .strength-fill {
@@ -647,20 +604,17 @@ body.dark-theme .config-select {
     border-radius: 4px;
 }
 
-.strength-text {
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-}
+.strength-text { font-size: var(--font-xs); font-weight: 500; }
 
 .requirements {
     background: var(--bg-light);
     border-radius: var(--border-radius);
-    padding: 16px;
-    margin-top: 20px;
+    padding: 14px;
+    margin-top: 16px;
 }
 
 .requirements-title {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-sm);
     font-weight: 600;
     color: var(--text-light);
     margin-bottom: 10px;
@@ -670,26 +624,25 @@ body.dark-theme .config-select {
 }
 
 .requirement-item {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-xs);
     color: var(--text-secondary-light);
     padding: 4px 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     transition: var(--transition);
 }
 
-.requirement-item i {
-    font-size: var(--font-size-sm);
-}
+.requirement-item i { font-size: var(--font-sm); }
 
-/*
- * 15. TOGGLE SWITCH
- */
+
+/* ========================================================================
+   15. TOGGLE SWITCH
+======================================================================== */
 .toggle-switch {
     position: relative;
-    width: 56px;
-    height: 28px;
+    width: 52px;
+    height: 26px;
     background: #d1d5db;
     border-radius: 50px;
     cursor: pointer;
@@ -702,8 +655,8 @@ body.dark-theme .config-select {
     position: absolute;
     top: 3px;
     left: 3px;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     background: white;
     border-radius: 50%;
     transition: var(--transition);
@@ -714,146 +667,26 @@ body.dark-theme .config-select {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
 }
 
-.toggle-switch.active::before {
-    transform: translateX(28px);
-}
+.toggle-switch.active::before { transform: translateX(26px); }
 
-.toggle-switch:hover {
-    transform: scale(1.05);
-}
 
-.toggle-switch:active {
-    transform: scale(0.98);
-}
-
-/*
- * 16. BADGES
- */
-.badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin-left: 8px;
-}
-
-.badge-new {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-body.dark-theme .badge-new {
-    background: #451a03;
-    color: #fbbf24;
-}
-
-/*
- * 17. ESTADÍSTICAS
- */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-top: 20px;
-    padding: 20px;
-    background: var(--bg-light);
-    border-radius: var(--border-radius);
-}
-
-body.dark-theme .stats-grid {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-number {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 4px;
-}
-
-.stat-label {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary-light);
-}
-
-/*
- * 18. NOTIFICACIÓN DE GUARDADO
- */
-.save-notification {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: var(--success);
-    color: white;
-    padding: 16px 24px;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-xl);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 600;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: var(--transition);
-    pointer-events: none;
-    z-index: 1000;
-}
-
-.save-notification.show {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-
-.save-notification i {
-    font-size: var(--font-size-xl);
-}
-
-/*
- * 19. LANGUAGE INFO
- */
-.language-info {
-    background: #d4edda;
-    border-left: 4px solid var(--success);
-    padding: 12px 16px;
-    border-radius: var(--border-radius);
-    margin-top: 12px;
-    font-size: var(--font-size-sm);
-    color: #155724;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    animation: slideDown 0.3s ease;
-}
-
-body.dark-theme .language-info {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success);
-}
-
-/*
- * 20. ALERTS
- */
+/* ========================================================================
+   16. ALERTS
+   — CORRECCIÓN: definición única — antes estaba duplicada con valores
+     diferentes (border-radius: var(--border-radius) vs 8px hardcodeado).
+======================================================================== */
 .alert {
-    padding: 12px 16px;
+    padding: 12px 15px;
     border-radius: var(--border-radius);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: var(--font-sm);
     animation: slideDown 0.3s ease;
 }
 
-.alert i {
-    font-size: var(--font-size-lg);
-    flex-shrink: 0;
-}
+.alert i { font-size: var(--font-lg); flex-shrink: 0; }
 
 .alert-success {
     background: #d4edda;
@@ -879,35 +712,25 @@ body.dark-theme .language-info {
     border: 1px solid #ffeaa7;
 }
 
-body.dark-theme .alert-success {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success);
-    border-color: var(--success);
-}
+/* Dark mode alerts */
+body.dark-theme .alert-success { background: rgba(16,185,129,.12); color: #34d399; border-color: #10b981; }
+body.dark-theme .alert-error   { background: rgba(239,68,68,.12);  color: #f87171; border-color: #ef4444; }
+body.dark-theme .alert-info    { background: rgba(59,130,246,.12); color: #93c5fd; border-color: #3b82f6; }
+body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34d; border-color: #f59e0b; }
 
-body.dark-theme .alert-error {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--error);
-    border-color: var(--error);
-}
 
-body.dark-theme .alert-info {
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--info);
-    border-color: var(--info);
-}
-
-/*
- * 21. FAQ SECTION
- */
-.faq-section {
-    margin-bottom: 24px;
-}
+/* ========================================================================
+   17. FAQ
+   — CORRECCIÓN: definición única con sistema unificado basado en
+     .faq-item.active (no .faq-answer.active).
+     Antes había dos definiciones contradictorias.
+======================================================================== */
+.faq-section { margin-bottom: 20px; }
 
 .faq-item {
     background: var(--bg-light);
     border-radius: var(--border-radius);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     overflow: hidden;
     transition: var(--transition);
 }
@@ -917,7 +740,7 @@ body.dark-theme .alert-info {
 }
 
 .faq-question {
-    padding: 16px;
+    padding: 15px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -926,200 +749,444 @@ body.dark-theme .alert-info {
     color: var(--text-light);
     transition: var(--transition);
     user-select: none;
+    gap: 8px;
 }
 
 .faq-question:hover {
     background: rgba(10, 147, 44, 0.05);
 }
 
-.faq-question span {
-    flex: 1;
-}
+.faq-question span { flex: 1; }
 
 .faq-question i {
-    transition: var(--transition);
-    font-size: var(--font-size-lg);
     color: var(--primary-color);
+    font-size: var(--font-lg);
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
 }
 
+/* La respuesta se expande via max-height con .faq-item.active */
 .faq-answer {
-    padding: 0 16px;
+    padding: 0 15px;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease, padding 0.4s ease;
     color: var(--text-secondary-light);
     line-height: 1.6;
+    font-size: var(--font-sm);
 }
 
 .faq-item.active .faq-answer {
-    padding: 0 16px 16px 16px;
-    max-height: 500px;
-    /* Aumentado para contenido más largo */
+    padding: 0 15px 15px;
+    max-height: 400px;
 }
 
-/*
- * 22. FILE UPLOAD
- */
-.file-upload {
-    border: 2px dashed var(--border-light);
+
+/* ========================================================================
+   18. NOTIFICACIÓN DE GUARDADO GLOBAL
+======================================================================== */
+.save-notification {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--success);
+    color: white;
+    padding: 14px 22px;
     border-radius: var(--border-radius);
-    padding: 24px;
-    text-align: center;
-    cursor: pointer;
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: var(--font-sm);
+    opacity: 0;
+    transform: translateY(20px);
     transition: var(--transition);
+    pointer-events: none;
+    z-index: 1000;
 }
 
-.file-upload:hover {
-    border-color: var(--primary-color);
-    background: rgba(10, 147, 44, 0.03);
+.save-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
-.file-upload input {
-    display: none;
+.save-notification i { font-size: var(--font-xl); }
+
+
+/* ========================================================================
+   19. TABLA DE HISTORIAL
+======================================================================== */
+.tabla-sesiones {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-sm);
 }
 
-.file-upload i {
-    font-size: 32px;
-    color: var(--primary-color);
-    margin-bottom: 8px;
-    display: block;
-}
-
-.file-list {
-    margin-top: 12px;
-}
-
-.file-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
+.tabla-sesiones th {
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 700;
+    color: var(--text-secondary-light);
+    font-size: var(--font-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-light);
     background: var(--bg-light);
-    border-radius: 6px;
-    margin-bottom: 8px;
 }
 
-.file-item-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: var(--font-size-sm);
+.tabla-sesiones td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-light);
     color: var(--text-light);
 }
 
-.file-item button {
-    background: none;
-    border: none;
-    color: #e53e3e;
-    cursor: pointer;
-    font-size: 18px;
+.tabla-sesiones tr:last-child td { border-bottom: none; }
+.tabla-sesiones tr:hover td      { background: rgba(10,147,44,.03); }
+
+
+/* ========================================================================
+   20. SESIONES ACTIVAS
+   — Lista de dispositivos con sesión iniciada.
+   — .sesion-item--actual: resaltado verde para la sesión actual.
+   — .sesion-badge: chips de "Sesión Actual" y "Nuevo".
+======================================================================== */
+.sesiones-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.alert {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 16px;
+/* Item individual de sesión */
+.sesion-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    animation: slideIn 0.3s ease;
+    gap: 14px;
+    padding: 16px;
+    background: var(--bg-light);
+    border-radius: var(--border-radius);
+    border: 1.5px solid var(--border-light);
+    transition: var(--transition);
+    position: relative;
 }
 
-.alert-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+.sesion-item:hover {
+    border-color: #d1d5db;
+    box-shadow: var(--shadow-sm);
 }
 
-.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+/* Sesión actual: fondo verde muy suave + borde verde */
+.sesion-item--actual {
+    background: var(--primary-light);
+    border-color: rgba(10, 147, 44, 0.3);
 }
 
-.alert-info {
-    background: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
+/* Ícono del navegador/dispositivo */
+.sesion-icono {
+    width: 44px;
+    height: 44px;
+    background: var(--card-light);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--primary-color);
+    flex-shrink: 0;
+    border: 1.5px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
 }
 
-.loading {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #ffffff;
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+/* Columna de info */
+.sesion-info {
+    flex: 1;
+    min-width: 0;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
+.sesion-titulo {
+    font-size: var(--font-sm);
+    font-weight: 700;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Metadatos: ciudad, tiempo, SO */
+.sesion-meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: var(--font-xs);
+    color: var(--text-secondary-light);
+}
+
+.sesion-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sesion-meta i { font-size: 11px; color: var(--primary-color); }
+
+/* Badges de estado */
+.sesion-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.sesion-badge--actual {
+    background: var(--primary-color);
+    color: white;
+}
+
+.sesion-badge--nueva {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+/* Botón cerrar sesión individual */
+.btn-cerrar-sesion {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #fee2e2;
+    color: var(--error);
+    border: 1px solid #fecaca;
+    border-radius: var(--border-radius);
+    font-size: var(--font-xs);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.btn-cerrar-sesion:hover {
+    background: var(--error);
+    color: white;
+    border-color: var(--error);
+    transform: translateY(-1px);
+}
+
+.btn-cerrar-sesion:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Footer con botón "cerrar todas" */
+.sesiones-footer {
+    padding-top: 8px;
+    border-top: 1px solid var(--border-light);
+    margin-top: 4px;
+}
+
+.btn-cerrar-todas {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Dark mode sesiones */
+body.dark-theme .sesion-item           { background: #1f2937; border-color: #374151; }
+body.dark-theme .sesion-item--actual   { background: rgba(10,147,44,.12); border-color: rgba(10,147,44,.3); }
+body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5563; }
+
+
+/* ========================================================================
+   21. ANIMACIONES
+======================================================================== */
+@keyframes fadeIn      { from { opacity: 0; }                    to { opacity: 1; } }
+@keyframes fadeInDown  { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDown   { from { opacity: 0; transform: translateY(-8px);  } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp     { from { opacity: 0; transform: translateY(8px);   } to { opacity: 1; transform: translateY(0); } }
+
+
+/* ========================================================================
+   22. RESPONSIVE — Tablets (hasta 1024px)
+======================================================================== */
+@media (max-width: 1024px) {
+    .container-dashboard {
+        padding: 20px 16px;
     }
 }
 
-.faq-section {
-    margin-bottom: 24px;
+
+/* ========================================================================
+   23. RESPONSIVE — Móvil (hasta 768px)
+   — Formularios de dos columnas colapsan a una.
+   — Tabs más compactos.
+   — Foto de perfil en columna.
+   — Sesiones en columna con botón cerrar abajo.
+======================================================================== */
+@media (max-width: 768px) {
+
+    .container-dashboard {
+        padding: 16px 12px;
+    }
+
+    /* Header más compacto */
+    .header-config h1 { font-size: 24px; }
+    .header-config    { margin-bottom: 24px; }
+
+    /* Tabs: padding reducido para que quepan más en pantalla */
+    .tab-config {
+        padding: 9px 14px;
+        font-size: var(--font-xs);
+        gap: 5px;
+    }
+
+    .tab-config i { font-size: var(--font-base); }
+
+    /* Ocultar texto de los tabs en pantallas muy pequeñas
+       y dejar solo el ícono (ver 480px) */
+
+    /* Cards con menos padding */
+    .config-card {
+        padding: 18px 16px;
+        margin-bottom: 16px;
+    }
+
+    /* Formularios: de 2 columnas a 1 columna */
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    /* Botones en columna */
+    .form-acciones {
+        flex-direction: column;
+    }
+
+    .form-acciones .btn-config {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Foto de perfil en columna */
+    .foto-perfil-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .foto-btns {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-upload,
+    .btn-remove {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Sesiones: apilar en columna, botón cerrar debajo */
+    .sesion-item {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .sesion-titulo {
+        font-size: var(--font-xs);
+    }
+
+    .sesion-meta {
+        gap: 8px;
+    }
+
+    .btn-cerrar-sesion {
+        width: 100%;
+        justify-content: center;
+        margin-top: 4px;
+    }
+
+    /* Notificación de guardado */
+    .save-notification {
+        bottom: 16px;
+        right: 12px;
+        left: 12px;
+        justify-content: center;
+    }
+
+    /* Toast en móvil: ancho completo */
+    .toast-container {
+        top: 12px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .toast-notification {
+        min-width: unset;
+        max-width: 100%;
+    }
 }
 
-.faq-item {
-    background: #f7fafc;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    overflow: hidden;
+
+/* ========================================================================
+   24. RESPONSIVE — Móviles pequeños (hasta 480px)
+   — Solo ícono en los tabs para ahorrar espacio.
+======================================================================== */
+@media (max-width: 480px) {
+
+    .header-config h1 { font-size: 20px; }
+
+    /* Solo ícono en los tabs */
+    .tab-config span { display: none; }
+    .tab-config      { padding: 10px 14px; }
+
+    .config-card {
+        padding: 14px 12px;
+    }
+
+    .config-icon {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-xl);
+    }
+
+    .config-card-header h3 { font-size: var(--font-lg); }
 }
 
-.faq-question {
-    padding: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-weight: 600;
-    color: #2d3748;
-    transition: background 0.3s ease;
+
+/* ========================================================================
+   25. ACCESIBILIDAD — Movimiento reducido
+======================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration:       0.01ms !important;
+        animation-iteration-count: 1     !important;
+        transition-duration:      0.01ms !important;
+    }
 }
 
-.faq-question:hover {
-    background: #edf2f7;
-}
 
-.faq-answer {
-    padding: 0 16px;
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
+/* ========================================================================
+   26. IMPRESIÓN
+======================================================================== */
+@media print {
+    .tabs-config,
+    .toast-container,
+    .save-notification,
+    .btn-cerrar-sesion,
+    .sesiones-footer,
+    .foto-btns    { display: none !important; }
 
-.faq-answer.active {
-    padding: 16px;
-    max-height: 200px;
-}
-
-.priority-badges {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.priority-badge {
-    padding: 8px 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex: 1;
-    text-align: center;
-    min-width: 80px;
-}
-
-.priority-badge:hover {
-    border-color: #667eea;
-}
-
-.priority-badge.selected {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-color: #667eea;
+    .config-card  { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
 }

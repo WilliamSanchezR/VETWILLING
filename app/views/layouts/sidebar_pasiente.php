@@ -20,21 +20,21 @@
         <div class="nav-section">
             <span class="nav-section-title">General</span>
 
-            <a href="<?= BASE_URL ?>/cliente/dashboard" class="nav-item" data-section="dashboard">
+            <a href="<?= BASE_URL ?>/cliente/dashboard" class="nav-item" data-section="dashboard" data-tooltip="Inicio">
                 <i class="bi bi-house-door"></i>
                 <span class="nav-text">Inicio</span>
             </a>
-            <a href="<?= BASE_URL ?>/cliente/mascotas" class="nav-item" data-section="mascotas">
+            <a href="<?= BASE_URL ?>/cliente/mascotas" class="nav-item" data-section="mascotas" data-tooltip="Mascotas">
                 <i class="bi bi-bluesky"></i>
                 <span class="nav-text">Mis Mascotas</span>
             </a>
-            <a href="<?= BASE_URL ?>/cliente/citas" class="nav-item" data-section="citas">
+            <a href="<?= BASE_URL ?>/cliente/citas" class="nav-item" data-section="citas" data-tooltip="Citas">
                 <i class="bi bi-calendar-check"></i>
                 <span class="nav-text">Citas</span>
             </a>
-            <a href="<?= BASE_URL ?>/cliente/tienda" class="nav-item" data-section="tienda">
+            <a href="<?= BASE_URL ?>/cliente/tienda" class="nav-item" data-section="tienda" data-tooltip="Catalogo">
                 <i class="bi bi-bag-plus"></i>
-                <span class="nav-text">Tienda</span>
+                <span class="nav-text">Catalogo</span>
             </a>
         </div>
     </nav>
