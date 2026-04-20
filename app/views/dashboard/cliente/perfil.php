@@ -22,34 +22,35 @@ $fallbackAvatar = "https://ui-avatars.com/api/?name=" . urlencode($nombreComplet
 $rutaImagen     = $fallbackAvatar;
 
 if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
-    $rutaAbs = BASE_PATH . "/public/uploads/{$carpetaUsuario}/{$fotoUsuario}";
-    if (file_exists($rutaAbs)) {
-        $rutaImagen = BASE_URL . "/public/uploads/{$carpetaUsuario}/{$fotoUsuario}";
-    }
+  $rutaAbs = BASE_PATH . "/public/uploads/{$carpetaUsuario}/{$fotoUsuario}";
+  if (file_exists($rutaAbs)) {
+    $rutaImagen = BASE_URL . "/public/uploads/{$carpetaUsuario}/{$fotoUsuario}";
+  }
 } else {
-    $defLocal = BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
-    if (file_exists($defLocal)) {
-        $rutaImagen = BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
-    }
+  $defLocal = BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+  if (file_exists($defLocal)) {
+    $rutaImagen = BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+  }
 }
 
 // ── Acción AJAX: cerrar sesión específica ────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
-    header('Content-Type: application/json');
-    switch ($_POST['accion']) {
-        case 'cerrar_sesion':
-            $ok = $sm->cerrar($_POST['token'] ?? '');
-            echo json_encode(['ok' => $ok]);
-            exit;
-        case 'cerrar_todas':
-            $n = $sm->cerrarTodas();
-            echo json_encode(['ok' => true, 'cerradas' => $n]);
-            exit;
-    }
+  header('Content-Type: application/json');
+  switch ($_POST['accion']) {
+    case 'cerrar_sesion':
+      $ok = $sm->cerrar($_POST['token'] ?? '');
+      echo json_encode(['ok' => $ok]);
+      exit;
+    case 'cerrar_todas':
+      $n = $sm->cerrarTodas();
+      echo json_encode(['ok' => true, 'cerradas' => $n]);
+      exit;
+  }
 }
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,8 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
         <div class="header-perfil">
           <div class="avatar-grande">
             <form class="contenedor-foto avatar-ring" id="form_cambio_imagen"
-                  action="<?= BASE_URL ?>/cliente/cambiar-foto"
-                  method="POST" enctype="multipart/form-data">
+              action="<?= BASE_URL ?>/cliente/cambiar-foto"
+              method="POST" enctype="multipart/form-data">
               <input type="hidden" name="id_usuario" value="<?= $id ?>">
               <input type="hidden" name="accion" value="cambiar-foto">
               <img
@@ -246,10 +247,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
 
             <!-- Alerta dispositivo nuevo -->
             <?php if ($sesionNueva): ?>
-            <div class="alerta-nuevo-dispositivo">
-              <i class="bi bi-exclamation-triangle-fill"></i>
-              <span>Inicio de sesión desde un nuevo dispositivo detectado.</span>
-            </div>
+              <div class="alerta-nuevo-dispositivo">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Inicio de sesión desde un nuevo dispositivo detectado.</span>
+              </div>
             <?php endif; ?>
 
             <!-- Cambiar contraseña -->
@@ -258,49 +259,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
                 <i class="bi bi-key-fill"></i> Cambiar Contraseña
               </div>
 
-              <div class="form-group">
-                <label>Contraseña actual</label>
-                <div class="input-icon-wrap">
-                  <i class="bi bi-lock-fill"></i>
-                  <input type="password" id="pass-actual" placeholder="••••••••">
-                  <button type="button" class="toggle-pass" data-target="pass-actual">
-                    <i class="bi bi-eye-fill"></i>
-                  </button>
-                </div>
-              </div>
+              <form method="POST"
+                action="<?= BASE_URL ?>/cliente/actualizar-contrasena"
+                id="passwordForm"
+                novalidate>
 
-              <div class="form-group">
-                <label>Nueva contraseña</label>
-                <div class="input-icon-wrap">
-                  <i class="bi bi-lock-fill"></i>
-                  <input type="password" id="pass-nueva" placeholder="••••••••">
-                  <button type="button" class="toggle-pass" data-target="pass-nueva">
-                    <i class="bi bi-eye-fill"></i>
-                  </button>
-                </div>
-                <div class="strength-bar mt-1">
-                  <div class="strength-segment" id="seg-1"></div>
-                  <div class="strength-segment" id="seg-2"></div>
-                  <div class="strength-segment" id="seg-3"></div>
-                  <div class="strength-segment" id="seg-4"></div>
-                </div>
-                <div class="strength-label" id="strength-label">Ingresa una contraseña</div>
-              </div>
+                <input type="hidden" name="id_usuario"
+                  value="<?= htmlspecialchars($_SESSION['user']['id_usuario']) ?>">
+                <input type="hidden" name="accion" value="modificar-contrasena">
 
-              <div class="form-group">
-                <label>Confirmar contraseña</label>
-                <div class="input-icon-wrap">
-                  <i class="bi bi-lock-fill"></i>
-                  <input type="password" id="pass-confirmar" placeholder="••••••••">
-                  <button type="button" class="toggle-pass" data-target="pass-confirmar">
-                    <i class="bi bi-eye-fill"></i>
-                  </button>
+                <!-- Contraseña actual -->
+                <div class="form-group">
+                  <label for="currentPassword">Contraseña actual</label>
+                  <div class="input-icon-wrap">
+                    <i class="bi bi-lock-fill"></i>
+                    <input type="password"
+                      id="currentPassword"
+                      name="contrasena-actual"
+                      placeholder="••••••••"
+                      required>
+                    <button type="button"
+                      class="toggle-pass"
+                      data-target="currentPassword"
+                      aria-label="Mostrar/ocultar contraseña">
+                      <i class="bi bi-eye-fill"></i>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <button class="btn-guardar btn-full">
-                <i class="bi bi-check-circle-fill me-2"></i>Actualizar Contraseña
-              </button>
+                <!-- Nueva contraseña -->
+                <div class="form-group">
+                  <label for="pass-nueva">Nueva contraseña</label>
+                  <div class="input-icon-wrap">
+                    <i class="bi bi-lock-fill"></i>
+                    <input type="password"
+                      id="pass-nueva"
+                      name="nueva-contrasena"
+                      placeholder="••••••••"
+                      required
+                      minlength="8">
+                    <button type="button"
+                      class="toggle-pass"
+                      data-target="pass-nueva"
+                      aria-label="Mostrar/ocultar contraseña">
+                      <i class="bi bi-eye-fill"></i>
+                    </button>
+                  </div>
+
+                  <!-- Barra de fortaleza (misma estructura del security-section) -->
+                  <div class="strength-bar mt-1">
+                    <div class="strength-segment" id="seg-1"></div>
+                    <div class="strength-segment" id="seg-2"></div>
+                    <div class="strength-segment" id="seg-3"></div>
+                    <div class="strength-segment" id="seg-4"></div>
+                  </div>
+                  <div class="strength-label" id="strength-label">Ingresa una contraseña</div>
+
+                  <!-- Confirmar contraseña -->
+                  <div class="form-group">
+                    <label for="pass-confirmar">Confirmar contraseña</label>
+                    <div class="input-icon-wrap">
+                      <i class="bi bi-lock-fill"></i>
+                      <input type="password"
+                        id="pass-confirmar"
+                        name="confi-contrasena"
+                        placeholder="••••••••"
+                        required
+                        minlength="8">
+                      <button type="button"
+                        class="toggle-pass"
+                        data-target="pass-confirmar"
+                        aria-label="Mostrar/ocultar contraseña">
+                        <i class="bi bi-eye-fill"></i>
+                      </button>
+                    </div>
+                    <!-- Indicador de coincidencia reutiliza strength-label -->
+                    <div class="strength-label" id="match-label" aria-live="polite"></div>
+                  </div>
+
+                  <button type="submit"
+                    class="btn-guardar btn-full"
+                    id="btn-submit-pass"
+                    style="margin-top:4px;">
+                    <i class="bi bi-check-circle-fill me-2"></i>Actualizar Contraseña
+                  </button>
+
+              </form>
             </div>
 
             <!-- Sesiones activas -->
@@ -312,20 +356,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
               <div class="sesiones-lista" id="sesiones-lista">
                 <?php foreach ($sesiones as $s): ?>
                   <?php
-                    $esCurrent = $s['is_current'] ?? false;
-                    $esNuevaSes = $s['es_nueva'] ?? false;
-                    $diff = time() - ($s['last_seen'] ?? time());
+                  $esCurrent = $s['is_current'] ?? false;
+                  $esNuevaSes = $s['es_nueva'] ?? false;
+                  $diff = time() - ($s['last_seen'] ?? time());
 
-                    if ($diff < 60)           $tiempo = 'Ahora';
-                    elseif ($diff < 3600)     $tiempo = 'Hace ' . floor($diff/60) . ' min';
-                    elseif ($diff < 86400)    $tiempo = 'Hace ' . floor($diff/3600) . ' h';
-                    elseif ($diff < 604800)   $tiempo = 'Hace ' . floor($diff/86400) . ' días';
-                    else                      $tiempo = 'Hace ' . floor($diff/604800) . ' sem';
+                  if ($diff < 60)           $tiempo = 'Ahora';
+                  elseif ($diff < 3600)     $tiempo = 'Hace ' . floor($diff / 60) . ' min';
+                  elseif ($diff < 86400)    $tiempo = 'Hace ' . floor($diff / 3600) . ' h';
+                  elseif ($diff < 604800)   $tiempo = 'Hace ' . floor($diff / 86400) . ' días';
+                  else                      $tiempo = 'Hace ' . floor($diff / 604800) . ' sem';
 
-                    $inactiva = $diff > 86400 * 3;
+                  $inactiva = $diff > 86400 * 3;
                   ?>
                   <div class="session-item <?= $esCurrent ? 'current' : '' ?>"
-                       data-token="<?= htmlspecialchars($s['token'] ?? '') ?>">
+                    data-token="<?= htmlspecialchars($s['token'] ?? '') ?>">
 
                     <div class="session-device-icon <?= $esCurrent ? 'active' : '' ?>">
                       <i class="bi <?= htmlspecialchars($s['tipo']['icono'] ?? 'bi-display') ?>"></i>
@@ -354,7 +398,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
 
                     <?php if (!$esCurrent): ?>
                       <button class="btn-cerrar-sesion"
-                              data-token="<?= htmlspecialchars($s['token'] ?? '') ?>">
+                        data-token="<?= htmlspecialchars($s['token'] ?? '') ?>">
                         <i class="bi bi-box-arrow-right"></i>
                         <span class="d-none d-sm-inline">Cerrar</span>
                       </button>
@@ -435,10 +479,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
             <div class="historial-lista">
               <?php
               $historial = [
-                ['dia'=>'15','mes'=>'Nov','titulo'=>'Consulta General – Max',   'doctor'=>'Dr. Juan Martínez',     'lugar'=>'Consultorio 2',    'precio'=>'$45.000'],
-                ['dia'=>'10','mes'=>'Nov','titulo'=>'Vacunación – Luna',         'doctor'=>'Dra. Ana García',       'lugar'=>'Consultorio 1',    'precio'=>'$35.000'],
-                ['dia'=>'08','mes'=>'Nov','titulo'=>'Control Postoperatorio – Rocky','doctor'=>'Dr. Carlos Rodríguez','lugar'=>'Consultorio 3', 'precio'=>'$30.000'],
-                ['dia'=>'05','mes'=>'Nov','titulo'=>'Baño y Peluquería – Luna',  'doctor'=>'María López',           'lugar'=>'Sala de Estética', 'precio'=>'$40.000'],
+                ['dia' => '15', 'mes' => 'Nov', 'titulo' => 'Consulta General – Max',   'doctor' => 'Dr. Juan Martínez',     'lugar' => 'Consultorio 2',    'precio' => '$45.000'],
+                ['dia' => '10', 'mes' => 'Nov', 'titulo' => 'Vacunación – Luna',         'doctor' => 'Dra. Ana García',       'lugar' => 'Consultorio 1',    'precio' => '$35.000'],
+                ['dia' => '08', 'mes' => 'Nov', 'titulo' => 'Control Postoperatorio – Rocky', 'doctor' => 'Dr. Carlos Rodríguez', 'lugar' => 'Consultorio 3', 'precio' => '$30.000'],
+                ['dia' => '05', 'mes' => 'Nov', 'titulo' => 'Baño y Peluquería – Luna',  'doctor' => 'María López',           'lugar' => 'Sala de Estética', 'precio' => '$40.000'],
               ];
               foreach ($historial as $h): ?>
                 <div class="historial-item">
@@ -470,6 +514,131 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
   <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/perfil.js"></script>
 
   <!-- URL base para el JS -->
-  <script>window.BASE_URL = '<?= BASE_URL ?>';</script>
+  <script>
+    window.BASE_URL = '<?= BASE_URL ?>';
+
+    (function() {
+      'use strict';
+
+      /* ── helpers ─────────────────────────────────────────── */
+      const $ = id => document.getElementById(id);
+
+      /* ── toggle show/hide password ───────────────────────── */
+      // Reutiliza el mismo listener de perfil.js (data-target)
+      // pero también cubre el botón de contraseña actual que tiene
+      // data-target="currentPassword" en lugar de los ids genéricos.
+      document.querySelectorAll('#passwordForm .toggle-pass').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const input = document.getElementById(this.dataset.target);
+          if (!input) return;
+          const show = input.type === 'password';
+          input.type = show ? 'text' : 'password';
+          this.querySelector('i').className = show ?
+            'bi bi-eye-slash-fill' :
+            'bi bi-eye-fill';
+        });
+      });
+
+      /* ── strength meter ──────────────────────────────────── */
+      const segs = [1, 2, 3, 4].map(n => $(`seg-${n}`));
+      const lbl = $('strength-label');
+      const nueva = $('pass-nueva');
+
+      const reqItems = {
+        length: {
+          el: $('req-length'),
+          ico: $('ico-length'),
+          test: v => v.length >= 8
+        },
+        uppercase: {
+          el: $('req-uppercase'),
+          ico: $('ico-uppercase'),
+          test: v => /[A-Z]/.test(v)
+        },
+        number: {
+          el: $('req-number'),
+          ico: $('ico-number'),
+          test: v => /[0-9]/.test(v)
+        },
+      };
+
+      function actualizarRequisito(key, val) {
+        const ok = reqItems[key].test(val);
+        const ico = reqItems[key].ico;
+        if (!ico) return;
+        ico.className = ok ? 'bi bi-check-circle-fill' : 'bi bi-circle';
+        // color inline para no agregar clases nuevas
+        ico.style.color = ok ? '#0FA832' : '';
+      }
+
+      nueva?.addEventListener('input', function() {
+        const val = this.value;
+        let score = 0;
+
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+        const cls = ['', 'active-weak', 'active-medium', 'active-medium', 'active-strong'];
+        const labels = [
+          'Ingresa una contraseña',
+          'Muy débil', 'Débil', 'Aceptable', '¡Contraseña segura!',
+        ];
+
+        segs.forEach((s, i) => {
+          s.className = 'strength-segment';
+          if (i < score) s.classList.add(cls[score]);
+        });
+
+        if (lbl) lbl.textContent = val.length === 0 ? labels[0] : labels[score];
+
+        Object.keys(reqItems).forEach(k => actualizarRequisito(k, val));
+        verificarCoincidencia();
+      });
+
+      /* ── match indicator ─────────────────────────────────── */
+      const confirmar = $('pass-confirmar');
+      const matchLbl = $('match-label');
+
+      function verificarCoincidencia() {
+        if (!confirmar || !matchLbl || !confirmar.value) {
+          if (matchLbl) matchLbl.textContent = '';
+          return;
+        }
+        const ok = nueva?.value === confirmar.value;
+        matchLbl.textContent = ok ? '✓ Las contraseñas coinciden' : '✗ Las contraseñas no coinciden';
+        matchLbl.style.color = ok ? '#0FA832' : '#A32D2D';
+      }
+
+      confirmar?.addEventListener('input', verificarCoincidencia);
+
+      /* ── validación antes de enviar ──────────────────────── */
+      $('passwordForm')?.addEventListener('submit', function(e) {
+        const actual = $('currentPassword')?.value.trim();
+        const nueVal = nueva?.value ?? '';
+        const confVal = confirmar?.value ?? '';
+
+        if (!actual) {
+          e.preventDefault();
+          $('currentPassword')?.focus();
+          return;
+        }
+
+        if (nueVal.length < 8 || !/[A-Z]/.test(nueVal) || !/[0-9]/.test(nueVal)) {
+          e.preventDefault();
+          nueva?.focus();
+          return;
+        }
+
+        if (nueVal !== confVal) {
+          e.preventDefault();
+          confirmar?.focus();
+        }
+      });
+
+    })();
+  </script>
 </body>
+
 </html>
