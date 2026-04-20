@@ -981,3 +981,84 @@ body {
 .sidebar-toggle {
     position: fixed;
 }
+
+/* Esto de aca es del topli donde se ve la notificacion */
+/* ================================================================
+   TOOLTIPS SIDEBAR COLAPSADO
+   Clases exactas: .sidebar.collapsed  .nav-item  .nav-text
+   ================================================================ */
+
+/* ── 1. Cuando está colapsado: ocultar textos y títulos ──────── */
+.sidebar.collapsed .nav-text,
+.sidebar.collapsed .nav-section-title {
+    display: none;
+}
+
+/* ── 2. Centrar ícono ─────────────────────────────────────────── */
+.sidebar.collapsed .nav-item {
+    justify-content: center;
+}
+
+/* ── 3. CLAVE: el sidebar NO debe recortar el tooltip ─────────── */
+.sidebar.collapsed {
+    overflow: visible !important;
+}
+
+.sidebar.collapsed .sidebar-nav,
+.sidebar.collapsed .nav-section {
+    overflow: visible !important;
+}
+
+/* ── 4. El nav-item necesita position:relative ────────────────── */
+.sidebar.collapsed .nav-item {
+    position: relative;
+}
+
+/* ── 5. Tooltip — cuerpo ──────────────────────────────────────── */
+.sidebar.collapsed .nav-item::after {
+    content: attr(data-tooltip);
+
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+
+    background: #1f2937;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Segoe UI', sans-serif;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 7px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 99999;
+}
+
+/* ── 6. Flechita ──────────────────────────────────────────────── */
+.sidebar.collapsed .nav-item::before {
+    content: '';
+    position: absolute;
+    left: calc(100% + 6px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+
+    border: 6px solid transparent;
+    border-right-color: #1f2937;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 99999;
+}
+
+/* ── 7. Mostrar en hover ──────────────────────────────────────── */
+.sidebar.collapsed .nav-item:hover::after,
+.sidebar.collapsed .nav-item:hover::before {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+}
