@@ -100,7 +100,7 @@ $isLocal = in_array($remoteAddr, ['127.0.0.1', '::1']);
 // Por lo tanto:
 // - En LOCAL se usa "/vetwilling"
 // - En PRODUCCIÓN se usa ""
-$baseFolder = $isLocal ? '/vetwilling' : '';
+$baseFolder = env_value('BASE_FOLDER', $isLocal ? '/vetwilling' : '');
 
 
 // ═══════════════════════════════════════════════════════════════════════════
