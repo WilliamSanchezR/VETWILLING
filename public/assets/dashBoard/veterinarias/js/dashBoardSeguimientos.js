@@ -1,553 +1,865 @@
 /**
- * ═══════════════════════════════════════════════════════════════════
- *  Dashboard Seguimientos - JavaScript con Integración API
- *  Funcionalidad completa para gestión de seguimientos
- * ═══════════════════════════════════════════════════════════════════
+ * dashBoardSeguimientos.js – VetWilling v3.0
+ *
+ * Correcciones respecto a la versión anterior:
+ *   1. showLoading() ya no conflicta con toggleEmptyState() —
+ *      se usa un estado centralizado (appState.fase) para saber
+ *      qué mostrar en cada momento.
+ *   2. La búsqueda opera sobre campos de datos (dataset.*),
+ *      NO sobre textContent, evitando que "ver" encuentre todas las tarjetas.
+ *   3. Los filtros Todos/Activos/Críticos/Completados están correctamente
+ *      conectados al JS (antes tenían el HTML pero no el listener).
+ *   4. confirm() y prompt() reemplazados por modales Bootstrap.
+ *   5. nuevoSeguimiento() implementada (antes era ReferenceError).
+ *   6. Los datos del API se obtienen en UN solo fetch cuando es posible.
+ *   7. Se agrega paginación (PAGE_SIZE = 10) para listas largas.
+ *   8. Los console.log de diagnóstico eliminados del PHP — ya no exponen sesión.
+ *   9. XSS: todos los valores interpolados pasan por escHtml().
+ *  10. obtenerBadgeEstado usa solo clases CSS que existen en el CSS.
  */
 
-(function() {
+(function () {
     'use strict';
 
-    // ============================================
-    // CONFIGURACIÓN
-    // ============================================
-    const baseUrl = window.BASE_URL || (() => {
-        const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
-        return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
-    })();
-    const API_URL = `${baseUrl}/veterinaria/api/seguimientos`;
-    
-    let currentView = 'list';
-    let searchTimeout = null;
-    let seguimientosData = [];
+    /* ============================================================
+       CONFIGURACIÓN
+    ============================================================ */
+    const BASE_URL   = window.BASE_URL || window.location.origin;
+    const API_URL    = `${BASE_URL}/veterinaria/api/seguimientos`;
+    const PAGE_SIZE  = 10;
 
-    // ============================================
-    // ELEMENTOS DEL DOM
-    // ============================================
-    const searchInput = document.getElementById('searchInput');
-    const clearSearchBtn = document.getElementById('clearSearch');
-    const listaSeguimientos = document.getElementById('listaSeguimientos');
-    const loadingState = document.getElementById('loadingState');
-    const emptyState = document.getElementById('emptyState');
-    const viewListBtn = document.getElementById('viewList');
-    const viewGridBtn = document.getElementById('viewGrid');
-    const toastContainer = document.getElementById('toastContainer');
+    /* ============================================================
+       ESTADO CENTRAL
+       Evita el problema anterior donde showLoading() y
+       toggleEmptyState() se contradecían al escribir display
+       directamente sobre el mismo elemento.
+    ============================================================ */
+    const appState = {
+        fase:           'idle',     // 'loading' | 'empty' | 'data'
+        todos:          [],         // todos los seguimientos cargados
+        visibles:       [],         // después de filtrar/ordenar
+        paginaActual:   1,
+        filtroActivo:   'todos',
+        orden:          'recientes',
+        busqueda:       '',
+    };
 
-    // Elementos de estadísticas
-    const statActivos = document.getElementById('statActivos');
-    const statCasosCriticos = document.getElementById('statCriticos');
-    const statProximasCitas = document.getElementById('statPendientes');
-    const statCompletados = document.getElementById('statCompletados');
+    /* ============================================================
+       REFS AL DOM
+    ============================================================ */
+    const $ = id => document.getElementById(id);
 
+    const elLista       = $('listaSeguimientos');
+    const elLoading     = $('loadingState');
+    const elEmpty       = $('emptyState');
+    const elSearch      = $('searchInput');
+    const elClearSearch = $('clearSearch');
+    const elSort        = $('sortSelect');
+    const elViewList    = $('viewList');
+    const elViewGrid    = $('viewGrid');
+    const elToasts      = $('toastContainer');
+    const elCount       = $('resultCount');
+    const elSync        = $('lastUpdate');
+    const elPag         = $('paginacion');
+    const elPagAnterior = $('btnPagAnterior');
+    const elPagSiguiente= $('btnPagSiguiente');
+    const elPagInfo     = $('paginaInfo');
 
-    // ============================================
-    // API - CARGA DE DATOS
-    // ============================================
+    const elStatActivos     = $('statActivos');
+    const elStatCriticos    = $('statCriticos');
+    const elStatPendientes  = $('statPendientes');
+    const elStatCompletados = $('statCompletados');
+
+    /* ============================================================
+       RENDERIZADO DE FASES
+    ============================================================ */
+    function setFase(fase) {
+        appState.fase = fase;
+        elLoading?.style && (elLoading.style.display  = fase === 'loading' ? 'flex'  : 'none');
+        elEmpty?.style   && (elEmpty.style.display    = fase === 'empty'   ? 'block' : 'none');
+        elLista?.style   && (elLista.style.display    = fase === 'data'    ? 'flex'  : 'none');
+        elPag?.style     && (elPag.style.display      = fase === 'data' && appState.visibles.length > PAGE_SIZE ? 'flex' : 'none');
+    }
+
+    /* ============================================================
+       CARGA DE DATOS — UN SOLO FETCH
+    ============================================================ */
     async function cargarSeguimientos() {
+        setFase('loading');
         try {
-            console.log('🔄 Iniciando carga de seguimientos...');
-            console.log('📡 URL del API:', `${API_URL}?action=listar`);
-            showLoading(true);
-            
-            const response = await fetch(`${API_URL}?action=listar`);
-            console.log('📨 Respuesta recibida:', response.status, response.statusText);
-            
-            const data = await response.json();
-            console.log('📦 Datos parseados:', data);
+            const res  = await fetch(`${API_URL}?action=listar`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
 
-            if (data.status === 'success') {
-                seguimientosData = data.data;
-                console.log(`✅ ${seguimientosData.length} seguimientos cargados`);
-                renderizarSeguimientos(seguimientosData);
-                cargarEstadisticas();
-                updateLastUpdateTime();
-                showToast('Seguimientos cargados correctamente', 'success', 2000);
+            if (data.status !== 'success') throw new Error(data.message || 'Error de API');
+
+            appState.todos = data.data || [];
+
+            /* Si el API devuelve estadísticas en la misma respuesta
+               las usamos directamente — evita el segundo fetch */
+            if (data.estadisticas) {
+                pintarEstadisticas(data.estadisticas);
             } else {
-                console.error('❌ Error en respuesta:', data.message);
-                throw new Error(data.message || 'Error al cargar seguimientos');
+                calcularEstadisticasLocales(appState.todos);
             }
-        } catch (error) {
-            console.error('💥 Error en cargarSeguimientos:', error);
-            showToast('Error al cargar seguimientos: ' + error.message, 'error');
-            toggleEmptyState(true);
-        } finally {
-            showLoading(false);
+
+            aplicarFiltros();
+            actualizarSync();
+
+        } catch (err) {
+            setFase('empty');
+            toast('Error al cargar seguimientos: ' + err.message, 'error');
         }
     }
 
-    async function cargarEstadisticas() {
-        try {
-            console.log('📊 Cargando estadísticas...');
-            const response = await fetch(`${API_URL}?action=estadisticas`);
-            const data = await response.json();
-            console.log('📈 Estadísticas recibidas:', data);
-
-            if (data.status === 'success') {
-                const stats = data.data;
-                if (statActivos) statActivos.textContent = stats.total_activos || 0;
-                if (statCasosCriticos) statCasosCriticos.textContent = stats.criticos || 0;
-                if (statProximasCitas) statProximasCitas.textContent = stats.requieren_atencion || 0;
-                if (statCompletados) statCompletados.textContent = stats.revisiones_hoy || 0;
-                console.log('✅ Estadísticas actualizadas');
-            }
-        } catch (error) {
-            console.error('❌ Error cargando estadísticas:', error);
-        }
+    /* ============================================================
+       ESTADÍSTICAS
+    ============================================================ */
+    function pintarEstadisticas(stats) {
+        if (elStatActivos)     elStatActivos.textContent     = stats.total_activos      ?? '—';
+        if (elStatCriticos)    elStatCriticos.textContent    = stats.criticos           ?? '—';
+        if (elStatPendientes)  elStatPendientes.textContent  = stats.requieren_atencion ?? '—';
+        if (elStatCompletados) elStatCompletados.textContent = stats.revisiones_hoy     ?? '—';
     }
 
-
-    // ============================================
-    // RENDERIZADO DE SEGUIMIENTOS
-    // ============================================
-    function renderizarSeguimientos(seguimientos) {
-        console.log('🎨 Iniciando renderizado de seguimientos:', seguimientos);
-        if (!listaSeguimientos) {
-            console.error('❌ Elemento listaSeguimientos no encontrado');
-            return;
-        }
-
-        listaSeguimientos.innerHTML = '';
-
-        if (!seguimientos || seguimientos.length === 0) {
-            console.warn('⚠️ No hay seguimientos para mostrar');
-            toggleEmptyState(true);
-            return;
-        }
-
-        toggleEmptyState(false);
-
-        seguimientos.forEach(seg => {
-            console.log('📝 Creando tarjeta para seguimiento:', seg.id_seguimiento);
-            const card = crearCardSeguimiento(seg);
-            listaSeguimientos.appendChild(card);
+    function calcularEstadisticasLocales(datos) {
+        const activos    = datos.filter(s => s.estado_seguimiento !== 'completado').length;
+        const criticos   = datos.filter(s => ['critico','critica'].includes((s.prioridad_calculada || s.prioridad || '').toLowerCase())).length;
+        const pendientes = datos.filter(s => s.estado_seguimiento === 'pendiente').length;
+        pintarEstadisticas({
+            total_activos:      activos,
+            criticos:           criticos,
+            requieren_atencion: pendientes,
+            revisiones_hoy:     '—',
         });
     }
 
-    function crearCardSeguimiento(seg) {
-        const article = document.createElement('article');
-        const prioridad = seg.prioridad_calculada || seg.prioridad || 'normal';
-        article.className = `card-seguimiento ${prioridad}`;
-        article.dataset.prioridad = prioridad;
-        article.dataset.estado = seg.estado_seguimiento || seg.estado || 'activo';
-        article.dataset.paciente = seg.paciente_nombre || '';
-        article.dataset.idSeguimiento = seg.id_seguimiento;
-        article.setAttribute('role', 'listitem');
+    /* ============================================================
+       FILTROS, BÚSQUEDA Y ORDEN — FUNCIÓN CENTRAL
+    ============================================================ */
+    function aplicarFiltros() {
+        const q      = appState.busqueda.toLowerCase().trim();
+        const filtro = appState.filtroActivo;
+        const orden  = appState.orden;
 
-        const badgePrioridad = obtenerBadgePrioridad(prioridad);
-        const badgeEstado = obtenerBadgeEstado(seg.estado_seguimiento);
-        const ultimaCitaTexto = seg.ultima_cita ? formatearFecha(seg.ultima_cita) : 'Sin citas';
-        const proximaCitaTexto = seg.proxima_cita ? formatearFecha(seg.proxima_cita) : 'Sin programar';
-        const avatarUrl = seg.img_mascota || `https://api.dicebear.com/7.x/bottts/svg?seed=${seg.paciente_nombre}`;
-        const progreso = seg.progreso_porcentaje || seg.progreso || 0;
+        let lista = appState.todos.filter(seg => {
+            const estado    = (seg.estado_seguimiento  || 'activo').toLowerCase();
+            const prioridad = (seg.prioridad_calculada || seg.prioridad || 'normal').toLowerCase();
 
-        article.innerHTML = `
-            <div class="header-seguimiento">
-                <div class="info-paciente-seg">
-                    <img src="${avatarUrl}" alt="Foto de ${seg.paciente_nombre}" class="avatar-seg">
-                    <div>
-                        <h6>${seg.paciente_nombre}</h6>
-                        <small class="text-muted">
-                            ${seg.especie} - ${seg.raza} | 
-                            ${seg.propietario_nombres} ${seg.propietario_apellidos}
-                        </small>
+            /* Filtro por estado */
+            if (filtro === 'activos') {
+                if (!['activo','en-tratamiento','programado'].includes(estado)) return false;
+            } else if (filtro === 'criticos') {
+                if (!['critico','critica'].includes(prioridad)) return false;
+            } else if (filtro === 'completados') {
+                if (estado !== 'completado') return false;
+            }
+
+            /* Filtro por búsqueda — SOLO en campos de texto, NO en HTML generado.
+               Esto evitaba que "ver" encontrara todas las tarjetas por el botón "Ver Detalles" */
+            if (q) {
+                const campos = [
+                    seg.paciente_nombre,
+                    seg.ultimo_diagnostico,
+                    seg.propietario_nombres,
+                    seg.propietario_apellidos,
+                    seg.tratamiento_actual,
+                    prioridad,
+                    estado,
+                ].map(v => (v || '').toLowerCase());
+
+                return campos.some(c => c.includes(q));
+            }
+
+            return true;
+        });
+
+        /* Ordenar */
+        lista = ordenar(lista, orden);
+
+        appState.visibles     = lista;
+        appState.paginaActual = 1;
+
+        renderizar();
+    }
+
+    function ordenar(lista, orden) {
+        const copia = [...lista];
+        switch (orden) {
+            case 'prioridad': {
+                const p = { critica: 0, critico: 0, alta: 1, media: 2, normal: 3, baja: 4 };
+                return copia.sort((a, b) =>
+                    (p[(a.prioridad_calculada || a.prioridad || '').toLowerCase()] ?? 3) -
+                    (p[(b.prioridad_calculada || b.prioridad || '').toLowerCase()] ?? 3)
+                );
+            }
+            case 'paciente':
+                return copia.sort((a, b) =>
+                    (a.paciente_nombre || '').localeCompare(b.paciente_nombre || '', 'es')
+                );
+            case 'fecha':
+                return copia.sort((a, b) =>
+                    new Date(b.proxima_cita || 0) - new Date(a.proxima_cita || 0)
+                );
+            default: // recientes
+                return copia.sort((a, b) =>
+                    new Date(b.ultima_cita || 0) - new Date(a.ultima_cita || 0)
+                );
+        }
+    }
+
+    /* ============================================================
+       RENDERIZADO CON PAGINACIÓN
+    ============================================================ */
+    function renderizar() {
+        if (!elLista) return;
+
+        const total  = appState.visibles.length;
+        const pagina = appState.paginaActual;
+        const inicio = (pagina - 1) * PAGE_SIZE;
+        const fin    = inicio + PAGE_SIZE;
+        const pagina_items = appState.visibles.slice(inicio, fin);
+        const totalPaginas = Math.ceil(total / PAGE_SIZE);
+
+        /* Actualizar contador */
+        if (elCount) {
+            elCount.textContent = total === 0 ? '' :
+                total === 1 ? '1 seguimiento' : `${total} seguimientos`;
+        }
+
+        if (total === 0) {
+            setFase('empty');
+            return;
+        }
+
+        elLista.innerHTML = '';
+        pagina_items.forEach((seg, i) => {
+            const card = crearCard(seg);
+            card.style.animationDelay = `${i * 0.04}s`;
+            elLista.appendChild(card);
+        });
+
+        setFase('data');
+
+        /* Paginación */
+        if (totalPaginas > 1) {
+            elPag.style.display        = 'flex';
+            if (elPagInfo)     elPagInfo.textContent     = `Página ${pagina} de ${totalPaginas}`;
+            if (elPagAnterior) elPagAnterior.disabled    = pagina === 1;
+            if (elPagSiguiente)elPagSiguiente.disabled   = pagina === totalPaginas;
+        } else {
+            elPag.style.display = 'none';
+        }
+    }
+
+    /* ============================================================
+       CREACIÓN DE TARJETA
+    ============================================================ */
+    function crearCard(seg) {
+        const prioridad  = (seg.prioridad_calculada || seg.prioridad || 'normal').toLowerCase();
+        const estado     = (seg.estado_seguimiento  || 'activo').toLowerCase();
+        const progreso   = Math.min(100, Math.max(0, parseInt(seg.progreso_porcentaje || seg.progreso || 0)));
+        const ultimaCita = seg.ultima_cita  ? formatFecha(seg.ultima_cita)  : 'Sin citas';
+        const proxCita   = seg.proxima_cita ? formatFecha(seg.proxima_cita) : 'Sin programar';
+        const avatarUrl  = seg.img_mascota  || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(seg.paciente_nombre || 'pet')}`;
+
+        const art = document.createElement('article');
+        art.className      = `card-seg ${prioridad}`;
+        art.setAttribute('role', 'listitem');
+
+        /* Campos de datos para búsqueda y filtrado — NO se usa textContent */
+        art.dataset.id          = seg.id_seguimiento;
+        art.dataset.prioridad   = prioridad;
+        art.dataset.estado      = estado;
+        art.dataset.paciente    = (seg.paciente_nombre     || '').toLowerCase();
+        art.dataset.diagnostico = (seg.ultimo_diagnostico  || '').toLowerCase();
+        art.dataset.propietario = `${seg.propietario_nombres || ''} ${seg.propietario_apellidos || ''}`.toLowerCase().trim();
+
+        art.innerHTML = `
+            <!-- HEADER -->
+            <div class="card-seg-header">
+                <div class="card-seg-paciente">
+                    <img src="${escHtml(avatarUrl)}"
+                         alt="Foto de ${escHtml(seg.paciente_nombre)}"
+                         class="card-seg-avatar"
+                         loading="lazy"
+                         onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=default'">
+                    <div style="min-width:0">
+                        <div class="card-seg-nombre">${escHtml(seg.paciente_nombre)}</div>
+                        <div class="card-seg-sub">
+                            ${escHtml(seg.especie || '')}${seg.raza ? ' · ' + escHtml(seg.raza) : ''}
+                            &nbsp;·&nbsp;
+                            ${escHtml(seg.propietario_nombres || '')} ${escHtml(seg.propietario_apellidos || '')}
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    ${badgePrioridad}
-                    ${badgeEstado}
+
+                <div class="card-seg-badges">
+                    ${badgePrioridad(prioridad)}
+                    ${badgeEstado(estado)}
+                </div>
+
+                <div class="card-seg-ctrl">
+                    <!-- Menú de acciones rápidas -->
                     <div class="dropdown">
-                        <button class="btn btn-quick-action" type="button" data-bs-toggle="dropdown" 
-                                aria-expanded="false" aria-label="Acciones rápidas para ${seg.paciente_nombre}">
+                        <button class="btn-ctrl"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                aria-label="Acciones para ${escHtml(seg.paciente_nombre)}">
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" data-action="ver" data-id="${seg.id_seguimiento}">
-                                <i class="bi bi-eye"></i> Ver Detalles
-                            </a></li>
-                            <li><a class="dropdown-item" href="#" data-action="editar" data-id="${seg.id_seguimiento}">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a></li>
-                            <li><a class="dropdown-item" href="#" data-action="notificar" data-id="${seg.id_seguimiento}">
-                                <i class="bi bi-bell"></i> Notificar Propietario
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#" data-action="completar" data-id="${seg.id_seguimiento}">
-                                <i class="bi bi-check-circle"></i> Marcar Completado
-                            </a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius:10px;border:1px solid #e5e7eb;">
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center gap-2"
+                                        type="button"
+                                        data-action="ver"
+                                        data-id="${seg.id_seguimiento}">
+                                    <i class="bi bi-eye text-info"></i> Ver detalles
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center gap-2"
+                                        type="button"
+                                        data-action="notificar"
+                                        data-id="${seg.id_seguimiento}"
+                                        data-nombre="${escHtml(seg.paciente_nombre)}">
+                                    <i class="bi bi-bell text-warning"></i> Notificar propietario
+                                </button>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center gap-2 text-success"
+                                        type="button"
+                                        data-action="completar"
+                                        data-id="${seg.id_seguimiento}"
+                                        data-nombre="${escHtml(seg.paciente_nombre)}">
+                                    <i class="bi bi-check-circle"></i> Marcar completado
+                                </button>
+                            </li>
                         </ul>
                     </div>
-                    <button class="btn btn-toggle-expand" type="button" aria-expanded="false" aria-label="Expandir seguimiento">
+
+                    <!-- Toggle expandir -->
+                    <button class="btn-ctrl btn-toggle-seg"
+                            type="button"
+                            aria-expanded="false"
+                            aria-label="Expandir detalles">
                         <i class="bi bi-chevron-down"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="compact-view">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="info-item">
-                        <i class="bi bi-calendar-check text-success" aria-hidden="true"></i>
+            <!-- VISTA COMPACTA (por defecto) -->
+            <div class="card-seg-compact">
+                <div class="card-seg-info-row">
+                    <div class="card-seg-info-item">
+                        <i class="bi bi-calendar-check" style="color:var(--green)"></i>
                         <strong>Última cita:</strong>
-                        <time datetime="${seg.ultima_cita || ''}">${ultimaCitaTexto}</time>
+                        <time datetime="${escHtml(seg.ultima_cita || '')}">${ultimaCita}</time>
                     </div>
-                    <div class="info-item">
-                        <i class="bi bi-calendar-event text-primary" aria-hidden="true"></i>
+                    <div class="card-seg-info-item">
+                        <i class="bi bi-calendar-event" style="color:var(--teal)"></i>
                         <strong>Próxima cita:</strong>
-                        <time datetime="${seg.proxima_cita || ''}">${proximaCitaTexto}</time>
+                        <time datetime="${escHtml(seg.proxima_cita || '')}">${proxCita}</time>
+                    </div>
+                    <div class="card-seg-info-item">
+                        <i class="bi bi-clipboard-pulse" style="color:var(--red)"></i>
+                        <strong>Diagnóstico:</strong>
+                        <span>${escHtml(seg.ultimo_diagnostico || 'Sin diagnóstico')}</span>
                     </div>
                 </div>
-                <div class="info-item mb-2">
-                    <i class="bi bi-clipboard-pulse text-danger" aria-hidden="true"></i>
-                    <strong>Diagnóstico:</strong>
-                    <span>${seg.ultimo_diagnostico || 'Sin diagnóstico registrado'}</span>
-                </div>
-                <div class="progreso-seguimiento mt-2">
-                    <div class="label-progreso">
+
+                <div class="prog-wrap">
+                    <div class="prog-label">
                         <span>Progreso del tratamiento</span>
-                        <span class="porcentaje-prog" role="status" aria-label="${progreso}% completado">${progreso}%</span>
+                        <span class="prog-pct"
+                              role="status"
+                              aria-label="${progreso}% completado">${progreso}%</span>
                     </div>
-                    <div class="progress" style="height: 8px;" role="progressbar" aria-valuenow="${progreso}" aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-bar bg-success" style="width: ${progreso}%"></div>
+                    <div class="prog-bar"
+                         role="progressbar"
+                         aria-valuenow="${progreso}"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                        <div class="prog-fill" style="width:${progreso}%"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="expanded-view" style="display: none;">
-                <div class="body-seguimiento">
-                    <div class="info-row">
-                        <i class="bi bi-capsule text-success" aria-hidden="true"></i>
-                        <strong>Tratamiento:</strong>
-                        <span>${seg.tratamiento_actual || 'No especificado'}</span>
+            <!-- VISTA EXPANDIDA (oculta por defecto) -->
+            <div class="card-seg-expanded" style="display:none">
+                <div class="card-seg-expanded-grid">
+                    <div class="exp-item">
+                        <i class="bi bi-capsule"></i>
+                        <div>
+                            <div class="exp-item-label">Tratamiento</div>
+                            <div class="exp-item-val">${escHtml(seg.tratamiento_actual || 'No especificado')}</div>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <i class="bi bi-people text-secondary" aria-hidden="true"></i>
-                        <strong>Propietario:</strong>
-                        <span>${seg.propietario_nombres} ${seg.propietario_apellidos}</span>
+                    <div class="exp-item">
+                        <i class="bi bi-people"></i>
+                        <div>
+                            <div class="exp-item-label">Propietario</div>
+                            <div class="exp-item-val">${escHtml(seg.propietario_nombres || '')} ${escHtml(seg.propietario_apellidos || '')}</div>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <i class="bi bi-telephone text-info" aria-hidden="true"></i>
-                        <strong>Teléfono:</strong>
-                        <span>${seg.propietario_telefono || 'No disponible'}</span>
+                    <div class="exp-item">
+                        <i class="bi bi-telephone"></i>
+                        <div>
+                            <div class="exp-item-label">Teléfono</div>
+                            <div class="exp-item-val">${escHtml(seg.propietario_telefono || 'No disponible')}</div>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <i class="bi bi-file-medical text-warning" aria-hidden="true"></i>
-                        <strong>Total de citas:</strong>
-                        <span>${seg.total_citas_realizadas || 0}</span>
+                    <div class="exp-item">
+                        <i class="bi bi-file-medical"></i>
+                        <div>
+                            <div class="exp-item-label">Total de citas</div>
+                            <div class="exp-item-val">${parseInt(seg.total_citas_realizadas || 0)}</div>
+                        </div>
                     </div>
                     ${seg.observaciones_generales ? `
-                    <div class="info-row">
-                        <i class="bi bi-journal-text text-primary" aria-hidden="true"></i>
-                        <strong>Observaciones:</strong>
-                        <span>${seg.observaciones_generales}</span>
-                    </div>
-                    ` : ''}
+                    <div class="exp-item" style="grid-column:1/-1">
+                        <i class="bi bi-journal-text"></i>
+                        <div>
+                            <div class="exp-item-label">Observaciones</div>
+                            <div class="exp-item-val">${escHtml(seg.observaciones_generales)}</div>
+                        </div>
+                    </div>` : ''}
                 </div>
 
-                <div class="footer-seguimiento">
-                    <button class="btn-accion-seg btn-actualizar" onclick="location.href='${baseUrl}/veterinaria/calendario'">
-                        <i class="bi bi-arrow-clockwise"></i> Programar Cita
+                <div class="card-seg-footer">
+                    <button class="btn-accion verde"
+                            type="button"
+                            onclick="location.href='${BASE_URL}/veterinaria/calendario'">
+                        <i class="bi bi-calendar-plus"></i> Programar cita
                     </button>
-                    <button class="btn-accion-seg btn-detalles" data-action="ver" data-id="${seg.id_seguimiento}">
-                        <i class="bi bi-eye"></i> Ver Detalles
+                    <button class="btn-accion azul"
+                            type="button"
+                            data-action="ver"
+                            data-id="${seg.id_seguimiento}">
+                        <i class="bi bi-eye"></i> Ver historial
                     </button>
-                    <button class="btn-accion-seg btn-completar" data-action="completar" data-id="${seg.id_seguimiento}">
+                    <button class="btn-accion naranja"
+                            type="button"
+                            data-action="notificar"
+                            data-id="${seg.id_seguimiento}"
+                            data-nombre="${escHtml(seg.paciente_nombre)}">
+                        <i class="bi bi-bell"></i> Notificar
+                    </button>
+                    <button class="btn-accion rojo"
+                            type="button"
+                            data-action="completar"
+                            data-id="${seg.id_seguimiento}"
+                            data-nombre="${escHtml(seg.paciente_nombre)}">
                         <i class="bi bi-check-circle"></i> Completar
                     </button>
                 </div>
             </div>
         `;
 
-        setupCardEventListeners(article);
-        return article;
-    }
-
-    function setupCardEventListeners(card) {
-        card.querySelectorAll('[data-action]').forEach(btn => {
-            btn.addEventListener('click', handleQuickAction);
+        /* Listeners */
+        art.querySelectorAll('[data-action]').forEach(btn => {
+            btn.addEventListener('click', manejarAccion);
         });
 
-        const toggleBtn = card.querySelector('.btn-toggle-expand');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', toggleExpand);
-        }
+        const toggle = art.querySelector('.btn-toggle-seg');
+        toggle?.addEventListener('click', function () {
+            const compact  = art.querySelector('.card-seg-compact');
+            const expanded = art.querySelector('.card-seg-expanded');
+            const abierto  = this.getAttribute('aria-expanded') === 'true';
+
+            compact.style.display  = abierto ? 'block' : 'none';
+            expanded.style.display = abierto ? 'none'  : 'block';
+            this.setAttribute('aria-expanded', String(!abierto));
+        });
+
+        return art;
     }
 
-    function obtenerBadgePrioridad(prioridad) {
-        const badges = {
-            'critica': '<span class="badge-prioridad critico"><i class="bi bi-exclamation-triangle-fill"></i> Crítico</span>',
-            'critico': '<span class="badge-prioridad critico"><i class="bi bi-exclamation-triangle-fill"></i> Crítico</span>',
-            'alta': '<span class="badge-prioridad alta"><i class="bi bi-exclamation-circle-fill"></i> Alta</span>',
-            'normal': '<span class="badge-prioridad normal"><i class="bi bi-circle-fill"></i> Normal</span>',
-            'baja': '<span class="badge-prioridad baja"><i class="bi bi-dash-circle-fill"></i> Baja</span>'
+    /* ============================================================
+       BADGES — usan solo clases que existen en el CSS
+    ============================================================ */
+    function badgePrioridad(p) {
+        const map = {
+            critico: ['critico', 'bi-exclamation-triangle-fill', 'Crítico'],
+            critica: ['critica', 'bi-exclamation-triangle-fill', 'Crítico'],
+            alta:    ['alta',    'bi-exclamation-circle-fill',   'Alta'],
+            media:   ['media',   'bi-dash-circle-fill',          'Media'],
+            normal:  ['normal',  'bi-circle-fill',               'Normal'],
+            baja:    ['baja',    'bi-arrow-down-circle-fill',     'Baja'],
         };
-        return badges[prioridad] || badges.normal;
+        const [cls, ico, txt] = map[p] || map.normal;
+        return `<span class="badge-pri ${cls}"><i class="bi ${ico}"></i> ${txt}</span>`;
     }
 
-    function obtenerBadgeEstado(estado) {
-        const badges = {
-            'en-tratamiento': '<span class="badge-tipo activa">En Tratamiento</span>',
-            'programado': '<span class="badge-tipo programada">Programado</span>',
-            'pendiente': '<span class="badge-tipo pendiente">Pendiente</span>'
+    function badgeEstado(e) {
+        const map = {
+            'activo':           ['activo',      'bi-activity',            'Activo'],
+            'activa':           ['activa',      'bi-activity',            'Activo'],
+            'en-tratamiento':   ['en-tratamiento','bi-activity',          'En Tratamiento'],
+            'programado':       ['programado',  'bi-calendar-check',      'Programado'],
+            'programada':       ['programada',  'bi-calendar-check',      'Programado'],
+            'pendiente':        ['pendiente',   'bi-clock',               'Pendiente'],
+            'completado':       ['completado',  'bi-check-circle-fill',   'Completado'],
         };
-        return badges[estado] || badges.pendiente;
+        const [cls, ico, txt] = map[e] || map['pendiente'];
+        return `<span class="badge-est ${cls}"><i class="bi ${ico}"></i> ${txt}</span>`;
     }
 
-    function formatearFecha(fecha) {
-        if (!fecha) return 'No disponible';
-        const date = new Date(fecha);
-        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return date.toLocaleDateString('es-ES', options);
-    }
-
-
-    // ============================================
-    // BÚSQUEDA Y FILTROS
-    // ============================================
-    if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            clearTimeout(searchTimeout);
-            const query = e.target.value.trim().toLowerCase();
-
-            if (clearSearchBtn) {
-                clearSearchBtn.style.display = query ? 'flex' : 'none';
-            }
-
-            searchTimeout = setTimeout(() => {
-                filterSeguimientos(query);
-            }, 300);
-        });
-
-        if (clearSearchBtn) {
-            clearSearchBtn.addEventListener('click', function() {
-                searchInput.value = '';
-                clearSearchBtn.style.display = 'none';
-                filterSeguimientos('');
-                searchInput.focus();
-            });
-        }
-    }
-
-    function filterSeguimientos(query) {
-        const cards = listaSeguimientos.querySelectorAll('.card-seguimiento');
-        let visibleCount = 0;
-
-        cards.forEach(card => {
-            const matches = !query || 
-                card.dataset.paciente?.toLowerCase().includes(query) || 
-                card.dataset.prioridad?.toLowerCase().includes(query) || 
-                card.dataset.estado?.toLowerCase().includes(query) ||
-                card.textContent.toLowerCase().includes(query);
-
-            card.style.display = matches ? '' : 'none';
-            if (matches) visibleCount++;
-        });
-
-        toggleEmptyState(visibleCount === 0);
-    }
-
-
-    // ============================================
-    // ACCIONES DE SEGUIMIENTOS
-    // ============================================
-    async function handleQuickAction(e) {
+    /* ============================================================
+       ACCIONES — confirm/prompt reemplazados por modales Bootstrap
+    ============================================================ */
+    function manejarAccion(e) {
         e.preventDefault();
-        const action = this.dataset.action;
-        const id = this.dataset.id;
-        const card = this.closest('.card-seguimiento');
-        const paciente = card.dataset.paciente || 'Paciente';
+        e.stopPropagation();
 
-        switch(action) {
+        const btn    = e.currentTarget;
+        const action = btn.dataset.action;
+        const id     = btn.dataset.id;
+        const nombre = btn.dataset.nombre
+            || btn.closest('.card-seg')?.dataset.paciente
+            || 'el paciente';
+
+        switch (action) {
             case 'ver':
-                window.location.href = `${baseUrl}/veterinaria/calendario?id=${id}`;
+                /* Expande la tarjeta inline en lugar de redirigir al calendario */
+                const card   = btn.closest('.card-seg');
+                const toggle = card?.querySelector('.btn-toggle-seg');
+                if (toggle && toggle.getAttribute('aria-expanded') !== 'true') {
+                    toggle.click();
+                }
+                card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 break;
-            case 'editar':
-                showToast(`Función de edición en desarrollo`, 'info');
-                break;
+
             case 'completar':
-                await completarSeguimiento(id, paciente, card);
+                abrirModalConfirmar(id, nombre, btn.closest('.card-seg'));
                 break;
+
             case 'notificar':
-                await notificarPropietario(id, paciente);
+                abrirModalNotificar(id, nombre);
                 break;
         }
     }
 
-    async function completarSeguimiento(id, paciente, card) {
-        if (!confirm(`¿Marcar como completado el seguimiento de ${paciente}?`)) return;
-
+    async function completarSeguimiento(id, nombre, card) {
         try {
-            const response = await fetch(`${API_URL}`, {
-                method: 'POST',
+            const res  = await fetch(API_URL, {
+                method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'finalizar', id_seguimiento: id })
+                body:    JSON.stringify({ action: 'finalizar', id_seguimiento: id }),
             });
-
-            const data = await response.json();
+            const data = await res.json();
 
             if (data.status === 'success') {
-                card.classList.add('animate__animated', 'animate__fadeOut');
-                setTimeout(() => {
-                    card.remove();
-                    checkIfEmpty();
-                    cargarEstadisticas();
-                }, 500);
-                showToast(`Seguimiento de ${paciente} completado`, 'success');
+                /* Remover del estado local y re-renderizar */
+                appState.todos = appState.todos.filter(s => String(s.id_seguimiento) !== String(id));
+                calcularEstadisticasLocales(appState.todos);
+                aplicarFiltros();
+                toast(`Seguimiento de ${nombre} completado`, 'success');
             } else {
-                throw new Error(data.message);
+                throw new Error(data.message || 'Error al completar');
             }
-        } catch (error) {
-            console.error('Error:', error);
-            showToast('Error al completar: ' + error.message, 'error');
+        } catch (err) {
+            toast('Error: ' + err.message, 'error');
         }
     }
 
-    async function notificarPropietario(id, paciente) {
-        const mensaje = prompt(`Mensaje para propietario de ${paciente}:`, 
-                               `Recordatorio de seguimiento para ${paciente}`);
-        
-        if (!mensaje) return;
-
+    async function notificarPropietario(id, nombre, mensaje) {
         try {
-            const response = await fetch(`${API_URL}`, {
-                method: 'POST',
+            const res  = await fetch(API_URL, {
+                method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'notificar', id_seguimiento: id, mensaje })
+                body:    JSON.stringify({ action: 'notificar', id_seguimiento: id, mensaje }),
             });
-
-            const data = await response.json();
+            const data = await res.json();
 
             if (data.status === 'success') {
-                showToast(`Notificación enviada al propietario de ${paciente}`, 'success');
+                toast(`Notificación enviada — ${nombre}`, 'success');
             } else {
-                throw new Error(data.message);
+                throw new Error(data.message || 'Error al notificar');
             }
-        } catch (error) {
-            console.error('Error:', error);
-            showToast('Error al notificar: ' + error.message, 'error');
+        } catch (err) {
+            toast('Error: ' + err.message, 'error');
         }
     }
 
+    /* ============================================================
+       MODALES DINÁMICOS
+    ============================================================ */
+    function crearModal(id, contenidoHtml) {
+        const existente = document.getElementById(id);
+        if (existente) return existente;
 
-    // ============================================
-    // EXPANDIR / COLAPSAR
-    // ============================================
-    function toggleExpand(e) {
-        const card = this.closest('.card-seguimiento');
-        const compactView = card.querySelector('.compact-view');
-        const expandedView = card.querySelector('.expanded-view');
-        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        const el = document.createElement('div');
+        el.id = id;
+        el.className = 'modal fade modal-seg';
+        el.tabIndex  = -1;
+        el.innerHTML = contenidoHtml;
+        document.body.appendChild(el);
+        return el;
+    }
 
-        if (isExpanded) {
-            compactView.style.display = 'block';
-            expandedView.style.display = 'none';
-            this.setAttribute('aria-expanded', 'false');
+    function abrirModalConfirmar(id, nombre, card) {
+        const modal = crearModal('modalConfirmarSeg', `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="mConfTitulo">Completar seguimiento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="mConfMensaje" class="mb-0" style="font-size:15px;"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" id="mConfOk" class="btn btn-success">
+                            <i class="bi bi-check-circle me-1"></i> Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>`);
+
+        modal.querySelector('#mConfMensaje').textContent =
+            `¿Confirmas que el seguimiento de ${nombre} ha sido completado?`;
+
+        /* Clonar el botón para limpiar listeners previos */
+        const btnOk    = modal.querySelector('#mConfOk');
+        const btnNuevo = btnOk.cloneNode(true);
+        btnOk.parentNode.replaceChild(btnNuevo, btnOk);
+
+        btnNuevo.addEventListener('click', async () => {
+            bootstrap.Modal.getInstance(modal)?.hide();
+            await completarSeguimiento(id, nombre, card);
+        });
+
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+
+    function abrirModalNotificar(id, nombre) {
+        const modal = crearModal('modalNotificarSeg', `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="mNotTitulo"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="mNotMensaje" class="form-label fw-semibold mb-2">
+                            Mensaje para el propietario:
+                        </label>
+                        <textarea id="mNotMensaje"
+                                  class="seg-textarea"
+                                  rows="4"
+                                  maxlength="500"
+                                  placeholder="Escribe el recordatorio…"></textarea>
+                        <div id="mNotError"
+                             class="text-danger mt-1"
+                             style="font-size:13px;display:none">
+                            Por favor escribe un mensaje antes de enviar.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" id="mNotOk" class="btn btn-warning text-dark">
+                            <i class="bi bi-send me-1"></i> Enviar notificación
+                        </button>
+                    </div>
+                </div>
+            </div>`);
+
+        modal.querySelector('#mNotTitulo').textContent = `Notificar propietario — ${nombre}`;
+
+        const textarea = modal.querySelector('#mNotMensaje');
+        const errEl    = modal.querySelector('#mNotError');
+        textarea.value = `Recordatorio de seguimiento para ${nombre}.`;
+
+        const btnOk    = modal.querySelector('#mNotOk');
+        const btnNuevo = btnOk.cloneNode(true);
+        btnOk.parentNode.replaceChild(btnNuevo, btnOk);
+
+        btnNuevo.addEventListener('click', async () => {
+            const msg = textarea.value.trim();
+            if (msg.length < 5) {
+                errEl.style.display = 'block';
+                textarea.focus();
+                return;
+            }
+            errEl.style.display = 'none';
+            bootstrap.Modal.getInstance(modal)?.hide();
+            await notificarPropietario(id, nombre, msg);
+        });
+
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+
+    /* ============================================================
+       NUEVO SEGUIMIENTO — implementada (antes era ReferenceError)
+    ============================================================ */
+    window.nuevoSeguimiento = function () {
+        window.location.href = `${BASE_URL}/veterinaria/seguimientos/nuevo`;
+    };
+
+    /* ============================================================
+       EVENTOS DE BÚSQUEDA Y FILTROS
+    ============================================================ */
+    let searchTimer = null;
+
+    elSearch?.addEventListener('input', function () {
+        const q = this.value.trim();
+        if (elClearSearch) elClearSearch.style.display = q ? 'block' : 'none';
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+            appState.busqueda = q;
+            aplicarFiltros();
+        }, 280);
+    });
+
+    elClearSearch?.addEventListener('click', () => {
+        if (elSearch) { elSearch.value = ''; elSearch.focus(); }
+        elClearSearch.style.display = 'none';
+        appState.busqueda = '';
+        aplicarFiltros();
+    });
+
+    /* Filtros de estado — CORRECCIÓN: antes no tenían addEventListener */
+    document.querySelectorAll('.seg-filtro-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.seg-filtro-btn').forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-pressed', 'false');
+            });
+            this.classList.add('active');
+            this.setAttribute('aria-pressed', 'true');
+            appState.filtroActivo = this.dataset.filtro || 'todos';
+            aplicarFiltros();
+        });
+    });
+
+    /* Ordenar */
+    elSort?.addEventListener('change', function () {
+        appState.orden = this.value;
+        aplicarFiltros();
+    });
+
+    /* Vista lista / grid */
+    elViewList?.addEventListener('click', () => cambiarVista('list'));
+    elViewGrid?.addEventListener('click', () => cambiarVista('grid'));
+
+    function cambiarVista(vista) {
+        if (vista === 'list') {
+            elLista?.classList.remove('grid-view');
+            elViewList?.classList.add('active');
+            elViewGrid?.classList.remove('active');
+            elViewList?.setAttribute('aria-pressed', 'true');
+            elViewGrid?.setAttribute('aria-pressed', 'false');
         } else {
-            compactView.style.display = 'none';
-            expandedView.style.display = 'block';
-            this.setAttribute('aria-expanded', 'true');
+            elLista?.classList.add('grid-view');
+            elViewList?.classList.remove('active');
+            elViewGrid?.classList.add('active');
+            elViewList?.setAttribute('aria-pressed', 'false');
+            elViewGrid?.setAttribute('aria-pressed', 'true');
         }
     }
 
-
-    // ============================================
-    // VISTAS (LISTA / GRID)
-    // ============================================
-    function switchView(view) {
-        currentView = view;
-
-        if (view === 'list') {
-            listaSeguimientos.classList.remove('grid-view');
-            viewListBtn?.classList.add('active');
-            viewGridBtn?.classList.remove('active');
-        } else {
-            listaSeguimientos.classList.add('grid-view');
-            viewListBtn?.classList.remove('active');
-            viewGridBtn?.classList.add('active');
-        }
-    }
-
-    if (viewListBtn && viewGridBtn) {
-        viewListBtn.addEventListener('click', () => switchView('list'));
-        viewGridBtn.addEventListener('click', () => switchView('grid'));
-    }
-
-
-    // ============================================
-    // FUNCIONES AUXILIARES
-    // ============================================
-    function showLoading(show) {
-        if (!loadingState || !listaSeguimientos) return;
-
-        if (show) {
-            loadingState.style.display = 'block';
-            listaSeguimientos.style.display = 'none';
-        } else {
-            setTimeout(() => {
-                loadingState.style.display = 'none';
-                listaSeguimientos.style.display = 'block';
-            }, 300);
-        }
-    }
-
-    function toggleEmptyState(show) {
-        if (emptyState) emptyState.style.display = show ? 'block' : 'none';
-        if (listaSeguimientos) listaSeguimientos.style.display = show ? 'none' : 'block';
-    }
-
-    function checkIfEmpty() {
-        const visibleCards = listaSeguimientos?.querySelectorAll('.card-seguimiento:not([style*="display: none"])');
-        toggleEmptyState(!visibleCards || visibleCards.length === 0);
-    }
-
-    function showToast(message, type = 'info', duration = 3000) {
-        if (!toastContainer) return;
-
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `<div class="toast-body"><i class="bi bi-${getToastIcon(type)} me-2"></i>${message}</div>`;
-        
-        toastContainer.appendChild(toast);
-
-        setTimeout(() => toast.remove(), duration);
-    }
-
-    function getToastIcon(type) {
-        return { success: 'check-circle-fill', error: 'x-circle-fill', warning: 'exclamation-triangle-fill', info: 'info-circle-fill' }[type] || 'info-circle-fill';
-    }
-
-    function updateLastUpdateTime() {
-        const el = document.getElementById('lastUpdate');
-        if (el) el.textContent = `Actualizado ${new Date().toLocaleTimeString('es-ES')}`;
-    }
-
-
-    // ============================================
-    // NAVEGACIÓN POR TECLADO
-    // ============================================
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.querySelectorAll('.dropdown-menu.show').forEach(d => d.classList.remove('show'));
-        }
-        
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f' && searchInput) {
-            e.preventDefault();
-            searchInput.focus();
+    /* Paginación */
+    elPagAnterior?.addEventListener('click', () => {
+        if (appState.paginaActual > 1) {
+            appState.paginaActual--;
+            renderizar();
+            elLista?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     });
 
+    elPagSiguiente?.addEventListener('click', () => {
+        const total = Math.ceil(appState.visibles.length / PAGE_SIZE);
+        if (appState.paginaActual < total) {
+            appState.paginaActual++;
+            renderizar();
+            elLista?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
 
-    // ============================================
-    // INICIALIZACIÓN
-    // ============================================
-    async function init() {
-        console.log('🚀 Dashboard Seguimientos iniciado');
-        await cargarSeguimientos();
-        console.log('✅ Sistema listo');
+    /* Teclado */
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f' && elSearch) {
+            e.preventDefault();
+            elSearch.focus();
+        }
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.dropdown-menu.show')
+                .forEach(d => d.classList.remove('show'));
+        }
+    });
+
+    /* Exportar (placeholder) */
+    $('btnExportar')?.addEventListener('click', () => {
+        toast('Exportación en desarrollo', 'info');
+    });
+
+    /* ============================================================
+       HELPERS
+    ============================================================ */
+    function formatFecha(f) {
+        if (!f) return '—';
+        try {
+            return new Date(f).toLocaleDateString('es-ES', {
+                year: 'numeric', month: 'short', day: 'numeric',
+            });
+        } catch (_) { return f; }
     }
 
+    function escHtml(val) {
+        return String(val ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function actualizarSync() {
+        if (elSync) {
+            elSync.textContent = `Actualizado ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+        }
+    }
+
+    function toast(message, type = 'info', duration = 3800) {
+        if (!elToasts) return;
+        const iconos = {
+            success: 'bi-check-circle-fill',
+            error:   'bi-x-circle-fill',
+            warning: 'bi-exclamation-triangle-fill',
+            info:    'bi-info-circle-fill',
+        };
+
+        const el = document.createElement('div');
+        el.className = `toast toast-vet ${type} show`;
+        el.setAttribute('role', 'alert');
+        el.setAttribute('aria-live', 'assertive');
+        el.innerHTML = `
+            <div class="toast-body">
+                <i class="bi ${iconos[type] || iconos.info}"></i>
+                ${escHtml(message)}
+            </div>`;
+
+        elToasts.appendChild(el);
+
+        setTimeout(() => {
+            el.classList.remove('show');
+            el.style.transition = 'opacity .3s';
+            el.style.opacity    = '0';
+            setTimeout(() => el.remove(), 300);
+        }, duration);
+    }
+
+    /* ============================================================
+       INIT
+    ============================================================ */
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', cargarSeguimientos);
     } else {
-        init();
+        cargarSeguimientos();
     }
 
 })();
