@@ -1088,3 +1088,114 @@ btnProfile.addEventListener('click', () => {
     const isActive = btnProfile.classList.toggle('active');
     btnProfile.setAttribute('aria-expanded', isActive);
 });
+
+
+
+// esta parte es de las notificaciones para si funciona si
+
+// ═══════════════════════════════════════════
+// NOTIFICACIONES - Campañita 🔔
+// ═══════════════════════════════════════════
+
+const BASE_URL = window.BASE_URL;
+
+// Iconos según tipo
+function iconoTipo(tipo) {
+    const iconos = {
+        'INFO'      : 'bi-info-circle-fill text-primary',
+        'alerta'    : 'bi-exclamation-triangle-fill text-warning',
+        'error'     : 'bi-x-circle-fill text-danger',
+        'advertencia': 'bi-exclamation-circle-fill text-warning'
+    };
+    return iconos[tipo] || 'bi-bell-fill text-secondary';
+}
+
+// Formatear fecha
+function formatearFecha(fecha) {
+    const d = new Date(fecha);
+    return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+// Cargar notificaciones desde el servidor
+async function cargarNotificaciones() {
+    try {
+        const res  = await fetch(`${BASE_URL}/preferencias-notificacion?accion=obtener`);
+        const data = await res.json();
+
+        const lista = document.getElementById('listaNotificaciones');
+        const badge = document.getElementById('badgeNotificaciones');
+
+        if (data.status !== 'success') return;
+
+        // Actualizar badge
+        const noLeidas = data.no_leidas;
+        badge.textContent = noLeidas > 0 ? noLeidas : '';
+        badge.style.display = noLeidas > 0 ? 'flex' : 'none';
+
+        // Renderizar lista
+        if (data.notificaciones.length === 0) {
+            lista.innerHTML = `
+                <div class="sin-notificaciones">
+                    <i class="bi bi-bell-slash"></i>
+                    <p>No tienes notificaciones</p>
+                </div>`;
+            return;
+        }
+
+        lista.innerHTML = data.notificaciones.map(n => `
+            <div class="notif-item ${n.leido == 0 ? 'no-leida' : ''}" data-id="${n.id}">
+                <div class="notif-icono">
+                    <i class="bi ${iconoTipo(n.tipo)}"></i>
+                </div>
+                <div class="notif-contenido">
+                    <p class="notif-titulo">${n.titulo ?? ''}</p>
+                    <p class="notif-mensaje">${n.mensaje}</p>
+                    <span class="notif-fecha">${formatearFecha(n.fecha)}</span>
+                </div>
+                ${n.leido == 0 ? `<span class="notif-punto"></span>` : ''}
+            </div>
+        `).join('');
+
+        // Click en una notificación = marcar como leída
+        lista.querySelectorAll('.notif-item.no-leida').forEach(item => {
+            item.addEventListener('click', async () => {
+                const id = item.dataset.id;
+                await fetch(`${BASE_URL}/preferencias-notificacion?accion=marcar_leida`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                item.classList.remove('no-leida');
+                item.querySelector('.notif-punto')?.remove();
+                // Restar del badge
+                const actual = parseInt(badge.textContent) || 0;
+                const nuevo = actual - 1;
+                badge.textContent = nuevo > 0 ? nuevo : '';
+                badge.style.display = nuevo > 0 ? 'flex' : 'none';
+            });
+        });
+
+    } catch (err) {
+        console.error('Error cargando notificaciones:', err);
+    }
+}
+
+// Marcar todas como leídas
+document.querySelector('[data-action="marcar-leidas"]')?.addEventListener('click', async () => {
+    await fetch(`${BASE_URL}/preferencias-notificacion?accion=marcar_todas`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    cargarNotificaciones(); // Recargar la lista
+});
+
+// Cargar al abrir el dropdown
+document.getElementById('btnNotificaciones')?.addEventListener('click', () => {
+    cargarNotificaciones();
+});
+
+// Cargar badge al iniciar la página (sin abrir el dropdown)
+cargarNotificaciones();
+
+// Recargar automáticamente cada 60 segundos
+setInterval(cargarNotificaciones, 60000);

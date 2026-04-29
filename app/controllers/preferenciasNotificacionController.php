@@ -31,11 +31,21 @@ switch ($method) {
             }
         }
         break;
-
+                    
     case 'GET':
         $accion = $_GET['accion'] ?? '';
         
         switch ($accion) {
+            case 'obtener':
+                obtenerNotificaciones();
+                break;
+            case 'marcar_leida':
+                marcarLeida();
+                break;
+            case 'marcar_todas':
+                marcarTodasLeidas();
+                break;
+
             case 'obtener':
                 obtenerPreferencia();
                 break;
