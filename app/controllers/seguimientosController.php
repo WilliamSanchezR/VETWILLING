@@ -23,8 +23,9 @@ if (!isset($_SESSION['user']['id_usuario'])) {
     exit();
 }
 
+$requestPayload = obtenerPayloadRequest();
 $method = $_SERVER['REQUEST_METHOD'];
-$action = $_GET['action'] ?? $_POST['action'] ?? '';
+$action = $_GET['action'] ?? $_POST['action'] ?? ($requestPayload['action'] ?? '');
 
 switch ($method) {
     case 'GET':
@@ -56,6 +57,9 @@ switch ($method) {
 
     case 'POST':
         switch ($action) {
+            case 'actualizar-estado':
+                actualizarEstadoPaciente();
+                break;
             case 'actualizar-observaciones':
                 actualizarObservaciones();
                 break;
@@ -134,6 +138,26 @@ function obtenerEstadisticas()
             'message' => 'Error al obtener estadísticas: ' . $e->getMessage()
         ]);
     }
+}
+
+function obtenerPayloadRequest(): array
+{
+    static $payload = null;
+
+    if ($payload !== null) {
+        return $payload;
+    }
+
+    $rawBody = file_get_contents('php://input');
+    if (!$rawBody) {
+        $payload = [];
+        return $payload;
+    }
+
+    $decoded = json_decode($rawBody, true);
+    $payload = is_array($decoded) ? $decoded : [];
+
+    return $payload;
 }
 
 /**
@@ -268,7 +292,7 @@ function obtenerAlertas()
 function actualizarObservaciones()
 {
     try {
-        $data = json_decode(file_get_contents('php://input'), true);
+        $data = obtenerPayloadRequest();
         
         $id_seguimiento = $data['id_seguimiento'] ?? null;
         $observacion = $data['observacion'] ?? null;
@@ -301,13 +325,54 @@ function actualizarObservaciones()
     }
 }
 
+function actualizarEstadoPaciente()
+{
+    try {
+        $data = obtenerPayloadRequest();
+
+        $id_seguimiento = isset($data['id_seguimiento']) ? (int) $data['id_seguimiento'] : 0;
+        $estado_salud = trim((string) ($data['estado_salud'] ?? ''));
+        $observacion = trim((string) ($data['observacion'] ?? ''));
+
+        if ($id_seguimiento <= 0 || $estado_salud === '' || $observacion === '') {
+            throw new Exception('Datos incompletos para la actualización clínica');
+        }
+
+        $id_usuario = (int) $_SESSION['user']['id_usuario'];
+
+        $seguimientosModel = new Seguimientos();
+        $resultado = $seguimientosModel->registrarActualizacionClinica($id_seguimiento, [
+            'estado_salud' => $estado_salud,
+            'observacion' => $observacion,
+            'diagnostico' => trim((string) ($data['diagnostico'] ?? '')),
+            'tratamiento' => trim((string) ($data['tratamiento'] ?? '')),
+            'dosis_tratamiento' => trim((string) ($data['dosis_tratamiento'] ?? '')),
+            'fecha_fin_tratamiento' => trim((string) ($data['fecha_fin_tratamiento'] ?? '')),
+        ], $id_usuario);
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Actualización clínica registrada correctamente',
+            'data' => $resultado,
+        ]);
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ]);
+    }
+}
+
 /**
  * Finaliza un seguimiento
  */
 function finalizarSeguimiento()
 {
     try {
-        $data = json_decode(file_get_contents('php://input'), true);
+        $data = obtenerPayloadRequest();
         
         $id_seguimiento = $data['id_seguimiento'] ?? null;
 
@@ -345,7 +410,7 @@ function finalizarSeguimiento()
 function registrarActividad()
 {
     try {
-        $data = json_decode(file_get_contents('php://input'), true);
+        $data = obtenerPayloadRequest();
         
         $id_seguimiento = $data['id_seguimiento'] ?? null;
         $tipo_actividad = $data['tipo_actividad'] ?? null;
@@ -395,7 +460,7 @@ function registrarActividad()
 function enviarNotificacion()
 {
     try {
-        $data = json_decode(file_get_contents('php://input'), true);
+        $data = obtenerPayloadRequest();
         
         $id_seguimiento = $data['id_seguimiento'] ?? null;
         $mensaje = $data['mensaje'] ?? 'Recordatorio de seguimiento';
@@ -407,19 +472,13 @@ function enviarNotificacion()
         $id_usuario = $_SESSION['user']['id_usuario'];
         
         $seguimientosModel = new Seguimientos();
-        $seguimiento = $seguimientosModel->obtenerSeguimientoPorId($id_seguimiento, $id_usuario);
-
-        if (!$seguimiento) {
-            throw new Exception('Seguimiento no encontrado');
-        }
-
-        // Aquí se integraría con el sistema de notificaciones/email existente
-        // Por ahora solo confirmamos la acción
+        $notificacionesCreadas = $seguimientosModel->enviarNotificacionSeguimiento($id_seguimiento, $id_usuario, $mensaje);
         
         header('Content-Type: application/json');
         echo json_encode([
             'status' => 'success',
-            'message' => 'Notificación enviada al propietario'
+            'message' => 'Notificación enviada correctamente',
+            'notificaciones_creadas' => $notificacionesCreadas
         ]);
     } catch (Exception $e) {
         header('Content-Type: application/json');

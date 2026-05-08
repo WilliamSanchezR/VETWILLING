@@ -611,6 +611,7 @@ class Reportes
             $sql = "SELECT
                         a.id_agendamiento,
                         DATE_FORMAT(a.fecha_hora, '%Y-%m-%d %H:%i') AS fecha,
+                        COALESCE(p.id_paciente, 0) AS id_paciente,
                         COALESCE(p.nombre, 'Sin paciente') AS paciente,
                         COALESCE(CONCAT(prop.nombres, ' ', prop.apellidos), 'Sin propietario') AS propietario,
                         COALESCE(s.nombre, 'Sin servicio') AS servicio,
@@ -658,5 +659,65 @@ class Reportes
             error_log('Error en Reportes::tablaAsignacionExiste - ' . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * RFS 32 subtask 6 & 8: Registra cada generación de reporte en el historial.
+     */
+    public function registrarGeneracion(int $idUsuario, string $tipoReporte, ?int $idPaciente, array $parametros): void
+    {
+        try {
+            $this->asegurarTablaReporteGenerado();
+            $sql = "INSERT INTO reporte_generado (id_usuario, tipo_reporte, id_paciente, parametros, generado_en)
+                    VALUES (:id_usuario, :tipo_reporte, :id_paciente, :parametros, CURRENT_TIMESTAMP)";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([
+                ':id_usuario'   => $idUsuario,
+                ':tipo_reporte' => $tipoReporte,
+                ':id_paciente'  => $idPaciente,
+                ':parametros'   => json_encode($parametros, JSON_UNESCAPED_UNICODE),
+            ]);
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::registrarGeneracion - ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * RFS 32 subtask 8: Devuelve el historial de reportes generados por el profesional.
+     */
+    public function obtenerHistorialGeneracion(int $idUsuario, ?int $idPaciente = null): array
+    {
+        try {
+            $this->asegurarTablaReporteGenerado();
+            $where = $idPaciente ? 'AND id_paciente = :id_paciente' : '';
+            $sql = "SELECT id, tipo_reporte, id_paciente, parametros, generado_en
+                    FROM reporte_generado
+                    WHERE id_usuario = :id_usuario {$where}
+                    ORDER BY generado_en DESC
+                    LIMIT 100";
+            $stmt = $this->conexion->prepare($sql);
+            $params = [':id_usuario' => $idUsuario];
+            if ($idPaciente) {
+                $params[':id_paciente'] = $idPaciente;
+            }
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerHistorialGeneracion - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    private function asegurarTablaReporteGenerado(): void
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS reporte_generado (
+            id           INT AUTO_INCREMENT PRIMARY KEY,
+            id_usuario   INT NOT NULL,
+            tipo_reporte VARCHAR(60) NOT NULL,
+            id_paciente  INT NULL,
+            parametros   JSON NULL,
+            generado_en  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+        $this->conexion->exec($sql);
     }
 }
