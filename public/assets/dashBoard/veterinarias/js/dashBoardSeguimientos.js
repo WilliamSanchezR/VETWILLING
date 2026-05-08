@@ -321,6 +321,15 @@
                             <li>
                                 <button class="dropdown-item d-flex align-items-center gap-2"
                                         type="button"
+                                        data-action="actualizar"
+                                        data-id="${seg.id_seguimiento}"
+                                        data-nombre="${escHtml(seg.paciente_nombre)}">
+                                    <i class="bi bi-heart-pulse text-success"></i> Actualizar estado
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center gap-2"
+                                        type="button"
                                         data-action="notificar"
                                         data-id="${seg.id_seguimiento}"
                                         data-nombre="${escHtml(seg.paciente_nombre)}">
@@ -440,6 +449,13 @@
                             data-id="${seg.id_seguimiento}">
                         <i class="bi bi-eye"></i> Ver historial
                     </button>
+                    <button class="btn-accion verde"
+                            type="button"
+                            data-action="actualizar"
+                            data-id="${seg.id_seguimiento}"
+                            data-nombre="${escHtml(seg.paciente_nombre)}">
+                        <i class="bi bi-heart-pulse"></i> Actualizar estado
+                    </button>
                     <button class="btn-accion naranja"
                             type="button"
                             data-action="notificar"
@@ -532,6 +548,10 @@
                 card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 break;
 
+            case 'actualizar':
+                abrirModalActualizarEstado(id, nombre);
+                break;
+
             case 'completar':
                 abrirModalConfirmar(id, nombre, btn.closest('.card-seg'));
                 break;
@@ -578,6 +598,30 @@
                 toast(`Notificación enviada — ${nombre}`, 'success');
             } else {
                 throw new Error(data.message || 'Error al notificar');
+            }
+        } catch (err) {
+            toast('Error: ' + err.message, 'error');
+        }
+    }
+
+    async function actualizarEstadoClinico(id, nombre, payload) {
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'actualizar-estado',
+                    id_seguimiento: id,
+                    ...payload,
+                }),
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                await cargarSeguimientos();
+                toast(`Estado clínico actualizado — ${nombre}`, 'success');
+            } else {
+                throw new Error(data.message || 'Error al actualizar el seguimiento');
             }
         } catch (err) {
             toast('Error: ' + err.message, 'error');
@@ -688,6 +732,94 @@
             errEl.style.display = 'none';
             bootstrap.Modal.getInstance(modal)?.hide();
             await notificarPropietario(id, nombre, msg);
+        });
+
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+
+    function abrirModalActualizarEstado(id, nombre) {
+        const modal = crearModal('modalActualizarSeg', `
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Actualización clínica — <span id="mActNombre"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="mActEstado" class="form-label fw-semibold">Estado actual de salud</label>
+                                <select id="mActEstado" class="form-select">
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="mejoria">Mejoría</option>
+                                    <option value="estable">Estable</option>
+                                    <option value="empeoramiento">Empeoramiento</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label for="mActDiagnostico" class="form-label fw-semibold">Diagnóstico reciente</label>
+                                <input id="mActDiagnostico" class="form-control" maxlength="255" placeholder="Diagnóstico o hallazgo clínico relevante">
+                            </div>
+                            <div class="col-md-7">
+                                <label for="mActTratamiento" class="form-label fw-semibold">Tratamiento o medicación en curso</label>
+                                <input id="mActTratamiento" class="form-control" maxlength="150" placeholder="Medicamento o tratamiento actual">
+                            </div>
+                            <div class="col-md-5">
+                                <label for="mActDosis" class="form-label fw-semibold">Dosis / indicación</label>
+                                <input id="mActDosis" class="form-control" maxlength="100" placeholder="Ej: 1 tableta cada 12 h">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="mActFechaFin" class="form-label fw-semibold">Fecha fin tratamiento</label>
+                                <input id="mActFechaFin" type="date" class="form-control">
+                            </div>
+                            <div class="col-md-8">
+                                <label for="mActObservacion" class="form-label fw-semibold">Observaciones del comportamiento y condición física</label>
+                                <textarea id="mActObservacion" class="seg-textarea" rows="4" maxlength="800" placeholder="Describe evolución clínica, comportamiento, signos y respuesta al tratamiento"></textarea>
+                            </div>
+                        </div>
+                        <div id="mActError" class="text-danger mt-2" style="font-size:13px;display:none">
+                            Completa al menos el estado de salud y las observaciones clínicas.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" id="mActOk" class="btn btn-success">
+                            <i class="bi bi-save me-1"></i> Guardar actualización
+                        </button>
+                    </div>
+                </div>
+            </div>`);
+
+        modal.querySelector('#mActNombre').textContent = nombre;
+
+        const btnOk = modal.querySelector('#mActOk');
+        const btnNuevo = btnOk.cloneNode(true);
+        btnOk.parentNode.replaceChild(btnNuevo, btnOk);
+
+        btnNuevo.addEventListener('click', async () => {
+            const estado = modal.querySelector('#mActEstado').value.trim();
+            const observacion = modal.querySelector('#mActObservacion').value.trim();
+            const diagnostico = modal.querySelector('#mActDiagnostico').value.trim();
+            const tratamiento = modal.querySelector('#mActTratamiento').value.trim();
+            const dosis = modal.querySelector('#mActDosis').value.trim();
+            const fechaFin = modal.querySelector('#mActFechaFin').value.trim();
+            const error = modal.querySelector('#mActError');
+
+            if (!estado || !observacion) {
+                error.style.display = 'block';
+                return;
+            }
+
+            error.style.display = 'none';
+            bootstrap.Modal.getInstance(modal)?.hide();
+            await actualizarEstadoClinico(id, nombre, {
+                estado_salud: estado,
+                observacion,
+                diagnostico,
+                tratamiento,
+                dosis_tratamiento: dosis,
+                fecha_fin_tratamiento: fechaFin,
+            });
         });
 
         bootstrap.Modal.getOrCreateInstance(modal).show();

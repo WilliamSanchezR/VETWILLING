@@ -26,7 +26,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
 </head>
 
-<body data-reportes-api-url="<?= BASE_URL ?>/veterinaria/reportes/data" data-reportes-pdf-url="<?= BASE_URL ?>/veterinaria/reportes/pdf" data-reportes-excel-url="<?= BASE_URL ?>/veterinaria/reportes/excel">
+<body data-reportes-api-url="<?= BASE_URL ?>/veterinaria/reportes/data" data-reportes-pdf-url="<?= BASE_URL ?>/veterinaria/reportes/pdf" data-reportes-excel-url="<?= BASE_URL ?>/veterinaria/reportes/excel" data-reportes-enviar-url="<?= BASE_URL ?>/veterinaria/reportes/enviar-ficha">
 
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Aqui va el include -->
@@ -72,6 +72,10 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <i class="bi bi-file-earmark-excel-fill"></i>
                             <span class="d-none d-md-inline">Exportar Excel</span>
                         </button>
+                        <button class="boton-exportar" style="background:#2563eb;color:#fff;" onclick="abrirModalEnviarFicha()">
+                            <i class="bi bi-envelope-fill"></i>
+                            <span class="d-none d-md-inline">Enviar ficha</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -95,6 +99,18 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             </button>
                             <button class="boton-periodo" data-periodo="ano">
                                 <i class="bi bi-calendar-range"></i> Año
+                            </button>
+                            <button class="boton-periodo" data-periodo="personalizado">
+                                <i class="bi bi-calendar2-range"></i> Personalizado
+                            </button>
+                        </div>
+                        <!-- Rango personalizado (RFS 32 subtask 3) -->
+                        <div class="d-flex gap-2 flex-wrap align-items-center mt-2" id="rangoPersonalizado" style="display:none!important;">
+                            <input type="date" id="fechaInicioReporte" class="form-control form-control-sm" style="width:auto;" title="Fecha inicio">
+                            <span class="text-muted small">al</span>
+                            <input type="date" id="fechaFinReporte" class="form-control form-control-sm" style="width:auto;" title="Fecha fin">
+                            <button class="btn btn-sm btn-success" onclick="cargarDashboardReportes()">
+                                <i class="bi bi-search"></i> Aplicar
                             </button>
                         </div>
                     </div>
@@ -426,12 +442,45 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 <th>Subservicio</th>
                                 <th>Estado</th>
                                 <th>Observaciones</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tablaDetalleCitasBody">
                             <!-- Datos dinámicos -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Enviar Ficha Clínica (RFS 32 subtask 7) -->
+    <div class="modal fade" id="modalEnviarFicha" tabindex="-1" aria-labelledby="modalEnviarFichaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEnviarFichaLabel">
+                        <i class="bi bi-envelope-fill me-2 text-primary"></i>Enviar Ficha Clínica por Correo
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Paciente seleccionado</label>
+                        <input type="text" class="form-control" id="enviarFichaNombrePaciente" readonly>
+                        <input type="hidden" id="enviarFichaIdPaciente">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mensaje adicional <span class="text-muted">(opcional)</span></label>
+                        <textarea class="form-control" id="enviarFichaMensaje" rows="3" placeholder="Ej: Por favor revisar la evolución del tratamiento..."></textarea>
+                    </div>
+                    <div id="enviarFichaAlerta" class="alert d-none"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmarEnviarFicha">
+                        <i class="bi bi-send-fill me-1"></i> Enviar al propietario
+                    </button>
                 </div>
             </div>
         </div>
