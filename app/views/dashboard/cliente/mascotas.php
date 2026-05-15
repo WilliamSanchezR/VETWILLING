@@ -272,29 +272,44 @@ $mascotas = listarMascotas();
          aria-labelledby="modalEliminarTitulo" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title text-danger d-flex align-items-center gap-2" id="modalEliminarTitulo">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        Eliminar mascota
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body pt-2">
-                    <p class="mb-1">¿Seguro que quieres eliminar a
-                        <strong id="nombreMascotaEliminar"></strong>?
-                    </p>
-                    <p class="text-muted small mb-0">Esta acción no se puede deshacer.</p>
-                </div>
-                <div class="modal-footer border-0 pt-0 gap-2">
-                    <button type="button" class="btn btn-sm btn-secondary d-flex align-items-center gap-1"
-                            data-bs-dismiss="modal">
-                        <i class="bi bi-x-lg"></i> Cancelar
-                    </button>
-                    <a href="#" id="btnConfirmarEliminar"
-                       class="btn btn-sm btn-danger d-flex align-items-center gap-1">
-                        <i class="bi bi-trash3"></i> Sí, eliminar
-                    </a>
-                </div>
+                <form id="formEliminarMascota" method="POST">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title text-danger d-flex align-items-center gap-2" id="modalEliminarTitulo">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Eliminar mascota
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body pt-2">
+                        <p class="mb-3">¿Seguro que quieres eliminar a
+                            <strong id="nombreMascotaEliminar"></strong>?
+                        </p>
+                        <div class="mb-3">
+                            <label for="motivoEliminacion" class="form-label">
+                                <span class="text-danger">*</span> Motivo de eliminación:
+                            </label>
+                            <textarea class="form-control form-control-sm" id="motivoEliminacion" 
+                                      name="motivo" rows="3" placeholder="Ej: Mudanza, razones personales, fallecimiento, etc." 
+                                      required></textarea>
+                            <small class="text-muted">Este registro quedará en la auditoría del sistema.</small>
+                        </div>
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-info-circle"></i> Esta acción no se puede deshacer.
+                        </p>
+                    </div>
+                    <div class="modal-footer border-0 pt-0 gap-2">
+                        <button type="button" class="btn btn-sm btn-secondary d-flex align-items-center gap-1"
+                                data-bs-dismiss="modal">
+                            <i class="bi bi-x-lg"></i> Cancelar
+                        </button>
+                        <button type="submit" id="btnConfirmarEliminar"
+                               class="btn btn-sm btn-danger d-flex align-items-center gap-1">
+                            <i class="bi bi-trash3"></i> Sí, eliminar
+                        </button>
+                    </div>
+                    <input type="hidden" id="idMascotaEliminar" name="id">
+                    <input type="hidden" name="accion" value="eliminar">
+                </form>
             </div>
         </div>
     </div>
@@ -350,6 +365,10 @@ $mascotas = listarMascotas();
         });
 
         /* ── Modal de eliminación ── */
+        var formEliminar = document.getElementById('formEliminarMascota');
+        var inputIdMascota = document.getElementById('idMascotaEliminar');
+        var inputMotivo = document.getElementById('motivoEliminacion');
+
         document.querySelectorAll('.btn-eliminar-mascota').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 var id     = this.dataset.id;
@@ -358,13 +377,43 @@ $mascotas = listarMascotas();
                 var spanNombre = document.getElementById('nombreMascotaEliminar');
                 if (spanNombre) spanNombre.textContent = nombre;
 
-                var btnConfirmar = document.getElementById('btnConfirmarEliminar');
-                if (btnConfirmar) {
-                    btnConfirmar.href =
-                        '<?= BASE_URL ?>/app/controllers/mascotasController.php?accion=eliminar&id=' + id;
-                }
+                if (inputIdMascota) inputIdMascota.value = id;
+                if (inputMotivo) inputMotivo.value = '';  // Limpiar motivo anterior
             });
         });
+
+        // Manejar envío del formulario
+        if (formEliminar) {
+            formEliminar.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                var motivo = inputMotivo ? inputMotivo.value.trim() : '';
+                if (!motivo) {
+                    alert('Por favor, ingresa un motivo para la eliminación.');
+                    return;
+                }
+
+                // Enviar formulario por POST
+                var formData = new FormData(formEliminar);
+                fetch('<?= BASE_URL ?>/app/controllers/mascotasController.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    // Cerrar modal
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('modalEliminarMascota'));
+                    if (modal) modal.hide();
+
+                    // Mostrar respuesta (el controller ya envía JSON con sweetAlert)
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al eliminar la mascota. Intenta de nuevo.');
+                });
+            });
+        }
 
     });
     </script>

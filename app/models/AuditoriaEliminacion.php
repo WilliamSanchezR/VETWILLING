@@ -43,15 +43,24 @@ class AuditoriaEliminacion
             $stmt = $this->conexion->prepare($sql);
 
             // Bindear parámetros
-            $stmt->bindParam(':id_paciente', $data['id_paciente'], PDO::PARAM_INT);
-            $stmt->bindParam(':nombre_mascota', $data['nombre_mascota'] ?? '', PDO::PARAM_STR);
-            $stmt->bindParam(':id_usuario', $data['id_usuario'], PDO::PARAM_INT);
-            $stmt->bindParam(':nombre_usuario', $data['nombre_usuario'] ?? '', PDO::PARAM_STR);
-            $stmt->bindParam(':rol_usuario', $data['rol_usuario'] ?? '', PDO::PARAM_STR);
-            $stmt->bindParam(':motivo_eliminacion', $data['motivo_eliminacion'] ?? '', PDO::PARAM_STR);
-            $stmt->bindParam(':citas_canceladas', $data['citas_canceladas'] ?? 0, PDO::PARAM_INT);
-            $stmt->bindParam(':tratamientos_cancelados', $data['tratamientos_cancelados'] ?? 0, PDO::PARAM_INT);
+            $id_paciente = $data['id_paciente'];
+            $nombre_mascota = $data['nombre_mascota'] ?? '';
+            $id_usuario = $data['id_usuario'];
+            $nombre_usuario = $data['nombre_usuario'] ?? '';
+            $rol_usuario = $data['rol_usuario'] ?? '';
+            $motivo_eliminacion = $data['motivo_eliminacion'] ?? '';
+            $citas_canceladas = $data['citas_canceladas'] ?? 0;
+            $tratamientos_cancelados = $data['tratamientos_cancelados'] ?? 0;
 
+            $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindParam(':nombre_mascota', $nombre_mascota, PDO::PARAM_STR);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':nombre_usuario', $nombre_usuario, PDO::PARAM_STR);
+            $stmt->bindParam(':rol_usuario', $rol_usuario, PDO::PARAM_STR);
+            $stmt->bindParam(':motivo_eliminacion', $motivo_eliminacion, PDO::PARAM_STR);
+            $stmt->bindParam(':citas_canceladas', $citas_canceladas, PDO::PARAM_INT);
+            $stmt->bindParam(':tratamientos_cancelados', $tratamientos_cancelados, PDO::PARAM_INT);
+            
             $resultado = $stmt->execute();
 
             if ($resultado) {

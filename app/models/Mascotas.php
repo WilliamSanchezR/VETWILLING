@@ -298,11 +298,12 @@ class Mascota
             if ($existeAsignacion) {
                 $cerrarAsignacion = $this->conexion->prepare(
                     "UPDATE paciente_profesional_asignacion
-                     SET estado = 'Inactivo', fecha_fin = CURRENT_TIMESTAMP
+                     SET estado = 'Finalizado', fecha_fin = CURRENT_TIMESTAMP
                      WHERE id_paciente = :id AND estado = 'Activo'"
                 );
                 $cerrarAsignacion->bindParam(':id', $id, PDO::PARAM_INT);
                 $cerrarAsignacion->execute();
+                error_log("✅ Asignación profesional finalizada");
             }
 
             // 3. Cancelar citas pendientes y contar

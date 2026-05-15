@@ -331,8 +331,8 @@ function eliminarMascota($id)
         }
 
         $id_usuario = $_SESSION['user']['id_usuario'];
-        $rol_usuario = $_SESSION['user']['rol'] ?? $_SESSION['rol'] ?? '';
-        $nombre_usuario = $_SESSION['user']['nombre'] ?? $_SESSION['nombres'] ?? 'Desconocido';
+        $id_rol = $_SESSION['user']['id_rol'] ?? 0;  // id_rol: 1=Admin, 2=Vet, 3=Propietario, 4=Representante
+        $nombre_usuario = $_SESSION['user']['nombre'] ?? $_SESSION['user']['nombres'] ?? 'Desconocido';
 
         // 2. OBTENER DATOS DE LA MASCOTA
         $objMascota = new Mascota();
@@ -343,10 +343,12 @@ function eliminarMascota($id)
             exit();
         }
 
-        // 3. VALIDACIÓN DE PERMISOS POR ROL
+        // 3. VALIDACIÓN DE PERMISOS POR ROL (usando id_rol: 1=Admin, 2=Vet, 3=Propietario, 4=Representante)
         $tienePermiso = false;
+        $rol_texto = '';
 
-        if ($rol_usuario === 'Propietario' || $rol_usuario === 'propietario') {
+        if ($id_rol == 3) {
+            // id_rol = 3 = Propietario (Cliente)
             // El propietario solo puede eliminar sus propias mascotas
             $db = new conexion();
             $conexion = $db->getConexion();
@@ -357,10 +359,17 @@ function eliminarMascota($id)
             $stmtProp->execute();
             $propietario = $stmtProp->fetch(PDO::FETCH_ASSOC);
 
-            if ($propietario && $mascota['id_propietario'] == $propietario['id_propietario']) {
+            error_log("🔍 Validando propietario - ID Usuario: $id_usuario, ID Propietario Usuario: " . ($propietario['id_propietario'] ?? 'null') . ", ID Propietario Mascota: " . $mascota['id_propietario']);
+
+            if ($propietario && (int)$mascota['id_propietario'] === (int)$propietario['id_propietario']) {
                 $tienePermiso = true;
+                $rol_texto = 'Propietario';
+                error_log("✅ Propietario validado correctamente");
+            } else {
+                error_log("❌ Propietario no coincide");
             }
-        } elseif ($rol_usuario === 'Veterinario' || $rol_usuario === 'veterinario') {
+        } elseif ($id_rol == 2) {
+            // id_rol = 2 = Veterinario
             // El veterinario solo puede eliminar mascotas que tiene asignadas
             $db = new conexion();
             $conexion = $db->getConexion();
@@ -377,10 +386,28 @@ function eliminarMascota($id)
 
             if ($resultVet && $resultVet['total'] > 0) {
                 $tienePermiso = true;
+                $rol_texto = 'Veterinario';
             }
-        } elseif ($rol_usuario === 'Administrador' || $rol_usuario === 'administrador') {
+        } elseif ($id_rol == 1) {
+            // id_rol = 1 = Administrador
             // Administrador tiene permiso total
             $tienePermiso = true;
+            $rol_texto = 'Administrador';
+        } elseif ($id_rol == 4) {
+            // id_rol = 4 = Representante (se trata igual que propietario)
+            $db = new conexion();
+            $conexion = $db->getConexion();
+
+            $sqlVerificaPropiedad = "SELECT id_propietario FROM propietario WHERE id_usuario = :id_usuario";
+            $stmtProp = $conexion->prepare($sqlVerificaPropiedad);
+            $stmtProp->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtProp->execute();
+            $propietario = $stmtProp->fetch(PDO::FETCH_ASSOC);
+
+            if ($propietario && (int)$mascota['id_propietario'] === (int)$propietario['id_propietario']) {
+                $tienePermiso = true;
+                $rol_texto = 'Representante';
+            }
         }
 
         // Si no tiene permiso, rechazar
@@ -406,7 +433,7 @@ function eliminarMascota($id)
         }
 
         // 5. OBTENER MOTIVO DE ELIMINACIÓN (si viene en POST)
-        $motivo = $_POST['motivo_eliminacion'] ?? '';
+        $motivo = $_POST['motivo'] ?? $_POST['motivo_eliminacion'] ?? '';
 
         if (empty($motivo)) {
             mostrarSweetAlert(
@@ -421,7 +448,7 @@ function eliminarMascota($id)
         $datosAuditoria = [
             'id_usuario' => $id_usuario,
             'nombre_usuario' => $nombre_usuario,
-            'rol_usuario' => $rol_usuario,
+            'rol_usuario' => $rol_texto,
             'motivo_eliminacion' => $motivo,
             'citas_canceladas' => $dependencias['citas_pendientes'],
             'tratamientos_cancelados' => $dependencias['tratamientos_activos']
