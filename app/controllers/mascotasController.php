@@ -11,7 +11,10 @@ switch ($method) {
         $accion = $_POST['accion'] ?? '';
 
         if ($accion === 'actualizar') {
-            actualizarMascota(); 
+            actualizarMascota();
+        } elseif ($accion === 'eliminar') {
+            // ✅ RFS 29: Eliminar con motivo (requiere POST)
+            eliminarMascota($_POST['id'] ?? $_POST['id_paciente'] ?? null);
         } else {
             registrarMascota();
         }
@@ -308,28 +311,146 @@ function actualizarMascota()
     exit();
 }
 
-// ✅ FUNCIÓN ELIMINAR CON GET (igual que tu ejemplo de veterinario)
+// ✅ FUNCIÓN ELIMINAR MEJORADA - RFS 29
+// Incluye: validación de permisos, verificación de dependencias, motivo y auditoría
 function eliminarMascota($id)
 {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
+    require_once __DIR__ . '/../models/Mascotas.php';
+    require_once __DIR__ . '/../models/AuditoriaEliminacion.php';
+    require_once __DIR__ . '/../../config/database.php';
 
-    // Crear instancia y eliminar
-    $objMascota = new Mascota();
-    $respuesta = $objMascota->eliminar($id);
+    try {
+        // 1. OBTENER DATOS DE LA SESIÓN
+        if (!isset($_SESSION['user'])) {
+            mostrarSweetAlert('error', 'Sesión no válida', 'Por favor inicia sesión');
+            exit();
+        }
 
-    // Responder según resultado
-    if ($respuesta) {
-        mostrarSweetAlert(
-            'success',
-            'Mascota inactivada',
-            'La mascota fue marcada como inactiva correctamente',
-            '/vetwilling/cliente/mascotas'
-        );
-    } else {
+        $id_usuario = $_SESSION['user']['id_usuario'];
+        $rol_usuario = $_SESSION['user']['rol'] ?? $_SESSION['rol'] ?? '';
+        $nombre_usuario = $_SESSION['user']['nombre'] ?? $_SESSION['nombres'] ?? 'Desconocido';
+
+        // 2. OBTENER DATOS DE LA MASCOTA
+        $objMascota = new Mascota();
+        $mascota = $objMascota->consultar($id);
+
+        if (!$mascota) {
+            mostrarSweetAlert('error', 'No encontrada', 'La mascota no existe o ya fue eliminada');
+            exit();
+        }
+
+        // 3. VALIDACIÓN DE PERMISOS POR ROL
+        $tienePermiso = false;
+
+        if ($rol_usuario === 'Propietario' || $rol_usuario === 'propietario') {
+            // El propietario solo puede eliminar sus propias mascotas
+            $db = new conexion();
+            $conexion = $db->getConexion();
+
+            $sqlVerificaPropiedad = "SELECT id_propietario FROM propietario WHERE id_usuario = :id_usuario";
+            $stmtProp = $conexion->prepare($sqlVerificaPropiedad);
+            $stmtProp->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtProp->execute();
+            $propietario = $stmtProp->fetch(PDO::FETCH_ASSOC);
+
+            if ($propietario && $mascota['id_propietario'] == $propietario['id_propietario']) {
+                $tienePermiso = true;
+            }
+        } elseif ($rol_usuario === 'Veterinario' || $rol_usuario === 'veterinario') {
+            // El veterinario solo puede eliminar mascotas que tiene asignadas
+            $db = new conexion();
+            $conexion = $db->getConexion();
+
+            $sqlVerificaVeterinario = "SELECT COUNT(*) as total FROM paciente_profesional_asignacion 
+                                       WHERE id_paciente = :id_paciente 
+                                       AND id_usuario = :id_usuario 
+                                       AND estado = 'Activo'";
+            $stmtVet = $conexion->prepare($sqlVerificaVeterinario);
+            $stmtVet->bindParam(':id_paciente', $id, PDO::PARAM_INT);
+            $stmtVet->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtVet->execute();
+            $resultVet = $stmtVet->fetch(PDO::FETCH_ASSOC);
+
+            if ($resultVet && $resultVet['total'] > 0) {
+                $tienePermiso = true;
+            }
+        } elseif ($rol_usuario === 'Administrador' || $rol_usuario === 'administrador') {
+            // Administrador tiene permiso total
+            $tienePermiso = true;
+        }
+
+        // Si no tiene permiso, rechazar
+        if (!$tienePermiso) {
+            mostrarSweetAlert(
+                'error',
+                'Permiso denegado',
+                'No tienes permisos para eliminar esta mascota. Solo el propietario o el veterinario asignado pueden hacerlo.'
+            );
+            exit();
+        }
+
+        // 4. VERIFICAR DEPENDENCIAS ACTIVAS
+        $dependencias = $objMascota->verificarDependencias($id);
+
+        if ($dependencias['tiene_dependencias']) {
+            mostrarSweetAlert(
+                'error',
+                'No se puede eliminar',
+                $dependencias['mensaje'] . ' Debes resolver estas pendencias primero.'
+            );
+            exit();
+        }
+
+        // 5. OBTENER MOTIVO DE ELIMINACIÓN (si viene en POST)
+        $motivo = $_POST['motivo_eliminacion'] ?? '';
+
+        if (empty($motivo)) {
+            mostrarSweetAlert(
+                'error',
+                'Motivo requerido',
+                'Por favor especifica un motivo para la eliminación'
+            );
+            exit();
+        }
+
+        // 6. PREPARAR DATOS DE AUDITORÍA
+        $datosAuditoria = [
+            'id_usuario' => $id_usuario,
+            'nombre_usuario' => $nombre_usuario,
+            'rol_usuario' => $rol_usuario,
+            'motivo_eliminacion' => $motivo,
+            'citas_canceladas' => $dependencias['citas_pendientes'],
+            'tratamientos_cancelados' => $dependencias['tratamientos_activos']
+        ];
+
+        // 7. ELIMINAR LA MASCOTA Y REGISTRAR AUDITORÍA
+        $respuesta = $objMascota->eliminar($id, $datosAuditoria);
+
+        // 8. RESPONDER AL USUARIO
+        if ($respuesta) {
+            mostrarSweetAlert(
+                'success',
+                'Mascota inactivada',
+                'La mascota fue marcada como inactiva correctamente. El registro y su historial médico se conservan en la auditoría.',
+                '/vetwilling/cliente/mascotas'
+            );
+        } else {
+            mostrarSweetAlert(
+                'error',
+                'Error al eliminar',
+                'No se pudo eliminar la mascota. Intenta nuevamente'
+            );
+        }
+    } catch (Exception $e) {
+        error_log("❌ Error en eliminarMascota: " . $e->getMessage());
         mostrarSweetAlert(
             'error',
-            'Error al eliminar',
-            'No se pudo eliminar la mascota. Intenta nuevamente'
+            'Error del sistema',
+            'Ocurrió un error. Por favor intenta más tarde.'
         );
     }
 

@@ -181,23 +181,112 @@ class Mascota
         }
     }
 
+    /**
+     * VERIFICAR DEPENDENCIAS ACTIVAS
+     * Valida si hay citas, tratamientos o facturas pendientes
+     */
+    public function verificarDependencias(int $id)
+    {
+        try {
+            $dependencias = [
+                'citas_pendientes' => 0,
+                'tratamientos_activos' => 0,
+                'facturas_pendientes' => 0,
+                'tiene_dependencias' => false,
+                'mensaje' => ''
+            ];
+
+            // 1. Verificar citas pendientes
+            $sqlCitas = "SELECT COUNT(*) as total FROM agendamiento 
+                        WHERE id_paciente = :id_paciente 
+                        AND estado IN ('Pendiente', 'Confirmada')";
+            $stmtCitas = $this->conexion->prepare($sqlCitas);
+            $stmtCitas->bindParam(':id_paciente', $id, PDO::PARAM_INT);
+            $stmtCitas->execute();
+            $resultCitas = $stmtCitas->fetch(PDO::FETCH_ASSOC);
+            $dependencias['citas_pendientes'] = $resultCitas['total'] ?? 0;
+
+            // 2. Verificar tratamientos activos
+            $sqlTratamientos = "SELECT COUNT(*) as total FROM paciente_tratamiento 
+                               WHERE id_paciente = :id_paciente 
+                               AND estado IN ('Activo', 'En Progreso')";
+            $stmtTratamientos = $this->conexion->prepare($sqlTratamientos);
+            $stmtTratamientos->bindParam(':id_paciente', $id, PDO::PARAM_INT);
+            $stmtTratamientos->execute();
+            $resultTratamientos = $stmtTratamientos->fetch(PDO::FETCH_ASSOC);
+            $dependencias['tratamientos_activos'] = $resultTratamientos['total'] ?? 0;
+
+            // 3. Verificar facturas pendientes (si existe tabla)
+            $sqlExisteFacturas = "SELECT COUNT(*) FROM information_schema.TABLES 
+                                 WHERE TABLE_SCHEMA = DATABASE() 
+                                 AND TABLE_NAME = 'factura'";
+            $stmtExiste = $this->conexion->prepare($sqlExisteFacturas);
+            $stmtExiste->execute();
+            $existeFacturas = ((int) $stmtExiste->fetchColumn() > 0);
+
+            if ($existeFacturas) {
+                $sqlFacturas = "SELECT COUNT(*) as total FROM factura 
+                               WHERE id_paciente = :id_paciente 
+                               AND estado IN ('Pendiente', 'Parcial')";
+                $stmtFacturas = $this->conexion->prepare($sqlFacturas);
+                $stmtFacturas->bindParam(':id_paciente', $id, PDO::PARAM_INT);
+                $stmtFacturas->execute();
+                $resultFacturas = $stmtFacturas->fetch(PDO::FETCH_ASSOC);
+                $dependencias['facturas_pendientes'] = $resultFacturas['total'] ?? 0;
+            }
+
+            // Determinar si hay dependencias
+            $totalDependencias = $dependencias['citas_pendientes'] + 
+                                 $dependencias['tratamientos_activos'] + 
+                                 $dependencias['facturas_pendientes'];
+
+            if ($totalDependencias > 0) {
+                $dependencias['tiene_dependencias'] = true;
+                $mensaje = "No se puede eliminar. Hay: ";
+                $detalles = [];
+                if ($dependencias['citas_pendientes'] > 0) {
+                    $detalles[] = $dependencias['citas_pendientes'] . " cita(s) pendiente(s)";
+                }
+                if ($dependencias['tratamientos_activos'] > 0) {
+                    $detalles[] = $dependencias['tratamientos_activos'] . " tratamiento(s) activo(s)";
+                }
+                if ($dependencias['facturas_pendientes'] > 0) {
+                    $detalles[] = $dependencias['facturas_pendientes'] . " factura(s) pendiente(s)";
+                }
+                $dependencias['mensaje'] = implode(", ", $detalles) . ".";
+            }
+
+            return $dependencias;
+        } catch (PDOException $e) {
+            error_log("Error Mascota::verificarDependencias → " . $e->getMessage());
+            return [
+                'citas_pendientes' => 0,
+                'tratamientos_activos' => 0,
+                'facturas_pendientes' => 0,
+                'tiene_dependencias' => false,
+                'mensaje' => 'Error al verificar dependencias'
+            ];
+        }
+    }
 
     /**
-     * ELIMINAR MASCOTA
+     * ELIMINAR MASCOTA (Borrado Lógico)
+     * Ahora puede recibir datos de auditoría
      */
-    public function eliminar(int $id)
+    public function eliminar(int $id, array $datosAuditoria = [])
     {
         try {
             $this->conexion->beginTransaction();
 
-            // 1. Obtener imagen antes de inactivar
+            // 1. Obtener información de la mascota
             $stmt = $this->conexion->prepare(
-                "SELECT img_mascota FROM paciente WHERE id_paciente = :id"
+                "SELECT nombre, img_mascota FROM paciente WHERE id_paciente = :id"
             );
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
             $mascota = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            // 2. Cerrar asignaciones activas si existen
             $sqlExisteAsignacion = "SELECT COUNT(*)
                                     FROM information_schema.TABLES
                                     WHERE TABLE_SCHEMA = DATABASE()
@@ -207,7 +296,6 @@ class Mascota
             $existeAsignacion = ((int) $stmtExiste->fetchColumn() > 0);
 
             if ($existeAsignacion) {
-                // Cerrar asignaciones activas asociadas al paciente.
                 $cerrarAsignacion = $this->conexion->prepare(
                     "UPDATE paciente_profesional_asignacion
                      SET estado = 'Inactivo', fecha_fin = CURRENT_TIMESTAMP
@@ -217,12 +305,29 @@ class Mascota
                 $cerrarAsignacion->execute();
             }
 
-            // 2. Inactivar mascota (borrado lógico)
+            // 3. Cancelar citas pendientes y contar
+            $sqlContarCitas = "UPDATE agendamiento
+                              SET estado = 'Cancelada'
+                              WHERE id_paciente = :id AND estado IN ('Pendiente', 'Confirmada')";
+            $stmtCitas = $this->conexion->prepare($sqlContarCitas);
+            $stmtCitas->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmtCitas->execute();
+            $citasCanceladas = $stmtCitas->rowCount();
+
+            // 4. Contar tratamientos activos antes de marcar como inactivos
+            $sqlTratamientos = "SELECT COUNT(*) as total FROM paciente_tratamiento 
+                               WHERE id_paciente = :id_paciente AND estado IN ('Activo', 'En Progreso')";
+            $stmtTratCount = $this->conexion->prepare($sqlTratamientos);
+            $stmtTratCount->bindParam(':id_paciente', $id, PDO::PARAM_INT);
+            $stmtTratCount->execute();
+            $resultTrat = $stmtTratCount->fetch(PDO::FETCH_ASSOC);
+            $tratamientosCancelados = $resultTrat['total'] ?? 0;
+
+            // 5. Inactivar mascota (borrado lógico)
             $delete = $this->conexion->prepare(
                 "UPDATE paciente
                  SET estado = 'Inactivo'
-                 WHERE id_paciente = :id
-                 AND estado = 'Activo'"
+                 WHERE id_paciente = :id AND estado = 'Activo'"
             );
             $delete->bindParam(':id', $id, PDO::PARAM_INT);
             $resultado = $delete->execute();
@@ -232,15 +337,18 @@ class Mascota
                 return false;
             }
 
-            $this->conexion->commit();
+            // 6. Registrar en auditoría si se proporcionan datos
+            if (!empty($datosAuditoria)) {
+                require_once __DIR__ . '/AuditoriaEliminacion.php';
+                $auditoria = new AuditoriaEliminacion();
+                $datosAuditoria['id_paciente'] = $id;
+                $datosAuditoria['nombre_mascota'] = $mascota['nombre'] ?? 'Desconocido';
+                $datosAuditoria['citas_canceladas'] = $citasCanceladas;
+                $datosAuditoria['tratamientos_cancelados'] = $tratamientosCancelados;
+                $auditoria->registrarEliminacion($datosAuditoria);
+            }
 
-            // 3. Eliminar imagen del servidor
-            // if ($resultado && !empty($mascota['img_mascota'])) {
-            //     $ruta = BASE_PATH . "/public/uploads/mascotas/" . $mascota['img_mascota'];
-            //     if (file_exists($ruta)) {
-            //         unlink($ruta);
-            //     }
-            // }
+            $this->conexion->commit();
 
             return $resultado;
         } catch (PDOException $e) {

@@ -134,9 +134,26 @@ function registrarPacienteConPropietario()
     }
 
     try {
-        // 1. Registrar el propietario
+        // 1. VALIDAR DUPLICIDAD - Verificar si el propietario ya existe
         $propietarioModel = new Propietario();
+        
+        if ($propietarioModel->existePropietario($numero_documento, $id_veterinaria)) {
+            $propietarioExistente = $propietarioModel->obtenerPropietarioExistente($numero_documento, $id_veterinaria);
+            
+            if ($propietarioExistente) {
+                error_log("⚠️ Cliente duplicado detectado. Documento: " . $numero_documento . " ID: " . $propietarioExistente['id_propietario']);
+                
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Este cliente ya está registrado en el sistema. Usa el registro existente.',
+                    'cliente_existente' => true,
+                    'id_propietario' => $propietarioExistente['id_propietario']
+                ]);
+                exit();
+            }
+        }
 
+        // 2. Registrar el propietario
         $dataPropietario = [
             'tipo_documento' => $tipo_documento,
             'numero_documento' => $numero_documento,
@@ -178,7 +195,7 @@ function registrarPacienteConPropietario()
             $emailAviso = 'El correo registrado no tiene un formato valido para enviar notificaciones.';
         }
 
-        // 2. Registrar mascotas
+        // 3. Registrar mascotas
         $mascotaModel = new Mascota();
         $asignacionModel = new PacienteProfesionalAsignacion();
 
