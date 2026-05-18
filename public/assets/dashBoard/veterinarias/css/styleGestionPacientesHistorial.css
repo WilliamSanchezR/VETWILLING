@@ -1,13 +1,45 @@
-/* ========================================
-DISEÑO GESTIÓN PACIENTES - HISTORIAL
-======================================== */
+/* ============================================================
+   Gestión de Pacientes — Historial Clínico
+   Rediseño visual senior · Drop-in replacement
+   Mantiene los mismos selectores que usa gestion-pacientes.js
+   ============================================================ */
 
+/* ---------- Tokens locales (sólo para esta vista) ---------- */
 .historial-shell {
+    --hist-primary: #0a932c;
+    --hist-primary-600: #097a25;
+    --hist-primary-50: rgba(10, 147, 44, 0.08);
+    --hist-primary-100: rgba(10, 147, 44, 0.14);
+    --hist-ink: #0f172a;
+    --hist-ink-soft: #334155;
+    --hist-muted: #64748b;
+    --hist-border: #e6ebf0;
+    --hist-border-strong: #d8e0e8;
+    --hist-surface: #ffffff;
+    --hist-surface-soft: #f7faf8;
+    --hist-bg: #f5f8f6;
+    --hist-radius: 14px;
+    --hist-radius-sm: 10px;
+    --hist-radius-pill: 999px;
+    --hist-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(15, 23, 42, 0.03);
+    --hist-shadow-md: 0 6px 18px -8px rgba(15, 23, 42, 0.18);
+    --hist-focus: 0 0 0 3px rgba(10, 147, 44, 0.18);
+    --hist-fs-xs: 11px;
+    --hist-fs-sm: 12.5px;
+    --hist-fs-md: 14px;
+    --hist-fs-lg: 16px;
+
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    color: var(--hist-ink);
 }
 
+.area-contenido {
+    padding: var(--spacing-xl);
+    padding-top: 0 !important ;
+}
+/* Tipografía consistente */
 .historial-shell,
 .historial-shell p,
 .historial-shell span,
@@ -19,7 +51,7 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 .historial-shell button,
 .historial-shell td,
 .historial-shell th {
-    font-family: var(--font-body);
+    font-family: var(--font-body, "Inter", system-ui, -apple-system, "Segoe UI", sans-serif);
 }
 
 .historial-shell h1,
@@ -29,81 +61,138 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 .historial-shell h5,
 .historial-shell h6,
 .mini-stat strong {
-    font-family: var(--font-titles);
+    font-family: var(--font-titles, "Inter", system-ui, sans-serif);
+    letter-spacing: -0.01em;
 }
 
+/* ---------- Encabezado ---------- */
 .encabezado-historial {
     margin-bottom: 0;
+    align-items: flex-end;
 }
 
-.workspace-tabs {
-    margin-top: 12px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.workspace-tab {
-    border: 1px solid #dce5ec;
-    border-radius: 999px;
-    background: #fff;
-    color: var(--gray-dark);
-    padding: 8px 13px;
-    font-size: var(--fs-title4);
+.encabezado-historial h4 {
+    font-size: 22px;
     font-weight: 700;
+    color: var(--hist-ink);
+    margin: 0;
     display: inline-flex;
     align-items: center;
-    transition: all 0.2s ease;
-}
-
-.workspace-tab:hover {
-    border-color: rgba(10, 147, 44, 0.35);
-    color: var(--primary-color);
-}
-
-.workspace-tab.active {
-    border-color: var(--primary-color);
-    background: rgba(10, 147, 44, 0.12);
-    color: var(--primary-color);
-}
-
-.ventana-oculta {
-    display: none;
+    gap: 8px;
 }
 
 .subtitulo-historial {
     margin-top: 6px;
-    font-size: var(--fs-title4);
-    color: var(--gray-dark);
-    opacity: 0.85;
+    font-size: var(--hist-fs-md);
+    color: var(--hist-muted);
+    font-weight: 400;
 }
 
+/* ---------- Mini stats ---------- */
+.mini-stat {
+    background: var(--hist-surface);
+    border-radius: var(--hist-radius);
+    box-shadow: var(--hist-shadow-sm);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid var(--hist-border);
+    height: 100%;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.mini-stat:hover {
+    box-shadow: var(--hist-shadow-md);
+    transform: translateY(-1px);
+}
+
+.mini-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.mini-stat strong {
+    display: block;
+    color: var(--hist-ink);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.mini-stat small {
+    display: block;
+    color: var(--hist-muted);
+    font-size: var(--hist-fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+}
+
+/* ---------- Tarjetas ---------- */
+.historial-card {
+    background: var(--hist-surface);
+    border-radius: var(--hist-radius);
+    box-shadow: var(--hist-shadow-sm);
+    padding: 20px;
+    border: 1px solid var(--hist-border);
+}
+
+.historial-card h5 {
+    margin: 0;
+    color: var(--hist-ink);
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bloque-titulo {
+    margin-bottom: 14px;
+}
+
+/* ---------- Flujo recomendado ---------- */
 .atajos-card {
-    background: linear-gradient(120deg, rgba(10, 147, 44, 0.08), rgba(147, 190, 223, 0.16));
-    border: 1px solid rgba(10, 147, 44, 0.12);
+    background:
+        linear-gradient(135deg, rgba(10, 147, 44, 0.05) 0%, rgba(255, 255, 255, 0) 60%),
+        var(--hist-surface);
+    border: 1px solid var(--hist-primary-100);
 }
 
 .atajos-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    gap: 12px;
 }
 
 .atajo-item {
-    background: rgba(255, 255, 255, 0.88);
-    border-radius: 10px;
-    border: 1px solid rgba(10, 147, 44, 0.08);
-    padding: 12px;
+    background: var(--hist-surface);
+    border-radius: var(--hist-radius-sm);
+    border: 1px solid var(--hist-border);
+    padding: 14px;
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.atajo-item:hover {
+    border-color: var(--hist-primary-100);
+    transform: translateY(-1px);
 }
 
 .atajo-num {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    background: var(--primary-color);
+    background: var(--hist-primary);
     color: #fff;
     font-size: 12px;
     font-weight: 700;
@@ -116,86 +205,96 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 
 .atajo-item strong {
     display: block;
-    font-size: var(--fs-title4);
-    color: var(--gray-dark);
-    margin-bottom: 2px;
+    font-size: var(--hist-fs-md);
+    color: var(--hist-ink);
+    margin-bottom: 3px;
+    font-weight: 600;
 }
 
 .atajo-item small {
-    color: #55616d;
-    line-height: 1.35;
+    color: var(--hist-muted);
+    line-height: 1.5;
+    font-size: var(--hist-fs-sm);
 }
 
-.mini-stat {
-    background: var(--white);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    padding: 14px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 1px solid rgba(10, 147, 44, 0.08);
-    height: 100%;
+/* ---------- Workspace tabs ---------- */
+.workspace-tabs {
+    margin-top: 4px;
+    display: inline-flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    padding: 4px;
+    background: #eef2f0;
+    border: 1px solid var(--hist-border);
+    border-radius: 12px;
+    width: fit-content;
 }
 
-.mini-stat-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
+.workspace-tab {
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--hist-muted);
+    padding: 8px 14px;
+    font-size: var(--hist-fs-md);
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
+    gap: 6px;
+    transition: all 0.18s ease;
+    cursor: pointer;
 }
 
-.mini-stat strong {
-    display: block;
-    color: var(--gray-dark);
-    font-size: var(--fs-title2);
-    line-height: 1.2;
+.workspace-tab:hover {
+    color: var(--hist-ink);
 }
 
-.mini-stat small {
-    color: var(--gray-dark);
-    opacity: 0.8;
-    font-size: var(--fs-title4);
+.workspace-tab.active {
+    background: var(--hist-surface);
+    color: var(--hist-ink);
+    border-color: var(--hist-border);
+    box-shadow: var(--hist-shadow-sm);
 }
 
-.historial-card {
-    background: var(--white);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    padding: 18px;
-    border: 1px solid rgba(10, 147, 44, 0.06);
+.ventana-oculta {
+    display: none;
 }
 
-.historial-card h5 {
-    margin: 0;
-    color: var(--gray-dark);
-    font-size: var(--fs-title2);
-}
-
-.bloque-titulo {
-    margin-bottom: 12px;
-}
-
+/* ---------- Filtros ---------- */
 .filtros-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr auto;
-    gap: 10px;
+    gap: 12px;
     align-items: end;
+}
+
+.label-historial {
+    display: block;
+    font-size: var(--hist-fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    color: var(--hist-muted);
+    margin-bottom: 6px;
 }
 
 .input-filtro,
 .select-filtro,
 .textarea-historial,
 .input-historial {
-    border: 1px solid var(--gray-medium);
-    border-radius: 10px;
+    border: 1px solid var(--hist-border-strong);
+    border-radius: var(--hist-radius-sm);
     padding: 10px 12px;
-    font-size: var(--fs-title4);
-    background: #fff;
+    font-size: var(--hist-fs-md);
+    background: var(--hist-surface);
+    color: var(--hist-ink);
     width: 100%;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.input-filtro::placeholder,
+.textarea-historial::placeholder {
+    color: #94a3b8;
 }
 
 .input-filtro:focus,
@@ -203,16 +302,13 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 .textarea-historial:focus,
 .input-historial:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(10, 147, 44, 0.12);
+    border-color: var(--hist-primary);
+    box-shadow: var(--hist-focus);
 }
 
-.label-historial {
-    display: block;
-    font-size: var(--fs-title4);
-    font-weight: 600;
-    color: var(--gray-dark);
-    margin-bottom: 6px;
+.input-historial[readonly] {
+    background: var(--hist-surface-soft);
+    color: var(--hist-ink-soft);
 }
 
 .acciones-filtro {
@@ -221,29 +317,61 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
     flex-wrap: wrap;
 }
 
-.btn-secundario {
-    border: 1px solid var(--gray-medium);
-    color: var(--gray-dark);
-    background: var(--white);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    font-size: var(--fs-title4);
+/* ---------- Botones ---------- */
+.boton-agregar {
+    background: var(--hist-primary);
+    color: #fff;
+    border: 1px solid var(--hist-primary);
+    border-radius: var(--hist-radius-sm);
+    padding: 10px 16px;
+    font-size: var(--hist-fs-md);
     font-weight: 600;
-    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(10, 147, 44, 0.18);
+    transition: background 0.18s ease, transform 0.05s ease;
+}
+
+.boton-agregar:hover {
+    background: var(--hist-primary-600);
+}
+
+.boton-agregar:active {
+    transform: translateY(1px);
+}
+
+.btn-secundario {
+    border: 1px solid var(--hist-border-strong);
+    color: var(--hist-ink-soft);
+    background: var(--hist-surface);
+    border-radius: var(--hist-radius-sm);
+    padding: 10px 14px;
+    font-size: var(--hist-fs-md);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.18s ease;
+    cursor: pointer;
 }
 
 .btn-secundario:hover {
-    background: #f7f9fb;
-    border-color: #d3dae2;
+    background: var(--hist-surface-soft);
+    border-color: #c8d2dc;
 }
 
 .btn-sm-fit {
-    height: 40px;
+    height: 42px;
 }
 
+/* ---------- Tabla ---------- */
 .tabla-wrapper {
-    border: 1px solid #e8edf1;
-    border-radius: 10px;
+    border: 1px solid var(--hist-border);
+    border-radius: var(--hist-radius-sm);
+    overflow: hidden;
+    background: var(--hist-surface);
 }
 
 .tabla-historial {
@@ -253,174 +381,243 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 }
 
 .tabla-historial thead th {
-    background: #f6faf7;
-    color: var(--gray-dark);
-    font-size: var(--fs-title4);
-    padding: 11px 12px;
-    border-bottom: 1px solid #e8edf1;
+    background: #f1f5f3;
+    color: var(--hist-muted);
+    font-size: var(--hist-fs-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--hist-border);
+    text-align: left;
     white-space: nowrap;
 }
 
 .tabla-historial tbody td {
-    font-size: var(--fs-title4);
-    color: var(--gray-dark);
-    padding: 11px 12px;
-    border-bottom: 1px solid #eef1f4;
+    font-size: var(--hist-fs-md);
+    color: var(--hist-ink-soft);
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--hist-border);
     vertical-align: middle;
+}
+
+.tabla-historial tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .tabla-historial tbody tr {
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.15s ease;
 }
 
 .tabla-historial tbody tr:hover {
-    background: #f8fdf9;
+    background: #f8fbf9;
 }
 
 .tabla-historial tbody tr.active {
-    background: rgba(10, 147, 44, 0.09);
+    background: var(--hist-primary-50);
 }
 
 .paciente-cell strong {
     display: block;
     margin-bottom: 2px;
+    color: var(--hist-ink);
+    font-weight: 600;
 }
 
 .paciente-cell small {
-    color: #6c757d;
-    font-size: var(--fs-title4);
+    color: var(--hist-muted);
+    font-size: var(--hist-fs-xs);
 }
 
+/* ---------- Badges ---------- */
 .badge-acceso,
 .badge-version,
 .badge-sync {
-    border-radius: 999px;
-    padding: 5px 10px;
-    font-size: var(--fs-title4);
+    border-radius: var(--hist-radius-pill);
+    padding: 4px 10px;
+    font-size: var(--hist-fs-xs);
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    line-height: 1;
 }
 
 .badge-acceso.permitido {
-    background: rgba(25, 135, 84, 0.15);
-    color: #146c43;
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
 }
 
 .badge-acceso.restringido {
-    background: rgba(220, 53, 69, 0.15);
-    color: #b02a37;
+    background: rgba(220, 38, 38, 0.12);
+    color: #b91c1c;
 }
 
 .badge-version {
-    background: rgba(13, 110, 253, 0.12);
-    color: #084298;
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
 }
 
 .badge-sync {
-    background: rgba(10, 147, 44, 0.13);
-    color: var(--primary-color);
+    background: var(--hist-primary-100);
+    color: var(--hist-primary-600);
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+    padding: 5px 10px;
 }
 
+/* ---------- Acciones por fila ---------- */
 .acciones-registro {
     display: flex;
     gap: 6px;
+    justify-content: flex-end;
 }
 
 .btn-mini {
     width: 32px;
     height: 32px;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--hist-border-strong);
     border-radius: 8px;
-    background: #fff;
-    color: var(--gray-dark);
-    transition: all 0.2s ease;
+    background: var(--hist-surface);
+    color: var(--hist-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
 }
 
 .btn-mini:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+    border-color: var(--hist-primary);
+    color: var(--hist-primary);
+    background: var(--hist-primary-50);
 }
 
+.btn-mini-danger {
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.btn-mini-danger:hover {
+    border-color: #dc2626;
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.06);
+}
+
+/* ---------- Panel de detalle ---------- */
 .panel-seguridad {
-    border: 1px dashed rgba(10, 147, 44, 0.32);
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 12px;
-    background: rgba(10, 147, 44, 0.04);
+    border: 1px dashed var(--hist-primary-100);
+    border-radius: var(--hist-radius-sm);
+    padding: 14px;
+    margin-bottom: 14px;
+    background: var(--hist-primary-50);
+}
+
+.panel-seguridad .text-muted,
+.panel-seguridad .small {
+    color: var(--hist-muted);
+    font-size: var(--hist-fs-sm);
+}
+
+.panel-seguridad strong {
+    color: var(--hist-ink);
 }
 
 .resumen-paciente {
-    border: 1px solid rgba(10, 147, 44, 0.12);
-    border-radius: 10px;
-    padding: 10px 12px;
-    background: #f7fcf8;
+    border: 1px solid var(--hist-primary-100);
+    border-radius: var(--hist-radius-sm);
+    padding: 12px 14px;
+    background: var(--hist-primary-50);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
 .resumen-paciente-head {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
 }
 
 .resumen-paciente-head i {
-    color: var(--primary-color);
-    font-size: 20px;
-    margin-top: 2px;
+    color: var(--hist-primary);
+    font-size: 22px;
+    margin-top: 1px;
+    background: var(--hist-surface);
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .resumen-paciente-head strong {
     display: block;
-    color: var(--gray-dark);
+    color: var(--hist-ink);
     font-size: 15px;
+    font-weight: 600;
     line-height: 1.2;
 }
 
 .resumen-paciente-head small {
-    color: #5d6a77;
-    line-height: 1.35;
+    color: var(--hist-muted);
+    line-height: 1.4;
+    font-size: var(--hist-fs-sm);
 }
 
 .campos-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 12px;
 }
 
 .textarea-historial {
-    min-height: 72px;
+    min-height: 80px;
     resize: vertical;
+    line-height: 1.5;
 }
 
 .acciones-panel {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 6px;
+    justify-content: flex-end;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--hist-border);
 }
 
 .bloque-versionado {
-    background: #f8fafc;
-    border-radius: 10px;
-    padding: 12px;
-    margin-top: 12px;
-    border: 1px solid #e8edf1;
+    background: var(--hist-surface-soft);
+    border-radius: var(--hist-radius-sm);
+    padding: 14px;
+    margin-top: 14px;
+    border: 1px solid var(--hist-border);
+}
+
+.bloque-versionado .small {
+    color: var(--hist-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: var(--hist-fs-xs);
+    font-weight: 600;
 }
 
 .item-version {
     display: flex;
     align-items: start;
     gap: 10px;
-    font-size: var(--fs-title4);
-    color: var(--gray-dark);
-    margin-bottom: 9px;
+    font-size: var(--hist-fs-sm);
+    color: var(--hist-ink-soft);
+    margin-bottom: 8px;
+    line-height: 1.5;
 }
 
 .item-version:last-child {
@@ -428,43 +625,57 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 }
 
 .item-version i {
-    color: var(--primary-color);
+    color: var(--hist-primary);
     margin-top: 2px;
 }
 
+/* ---------- Módulos clínicos ---------- */
 .modulo-fase2 {
-    border: 1px solid #e8edf1;
-    background: #fbfdfb;
+    border: 1px solid var(--hist-border);
+    background: var(--hist-surface);
 }
 
 .tabs-ficha {
-    border-bottom-color: #e5ebef;
+    border-bottom: 1px solid var(--hist-border) !important;
+    gap: 4px;
 }
 
 .tabs-ficha .nav-link {
-    color: var(--gray-dark);
-    font-size: var(--fs-title4);
-    border-radius: 10px 10px 0 0;
+    color: var(--hist-muted);
+    font-size: var(--hist-fs-md);
+    font-weight: 600;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0;
+    padding: 10px 14px;
+    transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.tabs-ficha .nav-link:hover {
+    color: var(--hist-ink);
 }
 
 .tabs-ficha .nav-link.active {
-    color: var(--primary-color);
+    color: var(--hist-primary) !important;
+    border-bottom-color: var(--hist-primary) !important;
+    background: transparent !important;
     font-weight: 700;
 }
 
 .listado-modulo {
-    border: 1px solid #e8edf1;
-    border-radius: 10px;
-    padding: 8px;
-    background: #fff;
-    max-height: 210px;
+    border: 1px solid var(--hist-border);
+    border-radius: var(--hist-radius-sm);
+    padding: 10px;
+    background: var(--hist-surface-soft);
+    max-height: 280px;
     overflow: auto;
 }
 
 .modulo-vacio {
-    font-size: var(--fs-title4);
-    color: #6c757d;
-    padding: 8px;
+    font-size: var(--hist-fs-sm);
+    color: var(--hist-muted);
+    padding: 14px;
+    text-align: center;
 }
 
 .modulo-lista {
@@ -474,58 +685,58 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 }
 
 .item-modulo {
-    border: 1px solid #edf2f5;
-    border-radius: 8px;
-    padding: 8px 10px;
-    background: #f9fcfa;
+    border: 1px solid var(--hist-border);
+    border-radius: var(--hist-radius-sm);
+    padding: 12px;
+    background: var(--hist-surface);
+    transition: border-color 0.18s ease, transform 0.05s ease;
+}
+
+.item-modulo:hover {
+    border-color: var(--hist-primary-100);
 }
 
 .item-modulo-head {
     display: flex;
     justify-content: space-between;
     gap: 8px;
-    margin-bottom: 4px;
-    font-size: var(--fs-title4);
-    color: var(--gray-dark);
+    margin-bottom: 6px;
+    font-size: var(--hist-fs-md);
+    color: var(--hist-ink);
+    font-weight: 600;
 }
 
 .item-modulo-head span {
-    color: #5f6f7d;
+    color: var(--hist-muted);
+    font-weight: 500;
+    font-size: var(--hist-fs-xs);
     white-space: nowrap;
 }
 
 .item-modulo-body,
 .item-modulo-foot {
-    font-size: var(--fs-title4);
-    color: #4b5563;
+    font-size: var(--hist-fs-sm);
+    color: var(--hist-ink-soft);
+    line-height: 1.5;
 }
 
 .item-modulo-foot {
-    margin-top: 3px;
+    margin-top: 4px;
+    color: var(--hist-muted);
 }
 
 .item-modulo-actions {
     display: flex;
     justify-content: flex-end;
     gap: 6px;
-    margin-top: 8px;
-}
-
-.btn-mini-danger {
-    border-color: #f1c6cb;
-    color: #b02a37;
-}
-
-.btn-mini-danger:hover {
-    border-color: #dc3545;
-    color: #dc3545;
-    background: rgba(220, 53, 69, 0.06);
+    margin-top: 10px;
 }
 
 .modulo-toolbar {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    margin-bottom: 12px;
 }
 
 .modulo-toolbar .input-filtro,
@@ -534,31 +745,40 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
     flex: 1;
 }
 
+/* ---------- Paginación ---------- */
 .paginacion-modulo {
-    margin-top: 8px;
+    margin-top: 12px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 }
 
 .btn-pagina {
     min-width: 32px;
     height: 32px;
-    border: 1px solid #d9e2e8;
+    border: 1px solid var(--hist-border-strong);
     border-radius: 8px;
-    background: #fff;
-    color: var(--gray-dark);
-    font-size: var(--fs-title4);
-    font-weight: 700;
+    background: var(--hist-surface);
+    color: var(--hist-ink-soft);
+    font-size: var(--hist-fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.btn-pagina:hover {
+    border-color: var(--hist-primary);
+    color: var(--hist-primary);
 }
 
 .btn-pagina.activa {
-    border-color: var(--primary-color);
-    background: rgba(10, 147, 44, 0.12);
-    color: var(--primary-color);
+    border-color: var(--hist-primary);
+    background: var(--hist-primary);
+    color: #fff;
 }
 
+/* ---------- Toasts ---------- */
 .toast-shell {
     position: fixed;
     top: 84px;
@@ -570,28 +790,31 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 }
 
 .toast-mini {
-    min-width: 260px;
-    max-width: 360px;
-    border-radius: 10px;
-    padding: 10px 12px;
-    box-shadow: var(--shadow-sm);
-    font-size: var(--fs-title4);
+    min-width: 280px;
+    max-width: 380px;
+    border-radius: var(--hist-radius-sm);
+    padding: 12px 14px;
+    box-shadow: var(--hist-shadow-md);
+    font-size: var(--hist-fs-md);
+    font-weight: 500;
     border: 1px solid transparent;
-    background: #fff;
+    background: var(--hist-surface);
+    color: var(--hist-ink);
 }
 
 .toast-mini.success {
-    border-color: rgba(25, 135, 84, 0.35);
-    background: #f3fbf6;
-    color: #146c43;
+    border-color: rgba(16, 185, 129, 0.35);
+    background: #ecfdf5;
+    color: #047857;
 }
 
 .toast-mini.error {
-    border-color: rgba(220, 53, 69, 0.35);
-    background: #fff5f6;
-    color: #b02a37;
+    border-color: rgba(220, 38, 38, 0.35);
+    background: #fef2f2;
+    color: #b91c1c;
 }
 
+/* ---------- Responsive ---------- */
 @media (max-width: 1200px) {
     .atajos-grid {
         grid-template-columns: 1fr;
@@ -610,6 +833,7 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
     .workspace-tabs {
         display: grid;
         grid-template-columns: 1fr;
+        width: 100%;
     }
 
     .workspace-tab {
@@ -627,5 +851,9 @@ DISEÑO GESTIÓN PACIENTES - HISTORIAL
 
     .btn-sm-fit {
         width: 100%;
+    }
+
+    .mini-stat strong {
+        font-size: 18px;
     }
 }
