@@ -52,6 +52,34 @@
         "created_at": 1776643625,
         "last_seen": 1776643625,
         "activa": true,
+        "is_current": false,
+        "es_nueva": true
+    },
+    "5184f9cd22d490e6cc30dd0f6d8b6f2cdcc57247488b513a": {
+        "ip": "::1",
+        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1",
+        "navegador": {
+            "nombre": "Safari 604",
+            "icono": "bi-browser-safari"
+        },
+        "so": {
+            "nombre": "iOS 18.5",
+            "icono": "bi-apple"
+        },
+        "tipo": {
+            "nombre": "Móvil",
+            "icono": "bi-phone-fill"
+        },
+        "marca": {
+            "nombre": "Apple iPhone",
+            "icono": "bi-phone-fill"
+        },
+        "ciudad": "Local / Desarrollo",
+        "fingerprint": "f8bff96ff83303dc",
+        "token": "5184f9cd22d490e6cc30dd0f6d8b6f2cdcc57247488b513a",
+        "created_at": 1779120772,
+        "last_seen": 1779120772,
+        "activa": true,
         "is_current": true,
         "es_nueva": true
     }
