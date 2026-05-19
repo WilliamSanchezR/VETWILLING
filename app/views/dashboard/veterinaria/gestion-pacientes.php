@@ -1,7 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -26,56 +25,71 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         <?php include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php' ?>
 
         <div class="area-contenido">
-            <section class="historial-shell">
-                <div class="encabezado-seccion encabezado-historial mb-0">
+            <section class="historial-shell" aria-labelledby="tituloGestionPacientes">
+
+                <!-- ============ ENCABEZADO ============ -->
+                <header class="encabezado-seccion encabezado-historial d-flex justify-content-between align-items-end flex-wrap gap-3 mb-0">
                     <div>
-                        <h4><i class="bi bi-clipboard2-pulse me-2"></i>Gestión de Pacientes</h4>
-                        <p class="subtitulo-historial mb-0">Historial clínico, control de acceso y trazabilidad por atención</p>
+                        <h4 id="tituloGestionPacientes">
+                            <i class="bi bi-clipboard2-pulse me-2"></i>Gestión de Pacientes
+                        </h4>
+                        <p class="subtitulo-historial mb-0">
+                            Historial clínico, control de acceso y trazabilidad por atención.
+                        </p>
                     </div>
-                    <div class="d-flex gap-2 flex-wrap">
+                    <div class="d-flex gap-2 flex-wrap" role="toolbar" aria-label="Acciones principales">
                         <button id="btnExportarPdf" class="btn-secundario" type="button">
-                            <i class="bi bi-download me-1"></i> Exportar reporte
+                            <i class="bi bi-download"></i> Exportar reporte
                         </button>
                         <button id="btnExportarFichaPdf" class="btn-secundario" type="button">
-                            <i class="bi bi-file-earmark-medical me-1"></i> Exportar ficha paciente
+                            <i class="bi bi-file-earmark-medical"></i> Ficha del paciente
                         </button>
                         <button id="btnNuevaAtencion" class="boton-agregar" type="button">
                             <i class="bi bi-plus-circle"></i> Nueva atención
                         </button>
                     </div>
-                </div>
+                </header>
 
-                <div class="row g-3 mt-1">
-                    <div class="col-6 col-md-3">
+                <!-- ============ MINI STATS ============ -->
+                <div class="row g-3" role="list" aria-label="Resumen operativo">
+                    <div class="col-6 col-md-3" role="listitem">
                         <div class="mini-stat">
-                            <span class="mini-stat-icon" style="background: rgba(10, 147, 44, 0.12); color: #0a932c;"><i class="bi bi-journal-text"></i></span>
+                            <span class="mini-stat-icon" style="background: rgba(10, 147, 44, 0.12); color: #0a932c;">
+                                <i class="bi bi-journal-text"></i>
+                            </span>
                             <div>
                                 <strong id="statTotalAtenciones">0</strong>
                                 <small>Atenciones</small>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-3" role="listitem">
                         <div class="mini-stat">
-                            <span class="mini-stat-icon" style="background: rgba(59, 130, 246, 0.12); color: #2563eb;"><i class="bi bi-people"></i></span>
+                            <span class="mini-stat-icon" style="background: rgba(37, 99, 235, 0.12); color: #2563eb;">
+                                <i class="bi bi-people"></i>
+                            </span>
                             <div>
                                 <strong id="statPacientesUnicos">0</strong>
                                 <small>Pacientes únicos</small>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-3" role="listitem">
                         <div class="mini-stat">
-                            <span class="mini-stat-icon" style="background: rgba(245, 158, 11, 0.14); color: #b45309;"><i class="bi bi-person-badge"></i></span>
+                            <span class="mini-stat-icon" style="background: rgba(245, 158, 11, 0.14); color: #b45309;">
+                                <i class="bi bi-person-badge"></i>
+                            </span>
                             <div>
                                 <strong id="statVeterinariosActivos">0</strong>
                                 <small>Veterinarios</small>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-md-3" role="listitem">
                         <div class="mini-stat">
-                            <span class="mini-stat-icon" style="background: rgba(20, 184, 166, 0.14); color: #0f766e;"><i class="bi bi-clock-history"></i></span>
+                            <span class="mini-stat-icon" style="background: rgba(20, 184, 166, 0.14); color: #0f766e;">
+                                <i class="bi bi-clock-history"></i>
+                            </span>
                             <div>
                                 <strong id="statUltimaAtencion">--</strong>
                                 <small>Última atención</small>
@@ -84,84 +98,95 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                 </div>
 
-                <div class="historial-card mt-3 atajos-card">
-                    <div class="bloque-titulo mb-2">
+                <!-- ============ FLUJO RECOMENDADO ============ -->
+                <div class="historial-card atajos-card">
+                    <div class="bloque-titulo d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h5><i class="bi bi-signpost-split me-2"></i>Flujo recomendado</h5>
+                        <small class="text-muted">Buenas prácticas clínicas</small>
                     </div>
                     <div class="atajos-grid">
                         <div class="atajo-item">
                             <span class="atajo-num">1</span>
                             <div>
-                                <strong>Filtra o busca paciente</strong>
-                                <small>Ubica rápidamente el historial que necesitas revisar.</small>
+                                <strong>Filtra o busca el paciente</strong>
+                                <small>Localiza el historial en segundos por nombre, fecha o veterinario.</small>
                             </div>
                         </div>
                         <div class="atajo-item">
                             <span class="atajo-num">2</span>
                             <div>
-                                <strong>Selecciona una atención</strong>
-                                <small>El panel derecho carga detalles y versiones automáticamente.</small>
+                                <strong>Selecciona la atención</strong>
+                                <small>El panel derecho carga versiones, ficha y trazabilidad automáticamente.</small>
                             </div>
                         </div>
                         <div class="atajo-item">
                             <span class="atajo-num">3</span>
                             <div>
-                                <strong>Edita y guarda</strong>
-                                <small>Registra cambios, vacunas, tratamientos, consultas y notas clínicas.</small>
+                                <strong>Edita, valida y guarda</strong>
+                                <small>Registra cambios en vacunas, tratamientos, consultas y notas clínicas.</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="historial-card mt-3">
+                <!-- ============ FILTROS ============ -->
+                <div class="historial-card">
                     <div class="bloque-titulo">
                         <h5><i class="bi bi-funnel me-2"></i>Filtros y búsqueda</h5>
                     </div>
                     <div class="filtros-grid">
                         <div>
-                            <label class="label-historial">Paciente</label>
-                            <input id="filtroPaciente" class="input-filtro" type="text" placeholder="Buscar por nombre del paciente...">
+                            <label for="filtroPaciente" class="label-historial">Paciente</label>
+                            <input id="filtroPaciente" class="input-filtro" type="text"
+                                placeholder="Buscar por nombre del paciente...">
                         </div>
                         <div>
-                            <label class="label-historial">Fecha</label>
+                            <label for="filtroFecha" class="label-historial">Fecha</label>
                             <input id="filtroFecha" class="input-filtro" type="date">
                         </div>
                         <div>
-                            <label class="label-historial">Veterinario</label>
+                            <label for="filtroVeterinario" class="label-historial">Veterinario</label>
                             <select id="filtroVeterinario" class="select-filtro">
                                 <option value="">Todos</option>
                             </select>
                         </div>
                         <div>
-                            <label class="label-historial">Acceso</label>
+                            <label for="filtroAcceso" class="label-historial">Acceso</label>
                             <select id="filtroAcceso" class="select-filtro">
                                 <option value="">Todos</option>
                                 <option value="Autorizado">Autorizado</option>
                             </select>
                         </div>
                         <div class="acciones-filtro">
-                            <button id="btnFiltrar" class="boton-agregar btn-sm-fit" type="button"><i class="bi bi-search"></i> Filtrar</button>
-                            <button id="btnLimpiar" class="btn-secundario btn-sm-fit" type="button"><i class="bi bi-arrow-counterclockwise"></i> Limpiar</button>
+                            <button id="btnFiltrar" class="boton-agregar btn-sm-fit" type="button">
+                                <i class="bi bi-search"></i> Filtrar
+                            </button>
+                            <button id="btnLimpiar" class="btn-secundario btn-sm-fit" type="button">
+                                <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+                            </button>
                         </div>
                     </div>
                 </div>
 
+                <!-- ============ WORKSPACE TABS ============ -->
                 <div class="workspace-tabs" role="tablist" aria-label="Ventanas de gestión clínica">
                     <button type="button" class="workspace-tab active" data-workspace-tab="listado" aria-selected="true">
-                        <i class="bi bi-table me-1"></i> Listado de atenciones
+                        <i class="bi bi-table"></i> Listado de atenciones
                     </button>
                     <button type="button" class="workspace-tab" data-workspace-tab="detalle" aria-selected="false">
-                        <i class="bi bi-file-earmark-medical me-1"></i> Detalle y edición
+                        <i class="bi bi-file-earmark-medical"></i> Detalle y edición
                     </button>
                     <button type="button" class="workspace-tab" data-workspace-tab="modulos" aria-selected="false">
-                        <i class="bi bi-journal-medical me-1"></i> Módulos clínicos
+                        <i class="bi bi-journal-medical"></i> Módulos clínicos
                     </button>
                 </div>
 
-                <div class="row g-3 mt-1">
+                <!-- ============ LISTADO + DETALLE ============ -->
+                <div class="row g-3">
+                    <!-- LISTADO -->
                     <div class="col-xl-7" id="panelListadoAtenciones">
                         <div class="historial-card h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                 <h5 class="mb-0"><i class="bi bi-table me-2"></i>Listado de atenciones</h5>
                                 <span class="badge-sync"><i class="bi bi-arrow-repeat"></i> Datos en tiempo real</span>
                             </div>
@@ -175,12 +200,14 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                             <th>Motivo</th>
                                             <th>Acceso</th>
                                             <th>Versión</th>
-                                            <th>Acciones</th>
+                                            <th class="text-end">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tablaHistorialesBody">
                                         <tr>
-                                            <td colspan="7" class="text-center py-3">Cargando historiales...</td>
+                                            <td colspan="7" class="text-center py-4 text-muted">
+                                                <i class="bi bi-hourglass-split me-1"></i> Cargando historiales...
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -188,92 +215,100 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         </div>
                     </div>
 
+                    <!-- DETALLE -->
                     <div class="col-xl-5 ventana-oculta" id="panelEdicionClinica">
                         <div class="historial-card h-100">
                             <div id="detalleContenidoHistorial">
-                                <h5><i class="bi bi-file-medical me-2"></i>Detalle y edición del historial</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                                    <h5 class="mb-0"><i class="bi bi-file-medical me-2"></i>Detalle y edición</h5>
+                                    <span class="badge-version" id="detalleVersion">--</span>
+                                </div>
 
-                                <div class="resumen-paciente mt-3 mb-2">
+                                <!-- Resumen del paciente -->
+                                <div class="resumen-paciente mb-3">
                                     <div class="resumen-paciente-head">
                                         <i class="bi bi-heart-pulse"></i>
                                         <div>
                                             <strong id="detallePacienteTitulo">Sin paciente seleccionado</strong>
-                                            <small id="detallePacienteMeta">Selecciona un registro en la tabla para iniciar la edición.</small>
+                                            <small id="detallePacienteMeta">Selecciona un registro de la tabla para iniciar la edición.</small>
                                         </div>
                                     </div>
-                                    <span class="badge-acceso permitido" id="detalleEstadoEdicion"><i class="bi bi-check-circle"></i> Listo para editar</span>
+                                    <span class="badge-acceso permitido" id="detalleEstadoEdicion">
+                                        <i class="bi bi-check-circle"></i> Listo para editar
+                                    </span>
                                 </div>
 
+                                <!-- Trazabilidad -->
                                 <div class="panel-seguridad">
-                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
                                         <span class="badge-sync"><i class="bi bi-link-45deg"></i> Integrado con consultas</span>
-                                        <span class="badge-version" id="detalleVersion">--</span>
                                     </div>
-                                    <div class="small text-muted mt-2">Paciente registrado: <strong id="detallePacienteRegistro">Sí</strong></div>
-                                    <div class="small text-muted">Acceso de edición: <strong id="detalleAcceso">Autorizado</strong></div>
-                                    <div class="small text-muted">Última actualización: <strong id="detalleActualizacion">--</strong></div>
+                                    <div class="small">Paciente registrado: <strong id="detallePacienteRegistro">Sí</strong></div>
+                                    <div class="small">Acceso de edición: <strong id="detalleAcceso">Autorizado</strong></div>
+                                    <div class="small">Última actualización: <strong id="detalleActualizacion">--</strong></div>
                                 </div>
 
-                                <form id="formHistorial" class="d-flex flex-column gap-2">
+                                <!-- Formulario -->
+                                <form id="formHistorial" class="d-flex flex-column gap-3 mt-3">
                                     <input type="hidden" id="campoIdHistorial">
                                     <input type="hidden" id="campoIdPaciente">
 
                                     <div class="campos-grid">
                                         <div>
-                                            <label class="label-historial">Nombre del paciente</label>
+                                            <label for="campoPaciente" class="label-historial">Nombre del paciente</label>
                                             <input id="campoPaciente" class="input-historial" type="text" readonly>
                                         </div>
                                         <div>
-                                            <label class="label-historial">Fecha de atención</label>
+                                            <label for="campoFecha" class="label-historial">Fecha de atención</label>
                                             <input id="campoFecha" class="input-historial" type="date">
                                         </div>
                                     </div>
 
                                     <div class="campos-grid">
                                         <div>
-                                            <label class="label-historial">Especie</label>
+                                            <label for="campoEspecie" class="label-historial">Especie</label>
                                             <input id="campoEspecie" class="input-historial" type="text" readonly>
                                         </div>
                                         <div>
-                                            <label class="label-historial">Raza</label>
+                                            <label for="campoRaza" class="label-historial">Raza</label>
                                             <input id="campoRaza" class="input-historial" type="text" readonly>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label class="label-historial">Veterinario responsable</label>
+                                        <label for="campoVeterinario" class="label-historial">Veterinario responsable</label>
                                         <input id="campoVeterinario" class="input-historial" type="text" readonly>
                                     </div>
 
                                     <div>
-                                        <label class="label-historial">Versiones del historial</label>
+                                        <label for="selectVersionHistorial" class="label-historial">Versiones del historial</label>
                                         <select id="selectVersionHistorial" class="select-filtro">
                                             <option value="">Selecciona una atención</option>
                                         </select>
                                     </div>
 
                                     <div>
-                                        <label class="label-historial">Motivo de la consulta</label>
+                                        <label for="campoMotivo" class="label-historial">Motivo de la consulta</label>
                                         <textarea id="campoMotivo" class="textarea-historial"></textarea>
                                     </div>
 
                                     <div>
-                                        <label class="label-historial">Diagnóstico</label>
+                                        <label for="campoDiagnostico" class="label-historial">Diagnóstico</label>
                                         <textarea id="campoDiagnostico" class="textarea-historial"></textarea>
                                     </div>
 
                                     <div>
-                                        <label class="label-historial">Tratamientos aplicados</label>
+                                        <label for="campoTratamiento" class="label-historial">Tratamientos aplicados</label>
                                         <textarea id="campoTratamiento" class="textarea-historial"></textarea>
                                     </div>
 
                                     <div>
-                                        <label class="label-historial">Medicación recetada</label>
+                                        <label for="campoMedicacion" class="label-historial">Medicación recetada</label>
                                         <textarea id="campoMedicacion" class="textarea-historial"></textarea>
                                     </div>
 
                                     <div>
-                                        <label class="label-historial">Observaciones adicionales</label>
+                                        <label for="campoObservaciones" class="label-historial">Observaciones adicionales</label>
                                         <textarea id="campoObservaciones" class="textarea-historial"></textarea>
                                     </div>
 
@@ -284,6 +319,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                     </div>
                                 </form>
 
+                                <!-- Trazabilidad final -->
                                 <div class="bloque-versionado">
                                     <strong class="small d-block mb-2">Trazabilidad y versionado</strong>
                                     <div class="item-version mb-0">
@@ -293,64 +329,78 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                 </div>
                             </div>
 
+                            <!-- ============ MÓDULOS CLÍNICOS ============ -->
                             <div class="historial-card modulo-fase2 mt-3 p-3 ventana-oculta" id="panelModulosClinicos">
-                                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                     <h5 class="mb-0"><i class="bi bi-journal-medical me-2"></i>Módulos clínicos</h5>
                                     <span class="badge-sync"><i class="bi bi-heart-pulse"></i> Ficha integral</span>
                                 </div>
 
                                 <ul class="nav nav-tabs tabs-ficha" id="tabsFichaClinica" role="tablist">
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="tab-vacunas" data-bs-toggle="tab" data-bs-target="#panel-vacunas" type="button" role="tab">Vacunas</button>
+                                        <button class="nav-link active" id="tab-vacunas" data-bs-toggle="tab"
+                                            data-bs-target="#panel-vacunas" type="button" role="tab">Vacunas</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="tab-tratamientos" data-bs-toggle="tab" data-bs-target="#panel-tratamientos" type="button" role="tab">Tratamientos</button>
+                                        <button class="nav-link" id="tab-tratamientos" data-bs-toggle="tab"
+                                            data-bs-target="#panel-tratamientos" type="button" role="tab">Tratamientos</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="tab-consultas" data-bs-toggle="tab" data-bs-target="#panel-consultas" type="button" role="tab">Consultas</button>
+                                        <button class="nav-link" id="tab-consultas" data-bs-toggle="tab"
+                                            data-bs-target="#panel-consultas" type="button" role="tab">Consultas</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="tab-notas" data-bs-toggle="tab" data-bs-target="#panel-notas" type="button" role="tab">Notas</button>
+                                        <button class="nav-link" id="tab-notas" data-bs-toggle="tab"
+                                            data-bs-target="#panel-notas" type="button" role="tab">Notas</button>
                                     </li>
                                 </ul>
 
                                 <div class="tab-content pt-3" id="tabContentFichaClinica">
+
+                                    <!-- VACUNAS -->
                                     <div class="tab-pane fade show active" id="panel-vacunas" role="tabpanel">
-                                        <div class="modulo-toolbar mb-2">
+                                        <div class="modulo-toolbar">
                                             <input id="buscarVacunas" class="input-filtro" type="text" placeholder="Buscar vacuna...">
                                             <input id="filtroFechaVacunas" class="input-filtro" type="date" title="Filtrar por fecha de aplicación">
                                         </div>
                                         <form id="formVacuna" class="d-flex flex-column gap-2">
                                             <div class="campos-grid">
                                                 <div>
-                                                    <label class="label-historial">Tipo de vacuna</label>
+                                                    <label for="vacunaTipo" class="label-historial">Tipo de vacuna</label>
                                                     <input id="vacunaTipo" class="input-historial" type="text" placeholder="Ej. Rabia">
                                                 </div>
                                                 <div>
-                                                    <label class="label-historial">Dosis</label>
+                                                    <label for="vacunaDosis" class="label-historial">Dosis</label>
                                                     <input id="vacunaDosis" class="input-historial" type="text" placeholder="Ej. 1 ml">
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label class="label-historial">Fecha de aplicación</label>
-                                                <input id="vacunaFecha" class="input-historial" type="date">
-                                            </div>
-                                            <div>
-                                                <label class="label-historial">Observaciones</label>
-                                                <textarea id="vacunaObservaciones" class="textarea-historial" placeholder="Observaciones de la vacuna"></textarea>
+                                            <div class="campos-grid">
+                                                <div>
+                                                    <label for="vacunaFecha" class="label-historial">Fecha de aplicación</label>
+                                                    <input id="vacunaFecha" class="input-historial" type="date">
+                                                </div>
+                                                <div>
+                                                    <label for="vacunaObservaciones" class="label-historial">Observaciones</label>
+                                                    <input id="vacunaObservaciones" class="input-historial" type="text" placeholder="Notas...">
+                                                </div>
                                             </div>
                                             <div class="acciones-panel">
-                                                <button id="btnGuardarVacuna" type="button" class="boton-agregar"><i class="bi bi-plus-circle"></i> Guardar vacuna</button>
+                                                <button id="btnGuardarVacuna" type="button" class="boton-agregar">
+                                                    <i class="bi bi-plus-circle"></i> Guardar vacuna
+                                                </button>
                                             </div>
                                         </form>
-                                        <div id="listaVacunas" class="listado-modulo mt-2"></div>
+                                        <div id="listaVacunas" class="listado-modulo mt-3">
+                                            <div class="modulo-vacio">Selecciona un paciente para ver su ficha clínica.</div>
+                                        </div>
                                         <div id="paginacionVacunas" class="paginacion-modulo"></div>
                                     </div>
 
+                                    <!-- TRATAMIENTOS -->
                                     <div class="tab-pane fade" id="panel-tratamientos" role="tabpanel">
-                                        <div class="modulo-toolbar mb-2">
+                                        <div class="modulo-toolbar">
                                             <input id="buscarTratamientos" class="input-filtro" type="text" placeholder="Buscar tratamiento...">
-                                            <select id="filtroEstadoTratamientos" class="select-filtro" title="Filtrar por estado">
+                                            <select id="filtroEstadoTratamientos" class="select-filtro">
                                                 <option value="">Todos los estados</option>
                                                 <option value="Activo">Activo</option>
                                                 <option value="Finalizado">Finalizado</option>
@@ -361,91 +411,110 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                                         <form id="formTratamiento" class="d-flex flex-column gap-2">
                                             <div class="campos-grid">
                                                 <div>
-                                                    <label class="label-historial">Medicamento</label>
-                                                    <input id="tratamientoMedicamento" class="input-historial" type="text" placeholder="Nombre del medicamento">
+                                                    <label for="tratamientoMedicamento" class="label-historial">Medicamento</label>
+                                                    <input id="tratamientoMedicamento" class="input-historial" type="text">
                                                 </div>
                                                 <div>
-                                                    <label class="label-historial">Dosis</label>
-                                                    <input id="tratamientoDosis" class="input-historial" type="text" placeholder="Ej. 5 mg cada 12h">
+                                                    <label for="tratamientoDosis" class="label-historial">Dosis</label>
+                                                    <input id="tratamientoDosis" class="input-historial" type="text">
                                                 </div>
                                             </div>
                                             <div class="campos-grid">
                                                 <div>
-                                                    <label class="label-historial">Fecha inicio</label>
+                                                    <label for="tratamientoInicio" class="label-historial">Inicio</label>
                                                     <input id="tratamientoInicio" class="input-historial" type="date">
                                                 </div>
                                                 <div>
-                                                    <label class="label-historial">Fecha fin</label>
+                                                    <label for="tratamientoFin" class="label-historial">Fin</label>
                                                     <input id="tratamientoFin" class="input-historial" type="date">
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label class="label-historial">Estado</label>
-                                                <select id="tratamientoEstado" class="select-filtro">
-                                                    <option value="Activo">Activo</option>
-                                                    <option value="Finalizado">Finalizado</option>
-                                                    <option value="Suspendido">Suspendido</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="label-historial">Observaciones</label>
-                                                <textarea id="tratamientoObservaciones" class="textarea-historial" placeholder="Notas del tratamiento"></textarea>
+                                            <div class="campos-grid">
+                                                <div>
+                                                    <label for="tratamientoEstado" class="label-historial">Estado</label>
+                                                    <select id="tratamientoEstado" class="select-filtro">
+                                                        <option value="Activo">Activo</option>
+                                                        <option value="Finalizado">Finalizado</option>
+                                                        <option value="Suspendido">Suspendido</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label for="tratamientoObservaciones" class="label-historial">Observaciones</label>
+                                                    <input id="tratamientoObservaciones" class="input-historial" type="text">
+                                                </div>
                                             </div>
                                             <div class="acciones-panel">
-                                                <button id="btnGuardarTratamiento" type="button" class="boton-agregar"><i class="bi bi-plus-circle"></i> Guardar tratamiento</button>
+                                                <button id="btnGuardarTratamiento" type="button" class="boton-agregar">
+                                                    <i class="bi bi-plus-circle"></i> Guardar tratamiento
+                                                </button>
                                             </div>
                                         </form>
-                                        <div id="listaTratamientos" class="listado-modulo mt-2"></div>
+                                        <div id="listaTratamientos" class="listado-modulo mt-3">
+                                            <div class="modulo-vacio">Selecciona un paciente para ver su ficha clínica.</div>
+                                        </div>
                                         <div id="paginacionTratamientos" class="paginacion-modulo"></div>
                                     </div>
 
+                                    <!-- CONSULTAS -->
                                     <div class="tab-pane fade" id="panel-consultas" role="tabpanel">
-                                        <div class="modulo-toolbar mb-2">
+                                        <div class="modulo-toolbar">
                                             <input id="buscarConsultas" class="input-filtro" type="text" placeholder="Buscar consulta...">
-                                            <input id="filtroFechaConsultas" class="input-filtro" type="date" title="Filtrar por fecha de consulta">
+                                            <input id="filtroFechaConsultas" class="input-filtro" type="date">
                                         </div>
                                         <form id="formConsulta" class="d-flex flex-column gap-2">
-                                            <div>
-                                                <label class="label-historial">Fecha de consulta</label>
-                                                <input id="consultaFecha" class="input-historial" type="date">
+                                            <div class="campos-grid">
+                                                <div>
+                                                    <label for="consultaFecha" class="label-historial">Fecha</label>
+                                                    <input id="consultaFecha" class="input-historial" type="date">
+                                                </div>
+                                                <div>
+                                                    <label for="consultaMotivo" class="label-historial">Motivo</label>
+                                                    <input id="consultaMotivo" class="input-historial" type="text">
+                                                </div>
                                             </div>
                                             <div>
-                                                <label class="label-historial">Motivo</label>
-                                                <textarea id="consultaMotivo" class="textarea-historial" placeholder="Motivo de consulta"></textarea>
+                                                <label for="consultaDiagnostico" class="label-historial">Diagnóstico</label>
+                                                <textarea id="consultaDiagnostico" class="textarea-historial"></textarea>
                                             </div>
                                             <div>
-                                                <label class="label-historial">Diagnóstico</label>
-                                                <textarea id="consultaDiagnostico" class="textarea-historial" placeholder="Diagnóstico de la consulta"></textarea>
-                                            </div>
-                                            <div>
-                                                <label class="label-historial">Observaciones</label>
-                                                <textarea id="consultaObservaciones" class="textarea-historial" placeholder="Observaciones adicionales"></textarea>
+                                                <label for="consultaObservaciones" class="label-historial">Observaciones</label>
+                                                <textarea id="consultaObservaciones" class="textarea-historial"></textarea>
                                             </div>
                                             <div class="acciones-panel">
-                                                <button id="btnGuardarConsulta" type="button" class="boton-agregar"><i class="bi bi-plus-circle"></i> Guardar consulta</button>
+                                                <button id="btnGuardarConsulta" type="button" class="boton-agregar">
+                                                    <i class="bi bi-plus-circle"></i> Guardar consulta
+                                                </button>
                                             </div>
                                         </form>
-                                        <div id="listaConsultas" class="listado-modulo mt-2"></div>
+                                        <div id="listaConsultas" class="listado-modulo mt-3">
+                                            <div class="modulo-vacio">Selecciona un paciente para ver su ficha clínica.</div>
+                                        </div>
                                         <div id="paginacionConsultas" class="paginacion-modulo"></div>
                                     </div>
 
+                                    <!-- NOTAS -->
                                     <div class="tab-pane fade" id="panel-notas" role="tabpanel">
-                                        <div class="modulo-toolbar mb-2">
+                                        <div class="modulo-toolbar">
                                             <input id="buscarNotas" class="input-filtro" type="text" placeholder="Buscar nota...">
-                                            <input id="filtroFechaNotas" class="input-filtro" type="date" title="Filtrar por fecha de creación">
+                                            <input id="filtroFechaNotas" class="input-filtro" type="date">
                                         </div>
                                         <form id="formNota" class="d-flex flex-column gap-2">
                                             <div>
-                                                <label class="label-historial">Nota clínica</label>
-                                                <textarea id="notaContenido" class="textarea-historial" placeholder="Escribe una nota breve para el seguimiento"></textarea>
+                                                <label for="notaContenido" class="label-historial">Nota clínica</label>
+                                                <textarea id="notaContenido" class="textarea-historial" placeholder="Escribe una nota..."></textarea>
                                             </div>
                                             <div class="acciones-panel">
-                                                <button id="btnGuardarNota" type="button" class="boton-agregar"><i class="bi bi-plus-circle"></i> Guardar nota</button>
+                                                <button id="btnGuardarNota" type="button" class="boton-agregar">
+                                                    <i class="bi bi-plus-circle"></i> Guardar nota
+                                                </button>
                                             </div>
                                         </form>
-                                        <div id="listaNotas" class="listado-modulo mt-2"></div>
+                                        <div id="listaNotas" class="listado-modulo mt-3">
+                                            <div class="modulo-vacio">Selecciona un paciente para ver su ficha clínica.</div>
+                                        </div>
                                         <div id="paginacionNotas" class="paginacion-modulo"></div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -455,12 +524,8 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/gestion-pacientes.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 </body>
 
 </html>

@@ -2,6 +2,8 @@ let chartIngresos = null;
 let chartServicios = null;
 let periodoActual = 'hoy';
 
+const REPORTES_ENVIAR_URL = document.body?.dataset?.reportesEnviarUrl ?? '';
+
 const coloresServicios = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'];
 
 function ajustarTextoAlContenedor(elemento, opciones = {}) {
@@ -354,7 +356,7 @@ function renderDetalleCitas(detalle) {
     if (!tbody) return;
 
     if (!detalle || !detalle.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-muted text-center p-3">Sin citas para el periodo y filtros seleccionados.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-muted text-center p-3">Sin citas para el periodo y filtros seleccionados.</td></tr>';
         return;
     }
 
@@ -365,6 +367,13 @@ function renderDetalleCitas(detalle) {
         else if (estado === 'CANCELADA') claseEstado = 'estado-cancelada';
 
         const fecha = item.fecha ? new Date(item.fecha.replace(' ', 'T')).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
+        const idPaciente = parseInt(item.id_paciente || '0', 10);
+        const nombrePaciente = (item.paciente || '').replace(/'/g, "\\'");
+        const btnEnviar = idPaciente > 0
+            ? `<button class="btn btn-sm btn-outline-primary py-0 px-1" title="Enviar ficha al propietario" onclick="abrirModalEnviarFicha(${idPaciente}, '${nombrePaciente}')">
+                   <i class="bi bi-envelope"></i>
+               </button>`
+            : '-';
 
         return `
             <tr>
@@ -375,9 +384,58 @@ function renderDetalleCitas(detalle) {
                 <td>${item.subservicio || '-'}</td>
                 <td><span class="badge-estado ${claseEstado}">${estado}</span></td>
                 <td>${item.observaciones || '-'}</td>
+                <td>${btnEnviar}</td>
             </tr>
         `;
     }).join('');
+}
+
+// RFS 32 subtask 7: abrir modal para enviar ficha clínica
+function abrirModalEnviarFicha(idPaciente = 0, nombrePaciente = '') {
+    const inputId = document.getElementById('enviarFichaIdPaciente');
+    const inputNombre = document.getElementById('enviarFichaNombrePaciente');
+    const inputMensaje = document.getElementById('enviarFichaMensaje');
+    const alerta = document.getElementById('enviarFichaAlerta');
+
+    if (inputId) inputId.value = idPaciente;
+    if (inputNombre) inputNombre.value = nombrePaciente || 'Seleccionar desde la tabla';
+    if (inputMensaje) inputMensaje.value = '';
+    if (alerta) { alerta.className = 'alert d-none'; alerta.textContent = ''; }
+
+    const modal = new bootstrap.Modal(document.getElementById('modalEnviarFicha'));
+    modal.show();
+}
+
+async function enviarFichaClinica(idPaciente, mensaje) {
+    const alerta = document.getElementById('enviarFichaAlerta');
+    const btn = document.getElementById('btnConfirmarEnviarFicha');
+
+    if (!idPaciente || idPaciente <= 0) {
+        if (alerta) { alerta.className = 'alert alert-warning'; alerta.textContent = 'Selecciona un paciente desde la tabla de citas.'; }
+        return;
+    }
+
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...'; }
+    if (alerta) { alerta.className = 'alert d-none'; alerta.textContent = ''; }
+
+    try {
+        const resp = await fetch(REPORTES_ENVIAR_URL + '?action=enviar-ficha', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_paciente: idPaciente, mensaje }),
+        });
+        const data = await resp.json();
+        if (data.status === 'success') {
+            if (alerta) { alerta.className = 'alert alert-success'; alerta.textContent = data.message || 'Correo enviado correctamente.'; }
+        } else {
+            if (alerta) { alerta.className = 'alert alert-danger'; alerta.textContent = data.message || 'Error al enviar el correo.'; }
+        }
+    } catch (err) {
+        if (alerta) { alerta.className = 'alert alert-danger'; alerta.textContent = 'Error de red al intentar enviar.'; }
+        console.error(err);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-send-fill me-1"></i> Enviar al propietario'; }
+    }
 }
 
 function obtenerFiltrosAvanzados() {
@@ -385,6 +443,13 @@ function obtenerFiltrosAvanzados() {
     const estadoCita = document.getElementById('filtroEstadoCita');
     if (estadoCita && estadoCita.value) {
         params.set('estado_cita', estadoCita.value);
+    }
+    // RFS 32 subtask 3: rango personalizado de fechas
+    if (periodoActual === 'personalizado') {
+        const fi = document.getElementById('fechaInicioReporte');
+        const ff = document.getElementById('fechaFinReporte');
+        if (fi && fi.value) params.set('fecha_inicio', fi.value);
+        if (ff && ff.value) params.set('fecha_fin', ff.value);
     }
     return params.toString();
 }
@@ -431,7 +496,16 @@ function configurarEventos() {
             document.querySelectorAll('.boton-periodo').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             periodoActual = this.dataset.periodo || 'mes';
-            cargarDashboardReportes();
+
+            // RFS 32 subtask 3: mostrar/ocultar rango personalizado
+            const rangoDiv = document.getElementById('rangoPersonalizado');
+            if (rangoDiv) {
+                rangoDiv.style.display = periodoActual === 'personalizado' ? 'flex' : 'none';
+            }
+
+            if (periodoActual !== 'personalizado') {
+                cargarDashboardReportes();
+            }
         });
     });
 
@@ -444,6 +518,16 @@ function configurarEventos() {
     const filtroEstado = document.getElementById('filtroEstadoCita');
     if (filtroEstado) {
         filtroEstado.addEventListener('change', cargarDashboardReportes);
+    }
+
+    // RFS 32 subtask 7: botón confirmar envío ficha
+    const btnConfirmar = document.getElementById('btnConfirmarEnviarFicha');
+    if (btnConfirmar) {
+        btnConfirmar.addEventListener('click', () => {
+            const idPaciente = parseInt(document.getElementById('enviarFichaIdPaciente')?.value || '0', 10);
+            const mensaje = document.getElementById('enviarFichaMensaje')?.value || '';
+            enviarFichaClinica(idPaciente, mensaje);
+        });
     }
 
     window.addEventListener('resize', ajustarMetricaIngresosTotales);

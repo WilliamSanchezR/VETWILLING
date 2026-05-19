@@ -9,6 +9,7 @@
  */
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/Notificacion.php';
 
 class Seguimientos
 {
@@ -124,6 +125,7 @@ class Seguimientos
                         p.img_mascota,
                         p.id_veterinaria,
                         prop.id_propietario,
+                        prop.id_usuario AS propietario_usuario_id,
                         prop.nombres AS propietario_nombres,
                         prop.apellidos AS propietario_apellidos,
                         prop.telefono AS propietario_telefono,
@@ -144,6 +146,117 @@ class Seguimientos
             error_log("Error en Seguimientos::obtenerSeguimientoPorId - " . $e->getMessage());
             return null;
         }
+    }
+
+    public function registrarActualizacionClinica(int $id_seguimiento, array $datos, int $id_usuario): array
+    {
+        $estadoSalud = $this->normalizarEstadoSalud($datos['estado_salud'] ?? '');
+        $observacion = trim((string) ($datos['observacion'] ?? ''));
+        $diagnostico = trim((string) ($datos['diagnostico'] ?? ''));
+        $tratamiento = trim((string) ($datos['tratamiento'] ?? ''));
+        $dosisTratamiento = trim((string) ($datos['dosis_tratamiento'] ?? ''));
+        $fechaFinTratamiento = trim((string) ($datos['fecha_fin_tratamiento'] ?? ''));
+
+        if ($estadoSalud === null) {
+            throw new InvalidArgumentException('Estado de salud inválido.');
+        }
+
+        if ($observacion === '') {
+            throw new InvalidArgumentException('La observación clínica es obligatoria.');
+        }
+
+        $seguimiento = $this->obtenerSeguimientoPorId($id_seguimiento, $id_usuario);
+        if (!$seguimiento) {
+            throw new RuntimeException('Seguimiento no encontrado o sin permisos para actualizarlo.');
+        }
+
+        $descripcion = $this->construirResumenActualizacion($estadoSalud, $observacion, $diagnostico, $tratamiento, $dosisTratamiento);
+        $progreso = $this->calcularProgresoPorEstado($estadoSalud, $seguimiento['progreso_porcentaje'] ?? null);
+
+        try {
+            $this->conexion->beginTransaction();
+
+            $sql = "UPDATE seguimientos_paciente
+                    SET observaciones_generales = :observacion,
+                        diagnostico_principal = :diagnostico,
+                        objetivo_tratamiento = :tratamiento,
+                        progreso_porcentaje = :progreso,
+                        updated_by = :id_usuario,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id_seguimiento = :id_seguimiento
+                      AND id_usuario_profesional = :id_usuario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([
+                ':observacion' => $observacion,
+                ':diagnostico' => $diagnostico !== '' ? $diagnostico : ($seguimiento['diagnostico_principal'] ?? null),
+                ':tratamiento' => $tratamiento !== '' ? $tratamiento : ($seguimiento['objetivo_tratamiento'] ?? null),
+                ':progreso' => $progreso,
+                ':id_usuario' => $id_usuario,
+                ':id_seguimiento' => $id_seguimiento,
+            ]);
+
+            $this->registrarActividad([
+                'id_seguimiento' => $id_seguimiento,
+                'tipo_actividad' => 'actualizacion_estado',
+                'titulo' => 'Actualización del estado del paciente',
+                'descripcion' => $descripcion,
+                'resultado' => 'Estado reportado: ' . ucfirst($estadoSalud),
+                'categoria' => 'clinico',
+                'estado' => 'completada',
+                'importancia' => $estadoSalud === 'empeoramiento' ? 'alta' : 'media',
+                'registrado_por' => $id_usuario,
+            ]);
+
+            $this->asegurarTablaHistorialClinico();
+            $this->insertarConsultaClinica((int) $seguimiento['id_paciente'], $id_usuario, $estadoSalud, $diagnostico, $descripcion);
+            $this->insertarNotaClinica((int) $seguimiento['id_paciente'], $id_usuario, $descripcion);
+            $historialId = $this->insertarHistorialClinico((int) $seguimiento['id_paciente'], $id_usuario, $estadoSalud, $diagnostico, $tratamiento, $dosisTratamiento, $descripcion);
+
+            $tratamientoId = null;
+            if ($tratamiento !== '') {
+                $tratamientoId = $this->insertarTratamientoClinico((int) $seguimiento['id_paciente'], $id_usuario, $tratamiento, $dosisTratamiento, $observacion, $fechaFinTratamiento);
+            }
+
+            $notificacionesCreadas = $this->crearNotificacionesSeguimiento(
+                $seguimiento,
+                'Actualización clínica registrada',
+                sprintf('Se actualizó el estado de %s a "%s". %s', $seguimiento['paciente_nombre'], $estadoSalud, $observacion),
+                $id_usuario
+            );
+
+            $this->conexion->commit();
+
+            return [
+                'id_seguimiento' => $id_seguimiento,
+                'estado_salud' => $estadoSalud,
+                'historial_registrado' => $historialId !== null,
+                'tratamiento_registrado' => $tratamientoId !== null,
+                'notificaciones_creadas' => $notificacionesCreadas,
+            ];
+        } catch (Throwable $e) {
+            if ($this->conexion->inTransaction()) {
+                $this->conexion->rollBack();
+            }
+
+            error_log('Error en Seguimientos::registrarActualizacionClinica - ' . $e->getMessage());
+            throw new RuntimeException('No se pudo registrar la actualización clínica.');
+        }
+    }
+
+    public function enviarNotificacionSeguimiento(int $id_seguimiento, int $id_usuario, string $mensaje): int
+    {
+        $seguimiento = $this->obtenerSeguimientoPorId($id_seguimiento, $id_usuario);
+        if (!$seguimiento) {
+            throw new RuntimeException('Seguimiento no encontrado.');
+        }
+
+        return $this->crearNotificacionesSeguimiento(
+            $seguimiento,
+            'Recordatorio de seguimiento',
+            trim($mensaje) !== '' ? trim($mensaje) : 'Se ha generado un recordatorio clínico para el seguimiento del paciente.',
+            $id_usuario
+        );
     }
 
     /**
@@ -500,5 +613,214 @@ class Seguimientos
         }
 
         return 'normal';
+    }
+
+    private function normalizarEstadoSalud(string $estado): ?string
+    {
+        $estado = strtolower(trim($estado));
+        $mapa = [
+            'mejoria' => 'mejoria',
+            'mejoría' => 'mejoria',
+            'estable' => 'estable',
+            'empeoramiento' => 'empeoramiento',
+        ];
+
+        return $mapa[$estado] ?? null;
+    }
+
+    private function calcularProgresoPorEstado(string $estadoSalud, $progresoActual): int
+    {
+        $progresoActual = (int) ($progresoActual ?? 0);
+        $mapa = [
+            'mejoria' => max($progresoActual, 75),
+            'estable' => max($progresoActual, 50),
+            'empeoramiento' => min($progresoActual > 0 ? $progresoActual : 25, 25),
+        ];
+
+        return $mapa[$estadoSalud] ?? max($progresoActual, 25);
+    }
+
+    private function construirResumenActualizacion(string $estadoSalud, string $observacion, string $diagnostico, string $tratamiento, string $dosisTratamiento): string
+    {
+        $partes = [
+            'Estado de salud: ' . ucfirst($estadoSalud),
+            'Observación: ' . $observacion,
+        ];
+
+        if ($diagnostico !== '') {
+            $partes[] = 'Diagnóstico: ' . $diagnostico;
+        }
+
+        if ($tratamiento !== '') {
+            $resumenTratamiento = 'Tratamiento/medicación: ' . $tratamiento;
+            if ($dosisTratamiento !== '') {
+                $resumenTratamiento .= ' (' . $dosisTratamiento . ')';
+            }
+            $partes[] = $resumenTratamiento;
+        }
+
+        return implode(' | ', $partes);
+    }
+
+    private function asegurarTablaHistorialClinico(): void
+    {
+        $sql = "CREATE TABLE IF NOT EXISTS historial_clinico_paciente (
+                    id_historial INT AUTO_INCREMENT PRIMARY KEY,
+                    id_historial_base INT NULL,
+                    id_paciente INT NOT NULL,
+                    id_usuario_profesional INT NOT NULL,
+                    fecha_atencion DATETIME NOT NULL,
+                    motivo_consulta VARCHAR(255) NOT NULL,
+                    diagnostico TEXT NULL,
+                    tratamientos_aplicados TEXT NULL,
+                    medicacion_recetada TEXT NULL,
+                    observaciones_adicionales TEXT NULL,
+                    version_registro INT NOT NULL DEFAULT 1,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    INDEX idx_hcp_base (id_historial_base),
+                    INDEX idx_hcp_paciente (id_paciente),
+                    INDEX idx_hcp_profesional (id_usuario_profesional),
+                    INDEX idx_hcp_fecha (fecha_atencion),
+                    CONSTRAINT fk_hcp_paciente FOREIGN KEY (id_paciente) REFERENCES paciente (id_paciente) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                    CONSTRAINT fk_hcp_usuario FOREIGN KEY (id_usuario_profesional) REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                    CONSTRAINT fk_hcp_historial_base FOREIGN KEY (id_historial_base) REFERENCES historial_clinico_paciente (id_historial) ON DELETE RESTRICT ON UPDATE RESTRICT
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
+        $this->conexion->exec($sql);
+    }
+
+    private function insertarConsultaClinica(int $id_paciente, int $id_usuario, string $estadoSalud, string $diagnostico, string $descripcion): void
+    {
+        $sql = "INSERT INTO paciente_consulta_clinica (
+                    id_paciente,
+                    id_usuario_profesional,
+                    fecha_consulta,
+                    motivo,
+                    diagnostico,
+                    observaciones
+                ) VALUES (
+                    :id_paciente,
+                    :id_usuario,
+                    CURRENT_TIMESTAMP,
+                    :motivo,
+                    :diagnostico,
+                    :observaciones
+                )";
+
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute([
+            ':id_paciente' => $id_paciente,
+            ':id_usuario' => $id_usuario,
+            ':motivo' => 'Actualización de seguimiento clínico',
+            ':diagnostico' => $diagnostico !== '' ? $diagnostico : 'Estado clínico reportado: ' . ucfirst($estadoSalud),
+            ':observaciones' => $descripcion,
+        ]);
+    }
+
+    private function insertarNotaClinica(int $id_paciente, int $id_usuario, string $descripcion): void
+    {
+        $sql = "INSERT INTO paciente_nota_clinica (id_paciente, id_usuario_profesional, nota)
+                VALUES (:id_paciente, :id_usuario, :nota)";
+
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute([
+            ':id_paciente' => $id_paciente,
+            ':id_usuario' => $id_usuario,
+            ':nota' => $descripcion,
+        ]);
+    }
+
+    private function insertarHistorialClinico(int $id_paciente, int $id_usuario, string $estadoSalud, string $diagnostico, string $tratamiento, string $dosisTratamiento, string $descripcion): ?int
+    {
+        $sql = "INSERT INTO historial_clinico_paciente (
+                    id_paciente,
+                    id_usuario_profesional,
+                    fecha_atencion,
+                    motivo_consulta,
+                    diagnostico,
+                    tratamientos_aplicados,
+                    medicacion_recetada,
+                    observaciones_adicionales
+                ) VALUES (
+                    :id_paciente,
+                    :id_usuario,
+                    CURRENT_TIMESTAMP,
+                    :motivo_consulta,
+                    :diagnostico,
+                    :tratamientos_aplicados,
+                    :medicacion_recetada,
+                    :observaciones_adicionales
+                )";
+
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute([
+            ':id_paciente' => $id_paciente,
+            ':id_usuario' => $id_usuario,
+            ':motivo_consulta' => 'Actualización de estado del seguimiento',
+            ':diagnostico' => $diagnostico !== '' ? $diagnostico : 'Estado clínico: ' . ucfirst($estadoSalud),
+            ':tratamientos_aplicados' => $tratamiento !== '' ? $tratamiento : null,
+            ':medicacion_recetada' => $tratamiento !== '' ? trim($tratamiento . ' ' . ($dosisTratamiento !== '' ? '(' . $dosisTratamiento . ')' : '')) : null,
+            ':observaciones_adicionales' => $descripcion,
+        ]);
+
+        return (int) $this->conexion->lastInsertId();
+    }
+
+    private function insertarTratamientoClinico(int $id_paciente, int $id_usuario, string $tratamiento, string $dosisTratamiento, string $observacion, string $fechaFinTratamiento): ?int
+    {
+        $sql = "INSERT INTO paciente_tratamiento (
+                    id_paciente,
+                    id_usuario_profesional,
+                    medicamento,
+                    dosis,
+                    fecha_inicio,
+                    fecha_fin,
+                    estado,
+                    observaciones
+                ) VALUES (
+                    :id_paciente,
+                    :id_usuario,
+                    :medicamento,
+                    :dosis,
+                    CURDATE(),
+                    :fecha_fin,
+                    'Activo',
+                    :observaciones
+                )";
+
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindValue(':id_paciente', $id_paciente, PDO::PARAM_INT);
+        $stmt->bindValue(':id_usuario', $id_usuario, PDO::PARAM_INT);
+        $stmt->bindValue(':medicamento', $tratamiento, PDO::PARAM_STR);
+        $stmt->bindValue(':dosis', $dosisTratamiento !== '' ? $dosisTratamiento : 'Según indicación veterinaria', PDO::PARAM_STR);
+        if ($fechaFinTratamiento !== '') {
+            $stmt->bindValue(':fecha_fin', $fechaFinTratamiento, PDO::PARAM_STR);
+        } else {
+            $stmt->bindValue(':fecha_fin', null, PDO::PARAM_NULL);
+        }
+        $stmt->bindValue(':observaciones', $observacion, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return (int) $this->conexion->lastInsertId();
+    }
+
+    private function crearNotificacionesSeguimiento(array $seguimiento, string $titulo, string $mensaje, int $id_usuario): int
+    {
+        $modeloNotificacion = new Notificacion();
+        $creadas = 0;
+
+        if (!empty($seguimiento['propietario_usuario_id'])) {
+            if (!$modeloNotificacion->crear((int) $seguimiento['propietario_usuario_id'], $titulo, $mensaje, 'INFO', (int) $seguimiento['id_seguimiento'])) {
+                throw new RuntimeException('No se pudo notificar al propietario.');
+            }
+            $creadas++;
+        }
+
+        if (!$modeloNotificacion->crear($id_usuario, $titulo, $mensaje, 'INFO', (int) $seguimiento['id_seguimiento'])) {
+            throw new RuntimeException('No se pudo registrar la notificación del profesional.');
+        }
+
+        return $creadas + 1;
     }
 }

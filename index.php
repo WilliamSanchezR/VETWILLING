@@ -207,6 +207,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesController.php';
         break;
 
+    case '/veterinaria/reportes/enviar-ficha':
+        require BASE_PATH . '/app/controllers/reportesController.php';
+        break;
+
     // RUTA COMENTADA: Registrar veterinarios
     // case '/veterinario/registrar-veterinarios':
     //     require BASE_PATH . '/app/views/dashboard/veterinaria/registro-veterinario.php';

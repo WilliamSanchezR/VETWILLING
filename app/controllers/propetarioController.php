@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/Propietario.php';
+require_once __DIR__ . '/../helpers/session_all.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -80,10 +81,80 @@ function listarPropietarios()
     return $resultado->listar();
 }
 
+
 function consultarPropietarioId($id)
 {
+    if (!isset($_SESSION['user'])) {
+        http_response_code(401);
+        return [
+            'status' => 'error',
+            'message' => 'Sesión no válida',
+            'code' => 'UNAUTHORIZED'
+        ];
+    }
+    
+    $id_usuario_sesion = $_SESSION['user']['id_usuario'];
+    $id_rol_sesion = (int)$_SESSION['user']['id_rol'];
+    
     $obj = new Propietario();
-    return $obj->consultarPropietario($id);
+    $propietario = $obj->consultarPropietario($id);
+    
+    if (!$propietario) {
+        http_response_code(404);
+        return [
+            'status' => 'error',
+            'message' => 'El propietario solicitado no existe',
+            'code' => 'NOT_FOUND'
+        ];
+    }
+    
+    if ($propietario['estado'] !== 'Activo') {
+        http_response_code(403);
+        return [
+            'status' => 'error',
+            'message' => 'Este propietario está inactivo y no puede ser consultado',
+            'code' => 'INACTIVE_OWNER'
+        ];
+    }
+
+    
+    if ($id_rol_sesion === 3) {
+        // Cliente: solo puede ver su propio perfil
+        if ((int)$id !== $id_usuario_sesion) {
+            http_response_code(403);
+            return [
+                'status' => 'error',
+                'message' => 'No tienes permisos para consultar este propietario',
+                'code' => 'FORBIDDEN'
+            ];
+        }
+    } elseif ($id_rol_sesion === 4) {
+        // Representante: debe verificar que el propietario pertenece a su veterinaria
+        $id_veterinaria_propietario = $propietario['id_veterinaria'] ?? null;
+        $id_veterinaria_sesion = $_SESSION['user']['id_veterinaria'] ?? null;
+        
+        if ($id_veterinaria_propietario !== $id_veterinaria_sesion) {
+            http_response_code(403);
+            return [
+                'status' => 'error',
+                'message' => 'Este propietario no pertenece a tu veterinaria',
+                'code' => 'FORBIDDEN'
+            ];
+        }
+    } elseif ($id_rol_sesion !== 1) {
+        // Otros roles que no tienen permisos (ej: Veterinario)
+        http_response_code(403);
+        return [
+            'status' => 'error',
+            'message' => 'Tu rol no tiene permisos para consultar propietarios',
+            'code' => 'FORBIDDEN'
+        ];
+    }
+    
+    return [
+        'status' => 'success',
+        'data' => $propietario
+    ];
 }
 
 function actualizarPropietario()

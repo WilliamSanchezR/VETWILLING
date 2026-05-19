@@ -17,6 +17,18 @@ if (!isset($_SESSION['user']['id_usuario'])) {
 
 $idUsuario = (int)$_SESSION['user']['id_usuario'];
 
+// POST: enviar ficha clínica por correo (RFS 32 subtask 7)
+if ($method === 'POST') {
+    if ($action === 'enviar-ficha') {
+        enviarFichaClinicaPorCorreo($idUsuario);
+        exit;
+    }
+    http_response_code(405);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['status' => 'error', 'message' => 'Método no permitido']);
+    exit;
+}
+
 if ($method !== 'GET') {
     http_response_code(405);
     header('Content-Type: application/json; charset=utf-8');
@@ -150,6 +162,14 @@ function generarReportePdf($idUsuario)
 {
     $payload = construirPayloadReportes($idUsuario);
 
+    // RFS 32 subtask 6 & 8: registrar generación en historial
+    $reportesModel = new Reportes();
+    $reportesModel->registrarGeneracion($idUsuario, 'pdf', null, [
+        'periodo'      => $_GET['periodo'] ?? 'mes',
+        'fecha_inicio' => $payload['meta']['fecha_inicio'] ?? '',
+        'fecha_fin'    => $payload['meta']['fecha_fin'] ?? '',
+    ]);
+
     ob_start();
     require BASE_PATH . '/app/views/pdf/reporte_resumen_veterinario_pdf.php';
     $html = ob_get_clean();
@@ -160,6 +180,14 @@ function generarReportePdf($idUsuario)
 function generarReporteExcel($idUsuario)
 {
     $payload = construirPayloadReportes($idUsuario);
+
+    // RFS 32 subtask 6 & 8: registrar generación en historial
+    $reportesModel = new Reportes();
+    $reportesModel->registrarGeneracion($idUsuario, 'excel', null, [
+        'periodo'      => $_GET['periodo'] ?? 'mes',
+        'fecha_inicio' => $payload['meta']['fecha_inicio'] ?? '',
+        'fecha_fin'    => $payload['meta']['fecha_fin'] ?? '',
+    ]);
 
     $filename = 'reporte_citas_' . date('Y-m-d') . '.xls';
 
@@ -271,4 +299,90 @@ function generarReporteExcel($idUsuario)
     echo '<br/><table><tr><td style="font-size:9px; color:#9ca3af;">Generado el ' . date('d/m/Y H:i') . ' — VetWilling</td></tr></table>';
     echo '</body></html>';
     exit;
+}
+
+// RFS 32 subtask 7: Enviar ficha clínica del paciente por correo al propietario
+function enviarFichaClinicaPorCorreo(int $idUsuario): void
+{
+    header('Content-Type: application/json; charset=utf-8');
+
+    $body = json_decode(file_get_contents('php://input'), true) ?? [];
+    $idPaciente = (int)($body['id_paciente'] ?? 0);
+    $mensajeAdicional = trim((string)($body['mensaje'] ?? ''));
+
+    if ($idPaciente <= 0) {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'ID de paciente inválido']);
+        return;
+    }
+
+    require_once BASE_PATH . '/app/models/Veterinario.php';
+    require_once BASE_PATH . '/app/helpers/mailer_helper.php';
+    require_once BASE_PATH . '/vendor/dompdf/autoload.inc.php';
+
+    $veterinarioModel = new Veterinario();
+    $ficha = $veterinarioModel->obtenerFichaClinicaPdfPorProfesional($idUsuario, $idPaciente);
+
+    if (!$ficha) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'No autorizado o paciente no encontrado']);
+        return;
+    }
+
+    $emailPropietario = $ficha['paciente']['propietario_email'] ?? '';
+    if (empty($emailPropietario)) {
+        http_response_code(422);
+        echo json_encode(['status' => 'error', 'message' => 'El propietario no tiene correo registrado']);
+        return;
+    }
+
+    // Generar PDF en memoria
+    $payload = ['meta' => ['fecha_generacion' => date('Y-m-d H:i:s')], 'ficha' => $ficha];
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/ficha_clinica_paciente_pdf.php';
+    $html = ob_get_clean();
+
+    $options = new \Dompdf\Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isRemoteEnabled', true);
+    $dompdf = new \Dompdf\Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    $pdfBytes = $dompdf->output();
+
+    // Registrar generación en historial (subtasks 6 & 8)
+    $reportesModel = new Reportes();
+    $reportesModel->registrarGeneracion($idUsuario, 'ficha_email', $idPaciente, [
+        'propietario_email' => $emailPropietario,
+        'fecha_envio'       => date('Y-m-d H:i:s'),
+    ]);
+
+    // Enviar correo con PHPMailer
+    try {
+        $mail = mailer_init();
+        $nombrePaciente   = htmlspecialchars($ficha['paciente']['nombre'] ?? 'Paciente');
+        $nombrePropietario = htmlspecialchars($ficha['paciente']['propietario_nombre'] ?? 'Propietario');
+
+        $mail->addAddress($emailPropietario, $nombrePropietario);
+        $mail->Subject = "Ficha Clínica de {$nombrePaciente} — VetWilling";
+
+        $cuerpo = "<p>Estimado/a <strong>{$nombrePropietario}</strong>,</p>
+                   <p>Adjuntamos la ficha clínica actualizada de su mascota <strong>{$nombrePaciente}</strong>.</p>";
+        if (!empty($mensajeAdicional)) {
+            $cuerpo .= '<p><em>' . htmlspecialchars($mensajeAdicional) . '</em></p>';
+        }
+        $cuerpo .= '<p>Saludos,<br/>Equipo VetWilling</p>';
+
+        $mail->Body    = $cuerpo;
+        $mail->AltBody = strip_tags($cuerpo);
+        $mail->addStringAttachment($pdfBytes, "ficha_clinica_{$nombrePaciente}.pdf", 'base64', 'application/pdf');
+        $mail->send();
+
+        echo json_encode(['status' => 'success', 'message' => "Ficha clínica enviada a {$emailPropietario}"]);
+    } catch (\Exception $e) {
+        error_log('Error al enviar ficha clínica por correo: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'No se pudo enviar el correo']);
+    }
 }
