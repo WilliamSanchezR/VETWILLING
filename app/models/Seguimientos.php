@@ -277,6 +277,9 @@ class Seguimientos
                         diagnostico_principal,
                         objetivo_tratamiento,
                         prioridad,
+                        estado,
+                        fecha_inicio,
+                        proxima_revision,
                         created_by
                     ) VALUES (
                         :id_paciente,
@@ -288,6 +291,9 @@ class Seguimientos
                         :diagnostico_principal,
                         :objetivo_tratamiento,
                         :prioridad,
+                        :estado,
+                        :fecha_inicio,
+                        :proxima_revision,
                         :created_by
                     )";
 
@@ -302,6 +308,9 @@ class Seguimientos
                 ':diagnostico_principal' => $datos['diagnostico_principal'] ?? null,
                 ':objetivo_tratamiento' => $datos['objetivo_tratamiento'] ?? null,
                 ':prioridad' => $datos['prioridad'] ?? 'normal',
+                ':estado' => $datos['estado'] ?? 'activo',
+                ':fecha_inicio' => $datos['fecha_inicio'] ?? date('Y-m-d'),
+                ':proxima_revision' => $datos['proxima_revision'] ?? null,
                 ':created_by' => $id_usuario_creador
             ]);
 
@@ -324,6 +333,43 @@ class Seguimientos
         } catch (PDOException $e) {
             $this->conexion->rollBack();
             error_log("Error en Seguimientos::crearSeguimiento - " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Agrega una medicación a un seguimiento
+     */
+    public function agregarMedicacion($id_seguimiento, $medicamento, $dosis, $id_usuario_prescriptor = null)
+    {
+        try {
+            $sql = "INSERT INTO seguimiento_medicaciones (
+                        id_seguimiento,
+                        medicamento,
+                        dosis,
+                        estado,
+                        fecha_inicio,
+                        prescrito_por
+                    ) VALUES (
+                        :id_seguimiento,
+                        :medicamento,
+                        :dosis,
+                        'activo',
+                        CURRENT_DATE,
+                        :prescrito_por
+                    )";
+
+            $stmt = $this->conexion->prepare($sql);
+            $resultado = $stmt->execute([
+                ':id_seguimiento' => $id_seguimiento,
+                ':medicamento' => $medicamento,
+                ':dosis' => $dosis,
+                ':prescrito_por' => $id_usuario_prescriptor
+            ]);
+
+            return $resultado ? $this->conexion->lastInsertId() : false;
+        } catch (PDOException $e) {
+            error_log("Error en Seguimientos::agregarMedicacion - " . $e->getMessage());
             return false;
         }
     }
