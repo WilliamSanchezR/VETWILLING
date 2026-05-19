@@ -57,6 +57,9 @@ switch ($method) {
 
     case 'POST':
         switch ($action) {
+            case 'crear':
+                crearNuevoSeguimiento();
+                break;
             case 'actualizar-estado':
                 actualizarEstadoPaciente();
                 break;
@@ -447,6 +450,98 @@ function registrarActividad()
     } catch (Exception $e) {
         header('Content-Type: application/json');
         http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ]);
+    }
+}
+
+/**
+ * Crea un nuevo seguimiento de paciente
+ */
+function crearNuevoSeguimiento()
+{
+    try {
+        // Obtener datos del formulario (puede ser FormData o JSON)
+        $data = obtenerPayloadRequest();
+        
+        // Si viene como FormData, los datos estarán en $_POST
+        if (empty($data) && !empty($_POST)) {
+            $data = $_POST;
+        }
+
+        // Validar datos requeridos
+        $id_paciente = $data['id_paciente'] ?? null;
+        $diagnostico = $data['diagnostico'] ?? null;
+        $prioridad = $data['prioridad'] ?? 'normal';
+        $estado = $data['estado'] ?? 'activo';
+
+        if (!$id_paciente || !$diagnostico) {
+            throw new Exception('Paciente y diagnóstico son requeridos');
+        }
+
+        $id_usuario = (int) $_SESSION['user']['id_usuario'];
+        $id_veterinaria = (int) ($_SESSION['user']['id_veterinaria'] ?? 0);
+
+        // Preparar datos para crear seguimiento
+        $datosNuevoSeguimiento = [
+            'id_paciente' => (int) $id_paciente,
+            'id_usuario_profesional' => $id_usuario,
+            'id_asignacion' => null, // Puede ser null inicialmente
+            'id_veterinaria' => $id_veterinaria,
+            'tipo_seguimiento' => $data['tipo_seguimiento'] ?? 'tratamiento-cronico',
+            'motivo' => $diagnostico, // Usar diagnóstico como motivo
+            'diagnostico_principal' => $diagnostico,
+            'objetivo_tratamiento' => $data['observaciones'] ?? null,
+            'prioridad' => $prioridad,
+            'estado' => $estado,
+            'fecha_inicio' => !empty($data['fecha_inicio']) ? $data['fecha_inicio'] : date('Y-m-d'),
+            'proxima_revision' => $data['proxima_revision'] ?? null
+        ];
+
+        // Crear seguimiento usando el modelo
+        $seguimientosModel = new Seguimientos();
+        $id_seguimiento = $seguimientosModel->crearSeguimiento($datosNuevoSeguimiento, $id_usuario);
+
+        if ($id_seguimiento) {
+            // Registrar medicación si se proporciona
+            if (!empty($data['medicamento'])) {
+                // Guardar en tabla seguimiento_medicaciones
+                $idMedicacion = $seguimientosModel->agregarMedicacion(
+                    $id_seguimiento,
+                    htmlspecialchars($data['medicamento']),
+                    htmlspecialchars($data['dosis'] ?? 'No especificada'),
+                    $id_usuario
+                );
+
+                // También registrar como actividad
+                $datosActividad = [
+                    'id_seguimiento' => $id_seguimiento,
+                    'tipo_actividad' => 'medicacion',
+                    'titulo' => 'Medicamento: ' . htmlspecialchars($data['medicamento']),
+                    'descripcion' => 'Dosis: ' . htmlspecialchars($data['dosis'] ?? 'No especificada'),
+                    'categoria' => 'medicacion',
+                    'estado' => 'completada',
+                    'importancia' => 'alta',
+                    'registrado_por' => $id_usuario
+                ];
+                $seguimientosModel->registrarActividad($datosActividad);
+            }
+
+            header('Content-Type: application/json');
+            http_response_code(201);
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Seguimiento creado exitosamente',
+                'id_seguimiento' => $id_seguimiento
+            ]);
+        } else {
+            throw new Exception('No se pudo crear el seguimiento');
+        }
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(400);
         echo json_encode([
             'status' => 'error',
             'message' => $e->getMessage()
