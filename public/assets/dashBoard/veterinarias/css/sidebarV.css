@@ -1,0 +1,900 @@
+:root {
+    --sv-width: 265px;
+    --sv-collapsed: 72px;
+    --sv-header-h: 76px;
+
+    /* Paleta verde - coherente con el cliente pero diferente */
+    --sv-primary:      #087726;
+    --sv-primary-dark: #065c1d;
+    --sv-primary-mid:  #0a9b42;
+    --sv-accent:       #0a9b42;
+    --sv-accent-light: #e8f5ec;
+
+    /* Superficies - fondo blanco (ajustado por el usuario) */
+    --sv-bg:           #ffffff;
+    --sv-bg-section:   #f4f9f5;
+    --sv-bg-hover:     #edf7f0;
+    --sv-bg-active:    #d6f0de;
+
+    /* Texto - oscuro sobre fondo claro */
+    --sv-text:         #2d3a30;
+    --sv-text-muted:   #6b8072;
+    --sv-text-active:  #0a4d1f;
+    --sv-text-section: #7aab88;
+
+    /* Bordes */
+    --sv-border:       #e2ede6;
+    --sv-border-active:#0a9b42;
+
+    /* Sombras */
+    --sv-shadow:       4px 0 24px rgba(0, 0, 0, 0.08);
+    --sv-shadow-item:  0 2px 8px rgba(10, 155, 66, 0.18);
+
+    /* Transiciones */
+    --sv-t:      0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    --sv-t-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Z-index */
+    --sv-z:             1000;
+    --sv-z-toggle:      1100;
+    --sv-z-tooltip:     1200;
+    --sv-z-overlay:     999;
+    --sv-z-mobile-menu: 2100;
+}
+
+/* ── Reset base ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-font-smoothing: antialiased; }
+
+/* ========================================================================
+   SIDEBAR PRINCIPAL
+   ======================================================================== */
+.sidebar-vet {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sv-width);
+    height: 100vh;
+    background: var(--sv-bg);
+    border-right: 1px solid var(--sv-border);
+    display: flex;
+    flex-direction: column;
+    transition: width var(--sv-t);
+    z-index: var(--sv-z);
+    box-shadow: var(--sv-shadow);
+    overflow-x: visible;
+    overflow-y: hidden;
+}
+
+.sidebar-vet.collapsed {
+    width: var(--sv-collapsed);
+    overflow: visible;
+}
+
+/* Línea decorativa derecha */
+.sidebar-vet::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15%;
+    height: 70%;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--sv-primary-mid), transparent);
+    opacity: 0.25;
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+/* ========================================================================
+   HEADER
+   ======================================================================== */
+.sv-header {
+    padding: 18px 16px 24px;
+    min-height: var(--sv-header-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--sv-border);
+    position: relative;
+    overflow: hidden;
+    background: var(--sv-bg);
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sv-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--sv-primary-mid), transparent);
+    opacity: 0.3;
+}
+
+/* Logos - sin invert porque fondo es blanco */
+.sv-logo-full {
+    max-width: 155px;
+    height: auto;
+    transition: opacity var(--sv-t);
+    opacity: 1;
+}
+
+.sv-logo-icon {
+    display: none;
+    width: 34px;
+    height: 34px;
+    transition: opacity var(--sv-t);
+    opacity: 1;
+}
+
+.sidebar-vet.collapsed .sv-logo-full { display: none; }
+.sidebar-vet.collapsed .sv-logo-icon { display: block; }
+
+/* Badge de rol */
+.sv-role-badge {
+    position: absolute;
+    bottom: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--sv-accent-light);
+    color: var(--sv-primary);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    padding: 2px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(10,155,66,0.25);
+    white-space: nowrap;
+    transition: opacity var(--sv-t);
+}
+
+.sidebar-vet.collapsed .sv-role-badge { opacity: 0; pointer-events: none; }
+
+/* ========================================================================
+   NAVEGACIÓN
+   ======================================================================== */
+.sv-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sv-border) transparent;
+}
+
+.sv-nav::-webkit-scrollbar { width: 4px; }
+.sv-nav::-webkit-scrollbar-track { background: transparent; }
+.sv-nav::-webkit-scrollbar-thumb { background: var(--sv-border); border-radius: 4px; }
+.sv-nav::-webkit-scrollbar-thumb:hover { background: #c5dac9; }
+
+/* ── Sección ── */
+.sv-section { margin-bottom: 4px; }
+
+.sv-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    color: var(--sv-text-section);
+    user-select: none;
+    transition: all var(--sv-t);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sv-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--sv-border);
+    min-width: 0;
+}
+
+.sidebar-vet.collapsed .sv-section-title {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+    margin: 0;
+}
+
+/* ── Items ── */
+.sv-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    margin-bottom: 2px;
+    border-radius: 9px;
+    color: var(--sv-text);           /* ← texto oscuro visible */
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: background var(--sv-t-fast), color var(--sv-t-fast), border-color var(--sv-t-fast);
+    position: relative;
+    cursor: pointer;
+    border: 1px solid transparent;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    line-height: 1;
+}
+
+.sv-item i {
+    font-size: 17px;
+    min-width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sv-text-muted);     /* ← icono en muted visible */
+    transition: color var(--sv-t-fast), transform var(--sv-t-fast);
+    flex-shrink: 0;
+}
+
+.sv-text {
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity var(--sv-t), width var(--sv-t);
+}
+
+/* ── Hover (el problema principal) ── */
+.sv-item:hover {
+    background: var(--sv-bg-hover);  /* verde muy claro */
+    color: var(--sv-primary);        /* verde oscuro legible */
+    border-color: rgba(10,155,66,0.2);
+}
+
+.sv-item:hover i {
+    color: var(--sv-primary-mid);
+    transform: translateX(2px);      /* micro-interacción sutil */
+}
+
+/* ── Activo ── */
+.sv-item.active {
+    background: var(--sv-bg-active);
+    color: var(--sv-text-active);
+    border-color: rgba(10,155,66,0.35);
+    box-shadow: var(--sv-shadow-item);
+    font-weight: 600;
+}
+
+.sv-item.active i {
+    color: var(--sv-primary-mid);
+}
+
+/* Indicador derecho (diferencia del cliente que lo tiene a la izquierda) */
+.sv-item.active::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--sv-primary-mid);
+    border-radius: 4px 0 0 4px;
+}
+
+/* ── Focus ── */
+.sv-item:focus-visible {
+    outline: 2px solid var(--sv-primary-mid);
+    outline-offset: 2px;
+}
+
+/* ── Modo colapsado ── */
+.sidebar-vet.collapsed .sv-item {
+    justify-content: center;
+    padding: 11px 0;
+}
+
+.sidebar-vet.collapsed .sv-item i {
+    margin: 0;
+    font-size: 19px;
+    min-width: auto;
+}
+
+.sidebar-vet.collapsed .sv-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.sidebar-vet.collapsed .sv-badge { display: none; }
+.sidebar-vet.collapsed .sv-item.active::before { display: none; }
+
+.sidebar-vet.collapsed .sv-item:hover {
+    transform: none;
+}
+
+/* ── Tooltips en colapsado ── */
+.sidebar-vet.collapsed .sv-item[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-4px);
+    background: #1a2e20;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--sv-t-fast), transform var(--sv-t-fast);
+    z-index: var(--sv-z-tooltip);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.sidebar-vet.collapsed .sv-item[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* ── Badge ── */
+.sv-badge {
+    margin-left: auto;
+    background: var(--sv-primary-mid);
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 700;
+    min-width: 19px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* ── Divisor ── */
+.sv-divider {
+    height: 1px;
+    background: var(--sv-border);
+    margin: 8px 10px;
+    transition: margin var(--sv-t);
+}
+
+.sidebar-vet.collapsed .sv-divider { margin: 8px 14px; }
+
+/* ── Logout ── */
+.sv-item.sv-danger {
+    color: #dc2626;
+}
+
+.sv-item.sv-danger i {
+    color: #dc2626;
+}
+
+.sv-item.sv-danger:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: rgba(220,38,38,0.25);
+}
+
+.sv-item.sv-danger:hover i {
+    color: #b91c1c;
+    transform: none;
+}
+
+/* ========================================================================
+   TOGGLE ESCRITORIO
+   ======================================================================== */
+.sv-toggle {
+    position: fixed;
+    left: calc(var(--sv-width) - 14px);
+    top: 86px;
+    width: 28px;
+    height: 28px;
+    background: var(--sv-primary-mid);
+    border: 2px solid var(--sv-bg);
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: left var(--sv-t), background var(--sv-t-fast), transform var(--sv-t-fast);
+    box-shadow: 0 2px 8px rgba(10,155,66,0.35);
+    z-index: var(--sv-z-toggle);
+    outline: none;
+}
+
+.sidebar-vet.collapsed .sv-toggle {
+    left: calc(var(--sv-collapsed) - 14px);
+}
+
+.sv-toggle:hover  { background: var(--sv-primary-dark); transform: scale(1.1); }
+.sv-toggle:active { transform: scale(0.92); }
+
+.sv-toggle i {
+    font-size: 13px;
+    transition: transform var(--sv-t);
+}
+
+.sidebar-vet.collapsed .sv-toggle i { transform: rotate(180deg); }
+
+/* ========================================================================
+   FOOTER
+   ======================================================================== */
+.sv-footer {
+    padding: 12px 10px;
+    border-top: 1px solid var(--sv-border);
+    background: var(--sv-bg-section);
+    flex-shrink: 0;
+}
+
+.sv-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background var(--sv-t-fast);
+    text-decoration: none;
+}
+
+.sv-user:hover { background: var(--sv-bg-hover); }
+
+.sv-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--sv-border-active);
+}
+
+.sv-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sv-user-info {
+    flex: 1;
+    overflow: hidden;
+    transition: opacity var(--sv-t), width var(--sv-t);
+}
+
+.sv-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sv-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sv-user-role {
+    font-size: 11px;
+    color: var(--sv-text-muted);
+    white-space: nowrap;
+}
+
+.sidebar-vet.collapsed .sv-user-info {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.sidebar-vet.collapsed .sv-user { justify-content: center; }
+
+/* ========================================================================
+   MAIN CONTENT
+   ======================================================================== */
+.sv-main,
+.sidebar-vet ~ .contenido-principal {
+    margin-left: var(--sv-width);
+    min-height: 100vh;
+    background: #f5f7fb;
+    transition: margin-left var(--sv-t);
+}
+
+.sidebar-vet.collapsed ~ .sv-main,
+.sidebar-vet.collapsed ~ .contenido-principal {
+    margin-left: var(--sv-collapsed);
+}
+
+/* ========================================================================
+   OVERLAY MÓVIL
+   ======================================================================== */
+.sv-mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: calc(var(--sv-z-mobile-menu) - 1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.sv-mobile-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ========================================================================
+   BOTTOM SHEET MÓVIL
+   Fondo oscuro para diferenciarlo del desktop blanco
+   ======================================================================== */
+.sv-bottom-sheet {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /* Fondo oscuro para que el sheet contraste y sea moderno */
+    background: #0f2318;
+    border-radius: 20px 20px 0 0;
+    z-index: var(--sv-z-mobile-menu);
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    max-height: 88vh;
+    overflow: hidden;
+    flex-direction: column;
+    border-top: 1px solid rgba(157,231,149,0.15);
+}
+
+.sv-bottom-sheet.open {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Handle */
+.sv-sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(157,231,149,0.25);
+    border-radius: 2px;
+    margin: 12px auto 0;
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+/* Header del sheet */
+.sv-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid rgba(157,231,149,0.12);
+    flex-shrink: 0;
+}
+
+.sv-sheet-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sv-sheet-logo {
+    width: 26px;
+    height: 26px;
+    filter: brightness(0) invert(1);
+    opacity: 0.88;
+}
+
+.sv-sheet-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.sv-sheet-close {
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(157,231,149,0.2);
+    background: rgba(10,155,66,0.15);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #d4eeda;
+    font-size: 15px;
+    transition: all 0.2s;
+}
+
+.sv-sheet-close:hover {
+    background: rgba(220,38,38,0.2);
+    border-color: rgba(220,38,38,0.4);
+    color: #f87171;
+}
+
+/* Usuario en el sheet */
+.sv-sheet-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(157,231,149,0.12);
+    flex-shrink: 0;
+}
+
+.sv-sheet-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 9px;
+    overflow: hidden;
+    border: 2px solid #0a9b42;
+    flex-shrink: 0;
+}
+
+.sv-sheet-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.sv-sheet-user-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.3;
+}
+
+.sv-sheet-user-role {
+    font-size: 11px;
+    color: #0a9b42;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 2px;
+}
+
+.sv-sheet-user-role::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #9DE795;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* Body scrollable */
+.sv-sheet-body {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px 12px 24px;
+    scrollbar-width: none;
+}
+
+.sv-sheet-body::-webkit-scrollbar { display: none; }
+
+/* Títulos de sección en el sheet */
+.sv-sheet-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #4d8060;                  /* ← verde apagado visible sobre oscuro */
+    padding: 12px 4px 6px;
+}
+
+/* ── Grid 2 columnas ── */
+.sv-sheet-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.sv-sheet-grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 8px;
+    background: rgba(255,255,255,0.05);  /* visible sobre oscuro */
+    border: 1px solid rgba(157,231,149,0.12);
+    border-radius: 11px;
+    text-decoration: none;
+    color: #c8e6cc;                      /* texto claro visible */
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.18s;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sv-sheet-grid-item i {
+    font-size: 22px;
+    color: #7aab88;                      /* icono visible */
+    transition: color 0.18s, transform 0.18s;
+}
+
+/* Hover y activo del grid */
+.sv-sheet-grid-item:hover {
+    background: rgba(10,155,66,0.22);
+    border-color: rgba(10,155,66,0.5);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.sv-sheet-grid-item:hover i {
+    color: #9DE795;
+    transform: scale(1.1);
+}
+
+.sv-sheet-grid-item.active {
+    background: rgba(10,155,66,0.3);
+    border-color: rgba(10,155,66,0.65);
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(10,155,66,0.25);
+}
+
+.sv-sheet-grid-item.active i {
+    color: #9DE795;
+}
+
+/* ── Lista ── */
+.sv-sheet-list-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 8px;
+    border-radius: 9px;
+    text-decoration: none;
+    color: #c8e6cc;                      /* texto claro visible */
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.18s, border-color 0.18s, color 0.18s;
+    cursor: pointer;
+    border: 1px solid transparent;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sv-sheet-list-item i {
+    font-size: 17px;
+    color: #7aab88;
+    min-width: 20px;
+    flex-shrink: 0;
+    transition: color 0.18s;
+}
+
+.sv-sheet-list-item:hover {
+    background: rgba(10,155,66,0.18);
+    border-color: rgba(157,231,149,0.2);
+    color: #ffffff;
+}
+
+.sv-sheet-list-item:hover i { color: #9DE795; }
+
+.sv-sheet-list-item.active {
+    background: rgba(10,155,66,0.28);
+    border-color: rgba(10,155,66,0.5);
+    color: #ffffff;
+}
+
+.sv-sheet-list-item.active i { color: #9DE795; }
+
+/* Divider del sheet */
+.sv-sheet-divider {
+    height: 1px;
+    background: rgba(157,231,149,0.12);
+    margin: 10px 0;
+}
+
+/* Logout del sheet */
+.sv-sheet-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 8px;
+    border-radius: 9px;
+    color: #f87171;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s;
+    text-decoration: none;
+    border: 1px solid transparent;
+    width: 100%;
+    background: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sv-sheet-logout i { font-size: 17px; min-width: 20px; flex-shrink: 0; }
+
+.sv-sheet-logout:hover {
+    background: rgba(248,113,113,0.1);
+    border-color: rgba(248,113,113,0.3);
+}
+
+/* ========================================================================
+   FAB MÓVIL
+   ======================================================================== */
+.sv-fab {
+    display: none;
+    position: fixed;
+    bottom: 22px;
+    right: 18px;
+    width: 50px;
+    height: 50px;
+    background: var(--sv-primary-mid);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 21px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1500;
+    box-shadow: 0 4px 16px rgba(10,155,66,0.4);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sv-fab:hover  { background: var(--sv-primary-dark); }
+.sv-fab:active { transform: scale(0.92); }
+.sv-fab.open   { transform: rotate(45deg); background: var(--sv-primary-dark); }
+
+/* ========================================================================
+   RESPONSIVE
+   ======================================================================== */
+@media (max-width: 768px) {
+    .sidebar-vet  { display: none !important; }
+    .sv-toggle    { display: none !important; }
+    .sv-main      { margin-left: 0 !important; }
+    .sv-fab            { display: flex; }
+    .sv-mobile-overlay { display: block; }
+    .sv-bottom-sheet   { display: flex; }
+}
+
+@media (min-width: 769px) {
+    .sv-fab,
+    .sv-mobile-overlay,
+    .sv-bottom-sheet { display: none !important; }
+}
+
+/* ========================================================================
+   ANIMACIONES DE ENTRADA
+   ======================================================================== */
+@keyframes sv-fade-in {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.sv-nav .sv-item {
+    animation: sv-fade-in 0.3s ease backwards;
+}
+
+.sv-nav .sv-section:nth-child(1) .sv-item:nth-child(1) { animation-delay: 0.04s; }
+.sv-nav .sv-section:nth-child(1) .sv-item:nth-child(2) { animation-delay: 0.08s; }
+.sv-nav .sv-section:nth-child(1) .sv-item:nth-child(3) { animation-delay: 0.12s; }
+.sv-nav .sv-section:nth-child(1) .sv-item:nth-child(4) { animation-delay: 0.16s; }
+.sv-nav .sv-section:nth-child(1) .sv-item:nth-child(5) { animation-delay: 0.20s; }
+.sv-nav .sv-section:nth-child(1) .sv-item:nth-child(6) { animation-delay: 0.24s; }
+.sv-nav .sv-section:nth-child(1) .sv-item:nth-child(7) { animation-delay: 0.28s; }
+.sv-nav .sv-section:nth-child(1) .sv-item:nth-child(8) { animation-delay: 0.32s; }
+
+.sv-item.active { animation: none; }
+
+/* ── Sin animaciones si el usuario las desactivó ── */
+@media (prefers-reduced-motion: reduce) {
+    .sv-item, .sidebar-vet, .sv-bottom-sheet, .sv-mobile-overlay {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ── Print ── */
+@media print {
+    .sidebar-vet, .sv-toggle, .sv-fab,
+    .sv-mobile-overlay, .sv-bottom-sheet { display: none !important; }
+    .sv-main { margin-left: 0 !important; }
+}
