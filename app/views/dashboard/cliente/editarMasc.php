@@ -442,6 +442,46 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                     </div>
                 
 
+                <!-- CAMPOS CLÍNICOS -->
+                <div class="form-row">
+                    <!-- PESO -->
+                    <div class="form-group">
+                        <label>Peso (kg)</label>
+                        <input type="number"
+                            name="peso"
+                            value="<?= $mascota['peso'] ?? '' ?>"
+                            placeholder="Ej: 8.5"
+                            step="0.1"
+                            min="0.1"
+                            max="200"
+                            class="form-control"
+                            style="height: 50px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    </div>
+
+                    <!-- ESTADO DE SALUD -->
+                    <div class="form-group">
+                        <label>Estado de Salud</label>
+                        <select name="estado_salud" class="form-control"
+                            style="height: 50px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <option value="">-- Seleccionar --</option>
+                            <option value="Bueno"    <?= ($mascota['estado_salud'] ?? '') === 'Bueno'    ? 'selected' : '' ?>>Bueno</option>
+                            <option value="Regular"  <?= ($mascota['estado_salud'] ?? '') === 'Regular'  ? 'selected' : '' ?>>Regular</option>
+                            <option value="Delicado" <?= ($mascota['estado_salud'] ?? '') === 'Delicado' ? 'selected' : '' ?>>Delicado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ÚLTIMA DESPARASITACIÓN -->
+                <div class="form-group">
+                    <label>Fecha Última Desparasitación</label>
+                    <input type="date"
+                        name="fecha_ultima_desparasitacion"
+                        value="<?= $mascota['fecha_ultima_desparasitacion'] ?? '' ?>"
+                        max="<?= date('Y-m-d') ?>"
+                        class="form-control"
+                        style="height: 50px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                </div>
+
                 <!-- BOTONES ACCIÓN -->
                 <div class="form-actions">
                     <a href="<?= BASE_URL ?>/cliente/mascotas" class="btn btn-secondary">
