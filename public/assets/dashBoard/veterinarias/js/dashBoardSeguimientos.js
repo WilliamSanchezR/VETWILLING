@@ -825,11 +825,233 @@
         bootstrap.Modal.getOrCreateInstance(modal).show();
     }
 
+    function abrirModalNuevoSeguimiento() {
+        const modal = crearModal('modalNuevoSeguimientoSeg', `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-plus-circle-fill" style="color: #00a884;"></i> Nuevo Seguimiento
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                        <!-- Sección: Seleccionar Paciente -->
+                        <div class="mb-4">
+                            <h6 class="mb-3" style="font-weight: 600; color: #333;">
+                                <i class="bi bi-heart-pulse" style="color: #00a884;"></i> Seleccionar Paciente
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="mNuevoPaciente" class="form-label fw-semibold">
+                                            Paciente <span style="color: #e74c3c;">*</span>
+                                        </label>
+                                        <select id="mNuevoPaciente" class="form-select" required>
+                                            <option value="">-- Seleccionar Paciente --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="mNuevoPropietario" class="form-label fw-semibold">Propietario</label>
+                                        <input type="text" id="mNuevoPropietario" class="form-control" readonly placeholder="Auto-cargado">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="border: 1px solid #e0e0e0;">
+                        <!-- Sección: Información del Seguimiento -->
+                        <div class="mb-4">
+                            <h6 class="mb-3" style="font-weight: 600; color: #333;">
+                                <i class="bi bi-clipboard-check" style="color: #00a884;"></i> Información del Seguimiento
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mNuevoDiagnostico" class="form-label fw-semibold">
+                                            Diagnóstico <span style="color: #e74c3c;">*</span>
+                                        </label>
+                                        <textarea id="mNuevoDiagnostico" class="form-control" rows="3" required placeholder="Escriba el diagnóstico..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mNuevoObservaciones" class="form-label fw-semibold">Observaciones</label>
+                                        <textarea id="mNuevoObservaciones" class="form-control" rows="3" placeholder="Observaciones adicionales..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mNuevoPrioridad" class="form-label fw-semibold">
+                                            Prioridad <span style="color: #e74c3c;">*</span>
+                                        </label>
+                                        <select id="mNuevoPrioridad" class="form-select" required>
+                                            <option value="">-- Seleccionar --</option>
+                                            <option value="baja">Baja</option>
+                                            <option value="normal" selected>Normal</option>
+                                            <option value="alta">Alta</option>
+                                            <option value="critica">Crítica</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mNuevoEstado" class="form-label fw-semibold">
+                                            Estado <span style="color: #e74c3c;">*</span>
+                                        </label>
+                                        <select id="mNuevoEstado" class="form-select" required>
+                                            <option value="activo" selected>Activo</option>
+                                            <option value="pausado">Pausado</option>
+                                            <option value="completado">Completado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mNuevoFechaInicio" class="form-label fw-semibold">
+                                            Fecha de Inicio <span style="color: #e74c3c;">*</span>
+                                        </label>
+                                        <input type="date" id="mNuevoFechaInicio" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mNuevoProximaRevision" class="form-label fw-semibold">Próxima Revisión</label>
+                                        <input type="date" id="mNuevoProximaRevision" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="border: 1px solid #e0e0e0;">
+                        <!-- Sección: Medicación (opcional) -->
+                        <div class="mb-4">
+                            <h6 class="mb-3" style="font-weight: 600; color: #333;">
+                                <i class="bi bi-capsule" style="color: #00a884;"></i> Medicación <small style="color: #999;">(Opcional)</small>
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mNuevoMedicamento" class="form-label fw-semibold">Medicamento</label>
+                                        <input type="text" id="mNuevoMedicamento" class="form-control" placeholder="Nombre del medicamento">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="mNuevoDosis" class="form-label fw-semibold">Dosis</label>
+                                        <input type="text" id="mNuevoDosis" class="form-control" placeholder="Ej: 500mg, 2 veces al día">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="mNuevoError" class="text-danger mt-2" style="font-size:13px;display:none">
+                            Por favor completa los campos requeridos.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" id="mNuevoOk" class="btn btn-success">
+                            <i class="bi bi-check-lg me-1"></i> Crear Seguimiento
+                        </button>
+                    </div>
+                </div>
+            </div>`);
+
+        // Cargar pacientes en el select
+        const selectPaciente = modal.querySelector('#mNuevoPaciente');
+        const selectPropietario = modal.querySelector('#mNuevoPropietario');
+        const today = new Date().toISOString().split('T')[0];
+        modal.querySelector('#mNuevoFechaInicio').value = today;
+
+        const pacientesUnicos = {};
+        appState.todos.forEach(seg => {
+            const key = seg.id_paciente;
+            if (!pacientesUnicos[key]) {
+                pacientesUnicos[key] = {
+                    id: seg.id_paciente,
+                    nombre: seg.nombre_mascota,
+                    propietario: seg.nombre_propietario
+                };
+            }
+        });
+
+        Object.values(pacientesUnicos).forEach(paciente => {
+            const option = document.createElement('option');
+            option.value = paciente.id;
+            option.textContent = `${paciente.nombre} (${paciente.propietario})`;
+            selectPaciente.appendChild(option);
+        });
+
+        selectPaciente.addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const propietario = selectedOption.text.split('(')[1]?.replace(')', '') || '';
+            selectPropietario.value = propietario;
+        });
+
+        // Botón guardar
+        const btnOk = modal.querySelector('#mNuevoOk');
+        const btnNuevo = btnOk.cloneNode(true);
+        btnOk.parentNode.replaceChild(btnNuevo, btnOk);
+
+        btnNuevo.addEventListener('click', async () => {
+            const id_paciente = modal.querySelector('#mNuevoPaciente').value;
+            const diagnostico = modal.querySelector('#mNuevoDiagnostico').value.trim();
+            const error = modal.querySelector('#mNuevoError');
+
+            if (!id_paciente || !diagnostico) {
+                error.style.display = 'block';
+                return;
+            }
+
+            error.style.display = 'none';
+
+            const datos = new FormData();
+            datos.append('action', 'crear');
+            datos.append('id_paciente', id_paciente);
+            datos.append('diagnostico', diagnostico);
+            datos.append('observaciones', modal.querySelector('#mNuevoObservaciones').value);
+            datos.append('prioridad', modal.querySelector('#mNuevoPrioridad').value);
+            datos.append('estado', modal.querySelector('#mNuevoEstado').value);
+            datos.append('fecha_inicio', modal.querySelector('#mNuevoFechaInicio').value);
+            datos.append('proxima_revision', modal.querySelector('#mNuevoProximaRevision').value);
+            datos.append('medicamento', modal.querySelector('#mNuevoMedicamento').value);
+            datos.append('dosis', modal.querySelector('#mNuevoDosis').value);
+
+            try {
+                const response = await fetch(`${BASE_URL}/veterinaria/api/seguimientos`, {
+                    method: 'POST',
+                    body: datos
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    toast('Seguimiento creado exitosamente', 'success');
+                    bootstrap.Modal.getInstance(modal)?.hide();
+                    setTimeout(() => {
+                        cargarSeguimientos();
+                    }, 800);
+                } else {
+                    toast(data.message || 'Error al crear el seguimiento', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                toast('Error al crear el seguimiento', 'error');
+            }
+        });
+
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+
     /* ============================================================
        NUEVO SEGUIMIENTO — implementada (antes era ReferenceError)
     ============================================================ */
     window.nuevoSeguimiento = function () {
-        window.location.href = `${BASE_URL}/veterinaria/seguimientos/nuevo`;
+        abrirModalNuevoSeguimiento();
     };
 
     /* ============================================================
