@@ -123,25 +123,34 @@ class Mascota
     }
 
     /**
-     * ACTUALIZAR MASCOTA
-     */
-    /**
      * ACTUALIZAR MASCOTA CON EDAD MEJORADA
      */
     public function actualizar(array $data)
     {
         try {
-            // Campos base que siempre se actualizan
-            $campos = "
-            nombre = :nombre,
-            especie = :especie,
-            raza = :raza,
-            edad_numero = :edad_numero,
-            edad_unidad = :edad_unidad,
-            sexo = :sexo
-        ";
+            // 1. Capturar valores actuales para auditoría
+            $sqlAntes = "SELECT nombre, especie, raza, edad_numero, edad_unidad, sexo,
+                                peso, estado_salud, fecha_ultima_desparasitacion, img_mascota
+                         FROM paciente WHERE id_paciente = :id_paciente AND estado = 'Activo'";
+            $stmtAntes = $this->conexion->prepare($sqlAntes);
+            $stmtAntes->bindParam(':id_paciente', $data['id_paciente'], PDO::PARAM_INT);
+            $stmtAntes->execute();
+            $valoresAntes = $stmtAntes->fetch(PDO::FETCH_ASSOC) ?: [];
 
-            // Agregar imagen solo si se subió una nueva
+            // 2. Construir UPDATE dinámico
+            $campos = "
+                nombre      = :nombre,
+                especie     = :especie,
+                raza        = :raza,
+                edad_numero = :edad_numero,
+                edad_unidad = :edad_unidad,
+                sexo        = :sexo,
+                peso        = :peso,
+                estado_salud = :estado_salud,
+                fecha_ultima_desparasitacion = :fecha_ultima_desparasitacion,
+                updated_by  = :updated_by
+            ";
+
             if (!empty($data['img_mascota'])) {
                 $campos .= ", img_mascota = :img_mascota";
             }
@@ -150,19 +159,18 @@ class Mascota
 
             $stmt = $this->conexion->prepare($sql);
 
-            // Vincular parámetros base
-            $stmt->bindParam(':nombre', $data['nombre']);
-            $stmt->bindParam(':especie', $data['especie']);
-            $stmt->bindParam(':raza', $data['raza']);
+            $stmt->bindParam(':nombre',       $data['nombre']);
+            $stmt->bindParam(':especie',      $data['especie']);
+            $stmt->bindParam(':raza',         $data['raza']);
+            $stmt->bindParam(':edad_numero',  $data['edad_numero'], PDO::PARAM_INT);
+            $stmt->bindParam(':edad_unidad',  $data['edad_unidad'], PDO::PARAM_STR);
+            $stmt->bindParam(':sexo',         $data['sexo']);
+            $stmt->bindParam(':peso',         $data['peso']);
+            $stmt->bindParam(':estado_salud', $data['estado_salud']);
+            $stmt->bindParam(':fecha_ultima_desparasitacion', $data['fecha_ultima_desparasitacion']);
+            $stmt->bindParam(':updated_by',   $data['id_usuario'], PDO::PARAM_INT);
+            $stmt->bindParam(':id_paciente',  $data['id_paciente'], PDO::PARAM_INT);
 
-            // ✅ VINCULAR EDAD CON UNIDAD
-            $stmt->bindParam(':edad_numero', $data['edad_numero'], PDO::PARAM_INT);
-            $stmt->bindParam(':edad_unidad', $data['edad_unidad'], PDO::PARAM_STR);
-
-            $stmt->bindParam(':sexo', $data['sexo']);
-            $stmt->bindParam(':id_paciente', $data['id_paciente'], PDO::PARAM_INT);
-
-            // Vincular imagen solo si existe
             if (!empty($data['img_mascota'])) {
                 $stmt->bindParam(':img_mascota', $data['img_mascota']);
             }
@@ -171,9 +179,36 @@ class Mascota
 
             if (!$resultado) {
                 error_log("Error PDO actualizar: " . print_r($stmt->errorInfo(), true));
+                return false;
             }
 
-            return $resultado;
+            // 3. Registrar auditoría de campos cambiados
+            if (!empty($data['id_usuario'])) {
+                require_once __DIR__ . '/AuditoriaModificacionMascotas.php';
+
+                $valoresDespues = [
+                    'nombre'                       => $data['nombre'],
+                    'especie'                      => $data['especie'],
+                    'raza'                         => $data['raza'],
+                    'edad_numero'                  => $data['edad_numero'],
+                    'edad_unidad'                  => $data['edad_unidad'],
+                    'sexo'                         => $data['sexo'],
+                    'peso'                         => $data['peso'],
+                    'estado_salud'                 => $data['estado_salud'],
+                    'fecha_ultima_desparasitacion' => $data['fecha_ultima_desparasitacion'],
+                    'img_mascota'                  => !empty($data['img_mascota']) ? $data['img_mascota'] : ($valoresAntes['img_mascota'] ?? null),
+                ];
+
+                $auditoria = new AuditoriaModificacionMascotas();
+                $auditoria->registrarCambios(
+                    (int)$data['id_paciente'],
+                    (int)$data['id_usuario'],
+                    $valoresAntes,
+                    $valoresDespues
+                );
+            }
+
+            return true;
         } catch (PDOException $e) {
             error_log('❌ Error Mascota::actualizar → ' . $e->getMessage());
             error_log('❌ Datos: ' . print_r($data, true));

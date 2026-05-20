@@ -238,16 +238,39 @@ function consultarMascotaId($id)
 
 function actualizarMascota()
 {
-    $id = $_POST['id_mascota'] ?? null;
-    $nombre = trim($_POST['nombre'] ?? '');
-    $especie = trim($_POST['especie'] ?? '');
-    $raza = trim($_POST['raza'] ?? '');
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-    // ✅ CAPTURAR EDAD CON UNIDAD
+    // Validar sesión activa
+    if (!isset($_SESSION['user']['id_usuario'])) {
+        mostrarSweetAlert('error', 'Sesión no válida', 'Por favor inicia sesión');
+        exit();
+    }
+
+    $id_usuario = $_SESSION['user']['id_usuario'];
+    $id_rol     = $_SESSION['user']['id_rol'] ?? 0;
+
+    $id          = $_POST['id_mascota'] ?? null;
+    $nombre      = trim($_POST['nombre'] ?? '');
+    $especie     = trim($_POST['especie'] ?? '');
+    $raza        = trim($_POST['raza'] ?? '');
     $edad_numero = (int)($_POST['edad_numero'] ?? 0);
     $edad_unidad = $_POST['edad_unidad'] ?? '';
+    $sexo        = $_POST['sexo'] ?? null;
 
-    $sexo = $_POST['sexo'] ?? null;
+    // Campos clínicos (opcionales)
+    $peso                         = !empty($_POST['peso']) ? (float)$_POST['peso'] : null;
+    $estado_salud                 = $_POST['estado_salud'] ?? null;
+    $fecha_ultima_desparasitacion = !empty($_POST['fecha_ultima_desparasitacion'])
+                                    ? $_POST['fecha_ultima_desparasitacion']
+                                    : null;
+
+    // Validar estado_salud contra valores permitidos
+    $estados_validos = ['Bueno', 'Regular', 'Delicado'];
+    if ($estado_salud !== null && !in_array($estado_salud, $estados_validos, true)) {
+        $estado_salud = null;
+    }
 
     // Validar campos obligatorios
     if (!$id || !$nombre || !$especie || !$raza || $edad_numero <= 0 || !$edad_unidad || !$sexo) {
@@ -255,9 +278,59 @@ function actualizarMascota()
         exit();
     }
 
+    require_once __DIR__ . '/../../config/database.php';
+
+    // ── VALIDACIÓN DE PROPIEDAD ────────────────────────────────────────
+    // Roles 1=Admin, 2=Vet pueden editar cualquier mascota.
+    // Rol 3=Propietario solo puede editar sus propias mascotas.
+    if ($id_rol == 3) {
+        try {
+            $db = new conexion();
+            $conexion = $db->getConexion();
+
+            // Obtener el id_propietario del usuario en sesión
+            $sqlProp = "SELECT id_propietario FROM propietario WHERE id_usuario = :id_usuario";
+            $stmtProp = $conexion->prepare($sqlProp);
+            $stmtProp->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtProp->execute();
+            $propietario = $stmtProp->fetch(PDO::FETCH_ASSOC);
+
+            if (!$propietario) {
+                mostrarSweetAlert('error', 'Perfil incompleto', 'Tu usuario no tiene perfil de propietario');
+                exit();
+            }
+
+            // Obtener el id_propietario de la mascota a editar
+            $sqlMasc = "SELECT id_propietario FROM paciente WHERE id_paciente = :id_paciente AND estado = 'Activo'";
+            $stmtMasc = $conexion->prepare($sqlMasc);
+            $stmtMasc->bindParam(':id_paciente', $id, PDO::PARAM_INT);
+            $stmtMasc->execute();
+            $mascotaActual = $stmtMasc->fetch(PDO::FETCH_ASSOC);
+
+            if (!$mascotaActual) {
+                mostrarSweetAlert('error', 'No encontrada', 'La mascota no existe o ya fue eliminada');
+                exit();
+            }
+
+            if ((int)$mascotaActual['id_propietario'] !== (int)$propietario['id_propietario']) {
+                error_log("❌ Intento de edición no autorizado: usuario $id_usuario sobre mascota $id");
+                mostrarSweetAlert('error', 'Sin permiso', 'No puedes editar una mascota que no te pertenece');
+                exit();
+            }
+        } catch (PDOException $e) {
+            error_log('❌ Error validando propiedad mascota: ' . $e->getMessage());
+            mostrarSweetAlert('error', 'Error', 'No se pudo verificar la propiedad de la mascota');
+            exit();
+        }
+    } elseif ($id_rol != 1 && $id_rol != 2) {
+        mostrarSweetAlert('error', 'Sin permiso', 'No tienes permisos para editar mascotas');
+        exit();
+    }
+    // ── FIN VALIDACIÓN DE PROPIEDAD ────────────────────────────────────
+
     $imagen = null;
 
-    // Validar y procesar imagen si se subió una nueva
+    // Procesar imagen si se subió una nueva
     if (!empty($_FILES['img_mascota']['name'])) {
         $file = $_FILES['img_mascota'];
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -284,14 +357,18 @@ function actualizarMascota()
     }
 
     $data = [
-        'id_paciente'  => $id,
-        'nombre'       => $nombre,
-        'especie'      => $especie,
-        'raza'         => $raza,
-        'edad_numero'  => $edad_numero,      // ✅ Número
-        'edad_unidad'  => $edad_unidad,      // ✅ Unidad
-        'sexo'         => $sexo,
-        'img_mascota'  => $imagen
+        'id_paciente'                  => $id,
+        'nombre'                       => $nombre,
+        'especie'                      => $especie,
+        'raza'                         => $raza,
+        'edad_numero'                  => $edad_numero,
+        'edad_unidad'                  => $edad_unidad,
+        'sexo'                         => $sexo,
+        'peso'                         => $peso,
+        'estado_salud'                 => $estado_salud,
+        'fecha_ultima_desparasitacion' => $fecha_ultima_desparasitacion,
+        'img_mascota'                  => $imagen,
+        'id_usuario'                   => $id_usuario,
     ];
 
     $mascota = new Mascota();
