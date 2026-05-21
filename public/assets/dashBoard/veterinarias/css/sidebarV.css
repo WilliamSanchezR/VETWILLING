@@ -165,6 +165,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-fon
     scrollbar-color: var(--sv-border) transparent;
 }
 
+.sidebar-vet.collapsed .sv-nav {
+    overflow-x: visible;
+}
+
 .sv-nav::-webkit-scrollbar { width: 4px; }
 .sv-nav::-webkit-scrollbar-track { background: transparent; }
 .sv-nav::-webkit-scrollbar-thumb { background: var(--sv-border); border-radius: 4px; }
@@ -294,6 +298,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-fon
 .sidebar-vet.collapsed .sv-item {
     justify-content: center;
     padding: 11px 0;
+    overflow: visible;
 }
 
 .sidebar-vet.collapsed .sv-item i {
@@ -316,8 +321,18 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-fon
     transform: none;
 }
 
-/* ── Tooltips en colapsado ── */
+/* ── Force sidebar-specific tooltips, no generic tooltip styles */
+.sidebar-vet .sv-item[data-tooltip]::before,
+.sidebar-vet .sv-item[data-tooltip]::after {
+    display: none !important;
+}
+
+.sidebar-vet.collapsed .sv-item[data-tooltip] {
+    position: relative;
+}
+
 .sidebar-vet.collapsed .sv-item[data-tooltip]::after {
+    display: block !important;
     content: attr(data-tooltip);
     position: absolute;
     left: calc(100% + 12px);
