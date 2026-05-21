@@ -21,6 +21,12 @@ switch ($method) {
     case 'GET':
         $accion = $_GET['accion'] ?? '';
 
+        // --- LISTAR PARA ADMIN (Subtarea 1: requiere admin) ---
+        if ($accion === 'listar-admin') {
+            listarPropietariosAdmin();
+            exit();
+        }
+
         // --- ELIMINAR ---
         if ($accion === 'eliminar' && isset($_GET['id'])) {
             eliminarPropietario($_GET['id']);
@@ -36,12 +42,6 @@ switch ($method) {
         if ($accion === 'consultar' && isset($_GET['id'])) {
             $data = consultarPropietarioId($_GET['id']);
             echo json_encode($data);
-            exit();
-        }
-
-        if ($accion === 'listar-veterinaria') {
-            $id_veterinaria = $_GET['id_veterinaria'] ?? '';
-
             exit();
         }
 
@@ -65,22 +65,45 @@ switch ($method) {
             http_response_code(400);
             echo json_encode(['error' => 'ID de propietario no proporcionado']);
         }
-
         break;
+
     default:
         http_response_code(405);
         echo json_encode(['error' => 'Método no permitido']);
 }
 
-
 // ==================== CRUD ====================
+
+// -----------------------------------------------------------------------
+// RFS 24 — Listar propietarios para administrador (JSON)
+// Subtarea 1: autenticación del administrador
+// -----------------------------------------------------------------------
+function listarPropietariosAdmin()
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    // Subtarea 1: solo el administrador puede listar
+    if (!isset($_SESSION['user']) || (int)$_SESSION['user']['id_rol'] !== 1) {
+        http_response_code(403);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Acceso no autorizado']);
+        exit();
+    }
+
+    $obj  = new Propietario();
+    $data = $obj->listarParaAdmin();
+
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'success', 'propietarios' => $data]);
+}
 
 function listarPropietarios()
 {
     $resultado = new Propietario();
     return $resultado->listar();
 }
-
 
 function consultarPropietarioId($id)
 {
@@ -218,15 +241,44 @@ function actualizarPropietario()
 
 function eliminarPropietario($id)
 {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    // Subtarea 1: autenticación del administrador
+    if (!isset($_SESSION['user']) || (int)$_SESSION['user']['id_rol'] !== 1) {
+        mostrarSweetAlert('error', 'Acceso denegado', 'Solo el administrador puede eliminar propietarios', BASE_URL . '/login');
+        exit();
+    }
+
+    $id = (int)$id;
     $obj = new Propietario();
+
+    // Subtarea 2: verificar existencia
+    $propietario = $obj->consultarPropietario($id);
+    if (!$propietario) {
+        mostrarSweetAlert('error', 'No encontrado', 'El propietario no existe', BASE_URL . '/admin/listar-propietarios');
+        exit();
+    }
+
     $resultado = $obj->eliminar($id);
 
     if ($resultado) {
+        // Subtarea 7: registrar en log de auditoría
+        $obj->registrarAuditoriaEliminacion([
+            'id_propietario'     => $id,
+            'nombre_propietario' => $resultado['nombre_propietario'],
+            'id_usuario_admin'   => (int)$_SESSION['user']['id_usuario'],
+            'nombre_admin'       => $_SESSION['user']['nombre'] ?? 'Administrador',
+            'motivo'             => 'Eliminación manual por administrador',
+            'ip_origen'          => $_SERVER['REMOTE_ADDR'] ?? null,
+        ]);
+
         mostrarSweetAlert(
             'success',
             'Propietario inhabilitado',
             'El propietario ha sido inhabilitado correctamente',
-            '/vetwilling/admin/listar-propietarios'
+            BASE_URL . '/admin/listar-propietarios'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar');
@@ -343,32 +395,65 @@ function listarPropietariosVeterinaria($id_veterinaria)
 
 function eliminarPropietarioAJAX($id)
 {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    header('Content-Type: application/json');
+
+    // Subtarea 1: autenticación del administrador
+    if (!isset($_SESSION['user']) || (int)$_SESSION['user']['id_rol'] !== 1) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Acceso no autorizado']);
+        exit();
+    }
+
+    $id = (int)$id;
+
     try {
         $obj = new Propietario();
+
+        // Subtarea 2: verificar existencia del propietario
+        $propietario = $obj->consultarPropietario($id);
+        if (!$propietario) {
+            http_response_code(404);
+            echo json_encode(['status' => 'error', 'message' => 'Propietario no encontrado']);
+            exit();
+        }
+
+        // Subtareas 4/5: inhabilitar (soft delete + bloquear acceso)
         $resultado = $obj->eliminar($id);
 
-
         if ($resultado) {
-            header('Content-Type: application/json');
+            // Subtarea 7: registrar en log de auditoría
+            $obj->registrarAuditoriaEliminacion([
+                'id_propietario'     => $id,
+                'nombre_propietario' => $resultado['nombre_propietario'],
+                'id_usuario_admin'   => (int)$_SESSION['user']['id_usuario'],
+                'nombre_admin'       => $_SESSION['user']['nombre'] ?? 'Administrador',
+                'motivo'             => 'Eliminación desde panel de administración',
+                'ip_origen'          => $_SERVER['REMOTE_ADDR'] ?? null,
+            ]);
+
+            // Subtarea 6: confirmación visual (respuesta para el JS)
             echo json_encode([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Propietario inhabilitado correctamente',
             ]);
         } else {
-            header('Content-Type: application/json');
-            header('HTTP/1.1 500 Internal Server Error');
+            http_response_code(500);
             echo json_encode([
-                'status' => 'error',
-                'message' => 'No se pudo eliminar el propietario',
+                'status'  => 'error',
+                'message' => 'No se pudo inhabilitar el propietario',
             ]);
         }
     } catch (Exception $e) {
-        header('Content-Type: application/json');
-        header('HTTP/1.1 500 Internal Server Error');
+        http_response_code(500);
         echo json_encode([
-            'status' => 'error',
-            'message' => 'Error al eliminar el propietario: ' . $e->getMessage()
+            'status'  => 'error',
+            'message' => 'Error interno al procesar la solicitud'
         ]);
+        error_log("eliminarPropietarioAJAX error: " . $e->getMessage());
     }
 
     exit();

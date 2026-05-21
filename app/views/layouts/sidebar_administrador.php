@@ -71,6 +71,21 @@ $final_path = end($path_parts); // Obtiene el último elemento
             </div>
 
 
+            <!-- Menu Propietarios (RFS 24) -->
+            <div class="submenu <?= $final_path == 'listar-propietarios' ? 'active open' : '' ?>">
+
+                <div class="submenu-toggle" data-tooltip="Propietarios">
+                    <i class="bi bi-people"></i>
+                    <span class="texto-item-sidebar">Propietarios</span>
+                    <i class="bi bi-chevron-down flecha"></i>
+                </div>
+
+                <ul class="submenu-items">
+                    <li><a class="nav-item <?= $final_path == 'listar-propietarios' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/listar-propietarios" data-tooltip="Listar">Listar</a></li>
+                </ul>
+            </div>
+
+
             <a href="<?= BASE_URL ?>/admin/listar-tickets"
                 class="nav-item <?= $final_path == '' ? 'active' : '' ?>"
                 data-tooltip="Ticket de Soporte">
