@@ -410,6 +410,12 @@ function cancelarCitaCliente()
             exit();
         }
 
+        // Subtarea 5: confirmar que el slot quedó liberado para nuevos agendamientos
+        $slotLiberado = $modeloCitas->confirmarSlotLiberado($id_agendamiento);
+        if (!$slotLiberado) {
+            error_log("⚠️ Advertencia: el slot del agendamiento {$id_agendamiento} no pudo verificarse como liberado");
+        }
+
         header('Content-Type: application/json');
         echo json_encode([
             'status' => 'success',

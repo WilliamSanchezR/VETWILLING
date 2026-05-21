@@ -298,9 +298,9 @@ class CitasCliente
         }
     }
 
-    /**
-     * Valida si una cita puede ser cancelada
-     */
+    /** Horas mínimas de anticipación requeridas para cancelar una cita */
+    const HORAS_LIMITE_CANCELACION = 2;
+
     public function validarEstadoCita($id_agendamiento)
     {
         try {
@@ -323,10 +323,32 @@ class CitasCliente
                 ];
             }
 
-            if (strtotime($cita['fecha_hora']) <= time()) {
+            // Subtarea 2: no permitir cancelar si ya está Finalizada o Cancelada
+            if (in_array($cita['estado'], ['Finalizada', 'Cancelada'])) {
+                return [
+                    'valido' => false,
+                    'mensaje' => "No se puede cancelar una cita con estado '{$cita['estado']}'",
+                    'estado_actual' => $cita['estado']
+                ];
+            }
+
+            $timestamp_cita = strtotime($cita['fecha_hora']);
+
+            // Subtarea 3: no permitir cancelar si la cita ya pasó o está en curso
+            if ($timestamp_cita <= time()) {
                 return [
                     'valido' => false,
                     'mensaje' => 'No se puede cancelar una cita ya iniciada o pasada',
+                    'estado_actual' => $cita['estado']
+                ];
+            }
+
+            // Subtarea 3: validar ventana de tiempo mínima de anticipación
+            $horas_restantes = ($timestamp_cita - time()) / 3600;
+            if ($horas_restantes < self::HORAS_LIMITE_CANCELACION) {
+                return [
+                    'valido' => false,
+                    'mensaje' => 'Solo puedes cancelar con al menos ' . self::HORAS_LIMITE_CANCELACION . ' horas de anticipación',
                     'estado_actual' => $cita['estado']
                 ];
             }
@@ -410,6 +432,34 @@ class CitasCliente
                 'exito' => false,
                 'mensaje' => 'Error del sistema'
             ];
+        }
+    }
+
+    /**
+     * Subtarea 5: Confirma que el slot del veterinario quedó liberado.
+     * La disponibilidad se libera implícitamente al marcar la cita como 'Cancelada',
+     * ya que verificarDisponibilidad() excluye citas en ese estado.
+     * Este método verifica que el estado fue registrado correctamente.
+     *
+     * @param int $id_agendamiento
+     * @return bool
+     */
+    public function confirmarSlotLiberado($id_agendamiento)
+    {
+        try {
+            $sql = "SELECT estado FROM agendamiento
+                    WHERE id_agendamiento = :id_agendamiento
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $fila && $fila['estado'] === 'Cancelada';
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::confirmarSlotLiberado -> " . $e->getMessage());
+            return false;
         }
     }
 
