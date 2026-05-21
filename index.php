@@ -102,6 +102,16 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/veterinaria/agenda-veterinario.php';
         break;
 
+    case '/veterinario/notificaciones':
+    case '/veterinaria/notificaciones':
+        require BASE_PATH . '/app/views/dashboard/veterinaria/notificaciones.php';
+        break;
+
+    case '/veterinario/api/notificaciones':
+    case '/veterinaria/api/notificaciones':
+        require BASE_PATH . '/app/controllers/NotificacioneController.php';
+        break;
+
     case '/veterinario/agregar-disponibilidad-agenda':
         require BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
         break;
