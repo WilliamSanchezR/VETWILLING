@@ -740,4 +740,151 @@ class CitasCliente
             return [];
         }
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  RFS 27 – CONSULTA DE INFORMACIÓN DEL ANIMAL (PACIENTE)
+    // ═══════════════════════════════════════════════════════════════
+
+    /**
+     * Subtarea 2/6: Obtiene información completa del paciente validando
+     * que pertenece al propietario autenticado.
+     */
+    public function obtenerInfoPacienteConPropiedad(int $id_propietario, int $id_paciente): ?array
+    {
+        try {
+            $sql = "SELECT
+                        p.id_paciente,
+                        p.id_propietario,
+                        p.nombre,
+                        p.especie,
+                        p.raza,
+                        p.edad_numero,
+                        p.edad_unidad,
+                        p.sexo,
+                        p.img_mascota,
+                        p.estado,
+                        p.peso,
+                        p.estado_salud,
+                        p.fecha_ultima_desparasitacion
+                    FROM paciente p
+                    WHERE p.id_paciente = :id_paciente
+                      AND p.id_propietario = :id_propietario
+                      AND p.estado = 'Activo'
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindValue(':id_propietario', $id_propietario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $row ?: null;
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::obtenerInfoPacienteConPropiedad -> " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Subtarea 3: Obtiene vacunas del paciente (propietario solo lectura).
+     */
+    public function obtenerVacunasPorPaciente(int $id_propietario, int $id_paciente): array
+    {
+        try {
+            $sql = "SELECT
+                        pv.id_vacuna,
+                        pv.tipo_vacuna,
+                        pv.dosis,
+                        pv.fecha_aplicacion,
+                        pv.observaciones,
+                        COALESCE(CONCAT(pr.nombres, ' ', pr.apellidos), 'No especificado') AS profesional_nombre
+                    FROM paciente_vacuna pv
+                    INNER JOIN paciente pac ON pv.id_paciente = pac.id_paciente
+                    LEFT JOIN profesional pr ON pv.id_usuario_profesional = pr.id_usuario
+                    WHERE pv.id_paciente = :id_paciente
+                      AND pac.id_propietario = :id_propietario
+                    ORDER BY pv.fecha_aplicacion DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindValue(':id_propietario', $id_propietario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // La tabla puede no existir todavía; retornar vacío sin error crítico
+            error_log("❌ Error en CitasCliente::obtenerVacunasPorPaciente -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Subtarea 5: Obtiene historial clínico del paciente (propietario solo lectura).
+     */
+    public function obtenerHistorialClinicoPorPaciente(int $id_propietario, int $id_paciente): array
+    {
+        try {
+            $sql = "SELECT
+                        h.id_historial,
+                        h.fecha_atencion,
+                        h.motivo_consulta,
+                        h.diagnostico,
+                        h.tratamientos_aplicados,
+                        h.medicacion_recetada,
+                        h.observaciones_adicionales,
+                        COALESCE(CONCAT(pr.nombres, ' ', pr.apellidos), 'No especificado') AS profesional_nombre
+                    FROM historial_clinico_paciente h
+                    INNER JOIN paciente pac ON h.id_paciente = pac.id_paciente
+                    LEFT JOIN profesional pr ON h.id_usuario_profesional = pr.id_usuario
+                    WHERE h.id_paciente = :id_paciente
+                      AND pac.id_propietario = :id_propietario
+                      AND h.id_historial_base IS NULL
+                    ORDER BY h.fecha_atencion DESC
+                    LIMIT 50";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindValue(':id_propietario', $id_propietario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::obtenerHistorialClinicoPorPaciente -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Subtarea 5: Obtiene tratamientos activos e históricos del paciente.
+     */
+    public function obtenerTratamientosPorPaciente(int $id_propietario, int $id_paciente): array
+    {
+        try {
+            $sql = "SELECT
+                        pt.id_tratamiento,
+                        pt.medicamento,
+                        pt.dosis,
+                        pt.fecha_inicio,
+                        pt.fecha_fin,
+                        pt.estado,
+                        pt.observaciones,
+                        COALESCE(CONCAT(pr.nombres, ' ', pr.apellidos), 'No especificado') AS profesional_nombre
+                    FROM paciente_tratamiento pt
+                    INNER JOIN paciente pac ON pt.id_paciente = pac.id_paciente
+                    LEFT JOIN profesional pr ON pt.id_usuario_profesional = pr.id_usuario
+                    WHERE pt.id_paciente = :id_paciente
+                      AND pac.id_propietario = :id_propietario
+                    ORDER BY pt.fecha_inicio DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindValue(':id_propietario', $id_propietario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::obtenerTratamientosPorPaciente -> " . $e->getMessage());
+            return [];
+        }
+    }
 }

@@ -50,6 +50,9 @@ switch ($method) {
             case 'historial_paciente':
                 obtenerHistorialPaciente();
                 break;
+            case 'ficha_paciente':
+                obtenerFichaCompletaPaciente();
+                break;
             case 'detalle':
                 obtenerDetalleCita();
                 break;
@@ -593,12 +596,72 @@ function obtenerHistorialPaciente()
     }
 }
 
+function obtenerFichaCompletaPaciente()
+{
+    try {
+        if (!isset($_SESSION['user']['id_usuario'])) {
+            http_response_code(401);
+            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado']);
+            exit();
+        }
+
+        $id_propietario = obtenerIdPropietario();
+        if (!$id_propietario) {
+            http_response_code(403);
+            echo json_encode(['status' => 'error', 'message' => 'Acceso denegado']);
+            exit();
+        }
+
+        $id_paciente = isset($_GET['id_paciente']) ? (int)$_GET['id_paciente'] : 0;
+        if ($id_paciente <= 0) {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'ID de paciente inválido']);
+            exit();
+        }
+
+        $modeloCitas = new CitasCliente();
+
+        // Subtareas 2/6: info completa con validación de propiedad
+        $paciente = $modeloCitas->obtenerInfoPacienteConPropiedad($id_propietario, $id_paciente);
+        if (!$paciente) {
+            http_response_code(403);
+            echo json_encode(['status' => 'error', 'message' => 'Paciente no encontrado o acceso denegado']);
+            exit();
+        }
+
+        // Subtarea 3: vacunas
+        $vacunas = $modeloCitas->obtenerVacunasPorPaciente($id_propietario, $id_paciente);
+
+        // Subtarea 5: historial clínico y tratamientos
+        $historial_clinico = $modeloCitas->obtenerHistorialClinicoPorPaciente($id_propietario, $id_paciente);
+        $tratamientos      = $modeloCitas->obtenerTratamientosPorPaciente($id_propietario, $id_paciente);
+        $citas             = $modeloCitas->obtenerHistorialPorPaciente($id_propietario, $id_paciente, 50);
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status'           => 'success',
+            'paciente'         => $paciente,
+            'vacunas'          => $vacunas,
+            'historial_clinico'=> $historial_clinico,
+            'tratamientos'     => $tratamientos,
+            'citas'            => $citas,
+        ]);
+        exit();
+
+    } catch (Exception $e) {
+        error_log("❌ Error en obtenerFichaCompletaPaciente: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Error del sistema']);
+        exit();
+    }
+}
+
 function obtenerServicios()
 {
     try {
         $modeloCitas = new CitasCliente();
         $id_veterinaria = $_SESSION['user']['id_veterinaria'] ?? null;
-        
+
         $servicios = $modeloCitas->obtenerServicios($id_veterinaria);
 
         header('Content-Type: application/json');
