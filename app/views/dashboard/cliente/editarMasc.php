@@ -1,14 +1,35 @@
 <?php
-require_once BASE_PATH . '/app/controllers/mascotasController.php';
-
-
-$id_mascota = $_GET['id'];
-$mascota = consultarMascotaId($id_mascota);
-
-
+// Subtarea 7: autenticación PRIMERO — antes de cualquier query a la BD
 require_once BASE_PATH . '/app/helpers/session_propietario.php';
 
+$id_mascota = (int)($_GET['id'] ?? 0);
+if ($id_mascota <= 0) {
+    header('Location: ' . BASE_URL . '/cliente/mascotas');
+    exit();
+}
 
+require_once BASE_PATH . '/app/controllers/mascotasController.php';
+$mascota = consultarMascotaId($id_mascota);
+
+// Subtarea 7: ownership validation — la mascota debe pertenecer al propietario autenticado
+if (!$mascota) {
+    header('Location: ' . BASE_URL . '/cliente/mascotas');
+    exit();
+}
+
+require_once BASE_PATH . '/config/database.php';
+$_dbOwn   = new conexion();
+$_connOwn = $_dbOwn->getConexion();
+$_stmtOwn = $_connOwn->prepare("SELECT id_propietario FROM propietario WHERE id_usuario = :uid");
+$_stmtOwn->bindValue(':uid', (int)$_SESSION['user']['id_usuario'], PDO::PARAM_INT);
+$_stmtOwn->execute();
+$_propRow = $_stmtOwn->fetch(PDO::FETCH_ASSOC);
+
+if (!$_propRow || (int)$mascota['id_propietario'] !== (int)$_propRow['id_propietario']) {
+    header('Location: ' . BASE_URL . '/cliente/mascotas');
+    exit();
+}
+unset($_dbOwn, $_connOwn, $_stmtOwn, $_propRow);
 ?>
 <!DOCTYPE html>
 <html lang="es">

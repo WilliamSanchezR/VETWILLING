@@ -361,6 +361,15 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
 
+    // RFS 24: Eliminación de registros de propietario
+    case '/admin/listar-propietarios':
+        require BASE_PATH . '/app/views/dashboard/administrador/listaPropietarios.php';
+        break;
+
+    case '/admin/api/propietarios':
+        require BASE_PATH . '/app/controllers/propetarioController.php';
+        break;
+
     // ---------------------------------------PROPIETARIO-------------------------------------//
 
     //PARA LOS CLIENTES Y SUS RUTAS

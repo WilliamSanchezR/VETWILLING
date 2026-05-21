@@ -403,9 +403,19 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                             </div>
                         </div>
 
+                        <!-- PESO (OPCIONAL) -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="bi bi-speedometer2"></i>
+                                Peso (kg) <span class="text-muted fw-normal">(opcional)</span>
+                            </label>
+                            <input type="number" name="peso" id="peso" class="form-control"
+                                   step="0.1" min="0.1" max="200" placeholder="Ej: 4.5">
+                        </div>
+
                         <!-- BOTONES -->
                         <div class="form-actions">
-                            <a href="<?= BASE_URL ?>/cliente/perfil" class="btn btn-secondary">
+                            <a href="<?= BASE_URL ?>/cliente/mascotas" class="btn btn-secondary">
                                 <i class="bi bi-x-lg"></i>
                                 Cancelar
                             </a>

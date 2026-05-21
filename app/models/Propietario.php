@@ -302,9 +302,9 @@ class Propietario
     public function eliminar($id)
     {
         try {
-            // Cambiar estado en vez de borrar
-            // consultamos el id del usuario asociado al propietario
-            $sqlUsuario = "SELECT id_usuario FROM propietario WHERE id_propietario = :id LIMIT 1";
+            // Obtener id_usuario y nombre asociados al propietario
+            $sqlUsuario = "SELECT p.id_usuario, CONCAT(p.nombres, ' ', p.apellidos) AS nombre_propietario
+                           FROM propietario p WHERE p.id_propietario = :id LIMIT 1";
             $queryUsuario = $this->conexion->prepare($sqlUsuario);
             $queryUsuario->bindParam(':id', $id, PDO::PARAM_INT);
             $queryUsuario->execute();
@@ -318,14 +318,77 @@ class Propietario
 
             $id_usuario = $resultUsuario['id_usuario'];
 
-            // Primero inhabilitamos el usuario
+            // Subtarea 4/5: inhabilitar — soft delete vía usuario.estado
             $sqlInhabilitarUsuario = "UPDATE usuario SET estado = 'Inactivo' WHERE id_usuario = :id_usuario";
             $queryInhabilitarUsuario = $this->conexion->prepare($sqlInhabilitarUsuario);
             $queryInhabilitarUsuario->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
 
-            return $queryInhabilitarUsuario->execute();
+            $ok = $queryInhabilitarUsuario->execute();
+            if ($ok) {
+                return ['success' => true, 'nombre_propietario' => $resultUsuario['nombre_propietario']];
+            }
+            return false;
         } catch (PDOException $e) {
             error_log("Error en Propietario::eliminar → " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /* ===============================
+        LISTAR PARA ADMINISTRADOR
+    =============================== */
+    public function listarParaAdmin()
+    {
+        try {
+            $sql = "SELECT p.id_propietario,
+                           p.img_perfil,
+                           p.tipo_documento,
+                           p.numero_documento,
+                           CONCAT(p.nombres, ' ', p.apellidos) AS nombre_completo,
+                           p.telefono,
+                           u.email,
+                           u.estado
+                    FROM propietario p
+                    JOIN usuario u ON p.id_usuario = u.id_usuario
+                    ORDER BY p.id_propietario DESC";
+
+            $query = $this->conexion->prepare($sql);
+            $query->execute();
+            $results = $query->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($results as &$row) {
+                $row['numero_documento'] = $this->decryptData($row['numero_documento']);
+                $row['telefono']         = $this->decryptData($row['telefono']);
+            }
+            return $results;
+        } catch (PDOException $e) {
+            error_log("Error en Propietario::listarParaAdmin → " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /* ===============================
+        REGISTRAR AUDITORÍA ELIMINACIÓN
+    =============================== */
+    public function registrarAuditoriaEliminacion($data)
+    {
+        try {
+            $sql = "INSERT INTO auditoria_eliminacion_propietarios
+                        (id_propietario, nombre_propietario, id_usuario_admin, nombre_admin, motivo, ip_origen)
+                    VALUES
+                        (:id_propietario, :nombre_propietario, :id_usuario_admin, :nombre_admin, :motivo, :ip_origen)";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_propietario',     (int)$data['id_propietario'],       PDO::PARAM_INT);
+            $stmt->bindValue(':nombre_propietario', $data['nombre_propietario'],         PDO::PARAM_STR);
+            $stmt->bindValue(':id_usuario_admin',   (int)$data['id_usuario_admin'],      PDO::PARAM_INT);
+            $stmt->bindValue(':nombre_admin',       $data['nombre_admin'],               PDO::PARAM_STR);
+            $stmt->bindValue(':motivo',             $data['motivo'] ?? null,             PDO::PARAM_STR);
+            $stmt->bindValue(':ip_origen',          $data['ip_origen'] ?? null,          PDO::PARAM_STR);
+            $stmt->execute();
+            return (int)$this->conexion->lastInsertId();
+        } catch (PDOException $e) {
+            error_log("Error en Propietario::registrarAuditoriaEliminacion → " . $e->getMessage());
             return false;
         }
     }
