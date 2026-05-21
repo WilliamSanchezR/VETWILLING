@@ -23,10 +23,12 @@ class Mascota
     public function registrar($data)
     {
         try {
-            $sql = "INSERT INTO paciente 
-                (id_propietario, nombre, especie, raza, edad_numero, edad_unidad, sexo, img_mascota)
-                VALUES 
-                (:id_propietario, :nombre, :especie, :raza, :edad_numero, :edad_unidad, :sexo, :img_mascota)";
+            $sql = "INSERT INTO paciente
+                (id_propietario, nombre, especie, raza, edad_numero, edad_unidad, sexo,
+                 peso, estado_salud, img_mascota)
+                VALUES
+                (:id_propietario, :nombre, :especie, :raza, :edad_numero, :edad_unidad, :sexo,
+                 :peso, :estado_salud, :img_mascota)";
 
             $stmt = $this->conexion->prepare($sql);
 
@@ -35,12 +37,18 @@ class Mascota
             $stmt->bindParam(':nombre', $data['nombre'], PDO::PARAM_STR);
             $stmt->bindParam(':especie', $data['especie'], PDO::PARAM_STR);
             $stmt->bindParam(':raza', $data['raza'], PDO::PARAM_STR);
-
-            // ✅ NUEVOS CAMPOS DE EDAD
             $stmt->bindParam(':edad_numero', $data['edad_numero'], PDO::PARAM_INT);
             $stmt->bindParam(':edad_unidad', $data['edad_unidad'], PDO::PARAM_STR);
-
             $stmt->bindParam(':sexo', $data['sexo'], PDO::PARAM_STR);
+
+            // Subtarea 2/6: campos clínicos iniciales
+            $peso = isset($data['peso']) && $data['peso'] !== null && $data['peso'] !== ''
+                    ? (float)$data['peso'] : null;
+            $stmt->bindValue(':peso', $peso, $peso !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+
+            // Subtarea 6: ficha clínica inicial — estado_salud = 'Bueno' por defecto
+            $estado_salud = !empty($data['estado_salud']) ? $data['estado_salud'] : 'Bueno';
+            $stmt->bindParam(':estado_salud', $estado_salud, PDO::PARAM_STR);
 
             // Imagen (puede ser NULL)
             $img_mascota = !empty($data['img_mascota']) ? $data['img_mascota'] : null;
