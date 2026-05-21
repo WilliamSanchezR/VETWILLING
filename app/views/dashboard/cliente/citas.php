@@ -177,11 +177,11 @@ $id_usuario = $_SESSION['user']['id_usuario'];
     /* ================================================================
        CONFIGURACIÓN GLOBAL
     ================================================================ */
-    const BASE_URL = '<?= BASE_URL ?>';
+    // BASE_URL ya declarado por nav.js desde window.BASE_URL (panel_superio_paciente.php)
     const URLS = {
-        MIS_CITAS:          BASE_URL + '/cliente/api/citas/listar?accion=listar',
-        HISTORIAL_PACIENTE: BASE_URL + '/cliente/api/citas/listar?accion=historial_paciente',
-        CANCELAR_CITA:      BASE_URL + '/cliente/api/citas/cancelar'
+        MIS_CITAS:          window.BASE_URL + '/cliente/api/citas/listar?accion=listar',
+        HISTORIAL_PACIENTE: window.BASE_URL + '/cliente/api/citas/listar?accion=historial_paciente',
+        CANCELAR_CITA:      window.BASE_URL + '/cliente/api/citas/cancelar'
     };
 
     let citasData    = [];
@@ -489,7 +489,7 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                               '<i class="bi bi-calendar2"></i> Reagendar' +
                           '</button>' +
                           '<button class="btn-accion btn-cancelar"' +
-                                  ' onclick="cancelarCita(' + cita.id_agendamiento + ', ' + JSON.stringify(cita.mascota_nombre || '') + ')">' +
+                                  ' onclick="cancelarCita(' + cita.id_agendamiento + ', \'' + (cita.mascota_nombre || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'") + '\')">' +
                               '<i class="bi bi-x-circle"></i> Cancelar' +
                           '</button>'
                         : '') +
