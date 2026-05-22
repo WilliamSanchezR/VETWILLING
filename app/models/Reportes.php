@@ -720,4 +720,112 @@ class Reportes
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
         $this->conexion->exec($sql);
     }
+
+    // -----------------------------------------------------------------------
+    // RFS 14 — subtarea 3: Inventario de la veterinaria del usuario
+    // -----------------------------------------------------------------------
+
+    /**
+     * Devuelve el id_veterinaria asociado al profesional (usuario).
+     * Retorna null si no tiene veterinaria asignada.
+     */
+    private function obtenerVeterinariaDeUsuario(int $idUsuario): ?int
+    {
+        try {
+            $sql = "SELECT pv.id_veterinaria
+                    FROM profesional prof
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE prof.id_usuario = :id_usuario
+                    LIMIT 1";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $row ? (int)$row['id_veterinaria'] : null;
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerVeterinariaDeUsuario - ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Resumen de inventario de la veterinaria del usuario autenticado.
+     */
+    public function obtenerResumenInventario(int $idUsuario): array
+    {
+        try {
+            $idVeterinaria = $this->obtenerVeterinariaDeUsuario($idUsuario);
+            if ($idVeterinaria === null) {
+                return [
+                    'total_productos' => 0, 'vencidos' => 0,
+                    'por_vencer' => 0, 'vigentes' => 0, 'cantidad_total' => 0,
+                ];
+            }
+
+            $sql = "SELECT
+                        COUNT(*) AS total_productos,
+                        SUM(CASE WHEN p.fecha_vencimiento < CURDATE() THEN 1 ELSE 0 END) AS vencidos,
+                        SUM(CASE WHEN p.fecha_vencimiento BETWEEN CURDATE()
+                                      AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS por_vencer,
+                        SUM(CASE WHEN p.fecha_vencimiento > DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                                      OR p.fecha_vencimiento IS NULL THEN 1 ELSE 0 END) AS vigentes,
+                        SUM(COALESCE(i.cantidad, 0)) AS cantidad_total
+                    FROM inventario i
+                    INNER JOIN producto p ON p.id_inventario = i.id_inventario
+                    WHERE i.id_veterinaria = :id_veterinaria";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            return [
+                'total_productos' => (int)($row['total_productos'] ?? 0),
+                'vencidos'        => (int)($row['vencidos']        ?? 0),
+                'por_vencer'      => (int)($row['por_vencer']      ?? 0),
+                'vigentes'        => (int)($row['vigentes']        ?? 0),
+                'cantidad_total'  => (int)($row['cantidad_total']  ?? 0),
+            ];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerResumenInventario - ' . $e->getMessage());
+            return ['total_productos' => 0, 'vencidos' => 0, 'por_vencer' => 0, 'vigentes' => 0, 'cantidad_total' => 0];
+        }
+    }
+
+    /**
+     * Lista de productos próximos a vencer (o ya vencidos) de la veterinaria.
+     */
+    public function obtenerProductosProximosVencer(int $idUsuario, int $dias = 60): array
+    {
+        try {
+            $idVeterinaria = $this->obtenerVeterinariaDeUsuario($idUsuario);
+            if ($idVeterinaria === null) {
+                return [];
+            }
+
+            $sql = "SELECT
+                        p.nombre,
+                        p.descripcion,
+                        p.fecha_vencimiento,
+                        DATEDIFF(p.fecha_vencimiento, CURDATE()) AS dias_restantes,
+                        i.cantidad,
+                        i.categoria,
+                        i.numero_lote
+                    FROM producto p
+                    INNER JOIN inventario i ON p.id_inventario = i.id_inventario
+                    WHERE i.id_veterinaria = :id_veterinaria
+                      AND p.fecha_vencimiento <= DATE_ADD(CURDATE(), INTERVAL :dias DAY)
+                    ORDER BY p.fecha_vencimiento ASC
+                    LIMIT 30";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':dias', $dias, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerProductosProximosVencer - ' . $e->getMessage());
+            return [];
+        }
+    }
 }
