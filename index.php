@@ -370,6 +370,23 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/propetarioController.php';
         break;
 
+    // RFS 14: Gestión de reportes — administrador
+    case '/admin/reportes':
+        require BASE_PATH . '/app/views/dashboard/administrador/reportesAdmin.php';
+        break;
+    case '/admin/reportes/data':
+        $GLOBALS['_route_action'] = 'data';
+        require BASE_PATH . '/app/controllers/reportesAdminController.php';
+        break;
+    case '/admin/reportes/pdf':
+        $GLOBALS['_route_action'] = 'pdf';
+        require BASE_PATH . '/app/controllers/reportesAdminController.php';
+        break;
+    case '/admin/reportes/excel':
+        $GLOBALS['_route_action'] = 'excel';
+        require BASE_PATH . '/app/controllers/reportesAdminController.php';
+        break;
+
     // ---------------------------------------PROPIETARIO-------------------------------------//
 
     //PARA LOS CLIENTES Y SUS RUTAS

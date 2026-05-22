@@ -1,0 +1,169 @@
+/* ─── Variables ─────────────────────────────────────────────────────────── */
+:root {
+    --verde:       #0a932c;
+    --verde-light: #ecfdf5;
+    --gris-50:     #f9fafb;
+    --gris-100:    #f3f4f6;
+    --gris-200:    #e5e7eb;
+    --gris-600:    #4b5563;
+    --gris-800:    #1f2937;
+    --rojo:        #ef4444;
+    --amarillo:    #f59e0b;
+    --azul:        #3b82f6;
+    --radio:       0.75rem;
+    --sombra:      0 2px 8px rgba(0,0,0,.08);
+}
+
+/* ─── Layout general ─────────────────────────────────────────────────────── */
+.contenido-principal { padding: 1.5rem; }
+
+.encabezado-pagina {
+    background: #fff;
+    border-radius: var(--radio);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--sombra);
+    margin-bottom: 1.25rem;
+}
+
+.titulo-pagina { font-size: 1.5rem; font-weight: 700; color: var(--gris-800); margin: 0; }
+.subtitulo-pagina { color: var(--gris-600); font-size: .875rem; }
+
+/* ─── Filtros ─────────────────────────────────────────────────────────────── */
+.barra-filtros {
+    background: #fff;
+    border-radius: var(--radio);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--sombra);
+    margin-bottom: 1.25rem;
+}
+
+.btn-periodo {
+    padding: .35rem .85rem;
+    border: 1.5px solid var(--gris-200);
+    border-radius: 9999px;
+    background: #fff;
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--gris-600);
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-periodo:hover, .btn-periodo.active {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: #fff;
+}
+
+/* ─── Tarjetas de resumen ─────────────────────────────────────────────────── */
+.tarjetas-resumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.25rem; }
+
+.tarjeta-stat {
+    background: #fff;
+    border-radius: var(--radio);
+    padding: 1.25rem 1rem;
+    box-shadow: var(--sombra);
+    border-left: 4px solid var(--verde);
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+}
+.tarjeta-stat.rojo    { border-color: var(--rojo);    }
+.tarjeta-stat.amarillo{ border-color: var(--amarillo);}
+.tarjeta-stat.azul    { border-color: var(--azul);    }
+.tarjeta-stat .stat-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--gris-600); font-weight: 600; }
+.tarjeta-stat .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--gris-800); line-height: 1.1; }
+.tarjeta-stat .stat-icon  { font-size: 1.25rem; color: var(--gris-200); align-self: flex-end; margin-top: -.5rem; }
+
+/* ─── Secciones ────────────────────────────────────────────────────────────── */
+.seccion-card {
+    background: #fff;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+.seccion-card .card-header {
+    background: var(--verde-light);
+    padding: .75rem 1.25rem;
+    border-bottom: 1px solid var(--gris-200);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-weight: 600;
+    color: var(--verde);
+    font-size: .9rem;
+}
+.seccion-card .card-body { padding: 1rem 1.25rem; }
+
+/* ─── Tabla ────────────────────────────────────────────────────────────────── */
+.tabla-reportes {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .82rem;
+}
+.tabla-reportes thead th {
+    background: var(--verde);
+    color: #fff;
+    padding: .6rem .75rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.tabla-reportes tbody td {
+    padding: .55rem .75rem;
+    border-bottom: 1px solid var(--gris-100);
+    color: var(--gris-800);
+    vertical-align: middle;
+}
+.tabla-reportes tbody tr:hover td { background: var(--gris-50); }
+.tabla-reportes .text-center { text-align: center; }
+
+/* ─── Badges ───────────────────────────────────────────────────────────────── */
+.badge-ok      { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 9999px; font-size: .72rem; font-weight: 600; }
+.badge-warn    { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 9999px; font-size: .72rem; font-weight: 600; }
+.badge-danger  { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 9999px; font-size: .72rem; font-weight: 600; }
+.badge-neutral { background: var(--gris-100); color: var(--gris-600); padding: 2px 8px; border-radius: 9999px; font-size: .72rem; font-weight: 600; }
+
+/* ─── Botones exportar ─────────────────────────────────────────────────────── */
+.btn-exportar {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .45rem 1rem;
+    border: none;
+    border-radius: .5rem;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s;
+}
+.btn-exportar:hover { opacity: .85; }
+.btn-pdf   { background: #ef4444; color: #fff; }
+.btn-excel { background: #16a34a; color: #fff; }
+
+/* ─── Estado vacío ─────────────────────────────────────────────────────────── */
+.estado-vacio { text-align: center; padding: 2rem; color: var(--gris-600); font-size: .875rem; }
+.estado-vacio i { font-size: 2rem; display: block; margin-bottom: .5rem; opacity: .4; }
+
+/* ─── Barra de progreso ────────────────────────────────────────────────────── */
+.barra-progreso { height: 6px; border-radius: 9999px; background: var(--gris-100); overflow: hidden; }
+.barra-progreso-fill { height: 100%; background: var(--verde); border-radius: 9999px; }
+
+/* ─── Donut mini ───────────────────────────────────────────────────────────── */
+.donut-wrap { position: relative; display: inline-flex; }
+.donut-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: var(--gris-800); }
+
+/* ─── Spinner ──────────────────────────────────────────────────────────────── */
+.spinner-overlay {
+    position: fixed; inset: 0; background: rgba(255,255,255,.6);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+}
+.spinner-ring {
+    width: 48px; height: 48px; border: 5px solid var(--gris-200);
+    border-top-color: var(--verde); border-radius: 50%;
+    animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
