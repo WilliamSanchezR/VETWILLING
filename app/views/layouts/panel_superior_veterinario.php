@@ -176,59 +176,15 @@ $fotoVetUrl  = $hayFotoVet
                     </div>
 
                     <div class="panel-body">
-                        <div class="notifications-list">
-
-                            <div class="notification-item unread">
-                                <div class="notification-indicator success"></div>
-                                <div class="notification-icon success">
-                                    <i class="bi bi-calendar-check-fill"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h4>Nueva cita agendada</h4>
-                                        <span class="notification-time">Hace 5 min</span>
-                                    </div>
-                                    <p>Max — Consulta general mañana 10:00 AM</p>
-                                </div>
-                                <button class="btn-icon-sm btn-eliminar-notif" aria-label="Eliminar">
-                                    <i class="bi bi-x"></i>
-                                </button>
+                        <div class="notifications-list" id="notificationsDropdownList">
+                            <!-- Las notificaciones se cargan desde el backend -->
+                        </div>
+                        <div class="notifications-empty is-hidden" id="notificationsDropdownEmpty">
+                            <div class="empty-icon">
+                                <i class="bi bi-bell-slash"></i>
                             </div>
-
-                            <div class="notification-item">
-                                <div class="notification-indicator warning"></div>
-                                <div class="notification-icon warning">
-                                    <i class="bi bi-exclamation-triangle-fill"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h4>Recordatorio de vacuna</h4>
-                                        <span class="notification-time">Hace 1 h</span>
-                                    </div>
-                                    <p>Luna — Antirrábica con vencimiento próximo</p>
-                                </div>
-                                <button class="btn-icon-sm btn-eliminar-notif" aria-label="Eliminar">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </div>
-
-                            <div class="notification-item">
-                                <div class="notification-indicator info"></div>
-                                <div class="notification-icon info">
-                                    <i class="bi bi-file-medical-fill"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h4>Resultados disponibles</h4>
-                                        <span class="notification-time">Hace 2 h</span>
-                                    </div>
-                                    <p>Rocky — Análisis de sangre listo para revisar</p>
-                                </div>
-                                <button class="btn-icon-sm btn-eliminar-notif" aria-label="Eliminar">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </div>
-
+                            <h4>No hay notificaciones nuevas</h4>
+                            <p>Todas las notificaciones leídas aparecerán aquí cuando haya novedades.</p>
                         </div>
                     </div>
 
