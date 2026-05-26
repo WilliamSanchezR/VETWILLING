@@ -496,6 +496,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/vacunas.php';
         break;
 
+    case '/cliente/notificaciones':
+        require BASE_PATH . '/app/views/dashboard/cliente/notificaciones.php';
+        break;
+
     //----------ACCIONES DEL PACIENTE---------//
     case '/cliente/actualizar':
         require BASE_PATH . '/app/controllers/propetarioController.php';
@@ -513,7 +517,9 @@ switch ($request) {
     case '/cliente/actualizar-contrasena':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
-
+    case '/paciente/api/notificaciones':
+        require BASE_PATH . '/app/controllers/NotificacioneController.php';
+        break;
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
@@ -740,4 +746,50 @@ switch ($request) {
         break;
 
 
+    // -------------------------SESIONES-------------------------------//
+    // ── API: Sesiones activas (confi.php) ──
+    case '/cliente/api/sesiones/cerrar':
+        require BASE_PATH . '/app/controllers/sesionesClienteController.php';
+        break;
+
+    case '/cliente/api/sesiones/cerrar-todas':
+        require BASE_PATH . '/app/controllers/sesionesClienteController.php';
+        break;
+
+    // ── API: Preferencias de usuario ──
+    case '/cliente/api/preferencias':
+        require BASE_PATH . '/app/controllers/preferenciasController.php';
+        break;
+
+    case '/cliente/api/preferencias/guardar':
+        require BASE_PATH . '/app/controllers/preferenciasController.php';
+        break;
+
+    case '/cliente/api/preferencias/reset':
+        require BASE_PATH . '/app/controllers/preferenciasController.php';
+        break;
+
+    // ── API: Acceso temporal al historial clínico ──
+
+    // Cliente
+    case '/cliente/api/historial/acceso/estado':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
+
+    case '/cliente/api/historial/acceso/solicitar':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
+
+    // Veterinario
+    case '/veterinaria/api/historial/acceso/pendientes':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
+
+    case '/veterinaria/api/historial/acceso/aprobar':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
+
+    case '/veterinaria/api/historial/acceso/rechazar':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
 }
