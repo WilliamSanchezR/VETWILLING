@@ -1,0 +1,345 @@
+/* ============================================================
+   notificaciones.css
+   Estilos para la página de notificaciones del veterinario
+   ============================================================ */
+
+/* ---------- Variables ---------- */
+:root {
+    --notif-accent:       #1D9E75;
+    --notif-accent-light: #E1F5EE;
+    --notif-accent-mid:   #0F6E56;
+    --notif-unread-dot:   #1D9E75;
+    --notif-read-dot:     #B4B2A9;
+    --notif-border:       rgba(0, 0, 0, 0.08);
+    --notif-hover-bg:     #F7FAF9;
+    --notif-unread-bg:    #F2FAF7;
+    --notif-radius:       12px;
+    --notif-radius-sm:    8px;
+    --notif-shadow:       0 1px 4px rgba(0,0,0,0.06);
+    --notif-shadow-hover: 0 4px 16px rgba(29,158,117,0.10);
+    --font-display:       'DM Sans', 'Segoe UI', sans-serif;
+    --font-body:          'DM Sans', 'Segoe UI', sans-serif;
+}
+
+/* ---- Importar fuente ---- */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+
+/* ---------- Layout de sección ---------- */
+.page-section--notifications {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    font-family: var(--font-body);
+}
+
+/* ---------- Encabezado de sección ---------- */
+.page-section__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.section-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--notif-accent-mid);
+    background: var(--notif-accent-light);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 0.5rem;
+}
+
+.page-section__header h1 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 0.35rem;
+    line-height: 1.2;
+}
+
+.section-description {
+    font-size: 14px;
+    color: #888780;
+    margin: 0;
+    max-width: 460px;
+    line-height: 1.6;
+}
+
+/* ---------- Botones de acción ---------- */
+.page-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: var(--notif-radius-sm);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s, transform 0.12s;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn-primary {
+    background: var(--notif-accent);
+    color: #fff;
+    border-color: var(--notif-accent);
+}
+
+.btn-primary:hover {
+    background: var(--notif-accent-mid);
+    border-color: var(--notif-accent-mid);
+    box-shadow: 0 2px 10px rgba(29,158,117,0.22);
+}
+
+.btn-secondary {
+    background: #fff;
+    color: #444441;
+    border-color: #D3D1C7;
+}
+
+.btn-secondary:hover {
+    background: #F1EFE8;
+    border-color: #B4B2A9;
+}
+
+/* ---------- Tarjeta contenedora ---------- */
+.notifications-page-card {
+    background: #fff;
+    border: 1px solid var(--notif-border);
+    border-radius: var(--notif-radius);
+    box-shadow: var(--notif-shadow);
+    overflow: hidden;
+    min-height: 200px;
+}
+
+/* ---------- Lista de notificaciones ---------- */
+.notifications-page-list {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---------- Item de notificación ---------- */
+.notification-item {
+    display: grid;
+    grid-template-columns: 10px 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.35rem;
+    border-bottom: 1px solid #F1EFE8;
+    cursor: pointer;
+    transition: background 0.16s, box-shadow 0.16s;
+    position: relative;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background: var(--notif-hover-bg);
+    box-shadow: inset 3px 0 0 var(--notif-accent);
+}
+
+.notification-item.unread {
+    background: var(--notif-unread-bg);
+}
+
+.notification-item.unread:hover {
+    background: #e6f6f1;
+}
+
+/* ---------- Indicador de estado ---------- */
+.notification-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    align-self: center;
+    transition: transform 0.16s;
+}
+
+.notification-indicator.unread {
+    background: var(--notif-unread-dot);
+    box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
+    animation: pulse-dot 2.2s ease-in-out infinite;
+}
+
+.notification-indicator.read {
+    background: var(--notif-read-dot);
+}
+
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(29,158,117,0.15); }
+    50%       { box-shadow: 0 0 0 5px rgba(29,158,117,0.08); }
+}
+
+/* ---------- Contenido ---------- */
+.notification-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.notification-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.notification-header h3 {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: #2C2C2A;
+    margin: 0;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 520px;
+}
+
+.notification-item.unread .notification-header h3 {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.notification-time {
+    font-size: 12px;
+    color: #888780;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.notification-content p {
+    font-size: 12.5px;
+    color: #888780;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- Etiqueta de tipo ---------- */
+.notification-type {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--notif-accent-mid);
+    background: var(--notif-accent-light);
+    padding: 3px 9px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    align-self: center;
+    text-transform: capitalize;
+}
+
+/* ---------- Estado vacío ---------- */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    gap: 0.75rem;
+}
+
+.empty-state.is-hidden {
+    display: none;
+}
+
+.empty-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--notif-accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.empty-icon i {
+    font-size: 28px;
+    color: var(--notif-accent-mid);
+}
+
+.empty-state h2 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2C2C2A;
+    margin: 0;
+}
+
+.empty-state p {
+    font-size: 13.5px;
+    color: #888780;
+    max-width: 380px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ---------- Utilidad ---------- */
+.is-hidden {
+    display: none !important;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .page-section__header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .page-actions {
+        width: 100%;
+    }
+
+    .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .notification-item {
+        grid-template-columns: 10px 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .notification-type {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: 2px;
+    }
+
+    .notification-header h3 {
+        max-width: 100%;
+        white-space: normal;
+    }
+}

@@ -121,4 +121,91 @@ class NotificacionController {
         echo json_encode($datos, JSON_UNESCAPED_UNICODE);
         exit();
     }
+
+    // ─────────────────────────────────────────────
+    // Métodos para dispatcher directo
+    // ─────────────────────────────────────────────
+    public function contarNotificaciones(): void {
+        $this->requireSesion();
+        $id_usuario = (int) $_SESSION['user']['id_usuario'];
+        $this->responderJson([
+            'status' => 'success',
+            'count' => $this->modelo->contarNoLeidas($id_usuario)
+        ]);
+    }
+
+    public function listarNotificaciones(): void {
+        $this->obtenerNotificaciones();
+    }
+
+    public function modificarNotificacion(): void {
+        $this->requireSesion();
+
+        $data = $this->getJsonInput();
+        $id_usuario = (int) $_SESSION['user']['id_usuario'];
+        $id = isset($data['id']) ? (int) $data['id'] : 0;
+        $mensaje = isset($data['mensaje']) ? trim($data['mensaje']) : '';
+        $tipo = $data['tipo'] ?? null;
+
+        if (!$id || $mensaje === '') {
+            $this->responderJson(['status' => 'error', 'mensaje' => 'Datos incompletos'], 400);
+        }
+
+        $resultado = $this->modelo->modificar($id, $id_usuario, $mensaje, $tipo);
+        $this->responderJson(['status' => $resultado ? 'success' : 'error', 'ok' => $resultado]);
+    }
+
+    public function cancelarNotificacion(): void {
+        $this->requireSesion();
+
+        $data = $this->getJsonInput();
+        $id_usuario = (int) $_SESSION['user']['id_usuario'];
+        $id = isset($data['id']) ? (int) $data['id'] : 0;
+        $motivo = $data['motivo'] ?? null;
+
+        if (!$id) {
+            $this->responderJson(['status' => 'error', 'mensaje' => 'ID requerido'], 400);
+        }
+
+        $resultado = $this->modelo->cancelar($id, $id_usuario, $motivo);
+        $this->responderJson(['status' => $resultado ? 'success' : 'error', 'ok' => $resultado]);
+    }
+}
+
+$accion = $_GET['accion'] ?? $_POST['accion'] ?? '';
+$controller = new NotificacionController();
+
+switch ($accion) {
+    case 'contar':
+        $controller->contarNotificaciones();
+        break;
+
+    case 'listar':
+        $controller->listarNotificaciones();
+        break;
+
+    case 'leida':
+        $controller->marcarLeida();
+        break;
+
+    case 'todas':
+        $controller->marcarTodasLeidas();
+        break;
+
+    case 'modificar':
+        $controller->modificarNotificacion();
+        break;
+
+    case 'cancelar':
+        $controller->cancelarNotificacion();
+        break;
+
+    default:
+        if ($accion !== '') {
+            http_response_code(400);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'mensaje' => 'Acción no válida'], JSON_UNESCAPED_UNICODE);
+            exit();
+        }
+        break;
 }
