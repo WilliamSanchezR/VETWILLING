@@ -115,6 +115,12 @@ function logCitaError($mensaje)
     @file_put_contents($file, $entry, FILE_APPEND | LOCK_EX);
 }
 
+$fechaInicio = strtotime($data['fecha_hora']);
+if ($fechaInicio < time()) {
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'No puedes agendar una cita en el pasado.']);
+    exit();
+}
 // ═══════════════════════════════════════════════════════════════════
 //  FUNCIÓN 1: CREAR CITA (RFS 33)
 // ═══════════════════════════════════════════════════════════════════
