@@ -278,6 +278,43 @@ class Reportes
         }
     }
 
+    public function obtenerReporteServiciosPorVeterinaria($idVeterinaria, $fechaInicio, $fechaFin)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        COALESCE(s.nombre, 'Sin servicio') AS servicio,
+                        COUNT(a.id_agendamiento) AS total_citas,
+                        SUM(CASE WHEN {$estadoNorm} = 'ATENDIDA' THEN 1 ELSE 0 END) AS atendidas,
+                        SUM(CASE WHEN {$estadoNorm} = 'CANCELADA' THEN 1 ELSE 0 END) AS canceladas,
+                        COALESCE(SUM(CASE
+                            WHEN {$estadoNorm} <> 'CANCELADA' THEN COALESCE(sub.costo, 0)
+                            ELSE 0
+                        END), 0) AS ingresos
+                    FROM agendamiento a
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    INNER JOIN profesional prof ON a.id_usuario = prof.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE pv.id_veterinaria = :id_veterinaria
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                    GROUP BY COALESCE(s.nombre, 'Sin servicio')
+                    ORDER BY total_citas DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerReporteServiciosPorVeterinaria - ' . $e->getMessage());
+            return [];
+        }
+    }
+
     public function obtenerTopTratamientos($idUsuario, $fechaInicio, $fechaFin, $limite = 5, array $filtros = [])
     {
         try {
