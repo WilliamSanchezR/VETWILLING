@@ -145,6 +145,24 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesServiciosRepresentanteController.php';
         break;
 
+    case '/representante/reportes-citas':
+        require BASE_PATH . '/app/views/dashboard/representante/reportesCitas.php';
+        break;
+
+    case '/representante/reportes-citas/data':
+        require BASE_PATH . '/app/controllers/reportesCitasRepresentanteController.php';
+        break;
+
+    case '/representante/reportes-citas/pdf':
+        $_GET['action'] = 'pdf';
+        require BASE_PATH . '/app/controllers/reportesCitasRepresentanteController.php';
+        break;
+
+    case '/representante/reportes-citas/excel':
+        $_GET['action'] = 'excel';
+        require BASE_PATH . '/app/controllers/reportesCitasRepresentanteController.php';
+        break;
+
     // RUTAS DEL CONTROLADOR DE CALENDARIO
     case '/calendario/cargar':
         require BASE_PATH . '/app/controllers/calendarioController.php';
