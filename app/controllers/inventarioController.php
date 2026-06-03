@@ -44,99 +44,154 @@ switch ($method) {
 
 // =============================================================================
 // FUNCIÓN: guardarProducto  (RFS 44)
-// Registra un lote nuevo y su producto en dos pasos.
-// Primero inserta en 'inventario', luego en 'producto' usando el ID devuelto.
+// Registra lote + producto dentro de una transacción BD.
+// Si falla cualquier INSERT, se revierte todo (sin lotes huérfanos).
 // =============================================================================
 function guardarProducto(): void
 {
+    // URL de retorno cuando hay error de validación
+    $urlRegistro = BASE_URL . '/representante/registro-producto';
+
     // ── 1. Capturar y limpiar los datos del formulario ────────────────────────
-    // (int) convierte el valor a entero de forma segura
-    // trim() elimina espacios en blanco al inicio y final de cada campo de texto
-    $id_veterinaria = (int)   ($_POST['id_veterinaria']   ?? 0);
-    $nombre         = trim(    $_POST['nombre']            ?? '');
-    $descripcion    = trim(    $_POST['descripcion']       ?? '');
-    $precio         = trim(    $_POST['precio']            ?? '0');
-    $fecha_venc     = trim(    $_POST['fecha_vencimiento'] ?? '');
-    $cantidad       = (int)   ($_POST['cantidad']          ?? 0);
-    $categoria      = trim(    $_POST['categoria']         ?? '');
-    $numero_lote    = trim(    $_POST['numero_lote']       ?? '');
-    $stock_minimo   = (int)   ($_POST['stock_minimo']      ?? 5);
+    $id_veterinaria         = (int) ($_POST['id_veterinaria']         ?? 0);
+    $nombre                 = trim($_POST['nombre']                 ?? '');
+    $descripcion            = trim($_POST['descripcion']            ?? '');
+    $proveedor              = trim($_POST['proveedor']                ?? '');
+    $precio                 = trim($_POST['precio']                   ?? '0');
+    $fecha_venc             = trim($_POST['fecha_vencimiento']        ?? '');
+    $cantidad               = (int) ($_POST['cantidad']                ?? 0);
+    $categoria              = trim($_POST['categoria']                ?? '');
+    $numero_lote            = trim($_POST['numero_lote']              ?? '');
+    $stock_minimo           = (int) ($_POST['stock_minimo']           ?? 5);
+    $detalle_almacenamiento = trim($_POST['detalle_almacenamiento']   ?? '');
 
-    // ── 2. Validar campos obligatorios ────────────────────────────────────────
-    if (empty($nombre) || $id_veterinaria <= 0 || $cantidad < 0) {
-        mostrarSweetAlert(
-            'error',
-            'Campos incompletos',
-            'El nombre del producto, la veterinaria y la cantidad son obligatorios.',
-            BASE_URL . '/representante/registro-producto'
-        );
+    // Categorías permitidas (deben coincidir con el <select> del formulario)
+    $categoriasValidas = ['medicamento', 'alimento', 'accesorio', 'insumo', 'otro'];
+
+    // ── 2. Validaciones backend estrictas (RFS 44) ──────────────────────────────
+
+    // Nombre obligatorio
+    if ($nombre === '') {
+        mostrarSweetAlert('error', 'Campo obligatorio', 'El nombre del producto es obligatorio.', $urlRegistro);
         exit();
     }
 
-    // ── 3. Validar que el precio sea un número positivo ───────────────────────
+    // Veterinaria de sesión válida
+    if ($id_veterinaria <= 0) {
+        mostrarSweetAlert('error', 'Sesión inválida', 'No se pudo identificar la veterinaria. Vuelve a iniciar sesión.', $urlRegistro);
+        exit();
+    }
+
+    // Cantidad debe ser mayor a cero (no se permite stock inicial en 0)
+    if ($cantidad <= 0) {
+        mostrarSweetAlert('error', 'Cantidad inválida', 'La cantidad inicial debe ser mayor a cero.', $urlRegistro);
+        exit();
+    }
+
+    // Categoría obligatoria y dentro de la lista permitida
+    if ($categoria === '' || !in_array($categoria, $categoriasValidas, true)) {
+        mostrarSweetAlert('error', 'Categoría inválida', 'Debes seleccionar una categoría válida para el producto.', $urlRegistro);
+        exit();
+    }
+
+    // Proveedor obligatorio
+    if ($proveedor === '') {
+        mostrarSweetAlert('error', 'Campo obligatorio', 'El proveedor o laboratorio es obligatorio.', $urlRegistro);
+        exit();
+    }
+
+    // Fecha de vencimiento obligatoria, con formato correcto y no pasada
+    if ($fecha_venc === '') {
+        mostrarSweetAlert('error', 'Campo obligatorio', 'La fecha de vencimiento es obligatoria.', $urlRegistro);
+        exit();
+    }
+
+    $fechaObj = DateTime::createFromFormat('Y-m-d', $fecha_venc);
+    $erroresFecha = DateTime::getLastErrors();
+
+    // createFromFormat devuelve false si el formato no es válido (ej: 2024-13-40)
+    if ($fechaObj === false || ($erroresFecha['warning_count'] ?? 0) > 0 || ($erroresFecha['error_count'] ?? 0) > 0) {
+        mostrarSweetAlert('error', 'Fecha inválida', 'La fecha de vencimiento no tiene un formato válido (AAAA-MM-DD).', $urlRegistro);
+        exit();
+    }
+
+    // Comparar solo la fecha (sin hora) contra hoy
+    $hoy = new DateTime('today');
+    if ($fechaObj < $hoy) {
+        mostrarSweetAlert('error', 'Fecha vencida', 'La fecha de vencimiento no puede ser anterior a hoy.', $urlRegistro);
+        exit();
+    }
+
+    // Precio numérico y no negativo
     if (!is_numeric($precio) || (float) $precio < 0) {
-        mostrarSweetAlert(
-            'error',
-            'Precio inválido',
-            'El precio debe ser un número mayor o igual a cero.',
-            BASE_URL . '/representante/registro-producto'
-        );
+        mostrarSweetAlert('error', 'Precio inválido', 'El precio debe ser un número mayor o igual a cero.', $urlRegistro);
         exit();
     }
 
-    // ── 4. Instanciar el modelo y ejecutar los dos INSERTs ────────────────────
-    $modelInv = new Inventario();
-
-    // Datos del lote (tabla inventario)
+    // ── 3. Armar los arreglos que consumirá el modelo ───────────────────────────
     $datosLote = [
-        'id_veterinaria' => $id_veterinaria,
-        'cantidad'       => $cantidad,
-        'categoria'      => $categoria,
-        'numero_lote'    => $numero_lote,
-        'stock_minimo'   => $stock_minimo,
+        'id_veterinaria'         => $id_veterinaria,
+        'cantidad'               => $cantidad,
+        'categoria'              => $categoria,
+        'numero_lote'            => $numero_lote,
+        'stock_minimo'           => $stock_minimo,
+        'detalle_almacenamiento' => $detalle_almacenamiento,
     ];
 
-    // Insertamos el lote y obtenemos su ID recién generado
-    $idLote = $modelInv->crearLote($datosLote);
-
-    if ($idLote === false) {
-        mostrarSweetAlert(
-            'error',
-            'Error al registrar',
-            'No se pudo guardar el lote. Intenta de nuevo.',
-            BASE_URL . '/representante/registro-producto'
-        );
-        exit();
-    }
-
-    // Datos del producto (tabla producto), usando el ID del lote recién creado
     $datosProducto = [
-        'id_inventario'    => $idLote,
-        'nombre'           => $nombre,
-        'descripcion'      => $descripcion,
-        'precio'           => (float) $precio,
-        'fecha_vencimiento'=> $fecha_venc,
-        'imagen'           => null, // La subida de imagen se implementa en fases siguientes
+        'nombre'            => $nombre,
+        'descripcion'       => $descripcion,
+        'proveedor'         => $proveedor,
+        'precio'            => (float) $precio,
+        'fecha_vencimiento' => $fecha_venc,
+        'imagen'            => null,
     ];
 
-    $exitoProducto = $modelInv->crearProducto($datosProducto);
+    // ── 4. Transacción BD: lote + producto o ninguno ───────────────────────────
+    $modelInv = new Inventario();
+    $pdo      = $modelInv->obtenerConexion();
 
-    // ── 5. Responder según el resultado ───────────────────────────────────────
-    if ($exitoProducto) {
+    try {
+        // Iniciamos la transacción: los INSERT quedan pendientes hasta commit()
+        $pdo->beginTransaction();
+
+        // Paso A: insertar el lote en 'inventario'
+        $idLote = $modelInv->crearLote($datosLote);
+
+        // Paso B: insertar el producto en 'producto' usando el ID del lote
+        $datosProducto['id_inventario'] = $idLote;
+        $exitoProducto = $modelInv->crearProducto($datosProducto);
+
+        if (!$exitoProducto) {
+            throw new RuntimeException('No se pudo insertar el producto.');
+        }
+
+        // Si llegamos aquí, ambos INSERT fueron bien → confirmamos cambios
+        $pdo->commit();
+
         mostrarSweetAlert(
             'success',
             '¡Producto registrado!',
             'El producto se agregó correctamente al inventario.',
             BASE_URL . '/representante/inventario'
         );
-    } else {
+
+    } catch (Throwable $e) {
+        // Cualquier error revierte lote y producto (evita registros huérfanos)
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        error_log('Error en guardarProducto - ' . $e->getMessage());
+
         mostrarSweetAlert(
             'error',
             'Error al registrar',
-            'El lote se guardó pero el producto no pudo registrarse. Contacta al administrador.',
-            BASE_URL . '/representante/inventario'
+            'No se pudo guardar el producto. Verifica los datos e intenta de nuevo.',
+            $urlRegistro
         );
     }
+
     exit();
 }
 
