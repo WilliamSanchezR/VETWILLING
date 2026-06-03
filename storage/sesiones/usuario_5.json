@@ -1,60 +1,4 @@
 {
-    "4053d32ceb9f610b5254327cbe229b71d16f6f6f3935ef12": {
-        "ip": "::1",
-        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-        "navegador": {
-            "nombre": "Chrome 147",
-            "icono": "bi-browser-chrome"
-        },
-        "so": {
-            "nombre": "Windows 11/10",
-            "icono": "bi-windows"
-        },
-        "tipo": {
-            "nombre": "Escritorio",
-            "icono": "bi-laptop-fill"
-        },
-        "marca": {
-            "nombre": "Desconocida",
-            "icono": "bi-display"
-        },
-        "ciudad": "Local / Desarrollo",
-        "fingerprint": "5e224c7153e75a8a",
-        "token": "4053d32ceb9f610b5254327cbe229b71d16f6f6f3935ef12",
-        "created_at": 1776617618,
-        "last_seen": 1776621436,
-        "activa": true,
-        "is_current": false,
-        "es_nueva": false
-    },
-    "ea51976180a5f17e2d437faf46944259caf09ed0e94669a9": {
-        "ip": "::1",
-        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
-        "navegador": {
-            "nombre": "Safari 604",
-            "icono": "bi-browser-safari"
-        },
-        "so": {
-            "nombre": "iOS 16.0",
-            "icono": "bi-apple"
-        },
-        "tipo": {
-            "nombre": "Móvil",
-            "icono": "bi-phone-fill"
-        },
-        "marca": {
-            "nombre": "Apple iPhone",
-            "icono": "bi-phone-fill"
-        },
-        "ciudad": "Local / Desarrollo",
-        "fingerprint": "f969c2e65cbe46d4",
-        "token": "ea51976180a5f17e2d437faf46944259caf09ed0e94669a9",
-        "created_at": 1776643625,
-        "last_seen": 1776643625,
-        "activa": true,
-        "is_current": false,
-        "es_nueva": true
-    },
     "5184f9cd22d490e6cc30dd0f6d8b6f2cdcc57247488b513a": {
         "ip": "::1",
         "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1",
@@ -78,9 +22,37 @@
         "fingerprint": "f8bff96ff83303dc",
         "token": "5184f9cd22d490e6cc30dd0f6d8b6f2cdcc57247488b513a",
         "created_at": 1779120772,
-        "last_seen": 1779120772,
+        "last_seen": 1779402747,
+        "activa": false,
+        "is_current": false,
+        "es_nueva": true
+    },
+    "7dc8801c0464d260b48a15c292f06090adc56792360ec511": {
+        "ip": "::1",
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+        "navegador": {
+            "nombre": "Chrome 148",
+            "icono": "bi-browser-chrome"
+        },
+        "so": {
+            "nombre": "Windows 11/10",
+            "icono": "bi-windows"
+        },
+        "tipo": {
+            "nombre": "Escritorio",
+            "icono": "bi-laptop-fill"
+        },
+        "marca": {
+            "nombre": "Desconocida",
+            "icono": "bi-display"
+        },
+        "ciudad": "Local / Desarrollo",
+        "fingerprint": "c490d241197976af",
+        "token": "7dc8801c0464d260b48a15c292f06090adc56792360ec511",
+        "created_at": 1779402045,
+        "last_seen": 1779669398,
         "activa": true,
         "is_current": true,
-        "es_nueva": true
+        "es_nueva": false
     }
 }

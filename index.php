@@ -127,6 +127,42 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/representante/suscripcion.php';
         break;
 
+    case '/representante/reportes-servicios':
+        require BASE_PATH . '/app/views/dashboard/representante/reportesServicios.php';
+        break;
+
+    case '/representante/reportes-servicios/data':
+        require BASE_PATH . '/app/controllers/reportesServiciosRepresentanteController.php';
+        break;
+
+    case '/representante/reportes-servicios/pdf':
+        $_GET['action'] = 'pdf';
+        require BASE_PATH . '/app/controllers/reportesServiciosRepresentanteController.php';
+        break;
+
+    case '/representante/reportes-servicios/excel':
+        $_GET['action'] = 'excel';
+        require BASE_PATH . '/app/controllers/reportesServiciosRepresentanteController.php';
+        break;
+
+    case '/representante/reportes-citas':
+        require BASE_PATH . '/app/views/dashboard/representante/reportesCitas.php';
+        break;
+
+    case '/representante/reportes-citas/data':
+        require BASE_PATH . '/app/controllers/reportesCitasRepresentanteController.php';
+        break;
+
+    case '/representante/reportes-citas/pdf':
+        $_GET['action'] = 'pdf';
+        require BASE_PATH . '/app/controllers/reportesCitasRepresentanteController.php';
+        break;
+
+    case '/representante/reportes-citas/excel':
+        $_GET['action'] = 'excel';
+        require BASE_PATH . '/app/controllers/reportesCitasRepresentanteController.php';
+        break;
+
     // RUTAS DEL CONTROLADOR DE CALENDARIO
     case '/calendario/cargar':
         require BASE_PATH . '/app/controllers/calendarioController.php';
@@ -496,6 +532,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/vacunas.php';
         break;
 
+    case '/cliente/notificaciones':
+        require BASE_PATH . '/app/views/dashboard/cliente/notificaciones.php';
+        break;
+
     //----------ACCIONES DEL PACIENTE---------//
     case '/cliente/actualizar':
         require BASE_PATH . '/app/controllers/propetarioController.php';
@@ -513,7 +553,15 @@ switch ($request) {
     case '/cliente/actualizar-contrasena':
         require BASE_PATH . '/app/controllers/usuarioController.php';
         break;
-
+    case '/paciente/api/notificaciones':
+        require BASE_PATH . '/app/controllers/NotificacioneController.php';
+        break;
+    case '/preferencias-notificacion':
+        require BASE_PATH . '/app/controllers/preferenciasNotificacionController.php';
+        break;
+    case '/representante/api/notificaciones':
+        require BASE_PATH . '/app/controllers/NotificacioneController.php';
+        break;
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
@@ -645,9 +693,36 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/representante/gestion-clinica.php';
         break;
 
-    //------------------------------INVENTARIO REPRESENTANTE------------------------------//
+    //------------------------------INVENTARIO REPRESENTANTE (RFS 44-49)------------------------------//
+
+    // Vista: lista de todos los productos del inventario
     case '/representante/inventario':
         require BASE_PATH . '/app/views/dashboard/representante/listaInventario.php';
+        break;
+
+    // Vista: formulario para registrar un nuevo producto
+    case '/representante/registro-producto':
+        require BASE_PATH . '/app/views/dashboard/representante/registroProducto.php';
+        break;
+
+    // Vista: formulario de edición con datos pre-llenados (GET ?id=X)
+    case '/representante/editar-producto':
+        require BASE_PATH . '/app/views/dashboard/representante/editarProducto.php';
+        break;
+
+    // Acción: guardar nuevo producto (POST desde registroProducto.php)
+    case '/representante/guardar-producto':
+        require BASE_PATH . '/app/controllers/inventarioController.php';
+        break;
+
+    // Acción: guardar cambios de edición (POST desde editarProducto.php)
+    case '/representante/actualizar-producto':
+        require BASE_PATH . '/app/controllers/inventarioController.php';
+        break;
+
+    // Acción: eliminar producto (POST desde listaInventario.php)
+    case '/representante/eliminar-producto':
+        require BASE_PATH . '/app/controllers/inventarioController.php';
         break;
 
 
@@ -740,4 +815,50 @@ switch ($request) {
         break;
 
 
+    // -------------------------SESIONES-------------------------------//
+    // ── API: Sesiones activas (confi.php) ──
+    case '/cliente/api/sesiones/cerrar':
+        require BASE_PATH . '/app/controllers/sesionesClienteController.php';
+        break;
+
+    case '/cliente/api/sesiones/cerrar-todas':
+        require BASE_PATH . '/app/controllers/sesionesClienteController.php';
+        break;
+
+    // ── API: Preferencias de usuario ──
+    case '/cliente/api/preferencias':
+        require BASE_PATH . '/app/controllers/preferenciasController.php';
+        break;
+
+    case '/cliente/api/preferencias/guardar':
+        require BASE_PATH . '/app/controllers/preferenciasController.php';
+        break;
+
+    case '/cliente/api/preferencias/reset':
+        require BASE_PATH . '/app/controllers/preferenciasController.php';
+        break;
+
+    // ── API: Acceso temporal al historial clínico ──
+
+    // Cliente
+    case '/cliente/api/historial/acceso/estado':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
+
+    case '/cliente/api/historial/acceso/solicitar':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
+
+    // Veterinario
+    case '/veterinaria/api/historial/acceso/pendientes':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
+
+    case '/veterinaria/api/historial/acceso/aprobar':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
+
+    case '/veterinaria/api/historial/acceso/rechazar':
+        require BASE_PATH . '/app/controllers/accesoHistorialController.php';
+        break;
 }

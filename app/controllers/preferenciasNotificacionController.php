@@ -9,26 +9,34 @@
 session_start();
 
 require_once __DIR__ . '/../models/usuario.php';
+require_once __DIR__ . '/../models/Notificacion.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'POST':
         $content_type = $_SERVER['CONTENT_TYPE'] ?? '';
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (!is_array($data)) {
+            $data = [];
+        }
+        $accion = $data['accion'] ?? '';
         
-        if (strpos($content_type, 'application/json') !== false) {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $accion = $data['accion'] ?? '';
-            
-            switch ($accion) {
-                case 'actualizar':
-                    actualizarPreferencia();
-                    break;
-                default:
-                    http_response_code(400);
-                    echo json_encode(['status' => 'error', 'message' => 'Acción no reconocida']);
-                    break;
-            }
+        switch ($accion) {
+            case 'actualizar':
+                actualizarPreferencia();
+                break;
+            case 'marcar_leida':
+                marcarLeida();
+                break;
+            case 'marcar_todas':
+                marcarTodasLeidas();
+                break;
+            default:
+                http_response_code(400);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['status' => 'error', 'message' => 'Acción no reconocida'], JSON_UNESCAPED_UNICODE);
+                break;
         }
         break;
                     
@@ -45,16 +53,16 @@ switch ($method) {
             case 'marcar_todas':
                 marcarTodasLeidas();
                 break;
-
-            case 'obtener':
-                obtenerPreferencia();
-                break;
             case 'historial':
                 obtenerHistorialNotificaciones();
                 break;
+            case 'preferencia':
+                obtenerPreferencia();
+                break;
             default:
                 http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'Acción no especificada']);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode(['status' => 'error', 'message' => 'Acción no especificada'], JSON_UNESCAPED_UNICODE);
                 break;
         }
         break;
@@ -83,7 +91,7 @@ function obtenerPreferencia()
         
         $preferencia = $modeloUsuario->obtenerPreferenciaNotificacion($id_usuario);
 
-        header('Content-Type: application/json');
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
             'status' => 'success',
             'preferencia' => $preferencia,
@@ -141,7 +149,7 @@ function actualizarPreferencia()
         $resultado = $modeloUsuario->actualizarPreferenciaNotificacion($id_usuario, $preferencia);
 
         if ($resultado) {
-            header('Content-Type: application/json');
+            header('Content-Type: application/json; charset=utf-8');
             http_response_code(200);
             echo json_encode([
                 'status' => 'success',
@@ -152,7 +160,8 @@ function actualizarPreferencia()
             exit();
         } else {
             http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => 'Error al actualizar la preferencia']);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => 'Error al actualizar la preferencia'], JSON_UNESCAPED_UNICODE);
             exit();
         }
 
@@ -173,7 +182,8 @@ function obtenerHistorialNotificaciones()
     try {
         if (!isset($_SESSION['user']['id_usuario'])) {
             http_response_code(401);
-            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado']);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado'], JSON_UNESCAPED_UNICODE);
             exit();
         }
 
@@ -184,18 +194,130 @@ function obtenerHistorialNotificaciones()
         $modeloUsuario = new Usuario();
         $historial = $modeloUsuario->obtenerHistorialNotificaciones($id_usuario, $limite);
 
-        header('Content-Type: application/json');
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
             'status' => 'success',
             'cantidad' => count($historial),
             'historial' => $historial
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
         exit();
 
     } catch (Exception $e) {
         error_log("❌ Error en obtenerHistorialNotificaciones: " . $e->getMessage());
         http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Error del sistema']);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['status' => 'error', 'message' => 'Error del sistema'], JSON_UNESCAPED_UNICODE);
+        exit();
+    }
+}
+
+function obtenerNotificaciones()
+{
+    try {
+        if (!isset($_SESSION['user']['id_usuario'])) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado'], JSON_UNESCAPED_UNICODE);
+            exit();
+        }
+
+        $id_usuario = $_SESSION['user']['id_usuario'];
+        $limite = isset($_GET['limite']) ? max(1, min((int) $_GET['limite'], 100)) : 20;
+        $pagina = isset($_GET['pagina']) ? max(1, (int) $_GET['pagina']) : 1;
+        $offset = ($pagina - 1) * $limite;
+
+        $modeloNotificacion = new Notificacion();
+        $notificaciones = $modeloNotificacion->obtenerPorUsuario($id_usuario, $limite, $offset);
+        $noLeidas = $modeloNotificacion->contarNoLeidas($id_usuario);
+
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'status' => 'success',
+            'notificaciones' => $notificaciones,
+            'no_leidas' => $noLeidas,
+            'pagina' => $pagina,
+            'limite' => $limite
+        ], JSON_UNESCAPED_UNICODE);
+        exit();
+
+    } catch (Exception $e) {
+        error_log("❌ Error en obtenerNotificaciones: " . $e->getMessage());
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['status' => 'error', 'message' => 'Error del sistema'], JSON_UNESCAPED_UNICODE);
+        exit();
+    }
+}
+
+function marcarLeida()
+{
+    try {
+        if (!isset($_SESSION['user']['id_usuario'])) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado'], JSON_UNESCAPED_UNICODE);
+            exit();
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = isset($data['id']) ? (int) $data['id'] : 0;
+
+        if ($id <= 0) {
+            http_response_code(400);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => 'ID de notificación inválido'], JSON_UNESCAPED_UNICODE);
+            exit();
+        }
+
+        $id_usuario = $_SESSION['user']['id_usuario'];
+        $modeloNotificacion = new Notificacion();
+        $resultado = $modeloNotificacion->marcarLeida($id, $id_usuario);
+
+        header('Content-Type: application/json; charset=utf-8');
+        if ($resultado) {
+            echo json_encode(['status' => 'success', 'message' => 'Notificación marcada como leída'], JSON_UNESCAPED_UNICODE);
+        } else {
+            http_response_code(404);
+            echo json_encode(['status' => 'error', 'message' => 'No se encontró la notificación o ya fue marcada'], JSON_UNESCAPED_UNICODE);
+        }
+        exit();
+
+    } catch (Exception $e) {
+        error_log("❌ Error en marcarLeida: " . $e->getMessage());
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['status' => 'error', 'message' => 'Error del sistema'], JSON_UNESCAPED_UNICODE);
+        exit();
+    }
+}
+
+function marcarTodasLeidas()
+{
+    try {
+        if (!isset($_SESSION['user']['id_usuario'])) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado'], JSON_UNESCAPED_UNICODE);
+            exit();
+        }
+
+        $id_usuario = $_SESSION['user']['id_usuario'];
+        $modeloNotificacion = new Notificacion();
+        $resultado = $modeloNotificacion->marcarTodasLeidas($id_usuario);
+
+        header('Content-Type: application/json; charset=utf-8');
+        if ($resultado) {
+            echo json_encode(['status' => 'success', 'message' => 'Todas las notificaciones marcadas como leídas'], JSON_UNESCAPED_UNICODE);
+        } else {
+            echo json_encode(['status' => 'success', 'message' => 'No había notificaciones pendientes'], JSON_UNESCAPED_UNICODE);
+        }
+        exit();
+
+    } catch (Exception $e) {
+        error_log("❌ Error en marcarTodasLeidas: " . $e->getMessage());
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['status' => 'error', 'message' => 'Error del sistema'], JSON_UNESCAPED_UNICODE);
         exit();
     }
 }

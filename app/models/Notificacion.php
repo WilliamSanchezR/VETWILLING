@@ -36,6 +36,30 @@ class Notificacion {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function obtenerNuevas(int $usuario_id, int $desde_id = 0): array {
+        if ($desde_id <= 0) {
+            return [];
+        }
+
+        $stmt = $this->conexion->prepare(
+            "SELECT id, tipo, mensaje, leido, canal, estado, fecha, referencia_id
+             FROM notificaciones
+             WHERE usuario_id = ? AND estado != 'cancelada' AND id > ?
+             ORDER BY fecha ASC"
+        );
+        $stmt->execute([$usuario_id, $desde_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerUltimoId(int $usuario_id): int {
+        $stmt = $this->conexion->prepare(
+            "SELECT COALESCE(MAX(id), 0) FROM notificaciones
+             WHERE usuario_id = ? AND estado != 'cancelada'"
+        );
+        $stmt->execute([$usuario_id]);
+        return (int) $stmt->fetchColumn();
+    }
+
     // Crear notificación interna (al crear cita, seguimiento, etc.)
     public function crear(int $usuario_id, string $tipo, string $mensaje, 
                           ?int $referencia_id = null, string $canal = 'plataforma'): int {

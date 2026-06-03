@@ -278,6 +278,43 @@ class Reportes
         }
     }
 
+    public function obtenerReporteServiciosPorVeterinaria($idVeterinaria, $fechaInicio, $fechaFin)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        COALESCE(s.nombre, 'Sin servicio') AS servicio,
+                        COUNT(a.id_agendamiento) AS total_citas,
+                        SUM(CASE WHEN {$estadoNorm} = 'ATENDIDA' THEN 1 ELSE 0 END) AS atendidas,
+                        SUM(CASE WHEN {$estadoNorm} = 'CANCELADA' THEN 1 ELSE 0 END) AS canceladas,
+                        COALESCE(SUM(CASE
+                            WHEN {$estadoNorm} <> 'CANCELADA' THEN COALESCE(sub.costo, 0)
+                            ELSE 0
+                        END), 0) AS ingresos
+                    FROM agendamiento a
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    INNER JOIN profesional prof ON a.id_usuario = prof.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE pv.id_veterinaria = :id_veterinaria
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                    GROUP BY COALESCE(s.nombre, 'Sin servicio')
+                    ORDER BY total_citas DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerReporteServiciosPorVeterinaria - ' . $e->getMessage());
+            return [];
+        }
+    }
+
     public function obtenerTopTratamientos($idUsuario, $fechaInicio, $fechaFin, $limite = 5, array $filtros = [])
     {
         try {
@@ -520,6 +557,133 @@ class Reportes
                 'pendientes' => 0,
                 'total' => 0
             ];
+        }
+    }
+
+    public function obtenerResumenEstadosCitasPorVeterinaria($idVeterinaria, $fechaInicio, $fechaFin)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        {$estadoNorm} AS estado_normalizado,
+                        COUNT(*) AS total
+                    FROM agendamiento a
+                    INNER JOIN profesional prof ON a.id_usuario = prof.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE pv.id_veterinaria = :id_veterinaria
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                    GROUP BY {$estadoNorm}";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->execute();
+
+            $resumen = [
+                'atendidas' => 0,
+                'canceladas' => 0,
+                'pendientes' => 0,
+                'total' => 0
+            ];
+
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            foreach ($rows as $row) {
+                $estado = $row['estado_normalizado'] ?? 'PENDIENTE';
+                $cantidad = (int)($row['total'] ?? 0);
+
+                if ($estado === 'ATENDIDA') {
+                    $resumen['atendidas'] += $cantidad;
+                } elseif ($estado === 'CANCELADA') {
+                    $resumen['canceladas'] += $cantidad;
+                } else {
+                    $resumen['pendientes'] += $cantidad;
+                }
+
+                $resumen['total'] += $cantidad;
+            }
+
+            return $resumen;
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerResumenEstadosCitasPorVeterinaria - ' . $e->getMessage());
+            return [
+                'atendidas' => 0,
+                'canceladas' => 0,
+                'pendientes' => 0,
+                'total' => 0
+            ];
+        }
+    }
+
+    public function obtenerDetalleCitasPorVeterinaria($idVeterinaria, $fechaInicio, $fechaFin, $limite = 100)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        a.id_agendamiento,
+                        DATE_FORMAT(a.fecha_hora, '%Y-%m-%d %H:%i') AS fecha,
+                        COALESCE(p.nombre, 'Sin paciente') AS paciente,
+                        COALESCE(CONCAT(prop.nombres, ' ', prop.apellidos), 'Sin propietario') AS propietario,
+                        COALESCE(s.nombre, 'Sin servicio') AS servicio,
+                        COALESCE(sub.nombre, a.tipo, 'Sin subservicio') AS subservicio,
+                        {$estadoNorm} AS estado,
+                        a.motivo_cancelacion,
+                        a.fecha_cancelacion
+                    FROM agendamiento a
+                    LEFT JOIN paciente p ON a.id_paciente = p.id_paciente
+                    LEFT JOIN propietario prop ON p.id_propietario = prop.id_propietario
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    INNER JOIN profesional prof ON a.id_usuario = prof.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE pv.id_veterinaria = :id_veterinaria
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                    ORDER BY a.fecha_hora DESC
+                    LIMIT :limite";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->bindParam(':limite', $limite, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerDetalleCitasPorVeterinaria - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function obtenerMotivosCancelacionPorVeterinaria($idVeterinaria, $fechaInicio, $fechaFin)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        COALESCE(NULLIF(TRIM(a.motivo_cancelacion), ''), 'Sin motivo') AS motivo,
+                        COUNT(*) AS total
+                    FROM agendamiento a
+                    INNER JOIN profesional prof ON a.id_usuario = prof.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE pv.id_veterinaria = :id_veterinaria
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                      AND {$estadoNorm} = 'CANCELADA'
+                    GROUP BY COALESCE(NULLIF(TRIM(a.motivo_cancelacion), ''), 'Sin motivo')
+                    ORDER BY total DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerMotivosCancelacionPorVeterinaria - ' . $e->getMessage());
+            return [];
         }
     }
 

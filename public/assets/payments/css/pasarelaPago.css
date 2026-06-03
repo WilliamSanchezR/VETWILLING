@@ -202,6 +202,27 @@ body {
     transform: translateY(-1px);
 }
 
+.btn-modal-open {
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px 16px;
+    background: #ffffff;
+    color: var(--verde);
+    border: 1px solid rgba(46, 125, 50, 0.22);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-modal-open:hover {
+    background: #f6fbf6;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.08);
+}
+
 .payment-help-text {
     margin-top: 10px;
     font-size: 13px;
@@ -644,4 +665,142 @@ body {
 
 .step-dot.done {
     background: var(--wompi-cyan);
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 12px;
+    }
+
+    .checkout-card,
+    .confirmacion-card,
+    .wompi-modal {
+        max-width: 100%;
+        border-radius: 16px;
+    }
+
+    .checkout-header,
+    .checkout-body,
+    .confirmacion-body,
+    .wompi-body {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .wompi-header {
+        padding-left: 18px;
+        padding-right: 18px;
+        gap: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .overlay {
+        padding: 12px;
+    }
+
+    .form-row,
+    .modal-footer {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .btn-modal-back,
+    .btn-modal-next {
+        width: 100%;
+    }
+
+    .btn-volver {
+        width: calc(100% - 40px);
+        margin: 0 20px 20px;
+    }
+
+    .metodo-item {
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+    }
+
+    .checkout-header,
+    .checkout-body {
+        padding-left: 28px;
+        padding-right: 28px;
+    }
+
+    .wompi-modal {
+        width: min(100%, 460px);
+    }
+
+    .wompi-header,
+    .modal-footer {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+@media (max-width: 375px) {
+    body {
+        padding: 8px;
+    }
+
+    .checkout-header,
+    .checkout-body,
+    .wompi-header,
+    .wompi-body,
+    .confirmacion-body {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .checkout-header {
+        padding-top: 22px;
+        padding-bottom: 22px;
+    }
+
+    .checkout-body {
+        padding-top: 22px;
+        padding-bottom: 22px;
+    }
+
+    .producto-box {
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 14px;
+        flex-direction: column;
+    }
+
+    .resumen-fila {
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .resumen-fila span:last-child,
+    .wompi-header .monto-header .valor,
+    .payment-help-text,
+    .producto-info .nombre,
+    .producto-info .detalle {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .btn-modal-open,
+    .btn-pagar,
+    .btn-verificar,
+    .btn-modal-back,
+    .btn-modal-next {
+        font-size: 14px;
+    }
+
+    .wompi-header .monto-header {
+        text-align: left;
+    }
+
+    .steps-indicator {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
 }

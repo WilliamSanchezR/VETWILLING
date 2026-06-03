@@ -1,5 +1,8 @@
 let pasoActual = 1;
 let metodoSeleccionado = '';
+let checkoutUrl = '';
+let verificarUrl = '';
+let intervaloSeguimiento = null;
 
 const baseUrl = window.BASE_URL || (() => {
     const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
@@ -14,13 +17,31 @@ const rutasVolver = {
 };
 
 function abrirModal() {
-    document.getElementById('overlay').classList.add('active');
+    const overlay = document.getElementById('overlay');
+    const modalFooter = document.getElementById('modal-footer');
+
+    if (!overlay) return;
+
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+
+    if (modalFooter) {
+        modalFooter.style.display = 'flex';
+    }
+
+    document.querySelectorAll('.metodo-item').forEach(m => m.classList.remove('selected'));
+    metodoSeleccionado = '';
     pasoActual = 1;
     irPaso(1);
 }
 
 function cerrarModal() {
-    document.getElementById('overlay').classList.remove('active');
+    const overlay = document.getElementById('overlay');
+
+    if (!overlay) return;
+
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
 }
 
 function seleccionarMetodo(el, nombre) {
@@ -31,37 +52,58 @@ function seleccionarMetodo(el, nombre) {
 }
 
 function irPaso(paso) {
+    const modalFooter = document.getElementById('modal-footer');
+    const btnNext = document.getElementById('btn-next');
+    const btnBack = document.getElementById('btn-back');
+
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step-' + paso).classList.add('active');
+    const pasoElement = document.getElementById('step-' + paso);
+    if (pasoElement) {
+        pasoElement.classList.add('active');
+    }
 
     for (let i = 1; i <= 3; i++) {
         const dot = document.getElementById('dot-' + i);
+        if (!dot) continue;
         dot.classList.remove('active', 'done');
         if (i < paso) dot.classList.add('done');
         if (i === paso) dot.classList.add('active');
     }
 
-    document.getElementById('btn-back').style.display = (paso > 1 && paso < 3) ? 'block' : 'none';
+    if (btnBack) {
+        btnBack.style.display = (paso > 1 && paso < 3) ? 'block' : 'none';
+    }
 
-    const btnNext = document.getElementById('btn-next');
-    if (paso === 1) { btnNext.textContent = 'Continuar →'; btnNext.disabled = true; }
-    if (paso === 2) { btnNext.textContent = 'Pagar $ 150.000 →'; btnNext.disabled = false; }
-    if (paso === 3) { document.getElementById('modal-footer').style.display = 'none'; }
+    if (btnNext) {
+        if (paso === 1) {
+            btnNext.textContent = 'Continuar →';
+            btnNext.disabled = true;
+        }
+
+        if (paso === 2) {
+            btnNext.textContent = 'Ir a Mercado Pago →';
+            btnNext.disabled = false;
+        }
+
+        if (paso === 3) {
+            btnNext.textContent = 'Procesando...';
+            btnNext.disabled = true;
+        }
+    }
+
+    if (modalFooter) {
+        modalFooter.style.display = paso === 3 ? 'none' : 'flex';
+    }
 
     pasoActual = paso;
 }
 
 function pasoContinuar() {
     if (pasoActual === 1) {
-        if (metodoSeleccionado === 'Tarjeta de crédito/débito') {
-            irPaso(2);
-        } else {
-            irPaso(3);
-            setTimeout(finalizarPago, 2800);
-        }
+        irPaso(2);
     } else if (pasoActual === 2) {
         irPaso(3);
-        setTimeout(finalizarPago, 2800);
+        setTimeout(finalizarPago, 1400);
     }
 }
 
@@ -72,21 +114,11 @@ function pasoAnterior() {
 function finalizarPago() {
     cerrarModal();
 
-    const txId = 'WMP-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-    const ahora = new Date().toLocaleString('es-CO', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-    });
+    if (checkoutUrl) {
+        window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+    }
 
-    document.getElementById('conf-id').textContent = txId;
-    document.getElementById('conf-metodo').textContent = metodoSeleccionado;
-    document.getElementById('conf-fecha').textContent = ahora;
-
-    document.getElementById('pagina-checkout').style.display = 'none';
-    document.getElementById('pagina-confirmacion').style.display = 'flex';
-    document.getElementById('pagina-confirmacion').style.alignItems = 'center';
-    document.getElementById('pagina-confirmacion').style.justifyContent = 'center';
-    document.getElementById('pagina-confirmacion').style.minHeight = '100vh';
+    iniciarSeguimiento();
 }
 
 // ← FUNCIÓN MODIFICADA
@@ -116,3 +148,52 @@ function formatExp(input) {
     input.value = val;
     document.getElementById('preview-exp').textContent = val || 'MM/AA';
 }
+
+function iniciarSeguimiento() {
+    if (!verificarUrl || intervaloSeguimiento) {
+        return;
+    }
+
+    const revisarEstado = async () => {
+        try {
+            const separador = verificarUrl.includes('?') ? '&' : '?';
+            const respuesta = await fetch(verificarUrl + separador + 'format=json', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                cache: 'no-store'
+            });
+
+            if (!respuesta.ok) {
+                return;
+            }
+
+            const data = await respuesta.json();
+            if (data && (data.estado === 'success' || data.estado === 'failure') && data.redirect_url) {
+                clearInterval(intervaloSeguimiento);
+                intervaloSeguimiento = null;
+                window.location.href = data.redirect_url;
+            }
+        } catch (error) {
+            console.debug('No fue posible verificar el pago automáticamente.', error);
+        }
+    };
+
+    revisarEstado();
+    intervaloSeguimiento = setInterval(revisarEstado, 8000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const botonPagar = document.getElementById('btnAbrirPasarela');
+
+    if (!botonPagar) {
+        return;
+    }
+
+    checkoutUrl = botonPagar.dataset.checkoutUrl || '';
+    verificarUrl = botonPagar.dataset.verificarUrl || '';
+
+    botonPagar.addEventListener('click', (event) => {
+        event.preventDefault();
+        abrirModal();
+    });
+});

@@ -1,4 +1,4 @@
- <?php
+<?php
 /**
  * Script para cerrar sesión de usuario
  * Destruye la sesión actual y redirige al inicio

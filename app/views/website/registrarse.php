@@ -1,6 +1,8 @@
 <?php
 if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
+    if (!headers_sent()) {
+        session_start();
+    }
 }
 
 $registroOld = $_SESSION['registro_old'] ?? [];
