@@ -26,6 +26,12 @@ config/database.php
 .htaccess
 
 .env
+.env.local
+.env.*
+!.env.example
+
+composer-setup.php
+composer.phar
 
 composer.lock
 composer.json
