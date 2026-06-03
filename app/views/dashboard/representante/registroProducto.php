@@ -69,8 +69,10 @@ $id_veterinaria = (int) $_SESSION['user']['id_veterinaria'];
 
                             <!-- Categoria -->
                             <div class="col-md-6">
-                                <label class="form-label" for="categoria">Categoria</label>
-                                <select id="categoria" name="categoria" class="form-select">
+                                <label class="form-label" for="categoria">
+                                    Categoria <span class="text-danger">*</span>
+                                </label>
+                                <select id="categoria" name="categoria" class="form-select" required>
                                     <option value="">-- Seleccionar --</option>
                                     <option value="medicamento">Medicamento</option>
                                     <option value="alimento">Alimento / Dieta</option>
@@ -90,6 +92,22 @@ $id_veterinaria = (int) $_SESSION['user']['id_veterinaria'];
                                     rows="3"
                                     placeholder="Descripcion breve del producto o indicaciones..."
                                 ></textarea>
+                            </div>
+
+                            <!-- Proveedor o laboratorio -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="proveedor">
+                                    Proveedor / Laboratorio <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="proveedor"
+                                    name="proveedor"
+                                    class="form-control"
+                                    placeholder="Ej: Lab. Veterinario S.A."
+                                    maxlength="150"
+                                    required
+                                >
                             </div>
 
                             <!-- Precio unitario -->
@@ -115,15 +133,15 @@ $id_veterinaria = (int) $_SESSION['user']['id_veterinaria'];
                             <!-- Fecha de vencimiento del producto -->
                             <div class="col-md-6">
                                 <label class="form-label" for="fecha_vencimiento">
-                                    Fecha de vencimiento
+                                    Fecha de vencimiento <span class="text-danger">*</span>
                                 </label>
                                 <input
                                     type="date"
                                     id="fecha_vencimiento"
                                     name="fecha_vencimiento"
                                     class="form-control"
+                                    required
                                 >
-                                <small class="text-muted">Dejar en blanco si no aplica.</small>
                             </div>
 
                         </div><!-- /.row -->
