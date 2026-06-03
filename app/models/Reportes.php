@@ -278,6 +278,43 @@ class Reportes
         }
     }
 
+    public function obtenerReporteServiciosPorVeterinaria($idVeterinaria, $fechaInicio, $fechaFin)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        COALESCE(s.nombre, 'Sin servicio') AS servicio,
+                        COUNT(a.id_agendamiento) AS total_citas,
+                        SUM(CASE WHEN {$estadoNorm} = 'ATENDIDA' THEN 1 ELSE 0 END) AS atendidas,
+                        SUM(CASE WHEN {$estadoNorm} = 'CANCELADA' THEN 1 ELSE 0 END) AS canceladas,
+                        COALESCE(SUM(CASE
+                            WHEN {$estadoNorm} <> 'CANCELADA' THEN COALESCE(sub.costo, 0)
+                            ELSE 0
+                        END), 0) AS ingresos
+                    FROM agendamiento a
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    INNER JOIN profesional prof ON a.id_usuario = prof.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE pv.id_veterinaria = :id_veterinaria
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                    GROUP BY COALESCE(s.nombre, 'Sin servicio')
+                    ORDER BY total_citas DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerReporteServiciosPorVeterinaria - ' . $e->getMessage());
+            return [];
+        }
+    }
+
     public function obtenerTopTratamientos($idUsuario, $fechaInicio, $fechaFin, $limite = 5, array $filtros = [])
     {
         try {
@@ -523,6 +560,133 @@ class Reportes
         }
     }
 
+    public function obtenerResumenEstadosCitasPorVeterinaria($idVeterinaria, $fechaInicio, $fechaFin)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        {$estadoNorm} AS estado_normalizado,
+                        COUNT(*) AS total
+                    FROM agendamiento a
+                    INNER JOIN profesional prof ON a.id_usuario = prof.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE pv.id_veterinaria = :id_veterinaria
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                    GROUP BY {$estadoNorm}";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->execute();
+
+            $resumen = [
+                'atendidas' => 0,
+                'canceladas' => 0,
+                'pendientes' => 0,
+                'total' => 0
+            ];
+
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            foreach ($rows as $row) {
+                $estado = $row['estado_normalizado'] ?? 'PENDIENTE';
+                $cantidad = (int)($row['total'] ?? 0);
+
+                if ($estado === 'ATENDIDA') {
+                    $resumen['atendidas'] += $cantidad;
+                } elseif ($estado === 'CANCELADA') {
+                    $resumen['canceladas'] += $cantidad;
+                } else {
+                    $resumen['pendientes'] += $cantidad;
+                }
+
+                $resumen['total'] += $cantidad;
+            }
+
+            return $resumen;
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerResumenEstadosCitasPorVeterinaria - ' . $e->getMessage());
+            return [
+                'atendidas' => 0,
+                'canceladas' => 0,
+                'pendientes' => 0,
+                'total' => 0
+            ];
+        }
+    }
+
+    public function obtenerDetalleCitasPorVeterinaria($idVeterinaria, $fechaInicio, $fechaFin, $limite = 100)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        a.id_agendamiento,
+                        DATE_FORMAT(a.fecha_hora, '%Y-%m-%d %H:%i') AS fecha,
+                        COALESCE(p.nombre, 'Sin paciente') AS paciente,
+                        COALESCE(CONCAT(prop.nombres, ' ', prop.apellidos), 'Sin propietario') AS propietario,
+                        COALESCE(s.nombre, 'Sin servicio') AS servicio,
+                        COALESCE(sub.nombre, a.tipo, 'Sin subservicio') AS subservicio,
+                        {$estadoNorm} AS estado,
+                        a.motivo_cancelacion,
+                        a.fecha_cancelacion
+                    FROM agendamiento a
+                    LEFT JOIN paciente p ON a.id_paciente = p.id_paciente
+                    LEFT JOIN propietario prop ON p.id_propietario = prop.id_propietario
+                    LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
+                    LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
+                    INNER JOIN profesional prof ON a.id_usuario = prof.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE pv.id_veterinaria = :id_veterinaria
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                    ORDER BY a.fecha_hora DESC
+                    LIMIT :limite";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->bindParam(':limite', $limite, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerDetalleCitasPorVeterinaria - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function obtenerMotivosCancelacionPorVeterinaria($idVeterinaria, $fechaInicio, $fechaFin)
+    {
+        try {
+            $estadoNorm = $this->estadoNormalizadoSql('a.estado');
+
+            $sql = "SELECT
+                        COALESCE(NULLIF(TRIM(a.motivo_cancelacion), ''), 'Sin motivo') AS motivo,
+                        COUNT(*) AS total
+                    FROM agendamiento a
+                    INNER JOIN profesional prof ON a.id_usuario = prof.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE pv.id_veterinaria = :id_veterinaria
+                      AND DATE(a.fecha_hora) BETWEEN :fecha_inicio AND :fecha_fin
+                      AND {$estadoNorm} = 'CANCELADA'
+                    GROUP BY COALESCE(NULLIF(TRIM(a.motivo_cancelacion), ''), 'Sin motivo')
+                    ORDER BY total DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_inicio', $fechaInicio, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_fin', $fechaFin, PDO::PARAM_STR);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerMotivosCancelacionPorVeterinaria - ' . $e->getMessage());
+            return [];
+        }
+    }
+
     public function obtenerPacientesAsignadosActivos($idUsuario)
     {
         try {
@@ -719,5 +883,113 @@ class Reportes
             generado_en  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
         $this->conexion->exec($sql);
+    }
+
+    // -----------------------------------------------------------------------
+    // RFS 14 — subtarea 3: Inventario de la veterinaria del usuario
+    // -----------------------------------------------------------------------
+
+    /**
+     * Devuelve el id_veterinaria asociado al profesional (usuario).
+     * Retorna null si no tiene veterinaria asignada.
+     */
+    private function obtenerVeterinariaDeUsuario(int $idUsuario): ?int
+    {
+        try {
+            $sql = "SELECT pv.id_veterinaria
+                    FROM profesional prof
+                    INNER JOIN profesional_veterinaria pv ON prof.id_profesional = pv.id_profesional
+                    WHERE prof.id_usuario = :id_usuario
+                    LIMIT 1";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $idUsuario, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $row ? (int)$row['id_veterinaria'] : null;
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerVeterinariaDeUsuario - ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Resumen de inventario de la veterinaria del usuario autenticado.
+     */
+    public function obtenerResumenInventario(int $idUsuario): array
+    {
+        try {
+            $idVeterinaria = $this->obtenerVeterinariaDeUsuario($idUsuario);
+            if ($idVeterinaria === null) {
+                return [
+                    'total_productos' => 0, 'vencidos' => 0,
+                    'por_vencer' => 0, 'vigentes' => 0, 'cantidad_total' => 0,
+                ];
+            }
+
+            $sql = "SELECT
+                        COUNT(*) AS total_productos,
+                        SUM(CASE WHEN p.fecha_vencimiento < CURDATE() THEN 1 ELSE 0 END) AS vencidos,
+                        SUM(CASE WHEN p.fecha_vencimiento BETWEEN CURDATE()
+                                      AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS por_vencer,
+                        SUM(CASE WHEN p.fecha_vencimiento > DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                                      OR p.fecha_vencimiento IS NULL THEN 1 ELSE 0 END) AS vigentes,
+                        SUM(COALESCE(i.cantidad, 0)) AS cantidad_total
+                    FROM inventario i
+                    INNER JOIN producto p ON p.id_inventario = i.id_inventario
+                    WHERE i.id_veterinaria = :id_veterinaria";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            return [
+                'total_productos' => (int)($row['total_productos'] ?? 0),
+                'vencidos'        => (int)($row['vencidos']        ?? 0),
+                'por_vencer'      => (int)($row['por_vencer']      ?? 0),
+                'vigentes'        => (int)($row['vigentes']        ?? 0),
+                'cantidad_total'  => (int)($row['cantidad_total']  ?? 0),
+            ];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerResumenInventario - ' . $e->getMessage());
+            return ['total_productos' => 0, 'vencidos' => 0, 'por_vencer' => 0, 'vigentes' => 0, 'cantidad_total' => 0];
+        }
+    }
+
+    /**
+     * Lista de productos próximos a vencer (o ya vencidos) de la veterinaria.
+     */
+    public function obtenerProductosProximosVencer(int $idUsuario, int $dias = 60): array
+    {
+        try {
+            $idVeterinaria = $this->obtenerVeterinariaDeUsuario($idUsuario);
+            if ($idVeterinaria === null) {
+                return [];
+            }
+
+            $sql = "SELECT
+                        p.nombre,
+                        p.descripcion,
+                        p.fecha_vencimiento,
+                        DATEDIFF(p.fecha_vencimiento, CURDATE()) AS dias_restantes,
+                        i.cantidad,
+                        i.categoria,
+                        i.numero_lote
+                    FROM producto p
+                    INNER JOIN inventario i ON p.id_inventario = i.id_inventario
+                    WHERE i.id_veterinaria = :id_veterinaria
+                      AND p.fecha_vencimiento <= DATE_ADD(CURDATE(), INTERVAL :dias DAY)
+                    ORDER BY p.fecha_vencimiento ASC
+                    LIMIT 30";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria, PDO::PARAM_INT);
+            $stmt->bindParam(':dias', $dias, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Error en Reportes::obtenerProductosProximosVencer - ' . $e->getMessage());
+            return [];
+        }
     }
 }

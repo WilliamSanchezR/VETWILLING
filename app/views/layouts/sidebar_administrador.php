@@ -92,6 +92,14 @@ $final_path = end($path_parts); // Obtiene el último elemento
                 <i class="bi bi-ticket-perforated"></i>
                 <span class="nav-text">Ticket de Soporte</span>
             </a>
+
+            <!-- RFS 14: Gestión de Reportes -->
+            <a href="<?= BASE_URL ?>/admin/reportes"
+                class="nav-item <?= $final_path == 'reportes' ? 'active' : '' ?>"
+                data-tooltip="Reportes">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                <span class="nav-text">Reportes</span>
+            </a>
         </div>
 
     </nav>

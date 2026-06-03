@@ -454,6 +454,68 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         </div>
     </div>
 
+    <!-- ── RFS 14 subtarea 3: Inventario de la veterinaria ─────────────── -->
+    <div class="fila-reportes mt-4">
+        <div class="card-reporte">
+            <div class="card-reporte-header">
+                <div>
+                    <h3 class="card-reporte-titulo">
+                        <i class="bi bi-box-seam me-2"></i>Inventario
+                    </h3>
+                    <p class="card-reporte-subtitulo">Estado actual del inventario de tu veterinaria</p>
+                </div>
+            </div>
+            <!-- KPIs de inventario -->
+            <div class="row g-2 mb-3" id="kpisInventario">
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded border text-center bg-light">
+                        <div class="small text-muted">Total Productos</div>
+                        <div class="fs-4 fw-bold text-dark" id="invTotalVet">—</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded border text-center" style="background:#ecfdf5;">
+                        <div class="small text-muted">Vigentes</div>
+                        <div class="fs-4 fw-bold text-success" id="invVigentesVet">—</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded border text-center" style="background:#fffbeb;">
+                        <div class="small text-muted">Por Vencer (30d)</div>
+                        <div class="fs-4 fw-bold text-warning" id="invVencerVet">—</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="p-3 rounded border text-center" style="background:#fef2f2;">
+                        <div class="small text-muted">Vencidos</div>
+                        <div class="fs-4 fw-bold text-danger" id="invVencidosVet">—</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tabla de productos próximos a vencer -->
+            <h6 class="fw-semibold mb-2 text-warning">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>Insumos próximos a vencer (60 días)
+            </h6>
+            <div class="table-responsive">
+                <table class="tabla-detalle-citas">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Lote</th>
+                            <th class="text-center">Cantidad</th>
+                            <th>Vence</th>
+                            <th class="text-center">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyInventarioVet">
+                        <tr><td colspan="6" class="text-center text-muted py-3">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Enviar Ficha Clínica (RFS 32 subtask 7) -->
     <div class="modal fade" id="modalEnviarFicha" tabindex="-1" aria-labelledby="modalEnviarFichaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

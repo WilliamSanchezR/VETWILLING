@@ -30,8 +30,9 @@
     background: var(--color-fondo);
 }
 
-.sidebar.collapsed ~ .contenido-principal {
-  margin-left: var(--sidebar-width-collapsed);
+.sidebar.collapsed ~ .contenido-principal,
+#sidebar.collapsed ~ .contenido-principal {
+  margin-left: var(--sidebar-collapsed-width);
 }
 .wrap {
   position: relative;

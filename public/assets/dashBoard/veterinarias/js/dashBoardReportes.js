@@ -485,6 +485,8 @@ async function cargarDashboardReportes() {
         renderAsignacionesActivas(payload.asignaciones_activas || []);
         renderHistorialAsignaciones(payload.historial_asignaciones || []);
         renderDetalleCitas(payload.detalle_citas || []);
+        // RFS 14 subtarea 3: inventario
+        renderInventarioVet(payload.inventario || {}, payload.productos_vencer || []);
     } catch (error) {
         console.error(error);
     }
@@ -540,6 +542,38 @@ function exportarPDF() {
     let url = `${window.REPORTES_PDF_URL}?action=pdf&periodo=${periodoActual}&anio=${anio}`;
     if (filtrosExtra) url += `&${filtrosExtra}`;
     window.open(url, '_blank');
+}
+
+// RFS 14 subtarea 3: Inventario de la veterinaria (vista del profesional)
+function renderInventarioVet(inv, productos) {
+    const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    setEl('invTotalVet',    inv.total_productos ?? 0);
+    setEl('invVigentesVet', inv.vigentes        ?? 0);
+    setEl('invVencerVet',   inv.por_vencer      ?? 0);
+    setEl('invVencidosVet', inv.vencidos        ?? 0);
+
+    const tbody = document.getElementById('tbodyInventarioVet');
+    if (!tbody) return;
+    if (!productos.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3"><i class="bi bi-check-circle text-success me-1"></i>Sin insumos próximos a vencer</td></tr>';
+        return;
+    }
+    const esc = s => { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; };
+    tbody.innerHTML = productos.map(p => {
+        const dias = parseInt(p.dias_restantes ?? 0);
+        let badge, label;
+        if (dias < 0)        { badge = 'bg-danger text-white'; label = 'Vencido'; }
+        else if (dias <= 15) { badge = 'bg-warning text-dark'; label = 'Crítico'; }
+        else                 { badge = 'bg-info text-dark';    label = 'Próximo'; }
+        return `<tr>
+            <td>${esc(p.nombre)}</td>
+            <td>${esc(p.categoria ?? '—')}</td>
+            <td>${esc(p.numero_lote ?? '—')}</td>
+            <td class="text-center">${p.cantidad ?? 0}</td>
+            <td>${esc(p.fecha_vencimiento ?? '')}</td>
+            <td class="text-center"><span class="badge ${badge}">${label} (${dias}d)</span></td>
+        </tr>`;
+    }).join('');
 }
 
 function exportarExcel() {
