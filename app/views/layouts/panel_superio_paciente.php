@@ -1,12 +1,16 @@
 <?php
 // 1. Iniciar sesión
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (!headers_sent()) {
+        session_start();
+    }
 }
 
 // 2. Validar sesión
 if (!isset($_SESSION['user'])) {
-    header('Location: /vetwilling/login');
+    if (!headers_sent()) {
+        header('Location: /vetwilling/login');
+    }
     exit();
 }
 
