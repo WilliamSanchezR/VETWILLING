@@ -7,6 +7,31 @@ const baseUrl = window.BASE_URL || (() => {
     return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
 })();
 
+/* Safety stubs for inline onclick usage from templates.
+   These provide no-op / delegated behavior if the real scripts haven't initialized yet. */
+if (!window.togglePerfilMenu) {
+    window.togglePerfilMenu = function() {
+        const btn = document.querySelector('#btnPerfil, [data-dropdown="perfil"], .btn-profile');
+        if (btn) btn.click();
+    };
+}
+if (!window.toggleNotificaciones) {
+    window.toggleNotificaciones = function() {
+        const btn = document.querySelector('#btnNotificaciones, [data-action="notificaciones"], .btn-notificaciones');
+        if (btn) btn.click();
+    };
+}
+if (!window.eliminarNotificacion) {
+    window.eliminarNotificacion = function(btn) {
+        try { btn?.closest && btn.closest('.notification-item')?.remove(); } catch(_) {}
+    };
+}
+if (!window.marcarTodasLeidas) {
+    window.marcarTodasLeidas = function() {
+        document.querySelectorAll('.notification-item.unread').forEach(i => i.classList.remove('unread'));
+    };
+}
+
 class PanelSuperiorRepresentante {
     constructor() {
         // Selector rápido
@@ -31,6 +56,11 @@ class PanelSuperiorRepresentante {
             cerrarModal: this.$("#btnCerrarModal"),
             cancelar: this.$("#btnCancelar"),
         };
+
+        this.notificationsApiUrl = `${baseUrl}/representante/api/notificaciones`;
+        this.notificationBadge = this.$("#notificationBadge");
+        this.notificationsContainer = this.$(".notifications-list");
+        this.notifications = [];
 
         this.modals = {
             soporte: this.$("#modalSoporte"),
@@ -63,6 +93,7 @@ class PanelSuperiorRepresentante {
         this.initTheme();
         this.initSidebarMovil();
         this.initEventosGlobales();
+        this.initNotificaciones();
 
         console.log("Panel Superior Representante listo ✔");
     }
@@ -113,9 +144,15 @@ class PanelSuperiorRepresentante {
         if (!menu) return;
 
         this.cerrarOtrosDropdowns(menu);
-        menu.style.display = menu.style.display === "block" ? "none" : "block";
-        this.state.activeDropdown =
-            menu.style.display === "block" ? "perfil" : null;
+        const abrirMenu = menu.style.display !== "block";
+        menu.style.display = abrirMenu ? "block" : "none";
+        // También sincronizamos la clase usada por otros scripts
+        if (abrirMenu) {
+            menu.classList.remove('is-hidden');
+        } else {
+            menu.classList.add('is-hidden');
+        }
+        this.state.activeDropdown = abrirMenu ? 'perfil' : null;
     }
 
     toggleNotificaciones() {
@@ -123,9 +160,18 @@ class PanelSuperiorRepresentante {
         if (!panel) return;
 
         this.cerrarOtrosDropdowns(panel);
-        panel.style.display = panel.style.display === "block" ? "none" : "block";
-        this.state.activeDropdown =
-            panel.style.display === "block" ? "notificaciones" : null;
+        const abrir = panel.style.display !== "block";
+        panel.style.display = abrir ? "block" : "none";
+        if (abrir) {
+            panel.classList.remove('is-hidden');
+        } else {
+            panel.classList.add('is-hidden');
+        }
+        this.state.activeDropdown = abrir ? "notificaciones" : null;
+
+        if (abrir) {
+            this.loadNotifications();
+        }
     }
 
     cerrarOtrosDropdowns(excepto) {
@@ -311,6 +357,174 @@ class PanelSuperiorRepresentante {
                 // this.buttons.perfil.classList.toggle('active');
             });
         }
+    }
+
+    /* ================= NOTIFICACIONES ================= */
+
+    async initNotificaciones() {
+        this.loadNotifications();
+        this.connectNotificationStream();
+    }
+
+    async loadNotifications() {
+        const data = await this.fetchNotifications('&limite=10');
+        if (!data) return;
+
+        this.notifications = Array.isArray(data.notificaciones) ? data.notificaciones : [];
+        const noLeidas = Number.isInteger(data.no_leidas) ? data.no_leidas : 0;
+
+        this.renderNotifications(this.notifications);
+        this.updateBadge(noLeidas);
+    }
+
+    async fetchNotifications(params = '') {
+        try {
+            const response = await fetch(`${this.notificationsApiUrl}?accion=listar${params}`);
+            if (!response.ok) return null;
+            return await response.json();
+        } catch (error) {
+            console.error('Error cargando notificaciones del representante:', error);
+            return null;
+        }
+    }
+
+    renderNotifications(items) {
+        if (!this.notificationsContainer) return;
+
+        if (!Array.isArray(items) || items.length === 0) {
+            this.notificationsContainer.innerHTML = `
+                <div class="notification-empty">
+                    <div class="notification-empty-icon"><i class="bi bi-bell-slash"></i></div>
+                    <p>No tienes notificaciones recientes.</p>
+                </div>`;
+            return;
+        }
+
+        this.notificationsContainer.innerHTML = items.map(item => {
+            const isUnread = item.leido == 0 || item.leido === false;
+            const iconClass = item.tipo === 'vacuna' ? 'bi-heart-pulse-fill' :
+                item.tipo === 'cita' ? 'bi-calendar-check-fill' :
+                item.tipo === 'seguimiento' ? 'bi-journal-medical' :
+                item.tipo === 'recordatorio' ? 'bi-bell-fill' :
+                'bi-bell-fill';
+            const statusClass = isUnread ? 'unread' : '';
+            const fecha = item.fecha ? new Date(item.fecha).toLocaleString('es-CO', {
+                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            }) : 'Sin fecha';
+            const detail = item.canal ? item.canal : item.referencia_id ? `Ref: ${item.referencia_id}` : '';
+
+            return `
+                <div class="notification-item ${statusClass}" data-notification-id="${item.id}">
+                    <div class="notification-indicator ${statusClass ? 'success' : 'info'}"></div>
+                    <div class="notification-icon ${statusClass ? 'success' : 'info'}">
+                        <i class="bi ${iconClass}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-header">
+                            <h4>${this.escapeHtml(item.mensaje || 'Nueva notificación')}</h4>
+                            <span class="notification-time">${this.escapeHtml(fecha)}</span>
+                        </div>
+                        <p>${this.escapeHtml(detail)}</p>
+                    </div>
+                    <button class="btn-icon-sm" onclick="eliminarNotificacion(this)" aria-label="Eliminar">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>`;
+        }).join('');
+    }
+
+    updateBadge(count = 0) {
+        if (!this.notificationBadge) return;
+        if (count <= 0) {
+            this.notificationBadge.style.display = 'none';
+            this.notificationBadge.textContent = '';
+            return;
+        }
+        this.notificationBadge.style.display = 'inline-flex';
+        this.notificationBadge.textContent = String(count);
+    }
+
+    async connectNotificationStream() {
+        if (!window.EventSource) {
+            setInterval(() => this.loadNotifications(), 30000);
+            return;
+        }
+
+        const streamUrl = `${this.notificationsApiUrl}?accion=stream`;
+        const source = new EventSource(streamUrl);
+
+        source.addEventListener('notify', event => {
+            try {
+                const data = JSON.parse(event.data);
+                if (Array.isArray(data.notificaciones) && data.notificaciones.length > 0) {
+                    this.notifications = this.notifications.concat(data.notificaciones);
+                    this.renderNotifications(this.notifications);
+                }
+                this.updateBadge(Number.isInteger(data.no_leidas) ? data.no_leidas : 0);
+            } catch (error) {
+                console.error('Error parseando stream de notificaciones representante:', error);
+            }
+        });
+
+        source.onerror = () => {
+            source.close();
+            setTimeout(() => this.connectNotificationStream(), 10000);
+        };
+    }
+
+    async marcarTodasLeidas() {
+        try {
+            const response = await fetch(`${this.notificationsApiUrl}?accion=todas`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+            if (!response.ok) return;
+            const data = await response.json();
+            if (data.status === 'success') {
+                await this.loadNotifications();
+            }
+        } catch (error) {
+            console.error('Error marcando todas las notificaciones leídas:', error);
+        }
+    }
+
+    async eliminarNotificacion(btn) {
+        const item = btn.closest('.notification-item');
+        const id = item?.dataset.notificationId;
+        if (!id) {
+            if (item) item.remove();
+            return;
+        }
+
+        try {
+            const response = await fetch(`${this.notificationsApiUrl}?accion=cancelar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: Number(id) })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.status === 'success') {
+                    item.remove();
+                    this.notifications = this.notifications.filter(n => String(n.id) !== String(id));
+                    const noLeidas = this.notifications.filter(n => !n.leido).length;
+                    this.updateBadge(noLeidas);
+                }
+            }
+        } catch (error) {
+            console.error('Error eliminando notificación representante:', error);
+        }
+    }
+
+    escapeHtml(value) {
+        if (typeof value !== 'string') return '';
+        return value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     /* ================= UTILIDADES ================= */

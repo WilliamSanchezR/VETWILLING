@@ -1,4 +1,3 @@
-
 <?php
 /* ====================================================================
    VISTA DE CITAS DEL CLIENTE
@@ -11,10 +10,16 @@
    - Filtros de fecha corregidos con parseLocalDate() para evitar
      problemas de timezone
    ==================================================================== */
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    if (!headers_sent()) {
+        session_start();
+    }
+}
 
 if (!isset($_SESSION['user']['id_usuario'])) {
-    header('Location: ' . BASE_URL . '/login');
+    if (!headers_sent()) {
+        header('Location: ' . BASE_URL . '/login');
+    }
     exit();
 }
 

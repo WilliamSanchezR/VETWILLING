@@ -227,6 +227,85 @@
         }
     }
 
+    const notificationSoundEnabled = localStorage.getItem('vetwilling_notifications_sound') !== 'false';
+
+    function requestNotificationPermission() {
+        if (!('Notification' in window)) return;
+        if (Notification.permission === 'default') {
+            Notification.requestPermission().catch(() => {});
+        }
+    }
+
+    function showBrowserNotification(title, body) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+        try {
+            new Notification(title || 'Nueva notificación', {
+                body: body || 'Tienes una nueva notificación.',
+                silent: false
+            });
+        } catch (error) {
+            console.error('Error mostrando notificación del navegador:', error);
+        }
+    }
+
+    function playNotificationTone() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 520;
+            gain.gain.value = 0.12;
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
+            oscillator.start();
+            oscillator.stop(ctx.currentTime + 0.08);
+        } catch (error) {
+            console.error('Error reproducir sonido de notificación:', error);
+        }
+    }
+
+    function handleNotificationStreamEvent(event) {
+        try {
+            const data = JSON.parse(event.data);
+            if (Array.isArray(data.notificaciones) && data.notificaciones.length > 0) {
+                const latest = data.notificaciones[data.notificaciones.length - 1];
+                const title = latest.tipo || 'Nueva notificación';
+                const body = latest.mensaje || 'Tienes una nueva notificación.';
+
+                if (document.hidden) {
+                    showBrowserNotification(title, body);
+                    if (notificationSoundEnabled) {
+                        playNotificationTone();
+                    }
+                }
+
+                if (window.Toast && Toast.mostrar) {
+                    Toast.mostrar(body, 'info');
+                }
+            }
+
+            loadNotifications();
+            window.dispatchEvent(new CustomEvent('notificacion:nueva', { detail: data }));
+        } catch (error) {
+            console.error('Error parsing notification stream event:', error);
+        }
+    }
+
+    function connectNotificationStream() {
+        if (!window.EventSource) return;
+        requestNotificationPermission();
+
+        const source = new EventSource(`${API_URL}?accion=stream`);
+        source.addEventListener('notify', handleNotificationStreamEvent);
+        source.onerror = () => {
+            source.close();
+            setTimeout(connectNotificationStream, 10000);
+        };
+    }
+
     async function markRead(id) {
         try {
             const res = await fetch(`${API_URL}?accion=leida`, {
@@ -336,7 +415,8 @@
 
     /* ── Arranque ── */
     loadNotifications();
-    // Polling automático cada 30 segundos
+    connectNotificationStream();
+    // Polling automático cada 30 segundos como respaldo
     setInterval(loadNotifications, 30000);
 
 })();

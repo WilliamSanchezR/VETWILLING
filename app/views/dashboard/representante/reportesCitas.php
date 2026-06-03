@@ -167,7 +167,9 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
                                 </tr>
                             </thead>
                             <tbody id="tbodyDetalle">
-                                <tr><td colspan="7" class="text-center text-muted">Cargando...</td></tr>
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Cargando...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -188,7 +190,9 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
                                 </tr>
                             </thead>
                             <tbody id="tbodyMotivos">
-                                <tr><td colspan="2" class="text-center text-muted">Cargando...</td></tr>
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">Cargando...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -214,7 +218,9 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
         const statPendientes = document.getElementById('statPendientes');
 
         function construirParams() {
-            const params = new URLSearchParams({ periodo: periodoActual });
+            const params = new URLSearchParams({
+                periodo: periodoActual
+            });
             if (periodoActual === 'personalizado') {
                 const fi = document.getElementById('fechaInicio').value;
                 const ff = document.getElementById('fechaFin').value;
@@ -327,6 +333,8 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
         cargarReporte();
     </script>
+
+    <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 </body>
 
 </html>

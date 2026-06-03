@@ -56,15 +56,18 @@ CONTENIDO PRINCIPAL
 ======================================== */
 .contenido-principal {
     margin-left: var(--sidebar-width);
-    min-height: 180vh;
+    /* Ajuste: altura relativa a la ventana, sin forzar 180vh que rompe el layout */
+    min-height: calc(100vh - var(--navbar-height, 70px));
     background-color: var(--color-fondo);
-    transition: margin-left var(--transition-normal);
+    transition: margin-left 0.22s ease;
     position: relative;
-    padding: 50px 20px 20px 20px;
-    top: 40px;
+    /* Reservar espacio para la navbar y mantener el padding lateral */
+    padding: calc(var(--navbar-height, 70px) + 20px) 20px 20px 20px;
 }
 
-#sidebar.collapsed~.contenido-principal {
+/* Manejar ambos selectores (#sidebar y .sidebar) para mayor compatibilidad */
+#sidebar.collapsed ~ .contenido-principal,
+.sidebar.collapsed ~ .contenido-principal {
     margin-left: var(--sidebar-collapsed-width);
 }
 

@@ -13,13 +13,13 @@ class NavbarManager {
         this.elements = {
             navbar: this.$('.navbar-superior'),
             dropdowns: {
-                notificaciones: this.$('#dropdownNotificaciones'),
-                perfil: this.$('#dropdownPerfil')
+                notificaciones: this.$('#dropdownNotificaciones') || this.$('[data-panel="notificaciones"]') || this.$('#notificationsPanel') || this.$('.notifications-list'),
+                perfil: this.$('#dropdownPerfil') || this.$('[data-panel="perfil"]') || this.$('#perfilDropdown')
             },
             buttons: {
-                notificaciones: this.$('[data-dropdown="notificaciones"]'),
-                perfil: this.$('[data-dropdown="perfil"]'),
-                marcarLeidas: this.$('[data-action="marcar-leidas"]')
+                notificaciones: this.$('[data-dropdown="notificaciones"]') || this.$('#btnNotificaciones') || this.$('.btn-notificaciones'),
+                perfil: this.$('[data-dropdown="perfil"]') || this.$('#btnPerfil') || this.$('.btn-profile'),
+                marcarLeidas: this.$('[data-action="marcar-leidas"]') || this.$('#btnMarcarLeidas')
             },
             search: this.$('#inputBusqueda'),
             modals: {
@@ -1128,12 +1128,14 @@ async function cargarNotificaciones() {
         if (data.status !== 'success') return;
 
         // Actualizar badge
-        const noLeidas = data.no_leidas;
-        badge.textContent = noLeidas > 0 ? noLeidas : '';
-        badge.style.display = noLeidas > 0 ? 'flex' : 'none';
+        const noLeidas = Number.isInteger(data.no_leidas) ? data.no_leidas : 0;
+        if (badge) {
+            badge.textContent = noLeidas > 0 ? noLeidas : '';
+            badge.style.display = noLeidas > 0 ? 'flex' : 'none';
+        }
 
         // Renderizar lista
-        if (data.notificaciones.length === 0) {
+        if (!Array.isArray(data.notificaciones) || data.notificaciones.length === 0) {
             lista.innerHTML = `
                 <div class="sin-notificaciones">
                     <i class="bi bi-bell-slash"></i>
@@ -1148,7 +1150,7 @@ async function cargarNotificaciones() {
                     <i class="bi ${iconoTipo(n.tipo)}"></i>
                 </div>
                 <div class="notif-contenido">
-                    <p class="notif-titulo">${n.titulo ?? ''}</p>
+                    <p class="notif-titulo">${n.titulo ?? n.tipo ?? 'Notificación'}</p>
                     <p class="notif-mensaje">${n.mensaje}</p>
                     <span class="notif-fecha">${formatearFecha(n.fecha)}</span>
                 </div>

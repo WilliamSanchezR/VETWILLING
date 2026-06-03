@@ -556,6 +556,12 @@ switch ($request) {
     case '/paciente/api/notificaciones':
         require BASE_PATH . '/app/controllers/NotificacioneController.php';
         break;
+    case '/preferencias-notificacion':
+        require BASE_PATH . '/app/controllers/preferenciasNotificacionController.php';
+        break;
+    case '/representante/api/notificaciones':
+        require BASE_PATH . '/app/controllers/NotificacioneController.php';
+        break;
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
 
