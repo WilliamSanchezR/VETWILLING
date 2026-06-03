@@ -687,9 +687,36 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/representante/gestion-clinica.php';
         break;
 
-    //------------------------------INVENTARIO REPRESENTANTE------------------------------//
+    //------------------------------INVENTARIO REPRESENTANTE (RFS 44-49)------------------------------//
+
+    // Vista: lista de todos los productos del inventario
     case '/representante/inventario':
         require BASE_PATH . '/app/views/dashboard/representante/listaInventario.php';
+        break;
+
+    // Vista: formulario para registrar un nuevo producto
+    case '/representante/registro-producto':
+        require BASE_PATH . '/app/views/dashboard/representante/registroProducto.php';
+        break;
+
+    // Vista: formulario de edición con datos pre-llenados (GET ?id=X)
+    case '/representante/editar-producto':
+        require BASE_PATH . '/app/views/dashboard/representante/editarProducto.php';
+        break;
+
+    // Acción: guardar nuevo producto (POST desde registroProducto.php)
+    case '/representante/guardar-producto':
+        require BASE_PATH . '/app/controllers/inventarioController.php';
+        break;
+
+    // Acción: guardar cambios de edición (POST desde editarProducto.php)
+    case '/representante/actualizar-producto':
+        require BASE_PATH . '/app/controllers/inventarioController.php';
+        break;
+
+    // Acción: eliminar producto (POST desde listaInventario.php)
+    case '/representante/eliminar-producto':
+        require BASE_PATH . '/app/controllers/inventarioController.php';
         break;
 
 
