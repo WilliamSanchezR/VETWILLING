@@ -366,7 +366,7 @@ $id_usuario = $_SESSION['user']['id_usuario'];
         var hoy    = new Date(); hoy.setHours(0, 0, 0, 0);
         var html   = '';
 
-        Object.keys(grupos).sort().forEach(function (fecha) {
+        Object.keys(grupos).sort().reverse().forEach(function (fecha) {
             var lista  = grupos[fecha];
             var parts  = fecha.split('-');
             var fObj   = new Date(+parts[0], +parts[1] - 1, +parts[2]);
