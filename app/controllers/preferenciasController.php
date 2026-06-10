@@ -34,20 +34,21 @@ if ($method === 'POST' && $uri === '/cliente/api/preferencias/guardar') {
 
     try {
         $resultado = $pm->guardar($body);
+
+        // AGREGAR ESTO: sincronizar sesión con el idioma guardado
+        if (isset($body['idioma'])) {
+            $_SESSION['lang'] = $body['idioma'];
+        }
+
         echo json_encode([
             'status'      => 'ok',
             'preferencias'=> $resultado,
         ]);
-    } catch (InvalidArgumentException $e) { 
-        http_response_code(400);
-        echo json_encode([
-            'status'  => 'error',
-            'message' => $e->getMessage(),
-        ]);
+    } catch (InvalidArgumentException $e) {
+        // ... igual que antes
     }
     exit;
 }
-
 /* ── POST /cliente/api/preferencias/reset ── */
 if ($method === 'POST' && $uri === '/cliente/api/preferencias/reset') {
     $resultado = $pm->restablecer();

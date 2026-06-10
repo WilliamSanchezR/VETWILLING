@@ -1,13 +1,18 @@
 /* ========================================================================
    CONFIGURACIÓN - CSS
    Author: VetWilling Dashboard
-   Version: 3.0 - CORREGIDO Y ADAPTADO PARA MÓVIL
-   Correcciones:
-   - .alert, .faq-item, .faq-question, .faq-answer definidos una sola vez
-   - Sistema unificado de FAQ: solo .faq-item.active (no .faq-answer.active)
-   - .tab-content--hidden reemplaza style="display:none" en el HTML
-   - Adaptación móvil completa: formularios, tabs, sesiones
-   - Estilos de sesiones activas integrados
+   Version: 4.0 - CORREGIDO Y MEJORADO
+   Cambios respecto a v3:
+   - [Bug] .tabla-historial → .tabla-sesiones alineado con HTML
+   - [Bug] .lista-sesiones  → .sesiones-lista alineado con HTML
+   - [Bug] .badge-actual    → .sesion-badge / .sesion-badge--actual alineado con HTML
+   - [Bug] FAQ: .faq-item.faq-open → .faq-item.active (alineado con toggleFAQ)
+   - [Mejora] Chevron del FAQ rota con CSS puro (transform), sin JS extra
+   - [Mejora] Dark mode completo: tabla historial, sesiones, formulario contraseña
+   - [Mejora] Radio buttons de notificaciones reemplazados por .notif-opcion visual
+   - [Mejora] Validación: estilos .field-invalid, .field-valid y .field-error
+   - [Mejora] Botones seguridad con width 100% en móvil (consistente con otros tabs)
+   - Paleta de colores sin cambios
 ======================================================================== */
 
 
@@ -187,8 +192,6 @@ body.dark-theme .toast-notification {
 
 /* ========================================================================
    7. TABS DE NAVEGACIÓN
-   — En móvil se hace más compacto y permite scroll horizontal sin
-     scrollbar visible.
 ======================================================================== */
 .tabs-config {
     display: flex;
@@ -196,11 +199,11 @@ body.dark-theme .toast-notification {
     margin-bottom: 28px;
     overflow-x: auto;
     padding-bottom: 4px;
-    scrollbar-width: none;          /* Firefox */
+    scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
 }
 
-.tabs-config::-webkit-scrollbar { display: none; }  /* Chrome/Safari */
+.tabs-config::-webkit-scrollbar { display: none; }
 
 .tab-config {
     display: flex;
@@ -233,13 +236,16 @@ body.dark-theme .toast-notification {
     box-shadow: var(--shadow-lg);
 }
 
+.tab-config:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
 .tab-config i { font-size: var(--font-lg); }
 
 
 /* ========================================================================
    8. CONTENIDO DE TABS
-   — CORRECCIÓN: .tab-content--hidden reemplaza style="display:none"
-     en el HTML para evitar el flash de contenido al cargar la página.
 ======================================================================== */
 .tab-content {
     animation: fadeIn 0.4s ease;
@@ -267,7 +273,6 @@ body.dark-theme .toast-notification {
     transform: translateY(-2px);
 }
 
-/* Header de la tarjeta */
 .config-card-header {
     display: flex;
     align-items: center;
@@ -277,7 +282,6 @@ body.dark-theme .toast-notification {
     border-bottom: 2px solid var(--border-light);
 }
 
-/* Ícono cuadrado verde */
 .config-icon {
     width: 48px;
     height: 48px;
@@ -332,6 +336,10 @@ body.dark-theme .toast-notification {
     border-radius: var(--border-radius);
 }
 
+.config-item--top {
+    align-items: flex-start;
+}
+
 .config-info h4 {
     font-size: var(--font-base);
     font-weight: 600;
@@ -349,8 +357,6 @@ body.dark-theme .toast-notification {
 /* ========================================================================
    11. FORMULARIOS
 ======================================================================== */
-
-/* Grid de dos columnas — colapsa a una en móvil (ver responsive) */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -405,6 +411,37 @@ body.dark-theme .toast-notification {
     min-height: 96px;
 }
 
+/* ---- Validación visual ----
+   MEJORA: estados .field-invalid y .field-valid para feedback inmediato.
+   Se aplican mediante JS en blur/input. Sin depender de :invalid CSS nativo
+   (que se dispara al cargar la página con campos vacíos required).
+*/
+.form-group-config input.field-invalid,
+.form-group-config select.field-invalid,
+.form-group-config textarea.field-invalid {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-group-config input.field-valid,
+.form-group-config select.field-valid,
+.form-group-config textarea.field-valid {
+    border-color: var(--success);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Mensaje de error inline bajo el campo */
+.field-error {
+    display: block;
+    font-size: var(--font-xs);
+    color: var(--error);
+    margin-top: 5px;
+    min-height: 16px;
+    transition: var(--transition-fast);
+}
+
+.field-error:empty { min-height: 0; }
+
 /* Fila de botones del formulario */
 .form-acciones {
     display: flex;
@@ -412,6 +449,8 @@ body.dark-theme .toast-notification {
     flex-wrap: wrap;
     margin-top: 16px;
 }
+
+.mt-md { margin-top: 20px; }
 
 /* Dark mode formularios */
 body.dark-theme .form-group-config input,
@@ -421,6 +460,18 @@ body.dark-theme .config-input,
 body.dark-theme .config-select {
     background: rgba(255, 255, 255, 0.05);
     border-color: #374151;
+    color: #f9fafb;
+}
+
+/* Dark mode — placeholder */
+body.dark-theme .form-group-config input::placeholder,
+body.dark-theme .form-group-config textarea::placeholder {
+    color: #6b7280;
+}
+
+/* Dark mode — select options */
+body.dark-theme .form-group-config select option {
+    background: #1f2937;
     color: #f9fafb;
 }
 
@@ -510,6 +561,15 @@ body.dark-theme .config-select {
     color: white;
 }
 
+/* Focus visible global para todos los botones */
+.btn-config:focus-visible,
+.btn-upload:focus-visible,
+.btn-remove:focus-visible,
+.btn-cerrar-sesion:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
 
 /* ========================================================================
    13. FOTO DE PERFIL
@@ -587,6 +647,10 @@ body.dark-theme .config-select {
 
 .toggle-password:hover { color: var(--primary-color); }
 
+/* Dark mode toggle password */
+body.dark-theme .toggle-password { color: #9ca3af; }
+body.dark-theme .toggle-password:hover { color: var(--primary-color); }
+
 .password-strength { margin-top: 8px; }
 
 .strength-bar {
@@ -635,6 +699,13 @@ body.dark-theme .config-select {
 
 .requirement-item i { font-size: var(--font-sm); }
 
+/* Dark mode requirements */
+body.dark-theme .requirements {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .requirements-title { color: #f9fafb; }
+
 
 /* ========================================================================
    15. TOGGLE SWITCH
@@ -671,9 +742,81 @@ body.dark-theme .config-select {
 
 
 /* ========================================================================
-   16. ALERTS
-   — CORRECCIÓN: definición única — antes estaba duplicada con valores
-     diferentes (border-radius: var(--border-radius) vs 8px hardcodeado).
+   16. NOTIFICACIONES — radio buttons visuales (MEJORA)
+   Reemplaza los radios nativos por un control visual consistente.
+   El input radio real queda oculto; .notif-toggle-visual es el indicador.
+======================================================================== */
+.notif-opcion {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Ocultar el input radio nativo de forma accesible */
+.notif-opcion input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+/* Indicador visual circular */
+.notif-toggle-visual {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border-light);
+    background: var(--bg-light);
+    transition: var(--transition);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.notif-toggle-visual::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    transition: transform 0.2s ease;
+}
+
+/* Seleccionado */
+.notif-opcion input[type="radio"]:checked + .notif-toggle-visual {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+}
+
+.notif-opcion input[type="radio"]:checked + .notif-toggle-visual::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Focus visible */
+.notif-opcion input[type="radio"]:focus-visible + .notif-toggle-visual {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Dark mode */
+body.dark-theme .notif-toggle-visual {
+    border-color: #374151;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .notif-opcion input[type="radio"]:checked + .notif-toggle-visual {
+    background: rgba(10, 147, 44, 0.2);
+    border-color: var(--primary-color);
+}
+
+
+/* ========================================================================
+   17. ALERTS
 ======================================================================== */
 .alert {
     padding: 12px 15px;
@@ -720,10 +863,10 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
 
 
 /* ========================================================================
-   17. FAQ
-   — CORRECCIÓN: definición única con sistema unificado basado en
-     .faq-item.active (no .faq-answer.active).
-     Antes había dos definiciones contradictorias.
+   18. FAQ
+   CORRECCIÓN: Sistema unificado basado en .faq-item.active
+   (antes había discrepancia: CSS usaba .active, JS usaba .faq-open)
+   MEJORA: El chevron rota via CSS puro, sin necesitar JS extra
 ======================================================================== */
 .faq-section { margin-bottom: 20px; }
 
@@ -740,6 +883,7 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
 }
 
 .faq-question {
+    width: 100%;
     padding: 15px;
     cursor: pointer;
     display: flex;
@@ -747,6 +891,9 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     justify-content: space-between;
     font-weight: 600;
     color: var(--text-light);
+    background: none;
+    border: none;
+    text-align: left;
     transition: var(--transition);
     user-select: none;
     gap: 8px;
@@ -756,16 +903,27 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     background: rgba(10, 147, 44, 0.05);
 }
 
+.faq-question:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
+    border-radius: var(--border-radius);
+}
+
 .faq-question span { flex: 1; }
 
 .faq-question i {
     color: var(--primary-color);
     font-size: var(--font-lg);
     flex-shrink: 0;
+    /* MEJORA: transición CSS pura para la rotación del chevron */
     transition: transform 0.3s ease;
 }
 
-/* La respuesta se expande via max-height con .faq-item.active */
+/* Rotar el chevron cuando el item está abierto */
+.faq-item.active .faq-question i {
+    transform: rotate(180deg);
+}
+
 .faq-answer {
     padding: 0 15px;
     max-height: 0;
@@ -781,9 +939,14 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     max-height: 400px;
 }
 
+/* Dark mode FAQ */
+body.dark-theme .faq-item  { background: rgba(255, 255, 255, 0.04); }
+body.dark-theme .faq-question { color: #f9fafb; }
+body.dark-theme .faq-answer   { color: #9ca3af; }
+
 
 /* ========================================================================
-   18. NOTIFICACIÓN DE GUARDADO GLOBAL
+   19. NOTIFICACIÓN DE GUARDADO GLOBAL
 ======================================================================== */
 .save-notification {
     position: fixed;
@@ -816,7 +979,9 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
 
 
 /* ========================================================================
-   19. TABLA DE HISTORIAL
+   20. TABLA DE HISTORIAL / SESIONES
+   CORRECCIÓN: el HTML usa .tabla-sesiones para la tabla de historial,
+   alineado con el CSS (antes el HTML usaba .tabla-historial).
 ======================================================================== */
 .tabla-sesiones {
     width: 100%;
@@ -845,20 +1010,39 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
 .tabla-sesiones tr:last-child td { border-bottom: none; }
 .tabla-sesiones tr:hover td      { background: rgba(10,147,44,.03); }
 
+/* Dark mode tabla */
+body.dark-theme .tabla-sesiones th {
+    background: rgba(255, 255, 255, 0.04);
+    color: #9ca3af;
+    border-bottom-color: #374151;
+}
+
+body.dark-theme .tabla-sesiones td {
+    color: #f9fafb;
+    border-bottom-color: #374151;
+}
+
+body.dark-theme .tabla-sesiones tr:hover td {
+    background: rgba(10, 147, 44, 0.06);
+}
+
 
 /* ========================================================================
-   20. SESIONES ACTIVAS
-   — Lista de dispositivos con sesión iniciada.
-   — .sesion-item--actual: resaltado verde para la sesión actual.
-   — .sesion-badge: chips de "Sesión Actual" y "Nuevo".
+   21. SESIONES ACTIVAS
+   CORRECCIÓN: clases alineadas con el HTML:
+   - .sesiones-lista (antes .lista-sesiones en HTML)
+   - .sesion-badge / .sesion-badge--actual (antes .badge-actual en HTML)
+   - .btn-cerrar-sesion para los botones individuales
 ======================================================================== */
 .sesiones-lista {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-/* Item individual de sesión */
 .sesion-item {
     display: flex;
     align-items: center;
@@ -876,13 +1060,11 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     box-shadow: var(--shadow-sm);
 }
 
-/* Sesión actual: fondo verde muy suave + borde verde */
 .sesion-item--actual {
     background: var(--primary-light);
     border-color: rgba(10, 147, 44, 0.3);
 }
 
-/* Ícono del navegador/dispositivo */
 .sesion-icono {
     width: 44px;
     height: 44px;
@@ -898,7 +1080,6 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     box-shadow: var(--shadow-sm);
 }
 
-/* Columna de info */
 .sesion-info {
     flex: 1;
     min-width: 0;
@@ -913,12 +1094,8 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     flex-wrap: wrap;
     gap: 6px;
     margin-bottom: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-/* Metadatos: ciudad, tiempo, SO */
 .sesion-meta {
     display: flex;
     gap: 14px;
@@ -935,7 +1112,6 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
 
 .sesion-meta i { font-size: 11px; color: var(--primary-color); }
 
-/* Badges de estado */
 .sesion-badge {
     display: inline-flex;
     align-items: center;
@@ -958,7 +1134,6 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     color: #2563eb;
 }
 
-/* Botón cerrar sesión individual */
 .btn-cerrar-sesion {
     display: inline-flex;
     align-items: center;
@@ -989,7 +1164,6 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     transform: none;
 }
 
-/* Footer con botón "cerrar todas" */
 .sesiones-footer {
     padding-top: 8px;
     border-top: 1px solid var(--border-light);
@@ -1002,13 +1176,38 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
 }
 
 /* Dark mode sesiones */
-body.dark-theme .sesion-item           { background: #1f2937; border-color: #374151; }
-body.dark-theme .sesion-item--actual   { background: rgba(10,147,44,.12); border-color: rgba(10,147,44,.3); }
-body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5563; }
+body.dark-theme .sesion-item         { background: #1f2937; border-color: #374151; }
+body.dark-theme .sesion-item--actual { background: rgba(10,147,44,.12); border-color: rgba(10,147,44,.3); }
+body.dark-theme .sesion-icono        { background: #374151; border-color: #4b5563; color: var(--primary-color); }
+body.dark-theme .sesion-titulo       { color: #f9fafb; }
+body.dark-theme .sesion-meta         { color: #9ca3af; }
+body.dark-theme .sesion-badge--nueva { background: rgba(59,130,246,.2); color: #93c5fd; }
+body.dark-theme .btn-cerrar-sesion   { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.4); color: #f87171; }
+body.dark-theme .btn-cerrar-sesion:hover { background: var(--error); color: white; border-color: var(--error); }
+body.dark-theme .sesiones-footer     { border-top-color: #374151; }
+
+/* ---- Estado vacío y carga ---- */
+.empty-state,
+.loading-state {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--text-secondary-light);
+    font-size: var(--font-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.empty-state i,
+.loading-state i {
+    font-size: var(--font-2xl);
+    opacity: 0.4;
+}
 
 
 /* ========================================================================
-   21. ANIMACIONES
+   22. ANIMACIONES
 ======================================================================== */
 @keyframes fadeIn      { from { opacity: 0; }                    to { opacity: 1; } }
 @keyframes fadeInDown  { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -1017,7 +1216,7 @@ body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5
 
 
 /* ========================================================================
-   22. RESPONSIVE — Tablets (hasta 1024px)
+   23. RESPONSIVE — Tablets (hasta 1024px)
 ======================================================================== */
 @media (max-width: 1024px) {
     .container-dashboard {
@@ -1027,23 +1226,15 @@ body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5
 
 
 /* ========================================================================
-   23. RESPONSIVE — Móvil (hasta 768px)
-   — Formularios de dos columnas colapsan a una.
-   — Tabs más compactos.
-   — Foto de perfil en columna.
-   — Sesiones en columna con botón cerrar abajo.
+   24. RESPONSIVE — Móvil (hasta 768px)
 ======================================================================== */
 @media (max-width: 768px) {
 
-    .container-dashboard {
-        padding: 16px 12px;
-    }
+    .container-dashboard { padding: 16px 12px; }
 
-    /* Header más compacto */
     .header-config h1 { font-size: 24px; }
     .header-config    { margin-bottom: 24px; }
 
-    /* Tabs: padding reducido para que quepan más en pantalla */
     .tab-config {
         padding: 9px 14px;
         font-size: var(--font-xs);
@@ -1052,22 +1243,16 @@ body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5
 
     .tab-config i { font-size: var(--font-base); }
 
-    /* Ocultar texto de los tabs en pantallas muy pequeñas
-       y dejar solo el ícono (ver 480px) */
-
-    /* Cards con menos padding */
     .config-card {
         padding: 18px 16px;
         margin-bottom: 16px;
     }
 
-    /* Formularios: de 2 columnas a 1 columna */
     .form-row {
         grid-template-columns: 1fr;
         gap: 0;
     }
 
-    /* Botones en columna */
     .form-acciones {
         flex-direction: column;
     }
@@ -1077,7 +1262,13 @@ body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5
         justify-content: center;
     }
 
-    /* Foto de perfil en columna */
+    /* Botones del form de contraseña también 100% en móvil
+       CORRECCIÓN: faltaba este bloque en v3 */
+    #formCambioPassword .form-acciones .btn-config {
+        width: 100%;
+        justify-content: center;
+    }
+
     .foto-perfil-container {
         flex-direction: column;
         align-items: flex-start;
@@ -1095,19 +1286,13 @@ body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5
         justify-content: center;
     }
 
-    /* Sesiones: apilar en columna, botón cerrar debajo */
     .sesion-item {
         flex-wrap: wrap;
         gap: 10px;
     }
 
-    .sesion-titulo {
-        font-size: var(--font-xs);
-    }
-
-    .sesion-meta {
-        gap: 8px;
-    }
+    .sesion-titulo { font-size: var(--font-xs); }
+    .sesion-meta   { gap: 8px; }
 
     .btn-cerrar-sesion {
         width: 100%;
@@ -1115,7 +1300,6 @@ body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5
         margin-top: 4px;
     }
 
-    /* Notificación de guardado */
     .save-notification {
         bottom: 16px;
         right: 12px;
@@ -1123,7 +1307,6 @@ body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5
         justify-content: center;
     }
 
-    /* Toast en móvil: ancho completo */
     .toast-container {
         top: 12px;
         right: 10px;
@@ -1138,14 +1321,12 @@ body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5
 
 
 /* ========================================================================
-   24. RESPONSIVE — Móviles pequeños (hasta 480px)
-   — Solo ícono en los tabs para ahorrar espacio.
+   25. RESPONSIVE — Móviles pequeños (hasta 480px)
 ======================================================================== */
 @media (max-width: 480px) {
 
     .header-config h1 { font-size: 20px; }
 
-    /* Solo ícono en los tabs */
     .tab-config span { display: none; }
     .tab-config      { padding: 10px 14px; }
 
@@ -1164,21 +1345,21 @@ body.dark-theme .sesion-icono          { background: #374151; border-color: #4b5
 
 
 /* ========================================================================
-   25. ACCESIBILIDAD — Movimiento reducido
+   26. ACCESIBILIDAD — Movimiento reducido
 ======================================================================== */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
-        animation-duration:       0.01ms !important;
-        animation-iteration-count: 1     !important;
-        transition-duration:      0.01ms !important;
+        animation-duration:        0.01ms !important;
+        animation-iteration-count: 1      !important;
+        transition-duration:       0.01ms !important;
     }
 }
 
 
 /* ========================================================================
-   26. IMPRESIÓN
+   27. IMPRESIÓN
 ======================================================================== */
 @media print {
     .tabs-config,
