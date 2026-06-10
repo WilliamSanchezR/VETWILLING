@@ -2,33 +2,34 @@
 
 /**
  * SessionManager.php – VetWilling Dashboard
- * Version: 3.0 - CORREGIDO
+ * Version: 3.1 - CORREGIDO + MEJORADO
  *
- * Correcciones aplicadas:
+ * Correcciones v3.1 sobre v3.0:
  *
- * 1. DUPLICADOS: leer() y escribir() ahora usan el mismo formato
- *    (objeto JSON indexado por token). Antes escribir() guardaba un
- *    array numérico y leer() re-indexaba, lo que podía perder entradas
- *    con token vacío y forzar creación de duplicados en el siguiente request.
+ * 1. COMPATIBILIDAD PHP < 8.1: array_is_list() no existe antes de PHP 8.1.
+ *    Se reemplazó por un polyfill inline compatible desde PHP 7.4+.
  *
- * 2. RACE CONDITION: escribir() ahora usa read-lock antes de leer y
- *    write-lock antes de escribir dentro del mismo descriptor de archivo,
- *    eliminando la ventana entre fopen() y flock() que permitía que dos
- *    requests simultáneos escribieran datos obsoletos encima del otro.
+ * 2. session_start() seguro: se verifica que no haya output previo antes
+ *    de iniciar sesión para evitar "headers already sent" warnings.
  *
- * 3. esDispositivoNuevo(): se llama ANTES de insertar la nueva entrada
- *    en $sesiones para no encontrar falsos positivos.
+ * 3. limpiarExpiradas(): protege la sesión actual para que nunca sea
+ *    eliminada aunque last_seen sea 0 por algún bug de escritura.
  *
- * 4. cerrar(): ahora devuelve un código de error descriptivo en lugar de
- *    bool para que el controlador pueda responder correctamente al frontend.
+ * 4. Detección de CriOS (Chrome en iOS) y FxiOS (Firefox en iOS) añadida
+ *    al detector de navegadores.
  *
- * 5. geolocalizarIp(): caché de 24h restaurada para no bloquear el login
- *    con peticiones HTTP síncronas a ip-api.com en cada request.
+ * 5. geo_cache protegido con .htaccess igual que el directorio padre.
  *
- * 6. JSON corrupto: leer() hace backup del archivo corrupto antes de
- *    devolver [] para no perder datos silenciosamente.
+ * 6. geolocalizarIp() usa HTTPS en lugar de HTTP para ip-api.com.
  *
- * 7. Detección completa de navegador, SO y marca restaurada desde v1.
+ * ── Correcciones v3.0 (mantenidas) ──────────────────────────────────────
+ * - Formato JSON indexado por token (sin re-indexación).
+ * - Race condition eliminada con flock LOCK_EX antes de truncar.
+ * - esDispositivoNuevo() llamado antes de insertar la nueva entrada.
+ * - cerrar() devuelve string descriptivo en lugar de bool.
+ * - Caché de geolocalización de 24h restaurada.
+ * - Backup de JSON corrupto antes de devolver [].
+ * - Detección completa de navegador, SO y marca.
  *
  * Uso:
  *   $sm = new SessionManager($id_usuario);
@@ -82,7 +83,6 @@ class SessionManager
      */
     public function registrar(): void
     {
-        /* Lee con lock compartido para evitar leer datos a medio escribir */
         $sesiones = $this->leerConLock();
         $info     = $this->detectar();
         $token    = $this->token_actual;
@@ -113,7 +113,6 @@ class SessionManager
                 $entrada['is_current'] = true;
                 $entrada['es_nueva']   = false;
 
-                /* Elimina la entrada vieja y crea con el nuevo token */
                 unset($sesiones[$t]);
                 $sesiones[$token] = $entrada;
 
@@ -173,10 +172,6 @@ class SessionManager
      *   'not_found'      → token no existe
      *   'is_current'     → no se puede cerrar la sesión activa desde aquí
      *   'write_error'    → error al escribir el archivo
-     *
-     * CORRECCIÓN: antes devolvía bool, lo que impedía al controlador
-     * distinguir entre "no encontrada" y "es la sesión actual",
-     * generando respuestas incorrectas al frontend (error de conexión).
      */
     public function cerrar(string $token): string
     {
@@ -239,8 +234,6 @@ class SessionManager
             $this->escribirConLock($sesiones);
         }
 
-        /* Eliminar token de la sesión PHP para que el próximo login
-           genere uno nuevo y no reutilice el token cerrado */
         unset($_SESSION['sm_token_' . $this->id_usuario]);
     }
 
@@ -263,7 +256,6 @@ class SessionManager
 
     /**
      * Información de detección del dispositivo actual.
-     * Público para que el controlador pueda usarlo si lo necesita.
      */
     public function detectar(): array
     {
@@ -289,14 +281,12 @@ class SessionManager
     /**
      * Lee el JSON con lock compartido (LOCK_SH).
      *
-     * CORRECCIÓN del formato: el JSON se guarda como objeto indexado
-     * por token {"abc123":{...}, "def456":{...}} en lugar de array
-     * numérico [{...},{...}]. Esto elimina el paso de re-indexación
-     * que podía perder entradas con token vacío y causar duplicados.
+     * CORRECCIÓN v3.1: reemplaza array_is_list() (PHP >= 8.1) por un
+     * polyfill compatible con PHP 7.4+. array_is_list() devuelve true
+     * cuando el array tiene claves numéricas consecutivas desde 0,
+     * equivalente a comprobar que las claves son [0, 1, 2, ...].
      *
-     * CORRECCIÓN de JSON corrupto: si el archivo existe pero no se
-     * puede decodificar, hace un backup antes de devolver [] para no
-     * perder datos silenciosamente.
+     * CORRECCIÓN v3.0: JSON corrupto genera backup antes de devolver [].
      */
     private function leerConLock(): array
     {
@@ -322,9 +312,22 @@ class SessionManager
             return [];
         }
 
+        /*
+         * Polyfill de array_is_list() para PHP < 8.1.
+         *
+         * array_is_list() devuelve true si el array está vacío o si
+         * sus claves son exactamente [0, 1, 2, ..., n-1].
+         * Un array indexado por tokens (strings) devuelve false → no necesita migración.
+         * Un array numérico (formato viejo) devuelve true → hay que re-indexar.
+         */
+        $esListaNumerica = (function (array $arr): bool {
+            if (empty($arr)) return true;
+            return array_keys($arr) === range(0, count($arr) - 1);
+        })($datos);
+
         /* Compatibilidad: si el archivo era un array numérico (formato viejo),
            convertirlo al nuevo formato indexado por token */
-        if (array_is_list($datos)) {
+        if ($esListaNumerica) {
             $indexado = [];
             foreach ($datos as $item) {
                 if (!empty($item['token'])) {
@@ -340,12 +343,8 @@ class SessionManager
     /**
      * Escribe el JSON con lock exclusivo (LOCK_EX).
      *
-     * CORRECCIÓN de race condition: abre con 'c' (no trunca al abrir),
-     * obtiene el lock ANTES de truncar y escribir. Esto evita la ventana
-     * entre fopen() y flock() donde dos requests simultáneos podían
-     * sobrescribirse mutuamente con datos obsoletos.
-     *
-     * Formato: objeto JSON indexado por token (no array numérico).
+     * Abre con 'c' (no trunca al abrir), obtiene el lock ANTES de
+     * truncar y escribir para evitar race conditions.
      *
      * @return bool true si se escribió correctamente
      */
@@ -357,15 +356,11 @@ class SessionManager
             return false;
         }
 
-        /* Lock exclusivo ANTES de truncar — elimina la race condition */
         flock($fh, LOCK_EX);
 
         ftruncate($fh, 0);
         rewind($fh);
 
-        /* Guardar como objeto JSON indexado por token, no como array numérico.
-           Esto hace que leerConLock() no necesite re-indexar y elimina
-           la posibilidad de perder entradas con token vacío. */
         $json = json_encode(
             $sesiones,
             JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
@@ -385,12 +380,18 @@ class SessionManager
 
     /**
      * Obtiene o genera el token de sesión para este usuario.
-     * El token se guarda en $_SESSION con una clave por usuario para
-     * que funcione correctamente en aplicaciones multiusuario.
+     *
+     * CORRECCIÓN v3.1: session_start() ahora verifica headers_sent()
+     * antes de ejecutarse para evitar el warning "headers already sent"
+     * cuando la sesión se inicia después de output (ej: vistas con HTML).
      */
     private function obtenerTokenActual(): string
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            if (!headers_sent()) {
+                session_start();
+            }
+        }
 
         $key = 'sm_token_' . $this->id_usuario;
 
@@ -407,8 +408,6 @@ class SessionManager
 
     /**
      * Marca solo el token indicado como is_current = true.
-     * Todos los demás quedan como false.
-     * Extraído como método para evitar copiar-pegar en los 3 casos de registrar().
      */
     private function marcarSoloEstaComoActual(array &$sesiones, string $token): void
     {
@@ -420,13 +419,17 @@ class SessionManager
 
     /**
      * Elimina del array las sesiones expiradas según su estado.
-     * — Activas:   se limpian tras EXPIRACION_ACTIVA días sin actividad.
-     * — Inactivas: se limpian tras EXPIRACION_INACTIVA días (historial).
+     *
+     * CORRECCIÓN v3.1: nunca elimina la sesión actual (token_actual),
+     * aunque su last_seen sea 0, para evitar auto-logout por bug.
      */
     private function limpiarExpiradas(array &$sesiones, int $ahora): void
     {
         foreach (array_keys($sesiones) as $t) {
-            $s       = $sesiones[$t];
+            /* Nunca eliminar la sesión que está siendo registrada ahora */
+            if ($t === $this->token_actual) continue;
+
+            $s        = $sesiones[$t];
             $inactiva = !($s['activa'] ?? true);
             $limite   = $inactiva
                 ? 86400 * self::EXPIRACION_INACTIVA
@@ -440,9 +443,7 @@ class SessionManager
 
     /**
      * Devuelve true si ninguna sesión existente tiene el mismo fingerprint.
-     *
-     * CORRECCIÓN: se llama ANTES de insertar la nueva entrada en $sesiones
-     * para no encontrar el dispositivo que acaba de crearse.
+     * Se llama ANTES de insertar la nueva entrada.
      */
     private function esDispositivoNuevo(string $fp, array $sesiones): bool
     {
@@ -453,8 +454,7 @@ class SessionManager
     }
 
     /**
-     * Crea el directorio de sesiones y lo protege con .htaccess
-     * para prevenir listado web si queda dentro del webroot por error.
+     * Crea el directorio de sesiones y lo protege con .htaccess.
      */
     private function inicializarDirectorio(): void
     {
@@ -470,24 +470,18 @@ class SessionManager
 
     /**
      * Obtiene la IP real del cliente respetando proxies confiables.
-     * Orden: IP directa primero para evitar spoofing de headers.
      */
     private function obtenerIp(): string
     {
-        /* REMOTE_ADDR primero — no puede ser falsificado por el cliente */
-        $directa = $_SERVER['REMOTE_ADDR'] ?? '';
-
-        /* Si viene de Cloudflare, el header CF es confiable */
         if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
             return trim($_SERVER['HTTP_CF_CONNECTING_IP']);
         }
 
-        /* Proxy estándar */
         if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             return trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]);
         }
 
-        return $directa ?: '0.0.0.0';
+        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     /* ================================================================
@@ -497,9 +491,9 @@ class SessionManager
     /**
      * Geolocalización con caché de 24h.
      *
-     * CORRECCIÓN: la versión anterior eliminó la caché, lo que hacía
-     * una petición HTTP síncrona a ip-api.com en cada login y podía
-     * bloquear el proceso durante el timeout de 2 segundos.
+     * CORRECCIÓN v3.1:
+     * - Usa HTTPS en lugar de HTTP para ip-api.com.
+     * - El directorio geo_cache recibe su propio .htaccess de protección.
      */
     private function geolocalizarIp(string $ip): string
     {
@@ -507,24 +501,24 @@ class SessionManager
             return 'Local / Desarrollo';
         }
 
-        /* Caché por IP para no hacer una petición externa en cada login */
         $cacheDir  = $this->directorio . '/geo_cache';
         $cacheFile = $cacheDir . '/' . md5($ip) . '.json';
 
         if (!is_dir($cacheDir)) {
             mkdir($cacheDir, 0750, true);
+            /* CORRECCIÓN v3.1: proteger geo_cache igual que el directorio padre */
+            file_put_contents($cacheDir . '/.htaccess', "Require all denied\n");
         }
 
-        /* Caché válida durante 24 horas */
         if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 86400) {
             $cached = json_decode(@file_get_contents($cacheFile), true);
             return $cached['ciudad'] ?? 'Desconocida';
         }
 
-        /* Petición a ip-api.com con timeout de 2 segundos */
+        /* CORRECCIÓN v3.1: HTTPS en lugar de HTTP */
         $ctx = stream_context_create(['http' => ['timeout' => 2]]);
         $raw = @file_get_contents(
-            "http://ip-api.com/json/{$ip}?fields=status,city,country",
+            "https://ip-api.com/json/{$ip}?fields=status,city,country",
             false,
             $ctx
         );
@@ -543,14 +537,18 @@ class SessionManager
 
     /**
      * Detecta navegador y versión principal desde el User-Agent.
-     * Orden importante: Edge y Opera deben ir ANTES de Chrome porque
-     * sus UA también contienen "Chrome".
+     *
+     * CORRECCIÓN v3.1: añadidos CriOS (Chrome en iOS) y FxiOS (Firefox en iOS).
+     * Deben ir ANTES de Chrome y Firefox respectivamente porque sus UA
+     * también contienen "Safari" al final.
      */
     private function detectarNavegador(string $ua): array
     {
         $navegadores = [
             'Edg'            => ['nombre' => 'Edge',             'icono' => 'bi-browser-edge'],
             'OPR'            => ['nombre' => 'Opera',            'icono' => 'bi-browser-opera'],
+            'CriOS'          => ['nombre' => 'Chrome iOS',       'icono' => 'bi-browser-chrome'],
+            'FxiOS'          => ['nombre' => 'Firefox iOS',      'icono' => 'bi-browser-firefox'],
             'Firefox'        => ['nombre' => 'Firefox',          'icono' => 'bi-browser-firefox'],
             'SamsungBrowser' => ['nombre' => 'Samsung Internet', 'icono' => 'bi-phone'],
             'Chrome'         => ['nombre' => 'Chrome',           'icono' => 'bi-browser-chrome'],
@@ -590,13 +588,11 @@ class SessionManager
 
         foreach ($sistemas as $clave => $data) {
             if (stripos($ua, $clave) !== false) {
-                /* Android: extraer versión */
                 if ($clave === 'Android') {
                     preg_match('/Android\s([\d.]+)/i', $ua, $m);
                     $ver = isset($m[1]) ? ' ' . $m[1] : '';
                     return ['nombre' => 'Android' . $ver, 'icono' => $data['icono']];
                 }
-                /* iOS / iPadOS: extraer versión */
                 if (in_array($clave, ['iPhone', 'iPad'], true)) {
                     preg_match('/OS\s([\d_]+)/i', $ua, $m);
                     $ver = isset($m[1]) ? ' ' . str_replace('_', '.', $m[1]) : '';
@@ -628,15 +624,12 @@ class SessionManager
      */
     private function detectarMarca(string $ua): array
     {
-        /* Samsung: modelo específico (ej: SM-A546B) */
         if (preg_match('/SM-[A-Z0-9]+/i', $ua, $m)) {
             return ['nombre' => 'Samsung ' . strtoupper($m[0]), 'icono' => 'bi-phone-fill'];
         }
-        /* Xiaomi: Redmi o Mi */
         if (preg_match('/Redmi\s[\w\s]+|Mi\s\d+/i', $ua, $m)) {
             return ['nombre' => 'Xiaomi ' . trim($m[0]), 'icono' => 'bi-phone-fill'];
         }
-        /* Motorola */
         if (preg_match('/moto\s[\w\s]+/i', $ua, $m)) {
             return ['nombre' => ucfirst(trim($m[0])), 'icono' => 'bi-phone-fill'];
         }

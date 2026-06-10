@@ -754,11 +754,11 @@ $mascotas = listarMascotas();
             });
 
             // ═══════════════════════════════════════════════════════════
-            //  ENVÍO DEL FORMULARIO - ✅ CORREGIDO
+            //  ENVÍO DEL FORMULARIO - ✅ CORREGIDO Y VALIDACIÓN DE FECHA
             // ═══════════════════════════════════════════════════════════
-            
+
             const form = document.getElementById('formAgendarCita');
-            
+
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
@@ -776,6 +776,20 @@ $mascotas = listarMascotas();
 
                 // Recopilar datos del formulario
                 const formData = new FormData(form);
+
+                // Validación de fecha pasada
+                const fechaInicio = new Date(formData.get('fecha_hora'));
+                const ahora = new Date();
+                if (fechaInicio < ahora) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha inválida',
+                        text: 'No puedes agendar una cita en el pasado.',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return;
+                }
+
                 const data = {
                     accion: 'crear', // ✅ AGREGADO
                     id_paciente: parseInt(formData.get('id_paciente')),
@@ -832,7 +846,12 @@ $mascotas = listarMascotas();
                             }
                         });
                     } else {
-                        throw new Error(result.message || 'Error al agendar cita');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: result.message || 'No se pudo agendar la cita. Por favor intenta nuevamente.',
+                            confirmButtonText: 'Entendido'
+                        });
                     }
                 } catch (error) {
                     console.error('Error:', error);

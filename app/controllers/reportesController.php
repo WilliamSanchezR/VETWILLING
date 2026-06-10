@@ -102,7 +102,10 @@ function construirPayloadReportes($idUsuario)
         'financiero' => $reportesModel->obtenerResumenFinancieroMensual($idUsuario, $anio, $filtros),
         'asignaciones_activas' => $reportesModel->obtenerPacientesAsignadosActivos($idUsuario),
         'historial_asignaciones' => $reportesModel->obtenerHistorialAsignacionesPeriodo($idUsuario, $inicio, $fin),
-        'detalle_citas' => $reportesModel->obtenerDetalleCitas($idUsuario, $inicio, $fin, $filtros)
+        'detalle_citas' => $reportesModel->obtenerDetalleCitas($idUsuario, $inicio, $fin, $filtros),
+        // RFS 14 subtarea 3: inventario de la veterinaria del profesional
+        'inventario' => $reportesModel->obtenerResumenInventario($idUsuario),
+        'productos_vencer' => $reportesModel->obtenerProductosProximosVencer($idUsuario, 60),
     ];
 }
 

@@ -115,8 +115,145 @@
     /* ══════════════════════════════════════════════════════════════
        NOTIFICACIONES
     ══════════════════════════════════════════════════════════════ */
-    const btnNotif   = $('btnNotificaciones');
-    const panelNotif = $('notificationsPanel');
+    const btnNotif              = $('btnNotificaciones');
+    const panelNotif            = $('notificationsPanel');
+    const dropdownList          = $('notificationsDropdownList');
+    const dropdownEmpty         = $('notificationsDropdownEmpty');
+    const btnMarcarLeidas       = $('btnMarcarLeidas');
+    const notificationBadge     = $('notificationBadge');
+    const notificationsApiUrl   = `${BASE_URL}/veterinario/api/notificaciones`;
+
+    const notificationTypes = {
+        cita: {
+            icon: 'bi-calendar-check-fill',
+            clase: 'success',
+            label: 'Cita'
+        },
+        vacuna: {
+            icon: 'bi-heart-pulse-fill',
+            clase: 'warning',
+            label: 'Vacuna'
+        },
+        seguimiento: {
+            icon: 'bi-journal-medical',
+            clase: 'info',
+            label: 'Seguimiento'
+        },
+        recordatorio: {
+            icon: 'bi-bell-fill',
+            clase: 'info',
+            label: 'Recordatorio'
+        },
+        default: {
+            icon: 'bi-bell-fill',
+            clase: 'info',
+            label: 'Notificación'
+        }
+    };
+
+    async function fetchNotifications(params = '') {
+        try {
+            const response = await fetch(`${notificationsApiUrl}?accion=listar${params}`);
+            if (!response.ok) {
+                throw new Error('No se pudo obtener notificaciones');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+
+    function buildNotificationHtml(item) {
+        const meta = notificationTypes[item.tipo] || notificationTypes.default;
+        const fecha = item.fecha ? new Date(item.fecha).toLocaleString('es-CO', {
+            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : 'Sin fecha';
+        const estadoClase = item.leido ? '' : 'unread';
+
+        return `
+            <article class="notification-item ${estadoClase}" data-notification-id="${item.id}">
+                <div class="notification-indicator ${meta.clase}"></div>
+                <div class="notification-icon ${meta.clase}">
+                    <i class="bi ${meta.icon}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-header">
+                        <h4>${escapeHtml(item.mensaje || meta.label)}</h4>
+                        <span class="notification-time">${fecha}</span>
+                    </div>
+                    <p>${escapeHtml(item.referencia_id ? `ID referencia: ${item.referencia_id}` : item.canal || '')}</p>
+                </div>
+            </article>
+        `;
+    }
+
+    function escapeHtml(value) {
+        if (typeof value !== 'string') return '';
+        return value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function renderNotifications(items) {
+        if (!dropdownList) return;
+
+        if (!Array.isArray(items) || items.length === 0) {
+            dropdownList.innerHTML = '';
+            dropdownEmpty?.classList.remove('is-hidden');
+            return;
+        }
+
+        dropdownEmpty?.classList.add('is-hidden');
+        dropdownList.innerHTML = items.map(buildNotificationHtml).join('');
+    }
+
+    function actualizarBadgeNotif(count = 0, unreadCount = 0) {
+        if (!notificationBadge) return;
+
+        if (count === 0) {
+            ocultar(notificationBadge);
+            return;
+        }
+
+        mostrar(notificationBadge);
+        notificationBadge.textContent = unreadCount > 0 ? String(unreadCount) : String(count);
+    }
+
+    async function cargarNotificacionesDropdown() {
+        const data = await fetchNotifications('&limite=8');
+        if (!data) {
+            renderNotifications([]);
+            actualizarBadgeNotif(0, 0);
+            return;
+        }
+
+        const notificaciones = data.notificaciones || [];
+        const noLeidas = Number.isInteger(data.no_leidas) ? data.no_leidas : 0;
+
+        renderNotifications(notificaciones);
+        actualizarBadgeNotif(noLeidas, noLeidas);
+    }
+
+    async function marcarTodasNotificacionesLeidas() {
+        try {
+            const response = await fetch(`${notificationsApiUrl}?accion=todas`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                await cargarNotificacionesDropdown();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     if (btnNotif && panelNotif) {
         btnNotif.setAttribute('aria-controls', 'notificationsPanel');
@@ -124,37 +261,18 @@
         btnNotif.addEventListener('click', e => {
             e.stopPropagation();
             toggleDropdown(panelNotif, btnNotif);
+            if (!panelNotif.classList.contains('is-hidden')) {
+                cargarNotificacionesDropdown();
+            }
         });
     }
 
-    /* Eliminar notificación individual */
-    $$('.btn-eliminar-notif').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            this.closest('.notification-item')?.remove();
-            actualizarBadgeNotif();
-        });
+    btnMarcarLeidas?.addEventListener('click', async () => {
+        await marcarTodasNotificacionesLeidas();
     });
 
-    /* Marcar todas como leídas */
-    $('btnMarcarLeidas')?.addEventListener('click', () => {
-        $$('.notification-item.unread').forEach(i => i.classList.remove('unread'));
-        actualizarBadgeNotif();
-    });
-
-    function actualizarBadgeNotif() {
-        const badge  = $('notificationBadge');
-        const unread = $$('.notification-item.unread').length;
-        const total  = $$('.notification-item').length;
-        if (!badge) return;
-
-        if (total === 0) {
-            ocultar(badge);
-        } else {
-            mostrar(badge);
-            badge.textContent = unread > 0 ? String(unread) : String(total);
-        }
-    }
+    cargarNotificacionesDropdown();
+    setInterval(cargarNotificacionesDropdown, 30000);
 
     /* ══════════════════════════════════════════════════════════════
        PERFIL

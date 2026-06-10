@@ -298,9 +298,9 @@ class CitasCliente
         }
     }
 
-    /**
-     * Valida si una cita puede ser cancelada
-     */
+    /** Horas mínimas de anticipación requeridas para cancelar una cita */
+    const HORAS_LIMITE_CANCELACION = 2;
+
     public function validarEstadoCita($id_agendamiento)
     {
         try {
@@ -323,10 +323,32 @@ class CitasCliente
                 ];
             }
 
-            if (strtotime($cita['fecha_hora']) <= time()) {
+            // Subtarea 2: no permitir cancelar si ya está Finalizada o Cancelada
+            if (in_array($cita['estado'], ['Finalizada', 'Cancelada'])) {
+                return [
+                    'valido' => false,
+                    'mensaje' => "No se puede cancelar una cita con estado '{$cita['estado']}'",
+                    'estado_actual' => $cita['estado']
+                ];
+            }
+
+            $timestamp_cita = strtotime($cita['fecha_hora']);
+
+            // Subtarea 3: no permitir cancelar si la cita ya pasó o está en curso
+            if ($timestamp_cita <= time()) {
                 return [
                     'valido' => false,
                     'mensaje' => 'No se puede cancelar una cita ya iniciada o pasada',
+                    'estado_actual' => $cita['estado']
+                ];
+            }
+
+            // Subtarea 3: validar ventana de tiempo mínima de anticipación
+            $horas_restantes = ($timestamp_cita - time()) / 3600;
+            if ($horas_restantes < self::HORAS_LIMITE_CANCELACION) {
+                return [
+                    'valido' => false,
+                    'mensaje' => 'Solo puedes cancelar con al menos ' . self::HORAS_LIMITE_CANCELACION . ' horas de anticipación',
                     'estado_actual' => $cita['estado']
                 ];
             }
@@ -410,6 +432,34 @@ class CitasCliente
                 'exito' => false,
                 'mensaje' => 'Error del sistema'
             ];
+        }
+    }
+
+    /**
+     * Subtarea 5: Confirma que el slot del veterinario quedó liberado.
+     * La disponibilidad se libera implícitamente al marcar la cita como 'Cancelada',
+     * ya que verificarDisponibilidad() excluye citas en ese estado.
+     * Este método verifica que el estado fue registrado correctamente.
+     *
+     * @param int $id_agendamiento
+     * @return bool
+     */
+    public function confirmarSlotLiberado($id_agendamiento)
+    {
+        try {
+            $sql = "SELECT estado FROM agendamiento
+                    WHERE id_agendamiento = :id_agendamiento
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $fila && $fila['estado'] === 'Cancelada';
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::confirmarSlotLiberado -> " . $e->getMessage());
+            return false;
         }
     }
 
@@ -687,6 +737,153 @@ class CitasCliente
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("❌ Error en CitasCliente::obtenerMascotasPropietario -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  RFS 27 – CONSULTA DE INFORMACIÓN DEL ANIMAL (PACIENTE)
+    // ═══════════════════════════════════════════════════════════════
+
+    /**
+     * Subtarea 2/6: Obtiene información completa del paciente validando
+     * que pertenece al propietario autenticado.
+     */
+    public function obtenerInfoPacienteConPropiedad(int $id_propietario, int $id_paciente): ?array
+    {
+        try {
+            $sql = "SELECT
+                        p.id_paciente,
+                        p.id_propietario,
+                        p.nombre,
+                        p.especie,
+                        p.raza,
+                        p.edad_numero,
+                        p.edad_unidad,
+                        p.sexo,
+                        p.img_mascota,
+                        p.estado,
+                        p.peso,
+                        p.estado_salud,
+                        p.fecha_ultima_desparasitacion
+                    FROM paciente p
+                    WHERE p.id_paciente = :id_paciente
+                      AND p.id_propietario = :id_propietario
+                      AND p.estado = 'Activo'
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindValue(':id_propietario', $id_propietario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $row ?: null;
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::obtenerInfoPacienteConPropiedad -> " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Subtarea 3: Obtiene vacunas del paciente (propietario solo lectura).
+     */
+    public function obtenerVacunasPorPaciente(int $id_propietario, int $id_paciente): array
+    {
+        try {
+            $sql = "SELECT
+                        pv.id_vacuna,
+                        pv.tipo_vacuna,
+                        pv.dosis,
+                        pv.fecha_aplicacion,
+                        pv.observaciones,
+                        COALESCE(CONCAT(pr.nombres, ' ', pr.apellidos), 'No especificado') AS profesional_nombre
+                    FROM paciente_vacuna pv
+                    INNER JOIN paciente pac ON pv.id_paciente = pac.id_paciente
+                    LEFT JOIN profesional pr ON pv.id_usuario_profesional = pr.id_usuario
+                    WHERE pv.id_paciente = :id_paciente
+                      AND pac.id_propietario = :id_propietario
+                    ORDER BY pv.fecha_aplicacion DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindValue(':id_propietario', $id_propietario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // La tabla puede no existir todavía; retornar vacío sin error crítico
+            error_log("❌ Error en CitasCliente::obtenerVacunasPorPaciente -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Subtarea 5: Obtiene historial clínico del paciente (propietario solo lectura).
+     */
+    public function obtenerHistorialClinicoPorPaciente(int $id_propietario, int $id_paciente): array
+    {
+        try {
+            $sql = "SELECT
+                        h.id_historial,
+                        h.fecha_atencion,
+                        h.motivo_consulta,
+                        h.diagnostico,
+                        h.tratamientos_aplicados,
+                        h.medicacion_recetada,
+                        h.observaciones_adicionales,
+                        COALESCE(CONCAT(pr.nombres, ' ', pr.apellidos), 'No especificado') AS profesional_nombre
+                    FROM historial_clinico_paciente h
+                    INNER JOIN paciente pac ON h.id_paciente = pac.id_paciente
+                    LEFT JOIN profesional pr ON h.id_usuario_profesional = pr.id_usuario
+                    WHERE h.id_paciente = :id_paciente
+                      AND pac.id_propietario = :id_propietario
+                      AND h.id_historial_base IS NULL
+                    ORDER BY h.fecha_atencion DESC
+                    LIMIT 50";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindValue(':id_propietario', $id_propietario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::obtenerHistorialClinicoPorPaciente -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Subtarea 5: Obtiene tratamientos activos e históricos del paciente.
+     */
+    public function obtenerTratamientosPorPaciente(int $id_propietario, int $id_paciente): array
+    {
+        try {
+            $sql = "SELECT
+                        pt.id_tratamiento,
+                        pt.medicamento,
+                        pt.dosis,
+                        pt.fecha_inicio,
+                        pt.fecha_fin,
+                        pt.estado,
+                        pt.observaciones,
+                        COALESCE(CONCAT(pr.nombres, ' ', pr.apellidos), 'No especificado') AS profesional_nombre
+                    FROM paciente_tratamiento pt
+                    INNER JOIN paciente pac ON pt.id_paciente = pac.id_paciente
+                    LEFT JOIN profesional pr ON pt.id_usuario_profesional = pr.id_usuario
+                    WHERE pt.id_paciente = :id_paciente
+                      AND pac.id_propietario = :id_propietario
+                    ORDER BY pt.fecha_inicio DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_paciente', $id_paciente, PDO::PARAM_INT);
+            $stmt->bindValue(':id_propietario', $id_propietario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("❌ Error en CitasCliente::obtenerTratamientosPorPaciente -> " . $e->getMessage());
             return [];
         }
     }

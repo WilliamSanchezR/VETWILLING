@@ -1,6 +1,5 @@
 <?php
 
-require_once BASE_PATH . '/vendor/autoload.php';
 require_once BASE_PATH . '/app/models/PagoSuscripcion.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -12,7 +11,20 @@ use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 
+$mercadoPagoAutoload = BASE_PATH . '/vendor/autoload.php';
+$mercadoPagoSdkDisponible = file_exists($mercadoPagoAutoload);
+
+if ($mercadoPagoSdkDisponible) {
+    require_once $mercadoPagoAutoload;
+}
+
 $action = resolverAccionMercadoPago();
+
+if (in_array($action, ['checkout', 'webhook'], true) && !$mercadoPagoSdkDisponible) {
+    http_response_code(500);
+    echo 'No se encontró la dependencia de Mercado Pago (vendor/autoload.php). Ejecuta composer install para habilitar el checkout.';
+    exit();
+}
 
 if ($action === 'webhook') {
     procesarWebhookMercadoPago();
@@ -54,14 +66,45 @@ function mostrarPasarelaPago()
     $plan = $_GET['plan'] ?? 'producto';
     $idSuscripcion = isset($_GET['id_suscripcion']) ? (int) $_GET['id_suscripcion'] : 0;
 
-    $modeloPago = new PagoSuscripcion();
+    $producto = [
+        'slug' => $plan,
+        'titulo' => 'Plan de suscripción',
+        'nombre' => 'Plan de suscripción',
+        'descripcion' => 'Suscripción mensual VetWilling',
+        'detalle' => 'Suscripción mensual VetWilling',
+        'monto' => 0,
+        'icono' => '🐾',
+        'referencia' => 'SUS-' . strtoupper($plan) . '-' . date('YmdHis'),
+    ];
 
-    if ($origen === 'suscripcion' && $idSuscripcion <= 0) {
-        $idVeterinariaSesion = isset($_SESSION['user']['id_veterinaria']) ? (int) $_SESSION['user']['id_veterinaria'] : 0;
-        $idSuscripcion = $modeloPago->obtenerOCrearSuscripcionPendiente($plan, $idVeterinariaSesion);
+    try {
+        $modeloPago = new PagoSuscripcion();
+
+        if ($origen === 'suscripcion' && $idSuscripcion <= 0) {
+            $idVeterinariaSesion = isset($_SESSION['user']['id_veterinaria']) ? (int) $_SESSION['user']['id_veterinaria'] : 0;
+            $idSuscripcion = $modeloPago->obtenerOCrearSuscripcionPendiente($plan, $idVeterinariaSesion);
+        }
+
+        $producto = $modeloPago->obtenerProducto($origen, $plan, $idSuscripcion);
+    } catch (Throwable $e) {
+        error_log('mostrarPasarelaPago fallback por error de BD: ' . $e->getMessage());
+
+        $catalogo = [
+            'basico' => ['nombre' => 'Plan Essential', 'detalle' => 'Suscripcion mensual para clinicas en crecimiento', 'monto' => 7900, 'icono' => '🐾'],
+            'procare' => ['nombre' => 'Plan ProCare', 'detalle' => 'Suscripcion mensual para operacion avanzada', 'monto' => 14900, 'icono' => '⭐'],
+            'mastervet' => ['nombre' => 'Plan MasterVet', 'detalle' => 'Suscripcion mensual completa para alta demanda', 'monto' => 40900, 'icono' => '👑'],
+        ];
+
+        if ($origen === 'suscripcion' && isset($catalogo[$plan])) {
+            $producto['slug'] = $plan;
+            $producto['titulo'] = $catalogo[$plan]['nombre'];
+            $producto['nombre'] = $catalogo[$plan]['nombre'];
+            $producto['descripcion'] = $catalogo[$plan]['detalle'];
+            $producto['detalle'] = $catalogo[$plan]['detalle'];
+            $producto['monto'] = $catalogo[$plan]['monto'];
+            $producto['icono'] = $catalogo[$plan]['icono'];
+        }
     }
-
-    $producto = $modeloPago->obtenerProducto($origen, $plan, $idSuscripcion);
 
     $queryCheckout = [
         'action' => 'checkout',
@@ -162,7 +205,11 @@ function crearPreferenciaYRedirigir()
             $request['auto_return'] = 'approved';
         }
 
-        if ($esLocal) {
+        $forzarWalletLocal = function_exists('env_value')
+            ? strtolower(trim((string) env_value('MP_FORCE_WALLET_LOCAL', '0')))
+            : '0';
+
+        if ($esLocal && in_array($forzarWalletLocal, ['1', 'true', 'yes'], true)) {
             $request['purpose'] = 'wallet_purchase';
             $request['payment_methods'] = [
                 'excluded_payment_types' => [

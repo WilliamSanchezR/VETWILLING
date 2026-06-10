@@ -143,14 +143,19 @@ function registrarMascota()
 
     $objMascota = new Mascota();
 
+    // Campos clínicos opcionales del formulario de registro
+    $peso_registro = !empty($_POST['peso']) ? (float)$_POST['peso'] : null;
+
     $data = [
         'id_propietario' => $id_propietario,
         'nombre'         => $nombre,
         'especie'        => $especie,
         'raza'           => $raza,
-        'edad_numero'    => $edad_numero,          // ✅ Número: 4
-        'edad_unidad'    => $edad_unidad,          // ✅ Unidad: "años"
+        'edad_numero'    => $edad_numero,
+        'edad_unidad'    => $edad_unidad,
         'sexo'           => $sexo,
+        'peso'           => $peso_registro,
+        'estado_salud'   => 'Bueno',   // Subtarea 6: ficha clínica inicial
         'img_mascota'    => $img_mascota
     ];
 
@@ -162,8 +167,8 @@ function registrarMascota()
         mostrarSweetAlert(
             'success',
             'Mascota registrada',
-            'La mascota ha sido registrada correctamente',
-            BASE_URL . '/cliente/perfil'
+            '¡' . htmlspecialchars($nombre) . ' ha sido registrada correctamente!',
+            BASE_URL . '/cliente/mascotas'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo registrar la mascota. Verifica la conexión a la base de datos.');

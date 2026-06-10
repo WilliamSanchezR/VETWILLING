@@ -26,6 +26,12 @@ config/database.php
 .htaccess
 
 .env
+.env.local
+.env.*
+!.env.example
+
+composer-setup.php
+composer.phar
 
 composer.lock
 composer.json
@@ -49,3 +55,8 @@ ENTREGA_SEED_INSTRUCTOR.md
 # Esta parte es para omitir que se suban los inicios de secion
 storage
 storage/sesiones/usuario_5.json
+
+# documentos yair :3
+DIAGNOSTICO_CITAS_RESULTADO.md
+DIAGNOSTICO_CITAS.md
+NOTIFICACIONES_ANALISIS.md
