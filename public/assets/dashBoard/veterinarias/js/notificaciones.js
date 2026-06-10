@@ -156,7 +156,10 @@
 
     btnMarkAllRead?.addEventListener('click', markAllAsRead);
     loadNotifications();
-    // Polling automático cada 30 segundos
+    window.addEventListener('notificacion:nueva', () => {
+        loadNotifications();
+    });
+    // Polling automático cada 30 segundos como respaldo
     setInterval(loadNotifications, 30000);
 })();
 

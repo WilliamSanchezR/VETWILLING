@@ -22,24 +22,30 @@ class MenuAdministrador {
     }
 
     bindEvents() {
-        this.subMenu.forEach((element) => {
-            element.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.openMenu(e);
+        if (this.subMenu && typeof this.subMenu.forEach === 'function') {
+            this.subMenu.forEach((element) => {
+                element.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openMenu(e);
+                });
             });
-        });
+        }
 
-        this.subMenuSeccond.forEach((element) => {
-            element.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.openSubMenu(e);
+        if (this.subMenuSeccond && typeof this.subMenuSeccond.forEach === 'function') {
+            this.subMenuSeccond.forEach((element) => {
+                element.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.openSubMenu(e);
+                });
             });
-        });
+        }
 
-        this.sidebarToggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.toggleSidebar();
-        });
+        if (this.sidebarToggle) {
+            this.sidebarToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggleSidebar();
+            });
+        }
 
     }
 
@@ -61,7 +67,7 @@ class MenuAdministrador {
         }
 
         // Si el sidebar está colapsado, agregamos el icono de flecha
-        if (this.sidebar.classList.contains("collapsed")) {
+        if (this.sidebar && this.sidebar.classList && this.sidebar.classList.contains("collapsed")) {
             this.mostrarSubmenuColapsado(parent);
         }
     }
@@ -109,11 +115,15 @@ class MenuAdministrador {
     }
 
     toggleSidebar() {
-        this.sidebar.classList.toggle("collapsed");
-        localStorage.setItem("sidebarCollapsed", this.sidebar.classList.contains("collapsed"));
+        if (this.sidebar && this.sidebar.classList) {
+            this.sidebar.classList.toggle("collapsed");
+            try {
+                localStorage.setItem("sidebarCollapsed", this.sidebar.classList.contains("collapsed"));
+            } catch (_) {}
+        }
 
         // Validamos si esta colapsado para ocultar los submenus abiertos
-        if (this.sidebar.classList.contains("collapsed")) {
+        if (this.sidebar && this.sidebar.classList && this.sidebar.classList.contains("collapsed")) {
             this.collapseMenu();
 
         } else {
@@ -132,11 +142,15 @@ class MenuAdministrador {
     }
 
     restoreSidebarState() {
-        const collapsed = localStorage.getItem("sidebarCollapsed") === "true";
-        if (collapsed) {
-            this.sidebar.classList.add("collapsed");
-            this.content?.classList.add("contenido-expandido");
-            this.collapseMenu();
+        try {
+            const collapsed = localStorage.getItem("sidebarCollapsed") === "true";
+            if (collapsed && this.sidebar && this.sidebar.classList) {
+                this.sidebar.classList.add("collapsed");
+                this.content?.classList.add("contenido-expandido");
+                this.collapseMenu();
+            }
+        } catch (_) {
+            // localStorage inaccesible — silencioso
         }
     }
 

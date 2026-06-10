@@ -32,12 +32,21 @@ class Inventario
         $this->conexion = $db->getConexion();
     }
 
+    /**
+     * Expone la conexión PDO para que el controlador pueda
+     * abrir transacciones (beginTransaction / commit / rollBack).
+     */
+    public function obtenerConexion(): PDO
+    {
+        return $this->conexion;
+    }
+
     // ============================================================
     // GRUPO A — CREAR (RFS 44)
     // Insertar un lote nuevo y su producto en dos pasos:
-    //   Paso 1: crearLote()    → inserta en tabla 'inventario'
-    //   Paso 2: crearProducto() → inserta en tabla 'producto'
-    // El controlador llama a los dos métodos en secuencia.
+    //   Paso 1: crearLote()     → inserta en tabla 'inventario'
+    //   Paso 2: crearProducto()  → inserta en tabla 'producto'
+    // El controlador envuelve ambos en una transacción única.
     // ============================================================
 
     /**
@@ -45,87 +54,97 @@ class Inventario
      * Devuelve el ID generado para usarlo en crearProducto().
      *
      * @param array $datos  Debe contener:
-     *                      - id_veterinaria (int)
-     *                      - cantidad       (int)
-     *                      - categoria      (string)
-     *                      - numero_lote    (string)
-     *                      - stock_minimo   (int)
-     * @return int|false    ID del lote creado, o false si falla
+     *                      - id_veterinaria         (int)
+     *                      - cantidad               (int)
+     *                      - categoria              (string)
+     *                      - numero_lote            (string)
+     *                      - stock_minimo           (int)
+     *                      - detalle_almacenamiento (string)
+     * @return int           ID del lote creado
+     * @throws PDOException  Si la inserción falla (el controlador hace rollBack)
      */
-    public function crearLote(array $datos)
+    public function crearLote(array $datos): int
     {
-        try {
-            // Preparamos la sentencia SQL con parámetros seguros (evita SQL Injection)
-            $sql = "INSERT INTO inventario
-                        (id_veterinaria, cantidad, categoria, numero_lote, stock_minimo)
-                    VALUES
-                        (:id_veterinaria, :cantidad, :categoria, :numero_lote, :stock_minimo)";
+        // Sentencia preparada: los :nombre se reemplazan de forma segura
+        $sql = "INSERT INTO inventario
+                    (id_veterinaria, cantidad, categoria, numero_lote, stock_minimo, detalle_almacenamiento)
+                VALUES
+                    (:id_veterinaria, :cantidad, :categoria, :numero_lote, :stock_minimo, :detalle_almacenamiento)";
 
-            $stmt = $this->conexion->prepare($sql);
+        $stmt = $this->conexion->prepare($sql);
 
-            // Vinculamos cada parámetro con su valor y su tipo de dato
-            $stmt->bindParam(':id_veterinaria', $datos['id_veterinaria'], PDO::PARAM_INT);
-            $stmt->bindParam(':cantidad',       $datos['cantidad'],       PDO::PARAM_INT);
-            $stmt->bindParam(':categoria',      $datos['categoria'],      PDO::PARAM_STR);
-            $stmt->bindParam(':numero_lote',    $datos['numero_lote'],    PDO::PARAM_STR);
-            $stmt->bindParam(':stock_minimo',   $datos['stock_minimo'],   PDO::PARAM_INT);
+        // Guardamos en variables locales porque bindParam exige referencias
+        $idVeterinaria         = (int) $datos['id_veterinaria'];
+        $cantidad              = (int) $datos['cantidad'];
+        $categoria             = $datos['categoria'];
+        $numeroLote            = $datos['numero_lote'];
+        $stockMinimo           = (int) $datos['stock_minimo'];
+        $detalleAlmacenamiento = $datos['detalle_almacenamiento'];
 
-            $stmt->execute();
+        $stmt->bindParam(':id_veterinaria',         $idVeterinaria,         PDO::PARAM_INT);
+        $stmt->bindParam(':cantidad',               $cantidad,              PDO::PARAM_INT);
+        $stmt->bindParam(':categoria',              $categoria,             PDO::PARAM_STR);
+        $stmt->bindParam(':numero_lote',           $numeroLote,            PDO::PARAM_STR);
+        $stmt->bindParam(':stock_minimo',          $stockMinimo,           PDO::PARAM_INT);
+        $stmt->bindParam(':detalle_almacenamiento', $detalleAlmacenamiento, PDO::PARAM_STR);
 
-            // lastInsertId() devuelve el ID del registro que acabamos de insertar
-            return (int) $this->conexion->lastInsertId();
+        $stmt->execute();
 
-        } catch (PDOException $e) {
-            // Guardamos el error en el log del servidor para depurar sin exponerlo al usuario
-            error_log('Error en Inventario::crearLote - ' . $e->getMessage());
-            return false;
-        }
+        return (int) $this->conexion->lastInsertId();
     }
 
     /**
      * Inserta el producto descriptivo asociado a un lote existente.
-     * Se llama justo después de crearLote() con el ID que devolvió.
+     * Se llama justo después de crearLote() dentro de la misma transacción.
      *
      * @param array $datos  Debe contener:
-     *                      - id_inventario     (int)   → el que devolvió crearLote()
+     *                      - id_inventario     (int)
      *                      - nombre            (string)
      *                      - descripcion       (string)
+     *                      - proveedor         (string)
      *                      - precio            (float)
-     *                      - fecha_vencimiento (string 'Y-m-d' o vacío)
-     *                      - imagen            (string o null)
-     * @return bool         true si se insertó, false si falló
+     *                      - fecha_vencimiento (string 'Y-m-d')
+     *                      - imagen            (string|null)
+     * @return bool
+     * @throws PDOException  Si la inserción falla (el controlador hace rollBack)
      */
     public function crearProducto(array $datos): bool
     {
-        try {
-            $sql = "INSERT INTO producto
-                        (id_inventario, nombre, descripcion, precio, precio_venta, costo_mayorista, fecha_vencimiento, imagen)
-                    VALUES
-                        (:id_inventario, :nombre, :descripcion, :precio, :precio_venta, :costo_mayorista, :fecha_vencimiento, :imagen)";
+        $sql = "INSERT INTO producto
+                    (id_inventario, nombre, descripcion, proveedor, precio, precio_venta, costo_mayorista, fecha_vencimiento, imagen)
+                VALUES
+                    (:id_inventario, :nombre, :descripcion, :proveedor, :precio, :precio_venta, :costo_mayorista, :fecha_vencimiento, :imagen)";
 
-            $stmt = $this->conexion->prepare($sql);
+        $stmt = $this->conexion->prepare($sql);
 
-            // Si fecha_vencimiento llega vacía la guardamos como NULL en la BD
-            $fechaVenc      = !empty($datos['fecha_vencimiento']) ? $datos['fecha_vencimiento'] : null;
-            $imagen         = !empty($datos['imagen'])            ? $datos['imagen']            : null;
-            $precioVenta    = isset($datos['precio_venta'])    && $datos['precio_venta']    !== '' ? $datos['precio_venta']    : $datos['precio'];
-            $costoMayorista = isset($datos['costo_mayorista']) && $datos['costo_mayorista'] !== '' ? $datos['costo_mayorista'] : $datos['precio'];
+        // Precio de venta y costo mayorista: si no vienen, usamos el precio base
+        $precioVenta    = isset($datos['precio_venta'])    && $datos['precio_venta']    !== ''
+            ? $datos['precio_venta']
+            : $datos['precio'];
+        $costoMayorista = isset($datos['costo_mayorista']) && $datos['costo_mayorista'] !== ''
+            ? $datos['costo_mayorista']
+            : $datos['precio'];
 
-            $stmt->bindParam(':id_inventario',     $datos['id_inventario'], PDO::PARAM_INT);
-            $stmt->bindParam(':nombre',            $datos['nombre'],        PDO::PARAM_STR);
-            $stmt->bindParam(':descripcion',       $datos['descripcion'],   PDO::PARAM_STR);
-            $stmt->bindParam(':precio',            $datos['precio']);
-            $stmt->bindParam(':precio_venta',      $precioVenta);
-            $stmt->bindParam(':costo_mayorista',   $costoMayorista);
-            $stmt->bindParam(':fecha_vencimiento', $fechaVenc,              PDO::PARAM_STR);
-            $stmt->bindParam(':imagen',            $imagen,                 PDO::PARAM_STR);
+        $imagen = !empty($datos['imagen']) ? $datos['imagen'] : null;
 
-            return $stmt->execute();
+        $idInventario    = (int) $datos['id_inventario'];
+        $nombre          = $datos['nombre'];
+        $descripcion     = $datos['descripcion'];
+        $proveedor       = $datos['proveedor'];
+        $precio          = $datos['precio'];
+        $fechaVencimiento = $datos['fecha_vencimiento'];
 
-        } catch (PDOException $e) {
-            error_log('Error en Inventario::crearProducto - ' . $e->getMessage());
-            return false;
-        }
+        $stmt->bindParam(':id_inventario',     $idInventario,     PDO::PARAM_INT);
+        $stmt->bindParam(':nombre',            $nombre,           PDO::PARAM_STR);
+        $stmt->bindParam(':descripcion',       $descripcion,      PDO::PARAM_STR);
+        $stmt->bindParam(':proveedor',         $proveedor,        PDO::PARAM_STR);
+        $stmt->bindParam(':precio',            $precio);
+        $stmt->bindParam(':precio_venta',      $precioVenta);
+        $stmt->bindParam(':costo_mayorista',   $costoMayorista);
+        $stmt->bindParam(':fecha_vencimiento', $fechaVencimiento, PDO::PARAM_STR);
+        $stmt->bindParam(':imagen',            $imagen,           PDO::PARAM_STR);
+
+        return $stmt->execute();
     }
 
     // ============================================================

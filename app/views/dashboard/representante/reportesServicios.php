@@ -7,19 +7,37 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Servicios - VetWilling</title>
+    <title>Reporte de Servicios — VetWilling</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
+    <link rel="icon"        href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
+    <link rel="stylesheet"  href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
+    <link rel="stylesheet"  href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+    <link rel="stylesheet"  href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
+    <link rel="stylesheet"  href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
+    <link rel="stylesheet"  href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/styleReportesAdmin.css">
+    <style>
+        /* Fallback local para asegurar que el contenido no ocupe todo el ancho
+           cuando falten reglas específicas en otros CSS cargados */
+        .contenido-principal {
+            margin-left: var(--sidebar-width, 260px);
+            min-height: calc(100vh - var(--navbar-height, 70px));
+            padding-top: calc(var(--navbar-height, 70px) + 20px);
+            transition: margin-left 0.22s ease;
+        }
+        #sidebar.collapsed ~ .contenido-principal,
+        .sidebar.collapsed ~ .contenido-principal {
+            margin-left: var(--sidebar-collapsed-width, 80px);
+        }
+    </style>
 </head>
 
-<body
+<body   
     data-api-url="<?= BASE_URL ?>/representante/reportes-servicios/data"
     data-pdf-url="<?= BASE_URL ?>/representante/reportes-servicios/pdf"
     data-excel-url="<?= BASE_URL ?>/representante/reportes-servicios/excel"
@@ -27,261 +45,435 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
     <?php include_once __DIR__ . '/../../layouts/sidebar_representante.php'; ?>
 
-    <div class="contenido-principal" id="contenidoPrincipal">
+    <style>
+        /* Forzar margen del contenido después de que se carguen estilos del sidebar */
+        .contenido-principal {
+            margin-left: var(--sidebar-width, 260px) !important;
+            padding-top: calc(var(--navbar-height, 70px) + 20px) !important;
+            min-height: calc(100vh - var(--navbar-height, 70px)) !important;
+            box-sizing: border-box !important;
+        }
+        #sidebar.collapsed ~ .contenido-principal,
+        .sidebar.collapsed ~ .contenido-principal {
+            margin-left: var(--sidebar-collapsed-width, 80px) !important;
+        }
+    </style>
+
+    <!-- ═══════════════════════════════ CONTENIDO PRINCIPAL ═══════════════════ -->
+    <main class="contenido-principal" id="contenidoPrincipal">
+
         <?php include_once __DIR__ . '/../../layouts/panel_superior_representante.php'; ?>
 
-        <div class="area-contenido">
-            <div class="header-admin">
-                <div class="header-info">
-                    <h1>Reporte de Servicios</h1>
-                    <p>Resumen de servicios por veterinaria</p>
-                    <small class="text-white-50" id="labelPeriodo"></small>
+        <div class="rep-wrapper">
+
+            <!-- ── Encabezado ─────────────────────────────────────────────── -->
+            <header class="rep-header">
+                <div class="rep-header__meta">
+                    <h1 class="rep-header__titulo">
+                        <i class="bi bi-graph-up-arrow" style="color: var(--clr-primary-600); margin-right: .35rem; font-size: 1.25rem; vertical-align: -2px;"></i>
+                        Reporte de Servicios
+                    </h1>
+                    <p class="rep-header__subtitulo">
+                        Resumen consolidado de citas, atención e ingresos por veterinaria
+                    </p>
+                    <span class="rep-header__periodo" id="labelPeriodo">
+                        <i class="bi bi-calendar3" style="font-size: .65rem;"></i>
+                        Cargando período...
+                    </span>
                 </div>
-                <div class="header-acciones">
-                    <button class="btn-header" onclick="exportarPDF()">
+
+                <div class="rep-header__acciones">
+                    <select class="rep-sel-vet" id="selVeterinaria" title="Filtrar por veterinaria">
+                        <option value="">Todas las veterinarias</option>
+                    </select>
+                    <button class="btn-exportar btn-exportar--pdf" onclick="exportarPDF()" title="Exportar a PDF">
                         <i class="bi bi-file-earmark-pdf-fill"></i>
-                        Exportar PDF
+                        PDF
                     </button>
-                    <button class="btn-header" onclick="exportarExcel()">
+                    <button class="btn-exportar btn-exportar--excel" onclick="exportarExcel()" title="Exportar a Excel">
                         <i class="bi bi-file-earmark-excel-fill"></i>
-                        Exportar Excel
+                        Excel
+                    </button>
+                </div>
+            </header>
+
+            <!-- ── Barra de filtros por período ───────────────────────────── -->
+            <div class="rep-filtros">
+                <span class="rep-filtros__label">Período</span>
+
+                <div class="rep-filtros__periodos">
+                    <button class="btn-periodo active" data-periodo="mes">
+                        <i class="bi bi-calendar-month"></i> Mes
+                    </button>
+                    <button class="btn-periodo" data-periodo="semana">
+                        <i class="bi bi-calendar-week"></i> Semana
+                    </button>
+                    <button class="btn-periodo" data-periodo="hoy">
+                        <i class="bi bi-calendar-day"></i> Hoy
+                    </button>
+                    <button class="btn-periodo" data-periodo="ano">
+                        <i class="bi bi-calendar-range"></i> Año
+                    </button>
+                    <button class="btn-periodo" data-periodo="personalizado">
+                        <i class="bi bi-calendar2-range"></i> Personalizado
+                    </button>
+                </div>
+
+                <!-- Rango personalizado (oculto por defecto) -->
+                <div class="rep-filtros__rango" id="rangoPersonalizado" style="display: none;">
+                    <input type="date" id="fechaInicio" title="Fecha de inicio">
+                    <span class="rep-filtros__sep">al</span>
+                    <input type="date" id="fechaFin" title="Fecha de fin">
+                    <button class="btn-exportar btn-exportar--excel" id="btnAplicarRango" style="padding: .35rem .75rem; font-size: .75rem;">
+                        <i class="bi bi-search"></i> Aplicar
                     </button>
                 </div>
             </div>
 
-            <div class="barra-acciones">
-                <div class="acciones-superior">
-                    <div class="acciones-izquierda">
-                        <button class="btn-accion btn-primary btn-periodo" data-periodo="mes">
-                            <i class="bi bi-calendar-month"></i> Mes
-                        </button>
-                        <button class="btn-accion btn-secondary btn-periodo" data-periodo="semana">
-                            <i class="bi bi-calendar-week"></i> Semana
-                        </button>
-                        <button class="btn-accion btn-secondary btn-periodo" data-periodo="hoy">
-                            <i class="bi bi-calendar-day"></i> Hoy
-                        </button>
-                        <button class="btn-accion btn-secondary btn-periodo" data-periodo="ano">
-                            <i class="bi bi-calendar-range"></i> Ano
-                        </button>
-                        <button class="btn-accion btn-secondary btn-periodo" data-periodo="personalizado">
-                            <i class="bi bi-calendar2-range"></i> Personalizado
-                        </button>
-                    </div>
-                    <div class="acciones-derecha" id="rangoPersonalizado" style="display:none!important;">
-                        <input type="date" id="fechaInicio" class="filtro-select" style="width:auto;">
-                        <span class="text-muted small">al</span>
-                        <input type="date" id="fechaFin" class="filtro-select" style="width:auto;">
-                        <button class="btn-accion btn-primary" id="btnAplicarRango">
-                            <i class="bi bi-search"></i>
-                            Aplicar
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <!-- ── KPI Cards ───────────────────────────────────────────────── -->
+            <div class="rep-kpis">
 
-            <div class="stats-grid">
-                <div class="stat-card primary">
-                    <div class="stat-header">
-                        <div class="stat-icon">
+                <div class="kpi-card kpi-card--verde">
+                    <div class="kpi-card__cabecera">
+                        <span class="kpi-card__etiqueta">Total citas</span>
+                        <span class="kpi-card__icono">
                             <i class="bi bi-calendar-check"></i>
-                        </div>
-                        <div class="stat-trend up">
-                            <i class="bi bi-graph-up"></i>
-                            Total
-                        </div>
+                        </span>
                     </div>
-                    <div class="stat-value" id="statTotal">—</div>
-                    <div class="stat-label">Total Citas</div>
-                    <div class="stat-footer">
-                        <i class="bi bi-calendar2-check"></i> Periodo actual
+                    <div class="kpi-card__valor" id="statTotal">—</div>
+                    <div class="kpi-card__pie">
+                        <i class="bi bi-calendar2-check"></i>
+                        Período actual
                     </div>
                 </div>
 
-                <div class="stat-card success">
-                    <div class="stat-header">
-                        <div class="stat-icon">
+                <div class="kpi-card kpi-card--verde">
+                    <div class="kpi-card__cabecera">
+                        <span class="kpi-card__etiqueta">Atendidas</span>
+                        <span class="kpi-card__icono">
                             <i class="bi bi-check-circle"></i>
-                        </div>
-                        <div class="stat-trend up">
-                            <i class="bi bi-arrow-up"></i>
-                            Atendidas
-                        </div>
+                        </span>
                     </div>
-                    <div class="stat-value" id="statAtendidas">—</div>
-                    <div class="stat-label">Citas Atendidas</div>
-                    <div class="stat-footer">
-                        <i class="bi bi-heart-pulse"></i> Servicios finalizados
+                    <div class="kpi-card__valor" id="statAtendidas">—</div>
+                    <div class="kpi-card__pie">
+                        <i class="bi bi-heart-pulse"></i>
+                        Servicios finalizados
                     </div>
                 </div>
 
-                <div class="stat-card danger">
-                    <div class="stat-header">
-                        <div class="stat-icon">
+                <div class="kpi-card kpi-card--rojo">
+                    <div class="kpi-card__cabecera">
+                        <span class="kpi-card__etiqueta">Canceladas</span>
+                        <span class="kpi-card__icono">
                             <i class="bi bi-x-circle"></i>
-                        </div>
-                        <div class="stat-trend down">
-                            <i class="bi bi-arrow-down"></i>
-                            Canceladas
-                        </div>
+                        </span>
                     </div>
-                    <div class="stat-value" id="statCanceladas">—</div>
-                    <div class="stat-label">Citas Canceladas</div>
-                    <div class="stat-footer">
-                        <i class="bi bi-exclamation-triangle"></i> Requieren atencion
+                    <div class="kpi-card__valor" id="statCanceladas">—</div>
+                    <div class="kpi-card__pie">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Requieren atención
                     </div>
                 </div>
 
-                <div class="stat-card warning">
-                    <div class="stat-header">
-                        <div class="stat-icon">
+                <div class="kpi-card kpi-card--amarillo">
+                    <div class="kpi-card__cabecera">
+                        <span class="kpi-card__etiqueta">Ingresos</span>
+                        <span class="kpi-card__icono">
                             <i class="bi bi-currency-dollar"></i>
-                        </div>
-                        <div class="stat-trend up">
-                            <i class="bi bi-arrow-up"></i>
-                            Ingresos
-                        </div>
+                        </span>
                     </div>
-                    <div class="stat-value" id="statIngresos">—</div>
-                    <div class="stat-label">Ingresos del Periodo</div>
-                    <div class="stat-footer">
-                        <i class="bi bi-cash-coin"></i> Total facturado
+                    <div class="kpi-card__valor num-money" id="statIngresos">—</div>
+                    <div class="kpi-card__pie">
+                        <i class="bi bi-cash-coin"></i>
+                        Total facturado
                     </div>
                 </div>
+
             </div>
 
-            <div class="grafico-card">
-                <div class="grafico-header">
-                    <h3 class="grafico-titulo">Detalle por Servicio</h3>
+            <!-- ── Detalle por servicio ────────────────────────────────────── -->
+            <section class="rep-seccion" aria-label="Detalle por servicio">
+                <div class="rep-seccion__cabecera">
+                    <h2 class="rep-seccion__titulo">
+                        <i class="bi bi-table"></i>
+                        Detalle por Servicio
+                    </h2>
+                    <div class="rep-seccion__acciones">
+                        <span class="text-muted" style="font-size: var(--text-xs);">
+                            Actualizado al cargarse la página
+                        </span>
+                    </div>
                 </div>
-                <div class="contenedor-tabla">
-                    <div class="table-responsive">
-                        <table class="tabla-admin">
+
+                <div class="rep-seccion__cuerpo rep-seccion__cuerpo--tabla">
+                    <div class="rep-tabla-scroll">
+                        <table class="rep-tabla" id="tablaServicios">
                             <thead>
                                 <tr>
                                     <th>Servicio</th>
-                                    <th class="text-center">Total Citas</th>
-                                    <th class="text-center">Atendidas</th>
-                                    <th class="text-center">Canceladas</th>
-                                    <th class="text-end">Ingresos</th>
+                                    <th class="col-center">Total citas</th>
+                                    <th class="col-center">Atendidas</th>
+                                    <th class="col-center">Canceladas</th>
+                                    <th class="col-right">Ingresos</th>
                                 </tr>
                             </thead>
                             <tbody id="tbodyServicios">
-                                <tr><td colspan="5" class="text-center text-muted">Cargando...</td></tr>
+                                <tr class="tabla-vacia">
+                                    <td colspan="5">
+                                        <i class="bi bi-hourglass-split"></i>
+                                        Cargando datos...
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+
+        </div><!-- /.rep-wrapper -->
+
+    </main>
+
+    <!-- ── Spinner de carga ────────────────────────────────────────────────── -->
+    <div class="rep-spinner" id="spinnerOverlay" style="display: none;" role="status" aria-label="Cargando">
+        <div class="rep-spinner__anillo"></div>
     </div>
 
+
+    <!-- ═══════════════════════════════ SCRIPTS ═══════════════════════════════ -->
     <script>
-        const apiUrl = document.body.dataset.apiUrl;
-        const pdfUrl = document.body.dataset.pdfUrl;
-        const excelUrl = document.body.dataset.excelUrl;
-        let periodoActual = 'mes';
+    /* ── Constantes ──────────────────────────────────────────────────────── */
 
-        const rangoPersonalizado = document.getElementById('rangoPersonalizado');
-        const labelPeriodo = document.getElementById('labelPeriodo');
-        const tbodyServicios = document.getElementById('tbodyServicios');
+    const API_URL   = document.body.dataset.apiUrl;
+    const PDF_URL   = document.body.dataset.pdfUrl;
+    const EXCEL_URL = document.body.dataset.excelUrl;
 
-        const statTotal = document.getElementById('statTotal');
-        const statAtendidas = document.getElementById('statAtendidas');
-        const statCanceladas = document.getElementById('statCanceladas');
-        const statIngresos = document.getElementById('statIngresos');
+    let periodoActual = 'mes';
 
-        function construirParams() {
-            const params = new URLSearchParams({ periodo: periodoActual });
-            if (periodoActual === 'personalizado') {
-                const fi = document.getElementById('fechaInicio').value;
-                const ff = document.getElementById('fechaFin').value;
-                if (fi && ff) {
-                    params.append('fecha_inicio', fi);
-                    params.append('fecha_fin', ff);
-                }
-            }
-            return params.toString();
+
+    /* ── DOM ─────────────────────────────────────────────────────────────── */
+
+    const elLabelPeriodo   = document.getElementById('labelPeriodo');
+    const elRango          = document.getElementById('rangoPersonalizado');
+    const elSelVet         = document.getElementById('selVeterinaria');
+    const elTbody          = document.getElementById('tbodyServicios');
+    const elStatTotal      = document.getElementById('statTotal');
+    const elStatAtendidas  = document.getElementById('statAtendidas');
+    const elStatCanceladas = document.getElementById('statCanceladas');
+    const elStatIngresos   = document.getElementById('statIngresos');
+    const elSpinner        = document.getElementById('spinnerOverlay');
+
+
+    /* ── Helpers ─────────────────────────────────────────────────────────── */
+
+    /**
+     * Formatea un número como moneda colombiana (sin decimales).
+     * @param {number|string} n
+     * @returns {string} ej. "$1.234.567"
+     */
+    function formatCOP(n) {
+        return '$' + Number(n).toLocaleString('es-CO', { maximumFractionDigits: 0 });
+    }
+
+    /**
+     * Escapa HTML para evitar XSS al insertar texto dinámico.
+     * @param {*} str
+     * @returns {string}
+     */
+    function esc(str) {
+        const d = document.createElement('div');
+        d.textContent = str ?? '';
+        return d.innerHTML;
+    }
+
+    /**
+     * Construye los query params del período actual.
+     * @returns {string}
+     */
+    function construirParams() {
+        const params = new URLSearchParams({ periodo: periodoActual });
+
+        if (elSelVet.value) {
+            params.set('id_veterinaria', elSelVet.value);
         }
 
-        async function cargarReporte() {
-            tbodyServicios.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Cargando...</td></tr>';
-            const response = await fetch(`${apiUrl}?${construirParams()}`);
-            const data = await response.json();
-
-            if (!data || data.status !== 'success') {
-                tbodyServicios.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar datos</td></tr>';
-                return;
+        if (periodoActual === 'personalizado') {
+            const fi = document.getElementById('fechaInicio').value;
+            const ff = document.getElementById('fechaFin').value;
+            if (fi && ff) {
+                params.set('fecha_inicio', fi);
+                params.set('fecha_fin',    ff);
             }
-
-            const payload = data.payload || {};
-            const servicios = payload.servicios || [];
-            const totales = payload.totales || {};
-            const meta = payload.meta || {};
-
-            labelPeriodo.textContent = `Periodo: ${meta.etiqueta_periodo || ''} (${meta.fecha_inicio || ''} a ${meta.fecha_fin || ''})`;
-
-            statTotal.textContent = totales.total_citas ?? 0;
-            statAtendidas.textContent = totales.atendidas ?? 0;
-            statCanceladas.textContent = totales.canceladas ?? 0;
-            statIngresos.textContent = `$${(totales.ingresos || 0).toLocaleString('es-CO')}`;
-
-            if (!servicios.length) {
-                tbodyServicios.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Sin datos para el periodo seleccionado</td></tr>';
-                return;
-            }
-
-            tbodyServicios.innerHTML = servicios.map((row) => {
-                const ingresos = Number(row.ingresos || 0).toLocaleString('es-CO');
-                return `
-                    <tr>
-                        <td>${row.servicio || ''}</td>
-                        <td class="text-center">${row.total_citas || 0}</td>
-                        <td class="text-center">${row.atendidas || 0}</td>
-                        <td class="text-center">${row.canceladas || 0}</td>
-                        <td class="text-end">$${ingresos}</td>
-                    </tr>
-                `;
-            }).join('');
         }
 
-        function setPeriodo(periodo, button) {
-            periodoActual = periodo;
-            document.querySelectorAll('.btn-periodo').forEach(btn => {
-                btn.classList.remove('btn-primary');
-                btn.classList.add('btn-secondary');
+        return params.toString();
+    }
+
+    /** Muestra u oculta el spinner de carga. */
+    function mostrarSpinner(visible) {
+        elSpinner.style.display = visible ? 'flex' : 'none';
+    }
+
+
+    /* ── Carga de datos ──────────────────────────────────────────────────── */
+
+    async function cargarReporte() {
+        mostrarSpinner(true);
+
+        try {
+            const res  = await fetch(`${API_URL}?${construirParams()}`);
+            const json = await res.json();
+
+            if (!res.ok || json.status !== 'success') {
+                throw new Error(json.message ?? 'Error al obtener los datos');
+            }
+
+            renderReporte(json.payload ?? {});
+
+        } catch (err) {
+            elTbody.innerHTML = `
+                <tr class="tabla-vacia">
+                    <td colspan="5">
+                        <i class="bi bi-wifi-off"></i>
+                        ${esc(err.message)}
+                    </td>
+                </tr>`;
+        } finally {
+            mostrarSpinner(false);
+        }
+    }
+
+
+    /* ── Render ──────────────────────────────────────────────────────────── */
+
+    function renderReporte(payload) {
+        const servicios = payload.servicios ?? [];
+        const totales   = payload.totales   ?? {};
+        const meta      = payload.meta      ?? {};
+
+        /* Etiqueta de período */
+        const fi = meta.fecha_inicio ?? '';
+        const ff = meta.fecha_fin    ?? '';
+        elLabelPeriodo.innerHTML = `
+            <i class="bi bi-calendar3" style="font-size: .65rem;"></i>
+            ${esc(meta.etiqueta_periodo ?? '')}
+            ${fi && ff ? `&nbsp;·&nbsp; ${esc(fi)} al ${esc(ff)}` : ''}
+        `;
+
+        /* Poblar selector de veterinarias (solo la primera vez) */
+        if (elSelVet.options.length <= 1 && Array.isArray(payload.veterinarias)) {
+            payload.veterinarias.forEach(v => {
+                const opt = new Option(v.nombre, v.id_veterinaria);
+                elSelVet.add(opt);
             });
-            button.classList.remove('btn-secondary');
-            button.classList.add('btn-primary');
-
-            if (periodo === 'personalizado') {
-                rangoPersonalizado.style.display = 'flex';
-            } else {
-                rangoPersonalizado.style.display = 'none';
-                cargarReporte();
-            }
         }
 
-        document.querySelectorAll('.btn-periodo').forEach((btn) => {
-            btn.addEventListener('click', () => setPeriodo(btn.dataset.periodo, btn));
-        });
+        /* KPIs */
+        elStatTotal.textContent      = (totales.total_citas  ?? 0).toLocaleString('es-CO');
+        elStatAtendidas.textContent  = (totales.atendidas    ?? 0).toLocaleString('es-CO');
+        elStatCanceladas.textContent = (totales.canceladas   ?? 0).toLocaleString('es-CO');
+        elStatIngresos.textContent   = formatCOP(totales.ingresos ?? 0);
 
-        document.getElementById('btnAplicarRango').addEventListener('click', () => {
-            if (periodoActual === 'personalizado') {
+        /* Tabla de servicios */
+        if (!servicios.length) {
+            elTbody.innerHTML = `
+                <tr class="tabla-vacia">
+                    <td colspan="5">
+                        <i class="bi bi-inbox"></i>
+                        Sin datos para el período seleccionado
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        elTbody.innerHTML = servicios.map(row => {
+            const total     = Number(row.total_citas ?? 0);
+            const atendidas = Number(row.atendidas   ?? 0);
+            const canceladas= Number(row.canceladas  ?? 0);
+            const ingresos  = Number(row.ingresos    ?? 0);
+
+            /* Calcular tasa de cancelación para badge */
+            const tasaCancel = total > 0 ? Math.round((canceladas / total) * 100) : 0;
+            let badgeClass = 'badge--ok';
+            if      (tasaCancel >= 30) badgeClass = 'badge--danger';
+            else if (tasaCancel >= 15) badgeClass = 'badge--warn';
+
+            return `
+                <tr>
+                    <td>
+                        <span class="rep-tabla__nombre">${esc(row.servicio)}</span>
+                    </td>
+                    <td class="col-center text-strong">${total.toLocaleString('es-CO')}</td>
+                    <td class="col-center">
+                        <span class="badge badge--ok">${atendidas.toLocaleString('es-CO')}</span>
+                    </td>
+                    <td class="col-center">
+                        <span class="badge ${badgeClass}">${canceladas.toLocaleString('es-CO')}</span>
+                    </td>
+                    <td class="col-right num-money text-strong">${formatCOP(ingresos)}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+
+    /* ── Exportar ────────────────────────────────────────────────────────── */
+
+    function exportarPDF() {
+        window.open(`${PDF_URL}?${construirParams()}`, '_blank');
+    }
+
+    function exportarExcel() {
+        window.location.href = `${EXCEL_URL}?${construirParams()}`;
+    }
+
+
+    /* ── Eventos ─────────────────────────────────────────────────────────── */
+
+    /* Botones de período */
+    document.querySelectorAll('.btn-periodo').forEach(btn => {
+        btn.addEventListener('click', () => {
+            /* Actualizar estado activo */
+            document.querySelectorAll('.btn-periodo').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            periodoActual = btn.dataset.periodo;
+
+            /* Mostrar / ocultar rango personalizado */
+            elRango.style.display = periodoActual === 'personalizado' ? 'flex' : 'none';
+
+            if (periodoActual !== 'personalizado') {
                 cargarReporte();
             }
         });
+    });
 
-        function exportarPDF() {
-            window.open(`${pdfUrl}?${construirParams()}`, '_blank');
+    /* Aplicar rango personalizado */
+    document.getElementById('btnAplicarRango').addEventListener('click', () => {
+        const fi = document.getElementById('fechaInicio').value;
+        const ff = document.getElementById('fechaFin').value;
+
+        if (!fi || !ff) {
+            alert('Por favor selecciona fecha de inicio y fecha de fin.');
+            return;
         }
 
-        function exportarExcel() {
-            window.open(`${excelUrl}?${construirParams()}`, '_blank');
+        if (fi > ff) {
+            alert('La fecha de inicio no puede ser mayor que la fecha de fin.');
+            return;
         }
 
         cargarReporte();
-    </script>
-</body>
+    });
 
+    /* Cambio de veterinaria */
+    elSelVet.addEventListener('change', () => cargarReporte());
+
+
+    /* ── Init ────────────────────────────────────────────────────────────── */
+
+    cargarReporte();
+    </script>
+<script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
+</body>
 </html>

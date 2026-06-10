@@ -1,4 +1,3 @@
-
 <?php
 
 class LoginController
@@ -6,7 +5,9 @@ class LoginController
     public function logout()
     {
         // Iniciar sesión para poder manipularla
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
 
         // Eliminar todas las variables de sesión
         session_unset();

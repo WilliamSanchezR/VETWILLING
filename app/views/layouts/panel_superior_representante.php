@@ -324,7 +324,7 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                     </div>
 
                     <div class="panel-body">
-                        <a href="<?= BASE_URL ?>/veterinario/suscripcion" class="dropdown-item">
+                        <a href="<?= BASE_URL ?>/representante/suscripcion" class="dropdown-item">
                             <div class="item-icon">
                                 <i class="bi bi-person-circle"></i>
                             </div>

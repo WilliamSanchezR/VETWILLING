@@ -21,9 +21,22 @@
     const $  = id => document.getElementById(id);
     const $$ = sel => document.querySelectorAll(sel);
 
-    function mostrar(el)    { el?.classList.remove('is-hidden'); }
-    function ocultar(el)    { el?.classList.add('is-hidden'); }
-    function estaOculto(el) { return el?.classList.contains('is-hidden'); }
+    function mostrar(el) {
+        if (!el) return;
+        el.classList.remove('is-hidden');
+        try { el.style.display = ''; } catch (_) {}
+    }
+    function ocultar(el) {
+        if (!el) return;
+        el.classList.add('is-hidden');
+        try { el.style.display = 'none'; } catch (_) {}
+    }
+    function estaOculto(el) {
+        if (!el) return true;
+        if (el.classList.contains('is-hidden')) return true;
+        if (el.classList.contains('show')) return false;
+        try { return getComputedStyle(el).display === 'none'; } catch (_) { return false; }
+    }
 
     /* ══════════════════════════════════════════════════════════════
        DROPDOWNS
@@ -55,10 +68,22 @@
      * @param {Element} btn   - el botón que lo controla
      */
     function toggleDropdown(panel, btn) {
+        if (!panel) return;
         cerrarTodosDropdowns(panel);
 
         const abriendo = estaOculto(panel);
         abriendo ? mostrar(panel) : ocultar(panel);
+
+        // Also keep compatibility with scripts that use `show` class or style.display
+        if (abriendo) {
+            panel.classList.add('show');
+            panel.classList.remove('is-hidden');
+            try { panel.style.display = 'block'; } catch (_) {}
+        } else {
+            panel.classList.remove('show');
+            panel.classList.add('is-hidden');
+            try { panel.style.display = 'none'; } catch (_) {}
+        }
 
         if (btn) {
             btn.setAttribute('aria-expanded', String(abriendo));
@@ -115,12 +140,13 @@
     /* ══════════════════════════════════════════════════════════════
        NOTIFICACIONES
     ══════════════════════════════════════════════════════════════ */
-    const btnNotif              = $('btnNotificaciones');
-    const panelNotif            = $('notificationsPanel');
-    const dropdownList          = $('notificationsDropdownList');
-    const dropdownEmpty         = $('notificationsDropdownEmpty');
-    const btnMarcarLeidas       = $('btnMarcarLeidas');
-    const notificationBadge     = $('notificationBadge');
+    // Element selection with fallbacks to tolerate different templates
+    const btnNotif = $('btnNotificaciones') || document.querySelector('[data-action="notificaciones"]') || document.querySelector('.btn-notificaciones');
+    const panelNotif = $('notificationsPanel') || document.querySelector('[data-panel="notificaciones"]') || document.querySelector('#notificationsPanel');
+    const dropdownList = $('notificationsDropdownList') || document.querySelector('.notifications-list') || document.querySelector('#listaNotificaciones');
+    const dropdownEmpty = $('notificationsDropdownEmpty') || document.querySelector('.notifications-empty');
+    const btnMarcarLeidas = $('btnMarcarLeidas') || document.querySelector('[data-action="marcar-leidas"]') || document.querySelector('.btn-marcar-leidas');
+    const notificationBadge = $('notificationBadge') || document.querySelector('#badgeNotificaciones') || document.querySelector('.badge-notificaciones');
     const notificationsApiUrl   = `${BASE_URL}/veterinario/api/notificaciones`;
 
     const notificationTypes = {
@@ -255,6 +281,101 @@
         }
     }
 
+    function requestBrowserNotificationPermission() {
+        if (!('Notification' in window)) return;
+        if (Notification.permission === 'default') {
+            Notification.requestPermission().catch(() => {});
+        }
+    }
+
+    function showBrowserNotification(title, body) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+        try {
+            new Notification(title, {
+                body: body || 'Tienes una nueva notificación',
+                silent: false
+            });
+        } catch (error) {
+            console.error('Error mostrando notificación del navegador:', error);
+        }
+    }
+
+    function playNotificationTone() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 520;
+            gain.gain.value = 0.12;
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
+            oscillator.start();
+            oscillator.stop(ctx.currentTime + 0.08);
+        } catch (error) {
+            console.error('Error reproduciendo sonido de notificación:', error);
+        }
+    }
+
+    function showAppToast(message) {
+        if (!message) return;
+        if (window.Toast && Toast.mostrar) {
+            Toast.mostrar(message, 'info');
+        }
+    }
+
+    function handleNotificationEvent(data) {
+        const noLeidas = Number.isInteger(data.no_leidas) ? data.no_leidas : 0;
+        actualizarBadgeNotif(noLeidas, noLeidas);
+
+        if (!panelNotif?.classList.contains('is-hidden')) {
+            cargarNotificacionesDropdown();
+        }
+
+        if (Array.isArray(data.notificaciones) && data.notificaciones.length > 0) {
+            const latest = data.notificaciones[data.notificaciones.length - 1];
+            const title = latest.tipo ? escapeHtml(latest.tipo) : 'Nueva notificación';
+            const body = latest.mensaje || 'Tienes una nueva notificación.';
+
+            if (document.hidden) {
+                showBrowserNotification(title, body);
+                playNotificationTone();
+            }
+
+            showAppToast(body);
+        }
+
+        window.dispatchEvent(new CustomEvent('notificacion:nueva', { detail: data }));
+    }
+
+    function connectNotificationStream() {
+        if (!window.EventSource) {
+            setInterval(cargarNotificacionesDropdown, 30000);
+            return;
+        }
+
+        requestBrowserNotificationPermission();
+
+        const streamUrl = `${notificationsApiUrl}?accion=stream`;
+        let source = new EventSource(streamUrl);
+
+        source.addEventListener('notify', event => {
+            try {
+                const data = JSON.parse(event.data);
+                handleNotificationEvent(data);
+            } catch (error) {
+                console.error('Error parsing notification stream data:', error);
+            }
+        });
+
+        source.onerror = () => {
+            source.close();
+            setTimeout(connectNotificationStream, 10000);
+        };
+    }
+
     if (btnNotif && panelNotif) {
         btnNotif.setAttribute('aria-controls', 'notificationsPanel');
 
@@ -272,7 +393,7 @@
     });
 
     cargarNotificacionesDropdown();
-    setInterval(cargarNotificacionesDropdown, 30000);
+    connectNotificationStream();
 
     /* ══════════════════════════════════════════════════════════════
        PERFIL
