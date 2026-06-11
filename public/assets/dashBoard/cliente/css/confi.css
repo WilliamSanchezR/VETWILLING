@@ -1,86 +1,17 @@
 /* ========================================================================
    CONFIGURACIÓN - CSS
-   Author: VetWilling Dashboard
-   Version: 4.0 - CORREGIDO Y MEJORADO
-   Cambios respecto a v3:
-   - [Bug] .tabla-historial → .tabla-sesiones alineado con HTML
-   - [Bug] .lista-sesiones  → .sesiones-lista alineado con HTML
-   - [Bug] .badge-actual    → .sesion-badge / .sesion-badge--actual alineado con HTML
-   - [Bug] FAQ: .faq-item.faq-open → .faq-item.active (alineado con toggleFAQ)
-   - [Mejora] Chevron del FAQ rota con CSS puro (transform), sin JS extra
-   - [Mejora] Dark mode completo: tabla historial, sesiones, formulario contraseña
-   - [Mejora] Radio buttons de notificaciones reemplazados por .notif-opcion visual
-   - [Mejora] Validación: estilos .field-invalid, .field-valid y .field-error
-   - [Mejora] Botones seguridad con width 100% en móvil (consistente con otros tabs)
-   - Paleta de colores sin cambios
+   Version: 5.0
+
+   ⚠️  Las variables CSS y el modo oscuro ya NO están aquí.
+       Se definen en theme.css, que se carga ANTES de este archivo.
+       Este archivo solo contiene estilos de componentes y layout.
+
+   Dependencias:
+     ← theme.css  (debe cargarse primero)
 ======================================================================== */
 
-
 /* ========================================================================
-   1. VARIABLES CSS
-======================================================================== */
-:root {
-    /* Colores principales */
-    --primary-color:    #0a932c;
-    --primary-dark:     #087a24;
-    --primary-light:    #e8f5ec;
-
-    /* Fondos */
-    --bg-light:    #f8f9fa;
-    --bg-sidebar:  #ffffff;
-    --card-light:  #ffffff;
-
-    /* Texto */
-    --text-light:           #1a1a2e;
-    --text-secondary-light: #6b7280;
-
-    /* Bordes */
-    --border-light:    #e5e7eb;
-    --border-radius:   12px;
-    --border-radius-lg: 16px;
-
-    /* Estados */
-    --success: #10b981;
-    --error:   #ef4444;
-    --warning: #f59e0b;
-    --info:    #3b82f6;
-
-    /* Sombras */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
-    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
-
-    /* Transiciones */
-    --transition-fast: all 0.15s ease;
-    --transition:      all 0.3s ease;
-
-    /* Tipografía */
-    --font-xs:   12px;
-    --font-sm:   14px;
-    --font-base: 16px;
-    --font-lg:   18px;
-    --font-xl:   20px;
-    --font-2xl:  24px;
-    --font-3xl:  32px;
-}
-
-
-/* ========================================================================
-   2. TEMA OSCURO
-======================================================================== */
-body.dark-theme {
-    --bg-light:             #1a1a2e;
-    --bg-sidebar:           #16213e;
-    --card-light:           #16213e;
-    --text-light:           #ffffff;
-    --text-secondary-light: #9ca3af;
-    --border-light:         #374151;
-}
-
-
-/* ========================================================================
-   3. RESET Y BASE
+   1. RESET Y BASE
 ======================================================================== */
 *,
 *::before,
@@ -91,7 +22,12 @@ body.dark-theme {
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family:
+        "Inter",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
     background: var(--bg-light);
     color: var(--text-light);
     font-size: var(--font-base);
@@ -99,7 +35,6 @@ body {
     transition: var(--transition);
     -webkit-font-smoothing: antialiased;
 }
-
 
 /* ========================================================================
    4. LAYOUT
@@ -113,7 +48,6 @@ body {
 .contenido-principal {
     transition: var(--transition);
 }
-
 
 /* ========================================================================
    5. TOAST — Notificaciones flotantes
@@ -151,22 +85,40 @@ body {
     transform: translateX(0);
 }
 
-.toast-notification i { font-size: var(--font-xl); flex-shrink: 0; }
+.toast-notification i {
+    font-size: var(--font-xl);
+    flex-shrink: 0;
+}
 
-.toast-success { border-color: var(--success); }
-.toast-success i { color: var(--success); }
-.toast-error   { border-color: var(--error); }
-.toast-error i { color: var(--error); }
-.toast-warning { border-color: var(--warning); }
-.toast-warning i { color: var(--warning); }
-.toast-info    { border-color: var(--info); }
-.toast-info i { color: var(--info); }
+.toast-success {
+    border-color: var(--success);
+}
+.toast-success i {
+    color: var(--success);
+}
+.toast-error {
+    border-color: var(--error);
+}
+.toast-error i {
+    color: var(--error);
+}
+.toast-warning {
+    border-color: var(--warning);
+}
+.toast-warning i {
+    color: var(--warning);
+}
+.toast-info {
+    border-color: var(--info);
+}
+.toast-info i {
+    color: var(--info);
+}
 
 body.dark-theme .toast-notification {
     background: #1f2937;
     color: #f9fafb;
 }
-
 
 /* ========================================================================
    6. HEADER DE CONFIGURACIÓN
@@ -189,7 +141,6 @@ body.dark-theme .toast-notification {
     color: var(--text-secondary-light);
 }
 
-
 /* ========================================================================
    7. TABS DE NAVEGACIÓN
 ======================================================================== */
@@ -203,7 +154,9 @@ body.dark-theme .toast-notification {
     -webkit-overflow-scrolling: touch;
 }
 
-.tabs-config::-webkit-scrollbar { display: none; }
+.tabs-config::-webkit-scrollbar {
+    display: none;
+}
 
 .tab-config {
     display: flex;
@@ -230,7 +183,11 @@ body.dark-theme .toast-notification {
 }
 
 .tab-config.active {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-dark)
+    );
     border-color: transparent;
     color: white;
     box-shadow: var(--shadow-lg);
@@ -241,8 +198,9 @@ body.dark-theme .toast-notification {
     outline-offset: 2px;
 }
 
-.tab-config i { font-size: var(--font-lg); }
-
+.tab-config i {
+    font-size: var(--font-lg);
+}
 
 /* ========================================================================
    8. CONTENIDO DE TABS
@@ -254,7 +212,6 @@ body.dark-theme .toast-notification {
 .tab-content--hidden {
     display: none !important;
 }
-
 
 /* ========================================================================
    9. TARJETAS DE CONFIGURACIÓN
@@ -285,7 +242,11 @@ body.dark-theme .toast-notification {
 .config-icon {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-dark)
+    );
     border-radius: var(--border-radius);
     display: flex;
     align-items: center;
@@ -308,7 +269,6 @@ body.dark-theme .toast-notification {
     color: var(--text-secondary-light);
     margin: 0;
 }
-
 
 /* ========================================================================
    10. ITEMS DE CONFIGURACIÓN
@@ -352,7 +312,6 @@ body.dark-theme .toast-notification {
     color: var(--text-secondary-light);
     margin: 0;
 }
-
 
 /* ========================================================================
    11. FORMULARIOS
@@ -440,7 +399,9 @@ body.dark-theme .toast-notification {
     transition: var(--transition-fast);
 }
 
-.field-error:empty { min-height: 0; }
+.field-error:empty {
+    min-height: 0;
+}
 
 /* Fila de botones del formulario */
 .form-acciones {
@@ -450,7 +411,9 @@ body.dark-theme .toast-notification {
     margin-top: 16px;
 }
 
-.mt-md { margin-top: 20px; }
+.mt-md {
+    margin-top: 20px;
+}
 
 /* Dark mode formularios */
 body.dark-theme .form-group-config input,
@@ -475,7 +438,6 @@ body.dark-theme .form-group-config select option {
     color: #f9fafb;
 }
 
-
 /* ========================================================================
    12. BOTONES
 ======================================================================== */
@@ -495,7 +457,11 @@ body.dark-theme .form-group-config select option {
 }
 
 .btn-primary-config {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-dark)
+    );
     color: white;
     box-shadow: var(--shadow-md);
 }
@@ -570,7 +536,6 @@ body.dark-theme .form-group-config select option {
     outline-offset: 2px;
 }
 
-
 /* ========================================================================
    13. FOTO DE PERFIL
 ======================================================================== */
@@ -617,8 +582,9 @@ body.dark-theme .form-group-config select option {
     flex-wrap: wrap;
 }
 
-.input-file { display: none; }
-
+.input-file {
+    display: none;
+}
 
 /* ========================================================================
    14. CONTRASEÑAS
@@ -629,7 +595,9 @@ body.dark-theme .form-group-config select option {
     align-items: center;
 }
 
-.password-input-wrapper input { padding-right: 48px; }
+.password-input-wrapper input {
+    padding-right: 48px;
+}
 
 .toggle-password {
     position: absolute;
@@ -645,13 +613,21 @@ body.dark-theme .form-group-config select option {
     align-items: center;
 }
 
-.toggle-password:hover { color: var(--primary-color); }
+.toggle-password:hover {
+    color: var(--primary-color);
+}
 
 /* Dark mode toggle password */
-body.dark-theme .toggle-password { color: #9ca3af; }
-body.dark-theme .toggle-password:hover { color: var(--primary-color); }
+body.dark-theme .toggle-password {
+    color: #9ca3af;
+}
+body.dark-theme .toggle-password:hover {
+    color: var(--primary-color);
+}
 
-.password-strength { margin-top: 8px; }
+.password-strength {
+    margin-top: 8px;
+}
 
 .strength-bar {
     height: 4px;
@@ -668,7 +644,10 @@ body.dark-theme .toggle-password:hover { color: var(--primary-color); }
     border-radius: 4px;
 }
 
-.strength-text { font-size: var(--font-xs); font-weight: 500; }
+.strength-text {
+    font-size: var(--font-xs);
+    font-weight: 500;
+}
 
 .requirements {
     background: var(--bg-light);
@@ -697,15 +676,18 @@ body.dark-theme .toggle-password:hover { color: var(--primary-color); }
     transition: var(--transition);
 }
 
-.requirement-item i { font-size: var(--font-sm); }
+.requirement-item i {
+    font-size: var(--font-sm);
+}
 
 /* Dark mode requirements */
 body.dark-theme .requirements {
     background: rgba(255, 255, 255, 0.05);
 }
 
-body.dark-theme .requirements-title { color: #f9fafb; }
-
+body.dark-theme .requirements-title {
+    color: #f9fafb;
+}
 
 /* ========================================================================
    15. TOGGLE SWITCH
@@ -722,7 +704,7 @@ body.dark-theme .requirements-title { color: #f9fafb; }
 }
 
 .toggle-switch::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 3px;
     left: 3px;
@@ -735,11 +717,16 @@ body.dark-theme .requirements-title { color: #f9fafb; }
 }
 
 .toggle-switch.active {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-dark)
+    );
 }
 
-.toggle-switch.active::before { transform: translateX(26px); }
-
+.toggle-switch.active::before {
+    transform: translateX(26px);
+}
 
 /* ========================================================================
    16. NOTIFICACIONES — radio buttons visuales (MEJORA)
@@ -775,7 +762,7 @@ body.dark-theme .requirements-title { color: #f9fafb; }
 }
 
 .notif-toggle-visual::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -809,11 +796,13 @@ body.dark-theme .notif-toggle-visual {
     background: rgba(255, 255, 255, 0.05);
 }
 
-body.dark-theme .notif-opcion input[type="radio"]:checked + .notif-toggle-visual {
+body.dark-theme
+    .notif-opcion
+    input[type="radio"]:checked
+    + .notif-toggle-visual {
     background: rgba(10, 147, 44, 0.2);
     border-color: var(--primary-color);
 }
-
 
 /* ========================================================================
    17. ALERTS
@@ -829,7 +818,10 @@ body.dark-theme .notif-opcion input[type="radio"]:checked + .notif-toggle-visual
     animation: slideDown 0.3s ease;
 }
 
-.alert i { font-size: var(--font-lg); flex-shrink: 0; }
+.alert i {
+    font-size: var(--font-lg);
+    flex-shrink: 0;
+}
 
 .alert-success {
     background: #d4edda;
@@ -856,11 +848,26 @@ body.dark-theme .notif-opcion input[type="radio"]:checked + .notif-toggle-visual
 }
 
 /* Dark mode alerts */
-body.dark-theme .alert-success { background: rgba(16,185,129,.12); color: #34d399; border-color: #10b981; }
-body.dark-theme .alert-error   { background: rgba(239,68,68,.12);  color: #f87171; border-color: #ef4444; }
-body.dark-theme .alert-info    { background: rgba(59,130,246,.12); color: #93c5fd; border-color: #3b82f6; }
-body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34d; border-color: #f59e0b; }
-
+body.dark-theme .alert-success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-color: #10b981;
+}
+body.dark-theme .alert-error {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border-color: #ef4444;
+}
+body.dark-theme .alert-info {
+    background: rgba(59, 130, 246, 0.12);
+    color: #93c5fd;
+    border-color: #3b82f6;
+}
+body.dark-theme .alert-warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: #fcd34d;
+    border-color: #f59e0b;
+}
 
 /* ========================================================================
    18. FAQ
@@ -868,7 +875,9 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
    (antes había discrepancia: CSS usaba .active, JS usaba .faq-open)
    MEJORA: El chevron rota via CSS puro, sin necesitar JS extra
 ======================================================================== */
-.faq-section { margin-bottom: 20px; }
+.faq-section {
+    margin-bottom: 20px;
+}
 
 .faq-item {
     background: var(--bg-light);
@@ -909,7 +918,9 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     border-radius: var(--border-radius);
 }
 
-.faq-question span { flex: 1; }
+.faq-question span {
+    flex: 1;
+}
 
 .faq-question i {
     color: var(--primary-color);
@@ -928,7 +939,9 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
     padding: 0 15px;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.4s ease, padding 0.4s ease;
+    transition:
+        max-height 0.4s ease,
+        padding 0.4s ease;
     color: var(--text-secondary-light);
     line-height: 1.6;
     font-size: var(--font-sm);
@@ -940,10 +953,15 @@ body.dark-theme .alert-warning { background: rgba(245,158,11,.12); color: #fcd34
 }
 
 /* Dark mode FAQ */
-body.dark-theme .faq-item  { background: rgba(255, 255, 255, 0.04); }
-body.dark-theme .faq-question { color: #f9fafb; }
-body.dark-theme .faq-answer   { color: #9ca3af; }
-
+body.dark-theme .faq-item {
+    background: rgba(255, 255, 255, 0.04);
+}
+body.dark-theme .faq-question {
+    color: #f9fafb;
+}
+body.dark-theme .faq-answer {
+    color: #9ca3af;
+}
 
 /* ========================================================================
    19. NOTIFICACIÓN DE GUARDADO GLOBAL
@@ -975,8 +993,9 @@ body.dark-theme .faq-answer   { color: #9ca3af; }
     pointer-events: auto;
 }
 
-.save-notification i { font-size: var(--font-xl); }
-
+.save-notification i {
+    font-size: var(--font-xl);
+}
 
 /* ========================================================================
    20. TABLA DE HISTORIAL / SESIONES
@@ -1007,8 +1026,12 @@ body.dark-theme .faq-answer   { color: #9ca3af; }
     color: var(--text-light);
 }
 
-.tabla-sesiones tr:last-child td { border-bottom: none; }
-.tabla-sesiones tr:hover td      { background: rgba(10,147,44,.03); }
+.tabla-sesiones tr:last-child td {
+    border-bottom: none;
+}
+.tabla-sesiones tr:hover td {
+    background: rgba(10, 147, 44, 0.03);
+}
 
 /* Dark mode tabla */
 body.dark-theme .tabla-sesiones th {
@@ -1025,7 +1048,6 @@ body.dark-theme .tabla-sesiones td {
 body.dark-theme .tabla-sesiones tr:hover td {
     background: rgba(10, 147, 44, 0.06);
 }
-
 
 /* ========================================================================
    21. SESIONES ACTIVAS
@@ -1110,7 +1132,10 @@ body.dark-theme .tabla-sesiones tr:hover td {
     gap: 4px;
 }
 
-.sesion-meta i { font-size: 11px; color: var(--primary-color); }
+.sesion-meta i {
+    font-size: 11px;
+    color: var(--primary-color);
+}
 
 .sesion-badge {
     display: inline-flex;
@@ -1176,15 +1201,42 @@ body.dark-theme .tabla-sesiones tr:hover td {
 }
 
 /* Dark mode sesiones */
-body.dark-theme .sesion-item         { background: #1f2937; border-color: #374151; }
-body.dark-theme .sesion-item--actual { background: rgba(10,147,44,.12); border-color: rgba(10,147,44,.3); }
-body.dark-theme .sesion-icono        { background: #374151; border-color: #4b5563; color: var(--primary-color); }
-body.dark-theme .sesion-titulo       { color: #f9fafb; }
-body.dark-theme .sesion-meta         { color: #9ca3af; }
-body.dark-theme .sesion-badge--nueva { background: rgba(59,130,246,.2); color: #93c5fd; }
-body.dark-theme .btn-cerrar-sesion   { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.4); color: #f87171; }
-body.dark-theme .btn-cerrar-sesion:hover { background: var(--error); color: white; border-color: var(--error); }
-body.dark-theme .sesiones-footer     { border-top-color: #374151; }
+body.dark-theme .sesion-item {
+    background: #1f2937;
+    border-color: #374151;
+}
+body.dark-theme .sesion-item--actual {
+    background: rgba(10, 147, 44, 0.12);
+    border-color: rgba(10, 147, 44, 0.3);
+}
+body.dark-theme .sesion-icono {
+    background: #374151;
+    border-color: #4b5563;
+    color: var(--primary-color);
+}
+body.dark-theme .sesion-titulo {
+    color: #f9fafb;
+}
+body.dark-theme .sesion-meta {
+    color: #9ca3af;
+}
+body.dark-theme .sesion-badge--nueva {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+}
+body.dark-theme .btn-cerrar-sesion {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+body.dark-theme .btn-cerrar-sesion:hover {
+    background: var(--error);
+    color: white;
+    border-color: var(--error);
+}
+body.dark-theme .sesiones-footer {
+    border-top-color: #374151;
+}
 
 /* ---- Estado vacío y carga ---- */
 .empty-state,
@@ -1205,15 +1257,47 @@ body.dark-theme .sesiones-footer     { border-top-color: #374151; }
     opacity: 0.4;
 }
 
-
 /* ========================================================================
    22. ANIMACIONES
 ======================================================================== */
-@keyframes fadeIn      { from { opacity: 0; }                    to { opacity: 1; } }
-@keyframes fadeInDown  { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideDown   { from { opacity: 0; transform: translateY(-8px);  } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideUp     { from { opacity: 0; transform: translateY(8px);   } to { opacity: 1; transform: translateY(0); } }
-
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 /* ========================================================================
    23. RESPONSIVE — Tablets (hasta 1024px)
@@ -1224,16 +1308,20 @@ body.dark-theme .sesiones-footer     { border-top-color: #374151; }
     }
 }
 
-
 /* ========================================================================
    24. RESPONSIVE — Móvil (hasta 768px)
 ======================================================================== */
 @media (max-width: 768px) {
+    .container-dashboard {
+        padding: 16px 12px;
+    }
 
-    .container-dashboard { padding: 16px 12px; }
-
-    .header-config h1 { font-size: 24px; }
-    .header-config    { margin-bottom: 24px; }
+    .header-config h1 {
+        font-size: 24px;
+    }
+    .header-config {
+        margin-bottom: 24px;
+    }
 
     .tab-config {
         padding: 9px 14px;
@@ -1241,7 +1329,9 @@ body.dark-theme .sesiones-footer     { border-top-color: #374151; }
         gap: 5px;
     }
 
-    .tab-config i { font-size: var(--font-base); }
+    .tab-config i {
+        font-size: var(--font-base);
+    }
 
     .config-card {
         padding: 18px 16px;
@@ -1291,8 +1381,12 @@ body.dark-theme .sesiones-footer     { border-top-color: #374151; }
         gap: 10px;
     }
 
-    .sesion-titulo { font-size: var(--font-xs); }
-    .sesion-meta   { gap: 8px; }
+    .sesion-titulo {
+        font-size: var(--font-xs);
+    }
+    .sesion-meta {
+        gap: 8px;
+    }
 
     .btn-cerrar-sesion {
         width: 100%;
@@ -1319,16 +1413,20 @@ body.dark-theme .sesiones-footer     { border-top-color: #374151; }
     }
 }
 
-
 /* ========================================================================
    25. RESPONSIVE — Móviles pequeños (hasta 480px)
 ======================================================================== */
 @media (max-width: 480px) {
+    .header-config h1 {
+        font-size: 20px;
+    }
 
-    .header-config h1 { font-size: 20px; }
-
-    .tab-config span { display: none; }
-    .tab-config      { padding: 10px 14px; }
+    .tab-config span {
+        display: none;
+    }
+    .tab-config {
+        padding: 10px 14px;
+    }
 
     .config-card {
         padding: 14px 12px;
@@ -1340,9 +1438,10 @@ body.dark-theme .sesiones-footer     { border-top-color: #374151; }
         font-size: var(--font-xl);
     }
 
-    .config-card-header h3 { font-size: var(--font-lg); }
+    .config-card-header h3 {
+        font-size: var(--font-lg);
+    }
 }
-
 
 /* ========================================================================
    26. ACCESIBILIDAD — Movimiento reducido
@@ -1351,12 +1450,11 @@ body.dark-theme .sesiones-footer     { border-top-color: #374151; }
     *,
     *::before,
     *::after {
-        animation-duration:        0.01ms !important;
-        animation-iteration-count: 1      !important;
-        transition-duration:       0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
-
 
 /* ========================================================================
    27. IMPRESIÓN
@@ -1367,7 +1465,13 @@ body.dark-theme .sesiones-footer     { border-top-color: #374151; }
     .save-notification,
     .btn-cerrar-sesion,
     .sesiones-footer,
-    .foto-btns    { display: none !important; }
+    .foto-btns {
+        display: none !important;
+    }
 
-    .config-card  { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    .config-card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+    }
 }

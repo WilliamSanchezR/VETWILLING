@@ -52,7 +52,35 @@
         "created_at": 1779402045,
         "last_seen": 1779669398,
         "activa": true,
-        "is_current": true,
+        "is_current": false,
         "es_nueva": false
+    },
+    "4b18cde60fe09d9737962cc02e1627e85a14290e99769efe": {
+        "ip": "::1",
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "navegador": {
+            "nombre": "Chrome 149",
+            "icono": "bi-browser-chrome"
+        },
+        "so": {
+            "nombre": "Windows 11/10",
+            "icono": "bi-windows"
+        },
+        "tipo": {
+            "nombre": "Escritorio",
+            "icono": "bi-laptop-fill"
+        },
+        "marca": {
+            "nombre": "Desconocida",
+            "icono": "bi-display"
+        },
+        "ciudad": "Local / Desarrollo",
+        "fingerprint": "35db7a896468a310",
+        "token": "4b18cde60fe09d9737962cc02e1627e85a14290e99769efe",
+        "created_at": 1781146015,
+        "last_seen": 1781147255,
+        "activa": true,
+        "is_current": true,
+        "es_nueva": true
     }
 }
