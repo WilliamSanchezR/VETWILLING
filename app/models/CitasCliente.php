@@ -204,7 +204,8 @@ class CitasCliente
                 $params['id_paciente'] = $filtros['id_paciente'];
             }
 
-            $sql .= " ORDER BY a.fecha_hora ASC";
+            // Mostrar las citas de más reciente a más antigua
+            $sql .= " ORDER BY a.fecha_hora DESC";
 
             $stmt = $this->conexion->prepare($sql);
 

@@ -362,18 +362,42 @@ $id_usuario = $_SESSION['user']['id_usuario'];
             return;
         }
 
-        var grupos = agruparPorDia(citas);
-        var hoy    = new Date(); hoy.setHours(0, 0, 0, 0);
-        var html   = '';
+        var hoy = new Date(); hoy.setHours(0,0,0,0);
 
-        Object.keys(grupos).sort().forEach(function (fecha) {
-            var lista  = grupos[fecha];
-            var parts  = fecha.split('-');
-            var fObj   = new Date(+parts[0], +parts[1] - 1, +parts[2]);
-            var diff   = Math.floor((fObj - hoy) / 86400000);
-            var etiq   = diff === 0 ? 'Hoy' :
-                         diff === 1 ? 'Mañana' :
-                         diff > 1   ? 'En ' + diff + ' días' : 'Pasada';
+        // Separar listas: pendientes futuras, otras próximas, pasadas
+        var pendientes = citas.filter(function(c) { return c.estado === 'Pendiente' && new Date(c.fecha_hora) >= hoy; });
+        var pasadas    = citas.filter(function(c) { return new Date(c.fecha_hora) < hoy; });
+        var otras      = citas.filter(function(c) { return !(pendientes.includes(c) || pasadas.includes(c)); });
+
+        // Ordenar cada segmento cronológicamente ascendente
+        var ordenarAsc = function(a, b) { return new Date(a.fecha_hora) - new Date(b.fecha_hora); };
+        pendientes.sort(ordenarAsc);
+        otras.sort(ordenarAsc);
+        pasadas.sort(ordenarAsc);
+
+        // Concatenar: pendientes → otras próximas → pasadas (al final)
+        var ordenadas = pendientes.concat(otras).concat(pasadas);
+
+        // Agrupar por día y renderizar en orden ascendente
+        var grupos = agruparPorDia(ordenadas);
+        var html = '';
+
+        // Construir lista de fechas en el orden en que aparecen en `ordenadas`
+        var seen = new Set();
+        var orderedDates = [];
+        ordenadas.forEach(function(c) {
+            var f = new Date(c.fecha_hora);
+            var k = f.getFullYear() + '-' + String(f.getMonth() + 1).padStart(2, '0') + '-' + String(f.getDate()).padStart(2, '0');
+            if (!seen.has(k)) { seen.add(k); orderedDates.push(k); }
+        });
+
+        orderedDates.forEach(function(fecha) {
+            var lista = grupos[fecha] || [];
+            lista.sort(ordenarAsc);
+            var parts = fecha.split('-');
+            var fObj = new Date(+parts[0], +parts[1]-1, +parts[2]);
+            var diff = Math.floor((fObj - hoy) / 86400000);
+            var etiq = diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana' : diff > 1 ? 'En ' + diff + ' días' : 'Pasada';
 
             html +=
                 '<div class="timeline-dia">' +
