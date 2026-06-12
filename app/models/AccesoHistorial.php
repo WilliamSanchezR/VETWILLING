@@ -11,12 +11,10 @@ class AccesoHistorial
 {
     private PDO $db;
 
-    private $conexion;
-
     public function __construct()
     {
         $db = new conexion();
-        $this->conexion = $db->getConexion();
+        $this->db = $db->getConexion();
     }
     /* ================================================================
        CLIENTE — solicitar acceso
@@ -62,10 +60,10 @@ class AccesoHistorial
      * Aprueba la solicitud y calcula la fecha de expiración.
      *
      * @param  int $id_acceso      ID del registro en acceso_historial_clinico
-     * @param  int $id_veterinario ID del veterinario que aprueba
+     * @param  int $id_profesional ID del profesional que aprueba
      * @param  int $duracion_horas Horas de acceso: 24 | 48 | 72 | 168
      */
-    public function aprobar(int $id_acceso, int $id_veterinario, int $duracion_horas): bool
+    public function aprobar(int $id_acceso, int $id_profesional, int $duracion_horas): bool
     {
         $horas = in_array($duracion_horas, [24, 48, 72, 168], true)
             ? $duracion_horas
@@ -74,7 +72,7 @@ class AccesoHistorial
         $stmt = $this->db->prepare(
             "UPDATE acceso_historial_clinico
              SET estado           = 'aprobado',
-                 id_veterinario   = :vet,
+                 id_profesional   = :vet,
                  duracion_horas   = :dur,
                  fecha_aprobacion = NOW(),
                  fecha_expiracion = DATE_ADD(NOW(), INTERVAL :dur2 HOUR)
@@ -82,7 +80,7 @@ class AccesoHistorial
         );
 
         return $stmt->execute([
-            ':vet'  => $id_veterinario,
+            ':vet'  => $id_profesional,
             ':dur'  => $horas,
             ':dur2' => $horas,
             ':id'   => $id_acceso,
@@ -92,19 +90,19 @@ class AccesoHistorial
     /**
      * Rechaza la solicitud con un motivo opcional.
      */
-    public function rechazar(int $id_acceso, int $id_veterinario, string $motivo = ''): bool
+    public function rechazar(int $id_acceso, int $id_profesional, string $motivo = ''): bool
     {
         $stmt = $this->db->prepare(
             "UPDATE acceso_historial_clinico
              SET estado          = 'rechazado',
-                 id_veterinario  = :vet,
+                 id_profesional  = :vet,
                  motivo_rechazo  = :mot,
                  fecha_aprobacion= NOW()
              WHERE id = :id AND estado = 'pendiente'"
         );
 
         return $stmt->execute([
-            ':vet' => $id_veterinario,
+            ':vet' => $id_profesional,
             ':mot' => $motivo,
             ':id'  => $id_acceso,
         ]) && $stmt->rowCount() > 0;
@@ -179,7 +177,7 @@ class AccesoHistorial
      * Lista solicitudes pendientes para el panel del veterinario.
      * Incluye nombre del propietario y la mascota.
      */
-    public function listarPendientes(int $id_veterinario): array
+    public function listarPendientes(int $id_profesional): array
     {
         /* Traemos pendientes de mascotas que tienen citas con este vet */
         $stmt = $this->db->prepare(
@@ -193,9 +191,9 @@ class AccesoHistorial
                 u.nombres       AS propietario_nombres,
                 u.apellidos     AS propietario_apellidos
              FROM acceso_historial_clinico a
-             INNER JOIN pacientes        p  ON p.id_paciente  = a.id_paciente
-             INNER JOIN propietarios     pr ON pr.id_propietario = a.id_propietario
-             INNER JOIN usuarios         u  ON u.id_usuario   = pr.id_usuario
+             INNER JOIN paciente         p  ON p.id_paciente     = a.id_paciente
+             INNER JOIN propietario      pr ON pr.id_propietario = a.id_propietario
+             INNER JOIN usuario          u  ON u.id_usuario      = pr.id_usuario
              WHERE a.estado = 'pendiente'
              ORDER BY a.fecha_solicitud ASC"
         );

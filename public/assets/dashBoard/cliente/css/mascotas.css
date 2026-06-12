@@ -9,10 +9,10 @@
    1. VARIABLES CSS
 ======================================================================== */
 :root {
-    --color-primary:              #639922;
-    --color-primary-dark:         #4a7c1f;
+    --color-primary:              #0a932c;
+    --color-primary-dark:         #0c7a26;
     --color-primary-light:        #EAF3DE;
-    --color-primary-text:         #3B6D11;
+    --color-primary-text:         #0a932c;
 
     --color-blue:                 #378ADD;
     --color-blue-dark:            #185FA5;
@@ -328,7 +328,7 @@ body {
     gap: 14px;
 }
 
-.hero-green  { background: linear-gradient(135deg, #4a7c1f, #639922); }
+.hero-green  { background: linear-gradient(135deg, #0a932c, #0c7a26); }
 .hero-blue   { background: linear-gradient(135deg, #185FA5, #378ADD); }
 .hero-amber  { background: linear-gradient(135deg, #854F0B, #BA7517); }
 .hero-purple { background: linear-gradient(135deg, #534AB7, #7F77DD); }
