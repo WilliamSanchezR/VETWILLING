@@ -373,9 +373,31 @@ $mascotas = listarMascotas();
             color: #0a932c;
         }
 
+        /* ═══════════════════════════════════════════════════════════ */
+        /*  BOTONES DE FECHAS DISPONIBLES EN MODAL                    */
+        /* ═══════════════════════════════════════════════════════════ */
 
-        body.dark-mode .btn-cancelar:hover {
-            background: #3d3d3d;
+        .btn-fecha-disponible {
+            padding: 10px 12px;
+            min-width: 70px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-align: center;
+            color: #333;
+        }
+
+        .btn-fecha-disponible:hover {
+            border-color: #0a932c;
+            background: #f0f9f5;
+            transform: translateY(-2px);
+        }
+
+        .btn-fecha-disponible:active {
+            transform: translateY(0);
         }
 
         /* ═══════════════════════════════════════════════════════════ */
@@ -546,44 +568,23 @@ $mascotas = listarMascotas();
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group-custom">
-                                    <label class="form-label-custom">
-                                        <i class="bi bi-calendar-event"></i>
-                                        Fecha y Hora de Inicio
-                                        <span class="required">*</span>
-                                    </label>
-                                    <input type="datetime-local" 
-                                           name="fecha_hora" 
-                                           id="fecha_hora" 
-                                           class="form-control-custom" 
-                                           required>
-                                    <div class="form-helper-text">
-                                        <i class="bi bi-info-circle"></i>
-                                        Selecciona cuándo quieres la cita
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group-custom">
-                                    <label class="form-label-custom">
-                                        <i class="bi bi-calendar-check"></i>
-                                        Fecha y Hora de Fin
-                                        <span class="required">*</span>
-                                    </label>
-                                    <input type="datetime-local" 
-                                           name="fecha_hora_fin" 
-                                           id="fecha_hora_fin" 
-                                           class="form-control-custom" 
-                                           required>
-                                    <div class="form-helper-text">
-                                        <i class="bi bi-clock"></i>
-                                        Duración estimada del servicio
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="form-group-custom">
+                            <button type="button" id="btnBuscarDisponibilidades" class="btn btn-success">
+                                <i class="bi bi-search"></i> Buscar horarios disponibles
+                            </button>
                         </div>
+
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">
+                                <i class="bi bi-person-bounding-box"></i>
+                                Veterinario seleccionado
+                            </label>
+                            <input type="text" id="veterinario_seleccionado" class="form-control-custom" placeholder="Selecciona un horario disponible" readonly>
+                        </div>
+
+                        <input type="hidden" name="id_usuario" id="id_usuario">
+                        <input type="hidden" name="fecha_hora" id="fecha_hora">
+                        <input type="hidden" name="fecha_hora_fin" id="fecha_hora_fin">
                     </div>
 
                     <!-- SECCIÓN 4: OBSERVACIONES -->
@@ -623,6 +624,67 @@ $mascotas = listarMascotas();
 
                 </form>
 
+                <!-- MODAL DE DISPONIBILIDADES -->
+                <div class="modal fade" id="modalDisponibilidades" tabindex="-1" aria-labelledby="modalDisponibilidadesLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalDisponibilidadesLabel">Horarios disponibles</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Fecha</label>
+                                        <input type="date" id="fecha_disponibilidad" class="form-control-custom" value="<?= date('Y-m-d') ?>">
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-end">
+                                        <button type="button" id="btnCargarDisponibilidades" class="btn btn-primary w-100">
+                                            <i class="bi bi-arrow-repeat"></i> Actualizar disponibilidad
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contenedor de fechas disponibles -->
+                                <div class="mb-4 p-3" style="background:#f8f9fa; border-radius:12px; border:1px solid #e0e0e0;">
+                                    <label class="form-label-custom mb-3">Fechas disponibles (próximos 30 días)</label>
+                                    <div id="fechasDisponiblesContainer" class="d-flex flex-wrap gap-2">
+                                        <div class="text-center text-muted w-100 py-3">
+                                            <small>Cargando fechas disponibles...</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="disponibilidadesContainer">
+                                    <div class="text-center py-5 text-muted">Seleccione una fecha y haga clic en actualizar para ver horarios</div>
+                                </div>
+                                <!-- Selector de hora (oculto hasta que se seleccione una disponibilidad) -->
+                                <div id="selectorHoraContainer" style="display:none; margin-top:20px; padding-top:20px; border-top:1px solid #ddd;">
+                                    <h6 class="mb-3">Selecciona una hora dentro del rango disponible</h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label-custom">Hora</label>
+                                            <input type="time" id="horaSeleccionada" class="form-control-custom">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label-custom">Rango disponible</label>
+                                            <p id="rangoDisponible" class="text-muted mb-0">-</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button type="button" id="btnConfirmarHora" class="btn btn-success w-100">
+                                            <i class="bi bi-check-circle"></i> Confirmar horario
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -642,6 +704,8 @@ $mascotas = listarMascotas();
         const URLS = {
             GET_SERVICIOS: BASE_URL + '/cliente/api/servicios?accion=servicios',
             GET_SUBSERVICIOS: BASE_URL + '/cliente/api/subservicios?accion=subservicios',
+            GET_VETERINARIOS: BASE_URL + '/calendario/getVeterinarios',
+            GET_DISPONIBILIDADES: BASE_URL + '/disponibilidad/horarios?action=disponibilidades',
             CREATE_CITA: BASE_URL + '/cliente/api/citas/crear'
         };
 
@@ -725,35 +789,6 @@ $mascotas = listarMascotas();
             });
 
             // ═══════════════════════════════════════════════════════════
-            //  CAMBIO EN FECHAS → VALIDAR Y ACTUALIZAR PASO
-            // ═══════════════════════════════════════════════════════════
-            
-            const inputFechaInicio = document.getElementById('fecha_hora');
-            const inputFechaFin = document.getElementById('fecha_hora_fin');
-
-            inputFechaInicio.addEventListener('change', function() {
-                // Auto-calcular fecha de fin (1 hora después)
-                if (this.value && !inputFechaFin.value) {
-                    const fechaInicio = new Date(this.value);
-                    const fechaFin = new Date(fechaInicio);
-                    fechaFin.setHours(fechaFin.getHours() + 1);
-                    
-                    const year = fechaFin.getFullYear();
-                    const month = String(fechaFin.getMonth() + 1).padStart(2, '0');
-                    const day = String(fechaFin.getDate()).padStart(2, '0');
-                    const hours = String(fechaFin.getHours()).padStart(2, '0');
-                    const minutes = String(fechaFin.getMinutes()).padStart(2, '0');
-                    
-                    inputFechaFin.value = `${year}-${month}-${day}T${hours}:${minutes}`;
-                }
-                updateStepIndicator(3);
-            });
-
-            inputFechaFin.addEventListener('change', function() {
-                updateStepIndicator(4);
-            });
-
-            // ═══════════════════════════════════════════════════════════
             //  ENVÍO DEL FORMULARIO - ✅ CORREGIDO Y VALIDACIÓN DE FECHA
             // ═══════════════════════════════════════════════════════════
 
@@ -795,6 +830,7 @@ $mascotas = listarMascotas();
                     id_paciente: parseInt(formData.get('id_paciente')),
                     id_servicio: parseInt(formData.get('id_servicio')),
                     id_subservicio: parseInt(formData.get('id_subservicio')),
+                    id_usuario: formData.get('id_usuario') ? parseInt(formData.get('id_usuario')) : null,
                     id_especialidad: 1, // Por defecto
                     tipo: document.querySelector('#id_subservicio option:checked').text.split(' - ')[0],
                     observaciones: formData.get('observaciones') || '',
@@ -802,6 +838,16 @@ $mascotas = listarMascotas();
                     fecha_hora_fin: formatDateForMySQL(new Date(formData.get('fecha_hora_fin'))),
                     estado: 'Pendiente'
                 };
+
+                if (!formData.get('id_usuario')) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Seleccione un horario',
+                        text: 'Debes seleccionar un horario disponible para ver el veterinario asignado.',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return;
+                }
 
                 console.log('Datos a enviar:', data);
 
@@ -863,6 +909,239 @@ $mascotas = listarMascotas();
                     });
                 }
             });
+
+            const modal = new bootstrap.Modal(document.getElementById('modalDisponibilidades'));
+
+            document.getElementById('btnBuscarDisponibilidades').addEventListener('click', function() {
+                modal.show();
+                cargarFechasDisponibles(); // Cargar fechas disponibles al abrir el modal
+                cargarDisponibilidades();
+            });
+
+            document.getElementById('btnCargarDisponibilidades').addEventListener('click', function() {
+                cargarDisponibilidades();
+            });
+
+            document.getElementById('fecha_disponibilidad').addEventListener('change', function() {
+                // Actualizar la lista cuando cambia la fecha
+                cargarDisponibilidades();
+            });
+
+            async function cargarFechasDisponibles() {
+                const container = document.getElementById('fechasDisponiblesContainer');
+                const hoy = new Date();
+                const diasDisponibles = new Set();
+
+                try {
+                    // Iterar sobre los próximos 30 días para obtener fechas con disponibilidad
+                    for (let i = 0; i < 30; i++) {
+                        const fecha = new Date(hoy);
+                        fecha.setDate(fecha.getDate() + i);
+                        const fechaStr = fecha.getFullYear() + '-' + 
+                                       String(fecha.getMonth() + 1).padStart(2, '0') + '-' + 
+                                       String(fecha.getDate()).padStart(2, '0');
+
+                        try {
+                            const response = await fetch(`${URLS.GET_DISPONIBILIDADES}&fecha=${encodeURIComponent(fechaStr)}`);
+                            const result = await response.json();
+
+                            if (result.status === 'success' && Array.isArray(result.data) && result.data.length > 0) {
+                                diasDisponibles.add(fechaStr);
+                            }
+                        } catch (error) {
+                            console.error(`Error cargando disponibilidad para ${fechaStr}:`, error);
+                        }
+                    }
+
+                    // Mostrar fechas disponibles como botones
+                    const fechasArray = Array.from(diasDisponibles).sort();
+                    
+                    if (fechasArray.length === 0) {
+                        container.innerHTML = '<div class="text-center text-muted w-100"><small>No hay fechas disponibles en los próximos 30 días</small></div>';
+                        return;
+                    }
+
+                    const botonesHtml = fechasArray.map(fecha => {
+                        const d = new Date(fecha + 'T00:00:00');
+                        const nombreDia = d.toLocaleDateString('es-ES', { weekday: 'short' });
+                        const dia = d.getDate();
+                        return `
+                            <button type="button" class="btn-fecha-disponible" data-fecha="${fecha}">
+                                <div style="font-weight:700; font-size:16px;">${dia}</div>
+                                <div style="font-size:11px; color:#666;">${nombreDia}</div>
+                            </button>
+                        `;
+                    }).join('');
+
+                    container.innerHTML = botonesHtml;
+
+                    // Agregar event listeners a los botones de fechas
+                    document.querySelectorAll('.btn-fecha-disponible').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const fecha = this.getAttribute('data-fecha');
+                            document.getElementById('fecha_disponibilidad').value = fecha;
+                            
+                            // Remover clase active de todos los botones
+                            document.querySelectorAll('.btn-fecha-disponible').forEach(b => {
+                                b.style.background = 'white';
+                                b.style.borderColor = '#e0e0e0';
+                                b.style.color = '#333';
+                            });
+                            
+                            // Marcar este botón como activo
+                            this.style.background = '#0a932c';
+                            this.style.borderColor = '#0a932c';
+                            this.style.color = 'white';
+                            
+                            cargarDisponibilidades();
+                        });
+                    });
+
+                } catch (error) {
+                    console.error('Error al cargar fechas disponibles:', error);
+                    container.innerHTML = '<div class="text-center text-danger w-100"><small>Error al cargar fechas disponibles</small></div>';
+                }
+            }
+
+            async function cargarDisponibilidades() {
+                const fecha = document.getElementById('fecha_disponibilidad').value;
+                const divisionesPrevias = document.getElementById('disponibilidadesContainer');
+                divisionesPrevias.innerHTML = '<div class="text-center py-5 text-muted">Cargando horarios disponibles...</div>';
+
+                try {
+                    const response = await fetch(`${URLS.GET_DISPONIBILIDADES}&fecha=${encodeURIComponent(fecha)}`);
+                    const result = await response.json();
+
+                    if (result.status !== 'success') {
+                        divisionesPrevias.innerHTML = `<div class="alert alert-warning">${result.message || 'No se pudo cargar la disponibilidad.'}</div>`;
+                        return;
+                    }
+
+                    const disponibles = result.data;
+                    if (!Array.isArray(disponibles) || disponibles.length === 0) {
+                        divisionesPrevias.innerHTML = '<div class="text-center py-5 text-muted">No hay horarios disponibles para la fecha seleccionada.</div>';
+                        return;
+                    }
+
+                    const cardsHtml = disponibles.map(item => {
+                        const horaInicio = item.hora_inicio.substring(0, 5);
+                        const horaFin = item.hora_fin.substring(0, 5);
+                        return `
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-2">${item.veterinario_nombre}</h5>
+                                    <p class="card-text mb-1"><strong>Especialidad:</strong> ${item.especialidad}</p>
+                                    <p class="card-text mb-1"><strong>Día:</strong> ${item.dia}</p>
+                                    <p class="card-text mb-3"><strong>Horario:</strong> ${horaInicio} - ${horaFin}</p>
+                                    <button type="button" class="btn btn-outline-success btnSeleccionarHorario" data-id_usuario="${item.id_usuario}" data-veterinario_nombre="${item.veterinario_nombre}" data-hora_inicio="${item.hora_inicio}" data-hora_fin="${item.hora_fin}">
+                                        Seleccionar este horario
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    divisionesPrevias.innerHTML = `<div class="row">${cardsHtml}</div>`;
+                    
+                    // Guardar datos de la disponibilidad seleccionada
+                    let disponibilidadSeleccionada = null;
+                    
+                    document.querySelectorAll('.btnSeleccionarHorario').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const idUsuario = this.getAttribute('data-id_usuario');
+                            const nombreVet = this.getAttribute('data-veterinario_nombre');
+                            const horaInicio = this.getAttribute('data-hora_inicio');
+                            const horaFin = this.getAttribute('data-hora_fin');
+
+                            // Guardar datos y mostrar selector de hora
+                            disponibilidadSeleccionada = {
+                                idUsuario,
+                                nombreVet,
+                                horaInicio: horaInicio.substring(0, 5),
+                                horaFin: horaFin.substring(0, 5),
+                                fecha: document.getElementById('fecha_disponibilidad').value
+                            };
+
+                            // Mostrar selector de hora
+                            const selectorContainer = document.getElementById('selectorHoraContainer');
+                            const inputHora = document.getElementById('horaSeleccionada');
+                            const rangoDisplay = document.getElementById('rangoDisponible');
+                            
+                            selectorContainer.style.display = 'block';
+                            inputHora.min = disponibilidadSeleccionada.horaInicio;
+                            inputHora.max = disponibilidadSeleccionada.horaFin;
+                            inputHora.value = disponibilidadSeleccionada.horaInicio;
+                            rangoDisplay.textContent = `${disponibilidadSeleccionada.horaInicio} - ${disponibilidadSeleccionada.horaFin}`;
+
+                            // Scroll al selector
+                            selectorContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        });
+                    });
+
+                    // Evento para confirmar hora
+                    document.getElementById('btnConfirmarHora').addEventListener('click', function() {
+                        if (!disponibilidadSeleccionada) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Error',
+                                text: 'Por favor selecciona una disponibilidad primero.',
+                                confirmButtonText: 'Entendido'
+                            });
+                            return;
+                        }
+
+                        const horaSeleccionada = document.getElementById('horaSeleccionada').value;
+                        if (!horaSeleccionada) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Error',
+                                text: 'Por favor selecciona una hora.',
+                                confirmButtonText: 'Entendido'
+                            });
+                            return;
+                        }
+
+                        // Validar que la hora esté dentro del rango
+                        if (horaSeleccionada < disponibilidadSeleccionada.horaInicio || horaSeleccionada > disponibilidadSeleccionada.horaFin) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Hora fuera de rango',
+                                text: `Selecciona una hora entre ${disponibilidadSeleccionada.horaInicio} y ${disponibilidadSeleccionada.horaFin}`,
+                                confirmButtonText: 'Entendido'
+                            });
+                            return;
+                        }
+
+                        // Rellenar campos del formulario
+                        document.getElementById('id_usuario').value = disponibilidadSeleccionada.idUsuario;
+                        
+                        // Calcular hora fin (1 hora después)
+                        const [horas, minutos] = horaSeleccionada.split(':');
+                        const fechaFin = new Date(disponibilidadSeleccionada.fecha);
+                        fechaFin.setHours(parseInt(horas) + 1, parseInt(minutos), 0);
+                        const horaFin = fechaFin.toTimeString().substring(0, 5);
+                        
+                        // Mostrar veterinario + hora inicio - hora fin
+                        document.getElementById('veterinario_seleccionado').value = `${disponibilidadSeleccionada.nombreVet} — ${horaSeleccionada} a ${horaFin}`;
+                        document.getElementById('fecha_hora').value = `${disponibilidadSeleccionada.fecha}T${horaSeleccionada}`;
+                        document.getElementById('fecha_hora_fin').value = `${disponibilidadSeleccionada.fecha}T${horaFin}`;
+                        
+                        modal.hide();
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Horario confirmado',
+                            text: `Cita agendada con ${disponibilidadSeleccionada.nombreVet} a las ${horaSeleccionada}`,
+                            confirmButtonText: 'Perfecto',
+                            timer: 2000
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error al cargar disponibilidades:', error);
+                    divisionesPrevias.innerHTML = '<div class="alert alert-danger">Error al cargar la disponibilidad. Intenta de nuevo.</div>';
+                }
+            }
         });
 
         // ═══════════════════════════════════════════════════════════
