@@ -158,6 +158,54 @@ class DisponibilidadUsuario
         }
     }
 
+    public function obtenerDisponibilidadesPorVeterinaria($id_veterinaria, $dia_semana = null)
+    {
+        try {
+            $sql = "SELECT
+                        d.id_disponibilidad,
+                        d.id_usuario,
+                        COALESCE(CONCAT(v.nombres, ' ', v.apellidos), 'Sin veterinario asignado') as veterinario_nombre,
+                        d.dia_semana,
+                        CASE d.dia_semana
+                            WHEN 1 THEN 'Lunes'
+                            WHEN 2 THEN 'Martes'
+                            WHEN 3 THEN 'Miércoles'
+                            WHEN 4 THEN 'Jueves'
+                            WHEN 5 THEN 'Viernes'
+                            WHEN 6 THEN 'Sábado'
+                            WHEN 7 THEN 'Domingo'
+                        END AS dia,
+                        es.nombre as especialidad,
+                        es.id_especialidad,
+                        d.hora_inicio,
+                        d.hora_fin,
+                        d.duracion_minutos as duracion
+                    FROM disponibilidad_usuario d
+                    LEFT JOIN veterinario v ON d.id_usuario = v.id_usuario
+                    LEFT JOIN especialidad es ON d.id_especialidad = es.id_especialidad
+                    WHERE d.estado = 'Activo' AND d.id_veterinaria = :id_veterinaria";
+
+            if (!empty($dia_semana)) {
+                $sql .= " AND d.dia_semana = :dia_semana";
+            }
+
+            $sql .= " ORDER BY d.dia_semana ASC, d.hora_inicio ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+
+            if (!empty($dia_semana)) {
+                $stmt->bindParam(':dia_semana', $dia_semana, PDO::PARAM_INT);
+            }
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en DisponibilidadUsuario::obtenerDisponibilidadesPorVeterinaria -> " . $e->getMessage());
+            return [];
+        }
+    }
+
     // Función para validar si una nueva disponibilidad se cruza con una existente
     function validarDisponibilidad($id_usuario, $id_especialidad, $id_veterinaria, $dia_semana, $hora_inicio, $hora_fin)
     {

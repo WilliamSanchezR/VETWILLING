@@ -27,7 +27,7 @@
         "is_current": false,
         "es_nueva": true
     },
-    "7dc8801c0464d260b48a15c292f06090adc56792360ec511": {
+    "64600b9504e6c150a38eb4c2dd0e8373ec37bd255ccad311": {
         "ip": "::1",
         "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
         "navegador": {
@@ -48,9 +48,9 @@
         },
         "ciudad": "Local / Desarrollo",
         "fingerprint": "c490d241197976af",
-        "token": "7dc8801c0464d260b48a15c292f06090adc56792360ec511",
+        "token": "64600b9504e6c150a38eb4c2dd0e8373ec37bd255ccad311",
         "created_at": 1779402045,
-        "last_seen": 1779669398,
+        "last_seen": 1780543682,
         "activa": true,
         "is_current": false,
         "es_nueva": false

@@ -549,21 +549,22 @@ body {
 .cita-card-body {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
+    gap: 54px;
     padding: 14px 16px 14px 22px;
     flex: 1;
 }
 
 /* Avatar de la mascota como fondo de imagen */
 .cita-mascota-avatar {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     border-radius: var(--radius-md);
     background-size: cover;
     background-position: center;
     background-color: var(--bg-gray-light);
     flex-shrink: 0;
     border: 2px solid var(--border-color);
+    margin-left: 30px;
 }
 
 /* Columna de información */
@@ -678,6 +679,7 @@ body {
 .btn-accion {
     padding: 11px 6px;
     border: none;
+    border-radius: 10px;
     border-right: 1.5px solid #f3f4f6;
     font-weight: 600;
     font-size: 12px;
@@ -689,7 +691,10 @@ body {
     gap: 5px;
     text-decoration: none;
     white-space: nowrap;
-    margin: 6px 0;
+    margin: 6px 4px;
+}
+.btn-accion .btn-ver{
+    margin: 20px !important;
 }
 
 .btn-accion:last-child { border-right: none; }
