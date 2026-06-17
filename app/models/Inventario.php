@@ -539,4 +539,93 @@ class Inventario
             ];
         }
     }
+
+    // ============================================================
+    // GRUPO G — MOVIMIENTOS DE STOCK (Paso 2)
+    // Métodos para decrementar/incrementar stock y validar disponibilidad.
+    // ============================================================
+
+    /**
+     * Disminuye la cantidad de un lote (inventario).
+     * Se usa cuando se registra una venta.
+     *
+     * @param int    $id_inventario ID del lote a reducir
+     * @param int    $cantidad      Cantidad a restar
+     * @param string $motivo        Razón de la salida (ej: 'venta', 'ajuste')
+     * @param int    $id_usuario    ID del usuario que registra la operación
+     * @return bool                 true si se actualizó, false si falló
+     */
+    public function decrementarStock(int $id_inventario, int $cantidad, string $motivo = 'venta', ?int $id_usuario = null): bool
+    {
+        try {
+            // Actualizar cantidad en inventario
+            $sql = "UPDATE inventario SET cantidad = cantidad - :cantidad WHERE id_inventario = :id_inventario AND cantidad >= :cantidad";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_inventario', $id_inventario, PDO::PARAM_INT);
+            $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+
+            return $stmt->execute() && $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::decrementarStock - ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Aumenta la cantidad de un lote (inventario).
+     * Se usa cuando se registra una entrada de stock.
+     *
+     * @param int    $id_inventario ID del lote a aumentar
+     * @param int    $cantidad      Cantidad a sumar
+     * @param string $motivo        Razón de la entrada (ej: 'compra', 'devolución')
+     * @param int    $id_usuario    ID del usuario que registra la operación
+     * @return bool                 true si se actualizó, false si falló
+     */
+    public function incrementarStock(int $id_inventario, int $cantidad, string $motivo = 'compra', ?int $id_usuario = null): bool
+    {
+        try {
+            // Actualizar cantidad en inventario
+            $sql = "UPDATE inventario SET cantidad = cantidad + :cantidad WHERE id_inventario = :id_inventario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_inventario', $id_inventario, PDO::PARAM_INT);
+            $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+
+            return $stmt->execute() && $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::incrementarStock - ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Valida si hay stock suficiente en un lote.
+     * Se usa antes de confirmar una venta.
+     *
+     * @param int $id_inventario ID del lote a verificar
+     * @param int $cantidad      Cantidad requerida
+     * @return bool              true si hay stock suficiente, false si no
+     */
+    public function validarDisponibilidad(int $id_inventario, int $cantidad): bool
+    {
+        try {
+            $sql = "SELECT cantidad FROM inventario WHERE id_inventario = :id_inventario AND estado = 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_inventario', $id_inventario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                return false; // Lote no existe o está inactivo
+            }
+
+            return (int) $row['cantidad'] >= $cantidad;
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::validarDisponibilidad - ' . $e->getMessage());
+            return false;
+        }
+    }
 }

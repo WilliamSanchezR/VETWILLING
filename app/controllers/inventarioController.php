@@ -10,6 +10,9 @@ require_once __DIR__ . '/../helpers/alert_helpers.php';
 // Importamos el modelo de inventario
 require_once __DIR__ . '/../models/Inventario.php';
 
+// Importamos el modelo de movimientos de stock (Paso 4)
+require_once __DIR__ . '/../models/MovimientoStock.php';
+
 // ── Detectar qué método HTTP usó el navegador (GET o POST) ───────────────────
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -41,6 +44,49 @@ switch ($method) {
         break;
 }
 
+
+// =============================================================================
+// FUNCIÓN AUXILIAR: validarStockDisponible  (Paso 4)
+// Valida si hay stock suficiente para procesar una operación.
+// Se reutiliza en actualizarProducto() y futuras funciones de venta.
+// =============================================================================
+function validarStockDisponible(int $id_inventario, int $cantidad_requerida): bool
+{
+    $modelInv = new Inventario();
+    return $modelInv->validarDisponibilidad($id_inventario, $cantidad_requerida);
+}
+
+// =============================================================================
+// FUNCIÓN AUXILIAR: obtenerStockActual  (Paso 4)
+// Retorna la cantidad actual de un lote usando los movimientos.
+// Útil para mostrar avisos al usuario si está bajando stock.
+// =============================================================================
+function obtenerStockActual(int $id_inventario): int
+{
+    $modelMov = new MovimientoStock();
+    return $modelMov->calcularCantidadActual($id_inventario);
+}
+
+// =============================================================================
+// FUNCIÓN AUXILIAR: procesarVenta  (Paso 4 - Para uso futuro en RFS 50)
+// Valida y decrementa stock para una venta.
+// Se usará en ventasController.php cuando se implemente RFS 50.
+// Retorna: ['exito' => bool, 'mensaje' => string]
+// =============================================================================
+function procesarVenta(int $id_inventario, int $cantidad, int $id_usuario = null): array
+{
+    if (!validarStockDisponible($id_inventario, $cantidad)) {
+        return ['exito' => false, 'mensaje' => 'Stock insuficiente'];
+    }
+    $modelInv = new Inventario();
+    $resultado = $modelInv->decrementarStock($id_inventario, $cantidad, 'venta', $id_usuario);
+    if ($resultado) {
+        $modelMov = new MovimientoStock();
+        $modelMov->registrarMovimiento($id_inventario, 'salida', $cantidad, 'venta', $id_usuario);
+        return ['exito' => true, 'mensaje' => 'Venta procesada'];
+    }
+    return ['exito' => false, 'mensaje' => 'Error al procesar'];
+}
 
 // =============================================================================
 // FUNCIÓN: guardarProducto  (RFS 44)
@@ -83,6 +129,7 @@ function guardarProducto(): void
     }
 
     // Cantidad debe ser mayor a cero (no se permite stock inicial en 0)
+    // [Paso 4] Validación de stock: cantidad inicial debe ser > 0
     if ($cantidad <= 0) {
         mostrarSweetAlert('error', 'Cantidad inválida', 'La cantidad inicial debe ser mayor a cero.', $urlRegistro);
         exit();
@@ -240,7 +287,30 @@ function actualizarProducto(): void
         exit();
     }
 
-    // ── 4. Llamar al modelo para actualizar las dos tablas ────────────────────
+    // ── 4. Validar cantidad: no puede ser menor a stock_minimo (Paso 4 - Validaciones) ─
+    // Si se intenta reducir stock por debajo del mínimo, rechazar la operación
+    if ($cantidad < $stock_minimo) {
+        mostrarSweetAlert(
+            'error',
+            'Cantidad insuficiente',
+            'La cantidad no puede ser menor al stock mínimo (' . $stock_minimo . ' unidades).',
+            BASE_URL . '/representante/editar-producto?id=' . $id_inventario
+        );
+        exit();
+    }
+
+    // ── 5. Validar cantidad: debe ser mayor a cero ─────────────────────────────
+    if ($cantidad <= 0) {
+        mostrarSweetAlert(
+            'error',
+            'Cantidad inválida',
+            'La cantidad debe ser mayor a cero.',
+            BASE_URL . '/representante/editar-producto?id=' . $id_inventario
+        );
+        exit();
+    }
+
+    // ── 6. Llamar al modelo para actualizar las dos tablas ────────────────────
     $modelInv = new Inventario();
 
     $datosLote = [
