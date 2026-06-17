@@ -1,6 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_veterinario.php';
-?>
+require_once BASE_PATH . "/app/helpers/session_veterinario.php"; ?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -32,13 +31,14 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 <body>
 
     <!-- BARRA LATERAL -->
-    <?php include_once __DIR__ . '/../../layouts/sidebar_veterinario.php'; ?>
+    <?php include_once __DIR__ . "/../../layouts/sidebar_veterinario.php"; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="contenido-principal" id="contenidoPrincipal">
 
         <!-- NAVBAR SUPERIOR -->
-        <?php include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php'; ?>
+        <?php include_once __DIR__ .
+            "/../../layouts/panel_superior_veterinario.php"; ?>
 
         <div class="area-contenido">
             <section class="historial-shell">
@@ -122,7 +122,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <div class="col-lg-4 d-flex flex-column gap-3">
 
                         <!-- Panel de búsqueda -->
-                        <div class="historial-card">
+                        <div class="historial-card" style="overflow:visible;">
                             <div class="bloque-titulo mb-3">
                                 <h5><i class="bi bi-search me-2"></i>Buscar Paciente</h5>
                             </div>
@@ -139,7 +139,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         </div>
 
                         <!-- Tarjeta info paciente -->
-                        <div class="historial-card receta-info-card flex-grow-1">
+                        <div class="historial-card receta-info-card grow">
                             <div class="receta-info-empty" id="emptyState">
                                 <div class="receta-empty-icon">
                                     <i class="bi bi-paw"></i>
@@ -275,7 +275,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     <button type="button" class="btn-secundario" data-bs-dismiss="modal">
                         <i class="bi bi-x-circle me-1"></i> Cancelar
                     </button>
-                    <button id="btn-guardar-resultados" type="button" class="boton-agregar">
+                    <button id="btn-guardar-resultados" type="button" class="btn" style="background:#0a932c;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-weight:600;cursor:pointer;">
                         <i class="bi bi-printer me-1"></i> Imprimir Receta
                     </button>
                 </div>
