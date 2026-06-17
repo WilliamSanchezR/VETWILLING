@@ -772,6 +772,11 @@ switch ($request) {
         require BASE_PATH . "/app/controllers/inventarioController.php";
         break;
 
+    //------------------------------MOVIMIENTOS DE STOCK (Paso 3)------------------------------//
+    case '/representante/movimientos-stock':
+        require BASE_PATH . '/app/controllers/movimientosStockController.php';
+        break;
+
     //---------------------------------------SERVICIOS-------------------------------------//
     case "/representante/registro-servicio":
         require BASE_PATH .
