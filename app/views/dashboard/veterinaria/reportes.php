@@ -1,6 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_veterinario.php';
-?>
+require_once BASE_PATH . "/app/helpers/session_veterinario.php"; ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -30,25 +29,22 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <!-- BARRA LATERAL IZQUIERDA -->
     <!-- Aqui va el include -->
-    <?php
-    include_once __DIR__ . '/../../layouts/sidebar_veterinario.php'
-    ?>
+    <?php include_once __DIR__ . "/../../layouts/sidebar_veterinario.php"; ?>
 
 
     <!-- PANEL DERECHO -->
     <!-- aqui va el inclunde notifi -->
     <?php
-    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
-    ?>
+// include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
+?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="contenido-principal" id="contenidoPrincipal">
         <!-- NAVBAR SUPERIOR -->
 
         <!-- Aqui va el include de navbar superior -->
-        <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php'
-        ?>
+        <?php include_once __DIR__ .
+            "/../../layouts/panel_superior_veterinario.php"; ?>
 
         <!-- ÁREA DE CONTENIDO -->
         <div class="area-contenido">
@@ -105,11 +101,11 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             </button>
                         </div>
                         <!-- Rango personalizado (RFS 32 subtask 3) -->
-                        <div class="d-flex gap-2 flex-wrap align-items-center mt-2" id="rangoPersonalizado" style="display:none!important;">
+                        <div class="d-flex gap-2 flex-wrap align-items-center mt-2" id="rangoPersonalizado" style="display:none;">
                             <input type="date" id="fechaInicioReporte" class="form-control form-control-sm" style="width:auto;" title="Fecha inicio">
                             <span class="text-muted small">al</span>
                             <input type="date" id="fechaFinReporte" class="form-control form-control-sm" style="width:auto;" title="Fecha fin">
-                            <button class="btn btn-sm btn-success" onclick="cargarDashboardReportes()">
+                            <button class="boton-periodo" onclick="periodoActual='personalizado';cargarDashboardReportes();">
                                 <i class="bi bi-search"></i> Aplicar
                             </button>
                         </div>
@@ -359,7 +355,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                             <p class="subtitulo-tabla">Desglose detallado por concepto</p>
                         </div>
                     </div>
-                    <button class="boton-detalle-tabla">
+                    <button class="boton-detalle-tabla" id="btnVerDetalleFinanciero">
                         <span>Ver Detalle Completo</span>
                         <i class="bi bi-arrow-right-circle-fill"></i>
                     </button>

@@ -69,7 +69,12 @@ function agregarDisponibilidadAgenda()
 
     // Validar campos obligatorios básicos
     if (empty($data['id_usuario']) || empty($data['id_veterinaria']) || empty($data['dia_semana']) || empty($data['duracion_minutos'])) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos obligatorios');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Campos vacíos',
+            'details' => 'Por favor complete todos los campos obligatorios'
+        ]);
         exit();
     }
 
@@ -83,19 +88,34 @@ function agregarDisponibilidadAgenda()
 
     // Validar que al menos uno de los dos grupos de horarios esté completo
     if (!$primerHorarioCompleto && !$segundoHorarioCompleto) {
-        mostrarSweetAlert('error', 'Horario incompleto', 'Debe ingresar al menos un par completo de horarios (inicio y fin)');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Horario incompleto',
+            'details' => 'Debe ingresar al menos un par completo de horarios (inicio y fin)'
+        ]);
         exit();
     }
 
     // Validar que si se ingresó uno del primer par, el otro también debe estar ingresado
     if ($tienePrimerHorario && !$primerHorarioCompleto) {
-        mostrarSweetAlert('error', 'Primera franja incompleta', 'Si ingresa un horario en la primera franja, debe completar tanto la hora de inicio como la hora de fin');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Primera franja incompleta',
+            'details' => 'Si ingresa un horario en la primera franja, debe completar tanto la hora de inicio como la hora de fin'
+        ]);
         exit();
     }
 
     // Validar que si se ingresó uno del segundo par, el otro también debe estar ingresado
     if ($tieneSegundoHorario && !$segundoHorarioCompleto) {
-        mostrarSweetAlert('error', 'Segunda franja incompleta', 'Si ingresa un horario en la segunda franja, debe completar tanto la hora de inicio como la hora de fin');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Segunda franja incompleta',
+            'details' => 'Si ingresa un horario en la segunda franja, debe completar tanto la hora de inicio como la hora de fin'
+        ]);
         exit();
     }
 

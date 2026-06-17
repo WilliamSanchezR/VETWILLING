@@ -1,6 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_veterinario.php';
-?>
+require_once BASE_PATH . "/app/helpers/session_veterinario.php"; ?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -35,11 +34,12 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
 <body>
 
-    <?php include_once __DIR__ . '/../../layouts/sidebar_veterinario.php' ?>
+    <?php include_once __DIR__ . "/../../layouts/sidebar_veterinario.php"; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="contenido-principal" id="contenidoPrincipal">
-        <?php include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php' ?>
+        <?php include_once __DIR__ .
+            "/../../layouts/panel_superior_veterinario.php"; ?>
 
         <div class="area-contenido">
             <section class="historial-shell laboratorio-shell">
@@ -309,6 +309,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
         </div>
     </div>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
