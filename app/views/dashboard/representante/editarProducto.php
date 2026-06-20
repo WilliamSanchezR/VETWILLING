@@ -124,6 +124,22 @@ $id_veterinaria = (int) $_SESSION['user']['id_veterinaria'];
                                 ><?= htmlspecialchars($item['descripcion'] ?? '') ?></textarea>
                             </div>
 
+                            <!-- Proveedor o laboratorio -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="proveedor">
+                                    Proveedor / Laboratorio <span class="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="proveedor"
+                                    name="proveedor"
+                                    class="form-control"
+                                    value="<?= htmlspecialchars($item['proveedor'] ?? '') ?>"
+                                    maxlength="150"
+                                    required
+                                >
+                            </div>
+
                             <!-- Precio unitario -->
                             <div class="col-md-6">
                                 <label class="form-label" for="precio">

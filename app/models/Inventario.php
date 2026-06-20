@@ -218,9 +218,11 @@ class Inventario
                         i.categoria,
                         i.numero_lote,
                         i.stock_minimo,
+                        i.detalle_almacenamiento,
                         p.id_producto,
                         p.nombre,
                         p.descripcion,
+                        p.proveedor,
                         p.precio,
                         p.precio_venta,
                         p.costo_mayorista,
@@ -254,7 +256,7 @@ class Inventario
 
     /**
      * Actualiza los campos del lote: cantidad, categoría,
-     * número de lote y stock mínimo.
+     * número de lote, stock mínimo y detalle de almacenamiento.
      *
      * @param int   $id_inventario  ID del lote a modificar
      * @param array $datos          Campos nuevos del lote
@@ -264,20 +266,24 @@ class Inventario
     {
         try {
             $sql = "UPDATE inventario
-                    SET cantidad       = :cantidad,
-                        categoria      = :categoria,
-                        numero_lote    = :numero_lote,
-                        stock_minimo   = :stock_minimo
+                    SET cantidad               = :cantidad,
+                        categoria              = :categoria,
+                        numero_lote            = :numero_lote,
+                        stock_minimo           = :stock_minimo,
+                        detalle_almacenamiento = :detalle_almacenamiento
                     WHERE id_inventario = :id_inventario
                       AND estado = 1";
 
             $stmt = $this->conexion->prepare($sql);
 
-            $stmt->bindParam(':cantidad',      $datos['cantidad'],     PDO::PARAM_INT);
-            $stmt->bindParam(':categoria',     $datos['categoria'],    PDO::PARAM_STR);
-            $stmt->bindParam(':numero_lote',   $datos['numero_lote'],  PDO::PARAM_STR);
-            $stmt->bindParam(':stock_minimo',  $datos['stock_minimo'], PDO::PARAM_INT);
-            $stmt->bindParam(':id_inventario', $id_inventario,         PDO::PARAM_INT);
+            $detalleAlmacenamiento = isset($datos['detalle_almacenamiento']) ? $datos['detalle_almacenamiento'] : '';
+
+            $stmt->bindParam(':cantidad',               $datos['cantidad'],     PDO::PARAM_INT);
+            $stmt->bindParam(':categoria',              $datos['categoria'],    PDO::PARAM_STR);
+            $stmt->bindParam(':numero_lote',            $datos['numero_lote'],  PDO::PARAM_STR);
+            $stmt->bindParam(':stock_minimo',           $datos['stock_minimo'], PDO::PARAM_INT);
+            $stmt->bindParam(':detalle_almacenamiento', $detalleAlmacenamiento, PDO::PARAM_STR);
+            $stmt->bindParam(':id_inventario',           $id_inventario,         PDO::PARAM_INT);
 
             return $stmt->execute();
 
@@ -289,7 +295,7 @@ class Inventario
 
     /**
      * Actualiza los campos descriptivos del producto:
-     * nombre, descripción, precio y fecha de vencimiento.
+     * nombre, descripción, proveedor, precio y fecha de vencimiento.
      *
      * @param int   $id_producto  ID del producto a modificar
      * @param array $datos        Campos nuevos del producto
@@ -301,6 +307,7 @@ class Inventario
             $sql = "UPDATE producto
                     SET nombre            = :nombre,
                         descripcion       = :descripcion,
+                        proveedor         = :proveedor,
                         precio            = :precio,
                         precio_venta      = :precio_venta,
                         costo_mayorista   = :costo_mayorista,
@@ -312,9 +319,11 @@ class Inventario
             $fechaVenc      = !empty($datos['fecha_vencimiento']) ? $datos['fecha_vencimiento'] : null;
             $precioVenta    = isset($datos['precio_venta'])    && $datos['precio_venta']    !== '' ? $datos['precio_venta']    : $datos['precio'];
             $costoMayorista = isset($datos['costo_mayorista']) && $datos['costo_mayorista'] !== '' ? $datos['costo_mayorista'] : $datos['precio'];
+            $proveedor      = isset($datos['proveedor']) ? $datos['proveedor'] : '';
 
             $stmt->bindParam(':nombre',            $datos['nombre'],      PDO::PARAM_STR);
             $stmt->bindParam(':descripcion',       $datos['descripcion'], PDO::PARAM_STR);
+            $stmt->bindParam(':proveedor',         $proveedor,            PDO::PARAM_STR);
             $stmt->bindParam(':precio',            $datos['precio']);
             $stmt->bindParam(':precio_venta',      $precioVenta);
             $stmt->bindParam(':costo_mayorista',   $costoMayorista);
