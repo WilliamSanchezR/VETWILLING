@@ -257,14 +257,16 @@ function actualizarProducto(): void
     $id_veterinaria = (int) ($_SESSION['user']['id_veterinaria'] ?? 0);
 
     // ── 2. Capturar los campos editables del formulario ───────────────────────
-    $nombre       = trim(   $_POST['nombre']            ?? '');
-    $descripcion  = trim(   $_POST['descripcion']       ?? '');
-    $precio       = trim(   $_POST['precio']            ?? '0');
-    $fecha_venc   = trim(   $_POST['fecha_vencimiento'] ?? '');
-    $cantidad     = (int)  ($_POST['cantidad']          ?? 0);
-    $categoria    = trim(   $_POST['categoria']         ?? '');
-    $numero_lote  = trim(   $_POST['numero_lote']       ?? '');
-    $stock_minimo = (int)  ($_POST['stock_minimo']      ?? 5);
+    $nombre                 = trim(   $_POST['nombre']                    ?? '');
+    $descripcion            = trim(   $_POST['descripcion']               ?? '');
+    $proveedor              = trim(   $_POST['proveedor']                 ?? '');
+    $precio                 = trim(   $_POST['precio']                    ?? '0');
+    $fecha_venc             = trim(   $_POST['fecha_vencimiento']        ?? '');
+    $cantidad               = (int)  ($_POST['cantidad']                  ?? 0);
+    $categoria              = trim(   $_POST['categoria']                 ?? '');
+    $numero_lote            = trim(   $_POST['numero_lote']               ?? '');
+    $stock_minimo           = (int)  ($_POST['stock_minimo']              ?? 5);
+    $detalle_almacenamiento = trim(   $_POST['detalle_almacenamiento']    ?? '');
 
     // ── 3. Validar que los IDs y campos obligatorios sean correctos ───────────
     if ($id_inventario <= 0 || $id_producto <= 0 || empty($nombre)) {
@@ -273,6 +275,17 @@ function actualizarProducto(): void
             'Datos inválidos',
             'No se pudo identificar el producto a editar.',
             BASE_URL . '/representante/inventario'
+        );
+        exit();
+    }
+
+    // Proveedor obligatorio
+    if ($proveedor === '') {
+        mostrarSweetAlert(
+            'error',
+            'Campo obligatorio',
+            'El proveedor o laboratorio es obligatorio.',
+            BASE_URL . '/representante/editar-producto?id=' . $id_inventario
         );
         exit();
     }
@@ -312,17 +325,23 @@ function actualizarProducto(): void
 
     // ── 6. Llamar al modelo para actualizar las dos tablas ────────────────────
     $modelInv = new Inventario();
+    $modelMov = new MovimientoStock();
+
+    // Obtener cantidad actual antes de actualizar para registrar movimiento si cambia
+    $cantidadAnterior = obtenerStockActual($id_inventario);
 
     $datosLote = [
-        'cantidad'     => $cantidad,
-        'categoria'    => $categoria,
-        'numero_lote'  => $numero_lote,
-        'stock_minimo' => $stock_minimo,
+        'cantidad'               => $cantidad,
+        'categoria'              => $categoria,
+        'numero_lote'            => $numero_lote,
+        'stock_minimo'           => $stock_minimo,
+        'detalle_almacenamiento' => $detalle_almacenamiento,
     ];
 
     $datosProducto = [
         'nombre'            => $nombre,
         'descripcion'       => $descripcion,
+        'proveedor'         => $proveedor,
         'precio'            => (float) $precio,
         'fecha_vencimiento' => $fecha_venc,
     ];
@@ -330,7 +349,23 @@ function actualizarProducto(): void
     $exitoLote     = $modelInv->actualizarLote($id_inventario, $datosLote);
     $exitoProducto = $modelInv->actualizarProducto($id_producto, $datosProducto);
 
-    // ── 5. Responder según el resultado ───────────────────────────────────────
+    // ── 7. Registrar movimiento de stock si la cantidad cambió ────────────────
+    if ($exitoLote && $cantidad !== $cantidadAnterior) {
+        $diferencia = $cantidad - $cantidadAnterior;
+        $tipoMovimiento = $diferencia > 0 ? 'entrada' : 'salida';
+        $cantidadMovimiento = abs($diferencia);
+        $motivo = 'Ajuste por edición de producto';
+
+        $modelMov->registrarMovimiento(
+            $id_inventario,
+            $tipoMovimiento,
+            $cantidadMovimiento,
+            $motivo,
+            $_SESSION['user']['id_usuario'] ?? null
+        );
+    }
+
+    // ── 8. Responder según el resultado ───────────────────────────────────────
     if ($exitoLote && $exitoProducto) {
         mostrarSweetAlert(
             'success',
