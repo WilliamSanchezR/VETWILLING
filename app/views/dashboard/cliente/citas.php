@@ -369,13 +369,14 @@ $id_usuario = $_SESSION['user']['id_usuario'];
         var pasadas    = citas.filter(function(c) { return new Date(c.fecha_hora) < hoy; });
         var otras      = citas.filter(function(c) { return !(pendientes.includes(c) || pasadas.includes(c)); });
 
-        // Ordenar cada segmento cronológicamente ascendente
+        // Ordenar cada segmento cronológicamente
         var ordenarAsc = function(a, b) { return new Date(a.fecha_hora) - new Date(b.fecha_hora); };
+        var ordenarDesc = function(a, b) { return new Date(b.fecha_hora) - new Date(a.fecha_hora); };
         pendientes.sort(ordenarAsc);
         otras.sort(ordenarAsc);
-        pasadas.sort(ordenarAsc);
+        pasadas.sort(ordenarDesc);
 
-        // Concatenar: pendientes → otras próximas → pasadas (al final)
+        // Concatenar: pendientes → otras próximas → pasadas (ultimas pasadas primero)
         var ordenadas = pendientes.concat(otras).concat(pasadas);
 
         // Agrupar por día y renderizar en orden ascendente
@@ -396,6 +397,9 @@ $id_usuario = $_SESSION['user']['id_usuario'];
             lista.sort(ordenarAsc);
             var parts = fecha.split('-');
             var fObj = new Date(+parts[0], +parts[1]-1, +parts[2]);
+            var fechaTexto = fObj.toLocaleDateString('es-ES', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
             var diff = Math.floor((fObj - hoy) / 86400000);
             var etiq = diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana' : diff > 1 ? 'En ' + diff + ' días' : 'Pasada';
 
@@ -403,7 +407,7 @@ $id_usuario = $_SESSION['user']['id_usuario'];
                 '<div class="timeline-dia">' +
                     '<div class="dia-header">' +
                         '<div class="dia-fecha">' +
-                            '<h3>' + formatearFecha(fObj) + '</h3>' +
+                            '<h3>' + fechaTexto + '</h3>' +
                             '<p>' + etiq + '</p>' +
                         '</div>' +
                         '<span class="dia-badge">' + lista.length + ' cita' + (lista.length > 1 ? 's' : '') + '</span>' +
