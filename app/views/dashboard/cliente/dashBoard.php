@@ -1,5 +1,63 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_propietario.php';
+require_once BASE_PATH . '/app/models/CitasCliente.php';
+
+$usuario = $_SESSION['user'] ?? [];
+$id_propietario = $_SESSION['user']['id_propietario'] ?? null;
+
+if (!$id_propietario && isset($_SESSION['user']['id_usuario'])) {
+    $modeloCitas = new CitasCliente();
+    $id_propietario = $modeloCitas->obtenerIdPropietarioPorUsuario((int)$_SESSION['user']['id_usuario']);
+    if ($id_propietario) {
+        $_SESSION['user']['id_propietario'] = $id_propietario;
+    }
+}
+
+$proximasCitas = [];
+
+if ($id_propietario) {
+    if (!isset($modeloCitas)) {
+        $modeloCitas = new CitasCliente();
+    }
+
+    $filtros = ['fecha_inicio' => date('Y-m-d')];
+    $citas = $modeloCitas->listarCitasPropietario($id_propietario, $filtros);
+
+    $proximasCitas = array_filter($citas, function ($cita) {
+        return !in_array($cita['estado'], ['Cancelada', 'Realizada']) &&
+               strtotime($cita['fecha_hora']) >= strtotime(date('Y-m-d') . ' 00:00:00');
+    });
+
+    usort($proximasCitas, function ($a, $b) {
+        return strtotime($a['fecha_hora']) - strtotime($b['fecha_hora']);
+    });
+
+    $proximasCitas = array_slice($proximasCitas, 0, 3);
+}
+
+function formatCitaFechaDia($fechaHora)
+{
+    $dt = new DateTime($fechaHora);
+    return $dt->format('d');
+}
+
+function formatCitaFechaMes($fechaHora)
+{
+    $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    $dt = new DateTime($fechaHora);
+    return $meses[(int)$dt->format('n') - 1];
+}
+
+function formatCitaHora($fechaHora)
+{
+    $dt = new DateTime($fechaHora);
+    return $dt->format('h:i A');
+}
+
+function cleanText($texto)
+{
+    return htmlspecialchars($texto ?? '', ENT_QUOTES, 'UTF-8');
+}
 ?>
 
 <!DOCTYPE html>
@@ -71,41 +129,28 @@ require_once BASE_PATH . '/app/helpers/session_propietario.php';
                             <a href="#" class="card-action">Ver todas</a>
                         </div>
 
-                        <div class="cita-item urgente">
-                            <div class="cita-fecha">
-                                <div class="cita-dia">22</div>
-                                <div class="cita-mes">Nov</div>
+                        <?php if (!empty($proximasCitas)): ?>
+                            <?php foreach ($proximasCitas as $cita): ?>
+                                <div class="cita-item<?= strtolower($cita['tipo'] ?? '') === 'urgente' ? ' urgente' : '' ?>">
+                                    <div class="cita-fecha">
+                                        <div class="cita-dia"><?= formatCitaFechaDia($cita['fecha_hora']) ?></div>
+                                        <div class="cita-mes"><?= formatCitaFechaMes($cita['fecha_hora']) ?></div>
+                                    </div>
+                                    <div class="cita-info">
+                                        <div class="cita-mascota"><?= cleanText($cita['mascota_nombre'] . ' - ' . ($cita['tipo'] ?: 'Cita')) ?></div>
+                                        <div class="cita-detalles"><?= cleanText($cita['veterinario_nombre'] . ' - ' . ($cita['subservicio_nombre'] ?: $cita['servicio_nombre'] ?: 'Sin servicio')) ?></div>
+                                    </div>
+                                    <div class="cita-hora"><?= formatCitaHora($cita['fecha_hora']) ?></div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="cita-item">
+                                <div class="cita-info">
+                                    <div class="cita-mascota">No hay citas próximas</div>
+                                    <div class="cita-detalles">Agrega una nueva cita para empezar</div>
+                                </div>
                             </div>
-                            <div class="cita-info">
-                                <div class="cita-mascota">Max - Control</div>
-                                <div class="cita-detalles">Dr. Martínez - Consulta general</div>
-                            </div>
-                            <div class="cita-hora">10:30 AM</div>
-                        </div>
-
-                        <div class="cita-item">
-                            <div class="cita-fecha">
-                                <div class="cita-dia">25</div>
-                                <div class="cita-mes">Nov</div>
-                            </div>
-                            <div class="cita-info">
-                                <div class="cita-mascota">Max - Vacunación</div>
-                                <div class="cita-detalles">Dra. López - Antirrábica</div>
-                            </div>
-                            <div class="cita-hora">03:00 PM</div>
-                        </div>
-
-                        <div class="cita-item">
-                            <div class="cita-fecha">
-                                <div class="cita-dia">28</div>
-                                <div class="cita-mes">Nov</div>
-                            </div>
-                            <div class="cita-info">
-                                <div class="cita-mascota">Luna - Baño</div>
-                                <div class="cita-detalles">Peluquería - Baño y corte</div>
-                            </div>
-                            <div class="cita-hora">11:00 AM</div>
-                        </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- RECORDATORIOS -->
