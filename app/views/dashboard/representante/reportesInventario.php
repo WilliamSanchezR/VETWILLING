@@ -165,6 +165,50 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
                         <i class="bi bi-cart-x"></i> Consumo del periodo
                     </div>
                 </div>
+
+                <div class="stat-card primary">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="bi bi-speedometer2"></i>
+                        </div>
+                        <div class="stat-trend up">
+                            <i class="bi bi-graph-up"></i>
+                            Promedio
+                        </div>
+                    </div>
+                    <div class="stat-value" id="statConsumoPromedio">—</div>
+                    <div class="stat-label">Consumo Prom./Día</div>
+                    <div class="stat-footer">
+                        <i class="bi bi-calendar-day"></i> Unidades por día
+                    </div>
+                </div>
+            </div>
+
+            <div class="grafico-card">
+                <div class="grafico-header">
+                    <h3 class="grafico-titulo">Métricas de Consumo Promedio</h3>
+                </div>
+                <div class="contenedor-tabla">
+                    <div class="table-responsive">
+                        <table class="tabla-admin">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Total Salidas</th>
+                                    <th>Total Entradas</th>
+                                    <th>Promedio Salida</th>
+                                    <th>Número Salidas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyMetricas">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">Cargando...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <div class="grafico-card">
@@ -279,9 +323,9 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
                     periodoActual = this.dataset.periodo;
                     
                     if (periodoActual === 'personalizado') {
-                        document.getElementById('rangoPersonalizado').style.display = 'flex!important';
+                        document.getElementById('rangoPersonalizado').style.setProperty('display', 'flex', 'important');
                     } else {
-                        document.getElementById('rangoPersonalizado').style.display = 'none!important';
+                        document.getElementById('rangoPersonalizado').style.setProperty('display', 'none', 'important');
                         cargarDatos();
                     }
                 });
@@ -337,6 +381,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
             const meta = payload.meta;
             const resumen = payload.resumen;
             const detalle = payload.detalle_inventario;
+            const metricas = payload.metricas_consumo;
             const masUsados = payload.productos_mas_usados;
             const alertas = payload.items_con_alertas;
             const categorias = payload.categorias_disponibles;
@@ -348,12 +393,33 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
             document.getElementById('statStockTotal').textContent = resumen.stock_total;
             document.getElementById('statLotesCriticos').textContent = resumen.lotes_criticos;
             document.getElementById('statTotalSalidas').textContent = resumen.total_salidas;
+            document.getElementById('statConsumoPromedio').textContent = resumen.consumo_promedio_diario ?? '0';
 
             actualizarCategoriaSelect(categorias);
 
+            actualizarTablaMetricas(metricas);
             actualizarTablaDetalle(detalle);
             actualizarTablaMasUsados(masUsados);
             actualizarTablaAlertas(alertas);
+        }
+
+        function actualizarTablaMetricas(metricas) {
+            const tbody = document.getElementById('tbodyMetricas');
+            if (!metricas || metricas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Sin datos de consumo para el periodo</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = metricas.map(row => `
+                <tr>
+                    <td>${row.nombre}</td>
+                    <td>${row.categoria}</td>
+                    <td>${row.total_salidas}</td>
+                    <td>${row.total_entradas}</td>
+                    <td>${parseFloat(row.promedio_salida || 0).toFixed(2)}</td>
+                    <td>${row.numero_salidas}</td>
+                </tr>
+            `).join('');
         }
 
         function actualizarCategoriaSelect(categorias) {
@@ -443,6 +509,8 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
             const pdfURL = document.body.dataset.pdfUrl;
             const fechaInicio = document.getElementById('fechaInicio').value;
             const fechaFin = document.getElementById('fechaFin').value;
+            categoriaActual = document.getElementById('filtroCategoria').value;
+            productoActual = document.getElementById('filtroProducto').value;
 
             let url = `${pdfURL}?periodo=${periodoActual}`;
             if (periodoActual === 'personalizado' && fechaInicio && fechaFin) {
@@ -462,6 +530,8 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
             const excelURL = document.body.dataset.excelUrl;
             const fechaInicio = document.getElementById('fechaInicio').value;
             const fechaFin = document.getElementById('fechaFin').value;
+            categoriaActual = document.getElementById('filtroCategoria').value;
+            productoActual = document.getElementById('filtroProducto').value;
 
             let url = `${excelURL}?periodo=${periodoActual}`;
             if (periodoActual === 'personalizado' && fechaInicio && fechaFin) {
