@@ -235,9 +235,9 @@ function _crearNotificacionVeterinario(
 
         $ins = $db->prepare(
             "INSERT INTO notificaciones
-                 (usuario_id, tipo, mensaje, leido, estado, canal, referencia_id, fecha)
+                 (usuario_id, tipo, mensaje, leido, referencia_id, fecha)
              VALUES
-                 (:uid, 'acceso_historial', :msg, 0, 'pendiente', 'plataforma', :ref, NOW())"
+                 (:uid, 'acceso_historial', :msg, 0, :ref, NOW())"
         );
         $ins->execute([
             ':uid' => $id_vet_usuario,
@@ -295,9 +295,9 @@ function _notificarPropietario(
 
         $db2->prepare(
             "INSERT INTO notificaciones
-                 (usuario_id, tipo, mensaje, leido, estado, canal, referencia_id, fecha)
+                 (usuario_id, tipo, mensaje, leido, referencia_id, fecha)
              VALUES
-                 (:uid, 'acceso_historial_respuesta', :msg, 0, 'enviada', 'plataforma', :ref, NOW())"
+                 (:uid, 'acceso_historial_respuesta', :msg, 0, :ref, NOW())"
         )->execute([
             ':uid' => $id_usuario_prop,
             ':msg' => $mensaje,
