@@ -7,6 +7,7 @@ class Propietario
     private $conexion;
     private $encryption_key;
     private $cipher = 'AES-256-CBC';
+    public $lastError = null;
 
     public function __construct()
     {
@@ -188,6 +189,7 @@ class Propietario
                 $this->conexion->rollBack();
                 error_log("❌ Error al crear usuario");
                 error_log("Error Info: " . print_r($queryUsuario->errorInfo(), true));
+                $this->lastError = print_r($queryUsuario->errorInfo(), true);
                 return false;
             }
 
@@ -228,7 +230,8 @@ class Propietario
             } else {
                 $this->conexion->rollBack();
                 error_log("❌ Error al ejecutar INSERT propietario");
-                error_log("Error Info: " . print_r($query->errorInfo(), true));
+                $this->lastError = print_r($query->errorInfo(), true);
+                error_log("Error Info: " . $this->lastError);
             }
 
             return false;
@@ -237,7 +240,8 @@ class Propietario
             if ($this->conexion->inTransaction()) {
                 $this->conexion->rollBack();
             }
-            error_log("❌ Error en Propietario::registrar → " . $e->getMessage());
+            $this->lastError = $e->getMessage();
+            error_log("❌ Error en Propietario::registrar → " . $this->lastError);
             error_log("SQL State: " . $e->getCode());
             return false;
         }

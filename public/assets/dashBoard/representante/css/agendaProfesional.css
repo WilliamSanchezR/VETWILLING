@@ -3,25 +3,25 @@
    agendaProfesional.css — versión limpia y profesional
    ============================================================ */
 
-
 /* ── VARIABLES ──────────────────────────────────────────── */
 
 :root {
-    --am-green:         #0f8f3a;
-    --am-green-dark:    #0c7a32;
-    --am-green-deep:    #1b5e20;
-    --am-green-glow:    rgba(15, 143, 58, 0.18);
-    --am-text:          #1a1a2e;
-    --am-text-muted:    #6b7280;
-    --am-border:        #e2e8f0;
-    --am-bg-input:      #f8fafc;
-    --am-bg-footer:     #f8fafc;
-    --am-gray-btn:      #64748b;
-    --am-gray-hover:    #475569;
-    --am-radius-modal:  20px;
-    --am-radius-input:  10px;
-    --am-radius-btn:    10px;
-    --am-shadow-modal:  0 25px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.08);
+    --am-green: #0f8f3a;
+    --am-green-dark: #0c7a32;
+    --am-green-deep: #1b5e20;
+    --am-green-glow: rgba(15, 143, 58, 0.18);
+    --am-text: #1a1a2e;
+    --am-text-muted: #6b7280;
+    --am-border: #e2e8f0;
+    --am-bg-input: #f8fafc;
+    --am-bg-footer: #f8fafc;
+    --am-gray-btn: #64748b;
+    --am-gray-hover: #475569;
+    --am-radius-modal: 20px;
+    --am-radius-input: 10px;
+    --am-radius-btn: 10px;
+    --am-shadow-modal:
+        0 25px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
 /* ============================================================
@@ -31,25 +31,41 @@
     width: 100% !important;
 }
 
+/* ── Diálogo: ancho máximo y asegura que el flex de Bootstrap funcione ── */
 .modal-agenda-dialog {
-    max-width: 480px;
+    max-width: 520px;
+    width: 100%;
 }
 
+/* ── Contenido: el form interno permite border-radius con clip correcto ── */
 .modal-agenda-content {
     border: none;
     border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    overflow: visible; /* no clipear el scroll interno */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    width: 100%; /* llena el dialog */
+    display: flex;
+    flex-direction: column;
+}
+
+/* El form que envuelve body+footer también es flex para que footer quede pegado abajo */
+.modal-agenda-content > form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* necesario en columnas flex para que overflow-y funcione */
 }
 
 .modal-agenda-header {
     background: #fff;
     border-bottom: 1.5px solid #f0f4f0;
-    padding: 22px 28px 18px;
+    padding: 20px 24px 16px;
+    border-radius: 16px 16px 0 0; /* redondeo sólo arriba */
+    flex-shrink: 0;
 }
 
 .modal-agenda-title {
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 700;
     color: #1a1a2e;
     display: flex;
@@ -60,26 +76,37 @@
 
 .modal-agenda-title-icon {
     color: #2e7d32;
-    font-size: 21px;
+    font-size: 20px;
 }
 
 .modal-agenda-close {
     opacity: 0.45;
 }
 
+/* Body con scroll cuando el contenido supera la ventana */
 .modal-agenda-body {
     background: #fff;
-    padding: 22px 28px 12px;
+    padding: 20px 24px 12px;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    /* Límite: viewport menos header(≈60px) + footer(≈56px) + márgenes(≈60px) */
+    max-height: calc(100dvh - 200px);
 }
 
 .modal-agenda-footer {
     background: #fff;
     border-top: 1.5px solid #f0f0f0;
-    padding: 16px 28px;
+    padding: 14px 24px;
     gap: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 0 0 16px 16px; /* redondeo sólo abajo */
 }
 
 .contenedor-agenda-profesional {
@@ -89,7 +116,6 @@
     position: relative;
     top: 56px;
 }
-
 
 /* Tarjeta info profesional */
 
@@ -102,7 +128,6 @@
     position: relative;
     overflow: hidden;
 }
-
 
 /* Detalle decorativo */
 
@@ -179,7 +204,6 @@
     font-weight: 600;
 }
 
-
 /* ============================================================
    1. DIALOG Y CONTENIDO
    ============================================================ */
@@ -197,7 +221,20 @@
     box-shadow: var(--am-shadow-modal) !important;
     opacity: 0;
     transform: translateY(16px) scale(0.98);
-    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition:
+        opacity 0.28s ease,
+        transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: 90vh !important;
+}
+
+#modalAgregarAgenda .modal-content > form,
+#modalEditarAgenda .modal-content > form {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important;
 }
 
 #modalAgregarAgenda.show .modal-content,
@@ -206,20 +243,22 @@
     transform: translateY(0) scale(1);
 }
 
-
 /* ============================================================
    2. HEADER
    ============================================================ */
 
 #modalAgregarAgenda .modal-header,
 #modalEditarAgenda .modal-header {
-    background: linear-gradient( 135deg, var(--am-green) 0%, var(--am-green-dark) 100%) !important;
+    background: linear-gradient(
+        135deg,
+        var(--am-green) 0%,
+        var(--am-green-dark) 100%
+    ) !important;
     border-bottom: none !important;
     padding: 22px 28px !important;
     position: relative;
     overflow: hidden;
 }
-
 
 /* Decoración header */
 
@@ -254,7 +293,7 @@
     background: rgba(255, 255, 255, 0.2);
     width: 34px;
     height: 34px;
-    border-radius: 8px;
+    border-radius: 8px;2
     display: flex;
     align-items: center;
     justify-content: center;
@@ -265,7 +304,9 @@
 #modalEditarAgenda .btn-close {
     filter: brightness(0) invert(1) !important;
     opacity: 0.7 !important;
-    transition: opacity 0.2s, transform 0.2s !important;
+    transition:
+        opacity 0.2s,
+        transform 0.2s !important;
     z-index: 1;
 }
 
@@ -275,10 +316,16 @@
     transform: rotate(90deg) !important;
 }
 
-
 /* ============================================================
    3. BODY
    ============================================================ */
+
+#modalAgregarAgenda .modal-content,
+#modalEditarAgenda .modal-content {
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: 90vh !important;
+}
 
 #modalAgregarAgenda .modal-body,
 #modalEditarAgenda .modal-body {
@@ -286,8 +333,11 @@
     display: flex !important;
     flex-direction: column !important;
     gap: 2px !important;
+    overflow-y: auto !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    max-height: calc(90vh - 120px) !important;
 }
-
 
 /* ============================================================
    4. GRUPOS DE CAMPO
@@ -297,7 +347,6 @@
 #modalEditarAgenda .mb-3 {
     margin-bottom: 18px !important;
 }
-
 
 /* ============================================================
    5. LABELS
@@ -353,7 +402,6 @@
     opacity: 0.7;
 }
 
-
 /* ============================================================
    6. INPUTS Y SELECTS
    ============================================================ */
@@ -373,7 +421,10 @@
     box-shadow: none !important;
     outline: none;
     box-sizing: border-box;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
     appearance: auto;
 }
 
@@ -410,7 +461,6 @@
     cursor: not-allowed;
 }
 
-
 /* ============================================================
    7. FILA DE HORAS
    ============================================================ */
@@ -429,7 +479,6 @@
     flex-direction: column;
 }
 
-
 /* Flecha separadora generada por CSS */
 
 #modalAgregarAgenda .am-time-row::after,
@@ -441,7 +490,6 @@
     flex-shrink: 0;
     font-weight: 300;
 }
-
 
 /* ============================================================
    8. FOOTER
@@ -455,8 +503,8 @@
     display: flex !important;
     justify-content: flex-end !important;
     gap: 10px !important;
+    flex-shrink: 0 !important;
 }
-
 
 /* ============================================================
    9. BOTONES
@@ -477,7 +525,6 @@
     letter-spacing: 0.01em;
 }
 
-
 /* Cancelar */
 
 #modalAgregarAgenda .am-btn-secondary,
@@ -497,20 +544,31 @@
     transform: translateY(0) !important;
 }
 
-
 /* Guardar / Agregar */
 
 #modalAgregarAgenda .am-btn-primary,
 #modalEditarAgenda .am-btn-primary {
-    background: linear-gradient( 135deg, var(--am-green), var(--am-green-dark)) !important;
-    background-image: linear-gradient( 135deg, var(--am-green), var(--am-green-dark)) !important;
+    background: linear-gradient(
+        135deg,
+        var(--am-green),
+        var(--am-green-dark)
+    ) !important;
+    background-image: linear-gradient(
+        135deg,
+        var(--am-green),
+        var(--am-green-dark)
+    ) !important;
     color: #ffffff !important;
     box-shadow: 0 2px 8px var(--am-green-glow) !important;
 }
 
 #modalAgregarAgenda .am-btn-primary:hover,
 #modalEditarAgenda .am-btn-primary:hover {
-    background: linear-gradient( 135deg, var(--am-green-dark), var(--am-green-deep)) !important;
+    background: linear-gradient(
+        135deg,
+        var(--am-green-dark),
+        var(--am-green-deep)
+    ) !important;
     box-shadow: 0 6px 20px rgba(15, 143, 58, 0.4) !important;
     transform: translateY(-2px) !important;
 }
@@ -520,7 +578,6 @@
     transform: translateY(0) !important;
     box-shadow: 0 2px 6px var(--am-green-glow) !important;
 }
-
 
 /* ============================================================
    10. RESPONSIVE
@@ -564,7 +621,13 @@
     padding: 0px !important;
 }
 
-.form-modal {
+/* Estilos específicos para el contenedor del formulario dentro del modal */
+#modalAgregarAgenda .form-modal,
+#modalEditarAgenda .form-modal {
     overflow-y: auto !important;
     padding: 26px 28px 18px !important;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }

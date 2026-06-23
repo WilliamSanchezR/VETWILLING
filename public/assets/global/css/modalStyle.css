@@ -24,7 +24,10 @@
 
 .form-modal {
     text-align: left;
-    overflow: hidden;
+    max-height: 65vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 10px;
 }
 
 

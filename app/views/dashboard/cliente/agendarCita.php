@@ -655,7 +655,7 @@ $mascotas = listarMascotas();
                                     </div>
                                 </div>
                                 
-                                <div id="disponibilidadesContainer">
+                                <div id="disponibilidadesContainer" class="list-group">
                                     <div class="text-center py-5 text-muted">Seleccione una fecha y haga clic en actualizar para ver horarios</div>
                                 </div>
                                 <!-- Selector de hora (oculto hasta que se seleccione una disponibilidad) -->
@@ -1023,25 +1023,21 @@ $mascotas = listarMascotas();
                         return;
                     }
 
-                    const cardsHtml = disponibles.map(item => {
+                    const itemsHtml = disponibles.map(item => {
                         const horaInicio = item.hora_inicio.substring(0, 5);
                         const horaFin = item.hora_fin.substring(0, 5);
                         return `
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <h5 class="card-title mb-2">${item.veterinario_nombre}</h5>
-                                    <p class="card-text mb-1"><strong>Especialidad:</strong> ${item.especialidad}</p>
-                                    <p class="card-text mb-1"><strong>Día:</strong> ${item.dia}</p>
-                                    <p class="card-text mb-3"><strong>Horario:</strong> ${horaInicio} - ${horaFin}</p>
-                                    <button type="button" class="btn btn-outline-success btnSeleccionarHorario" data-id_usuario="${item.id_usuario}" data-veterinario_nombre="${item.veterinario_nombre}" data-hora_inicio="${item.hora_inicio}" data-hora_fin="${item.hora_fin}">
-                                        Seleccionar este horario
-                                    </button>
+                            <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center btnSeleccionarHorario" data-id_usuario="${item.id_usuario}" data-veterinario_nombre="${item.veterinario_nombre}" data-hora_inicio="${item.hora_inicio}" data-hora_fin="${item.hora_fin}">
+                                <div>
+                                    <strong>${item.veterinario_nombre}</strong><br>
+                                    <small>${horaInicio} - ${horaFin}</small>
                                 </div>
-                            </div>
+                                <span class="badge bg-success">Seleccionar</span>
+                            </button>
                         `;
                     }).join('');
 
-                    divisionesPrevias.innerHTML = `<div class="row">${cardsHtml}</div>`;
+                    divisionesPrevias.innerHTML = `<div class="list-group">${itemsHtml}</div>`;
                     
                     // Guardar datos de la disponibilidad seleccionada
                     let disponibilidadSeleccionada = null;

@@ -225,6 +225,37 @@ function crearAgendamientoAjax()
 
         $id_especialidad = (int)$id_especialidad_resuelta;
 
+        // Resolver profesional asignado si se indica en el payload
+        $id_veterinario = null;
+        if (!empty($data['id_veterinario']) && is_numeric($data['id_veterinario'])) {
+            $id_veterinario = (int)$data['id_veterinario'];
+        } elseif (!empty($data['id_usuario']) && is_numeric($data['id_usuario'])) {
+            $id_veterinario = (int)$data['id_usuario'];
+        }
+
+        if ($id_veterinario !== null) {
+            require_once __DIR__ . '/../models/Profesional.php';
+            $profesionalModel = new Profesional();
+            $profesional = $profesionalModel->consultarPorId($id_veterinario);
+            if ($profesional) {
+                $id_usuario = $id_veterinario;
+            } else {
+                error_log("Profesional no encontrado para id_veterinario/id_usuario: {$id_veterinario}");
+                // Si el usuario actual no es profesional, dejar el campo id_usuario como NULL
+                $currentUserProfesional = $profesionalModel->consultarPorId($id_usuario);
+                if (!$currentUserProfesional) {
+                    $id_usuario = null;
+                }
+            }
+        } else {
+            require_once __DIR__ . '/../models/Profesional.php';
+            $profesionalModel = new Profesional();
+            $currentUserProfesional = $profesionalModel->consultarPorId($id_usuario);
+            if (!$currentUserProfesional) {
+                $id_usuario = null;
+            }
+        }
+
         // Validar que la cita esté dentro de la disponibilidad
         $validacionDisponibilidad = $disponibilidadModel->validarCitaDentroDisponibilidad(
             $id_usuario,
@@ -917,9 +948,9 @@ function obtenerVeterinarios()
             exit();
         }
 
-        require_once __DIR__ . '/../models/Veterinario.php';
-        $veterinarioModel = new Veterinario();
-        $veterinarios = $veterinarioModel->listar($id_veterinaria);
+        require_once __DIR__ . '/../models/Profesional.php';
+        $profesionalModel = new Profesional();
+        $veterinarios = $profesionalModel->listar($id_veterinaria);
 
         header('Content-Type: application/json');
         echo json_encode(['status' => 'success', 'data' => $veterinarios]);

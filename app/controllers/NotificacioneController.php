@@ -4,9 +4,11 @@
  * Responsabilidad: Recibir peticiones HTTP, validar sesión/input y responder JSON.
  * 
  * Rutas esperadas (ejemplo con router propio):
- *   GET  /notificaciones           → obtenerNotificaciones()
- *   POST /notificaciones/leida     → marcarLeida()
- *   POST /notificaciones/todas     → marcarTodasLeidas()
+ *   GET  /notificaciones?accion=listar   → obtenerNotificaciones()
+ *   GET  /notificaciones?accion=detalle  → verDetalle()
+ *   POST /notificaciones?accion=registrar → registrarNotificacion()
+ *   POST /notificaciones?accion=leida    → marcarLeida()
+ *   POST /notificaciones?accion=todas    → marcarTodasLeidas()
  */
 
 require_once BASE_PATH . '/app/models/Notificacion.php';
@@ -101,6 +103,71 @@ class NotificacionController {
     // POST /notificaciones/leida
     // Body JSON: { "id": 123 }
     // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────
+    // GET /notificaciones?accion=detalle&id=123
+    // ─────────────────────────────────────────────
+    public function verDetalle(): void {
+        $this->requireSesion();
+
+        $id         = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        $id_usuario = (int) $_SESSION['user']['id_usuario'];
+
+        if ($id <= 0) {
+            $this->responderJson(['status' => 'error', 'mensaje' => 'ID de notificación inválido.'], 400);
+        }
+
+        $notificacion = $this->modelo->obtenerPorId($id, $id_usuario);
+
+        if (!$notificacion) {
+            $this->responderJson(['status' => 'error', 'mensaje' => 'Notificación no encontrada.'], 404);
+        }
+
+        $this->responderJson([
+            'status'       => 'success',
+            'notificacion' => $notificacion,
+        ]);
+    }
+
+    // ─────────────────────────────────────────────
+    // POST /notificaciones?accion=registrar
+    // Body JSON: { "titulo", "mensaje", "tipo", "usuario_id?" }
+    // ─────────────────────────────────────────────
+    public function registrarNotificacion(): void {
+        $this->requireSesion();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->responderJson(['status' => 'error', 'mensaje' => 'Método no permitido.'], 405);
+        }
+
+        $data       = $this->getJsonInput();
+        $id_usuario = isset($data['usuario_id']) ? (int) $data['usuario_id'] : (int) $_SESSION['user']['id_usuario'];
+        $titulo     = trim($data['titulo'] ?? $data['title'] ?? '');
+        $mensaje    = trim($data['mensaje'] ?? $data['message'] ?? '');
+        $tipo       = trim($data['tipo'] ?? $data['type'] ?? 'info');
+        $referencia = isset($data['referencia_id']) ? (int) $data['referencia_id'] : null;
+
+        if ($titulo === '' && $mensaje === '') {
+            $this->responderJson(['status' => 'error', 'mensaje' => 'Título o mensaje requerido.'], 400);
+        }
+
+        if ($id_usuario <= 0) {
+            $this->responderJson(['status' => 'error', 'mensaje' => 'Usuario destino inválido.'], 400);
+        }
+
+        $id = $this->modelo->registrar($id_usuario, $titulo, $mensaje, $tipo, $referencia);
+
+        if ($id <= 0) {
+            $this->responderJson(['status' => 'error', 'mensaje' => 'No se pudo registrar la notificación.'], 500);
+        }
+
+        $this->responderJson([
+            'status'       => 'success',
+            'mensaje'      => 'Notificación registrada.',
+            'id'           => $id,
+            'notificacion' => $this->modelo->obtenerPorId($id, $id_usuario),
+        ], 201);
+    }
+
     public function marcarLeida(): void {
         $this->requireSesion();
 
@@ -238,6 +305,14 @@ switch ($accion) {
 
     case 'listar':
         $controller->listarNotificaciones();
+        break;
+
+    case 'detalle':
+        $controller->verDetalle();
+        break;
+
+    case 'registrar':
+        $controller->registrarNotificacion();
         break;
 
     case 'leida':

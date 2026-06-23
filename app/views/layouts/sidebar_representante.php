@@ -173,6 +173,12 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             <i class="bi bi-clipboard-data"></i>
                             <span class="nav-text">Reportes Citas</span>
                         </a></li>
+                    <li><a href="<?= BASE_URL ?>/representante/reportes-inventario"
+                            class="nav-item <?= $final_path == 'reportes-inventario' ? 'active' : '' ?>"
+                            data-section="reportes">
+                            <i class="bi bi-box-seam"></i>
+                            <span class="nav-text">Reportes Inventario</span>
+                        </a></li>
                 </ul>
             </div>
 

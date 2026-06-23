@@ -218,9 +218,11 @@ class Inventario
                         i.categoria,
                         i.numero_lote,
                         i.stock_minimo,
+                        i.detalle_almacenamiento,
                         p.id_producto,
                         p.nombre,
                         p.descripcion,
+                        p.proveedor,
                         p.precio,
                         p.precio_venta,
                         p.costo_mayorista,
@@ -254,7 +256,7 @@ class Inventario
 
     /**
      * Actualiza los campos del lote: cantidad, categoría,
-     * número de lote y stock mínimo.
+     * número de lote, stock mínimo y detalle de almacenamiento.
      *
      * @param int   $id_inventario  ID del lote a modificar
      * @param array $datos          Campos nuevos del lote
@@ -264,20 +266,24 @@ class Inventario
     {
         try {
             $sql = "UPDATE inventario
-                    SET cantidad       = :cantidad,
-                        categoria      = :categoria,
-                        numero_lote    = :numero_lote,
-                        stock_minimo   = :stock_minimo
+                    SET cantidad               = :cantidad,
+                        categoria              = :categoria,
+                        numero_lote            = :numero_lote,
+                        stock_minimo           = :stock_minimo,
+                        detalle_almacenamiento = :detalle_almacenamiento
                     WHERE id_inventario = :id_inventario
                       AND estado = 1";
 
             $stmt = $this->conexion->prepare($sql);
 
-            $stmt->bindParam(':cantidad',      $datos['cantidad'],     PDO::PARAM_INT);
-            $stmt->bindParam(':categoria',     $datos['categoria'],    PDO::PARAM_STR);
-            $stmt->bindParam(':numero_lote',   $datos['numero_lote'],  PDO::PARAM_STR);
-            $stmt->bindParam(':stock_minimo',  $datos['stock_minimo'], PDO::PARAM_INT);
-            $stmt->bindParam(':id_inventario', $id_inventario,         PDO::PARAM_INT);
+            $detalleAlmacenamiento = isset($datos['detalle_almacenamiento']) ? $datos['detalle_almacenamiento'] : '';
+
+            $stmt->bindParam(':cantidad',               $datos['cantidad'],     PDO::PARAM_INT);
+            $stmt->bindParam(':categoria',              $datos['categoria'],    PDO::PARAM_STR);
+            $stmt->bindParam(':numero_lote',            $datos['numero_lote'],  PDO::PARAM_STR);
+            $stmt->bindParam(':stock_minimo',           $datos['stock_minimo'], PDO::PARAM_INT);
+            $stmt->bindParam(':detalle_almacenamiento', $detalleAlmacenamiento, PDO::PARAM_STR);
+            $stmt->bindParam(':id_inventario',           $id_inventario,         PDO::PARAM_INT);
 
             return $stmt->execute();
 
@@ -289,7 +295,7 @@ class Inventario
 
     /**
      * Actualiza los campos descriptivos del producto:
-     * nombre, descripción, precio y fecha de vencimiento.
+     * nombre, descripción, proveedor, precio y fecha de vencimiento.
      *
      * @param int   $id_producto  ID del producto a modificar
      * @param array $datos        Campos nuevos del producto
@@ -301,6 +307,7 @@ class Inventario
             $sql = "UPDATE producto
                     SET nombre            = :nombre,
                         descripcion       = :descripcion,
+                        proveedor         = :proveedor,
                         precio            = :precio,
                         precio_venta      = :precio_venta,
                         costo_mayorista   = :costo_mayorista,
@@ -312,9 +319,11 @@ class Inventario
             $fechaVenc      = !empty($datos['fecha_vencimiento']) ? $datos['fecha_vencimiento'] : null;
             $precioVenta    = isset($datos['precio_venta'])    && $datos['precio_venta']    !== '' ? $datos['precio_venta']    : $datos['precio'];
             $costoMayorista = isset($datos['costo_mayorista']) && $datos['costo_mayorista'] !== '' ? $datos['costo_mayorista'] : $datos['precio'];
+            $proveedor      = isset($datos['proveedor']) ? $datos['proveedor'] : '';
 
             $stmt->bindParam(':nombre',            $datos['nombre'],      PDO::PARAM_STR);
             $stmt->bindParam(':descripcion',       $datos['descripcion'], PDO::PARAM_STR);
+            $stmt->bindParam(':proveedor',         $proveedor,            PDO::PARAM_STR);
             $stmt->bindParam(':precio',            $datos['precio']);
             $stmt->bindParam(':precio_venta',      $precioVenta);
             $stmt->bindParam(':costo_mayorista',   $costoMayorista);
@@ -537,6 +546,462 @@ class Inventario
                 'total_productos' => 0, 'vencidos' => 0,
                 'por_vencer' => 0, 'vigentes' => 0, 'cantidad_total' => 0,
             ];
+        }
+    }
+
+    // ============================================================
+    // GRUPO G — MOVIMIENTOS DE STOCK (Paso 2)
+    // Métodos para decrementar/incrementar stock y validar disponibilidad.
+    // ============================================================
+
+    /**
+     * Disminuye la cantidad de un lote (inventario).
+     * Se usa cuando se registra una venta.
+     *
+     * @param int    $id_inventario ID del lote a reducir
+     * @param int    $cantidad      Cantidad a restar
+     * @param string $motivo        Razón de la salida (ej: 'venta', 'ajuste')
+     * @param int    $id_usuario    ID del usuario que registra la operación
+     * @return bool                 true si se actualizó, false si falló
+     */
+    public function decrementarStock(int $id_inventario, int $cantidad, string $motivo = 'venta', ?int $id_usuario = null): bool
+    {
+        try {
+            // Actualizar cantidad en inventario
+            $sql = "UPDATE inventario SET cantidad = cantidad - :cantidad WHERE id_inventario = :id_inventario AND cantidad >= :cantidad";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_inventario', $id_inventario, PDO::PARAM_INT);
+            $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+
+            return $stmt->execute() && $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::decrementarStock - ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Aumenta la cantidad de un lote (inventario).
+     * Se usa cuando se registra una entrada de stock.
+     *
+     * @param int    $id_inventario ID del lote a aumentar
+     * @param int    $cantidad      Cantidad a sumar
+     * @param string $motivo        Razón de la entrada (ej: 'compra', 'devolución')
+     * @param int    $id_usuario    ID del usuario que registra la operación
+     * @return bool                 true si se actualizó, false si falló
+     */
+    public function incrementarStock(int $id_inventario, int $cantidad, string $motivo = 'compra', ?int $id_usuario = null): bool
+    {
+        try {
+            // Actualizar cantidad en inventario
+            $sql = "UPDATE inventario SET cantidad = cantidad + :cantidad WHERE id_inventario = :id_inventario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_inventario', $id_inventario, PDO::PARAM_INT);
+            $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+
+            return $stmt->execute() && $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::incrementarStock - ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Valida si hay stock suficiente en un lote.
+     * Se usa antes de confirmar una venta.
+     *
+     * @param int $id_inventario ID del lote a verificar
+     * @param int $cantidad      Cantidad requerida
+     * @return bool              true si hay stock suficiente, false si no
+     */
+    public function validarDisponibilidad(int $id_inventario, int $cantidad): bool
+    {
+        try {
+            $sql = "SELECT cantidad FROM inventario WHERE id_inventario = :id_inventario AND estado = 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_inventario', $id_inventario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                return false; // Lote no existe o está inactivo
+            }
+
+            return (int) $row['cantidad'] >= $cantidad;
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::validarDisponibilidad - ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    // ============================================================
+    // GRUPO H — REPORTES Y ANÁLISIS DE INVENTARIO (Issue #249)
+    // Métodos para generar reportes de inventario con filtros y métricas
+    // ============================================================
+
+    /**
+     * Obtiene reporte de inventario con filtros por fecha, categoría y producto
+     *
+     * @param int $id_veterinaria ID de la veterinaria
+     * @param string|null $fecha_inicio Fecha inicio filtro (Y-m-d)
+     * @param string|null $fecha_fin Fecha fin filtro (Y-m-d)
+     * @param string|null $categoria Categoría filtro
+     * @param string|null $producto Nombre producto filtro (búsqueda parcial)
+     * @return array Datos del inventario filtrado
+     */
+    public function obtenerReporteInventario(int $id_veterinaria, ?string $fecha_inicio = null, ?string $fecha_fin = null, ?string $categoria = null, ?string $producto = null): array
+    {
+        try {
+            $sql = "SELECT
+                        i.id_inventario,
+                        i.cantidad,
+                        i.categoria,
+                        i.numero_lote,
+                        i.stock_minimo,
+                        IF(i.cantidad <= i.stock_minimo, 1, 0) AS alerta_stock,
+                        p.id_producto,
+                        p.nombre,
+                        p.descripcion,
+                        p.proveedor,
+                        p.precio,
+                        p.fecha_vencimiento,
+                        DATEDIFF(p.fecha_vencimiento, CURDATE()) AS dias_para_vencer,
+                        i.creado_en
+                    FROM inventario i
+                    INNER JOIN producto p ON p.id_inventario = i.id_inventario
+                    WHERE i.id_veterinaria = :id_veterinaria
+                      AND i.estado = 1";
+
+            $params = [':id_veterinaria' => $id_veterinaria];
+
+            if ($fecha_inicio && $fecha_fin) {
+                $sql .= " AND DATE(i.creado_en) BETWEEN :fecha_inicio AND :fecha_fin";
+                $params[':fecha_inicio'] = $fecha_inicio;
+                $params[':fecha_fin'] = $fecha_fin;
+            }
+
+            if ($categoria) {
+                $sql .= " AND i.categoria = :categoria";
+                $params[':categoria'] = $categoria;
+            }
+
+            if ($producto) {
+                $sql .= " AND p.nombre LIKE :producto";
+                $params[':producto'] = "%{$producto}%";
+            }
+
+            $sql .= " ORDER BY i.creado_en DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::obtenerReporteInventario - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Calcula métricas de consumo promedio basadas en movimientos históricos
+     *
+     * @param int $id_veterinaria ID de la veterinaria
+     * @param string $fecha_inicio Fecha inicio para cálculo (Y-m-d)
+     * @param string $fecha_fin Fecha fin para cálculo (Y-m-d)
+     * @return array Métricas de consumo
+     */
+    public function obtenerMetricasConsumo(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, ?string $categoria = null, ?string $producto = null): array
+    {
+        try {
+            $sql = "SELECT
+                        p.nombre,
+                        p.proveedor,
+                        i.categoria,
+                        SUM(CASE WHEN ms.tipo = 'salida' THEN ms.cantidad ELSE 0 END) AS total_salidas,
+                        SUM(CASE WHEN ms.tipo = 'entrada' THEN ms.cantidad ELSE 0 END) AS total_entradas,
+                        COUNT(CASE WHEN ms.tipo = 'salida' THEN 1 END) AS numero_salidas,
+                        ROUND(AVG(CASE WHEN ms.tipo = 'salida' THEN ms.cantidad END), 2) AS promedio_salida
+                    FROM movimiento_stock ms
+                    INNER JOIN inventario i ON ms.id_inventario = i.id_inventario
+                    INNER JOIN producto p ON i.id_inventario = p.id_inventario
+                    WHERE i.id_veterinaria = :id_veterinaria
+                      AND DATE(ms.fecha_movimiento) BETWEEN :fecha_inicio AND :fecha_fin";
+
+            $params = [
+                ':id_veterinaria' => $id_veterinaria,
+                ':fecha_inicio' => $fecha_inicio,
+                ':fecha_fin' => $fecha_fin,
+            ];
+
+            if ($categoria) {
+                $sql .= " AND i.categoria = :categoria";
+                $params[':categoria'] = $categoria;
+            }
+
+            if ($producto) {
+                $sql .= " AND p.nombre LIKE :producto";
+                $params[':producto'] = "%{$producto}%";
+            }
+
+            $sql .= " GROUP BY p.id_producto, p.nombre, p.proveedor, i.categoria
+                    ORDER BY total_salidas DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::obtenerMetricasConsumo - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Obtiene lista de productos más usados (mayor número de salidas)
+     *
+     * @param int $id_veterinaria ID de la veterinaria
+     * @param string $fecha_inicio Fecha inicio (Y-m-d)
+     * @param string $fecha_fin Fecha fin (Y-m-d)
+     * @param int $limite Número máximo de productos a retornar
+     * @return array Productos más usados
+     */
+    public function obtenerProductosMasUsados(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, int $limite = 10, ?string $categoria = null, ?string $producto = null): array
+    {
+        try {
+            $sql = "SELECT
+                        p.nombre,
+                        p.proveedor,
+                        i.categoria,
+                        SUM(CASE WHEN ms.tipo = 'salida' THEN ms.cantidad ELSE 0 END) AS total_salidas,
+                        COUNT(CASE WHEN ms.tipo = 'salida' THEN 1 END) AS numero_salidas
+                    FROM movimiento_stock ms
+                    INNER JOIN inventario i ON ms.id_inventario = i.id_inventario
+                    INNER JOIN producto p ON i.id_inventario = p.id_inventario
+                    WHERE i.id_veterinaria = :id_veterinaria
+                      AND DATE(ms.fecha_movimiento) BETWEEN :fecha_inicio AND :fecha_fin";
+
+            $params = [
+                ':id_veterinaria' => $id_veterinaria,
+                ':fecha_inicio' => $fecha_inicio,
+                ':fecha_fin' => $fecha_fin,
+                ':limite' => $limite,
+            ];
+
+            if ($categoria) {
+                $sql .= " AND i.categoria = :categoria";
+                $params[':categoria'] = $categoria;
+            }
+
+            if ($producto) {
+                $sql .= " AND p.nombre LIKE :producto";
+                $params[':producto'] = "%{$producto}%";
+            }
+
+            $sql .= " GROUP BY p.id_producto, p.nombre, p.proveedor, i.categoria
+                    ORDER BY total_salidas DESC
+                    LIMIT :limite";
+
+            $stmt = $this->conexion->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value, $key === ':limite' || $key === ':id_veterinaria' ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::obtenerProductosMasUsados - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Obtiene items con alto número de alertas de stock
+     *
+     * @param int $id_veterinaria ID de la veterinaria
+     * @param string $fecha_inicio Fecha inicio (Y-m-d)
+     * @param string $fecha_fin Fecha fin (Y-m-d)
+     * @param int $limite Número máximo de items a retornar
+     * @return array Items con alertas de stock
+     */
+    public function obtenerItemsConAlertas(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, int $limite = 10, ?string $categoria = null, ?string $producto = null): array
+    {
+        try {
+            // Estado actual de stock bajo; el rango de fechas filtra lotes registrados en el periodo
+            $sql = "SELECT
+                        p.nombre,
+                        p.proveedor,
+                        i.categoria,
+                        i.cantidad,
+                        i.stock_minimo,
+                        (i.stock_minimo - i.cantidad) AS deficit,
+                        CASE 
+                            WHEN i.cantidad <= i.stock_minimo THEN 'CRITICO'
+                            WHEN i.cantidad <= (i.stock_minimo * 1.5) THEN 'ALERTA'
+                            ELSE 'NORMAL'
+                        END AS nivel_alerta,
+                        p.fecha_vencimiento,
+                        DATEDIFF(p.fecha_vencimiento, CURDATE()) AS dias_para_vencer
+                    FROM inventario i
+                    INNER JOIN producto p ON i.id_inventario = p.id_inventario
+                    WHERE i.id_veterinaria = :id_veterinaria
+                      AND i.estado = 1
+                      AND i.cantidad <= (i.stock_minimo * 1.5)
+                      AND DATE(i.creado_en) BETWEEN :fecha_inicio AND :fecha_fin";
+
+            $params = [
+                ':id_veterinaria' => $id_veterinaria,
+                ':fecha_inicio' => $fecha_inicio,
+                ':fecha_fin' => $fecha_fin,
+                ':limite' => $limite,
+            ];
+
+            if ($categoria) {
+                $sql .= " AND i.categoria = :categoria";
+                $params[':categoria'] = $categoria;
+            }
+
+            if ($producto) {
+                $sql .= " AND p.nombre LIKE :producto";
+                $params[':producto'] = "%{$producto}%";
+            }
+
+            $sql .= " ORDER BY 
+                        CASE 
+                            WHEN i.cantidad <= i.stock_minimo THEN 1
+                            WHEN i.cantidad <= (i.stock_minimo * 1.5) THEN 2
+                            ELSE 3
+                        END ASC,
+                        (i.stock_minimo - i.cantidad) DESC
+                    LIMIT :limite";
+
+            $stmt = $this->conexion->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value, $key === ':limite' || $key === ':id_veterinaria' ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::obtenerItemsConAlertas - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Obtiene resumen general de reportes de inventario
+     *
+     * @param int $id_veterinaria ID de la veterinaria
+     * @param string $fecha_inicio Fecha inicio (Y-m-d)
+     * @param string $fecha_fin Fecha fin (Y-m-d)
+     * @return array Resumen de métricas
+     */
+    public function obtenerResumenReporteInventario(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, ?string $categoria = null, ?string $producto = null): array
+    {
+        try {
+            $sql = "SELECT
+                        COUNT(DISTINCT i.id_inventario) AS total_lotes,
+                        SUM(i.cantidad) AS stock_total,
+                        SUM(CASE WHEN i.cantidad <= i.stock_minimo THEN 1 ELSE 0 END) AS lotes_criticos,
+                        SUM(CASE WHEN p.fecha_vencimiento < CURDATE() THEN 1 ELSE 0 END) AS vencidos,
+                        SUM(CASE WHEN p.fecha_vencimiento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS por_vencer,
+                        SUM(CASE WHEN ms.tipo = 'entrada' THEN ms.cantidad ELSE 0 END) AS total_entradas,
+                        SUM(CASE WHEN ms.tipo = 'salida' THEN ms.cantidad ELSE 0 END) AS total_salidas,
+                        COUNT(CASE WHEN ms.tipo = 'salida' THEN 1 END) AS movimientos_salida
+                    FROM inventario i
+                    INNER JOIN producto p ON i.id_inventario = p.id_inventario
+                    LEFT JOIN movimiento_stock ms ON i.id_inventario = ms.id_inventario
+                        AND DATE(ms.fecha_movimiento) BETWEEN :fecha_inicio AND :fecha_fin
+                    WHERE i.id_veterinaria = :id_veterinaria
+                      AND i.estado = 1";
+
+            $params = [
+                ':id_veterinaria' => $id_veterinaria,
+                ':fecha_inicio' => $fecha_inicio,
+                ':fecha_fin' => $fecha_fin,
+            ];
+
+            if ($categoria) {
+                $sql .= " AND i.categoria = :categoria";
+                $params[':categoria'] = $categoria;
+            }
+
+            if ($producto) {
+                $sql .= " AND p.nombre LIKE :producto";
+                $params[':producto'] = "%{$producto}%";
+            }
+
+            $stmt = $this->conexion->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            $stmt->execute();
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $diasPeriodo = max(1, (new DateTime($fecha_inicio))->diff(new DateTime($fecha_fin))->days + 1);
+            $totalSalidas = (int) ($row['total_salidas'] ?? 0);
+            $movimientosSalida = (int) ($row['movimientos_salida'] ?? 0);
+
+            return [
+                'total_lotes' => (int) ($row['total_lotes'] ?? 0),
+                'stock_total' => (int) ($row['stock_total'] ?? 0),
+                'lotes_criticos' => (int) ($row['lotes_criticos'] ?? 0),
+                'vencidos' => (int) ($row['vencidos'] ?? 0),
+                'por_vencer' => (int) ($row['por_vencer'] ?? 0),
+                'total_entradas' => (int) ($row['total_entradas'] ?? 0),
+                'total_salidas' => $totalSalidas,
+                'consumo_promedio_diario' => round($totalSalidas / $diasPeriodo, 2),
+                'promedio_por_salida' => $movimientosSalida > 0
+                    ? round($totalSalidas / $movimientosSalida, 2)
+                    : 0,
+            ];
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::obtenerResumenReporteInventario - ' . $e->getMessage());
+            return [
+                'total_lotes' => 0,
+                'stock_total' => 0,
+                'lotes_criticos' => 0,
+                'vencidos' => 0,
+                'por_vencer' => 0,
+                'total_entradas' => 0,
+                'total_salidas' => 0,
+                'consumo_promedio_diario' => 0,
+                'promedio_por_salida' => 0,
+            ];
+        }
+    }
+
+    /**
+     * Obtiene categorías disponibles para filtros
+     *
+     * @param int $id_veterinaria ID de la veterinaria
+     * @return array Categorías únicas
+     */
+    public function obtenerCategoriasDisponibles(int $id_veterinaria): array
+    {
+        try {
+            $sql = "SELECT DISTINCT categoria FROM inventario 
+                    WHERE id_veterinaria = :id_veterinaria AND estado = 1 
+                    ORDER BY categoria";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::obtenerCategoriasDisponibles - ' . $e->getMessage());
+            return [];
         }
     }
 }
