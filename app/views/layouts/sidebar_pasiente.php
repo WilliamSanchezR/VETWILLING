@@ -190,8 +190,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-sidebarToggle?.addEventListener('click', function () {
-    console.log('CLICK FUNCIONA');
-    sidebar.classList.toggle('collapsed');
-});
+/* Nota: el listener de sidebarToggle vive únicamente dentro de DOMContentLoaded
+   (arriba). El bloque redundante que existía aquí fue eliminado porque
+   'sidebarToggle' era undefined en este scope (var declarado dentro del callback)
+   y con optional-chaining (?.) era un no-op silencioso. */
 </script>

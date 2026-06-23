@@ -9,6 +9,7 @@
 session_start();
 
 require_once __DIR__ . '/../models/CitasCliente.php';
+require_once __DIR__ . '/../models/Profesional.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
 require_once __DIR__ . '/../helpers/notificacion_helper.php';
 
@@ -161,7 +162,23 @@ function crearCitaCliente()
         }
 
         $modeloCitas = new CitasCliente();
-        
+        $id_usuario_veterinario = null;
+
+        $id_usuario_profesional = null;
+        if (!empty($data['id_usuario']) && is_numeric($data['id_usuario'])) {
+            $id_usuario_profesional = (int)$data['id_usuario'];
+        } elseif (!empty($data['id_veterinario']) && is_numeric($data['id_veterinario'])) {
+            $id_usuario_profesional = (int)$data['id_veterinario'];
+        }
+
+        if ($id_usuario_profesional !== null) {
+            $profesionalModel = new Profesional();
+            $profesional = $profesionalModel->consultarPorId($id_usuario_profesional);
+            if ($profesional) {
+                $id_usuario_veterinario = $id_usuario_profesional;
+            }
+        }
+
         if (!$modeloCitas->verificarMascotaPropietario($data['id_paciente'], $id_propietario)) {
             http_response_code(403);
             echo json_encode(['status' => 'error', 'message' => 'La mascota no pertenece a este propietario']);
@@ -207,8 +224,8 @@ function crearCitaCliente()
             'fecha_hora' => $data['fecha_hora'],
             'fecha_hora_fin' => $data['fecha_hora_fin'],
             'estado' => 'Pendiente',
-            // El campo id_usuario almacena el usuario que crea la cita (propietario en este caso)
-            'id_usuario' => isset($_SESSION['user']['id_usuario']) ? (int)$_SESSION['user']['id_usuario'] : null
+            // El campo id_usuario almacena el veterinario asignado para la cita
+            'id_usuario' => $id_usuario_veterinario
         ];
 
         $id_cita = $modeloCitas->crearCita($datosInsert);

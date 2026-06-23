@@ -26,6 +26,12 @@ config/database.php
 .htaccess
 
 .env
+.env.local
+.env.*
+!.env.example
+
+composer-setup.php
+composer.phar
 
 composer.lock
 composer.json
@@ -61,4 +67,12 @@ AUDITORIA_FRONTEND_CRITICA.md
 PATCH_FRONTEND_CRITICO.md
 MODULO_PACIENTE_COMPLETO.md
 AUDITORIA_SESSION_START.md
-PATCH_SESSION_START.md  
+PATCH_SESSION_START.md
+
+bootstrap.php
+
+# ── Documentación de desarrollo (no se sube al repo) ──────────────────────
+# Archivos .md generados durante el desarrollo local
+*.md
+# Excepción: mantener el README principal si existe
+!README.md

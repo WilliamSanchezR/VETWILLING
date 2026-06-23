@@ -5,6 +5,10 @@
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/DisponibilidadUsuario.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 
 //CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
 $method = $_SERVER['REQUEST_METHOD'];
@@ -16,6 +20,8 @@ switch ($method) {
         $accion = $_GET['action'] ?? '';
         if ($accion === 'horarios') {
             obtenerDisponibilidadesJson();
+        } else if ($accion === 'disponibilidades') {
+            obtenerDisponibilidadesDisponiblesJson();
         } else if ($accion === 'eliminar') {
             eliminarAgenda($_GET['id']);
         }
@@ -63,7 +69,12 @@ function agregarDisponibilidadAgenda()
 
     // Validar campos obligatorios básicos
     if (empty($data['id_usuario']) || empty($data['id_veterinaria']) || empty($data['dia_semana']) || empty($data['duracion_minutos'])) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos obligatorios');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Campos vacíos',
+            'details' => 'Por favor complete todos los campos obligatorios'
+        ]);
         exit();
     }
 
@@ -77,19 +88,34 @@ function agregarDisponibilidadAgenda()
 
     // Validar que al menos uno de los dos grupos de horarios esté completo
     if (!$primerHorarioCompleto && !$segundoHorarioCompleto) {
-        mostrarSweetAlert('error', 'Horario incompleto', 'Debe ingresar al menos un par completo de horarios (inicio y fin)');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Horario incompleto',
+            'details' => 'Debe ingresar al menos un par completo de horarios (inicio y fin)'
+        ]);
         exit();
     }
 
     // Validar que si se ingresó uno del primer par, el otro también debe estar ingresado
     if ($tienePrimerHorario && !$primerHorarioCompleto) {
-        mostrarSweetAlert('error', 'Primera franja incompleta', 'Si ingresa un horario en la primera franja, debe completar tanto la hora de inicio como la hora de fin');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Primera franja incompleta',
+            'details' => 'Si ingresa un horario en la primera franja, debe completar tanto la hora de inicio como la hora de fin'
+        ]);
         exit();
     }
 
     // Validar que si se ingresó uno del segundo par, el otro también debe estar ingresado
     if ($tieneSegundoHorario && !$segundoHorarioCompleto) {
-        mostrarSweetAlert('error', 'Segunda franja incompleta', 'Si ingresa un horario en la segunda franja, debe completar tanto la hora de inicio como la hora de fin');
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Segunda franja incompleta',
+            'details' => 'Si ingresa un horario en la segunda franja, debe completar tanto la hora de inicio como la hora de fin'
+        ]);
         exit();
     }
 
@@ -114,6 +140,41 @@ function obtenerDisponibilidadesPorUsuario($id_usuario, $id_veterinaria)
     $disponibilidades = $disponibilidadUsuarioModel->obtenerDisponibilidadesPorUsuario($id_usuario, $id_veterinaria);
 
     return $disponibilidades;
+}
+
+// Función para obtener disponibilidades de veterinarios para el modal del cliente
+function obtenerDisponibilidadesDisponiblesJson()
+{
+    $id_veterinaria = $_GET['id_veterinaria'] ?? ($_SESSION['user']['id_veterinaria'] ?? null);
+    $id_usuario = !empty($_GET['id_usuario']) ? (int)$_GET['id_usuario'] : null;
+    $fecha = $_GET['fecha'] ?? null;
+
+    if (empty($id_veterinaria)) {
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Falta el ID de veterinaria']);
+        exit();
+    }
+
+    $disponibilidadUsuarioModel = new DisponibilidadUsuario();
+
+    if ($id_usuario) {
+        $disponibilidades = $disponibilidadUsuarioModel->obtenerDisponibilidadesPorUsuario($id_usuario, $id_veterinaria);
+    } else {
+        $dia_semana = null;
+        if (!empty($fecha)) {
+            $timestamp = strtotime($fecha);
+            if ($timestamp !== false) {
+                $dia_semana = (int)date('N', $timestamp);
+            }
+        }
+
+        $disponibilidades = $disponibilidadUsuarioModel->obtenerDisponibilidadesPorVeterinaria($id_veterinaria, $dia_semana);
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'success', 'data' => $disponibilidades]);
+    exit();
 }
 
 // Función para eliminar una disponibilidad de la agenda

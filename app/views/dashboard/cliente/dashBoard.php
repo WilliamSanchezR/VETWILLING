@@ -167,8 +167,8 @@ $total_no_leidas = count(array_filter($notificaciones, fn($n) => !$n['leida']));
     <!-- Bootstrap Icons (único set de iconos del proyecto) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-    <!-- Favicon -->
-    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
+        <!-- Favicon -->
+        <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
     <!-- CSS del módulo cliente (sidebar, navbar, base) -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">

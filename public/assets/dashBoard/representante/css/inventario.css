@@ -1,0 +1,115 @@
+/* ============================================================
+   inventario.css
+   Estilos específicos del módulo de Gestión de Inventario.
+   Complementa los estilos globales del proyecto (Bootstrap,
+   styleTableAdmin.css, representante.styles.css, etc.)
+   ============================================================ */
+
+
+/* ============================================================
+   1. BADGES DE ESTADO DE STOCK
+   Se usan en la columna "Estado Stock" de la tabla de inventario.
+   ============================================================ */
+
+/* Stock en nivel saludable: verde */
+.badge-stock-ok {
+    background: #198754;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: .78rem;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Stock por debajo del mínimo: rojo */
+.badge-stock-warn {
+    background: #dc3545;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: .78rem;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+
+/* ============================================================
+   2. BADGES DE VENCIMIENTO
+   Se usan en la columna "Vencimiento" de la tabla.
+   El color cambia según los días que faltan para vencer.
+   ============================================================ */
+
+/* Base común para todos los badges de vencimiento */
+.badge-vence-ok,
+.badge-vence-pronto,
+.badge-vence-crit,
+.badge-vencido,
+.badge-sin-vence {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: .78rem;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Más de 30 días para vencer: azul claro (sin urgencia) */
+.badge-vence-ok {
+    background: #0dcaf0;
+    color: #000;
+}
+
+/* Entre 16 y 30 días para vencer: amarillo (atención) */
+.badge-vence-pronto {
+    background: #ffc107;
+    color: #000;
+}
+
+/* Entre 1 y 15 días para vencer: naranja (urgente) */
+.badge-vence-crit {
+    background: #fd7e14;
+    color: #fff;
+}
+
+/* Fecha de vencimiento ya pasada: rojo (crítico) */
+.badge-vencido {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Producto sin fecha de vencimiento registrada: gris */
+.badge-sin-vence {
+    background: #6c757d;
+    color: #fff;
+}
+
+
+/* ============================================================
+   3. BANNER DE ALERTA DE STOCK BAJO
+   Aparece en la parte superior de la lista cuando hay productos
+   con stock por debajo del mínimo configurado.
+   ============================================================ */
+.alerta-stock-banner {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9rem;
+}
+
+/* Icono de advertencia dentro del banner */
+.alerta-stock-banner i {
+    flex-shrink: 0; /* Evita que el icono se encoja */
+}

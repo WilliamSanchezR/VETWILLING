@@ -1,0 +1,267 @@
+/* =============================================================================
+   theme.css — VetWilling
+   Módulo independiente de temas: design tokens + modo oscuro + botones.
+
+   Propósito: ser la ÚNICA fuente de verdad para los tokens de diseño del
+   cliente dashboard. Se carga ANTES de cualquier otro CSS del módulo.
+
+   Estructura:
+     1. Design tokens — modo claro (variables CSS en :root)
+     2. Override — modo oscuro (body.dark-theme)
+     3. Transición animada al cambiar tema
+     4. Componente: botones de selección de tema
+     5. Componente: selector de idioma con estilo
+
+   Uso:
+     <link rel="stylesheet" href=".../theme.css">
+     ← DEBE ir antes de sidebar.css, clientes.css y confi.css
+============================================================================= */
+
+
+/* =============================================================================
+   1. DESIGN TOKENS — Modo Claro (base)
+============================================================================= */
+:root {
+    /* ── Marca ── */
+    --primary-color  : #0a932c;
+    --primary-dark   : #087a24;
+    --primary-light  : #e8f5ec;
+    --primary-rgb    : 10, 147, 44;       /* para rgba(var(--primary-rgb), 0.1) */
+
+    /* ── Fondos ── */
+    --bg-light       : #f8f9fa;
+    --bg-sidebar     : #ffffff;
+    --card-light     : #ffffff;
+    --bg-input       : #ffffff;
+    --bg-hover       : #f3f4f6;
+
+    /* ── Texto ── */
+    --text-light           : #1a1a2e;
+    --text-secondary-light : #6b7280;
+    --text-muted-light     : #9ca3af;
+    --text-inverse         : #ffffff;
+
+    /* ── Bordes ── */
+    --border-light     : #e5e7eb;
+    --border-radius    : 12px;
+    --border-radius-lg : 16px;
+    --border-radius-xl : 24px;
+    --border-radius-full: 9999px;
+
+    /* ── Estados semánticos ── */
+    --success      : #10b981;
+    --success-bg   : #ecfdf5;
+    --error        : #ef4444;
+    --error-bg     : #fef2f2;
+    --warning      : #f59e0b;
+    --warning-bg   : #fffbeb;
+    --info         : #3b82f6;
+    --info-bg      : #eff6ff;
+
+    /* ── Sombras ── */
+    --shadow-sm  : 0 1px 2px  rgba(0,0,0,.05);
+    --shadow-md  : 0 4px 6px  rgba(0,0,0,.07);
+    --shadow-lg  : 0 8px 16px rgba(0,0,0,.12);
+    --shadow-xl  : 0 20px 25px rgba(0,0,0,.15);
+
+    /* ── Transiciones ── */
+    --transition-fast : all 0.15s ease;
+    --transition      : all 0.30s ease;
+    --transition-slow : all 0.50s ease;
+
+    /* ── Tipografía ── */
+    --font-xs   : 12px;
+    --font-sm   : 14px;
+    --font-base : 16px;
+    --font-lg   : 18px;
+    --font-xl   : 20px;
+    --font-2xl  : 24px;
+    --font-3xl  : 32px;
+
+    /* ── Duración del cambio de tema (sincronizar con JS: THEME_TRANS_MS) ── */
+    --theme-transition-duration: 0.35s;
+}
+
+
+/* =============================================================================
+   2. OVERRIDE — Modo Oscuro
+   Sólo sobreescribe los tokens que cambian; el resto hereda de :root.
+============================================================================= */
+body.dark-theme {
+    /* Fondos */
+    --bg-light       : #0f0f1a;
+    --bg-sidebar     : #16213e;
+    --card-light     : #1a1a2e;
+    --bg-input       : #1e2a3a;
+    --bg-hover       : #1e2a3a;
+
+    /* Texto */
+    --text-light           : #f0f4f8;
+    --text-secondary-light : #9ca3af;
+    --text-muted-light     : #6b7280;
+
+    /* Bordes */
+    --border-light : #2d3748;
+
+    /* Sombras (más opacas en oscuro para mayor contraste) */
+    --shadow-sm  : 0 1px 2px  rgba(0,0,0,.30);
+    --shadow-md  : 0 4px 6px  rgba(0,0,0,.40);
+    --shadow-lg  : 0 8px 16px rgba(0,0,0,.50);
+    --shadow-xl  : 0 20px 25px rgba(0,0,0,.60);
+
+    /* Fondos de estados semánticos */
+    --success-bg   : #052e16;
+    --error-bg     : #1c0707;
+    --warning-bg   : #1c1300;
+    --info-bg      : #0c1a3a;
+}
+
+
+/* =============================================================================
+   3. TRANSICIÓN ANIMADA AL CAMBIAR TEMA
+   La clase .theme-transitioning se añade/quita por theme.js.
+   NO está activa en la carga inicial (evita parpadeo/FOUC).
+============================================================================= */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+    transition:
+        background-color var(--theme-transition-duration) ease,
+        color            var(--theme-transition-duration) ease,
+        border-color     var(--theme-transition-duration) ease,
+        box-shadow       var(--theme-transition-duration) ease,
+        fill             var(--theme-transition-duration) ease !important;
+}
+
+/* Reducir movimiento cuando el usuario lo solicita */
+@media (prefers-reduced-motion: reduce) {
+    .theme-transitioning,
+    .theme-transitioning *,
+    .theme-transitioning *::before,
+    .theme-transitioning *::after {
+        transition: none !important;
+    }
+}
+
+
+/* =============================================================================
+   4. COMPONENTE: Botones de selección de tema
+   Clases: .tema-selector (contenedor), .tema-btn, .tema-btn--activo
+============================================================================= */
+.tema-selector {
+    display        : flex;
+    gap            : 8px;
+    flex-wrap      : wrap;
+}
+
+.tema-btn {
+    display        : inline-flex;
+    align-items    : center;
+    gap            : 8px;
+    padding        : 10px 20px;
+    border         : 2px solid var(--border-light);
+    border-radius  : var(--border-radius);
+    background     : var(--card-light);
+    color          : var(--text-secondary-light);
+    font-size      : var(--font-sm);
+    font-weight    : 600;
+    cursor         : pointer;
+    transition     : var(--transition);
+    white-space    : nowrap;
+    user-select    : none;
+    line-height    : 1;
+}
+
+.tema-btn:hover:not(.tema-btn--activo) {
+    border-color   : var(--primary-color);
+    color          : var(--primary-color);
+    background     : var(--primary-light);
+    transform      : translateY(-2px);
+    box-shadow     : var(--shadow-md);
+}
+
+/* Estado activo — gradiente de marca */
+.tema-btn--activo {
+    background     : linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-color   : transparent;
+    color          : #ffffff;
+    box-shadow     : var(--shadow-lg);
+    transform      : translateY(-1px);
+}
+
+.tema-btn--activo:hover {
+    box-shadow     : var(--shadow-xl);
+    transform      : translateY(-3px);
+}
+
+/* Foco visible (accesibilidad) */
+.tema-btn:focus-visible {
+    outline        : 2px solid var(--primary-color);
+    outline-offset : 3px;
+    border-radius  : var(--border-radius);
+}
+
+/* Ícono dentro del botón */
+.tema-btn i {
+    font-size      : var(--font-lg);
+    transition     : transform 0.25s ease;
+    pointer-events : none;
+}
+
+.tema-btn--activo i {
+    transform      : scale(1.15) rotate(-5deg);
+}
+
+/* Modo oscuro: ajustar hover del botón inactivo */
+body.dark-theme .tema-btn:hover:not(.tema-btn--activo) {
+    background     : rgba(var(--primary-rgb), 0.15);
+    border-color   : var(--primary-color);
+    color          : #34d058;
+}
+
+
+/* =============================================================================
+   5. COMPONENTE: Selector de idioma / zona horaria / formato
+   Clase: .config-select — estilizado de forma coherente con el tema
+============================================================================= */
+.config-select {
+    width          : 100%;
+    max-width      : 280px;
+    padding        : 10px 36px 10px 14px;
+    border         : 2px solid var(--border-light);
+    border-radius  : var(--border-radius);
+    background     : var(--bg-input);
+    color          : var(--text-light);
+    font-size      : var(--font-sm);
+    font-weight    : 500;
+    cursor         : pointer;
+    appearance     : none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat  : no-repeat;
+    background-position: right 12px center;
+    transition     : var(--transition);
+}
+
+.config-select:focus {
+    outline        : none;
+    border-color   : var(--primary-color);
+    box-shadow     : 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+}
+
+.config-select:hover {
+    border-color   : var(--primary-color);
+}
+
+body.dark-theme .config-select {
+    background-color : var(--bg-input);
+    color            : var(--text-light);
+    border-color     : var(--border-light);
+    background-image : url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+
+body.dark-theme .config-select option {
+    background : var(--card-light);
+    color      : var(--text-light);
+}

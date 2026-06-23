@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../config/dataBase.php';
+require_once __DIR__ . '/../../config/database.php';
 
 class PagoSuscripcion
 {
@@ -150,6 +150,37 @@ class PagoSuscripcion
         $this->actualizarDatosInicialesSuscripcion($idSuscripcion, $referencia);
 
         return $referencia;
+    }
+
+    /**
+     * Resuelve el id_suscripcion a partir de la referencia externa de Mercado Pago.
+     * Formato esperado: SUSC-{id}-VET{id}-PLAN{id}
+     */
+    public function resolverIdSuscripcionPorReferencia(string $referencia): int
+    {
+        $referencia = trim($referencia);
+        if ($referencia === '') {
+            return 0;
+        }
+
+        if (preg_match('/^SUSC-(\d+)-/i', $referencia, $coincidencias)) {
+            return (int) $coincidencias[1];
+        }
+
+        if (!$this->columnaSuscripcionExiste('external_reference')) {
+            return 0;
+        }
+
+        $consulta = "SELECT id_suscripcion
+                     FROM suscripcion
+                     WHERE external_reference = :external_reference
+                     LIMIT 1";
+
+        $stmt = $this->conexion->prepare($consulta);
+        $stmt->bindValue(':external_reference', $referencia, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return (int) ($stmt->fetchColumn() ?: 0);
     }
 
     public function confirmarPagoSuscripcion(int $idSuscripcion, array $datosPago = [])

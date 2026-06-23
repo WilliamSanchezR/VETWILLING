@@ -56,10 +56,16 @@ $verificarUrl = $verificarUrl ?? '';
                 <span>$ <?= number_format((float) $producto['monto'], 0, ',', '.') ?> COP</span>
             </div>
 
-            <a class="btn-pagar" href="<?= htmlspecialchars($checkoutUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">
+            <button type="button" class="btn-modal-open" onclick="abrirModal()">
+                Ver modal de pago
+            </button>
+
+            <button type="button" class="btn-pagar" id="btnAbrirPasarela"
+                    data-checkout-url="<?= htmlspecialchars($checkoutUrl, ENT_QUOTES, 'UTF-8') ?>"
+                    data-verificar-url="<?= htmlspecialchars($verificarUrl, ENT_QUOTES, 'UTF-8') ?>">
                 <span>🔒</span>
                 Abrir Mercado Pago
-            </a>
+            </button>
 
             <?php if (!empty($verificarUrl)) : ?>
                 <a class="btn-verificar" href="<?= htmlspecialchars($verificarUrl, ENT_QUOTES, 'UTF-8') ?>">
@@ -76,54 +82,87 @@ $verificarUrl = $verificarUrl ?? '';
     </div>
 </div>
 
-<script>
-(function () {
-    const verificarUrl = <?= json_encode($verificarUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
-    const botonPagar = document.querySelector('.btn-pagar');
+<div id="overlay" class="overlay" aria-hidden="true">
+    <div class="wompi-modal" role="dialog" aria-modal="true" aria-labelledby="pasarelaModalTitle">
+        <button type="button" class="btn-cerrar" onclick="cerrarModal()" aria-label="Cerrar modal">×</button>
 
-    if (!verificarUrl || !botonPagar) {
-        return;
-    }
+        <div class="wompi-header">
+            <div>
+                <div class="wompi-brand" id="pasarelaModalTitle">Vet<span>Willing</span></div>
+                <div class="subtitle">Modal de checkout</div>
+            </div>
+            <div class="monto-header">
+                <div class="label">Total a pagar</div>
+                <div class="valor">$ <?= number_format((float) $producto['monto'], 0, ',', '.') ?> COP</div>
+            </div>
+        </div>
 
-    let intervalo = null;
+        <div class="steps-indicator" aria-hidden="true">
+            <span id="dot-1" class="step-dot active"></span>
+            <span id="dot-2" class="step-dot"></span>
+            <span id="dot-3" class="step-dot"></span>
+        </div>
 
-    const revisarEstado = async () => {
-        try {
-            const separador = verificarUrl.includes('?') ? '&' : '?';
-            const respuesta = await fetch(verificarUrl + separador + 'format=json', {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                credentials: 'same-origin',
-                cache: 'no-store'
-            });
+        <div class="wompi-body">
+            <div id="step-1" class="step active">
+                <div class="metodos-title">Selecciona un método de pago</div>
 
-            if (!respuesta.ok) {
-                return;
-            }
+                <div class="metodo-item selected" onclick="seleccionarMetodo(this, 'Tarjeta de crédito/débito')">
+                    <div class="metodo-icon">💳</div>
+                    <div>
+                        <div class="metodo-nombre">Tarjeta de crédito/débito</div>
+                        <div class="metodo-desc">Pago seguro a través de Mercado Pago.</div>
+                    </div>
+                </div>
 
-            const data = await respuesta.json();
-            if (data && (data.estado === 'success' || data.estado === 'failure') && data.redirect_url) {
-                if (intervalo) {
-                    clearInterval(intervalo);
-                }
+                <div class="metodo-item" onclick="seleccionarMetodo(this, 'PSE')">
+                    <div class="metodo-icon">🏦</div>
+                    <div>
+                        <div class="metodo-nombre">PSE</div>
+                        <div class="metodo-desc">Redirección al checkout oficial.</div>
+                    </div>
+                </div>
+            </div>
 
-                window.location.href = data.redirect_url;
-            }
-        } catch (error) {
-            console.debug('No fue posible verificar el pago automáticamente.', error);
-        }
-    };
+            <div id="step-2" class="step">
+                <div class="tarjeta-preview">
+                    <div>Resumen de pago</div>
+                    <div class="numero"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8') ?></div>
+                    <div class="fila">
+                        <span><?= htmlspecialchars($producto['referencia'], ENT_QUOTES, 'UTF-8') ?></span>
+                        <span id="preview-exp">COP</span>
+                    </div>
+                </div>
 
-    const iniciarSeguimiento = () => {
-        if (intervalo) {
-            return;
-        }
+                <div class="payment-test-alert">
+                    <div class="payment-test-alert__title">Verificación previa</div>
+                    <ul class="payment-test-alert__list">
+                        <li>Revisa el resumen antes de continuar.</li>
+                        <li>El pago final se procesa en Mercado Pago.</li>
+                    </ul>
+                </div>
+            </div>
 
-        revisarEstado();
-        intervalo = setInterval(revisarEstado, 8000);
-    };
+            <div id="step-3" class="step">
+                <div class="procesando">
+                    <div class="spinner" aria-hidden="true"></div>
+                    <h3>Abriendo Mercado Pago</h3>
+                    <p>Redirigiendo al checkout oficial para completar el pago.</p>
+                </div>
+            </div>
+        </div>
 
-    botonPagar.addEventListener('click', iniciarSeguimiento);
-})();
-</script>
+        <div class="modal-footer" id="modal-footer">
+            <button type="button" class="btn-modal-back" id="btn-back" onclick="pasoAnterior()" style="display:none;">
+                Atrás
+            </button>
+            <button type="button" class="btn-modal-next" id="btn-next" onclick="pasoContinuar()" disabled>
+                Continuar →
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="<?= BASE_URL ?>/public/assets/payments/js/pasarelaPago.js" defer></script>
 </body>
 </html>

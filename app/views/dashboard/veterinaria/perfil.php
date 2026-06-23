@@ -1,28 +1,37 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_all.php';
-require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+require_once BASE_PATH . "/app/helpers/session_all.php";
+require_once BASE_PATH . "/app/controllers/perfilControllers.php";
 
-$rol = $_SESSION['user']['id_rol'];
-$id = $_SESSION['user']['id_usuario'];
+$rol = $_SESSION["user"]["id_rol"];
+$id = $_SESSION["user"]["id_usuario"];
 $usuario = mostrarPerfil($id);
 
 // ── CORRECCIÓN: Lógica de ruta de imagen robusta para Hostinger ──
-$fotoUsuario    = $usuario['img_perfil'] ?? '';
-$carpetaUsuario = ($usuario['id_rol'] == 4) ? 'usuarios' : 'profesionales';
+$fotoUsuario = $usuario["img_perfil"] ?? "";
+$carpetaUsuario = $usuario["id_rol"] == 4 ? "usuarios" : "profesionales";
 
-$nombreCompleto    = trim(($usuario['nombres'] ?? '') . ' ' . ($usuario['apellidos'] ?? ''));
-$fallbackAvatar    = "https://ui-avatars.com/api/?name=" . urlencode($nombreCompleto) . "&background=4e9af1&color=fff&size=128";
+$nombreCompleto = trim(
+    ($usuario["nombres"] ?? "") . " " . ($usuario["apellidos"] ?? ""),
+);
+$fallbackAvatar =
+    "https://ui-avatars.com/api/?name=" .
+    urlencode($nombreCompleto) .
+    "&background=4e9af1&color=fff&size=128";
 $rutaImagenUsuario = $fallbackAvatar;
 
-if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
-    $rutaAbsoluta = BASE_PATH . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+if (!empty($fotoUsuario) && $fotoUsuario !== "default-avatar.png") {
+    $rutaAbsoluta =
+        BASE_PATH . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
     if (file_exists($rutaAbsoluta)) {
-        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
+        $rutaImagenUsuario =
+            BASE_URL . "/public/uploads/{$carpetaUsuario}/" . $fotoUsuario;
     }
 } else {
-    $defaultLocal = BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+    $defaultLocal =
+        BASE_PATH . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
     if (file_exists($defaultLocal)) {
-        $rutaImagenUsuario = BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
+        $rutaImagenUsuario =
+            BASE_URL . "/public/uploads/{$carpetaUsuario}/default-avatar.png";
     }
 }
 ?>
@@ -52,17 +61,14 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
 
 <body>
 
-    <?php
-    // <!-- BARRA LATERAL IZQUIERDA -->
-    include_once __DIR__ . '/../../layouts/sidebar_veterinario.php';
-    ?>
+    <?php // <!-- BARRA LATERAL IZQUIERDA -->
+    include_once __DIR__ . "/../../layouts/sidebar_veterinario.php"; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="contenido-principal" id="contenidoPrincipal">
         <!-- NAVBAR SUPERIOR -->
-        <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php';
-        ?>
+        <?php include_once __DIR__ .
+            "/../../layouts/panel_superior_veterinario.php"; ?>
 
         <!-- ÁREA DE CONTENIDO -->
         <div class="area-contenido">
@@ -79,7 +85,9 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                                 <img
                                     src="<?= $rutaImagenUsuario ?>"
                                     class="fotito"
-                                    alt="<?= htmlspecialchars($nombreCompleto) ?>"
+                                    alt="<?= htmlspecialchars(
+                                        $nombreCompleto,
+                                    ) ?>"
                                     width="100"
                                     onerror="this.onerror=null; this.src='<?= $fallbackAvatar ?>'">
                                 <div class="avatar-icon">
@@ -88,9 +96,13 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                                 <input type="file" id="upload-logo" accept="image/*" name="img_perfil">
                             </form>
 
-                            <h3><?= $usuario['nombres'] ?> <br> <?= $usuario['apellidos'] ?></h3>
-                            <h4><span>+57</span> <?= $usuario['telefono'] ?></h4>
-                            <h5><?= $usuario['email'] ?></h5>
+                            <h3><?= $usuario["nombres"] ?> <br> <?= $usuario[
+     "apellidos"
+ ] ?></h3>
+                            <h4><span>+57</span> <?= $usuario[
+                                "telefono"
+                            ] ?></h4>
+                            <h5><?= $usuario["email"] ?></h5>
                             <div class="actions">
                                 <button class="btn_change_password" data-bs-toggle="modal" data-bs-target="#exampleModal">Cambiar contraseña</button>
                             </div>
@@ -99,24 +111,26 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
 
                     <!-- Información General -->
                     <div class="col-md-4">
-                        <div class="info">
+                        <div class="info" id="bloqueInfoGeneral">
                             <h2>
                                 Información General
-                                <a href="#" aria-label="Editar información"><i class="bi bi-pencil-square"></i></a>
+                                <a href="#" onclick="activarEdicionBloque('bloqueInfoGeneral'); return false;" aria-label="Editar información" title="Editar"><i class="bi bi-pencil-square"></i></a>
                             </h2>
                             <p><span>Dirección: </span>Calle 6 # 23-34</p>
                             <p><span>Fecha de Registro: </span>20 - Ago - 2025</p>
-                            <p><span>Correo: </span><?= $usuario['email'] ?></p>
-                            <p><span>Teléfono: </span>+57 <?= $usuario['telefono'] ?></p>
+                            <p><span>Correo: </span><?= $usuario["email"] ?></p>
+                            <p><span>Teléfono: </span>+57 <?= $usuario[
+                                "telefono"
+                            ] ?></p>
                         </div>
                     </div>
 
                     <!-- Especialidades -->
                     <div class="col-md-4">
-                        <div class="especialidades">
+                        <div class="especialidades" id="bloqueEspecialidades">
                             <h2>
                                 Especialidades
-                                <a href="#" aria-label="Editar especialidades"><i class="bi bi-pencil-square"></i></a>
+                                <a href="#" onclick="activarEdicionBloque('bloqueEspecialidades'); return false;" aria-label="Editar especialidades" title="Editar"><i class="bi bi-pencil-square"></i></a>
                             </h2>
                             <div class="mt-3">
                                 <span class="especialidad-tag"><i class="bi bi-heart-pulse-fill me-2"></i>Cirugía General</span>
@@ -166,10 +180,10 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
 
                     <!-- Horario de Atención -->
                     <div class="col-md-4">
-                        <div class="horarios">
+                        <div class="horarios" id="bloqueHorarios">
                             <h2>
                                 Horario de Atención
-                                <a href="#" aria-label="Editar horarios"><i class="bi bi-pencil-square"></i></a>
+                                <a href="#" onclick="activarEdicionBloque('bloqueHorarios'); return false;" aria-label="Editar horarios" title="Editar"><i class="bi bi-pencil-square"></i></a>
                             </h2>
                             <p><span>Lunes a Viernes: </span>8:00 AM - 6:00 PM</p>
                             <p><span>Sábados: </span>9:00 AM - 2:00 PM</p>
@@ -319,6 +333,32 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
             </div>
         </div>
     </div>
+
+    <script>
+    function activarEdicionBloque(bloqueId) {
+        const bloque = document.getElementById(bloqueId);
+        if (!bloque) return;
+        const parrafos = bloque.querySelectorAll('p, span.especialidad-tag');
+        const yaActivo = bloque.classList.contains('bloque-edicion-activo');
+        if (yaActivo) {
+            bloque.classList.remove('bloque-edicion-activo');
+            parrafos.forEach(function(el) {
+                el.contentEditable = 'false';
+                el.style.outline = '';
+            });
+        } else {
+            bloque.classList.add('bloque-edicion-activo');
+            parrafos.forEach(function(el) {
+                el.contentEditable = 'true';
+                el.style.outline = '1px dashed #0a932c';
+                el.style.borderRadius = '3px';
+                el.style.padding = '2px 4px';
+                el.style.cursor = 'text';
+            });
+            if (parrafos.length) parrafos[0].focus();
+        }
+    }
+    </script>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
