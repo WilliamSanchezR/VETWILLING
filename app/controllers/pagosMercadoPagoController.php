@@ -320,7 +320,8 @@ function verificarPagoYRedirigirConfirmacion()
     $pago = consultarPagoMercadoPagoPorReferencia($accessToken, $externalReference);
 
     if ($pago !== null) {
-        $queryConfirmacion['estado'] = normalizarEstadoPagoParaVista((string) ($pago['status'] ?? 'pending'));
+        $estadoPagoMp = (string) ($pago['status'] ?? 'pending');
+        $queryConfirmacion['estado'] = normalizarEstadoPagoParaVista($estadoPagoMp);
 
         if (!empty($pago['id'])) {
             $queryConfirmacion['payment_id'] = (string) $pago['id'];
@@ -332,6 +333,15 @@ function verificarPagoYRedirigirConfirmacion()
 
         if (!empty($pago['external_reference'])) {
             $queryConfirmacion['external_reference'] = (string) $pago['external_reference'];
+        }
+
+        // Persistir suscripción activa en cuanto Mercado Pago confirma el pago.
+        if ($origen === 'suscripcion' && esEstadoPagoDefinitivo($estadoPagoMp)) {
+            $modeloPago->registrarResultadoPagoSuscripcion($idSuscripcion, $estadoPagoMp, [
+                'payment_id' => $pago['id'] ?? null,
+                'external_reference' => $pago['external_reference'] ?? $externalReference,
+                'date_approved' => $pago['date_approved'] ?? null,
+            ]);
         }
     }
 
@@ -349,6 +359,13 @@ function mostrarConfirmacionPago()
     $merchantOrderId = $_GET['merchant_order_id'] ?? '-';
     $referencia = $_GET['external_reference'] ?? '-';
 
+    $modeloPago = new PagoSuscripcion();
+
+    // Recuperar la suscripción si Mercado Pago no devolvió id_suscripcion en la URL.
+    if ($idSuscripcion <= 0 && $referencia !== '-') {
+        $idSuscripcion = $modeloPago->resolverIdSuscripcionPorReferencia($referencia);
+    }
+
     $titulo = 'Pago en proceso';
     $mensaje = 'Estamos validando tu transaccion. En breve veras el estado final.';
     $detalleConfirmacion = '';
@@ -361,12 +378,34 @@ function mostrarConfirmacionPago()
         $mensaje = 'No fue posible procesar el pago. Intenta nuevamente con otro metodo.';
     }
 
-    if ($idSuscripcion > 0) {
-        $modeloPago = new PagoSuscripcion();
-        $resultadoConfirmacion = $modeloPago->registrarResultadoPagoSuscripcion($idSuscripcion, $estado, [
+    if ($idSuscripcion > 0 && $origen === 'suscripcion') {
+        $estadoRegistro = $estado;
+        $pagoConfirmado = null;
+
+        // Validar contra la API cuando el retorno indica éxito pero falta el estado real del pago.
+        $accessToken = function_exists('env_value')
+            ? env_value('MP_ACCESS_TOKEN', '')
+            : (getenv('MP_ACCESS_TOKEN') ?: (defined('MP_ACCESS_TOKEN') ? MP_ACCESS_TOKEN : ''));
+
+        if ($estado === 'success' && !empty($accessToken)) {
+            if ($paymentId !== '-' && is_numeric($paymentId)) {
+                $pagoConfirmado = consultarPagoMercadoPagoPorId($accessToken, (int) $paymentId);
+            } elseif ($referencia !== '-') {
+                $pagoConfirmado = consultarPagoMercadoPagoPorReferencia($accessToken, $referencia);
+            } else {
+                $pagoConfirmado = null;
+            }
+
+            if ($pagoConfirmado !== null) {
+                $estadoRegistro = (string) ($pagoConfirmado['status'] ?? $estado);
+            }
+        }
+
+        $resultadoConfirmacion = $modeloPago->registrarResultadoPagoSuscripcion($idSuscripcion, $estadoRegistro, [
             'payment_id' => $paymentId !== '-' ? $paymentId : null,
             'merchant_order_id' => $merchantOrderId !== '-' ? $merchantOrderId : null,
             'external_reference' => $referencia !== '-' ? $referencia : null,
+            'date_approved' => $pagoConfirmado['date_approved'] ?? null,
         ]);
 
         if (!empty($resultadoConfirmacion['ok'])) {
@@ -477,6 +516,59 @@ function normalizarEstadoPagoParaVista(string $estadoPago): string
     };
 }
 
+function esEstadoPagoDefinitivo(string $estadoPago): bool
+{
+    return in_array(strtolower(trim($estadoPago)), [
+        'approved',
+        'rejected',
+        'cancelled',
+        'canceled',
+        'refunded',
+    ], true);
+}
+
+function consultarPagoMercadoPagoPorId(string $accessToken, int $paymentId): ?array
+{
+    if ($paymentId <= 0) {
+        return null;
+    }
+
+    $url = 'https://api.mercadopago.com/v1/payments/' . $paymentId;
+    $headers = [
+        'Authorization: Bearer ' . $accessToken,
+        'Content-Type: application/json',
+    ];
+
+    $response = false;
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+        $response = curl_exec($ch);
+        curl_close($ch);
+    } else {
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'header' => implode("\r\n", $headers),
+                'timeout' => 20,
+            ],
+        ]);
+
+        $response = @file_get_contents($url, false, $context);
+    }
+
+    if ($response === false || $response === '') {
+        return null;
+    }
+
+    $data = json_decode($response, true);
+
+    return is_array($data) ? $data : null;
+}
+
 function consultarPagoMercadoPagoPorReferencia(string $accessToken, string $externalReference): ?array
 {
     if ($externalReference === '') {
@@ -581,6 +673,11 @@ function procesarWebhookMercadoPago()
 
             $idSuscripcion = (int) ($metadata['id_suscripcion'] ?? ($_GET['id_suscripcion'] ?? 0));
             $estadoPago = $payment->status ?? null;
+
+            if ($idSuscripcion <= 0 && !empty($payment->external_reference)) {
+                $modeloPago = new PagoSuscripcion();
+                $idSuscripcion = $modeloPago->resolverIdSuscripcionPorReferencia((string) $payment->external_reference);
+            }
 
             if ($idSuscripcion > 0) {
                 $modeloPago = new PagoSuscripcion();
