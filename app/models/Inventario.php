@@ -503,6 +503,56 @@ class Inventario
     }
 
     /**
+     * Genera alertas automáticas de inventario y las registra en el sistema de notificaciones.
+     * Detecta stock bajo y productos próximos a vencer.
+     *
+     * @param int $id_veterinaria ID de la veterinaria
+     * @param int $id_usuario ID del usuario para notificaciones
+     * @param int $dias_vencimiento Días de anticipación para alertas de vencimiento (default 30)
+     * @return array Resumen de alertas generadas ['stock_bajo' => int, 'vencimiento' => int]
+     */
+    public function generarAlertasInventario(int $id_veterinaria, int $id_usuario, int $dias_vencimiento = 30): array
+    {
+        require_once __DIR__ . '/Notificacion.php';
+        $modeloNotificacion = new Notificacion();
+
+        $alertas = ['stock_bajo' => 0, 'vencimiento' => 0];
+
+        // Detectar stock bajo
+        $lotesStockBajo = $this->obtenerLotesStockBajo($id_veterinaria);
+        foreach ($lotesStockBajo as $lote) {
+            $mensaje = "Stock crítico: {$lote['nombre']} (Lote {$lote['numero_lote']}) - Stock actual: {$lote['cantidad']}, Mínimo: {$lote['stock_minimo']}";
+            $modeloNotificacion->registrar(
+                $id_usuario,
+                'Alerta de Inventario',
+                $mensaje,
+                'warning',
+                $lote['id_inventario']
+            );
+            $alertas['stock_bajo']++;
+        }
+
+        // Detectar vencimientos próximos
+        $productosVencer = $this->obtenerProductosProximosAVencer($id_veterinaria, $dias_vencimiento);
+        foreach ($productosVencer as $producto) {
+            $dias = $producto['dias_para_vencer'];
+            $estado = $dias < 0 ? 'VENCIDO' : 'Próximo a vencer';
+            $mensaje = "{$estado}: {$producto['nombre']} (Lote {$producto['numero_lote']}) - {$producto['fecha_vencimiento']} ({$dias} días)";
+            $tipo = $dias < 0 ? 'danger' : 'warning';
+            $modeloNotificacion->registrar(
+                $id_usuario,
+                'Alerta de Vencimiento',
+                $mensaje,
+                $tipo,
+                $producto['id_inventario']
+            );
+            $alertas['vencimiento']++;
+        }
+
+        return $alertas;
+    }
+
+    /**
      * Resumen general del inventario de la veterinaria:
      * total de productos, vigentes, por vencer y vencidos.
      * Misma estructura de claves que usa Reportes.php para consistencia.

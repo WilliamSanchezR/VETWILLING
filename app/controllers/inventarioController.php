@@ -216,6 +216,12 @@ function guardarProducto(): void
         // Si llegamos aquí, ambos INSERT fueron bien → confirmamos cambios
         $pdo->commit();
 
+        // Generar alertas automáticas después de registrar producto
+        $id_usuario = (int) ($_SESSION['user']['id_usuario'] ?? 0);
+        if ($id_usuario > 0) {
+            $modelInv->generarAlertasInventario($id_veterinaria, $id_usuario);
+        }
+
         mostrarSweetAlert(
             'success',
             '¡Producto registrado!',
@@ -367,6 +373,12 @@ function actualizarProducto(): void
 
     // ── 8. Responder según el resultado ───────────────────────────────────────
     if ($exitoLote && $exitoProducto) {
+        // Generar alertas automáticas después de actualizar producto
+        $id_usuario = (int) ($_SESSION['user']['id_usuario'] ?? 0);
+        if ($id_usuario > 0) {
+            $modelInv->generarAlertasInventario($id_veterinaria, $id_usuario);
+        }
+
         mostrarSweetAlert(
             'success',
             '¡Producto actualizado!',
