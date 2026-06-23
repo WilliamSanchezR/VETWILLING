@@ -1,32 +1,12 @@
-/* ========================================================================
-   DASHBOARD CLIENTE
-   Author: VetWilling Dashboard
-   Version: 4.0 - FINAL UNIFICADO
-   Description: Estilos del área principal del dashboard del cliente.
-                Corrige el espacio en blanco en móvil usando !important
-                para garantizar que margin-left:0 siempre gane sin
-                importar el orden de carga de sidebar.css.
-======================================================================== */
-
-
-/* ========================================================================
-   1. VARIABLES CSS
-   — --color-principal-hover: verde oscuro para hovers (nuevo).
-   — --color-secundario: corregido a rgba() legible (antes era #087a2562
-     con alfa embebido que causaba botones semitransparentes en hover).
-   — --sidebar-width y --sidebar-width-collapsed deben coincidir
-     exactamente con sidebar.css para que los márgenes cuadren.
-======================================================================== */
-:root {
-    --color-principal:         #087a24;
-    --color-principal-hover:   #065c1b;
-    --color-secundario:        rgba(8, 122, 37, 0.38);
-    --color-fondo:             #f5f7fb;
-    --color-texto:             #333333;
-    --sidebar-width:           260px;
-    --sidebar-width-collapsed: 80px;
-}
-
+/* ============================================================
+   DASHBOARD CLIENTE — VetWilling
+   Archivo  : dashboard-cliente.css
+   Versión  : 1.0
+   Propósito: Estilos exclusivos del dashboard del propietario.
+              Solo importar en dashboard_cliente.php.
+              Las variables globales (sidebar, navbar, colores
+              base) viven en clientes-base.css.
+   ============================================================ */
 
 /* ========================================================================
    2. RESET GENERAL
@@ -64,6 +44,15 @@ body::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
    — La transición suaviza el cambio al colapsar/expandir el sidebar.
    — Cuando el sidebar colapsa, el margen se reduce al ancho colapsado.
 ======================================================================== */
+:root {
+    --color-principal:         #087a24;
+    --color-principal-hover:   #065c1b;
+    --color-secundario:        rgba(8, 122, 37, 0.38);
+    --color-fondo:             #f5f7fb;
+    --color-texto:             #333333;
+    --sidebar-width:           260px;
+    --sidebar-width-collapsed: 80px;
+}
 .contenido-principal {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
@@ -201,555 +190,873 @@ body::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
 }
 
 
-/* ========================================================================
-   6. CARD DE BIENVENIDA
-   — Bloque verde con el saludo al usuario.
-   — Ocupa el 100% del ancho disponible.
-======================================================================== */
-.bienvenida-card {
-    background: linear-gradient(135deg, #0a932c, #087a24);
-    border-radius: 16px;
-    padding: 40px;
-    color: white;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 15px rgba(10, 147, 44, 0.3);
-    width: 100%;
+
+
+/* ============================================================
+   1. VARIABLES LOCALES DEL DASHBOARD
+      Se definen aquí y no en :root global para evitar
+      contaminar otras vistas del módulo cliente.
+   ============================================================ */
+.dashboard-wrapper {
+    --dash-gap:          28px;
+    --dash-radius:       18px;
+    --dash-radius-sm:    12px;
+    --dash-shadow:       0 2px 12px rgba(0,0,0,0.07);
+    --dash-shadow-hover: 0 8px 28px rgba(10,147,44,0.14);
+
+    /* Paleta de marca */
+    --verde-primario:    #0a932c;
+    --verde-oscuro:      #0a7d26;
+    --verde-suave:       #e8f5ec;
+    --verde-medio:       #c8e6c9;
+    --texto-principal:   #1a2332;
+    --texto-secundario:  #5a6a7a;
+    --fondo-card:        #ffffff;
+    --fondo-base:        #f4f6f9;
+    --borde-suave:       #e8ecf0;
+
+    /* Estados de alerta */
+    --alerta-rojo:       #ef4444;
+    --alerta-amarillo:   #f59e0b;
+    --alerta-azul:       #3b82f6;
+
+    display: contents; /* el wrapper no genera caja, solo scope de variables */
 }
 
-.bienvenida-card h2 {
-    font-size: 32px;
-    margin-bottom: 12px;
-    font-weight: 600;
-}
 
-.bienvenida-card p {
-    font-size: 16px;
-    opacity: 0.95;
-    line-height: 1.6;
-    margin-bottom: 8px;
-}
-
-.bienvenida-card .frase {
-    font-weight: 600;
-    font-size: 18px;
-    margin-top: 10px;
-    opacity: 1;
+/* ============================================================
+   2. CONTENEDOR GENERAL DEL DASHBOARD
+   ============================================================ */
+.container-dashboard {
+    padding: var(--dash-gap);
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--dash-gap);
 }
 
 
-/* ========================================================================
-   7. ALERTAS
-   — Caja amarilla de advertencia con borde izquierdo.
-======================================================================== */
-.alert-box {
-    background: #fff3cd;
-    border-left: 4px solid #ffc107;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 30px;
+/* ============================================================
+   3. BANNER DE BIENVENIDA
+      Layout: texto a la izquierda, ilustración a la derecha.
+      Fondo: gradiente verde de marca con onda decorativa SVG.
+   ============================================================ */
+.bienvenida-banner {
+    position: relative;
+    background: linear-gradient(135deg, #0a932c 0%, #0a7d26 60%, #065c1b 100%);
+    border-radius: var(--dash-radius);
+    padding: 36px 44px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    justify-content: space-between;
+    gap: 24px;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(10,147,44,0.28);
+    min-height: 160px;
 }
 
-.alert-icon {
-    font-size: 28px;
-    flex-shrink: 0;
+/* Onda decorativa de fondo */
+.bienvenida-banner::before {
+    content: '';
+    position: absolute;
+    right: -60px;
+    top: -60px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    pointer-events: none;
+}
+.bienvenida-banner::after {
+    content: '';
+    position: absolute;
+    right: 60px;
+    bottom: -80px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
 }
 
-.alert-content h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #856404;
-    margin-bottom: 5px;
+/* Bloque de texto */
+.bienvenida-texto {
+    position: relative;
+    z-index: 2;
+    flex: 1;
 }
 
-.alert-content p {
+.bienvenida-saludo {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.bienvenida-nombre {
+    font-size: 30px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.bienvenida-frase {
     font-size: 14px;
-    color: #856404;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.6;
+    max-width: 480px;
     margin: 0;
 }
 
-
-/* ========================================================================
-   8. TÍTULO DE SECCIÓN
-   — Encabezado antes de cada grupo de contenido.
-======================================================================== */
-.seccion-titulo {
-    font-size: 22px;
-    color: #2c3e50;
-    margin-bottom: 20px;
-    font-weight: 600;
-}
-
-
-/* ========================================================================
-   9. GRID DE MASCOTAS
-   — Rejilla que se adapta: 3 columnas en PC, 1 en móvil.
-======================================================================== */
-.mascotas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
-    margin-bottom: 30px;
-}
-
-/* Tarjeta individual de mascota */
-.mascota-card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.mascota-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.mascota-header {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    margin-bottom: 20px;
-}
-
-.mascota-avatar {
-    width: 70px;
-    height: 70px;
+/* Ilustración SVG / emoji del lado derecho */
+.bienvenida-ilustracion {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    background: rgba(255,255,255,0.12);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 38px;
-    background: linear-gradient(135deg, #0a932c, #087a24);
+    font-size: 64px;
+    /* Animación suave de flotación */
+    animation: flotar 3.5s ease-in-out infinite;
+}
+
+@keyframes flotar {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+}
+
+/* Chip de fecha en el banner */
+.bienvenida-fecha {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 14px;
+}
+
+
+/* ============================================================
+   4. SECCIÓN DE RECORDATORIOS (CHIPS INTERACTIVOS)
+      Chips horizontales con icono Bootstrap + tooltip al hover.
+   ============================================================ */
+.recordatorios-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.recordatorios-titulo {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--texto-principal, #1a2332);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recordatorios-titulo i {
+    color: var(--verde-primario, #0a932c);
+    font-size: 17px;
+}
+
+/* Fila de chips */
+.recordatorios-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Chip individual */
+.chip-recordatorio {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.25s ease;
+    background: #ffffff;
+    box-shadow: var(--dash-shadow, 0 2px 12px rgba(0,0,0,0.07));
+    user-select: none;
+}
+
+.chip-recordatorio i {
+    font-size: 16px;
     flex-shrink: 0;
 }
 
-.mascota-info h3 {
-    font-size: 20px;
-    color: #2c3e50;
-    margin-bottom: 5px;
+/* Variantes de color por tipo */
+.chip-vacuna   { color: #7c3aed; border-color: #ede9fe; background: #faf5ff; }
+.chip-medicina { color: #0284c7; border-color: #e0f2fe; background: #f0f9ff; }
+.chip-control  { color: #0a932c; border-color: #dcfce7; background: #f0fdf4; }
+.chip-bano     { color: #0891b2; border-color: #cffafe; background: #ecfeff; }
+.chip-urgente  { color: #dc2626; border-color: #fee2e2; background: #fff1f2; }
+
+/* Hover: el chip se eleva y muestra tooltip */
+.chip-recordatorio:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    border-color: currentColor;
 }
 
-.mascota-info p {
+/* Tooltip del chip */
+.chip-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.92);
+    background: #1a2332;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 8px 14px;
+    border-radius: 10px;
+    white-space: nowrap;
+    max-width: 240px;
+    white-space: normal;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 100;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+
+/* Flechita del tooltip */
+.chip-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1a2332;
+}
+
+.chip-recordatorio:hover .chip-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+/* Badge de urgencia en chips */
+.chip-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #dc2626;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+
+/* ============================================================
+   5. GRID DE CONTENIDO (CITAS + RECORDATORIOS DETALLADOS)
+   ============================================================ */
+.dash-content-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: var(--dash-gap, 28px);
+    align-items: start;
+}
+
+
+/* ============================================================
+   6. CARDS GENÉRICAS DEL DASHBOARD
+   ============================================================ */
+.dash-card {
+    background: var(--fondo-card, #ffffff);
+    border-radius: var(--dash-radius, 18px);
+    padding: 24px 26px;
+    box-shadow: var(--dash-shadow, 0 2px 12px rgba(0,0,0,0.07));
+    transition: box-shadow 0.3s ease;
+}
+
+.dash-card:hover {
+    box-shadow: var(--dash-shadow-hover, 0 8px 28px rgba(10,147,44,0.14));
+}
+
+/* Header de cada card */
+.dash-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--borde-suave, #e8ecf0);
+}
+
+.dash-card-titulo {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--texto-principal, #1a2332);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.dash-card-titulo i {
+    color: var(--verde-primario, #0a932c);
+    font-size: 17px;
+}
+
+.dash-card-accion {
+    font-size: 13px;
+    color: var(--verde-primario, #0a932c);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.dash-card-accion:hover {
+    background: var(--verde-suave, #e8f5ec);
+    color: var(--verde-oscuro, #0a7d26);
+}
+
+
+/* ============================================================
+   7. LISTA DE CITAS PRÓXIMAS
+   ============================================================ */
+.citas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cita-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: var(--dash-radius-sm, 12px);
+    background: var(--fondo-base, #f4f6f9);
+    border-left: 4px solid var(--verde-primario, #0a932c);
+    transition: all 0.25s ease;
+    cursor: default;
+}
+
+.cita-row:hover {
+    background: #edf7f0;
+    transform: translateX(5px);
+    border-left-color: var(--verde-oscuro, #0a7d26);
+}
+
+/* Cita urgente */
+.cita-row.es-urgente {
+    border-left-color: var(--alerta-rojo, #ef4444);
+    background: #fff5f5;
+}
+
+.cita-row.es-urgente:hover {
+    background: #ffe8e8;
+}
+
+/* Bloque de fecha (día + mes) */
+.cita-fecha-bloque {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 52px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 8px 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.cita-dia-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--texto-principal, #1a2332);
+    line-height: 1;
+}
+
+.cita-mes-txt {
+    font-size: 11px;
+    color: var(--texto-secundario, #5a6a7a);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+}
+
+/* Información central */
+.cita-info-bloque {
+    flex: 1;
+    min-width: 0; /* evita overflow de texto largo */
+}
+
+.cita-nombre {
     font-size: 14px;
-    color: #7f8c8d;
+    font-weight: 600;
+    color: var(--texto-principal, #1a2332);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.mascota-detalles {
+.cita-detalle {
+    font-size: 12px;
+    color: var(--texto-secundario, #5a6a7a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Hora (derecha) */
+.cita-hora-tag {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--verde-primario, #0a932c);
+    background: var(--verde-suave, #e8f5ec);
+    padding: 4px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.cita-row.es-urgente .cita-hora-tag {
+    color: var(--alerta-rojo, #ef4444);
+    background: #fee2e2;
+}
+
+/* Estado "sin citas" */
+.citas-vacio {
+    text-align: center;
+    padding: 30px 0;
+    color: var(--texto-secundario, #5a6a7a);
+    font-size: 14px;
+}
+
+.citas-vacio i {
+    font-size: 36px;
+    color: #d1d5db;
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+/* ============================================================
+   8. LISTA DE RECORDATORIOS DETALLADOS (en card)
+   ============================================================ */
+.recordatorios-lista {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.detalle-item {
+.recordatorio-row {
     display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    padding: 10px 0;
-    border-top: 1px solid #ecf0f1;
-}
-
-.detalle-label { color: #7f8c8d; }
-.detalle-valor { color: #2c3e50; font-weight: 500; }
-
-.mascota-footer {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px solid #ecf0f1;
-    display: flex;
+    align-items: center;
     gap: 12px;
-}
-
-.btn-mascota {
-    flex: 1;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: none;
-    font-weight: 500;
-}
-
-/* Botón verde principal
-   CORRECCIÓN: hover usa --color-principal-hover (sólido)
-   en vez del antiguo --color-secundario (semitransparente) */
-.btn-primary {
-    background: var(--color-principal);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--color-principal-hover);
-    transform: translateY(-2px);
-}
-
-/* Botón gris secundario */
-.btn-secondary {
-    background: #ecf0f1;
-    color: #2c3e50;
-}
-
-.btn-secondary:hover {
-    background: #d5d8dc;
-    transform: translateY(-2px);
-}
-
-
-/* ========================================================================
-   10. CONTENT GRID
-   — Dos columnas para citas y recordatorios en PC.
-   — Colapsa a una columna en tablet y móvil.
-======================================================================== */
-.content-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 25px;
-    margin-bottom: 30px;
-}
-
-/* Card genérica (citas, recordatorios, etc.) */
-.card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.card-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.card-title .bi-calendar2-week,
-.card-title .bi-bell-fill {
-    color: var(--color-principal);
-    margin-right: 8px;
-}
-
-.card-action {
-    color: var(--color-principal);
-    font-size: 14px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s;
-}
-
-.card-action:hover {
-    color: var(--color-principal-hover);
-    text-decoration: underline;
-}
-
-
-/* ========================================================================
-   11. CITAS
-   — Lista de citas próximas con fecha, info y hora.
-======================================================================== */
-.cita-item {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    padding: 16px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    background: #f8f9fa;
-    border-left: 4px solid var(--color-principal);
-    transition: all 0.3s;
-}
-
-.cita-item:hover {
-    background: #e9ecef;
-    transform: translateX(8px);
-}
-
-.cita-item.urgente {
-    border-left-color: #e74c3c;
-    background: #ffebee;
-}
-
-.cita-fecha {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 60px;
-    padding: 10px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    flex-shrink: 0;
-}
-
-.cita-dia {
-    font-size: 24px;
-    font-weight: 700;
-    color: #2c3e50;
-    line-height: 1;
-}
-
-.cita-mes {
-    font-size: 12px;
-    color: #7f8c8d;
-    text-transform: uppercase;
-    margin-top: 2px;
-}
-
-.cita-info   { flex: 1; }
-
-.cita-mascota {
-    font-size: 16px;
-    color: #2c3e50;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.cita-detalles {
-    font-size: 13px;
-    color: #7f8c8d;
-}
-
-.cita-hora {
-    font-size: 15px;
-    color: var(--color-principal);
-    font-weight: 600;
-    flex-shrink: 0;
-}
-
-
-/* ========================================================================
-   12. RECORDATORIOS
-   — CORRECCIÓN: eliminados los bloques duplicados que pisaban los estilos
-     (había 2 definiciones de .recordatorio-item, .recordatorio-icon
-     y .recordatorio-texto con valores distintos entre sí).
-   — CORRECCIÓN: eliminado el selector inválido "-syringe { }" que
-     rompía el parseo CSS y silenciaba todos los estilos que venían después.
-======================================================================== */
-.recordatorio-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    background: #f9fafb;
-    border-radius: 14px;
-    border: 1px solid #e8f5e9;
-    transition: all 0.3s ease;
+    padding: 12px 14px;
+    border-radius: var(--dash-radius-sm, 12px);
+    background: var(--fondo-base, #f4f6f9);
+    transition: all 0.25s ease;
     cursor: default;
     position: relative;
     overflow: hidden;
 }
 
-/* Barra verde a la izquierda de cada recordatorio */
-.recordatorio-item::before {
+/* Barra de color lateral */
+.recordatorio-row::before {
     content: '';
     position: absolute;
     left: 0;
     top: 0;
     height: 100%;
-    width: 4px;
-    background: linear-gradient(180deg, #4caf50, #2e7d32);
-    border-radius: 4px 0 0 4px;
+    width: 3px;
+    background: var(--rec-color, #0a932c);
+    border-radius: 3px 0 0 3px;
 }
 
-.recordatorio-item:hover {
+.recordatorio-row:hover {
     background: #ffffff;
-    border-color: #a5d6a7;
-    transform: translateX(4px);
-    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.12);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    transform: translateX(3px);
 }
 
-/* Ícono del recordatorio */
-.recordatorio-icon {
+/* Icono del recordatorio */
+.recordatorio-icono {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--rec-bg, #e8f5ec);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
 }
 
-.recordatorio-item:hover .recordatorio-icon {
-    transform: scale(1.1) rotate(-5deg);
+.recordatorio-row:hover .recordatorio-icono {
+    transform: scale(1.08) rotate(-4deg);
 }
 
-.recordatorio-icon span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.recordatorio-icono i {
+    font-size: 16px;
+    color: var(--rec-color, #0a932c);
 }
 
-.recordatorio-icon i {
-    font-size: 1.2rem;
-    color: #2e7d32;
-}
-
-/* Texto del recordatorio */
-.recordatorio-texto {
+/* Texto */
+.recordatorio-info {
     flex: 1;
+    min-width: 0;
 }
 
-.recordatorio-texto h4 {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #1b5e20;
-    margin: 0 0 3px 0;
-    line-height: 1.3;
+.recordatorio-titulo-item {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--texto-principal, #1a2332);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.recordatorio-texto p {
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin: 0;
+.recordatorio-desc {
+    font-size: 11.5px;
+    color: var(--texto-secundario, #5a6a7a);
     line-height: 1.4;
 }
 
-/* Badge rojo "!" para recordatorios urgentes */
-.recordatorio-item.urgente::after {
-    content: '!';
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 22px;
-    height: 22px;
-    background: #ef5350;
-    color: white;
+/* Variables de color por tipo (inline style en el HTML) */
+/* Ej: style="--rec-color:#7c3aed; --rec-bg:#faf5ff;" */
+
+
+/* ============================================================
+   9. PANEL LATERAL DE NOTIFICACIONES (SIDEBAR DERECHO)
+      Se abre al click en la campanita de la navbar.
+   ============================================================ */
+.notif-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,20,30,0.35);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.notif-panel-overlay.activo {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.notif-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 380px;
+    max-width: 95vw;
+    background: #ffffff;
+    box-shadow: -6px 0 30px rgba(0,0,0,0.14);
+    z-index: 1050;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px 0 0 16px;
+}
+
+.notif-panel.activo {
+    transform: translateX(0);
+}
+
+/* Header del panel */
+.notif-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+}
+
+.notif-panel-titulo {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a2332;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notif-panel-titulo i {
+    color: #0a932c;
+}
+
+.notif-panel-cerrar {
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
-    font-size: 0.75rem;
-    font-weight: 800;
+    border: none;
+    background: #f4f6f9;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #5a6a7a;
+    font-size: 16px;
+    transition: background 0.2s;
+}
+
+.notif-panel-cerrar:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+/* Cuerpo del panel (scrolleable) */
+.notif-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notif-panel-body::-webkit-scrollbar { width: 5px; }
+.notif-panel-body::-webkit-scrollbar-track { background: transparent; }
+.notif-panel-body::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+/* Item de notificación */
+.notif-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    background: #f9fafb;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.notif-item:hover {
+    background: #ffffff;
+    border-color: #e8ecf0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.notif-item.no-leida {
+    background: #f0fdf4;
+    border-color: #d1fae5;
+}
+
+.notif-icono-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.notif-icono-wrap.verde  { background: #dcfce7; color: #15803d; }
+.notif-icono-wrap.azul   { background: #dbeafe; color: #1d4ed8; }
+.notif-icono-wrap.rojo   { background: #fee2e2; color: #dc2626; }
+.notif-icono-wrap.naranja { background: #ffedd5; color: #c2410c; }
+
+.notif-contenido {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-msg {
+    font-size: 13px;
+    color: #1a2332;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.notif-tiempo {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* Punto indicador de no leída */
+.notif-punto {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #0a932c;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+/* Footer del panel */
+.notif-panel-footer {
+    padding: 14px 24px;
+    border-top: 1px solid #f0f0f0;
+    flex-shrink: 0;
+}
+
+.btn-ver-todas {
+    display: block;
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    background: #0a932c;
+    color: white;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-ver-todas:hover {
+    background: #0a7d26;
+    color: white;
+}
+
+/* Vacío de notificaciones */
+.notif-vacio {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+}
+
+.notif-vacio i {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 12px;
+    color: #d1d5db;
 }
 
 
-/* ========================================================================
-   13. RESPONSIVE — Tablets (769px – 1024px)
-   — Las dos columnas de content-grid colapsan a una sola.
-   — Las mascotas siguen en grid pero con columnas más angostas.
-======================================================================== */
+/* ============================================================
+   10. ANIMACIONES DE ENTRADA
+       Las tarjetas y chips entran con fade + translateY.
+   ============================================================ */
+.dash-fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.dash-fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* ============================================================
+   11. RESPONSIVE
+   ============================================================ */
+
+/* Tablet */
 @media (max-width: 1024px) {
-    .content-grid {
+    .dash-content-grid {
         grid-template-columns: 1fr;
-    }
-
-    .mascotas-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
 }
 
-
-/* ========================================================================
-   14. RESPONSIVE — Móvil (hasta 768px)
-   — El sidebar se oculta: la burbuja FAB lo reemplaza (ver sidebar.css).
-   — CORRECCIÓN DEL ESPACIO EN BLANCO: margin-left usa !important para
-     garantizar que gane sobre cualquier regla de sidebar.css sin importar
-     el orden en que se carguen los archivos CSS.
-   — min-height usa 100dvh (dynamic viewport height) que es más preciso
-     en móvil porque descuenta la barra del navegador.
-   — Los contenedores usan display:flex para que el contenido ocupe
-     el 100% de la altura de la pantalla sin zonas vacías.
-======================================================================== */
+/* Móvil */
 @media (max-width: 768px) {
-
-    /* FIX ESPACIO EN BLANCO:
-       !important garantiza que margin-left:0 gane siempre,
-       sin importar qué regla de sidebar.css se haya cargado antes */
-    .contenido-principal {
-        margin-left: 0 !important;
-        min-height: 100vh;
-        min-height: 100dvh; /* dvh descuenta la barra del navegador en móvil */
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        background: var(--color-fondo);
-    }
-
-    /* El área crece para llenar el espacio sin zonas blancas */
-    .area-contenido {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        max-width: 100%;
-        padding: 20px;
-    }
-
-    /* El container también se estira para ocupar la altura completa */
     .container-dashboard {
-        flex: 1;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .bienvenida-banner {
+        padding: 24px;
+        min-height: auto;
+    }
+
+    .bienvenida-nombre {
+        font-size: 22px;
+    }
+
+    .bienvenida-ilustracion {
+        width: 80px;
+        height: 80px;
+        font-size: 42px;
+    }
+
+    .recordatorios-chips {
+        gap: 8px;
+    }
+
+    .chip-recordatorio {
+        font-size: 12px;
+        padding: 8px 14px;
+    }
+
+    /* Tooltip en móvil: aparece abajo en vez de arriba */
+    .chip-tooltip {
+        bottom: auto;
+        top: calc(100% + 10px);
+    }
+
+    .chip-tooltip::after {
+        top: auto;
+        bottom: 100%;
+        border-top-color: transparent;
+        border-bottom-color: #1a2332;
+    }
+
+    .notif-panel {
+        width: 100%;
+        border-radius: 16px 16px 0 0;
+        top: auto;
+        bottom: 0;
+        height: 80vh;
+        transform: translateY(100%);
+    }
+
+    .notif-panel.activo {
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .bienvenida-ilustracion {
+        display: none; /* en pantallas muy pequeñas se oculta la ilustración */
+    }
+
+    .bienvenida-banner {
         padding: 20px;
     }
-
-    /* Navbar más compacta */
-    .navbar-superior {
-        padding: 15px 20px;
-    }
-
-    /* El nombre se oculta para ahorrar espacio en la navbar */
-    .user-name {
-        display: none;
-    }
-
-    /* Mascotas en columna única */
-    .mascotas-grid {
-        grid-template-columns: 1fr;
-    }
-
-    /* Bienvenida más compacta */
-    .bienvenida-card {
-        padding: 25px;
-    }
-
-    .bienvenida-card h2 {
-        font-size: 24px;
-    }
-
-    /* Menos gap en el grid de citas/recordatorios */
-    .content-grid {
-        gap: 20px;
-    }
 }
 
-
-/* ========================================================================
-   15. RESPONSIVE — Móviles pequeños (hasta 480px)
-   — Ajustes adicionales para pantallas muy pequeñas (menos de 5").
-======================================================================== */
-@media (max-width: 480px) {
-    .bienvenida-card         { padding: 25px; }
-    .bienvenida-card h2      { font-size: 20px; }
-    .bienvenida-card p       { font-size: 14px; }
-    .mascota-card            { padding: 20px; }
-    .card                    { padding: 20px; }
-}
-
-
-/* ========================================================================
-   16. ESTILOS DE IMPRESIÓN
-   — Al imprimir se elimina el margen del sidebar y la navbar.
-======================================================================== */
-@media print {
-    .contenido-principal {
-        margin-left: 0 !important;
-    }
-
-    .navbar-superior {
-        display: none;
-    }
+/* Respeto por reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    .bienvenida-ilustracion { animation: none; }
+    .dash-fade-in { transition: none; opacity: 1; transform: none; }
+    .chip-recordatorio,
+    .cita-row,
+    .recordatorio-row { transition: none; }
 }

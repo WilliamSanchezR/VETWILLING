@@ -369,3 +369,10 @@ function generarPDF() {
     // Guardar el PDF
     doc.save('Historial_Medico_' + nombre.replace(/\s+/g, '_') + '.pdf');
 }
+
+const img = document.getElementById('fotoMascota');
+
+img.onerror = function () {
+    this.onerror = null;
+    this.src = '/assets/img/default-pet.png';
+};

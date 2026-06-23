@@ -300,6 +300,8 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
     <script>
         let periodoActual = 'mes';
         let categoriaActual = '';

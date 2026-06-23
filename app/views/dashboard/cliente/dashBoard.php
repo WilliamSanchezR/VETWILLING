@@ -184,13 +184,13 @@ if ($id_propietario) {
 <body>
 
     <!-- SIDEBAR -->
-    <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
+    <?php include_once _DIR_ . '/../../layouts/sidebar_pasiente.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido-principal" id="contenidoPrincipal">
 
         <!-- NAVBAR SUPERIOR -->
-        <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
+        <?php include_once _DIR_ . '/../../layouts/panel_superio_paciente.php'; ?>
 
         <div class="area-contenido">
 
