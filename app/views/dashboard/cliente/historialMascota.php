@@ -5,7 +5,7 @@
  */
 require_once BASE_PATH . '/app/helpers/session_propietario.php';
 require_once BASE_PATH . '/app/models/CitasCliente.php';
-require_once BASE_PATH . '/app/models/AccesoHistorial.php';
+// require_once BASE_PATH . '/app/models/AccesoHistorial.php';
 
 $id_mascota = (int)($_GET['id'] ?? 0);
 if ($id_mascota <= 0) {
@@ -27,10 +27,10 @@ if (!$mascota) {
     exit;
 }
 
-/* ── Control de acceso al historial clínico ── */
-$_accesoModel  = new AccesoHistorial();
-$accesoInfo    = $_accesoModel->estadoAcceso($id_mascota, $_id_propietario);
-$tieneAcceso   = $accesoInfo['estado'] === 'aprobado';
+// /* ── Control de acceso al historial clínico ── */
+// $_accesoModel  = new AccesoHistorial();
+// $accesoInfo    = $_accesoModel->estadoAcceso($id_mascota, $_id_propietario);
+// $tieneAcceso   = $accesoInfo['estado'] === 'aprobado';
 
 function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
 ?>
@@ -115,7 +115,7 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
                         <p class="text-muted mb-0">Información completa del paciente</p>
                     </div>
                     <div class="d-flex gap-2 flex-wrap align-items-center">
-                        <?php if ($tieneAcceso): ?>
+                        <!-- <?php if ($tieneAcceso): ?>
                             <span class="acceso-timer" id="countdownTimer"
                                   data-expira="<?= e($accesoInfo['fecha_expiracion']) ?>">
                                 <i class="bi bi-clock"></i>
@@ -129,7 +129,7 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
                             <button class="btn btn-danger btn-sm" onclick="generarPDF()">
                                 <i class="bi bi-file-pdf me-1"></i>PDF
                             </button>
-                        <?php endif; ?>
+                        <?php endif; ?> -->
                     </div>
                 </div>
 
@@ -138,10 +138,11 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-md-2 text-center mb-3 mb-md-0">
-                                <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= e($mascota['img_mascota'] ?? 'default.png') ?>"
-                                     alt="<?= e($mascota['nombre']) ?>"
-                                     onerror="this.src='<?= BASE_URL ?>/public/assets/webSite/img/default-pet.png'"
-                                     style="width:90px;height:90px;border-radius:50%;object-fit:cover;">
+                                <img id="fotoMascota"
+                                    src="<?= BASE_URL ?>/public/uploads/mascotas/<?= e($mascota['img_mascota'] ?? 'default.png') ?>"
+                                    alt="<?= e($mascota['nombre']) ?>"
+                                    onerror="this.onerror=null; this.src='<?= BASE_URL ?>/public/assets/webSite/img/default-pet.png';"
+                                    style="width:90px;height:90px;border-radius:50%;object-fit:cover;">
                             </div>
                             <div class="col-md-10">
                                 <div class="row g-2">
@@ -187,14 +188,14 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabHistorial">
+                        <!-- <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabHistorial">
                             <i class="bi bi-clipboard2-pulse me-1"></i>Historial Clínico
                             <?php if (!$tieneAcceso): ?>
                                 <i class="bi bi-lock-fill text-warning ms-1" title="Requiere permiso"></i>
                             <?php else: ?>
                                 <i class="bi bi-unlock-fill text-success ms-1"></i>
                             <?php endif; ?>
-                        </button>
+                        </button> -->
                     </li>
                     <li class="nav-item">
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabVacunas">
