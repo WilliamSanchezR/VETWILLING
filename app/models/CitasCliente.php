@@ -171,14 +171,14 @@ class CitasCliente
                         sub.costo as subservicio_costo,
                         
                         a.id_usuario,
-                        COALESCE(CONCAT(v.nombres, ' ', v.apellidos), 'No asignado') as veterinario_nombre
+                        COALESCE(CONCAT(prf.nombres, ' ', prf.apellidos), 'No asignado') as veterinario_nombre
                         
                     FROM agendamiento a
                     INNER JOIN paciente pac ON a.id_paciente = pac.id_paciente
                     INNER JOIN propietario pr ON pac.id_propietario = pr.id_propietario
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
-                    LEFT JOIN veterinario v ON a.id_usuario = v.id_usuario
+                    LEFT JOIN profesional prf ON a.id_usuario = prf.id_usuario
                     
                     WHERE pac.id_propietario = :id_propietario";
 
@@ -252,12 +252,12 @@ class CitasCliente
                         pac.nombre AS mascota_nombre,
                         s.nombre AS servicio_nombre,
                         sub.nombre AS subservicio_nombre,
-                        COALESCE(CONCAT(v.nombres, ' ', v.apellidos), 'No asignado') AS veterinario_nombre
+                        COALESCE(CONCAT(prf.nombres, ' ', prf.apellidos), 'No asignado') AS veterinario_nombre
                     FROM agendamiento a
                     INNER JOIN paciente pac ON a.id_paciente = pac.id_paciente
                     LEFT JOIN servicio s ON a.id_servicio = s.id_servicio
                     LEFT JOIN subservicios sub ON a.id_subservicio = sub.id_subservicio
-                    LEFT JOIN veterinario v ON a.id_usuario = v.id_usuario
+                    LEFT JOIN profesional prf ON a.id_usuario = prf.id_usuario
                     WHERE pac.id_propietario = :id_propietario
                     AND a.id_paciente = :id_paciente
                     ORDER BY a.fecha_hora DESC, a.id_agendamiento DESC

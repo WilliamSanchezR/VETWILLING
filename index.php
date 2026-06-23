@@ -605,6 +605,10 @@ switch ($request) {
         require BASE_PATH . "/app/controllers/reportesPdfControllers.php";
         reporteMascotas();
         break;
+    case "/historial-clinico-pdf":
+        require BASE_PATH . "/app/controllers/reportesPdfControllers.php";
+        historialClinicoPdf();
+        break;
     default:
         http_response_code(404);
         require BASE_PATH . "/app/views/auth/error404.php";
