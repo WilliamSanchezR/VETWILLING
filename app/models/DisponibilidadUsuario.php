@@ -164,7 +164,7 @@ class DisponibilidadUsuario
             $sql = "SELECT
                         d.id_disponibilidad,
                         d.id_usuario,
-                        COALESCE(CONCAT(v.nombres, ' ', v.apellidos), 'Sin veterinario asignado') as veterinario_nombre,
+                        COALESCE(CONCAT(pr.nombres, ' ', pr.apellidos), 'Sin veterinario asignado') as veterinario_nombre,
                         d.dia_semana,
                         CASE d.dia_semana
                             WHEN 1 THEN 'Lunes'
@@ -181,7 +181,7 @@ class DisponibilidadUsuario
                         d.hora_fin,
                         d.duracion_minutos as duracion
                     FROM disponibilidad_usuario d
-                    LEFT JOIN veterinario v ON d.id_usuario = v.id_usuario
+                    LEFT JOIN profesional pr ON d.id_usuario = pr.id_usuario
                     LEFT JOIN especialidad es ON d.id_especialidad = es.id_especialidad
                     WHERE d.estado = 'Activo' AND d.id_veterinaria = :id_veterinaria";
 

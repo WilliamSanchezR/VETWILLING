@@ -206,12 +206,17 @@ function registrarPacienteConPropietario()
         error_log("ID Propietario generado: " . $id_propietario);
 
         if (!$id_propietario) {
-            echo json_encode([
-                "success" => false,
-                "message" => "No se pudo registrar el propietario",
-            ]);
+                // Intentar incluir detalle de error desde el modelo para depuración
+                $debug = isset($propietarioModel->lastError) ? $propietarioModel->lastError : null;
+                error_log("❌ Fallo registrar propietario. Debug: " . print_r($debug, true));
+                echo json_encode([
+                    "success" => false,
+                    "message" => "No se pudo registrar el propietario",
+                    "debug" => $debug,
+                ]);
             exit();
         }
+        
 
         $emailEnviado = false;
         $emailAviso = "";

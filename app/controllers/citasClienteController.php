@@ -9,7 +9,7 @@
 session_start();
 
 require_once __DIR__ . '/../models/CitasCliente.php';
-require_once __DIR__ . '/../models/Veterinario.php';
+require_once __DIR__ . '/../models/Profesional.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
 require_once __DIR__ . '/../helpers/notificacion_helper.php';
 
@@ -164,11 +164,18 @@ function crearCitaCliente()
         $modeloCitas = new CitasCliente();
         $id_usuario_veterinario = null;
 
+        $id_usuario_profesional = null;
         if (!empty($data['id_usuario']) && is_numeric($data['id_usuario'])) {
-            $veterinarioModel = new Veterinario();
-            $veterinario = $veterinarioModel->listarVeterinario((int)$data['id_usuario']);
-            if ($veterinario) {
-                $id_usuario_veterinario = (int)$data['id_usuario'];
+            $id_usuario_profesional = (int)$data['id_usuario'];
+        } elseif (!empty($data['id_veterinario']) && is_numeric($data['id_veterinario'])) {
+            $id_usuario_profesional = (int)$data['id_veterinario'];
+        }
+
+        if ($id_usuario_profesional !== null) {
+            $profesionalModel = new Profesional();
+            $profesional = $profesionalModel->consultarPorId($id_usuario_profesional);
+            if ($profesional) {
+                $id_usuario_veterinario = $id_usuario_profesional;
             }
         }
 

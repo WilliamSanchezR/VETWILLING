@@ -8,7 +8,7 @@
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 11px;
-            color: #1f2937;
+            color: #ff0099;
         }
 
         h1 {

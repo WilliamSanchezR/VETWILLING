@@ -793,7 +793,6 @@ $mascotas = listarMascotas();
             // ═══════════════════════════════════════════════════════════
 
             const form = document.getElementById('formAgendarCita');
-            let disponibilidadSeleccionada = null;
 
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -1007,8 +1006,6 @@ $mascotas = listarMascotas();
             async function cargarDisponibilidades() {
                 const fecha = document.getElementById('fecha_disponibilidad').value;
                 const divisionesPrevias = document.getElementById('disponibilidadesContainer');
-                const selectorContainer = document.getElementById('selectorHoraContainer');
-                selectorContainer.style.display = 'none';
                 divisionesPrevias.innerHTML = '<div class="text-center py-5 text-muted">Cargando horarios disponibles...</div>';
 
                 try {
@@ -1026,17 +1023,7 @@ $mascotas = listarMascotas();
                         return;
                     }
 
-                    const vistos = new Set();
-                    const disponiblesUnicos = disponibles.filter(item => {
-                        const key = `${item.id_usuario}_${item.hora_inicio}_${item.hora_fin}`;
-                        if (vistos.has(key)) {
-                            return false;
-                        }
-                        vistos.add(key);
-                        return true;
-                    });
-
-                    const itemsHtml = disponiblesUnicos.map(item => {
+                    const itemsHtml = disponibles.map(item => {
                         const horaInicio = item.hora_inicio.substring(0, 5);
                         const horaFin = item.hora_fin.substring(0, 5);
                         return `
@@ -1051,6 +1038,10 @@ $mascotas = listarMascotas();
                     }).join('');
 
                     divisionesPrevias.innerHTML = `<div class="list-group">${itemsHtml}</div>`;
+                    
+                    // Guardar datos de la disponibilidad seleccionada
+                    let disponibilidadSeleccionada = null;
+                    
                     document.querySelectorAll('.btnSeleccionarHorario').forEach(button => {
                         button.addEventListener('click', function() {
                             const idUsuario = this.getAttribute('data-id_usuario');
@@ -1058,6 +1049,7 @@ $mascotas = listarMascotas();
                             const horaInicio = this.getAttribute('data-hora_inicio');
                             const horaFin = this.getAttribute('data-hora_fin');
 
+                            // Guardar datos y mostrar selector de hora
                             disponibilidadSeleccionada = {
                                 idUsuario,
                                 nombreVet,
@@ -1066,74 +1058,87 @@ $mascotas = listarMascotas();
                                 fecha: document.getElementById('fecha_disponibilidad').value
                             };
 
+                            // Mostrar selector de hora
+                            const selectorContainer = document.getElementById('selectorHoraContainer');
                             const inputHora = document.getElementById('horaSeleccionada');
                             const rangoDisplay = document.getElementById('rangoDisponible');
-
+                            
                             selectorContainer.style.display = 'block';
                             inputHora.min = disponibilidadSeleccionada.horaInicio;
                             inputHora.max = disponibilidadSeleccionada.horaFin;
                             inputHora.value = disponibilidadSeleccionada.horaInicio;
                             rangoDisplay.textContent = `${disponibilidadSeleccionada.horaInicio} - ${disponibilidadSeleccionada.horaFin}`;
+
+                            // Scroll al selector
                             selectorContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                         });
                     });
+
+                    // Evento para confirmar hora
+                    document.getElementById('btnConfirmarHora').addEventListener('click', function() {
+                        if (!disponibilidadSeleccionada) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Error',
+                                text: 'Por favor selecciona una disponibilidad primero.',
+                                confirmButtonText: 'Entendido'
+                            });
+                            return;
+                        }
+
+                        const horaSeleccionada = document.getElementById('horaSeleccionada').value;
+                        if (!horaSeleccionada) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Error',
+                                text: 'Por favor selecciona una hora.',
+                                confirmButtonText: 'Entendido'
+                            });
+                            return;
+                        }
+
+                        // Validar que la hora esté dentro del rango
+                        if (horaSeleccionada < disponibilidadSeleccionada.horaInicio || horaSeleccionada > disponibilidadSeleccionada.horaFin) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Hora fuera de rango',
+                                text: `Selecciona una hora entre ${disponibilidadSeleccionada.horaInicio} y ${disponibilidadSeleccionada.horaFin}`,
+                                confirmButtonText: 'Entendido'
+                            });
+                            return;
+                        }
+
+                        // Rellenar campos del formulario
+                        document.getElementById('id_usuario').value = disponibilidadSeleccionada.idUsuario;
+                        
+                        // Calcular hora fin (1 hora después)
+                        const [horas, minutos] = horaSeleccionada.split(':');
+                        const fechaFin = new Date(disponibilidadSeleccionada.fecha);
+                        fechaFin.setHours(parseInt(horas) + 1, parseInt(minutos), 0);
+                        const horaFin = fechaFin.toTimeString().substring(0, 5);
+                        
+                        // Mostrar veterinario + hora inicio - hora fin
+                        document.getElementById('veterinario_seleccionado').value = `${disponibilidadSeleccionada.nombreVet} — ${horaSeleccionada} a ${horaFin}`;
+                        document.getElementById('fecha_hora').value = `${disponibilidadSeleccionada.fecha}T${horaSeleccionada}`;
+                        document.getElementById('fecha_hora_fin').value = `${disponibilidadSeleccionada.fecha}T${horaFin}`;
+                        
+                        modal.hide();
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Horario confirmado',
+                            text: `Cita agendada con ${disponibilidadSeleccionada.nombreVet} a las ${horaSeleccionada}`,
+                            confirmButtonText: 'Perfecto',
+                            timer: 2000
+                        });
+                    });
+                    
                 } catch (error) {
                     console.error('Error al cargar disponibilidades:', error);
                     divisionesPrevias.innerHTML = '<div class="alert alert-danger">Error al cargar la disponibilidad. Intenta de nuevo.</div>';
                 }
             }
-
-            document.getElementById('btnConfirmarHora').addEventListener('click', function() {
-                if (!disponibilidadSeleccionada) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Error',
-                        text: 'Por favor selecciona una disponibilidad primero.',
-                        confirmButtonText: 'Entendido'
-                    });
-                    return;
-                }
-
-                const horaSeleccionada = document.getElementById('horaSeleccionada').value;
-                if (!horaSeleccionada) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Error',
-                        text: 'Por favor selecciona una hora.',
-                        confirmButtonText: 'Entendido'
-                    });
-                    return;
-                }
-
-                if (horaSeleccionada < disponibilidadSeleccionada.horaInicio || horaSeleccionada > disponibilidadSeleccionada.horaFin) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Hora fuera de rango',
-                        text: `Selecciona una hora entre ${disponibilidadSeleccionada.horaInicio} y ${disponibilidadSeleccionada.horaFin}`,
-                        confirmButtonText: 'Entendido'
-                    });
-                    return;
-                }
-
-                document.getElementById('id_usuario').value = disponibilidadSeleccionada.idUsuario;
-                const [horas, minutos] = horaSeleccionada.split(':');
-                const fechaFin = new Date(disponibilidadSeleccionada.fecha);
-                fechaFin.setHours(parseInt(horas) + 1, parseInt(minutos), 0);
-                const horaFin = fechaFin.toTimeString().substring(0, 5);
-
-                document.getElementById('veterinario_seleccionado').value = `${disponibilidadSeleccionada.nombreVet} — ${horaSeleccionada} a ${horaFin}`;
-                document.getElementById('fecha_hora').value = `${disponibilidadSeleccionada.fecha}T${horaSeleccionada}`;
-                document.getElementById('fecha_hora_fin').value = `${disponibilidadSeleccionada.fecha}T${horaFin}`;
-
-                modal.hide();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Horario confirmado',
-                    text: `Cita agendada con ${disponibilidadSeleccionada.nombreVet} a las ${horaSeleccionada}`,
-                    confirmButtonText: 'Perfecto',
-                    timer: 2000
-                });
-            });
+        });
 
         // ═══════════════════════════════════════════════════════════
         //  FUNCIÓN PARA CARGAR SERVICIOS
@@ -1216,7 +1221,6 @@ $mascotas = listarMascotas();
         }
 
         console.log('✅ Vista de Agendar Cita cargada correctamente');
-    });
     </script>
 
 </body>

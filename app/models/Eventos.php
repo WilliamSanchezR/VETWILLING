@@ -32,22 +32,35 @@ class Eventos
             $observaciones = $data['observaciones'] ?? null;
             $stmt->bindParam(':observaciones', $observaciones);
             $stmt->bindParam(':fecha_hora', $data['fecha_hora']);
-            $stmt->bindParam(':fecha_hora_fin', $data['fecha_hora_fin']);
+            if ($data['fecha_hora_fin'] !== null && $data['fecha_hora_fin'] !== '') {
+                $stmt->bindParam(':fecha_hora_fin', $data['fecha_hora_fin']);
+            } else {
+                $stmt->bindValue(':fecha_hora_fin', null, PDO::PARAM_NULL);
+            }
             $stmt->bindParam(':estado', $data['estado']);
-            $stmt->bindParam(':id_usuario', $data['id_usuario'], PDO::PARAM_INT);
+
+            if (isset($data['id_usuario']) && $data['id_usuario'] !== null && $data['id_usuario'] !== '') {
+                $stmt->bindValue(':id_usuario', (int)$data['id_usuario'], PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue(':id_usuario', null, PDO::PARAM_NULL);
+            }
 
             // Bind de campos requeridos
-            $id_paciente = $data['id_paciente'];
-            $id_servicio = $data['id_servicio'];
-            $id_subservicio = $data['id_subservicio'] ?? null;
-            $id_especialidad = $data['id_especialidad'];
+            $id_paciente = isset($data['id_paciente']) ? (int)$data['id_paciente'] : null;
+            $id_servicio = isset($data['id_servicio']) ? (int)$data['id_servicio'] : null;
+            $id_subservicio = isset($data['id_subservicio']) && $data['id_subservicio'] !== '' ? (int)$data['id_subservicio'] : null;
+            $id_especialidad = isset($data['id_especialidad']) ? (int)$data['id_especialidad'] : null;
 
             $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
             $stmt->bindParam(':id_servicio', $id_servicio, PDO::PARAM_INT);
             $stmt->bindParam(':id_especialidad', $id_especialidad, PDO::PARAM_INT);
 
             // Bind seguro para id_subservicio
-            $stmt->bindValue(':id_subservicio', $data['id_subservicio'], PDO::PARAM_INT);
+            if ($id_subservicio !== null) {
+                $stmt->bindValue(':id_subservicio', $id_subservicio, PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue(':id_subservicio', null, PDO::PARAM_NULL);
+            }
             $resultado = $stmt->execute();
 
             if (!$resultado) {
