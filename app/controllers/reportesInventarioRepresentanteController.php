@@ -109,11 +109,11 @@ function construirPayloadInventario($idVeterinaria)
             'categoria' => $categoria,
             'producto' => $producto
         ],
-        'resumen' => $inventario->obtenerResumenReporteInventario($idVeterinaria, $inicio, $fin),
+        'resumen' => $inventario->obtenerResumenReporteInventario($idVeterinaria, $inicio, $fin, $categoria, $producto),
         'detalle_inventario' => $inventario->obtenerReporteInventario($idVeterinaria, $inicio, $fin, $categoria, $producto),
-        'metricas_consumo' => $inventario->obtenerMetricasConsumo($idVeterinaria, $inicio, $fin),
-        'productos_mas_usados' => $inventario->obtenerProductosMasUsados($idVeterinaria, $inicio, $fin, 10),
-        'items_con_alertas' => $inventario->obtenerItemsConAlertas($idVeterinaria, $inicio, $fin, 10),
+        'metricas_consumo' => $inventario->obtenerMetricasConsumo($idVeterinaria, $inicio, $fin, $categoria, $producto),
+        'productos_mas_usados' => $inventario->obtenerProductosMasUsados($idVeterinaria, $inicio, $fin, 10, $categoria, $producto),
+        'items_con_alertas' => $inventario->obtenerItemsConAlertas($idVeterinaria, $inicio, $fin, 10, $categoria, $producto),
         'categorias_disponibles' => $inventario->obtenerCategoriasDisponibles($idVeterinaria)
     ];
 }
@@ -211,6 +211,28 @@ function generarReporteInventarioExcel($idVeterinaria)
             echo '<td>' . (int)($row['stock_minimo'] ?? 0) . '</td>';
             echo '<td>' . ($row['alerta_stock'] == 1 ? 'CRÍTICO' : 'NORMAL') . '</td>';
             echo '<td>' . htmlspecialchars($row['fecha_vencimiento'] ?? '') . '</td>';
+            echo '</tr>';
+        }
+    }
+
+    echo '</tbody></table>';
+
+    echo '<table class="seccion"><tr><td>Métricas de Consumo Promedio</td></tr></table>';
+    echo '<table class="grid"><thead><tr>';
+    echo '<th>Producto</th><th>Categoría</th><th>Total Salidas</th><th>Total Entradas</th><th>Promedio Salida</th><th>Número Salidas</th>';
+    echo '</tr></thead><tbody>';
+
+    if (empty($metricas)) {
+        echo '<tr><td colspan="6">Sin datos de consumo para el periodo</td></tr>';
+    } else {
+        foreach ($metricas as $row) {
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($row['nombre'] ?? '') . '</td>';
+            echo '<td>' . htmlspecialchars($row['categoria'] ?? '') . '</td>';
+            echo '<td>' . (int)($row['total_salidas'] ?? 0) . '</td>';
+            echo '<td>' . (int)($row['total_entradas'] ?? 0) . '</td>';
+            echo '<td>' . number_format((float)($row['promedio_salida'] ?? 0), 2) . '</td>';
+            echo '<td>' . (int)($row['numero_salidas'] ?? 0) . '</td>';
             echo '</tr>';
         }
     }

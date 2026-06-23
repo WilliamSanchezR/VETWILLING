@@ -717,7 +717,7 @@ class Inventario
      * @param string $fecha_fin Fecha fin para cálculo (Y-m-d)
      * @return array Métricas de consumo
      */
-    public function obtenerMetricasConsumo(int $id_veterinaria, string $fecha_inicio, string $fecha_fin): array
+    public function obtenerMetricasConsumo(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, ?string $categoria = null, ?string $producto = null): array
     {
         try {
             $sql = "SELECT
@@ -727,19 +727,36 @@ class Inventario
                         SUM(CASE WHEN ms.tipo = 'salida' THEN ms.cantidad ELSE 0 END) AS total_salidas,
                         SUM(CASE WHEN ms.tipo = 'entrada' THEN ms.cantidad ELSE 0 END) AS total_entradas,
                         COUNT(CASE WHEN ms.tipo = 'salida' THEN 1 END) AS numero_salidas,
-                        AVG(CASE WHEN ms.tipo = 'salida' THEN ms.cantidad END) AS promedio_salida
+                        ROUND(AVG(CASE WHEN ms.tipo = 'salida' THEN ms.cantidad END), 2) AS promedio_salida
                     FROM movimiento_stock ms
                     INNER JOIN inventario i ON ms.id_inventario = i.id_inventario
                     INNER JOIN producto p ON i.id_inventario = p.id_inventario
                     WHERE i.id_veterinaria = :id_veterinaria
-                      AND DATE(ms.fecha_movimiento) BETWEEN :fecha_inicio AND :fecha_fin
-                    GROUP BY p.id_producto, p.nombre, p.proveedor, i.categoria
+                      AND DATE(ms.fecha_movimiento) BETWEEN :fecha_inicio AND :fecha_fin";
+
+            $params = [
+                ':id_veterinaria' => $id_veterinaria,
+                ':fecha_inicio' => $fecha_inicio,
+                ':fecha_fin' => $fecha_fin,
+            ];
+
+            if ($categoria) {
+                $sql .= " AND i.categoria = :categoria";
+                $params[':categoria'] = $categoria;
+            }
+
+            if ($producto) {
+                $sql .= " AND p.nombre LIKE :producto";
+                $params[':producto'] = "%{$producto}%";
+            }
+
+            $sql .= " GROUP BY p.id_producto, p.nombre, p.proveedor, i.categoria
                     ORDER BY total_salidas DESC";
 
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
-            $stmt->bindParam(':fecha_inicio', $fecha_inicio, PDO::PARAM_STR);
-            $stmt->bindParam(':fecha_fin', $fecha_fin, PDO::PARAM_STR);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -758,7 +775,7 @@ class Inventario
      * @param int $limite Número máximo de productos a retornar
      * @return array Productos más usados
      */
-    public function obtenerProductosMasUsados(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, int $limite = 10): array
+    public function obtenerProductosMasUsados(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, int $limite = 10, ?string $categoria = null, ?string $producto = null): array
     {
         try {
             $sql = "SELECT
@@ -771,16 +788,33 @@ class Inventario
                     INNER JOIN inventario i ON ms.id_inventario = i.id_inventario
                     INNER JOIN producto p ON i.id_inventario = p.id_inventario
                     WHERE i.id_veterinaria = :id_veterinaria
-                      AND DATE(ms.fecha_movimiento) BETWEEN :fecha_inicio AND :fecha_fin
-                    GROUP BY p.id_producto, p.nombre, p.proveedor, i.categoria
+                      AND DATE(ms.fecha_movimiento) BETWEEN :fecha_inicio AND :fecha_fin";
+
+            $params = [
+                ':id_veterinaria' => $id_veterinaria,
+                ':fecha_inicio' => $fecha_inicio,
+                ':fecha_fin' => $fecha_fin,
+                ':limite' => $limite,
+            ];
+
+            if ($categoria) {
+                $sql .= " AND i.categoria = :categoria";
+                $params[':categoria'] = $categoria;
+            }
+
+            if ($producto) {
+                $sql .= " AND p.nombre LIKE :producto";
+                $params[':producto'] = "%{$producto}%";
+            }
+
+            $sql .= " GROUP BY p.id_producto, p.nombre, p.proveedor, i.categoria
                     ORDER BY total_salidas DESC
                     LIMIT :limite";
 
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
-            $stmt->bindParam(':fecha_inicio', $fecha_inicio, PDO::PARAM_STR);
-            $stmt->bindParam(':fecha_fin', $fecha_fin, PDO::PARAM_STR);
-            $stmt->bindParam(':limite', $limite, PDO::PARAM_INT);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value, $key === ':limite' || $key === ':id_veterinaria' ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -799,9 +833,10 @@ class Inventario
      * @param int $limite Número máximo de items a retornar
      * @return array Items con alertas de stock
      */
-    public function obtenerItemsConAlertas(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, int $limite = 10): array
+    public function obtenerItemsConAlertas(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, int $limite = 10, ?string $categoria = null, ?string $producto = null): array
     {
         try {
+            // Estado actual de stock bajo; el rango de fechas filtra lotes registrados en el periodo
             $sql = "SELECT
                         p.nombre,
                         p.proveedor,
@@ -820,8 +855,27 @@ class Inventario
                     INNER JOIN producto p ON i.id_inventario = p.id_inventario
                     WHERE i.id_veterinaria = :id_veterinaria
                       AND i.estado = 1
-                      AND DATE(i.creado_en) BETWEEN :fecha_inicio AND :fecha_fin
-                    ORDER BY 
+                      AND i.cantidad <= (i.stock_minimo * 1.5)
+                      AND DATE(i.creado_en) BETWEEN :fecha_inicio AND :fecha_fin";
+
+            $params = [
+                ':id_veterinaria' => $id_veterinaria,
+                ':fecha_inicio' => $fecha_inicio,
+                ':fecha_fin' => $fecha_fin,
+                ':limite' => $limite,
+            ];
+
+            if ($categoria) {
+                $sql .= " AND i.categoria = :categoria";
+                $params[':categoria'] = $categoria;
+            }
+
+            if ($producto) {
+                $sql .= " AND p.nombre LIKE :producto";
+                $params[':producto'] = "%{$producto}%";
+            }
+
+            $sql .= " ORDER BY 
                         CASE 
                             WHEN i.cantidad <= i.stock_minimo THEN 1
                             WHEN i.cantidad <= (i.stock_minimo * 1.5) THEN 2
@@ -831,10 +885,9 @@ class Inventario
                     LIMIT :limite";
 
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
-            $stmt->bindParam(':fecha_inicio', $fecha_inicio, PDO::PARAM_STR);
-            $stmt->bindParam(':fecha_fin', $fecha_fin, PDO::PARAM_STR);
-            $stmt->bindParam(':limite', $limite, PDO::PARAM_INT);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value, $key === ':limite' || $key === ':id_veterinaria' ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
             $stmt->execute();
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -852,7 +905,7 @@ class Inventario
      * @param string $fecha_fin Fecha fin (Y-m-d)
      * @return array Resumen de métricas
      */
-    public function obtenerResumenReporteInventario(int $id_veterinaria, string $fecha_inicio, string $fecha_fin): array
+    public function obtenerResumenReporteInventario(int $id_veterinaria, string $fecha_inicio, string $fecha_fin, ?string $categoria = null, ?string $producto = null): array
     {
         try {
             $sql = "SELECT
@@ -862,7 +915,8 @@ class Inventario
                         SUM(CASE WHEN p.fecha_vencimiento < CURDATE() THEN 1 ELSE 0 END) AS vencidos,
                         SUM(CASE WHEN p.fecha_vencimiento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS por_vencer,
                         SUM(CASE WHEN ms.tipo = 'entrada' THEN ms.cantidad ELSE 0 END) AS total_entradas,
-                        SUM(CASE WHEN ms.tipo = 'salida' THEN ms.cantidad ELSE 0 END) AS total_salidas
+                        SUM(CASE WHEN ms.tipo = 'salida' THEN ms.cantidad ELSE 0 END) AS total_salidas,
+                        COUNT(CASE WHEN ms.tipo = 'salida' THEN 1 END) AS movimientos_salida
                     FROM inventario i
                     INNER JOIN producto p ON i.id_inventario = p.id_inventario
                     LEFT JOIN movimiento_stock ms ON i.id_inventario = ms.id_inventario
@@ -870,13 +924,33 @@ class Inventario
                     WHERE i.id_veterinaria = :id_veterinaria
                       AND i.estado = 1";
 
+            $params = [
+                ':id_veterinaria' => $id_veterinaria,
+                ':fecha_inicio' => $fecha_inicio,
+                ':fecha_fin' => $fecha_fin,
+            ];
+
+            if ($categoria) {
+                $sql .= " AND i.categoria = :categoria";
+                $params[':categoria'] = $categoria;
+            }
+
+            if ($producto) {
+                $sql .= " AND p.nombre LIKE :producto";
+                $params[':producto'] = "%{$producto}%";
+            }
+
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
-            $stmt->bindParam(':fecha_inicio', $fecha_inicio, PDO::PARAM_STR);
-            $stmt->bindParam(':fecha_fin', $fecha_fin, PDO::PARAM_STR);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
             $stmt->execute();
 
             $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $diasPeriodo = max(1, (new DateTime($fecha_inicio))->diff(new DateTime($fecha_fin))->days + 1);
+            $totalSalidas = (int) ($row['total_salidas'] ?? 0);
+            $movimientosSalida = (int) ($row['movimientos_salida'] ?? 0);
 
             return [
                 'total_lotes' => (int) ($row['total_lotes'] ?? 0),
@@ -885,7 +959,11 @@ class Inventario
                 'vencidos' => (int) ($row['vencidos'] ?? 0),
                 'por_vencer' => (int) ($row['por_vencer'] ?? 0),
                 'total_entradas' => (int) ($row['total_entradas'] ?? 0),
-                'total_salidas' => (int) ($row['total_salidas'] ?? 0),
+                'total_salidas' => $totalSalidas,
+                'consumo_promedio_diario' => round($totalSalidas / $diasPeriodo, 2),
+                'promedio_por_salida' => $movimientosSalida > 0
+                    ? round($totalSalidas / $movimientosSalida, 2)
+                    : 0,
             ];
         } catch (PDOException $e) {
             error_log('Error en Inventario::obtenerResumenReporteInventario - ' . $e->getMessage());
@@ -897,6 +975,8 @@ class Inventario
                 'por_vencer' => 0,
                 'total_entradas' => 0,
                 'total_salidas' => 0,
+                'consumo_promedio_diario' => 0,
+                'promedio_por_salida' => 0,
             ];
         }
     }
