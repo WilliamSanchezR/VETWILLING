@@ -347,9 +347,55 @@ class Inventario
     // ============================================================
 
     /**
+     * Obtiene un lote activo verificando que pertenezca a la veterinaria de sesión.
+     * Centraliza la validación de propiedad antes de editar o eliminar.
+     */
+    public function obtenerLoteActivoDeVeterinaria(int $id_inventario, int $id_veterinaria): array|false
+    {
+        try {
+            $sql = "SELECT
+                        i.id_inventario,
+                        i.id_veterinaria,
+                        i.cantidad,
+                        i.categoria,
+                        i.numero_lote,
+                        i.stock_minimo,
+                        i.detalle_almacenamiento,
+                        i.estado,
+                        p.id_producto,
+                        p.nombre,
+                        p.descripcion,
+                        p.proveedor,
+                        p.precio,
+                        p.precio_venta,
+                        p.costo_mayorista,
+                        p.fecha_vencimiento,
+                        p.imagen
+                    FROM inventario i
+                    INNER JOIN producto p ON p.id_inventario = i.id_inventario
+                    WHERE i.id_inventario  = :id_inventario
+                      AND i.id_veterinaria = :id_veterinaria
+                      AND i.estado = 1
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_inventario',  $id_inventario,  PDO::PARAM_INT);
+            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $lote = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $lote ?: false;
+
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::obtenerLoteActivoDeVeterinaria - ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Marca el lote como eliminado (estado = 0).
-     * El producto asociado queda oculto porque listarInventario()
-     * filtra con WHERE estado = 1.
+     * Soft-delete: conserva filas en inventario, producto y movimiento_stock
+     * para que reportes históricos sigan referenciando los mismos IDs.
      *
      * @param int $id_inventario   ID del lote a eliminar
      * @param int $id_veterinaria  Seguridad extra: solo borra si pertenece a esta veterinaria
@@ -358,12 +404,12 @@ class Inventario
     public function eliminarLote(int $id_inventario, int $id_veterinaria): bool
     {
         try {
-            // El filtro id_veterinaria impide que un representante elimine
-            // lotes de otra veterinaria manipulando el ID en el formulario
+            // Solo lotes activos; nunca DELETE físico
             $sql = "UPDATE inventario
                     SET estado = 0
                     WHERE id_inventario  = :id_inventario
-                      AND id_veterinaria = :id_veterinaria";
+                      AND id_veterinaria = :id_veterinaria
+                      AND estado = 1";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_inventario',  $id_inventario,  PDO::PARAM_INT);
@@ -371,8 +417,6 @@ class Inventario
 
             $stmt->execute();
 
-            // rowCount() devuelve cuántas filas se modificaron
-            // Si es 0, el ID no existía o no pertenecía a esta veterinaria
             return $stmt->rowCount() > 0;
 
         } catch (PDOException $e) {

@@ -13,6 +13,12 @@ require_once __DIR__ . '/../models/Inventario.php';
 // Importamos el modelo de movimientos de stock (Paso 4)
 require_once __DIR__ . '/../models/MovimientoStock.php';
 
+// Días sin movimientos requeridos para permitir eliminación (Issue #245)
+const DIAS_BLOQUEO_ELIMINACION = 30;
+
+// Categorías permitidas (deben coincidir con el <select> del formulario)
+const CATEGORIAS_INVENTARIO = ['medicamento', 'alimento', 'accesorio', 'insumo', 'otro'];
+
 // ── Detectar qué método HTTP usó el navegador (GET o POST) ───────────────────
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -89,6 +95,129 @@ function procesarVenta(int $id_inventario, int $cantidad, int $id_usuario = null
 }
 
 // =============================================================================
+// VALIDACIONES COMPARTIDAS (Issue #245)
+// Centraliza reglas para bloquear editar/eliminar con datos inconsistentes.
+// =============================================================================
+
+/**
+ * Valida campos de producto enviados por formulario (crear/editar).
+ *
+ * @return string[] Lista de mensajes de error; vacía si todo es válido
+ */
+function validarCamposProducto(array $datos, bool $permitirFechaVencida = false): array
+{
+    $errores = [];
+
+    $nombre     = trim($datos['nombre'] ?? '');
+    $proveedor  = trim($datos['proveedor'] ?? '');
+    $categoria  = trim($datos['categoria'] ?? '');
+    $precio     = trim((string) ($datos['precio'] ?? ''));
+    $fechaVenc  = trim($datos['fecha_vencimiento'] ?? '');
+    $cantidad   = (int) ($datos['cantidad'] ?? 0);
+    $stockMin   = (int) ($datos['stock_minimo'] ?? 0);
+
+    if ($nombre === '') {
+        $errores[] = 'El nombre del producto es obligatorio.';
+    }
+
+    if ($proveedor === '') {
+        $errores[] = 'El proveedor o laboratorio es obligatorio.';
+    }
+
+    if ($categoria === '' || !in_array($categoria, CATEGORIAS_INVENTARIO, true)) {
+        $errores[] = 'Debes seleccionar una categoría válida para el producto.';
+    }
+
+    if ($precio === '' || !is_numeric($precio) || (float) $precio < 0) {
+        $errores[] = 'El precio debe ser un número mayor o igual a cero.';
+    }
+
+    if ($fechaVenc === '') {
+        $errores[] = 'La fecha de vencimiento es obligatoria.';
+    } else {
+        $fechaObj     = DateTime::createFromFormat('Y-m-d', $fechaVenc);
+        $erroresFecha = DateTime::getLastErrors();
+
+        if ($fechaObj === false
+            || ($erroresFecha['warning_count'] ?? 0) > 0
+            || ($erroresFecha['error_count'] ?? 0) > 0
+        ) {
+            $errores[] = 'La fecha de vencimiento no tiene un formato válido (AAAA-MM-DD).';
+        } elseif (!$permitirFechaVencida) {
+            $hoy = new DateTime('today');
+            if ($fechaObj < $hoy) {
+                $errores[] = 'La fecha de vencimiento no puede ser anterior a hoy.';
+            }
+        }
+    }
+
+    if ($cantidad <= 0) {
+        $errores[] = 'La cantidad debe ser mayor a cero.';
+    }
+
+    if ($stockMin < 0) {
+        $errores[] = 'El stock mínimo no puede ser negativo.';
+    }
+
+    if ($cantidad > 0 && $stockMin > 0 && $cantidad < $stockMin) {
+        $errores[] = 'La cantidad no puede ser menor al stock mínimo (' . $stockMin . ' unidades).';
+    }
+
+    return $errores;
+}
+
+/**
+ * Valida que un lote activo en BD tenga datos consistentes antes de operar.
+ *
+ * @return string[] Lista de mensajes de error; vacía si el registro es íntegro
+ */
+function validarIntegridadLote(array $lote): array
+{
+    return validarCamposProducto([
+        'nombre'            => $lote['nombre'] ?? '',
+        'proveedor'         => $lote['proveedor'] ?? '',
+        'categoria'         => $lote['categoria'] ?? '',
+        'precio'            => $lote['precio'] ?? '',
+        'fecha_vencimiento' => $lote['fecha_vencimiento'] ?? '',
+        'cantidad'          => $lote['cantidad'] ?? 0,
+        'stock_minimo'      => $lote['stock_minimo'] ?? 0,
+    ], true);
+}
+
+/**
+ * Resuelve un lote operable: existe, pertenece a la veterinaria y pasa integridad.
+ *
+ * @return array{lote: array|null, errores: string[]}
+ */
+function resolverLoteOperable(
+    Inventario $modelInv,
+    int $id_inventario,
+    int $id_veterinaria,
+    ?int $id_producto = null
+): array {
+    if ($id_inventario <= 0 || $id_veterinaria <= 0) {
+        return ['lote' => null, 'errores' => ['No se pudo identificar el producto.']];
+    }
+
+    $lote = $modelInv->obtenerLoteActivoDeVeterinaria($id_inventario, $id_veterinaria);
+
+    if (!$lote) {
+        return ['lote' => null, 'errores' => ['El producto no existe, ya fue eliminado o no pertenece a tu veterinaria.']];
+    }
+
+    if ($id_producto !== null && (int) $lote['id_producto'] !== $id_producto) {
+        return ['lote' => null, 'errores' => ['Los identificadores del producto no coinciden.']];
+    }
+
+    $erroresIntegridad = validarIntegridadLote($lote);
+    if (!empty($erroresIntegridad)) {
+        return ['lote' => null, 'errores' => $erroresIntegridad];
+    }
+
+    return ['lote' => $lote, 'errores' => []];
+}
+
+// =============================================================================
 // FUNCIÓN: guardarProducto  (RFS 44)
 // Registra lote + producto dentro de una transacción BD.
 // Si falla cualquier INSERT, se revierte todo (sin lotes huérfanos).
@@ -111,67 +240,26 @@ function guardarProducto(): void
     $stock_minimo           = (int) ($_POST['stock_minimo']           ?? 5);
     $detalle_almacenamiento = trim($_POST['detalle_almacenamiento']   ?? '');
 
-    // Categorías permitidas (deben coincidir con el <select> del formulario)
-    $categoriasValidas = ['medicamento', 'alimento', 'accesorio', 'insumo', 'otro'];
-
     // ── 2. Validaciones backend estrictas (RFS 44) ──────────────────────────────
 
-    // Nombre obligatorio
-    if ($nombre === '') {
-        mostrarSweetAlert('error', 'Campo obligatorio', 'El nombre del producto es obligatorio.', $urlRegistro);
+    $erroresValidacion = validarCamposProducto([
+        'nombre'            => $nombre,
+        'proveedor'         => $proveedor,
+        'categoria'         => $categoria,
+        'precio'            => $precio,
+        'fecha_vencimiento' => $fecha_venc,
+        'cantidad'          => $cantidad,
+        'stock_minimo'      => $stock_minimo,
+    ]);
+
+    if (!empty($erroresValidacion)) {
+        mostrarSweetAlert('error', 'Datos inválidos', implode(' ', $erroresValidacion), $urlRegistro);
         exit();
     }
 
     // Veterinaria de sesión válida
     if ($id_veterinaria <= 0) {
         mostrarSweetAlert('error', 'Sesión inválida', 'No se pudo identificar la veterinaria. Vuelve a iniciar sesión.', $urlRegistro);
-        exit();
-    }
-
-    // Cantidad debe ser mayor a cero (no se permite stock inicial en 0)
-    // [Paso 4] Validación de stock: cantidad inicial debe ser > 0
-    if ($cantidad <= 0) {
-        mostrarSweetAlert('error', 'Cantidad inválida', 'La cantidad inicial debe ser mayor a cero.', $urlRegistro);
-        exit();
-    }
-
-    // Categoría obligatoria y dentro de la lista permitida
-    if ($categoria === '' || !in_array($categoria, $categoriasValidas, true)) {
-        mostrarSweetAlert('error', 'Categoría inválida', 'Debes seleccionar una categoría válida para el producto.', $urlRegistro);
-        exit();
-    }
-
-    // Proveedor obligatorio
-    if ($proveedor === '') {
-        mostrarSweetAlert('error', 'Campo obligatorio', 'El proveedor o laboratorio es obligatorio.', $urlRegistro);
-        exit();
-    }
-
-    // Fecha de vencimiento obligatoria, con formato correcto y no pasada
-    if ($fecha_venc === '') {
-        mostrarSweetAlert('error', 'Campo obligatorio', 'La fecha de vencimiento es obligatoria.', $urlRegistro);
-        exit();
-    }
-
-    $fechaObj = DateTime::createFromFormat('Y-m-d', $fecha_venc);
-    $erroresFecha = DateTime::getLastErrors();
-
-    // createFromFormat devuelve false si el formato no es válido (ej: 2024-13-40)
-    if ($fechaObj === false || ($erroresFecha['warning_count'] ?? 0) > 0 || ($erroresFecha['error_count'] ?? 0) > 0) {
-        mostrarSweetAlert('error', 'Fecha inválida', 'La fecha de vencimiento no tiene un formato válido (AAAA-MM-DD).', $urlRegistro);
-        exit();
-    }
-
-    // Comparar solo la fecha (sin hora) contra hoy
-    $hoy = new DateTime('today');
-    if ($fechaObj < $hoy) {
-        mostrarSweetAlert('error', 'Fecha vencida', 'La fecha de vencimiento no puede ser anterior a hoy.', $urlRegistro);
-        exit();
-    }
-
-    // Precio numérico y no negativo
-    if (!is_numeric($precio) || (float) $precio < 0) {
-        mostrarSweetAlert('error', 'Precio inválido', 'El precio debe ser un número mayor o igual a cero.', $urlRegistro);
         exit();
     }
 
@@ -272,68 +360,43 @@ function actualizarProducto(): void
     $categoria              = trim(   $_POST['categoria']                 ?? '');
     $numero_lote            = trim(   $_POST['numero_lote']               ?? '');
     $stock_minimo           = (int)  ($_POST['stock_minimo']              ?? 5);
-    $detalle_almacenamiento = trim(   $_POST['detalle_almacenamiento']    ?? '');
+    $detalle_almacenamiento = trim($_POST['detalle_almacenamiento']   ?? '');
 
-    // ── 3. Validar que los IDs y campos obligatorios sean correctos ───────────
-    if ($id_inventario <= 0 || $id_producto <= 0 || empty($nombre)) {
+    $urlEditar = BASE_URL . '/representante/editar-producto?id=' . $id_inventario;
+
+    // ── 3. Verificar lote activo, propiedad e integridad antes de escribir ────
+    $modelInv = new Inventario();
+    $resolucion = resolverLoteOperable($modelInv, $id_inventario, $id_veterinaria, $id_producto);
+
+    if (!empty($resolucion['errores'])) {
         mostrarSweetAlert(
             'error',
-            'Datos inválidos',
-            'No se pudo identificar el producto a editar.',
+            'Operación no permitida',
+            implode(' ', $resolucion['errores']),
             BASE_URL . '/representante/inventario'
         );
         exit();
     }
 
-    // Proveedor obligatorio
-    if ($proveedor === '') {
-        mostrarSweetAlert(
-            'error',
-            'Campo obligatorio',
-            'El proveedor o laboratorio es obligatorio.',
-            BASE_URL . '/representante/editar-producto?id=' . $id_inventario
-        );
+    // ── 4. Validar campos enviados por el formulario ──────────────────────────
+    $erroresValidacion = validarCamposProducto([
+        'nombre'            => $nombre,
+        'proveedor'         => $proveedor,
+        'categoria'         => $categoria,
+        'precio'            => $precio,
+        'fecha_vencimiento' => $fecha_venc,
+        'cantidad'          => $cantidad,
+        'stock_minimo'      => $stock_minimo,
+    ], true);
+
+    if (!empty($erroresValidacion)) {
+        mostrarSweetAlert('error', 'Datos inválidos', implode(' ', $erroresValidacion), $urlEditar);
         exit();
     }
 
-    if (!is_numeric($precio) || (float) $precio < 0) {
-        mostrarSweetAlert(
-            'error',
-            'Precio inválido',
-            'El precio debe ser un número mayor o igual a cero.',
-            BASE_URL . '/representante/editar-producto?id=' . $id_inventario
-        );
-        exit();
-    }
-
-    // ── 4. Validar cantidad: no puede ser menor a stock_minimo (Paso 4 - Validaciones) ─
-    // Si se intenta reducir stock por debajo del mínimo, rechazar la operación
-    if ($cantidad < $stock_minimo) {
-        mostrarSweetAlert(
-            'error',
-            'Cantidad insuficiente',
-            'La cantidad no puede ser menor al stock mínimo (' . $stock_minimo . ' unidades).',
-            BASE_URL . '/representante/editar-producto?id=' . $id_inventario
-        );
-        exit();
-    }
-
-    // ── 5. Validar cantidad: debe ser mayor a cero ─────────────────────────────
-    if ($cantidad <= 0) {
-        mostrarSweetAlert(
-            'error',
-            'Cantidad inválida',
-            'La cantidad debe ser mayor a cero.',
-            BASE_URL . '/representante/editar-producto?id=' . $id_inventario
-        );
-        exit();
-    }
-
-    // ── 6. Llamar al modelo para actualizar las dos tablas ────────────────────
-    $modelInv = new Inventario();
+    // ── 5. Actualizar en transacción (lote + producto + movimiento opcional) ───
     $modelMov = new MovimientoStock();
-
-    // Obtener cantidad actual antes de actualizar para registrar movimiento si cambia
+    $pdo      = $modelInv->obtenerConexion();
     $cantidadAnterior = obtenerStockActual($id_inventario);
 
     $datosLote = [
@@ -352,28 +415,36 @@ function actualizarProducto(): void
         'fecha_vencimiento' => $fecha_venc,
     ];
 
-    $exitoLote     = $modelInv->actualizarLote($id_inventario, $datosLote);
-    $exitoProducto = $modelInv->actualizarProducto($id_producto, $datosProducto);
+    try {
+        $pdo->beginTransaction();
 
-    // ── 7. Registrar movimiento de stock si la cantidad cambió ────────────────
-    if ($exitoLote && $cantidad !== $cantidadAnterior) {
-        $diferencia = $cantidad - $cantidadAnterior;
-        $tipoMovimiento = $diferencia > 0 ? 'entrada' : 'salida';
-        $cantidadMovimiento = abs($diferencia);
-        $motivo = 'Ajuste por edición de producto';
+        $exitoLote     = $modelInv->actualizarLote($id_inventario, $datosLote);
+        $exitoProducto = $modelInv->actualizarProducto($id_producto, $datosProducto);
 
-        $modelMov->registrarMovimiento(
-            $id_inventario,
-            $tipoMovimiento,
-            $cantidadMovimiento,
-            $motivo,
-            $_SESSION['user']['id_usuario'] ?? null
-        );
-    }
+        if (!$exitoLote || !$exitoProducto) {
+            throw new RuntimeException('No se pudieron guardar todos los cambios.');
+        }
 
-    // ── 8. Responder según el resultado ───────────────────────────────────────
-    if ($exitoLote && $exitoProducto) {
-        // Generar alertas automáticas después de actualizar producto
+        if ($cantidad !== $cantidadAnterior) {
+            $diferencia         = $cantidad - $cantidadAnterior;
+            $tipoMovimiento     = $diferencia > 0 ? 'entrada' : 'salida';
+            $cantidadMovimiento = abs($diferencia);
+
+            $movimientoOk = $modelMov->registrarMovimiento(
+                $id_inventario,
+                $tipoMovimiento,
+                $cantidadMovimiento,
+                'Ajuste por edición de producto',
+                $_SESSION['user']['id_usuario'] ?? null
+            );
+
+            if (!$movimientoOk) {
+                throw new RuntimeException('No se pudo registrar el movimiento de stock.');
+            }
+        }
+
+        $pdo->commit();
+
         $id_usuario = (int) ($_SESSION['user']['id_usuario'] ?? 0);
         if ($id_usuario > 0) {
             $modelInv->generarAlertasInventario($id_veterinaria, $id_usuario);
@@ -385,12 +456,18 @@ function actualizarProducto(): void
             'Los cambios se guardaron correctamente.',
             BASE_URL . '/representante/inventario'
         );
-    } else {
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        error_log('Error en actualizarProducto - ' . $e->getMessage());
+
         mostrarSweetAlert(
             'error',
             'Error al actualizar',
             'No se pudieron guardar todos los cambios. Intenta de nuevo.',
-            BASE_URL . '/representante/editar-producto?id=' . $id_inventario
+            $urlEditar
         );
     }
     exit();
@@ -404,42 +481,53 @@ function actualizarProducto(): void
 // =============================================================================
 function eliminarProducto(): void
 {
-    // ── 1. Capturar el ID del lote a eliminar ─────────────────────────────────
-    $id_inventario  = (int) ($_POST['id_inventario']  ?? 0);
-
-    // Tomamos la veterinaria de la sesión para evitar que alguien manipule
-    // el formulario e intente eliminar lotes de otra clínica
+    $urlInventario  = BASE_URL . '/representante/inventario';
+    $id_inventario  = (int) ($_POST['id_inventario'] ?? 0);
     $id_veterinaria = (int) ($_SESSION['user']['id_veterinaria'] ?? 0);
 
-    // ── 2. Validar que llegaron IDs válidos ───────────────────────────────────
-    if ($id_inventario <= 0 || $id_veterinaria <= 0) {
+    $modelInv = new Inventario();
+    $resolucion = resolverLoteOperable($modelInv, $id_inventario, $id_veterinaria);
+
+    if (!empty($resolucion['errores'])) {
         mostrarSweetAlert(
             'error',
-            'Solicitud inválida',
-            'No se pudo identificar el producto a eliminar.',
-            BASE_URL . '/representante/inventario'
+            'Operación no permitida',
+            implode(' ', $resolucion['errores']),
+            $urlInventario
         );
         exit();
     }
 
-    // ── 3. Ejecutar el soft-delete en el modelo ───────────────────────────────
-    $modelInv  = new Inventario();
+    // Bloquear si hubo movimientos recientes (protege trazabilidad en reportes)
+    $modelMov = new MovimientoStock();
+    if ($modelMov->tieneMovimientosRecientes($id_inventario, DIAS_BLOQUEO_ELIMINACION)) {
+        mostrarSweetAlert(
+            'error',
+            'Eliminación bloqueada',
+            'Este producto tiene movimientos de stock en los últimos '
+                . DIAS_BLOQUEO_ELIMINACION
+                . ' días. No puede eliminarse para preservar la trazabilidad.',
+            $urlInventario
+        );
+        exit();
+    }
+
+    // Soft-delete: estado = 0; registros en producto y movimiento_stock permanecen
     $resultado = $modelInv->eliminarLote($id_inventario, $id_veterinaria);
 
-    // ── 4. Responder con alerta y redirigir a la lista ────────────────────────
     if ($resultado) {
         mostrarSweetAlert(
             'success',
             'Producto eliminado',
             'El producto fue retirado del inventario correctamente.',
-            BASE_URL . '/representante/inventario'
+            $urlInventario
         );
     } else {
         mostrarSweetAlert(
             'error',
             'Error al eliminar',
-            'No se encontró el producto o no tienes permiso para eliminarlo.',
-            BASE_URL . '/representante/inventario'
+            'No se pudo completar la eliminación. Intenta de nuevo.',
+            $urlInventario
         );
     }
     exit();
