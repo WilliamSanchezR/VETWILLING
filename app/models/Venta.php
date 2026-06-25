@@ -160,20 +160,12 @@ class Venta
 
     /**
      * Lista ventas de una veterinaria con filtros opcionales.
-     * Filtros extra: id_cliente, producto (búsqueda por nombre), estado.
      */
-    public function listarVentas(
-        int $id_veterinaria,
-        ?string $fecha_inicio = null,
-        ?string $fecha_fin = null,
-        ?int $id_cliente = null,
-        ?string $producto = null,
-        ?string $estado = null
-    ): array {
+    public function listarVentas(int $id_veterinaria, ?string $fecha_inicio = null, ?string $fecha_fin = null): array
+    {
         try {
-            $sql = "SELECT v.id_venta, v.id_cliente, v.subtotal, v.descuento, v.impuesto, v.total,
-                           v.fecha_venta, u.nombre AS usuario, p.nombre AS cliente,
-                           COALESCE(v.estado, 'completada') AS estado
+            $sql = "SELECT v.id_venta, v.id_cliente, v.subtotal, v.descuento, v.impuesto, v.total, 
+                           v.fecha_venta, u.nombre as usuario, p.nombre as cliente
                     FROM venta v
                     LEFT JOIN usuario u ON v.id_usuario = u.id_usuario
                     LEFT JOIN propietario p ON v.id_cliente = p.id_propietario
