@@ -200,6 +200,29 @@ switch ($request) {
             "/app/controllers/reportesInventarioRepresentanteController.php";
         break;
 
+    // Historial de ventas (Issue #244)
+    case "/representante/historial-ventas":
+        require BASE_PATH .
+            "/app/views/dashboard/representante/historialVentas.php";
+        break;
+
+    case "/representante/historial-ventas/data":
+        require BASE_PATH .
+            "/app/controllers/historialVentasController.php";
+        break;
+
+    case "/representante/historial-ventas/pdf":
+        $_GET["action"] = "pdf";
+        require BASE_PATH .
+            "/app/controllers/historialVentasController.php";
+        break;
+
+    case "/representante/historial-ventas/excel":
+        $_GET["action"] = "excel";
+        require BASE_PATH .
+            "/app/controllers/historialVentasController.php";
+        break;
+
     // RUTAS DEL CONTROLADOR DE CALENDARIO
     case "/calendario/cargar":
         require BASE_PATH . "/app/controllers/calendarioController.php";
