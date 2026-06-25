@@ -134,6 +134,32 @@ class MovimientoStock {
         }
     }
 
+    /**
+     * Indica si el lote tiene movimientos dentro de los últimos N días.
+     * Usado para bloquear eliminación de productos con actividad reciente (Issue #245).
+     */
+    public function tieneMovimientosRecientes(int $id_inventario, int $dias = 30): bool
+    {
+        try {
+            $sql = "SELECT COUNT(*) AS total
+                    FROM movimiento_stock
+                    WHERE id_inventario = :id_inventario
+                      AND fecha_movimiento >= DATE_SUB(NOW(), INTERVAL :dias DAY)";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_inventario', $id_inventario, PDO::PARAM_INT);
+            $stmt->bindParam(':dias', $dias, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return ((int) ($row['total'] ?? 0)) > 0;
+        } catch (Exception $e) {
+            error_log('Error en MovimientoStock::tieneMovimientosRecientes - ' . $e->getMessage());
+            // Ante error de consulta, bloquear eliminación por precaución
+            return true;
+        }
+    }
+
     // Validar si hay stock suficiente para una operación
     public function validarDisponibilidad($id_inventario, $cantidad_requerida) {
         try {

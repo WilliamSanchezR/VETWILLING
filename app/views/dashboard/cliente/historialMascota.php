@@ -1,5 +1,4 @@
 <?php
-
 /**
  * historialMascota.php – VetWilling
  * RFS 27 – Vista de historial médico con control de acceso temporal
@@ -33,14 +32,10 @@ if (!$mascota) {
 // $accesoInfo    = $_accesoModel->estadoAcceso($id_mascota, $_id_propietario);
 // $tieneAcceso   = $accesoInfo['estado'] === 'aprobado';
 
-function e($v)
-{
-    return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8');
-}
+function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,11 +57,10 @@ function e($v)
             position: relative;
             min-height: 200px;
         }
-
         .seccion-bloqueada .bloqueo-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(255, 255, 255, .85);
+            background: rgba(255,255,255,.85);
             backdrop-filter: blur(4px);
             display: flex;
             flex-direction: column;
@@ -76,19 +70,8 @@ function e($v)
             border-radius: 8px;
             z-index: 10;
         }
-
-        .bloqueo-overlay i {
-            font-size: 2.5rem;
-            color: #6c757d;
-        }
-
-        .bloqueo-overlay p {
-            color: #495057;
-            font-size: .95rem;
-            text-align: center;
-            max-width: 340px;
-            margin: 0;
-        }
+        .bloqueo-overlay i { font-size: 2.5rem; color: #6c757d; }
+        .bloqueo-overlay p { color: #495057; font-size: .95rem; text-align: center; max-width: 340px; margin: 0; }
 
         /* ── Cuenta regresiva ── */
         .acceso-timer {
@@ -99,10 +82,7 @@ function e($v)
             color: #198754;
             font-weight: 500;
         }
-
-        .acceso-timer.expira-pronto {
-            color: #dc3545;
-        }
+        .acceso-timer.expira-pronto { color: #dc3545; }
 
         /* ── Badge de estado ── */
         .estado-acceso-badge {
@@ -137,7 +117,7 @@ function e($v)
                     <div class="d-flex gap-2 flex-wrap align-items-center">
                         <!-- <?php if ($tieneAcceso): ?>
                             <span class="acceso-timer" id="countdownTimer"
-                                data-expira="<?= e($accesoInfo['fecha_expiracion']) ?>">
+                                  data-expira="<?= e($accesoInfo['fecha_expiracion']) ?>">
                                 <i class="bi bi-clock"></i>
                                 <span id="timerTexto">Calculando...</span>
                             </span>
@@ -145,14 +125,6 @@ function e($v)
                         <a href="<?= BASE_URL ?>/cliente/mascotas" class="btn btn-outline-secondary btn-sm">
                             <i class="bi bi-arrow-left me-1"></i>Volver
                         </a>
-
-                        <!-- <?php if ($tieneAcceso): ?>
-                            <a href="<?= BASE_URL ?>/historial-clinico-pdf?id_paciente=<?= (int)$mascota['id_paciente'] ?>"
-                                class="btn btn-danger btn-sm" target="_blank" rel="noopener">
-                                <i class="bi bi-file-pdf me-1"></i>PDF
-                            </a>
-                        <?php endif; ?> -->
-
                         <?php if ($tieneAcceso): ?>
                             <button class="btn btn-danger btn-sm" onclick="generarPDF()">
                                 <i class="bi bi-file-pdf me-1"></i>PDF
@@ -196,12 +168,7 @@ function e($v)
                                         <label class="text-muted small d-block">Estado de Salud</label>
                                         <?php
                                         $es = $mascota['estado_salud'] ?? '';
-                                        $bg = match ($es) {
-                                            'Bueno' => 'success',
-                                            'Regular' => 'warning',
-                                            'Delicado' => 'danger',
-                                            default => 'secondary'
-                                        };
+                                        $bg = match($es) { 'Bueno' => 'success', 'Regular' => 'warning', 'Delicado' => 'danger', default => 'secondary' };
                                         echo $es
                                             ? '<span class="badge bg-' . $bg . '">' . e($es) . '</span>'
                                             : '<span class="text-muted small">—</span>';
@@ -260,13 +227,7 @@ function e($v)
                                 <div class="table-responsive d-none" id="wrapperCitas">
                                     <table class="table table-hover align-middle">
                                         <thead class="table-light">
-                                            <tr>
-                                                <th>Fecha</th>
-                                                <th>Servicio</th>
-                                                <th>Tipo</th>
-                                                <th>Estado</th>
-                                                <th>Observaciones</th>
-                                            </tr>
+                                            <tr><th>Fecha</th><th>Servicio</th><th>Tipo</th><th>Estado</th><th>Observaciones</th></tr>
                                         </thead>
                                         <tbody id="bodyCitas"></tbody>
                                     </table>
@@ -285,37 +246,37 @@ function e($v)
                             <div class="card-body seccion-bloqueada" id="contenedorHistorial">
 
                                 <?php if (!$tieneAcceso): ?>
-                                    <!-- ── OVERLAY DE BLOQUEO ── -->
-                                    <div class="bloqueo-overlay" id="overlayHistorial">
-                                        <i class="bi bi-lock-fill"></i>
-                                        <p>
-                                            <?php if ($accesoInfo['estado'] === 'pendiente'): ?>
-                                                <strong>Solicitud pendiente.</strong><br>
-                                                Tu solicitud fue enviada. El veterinario la revisará pronto.
-                                            <?php elseif ($accesoInfo['estado'] === 'rechazado'): ?>
-                                                <strong>Solicitud rechazada.</strong><br>
-                                                <?= $accesoInfo['motivo_rechazo'] ? 'Motivo: ' . e($accesoInfo['motivo_rechazo']) : 'Contacta a tu veterinario para más información.' ?>
-                                            <?php elseif ($accesoInfo['estado'] === 'expirado'): ?>
-                                                <strong>El acceso ha expirado.</strong><br>
-                                                Puedes solicitar un nuevo acceso al veterinario.
-                                            <?php else: ?>
-                                                <strong>Sección restringida.</strong><br>
-                                                El historial clínico requiere autorización del veterinario.
-                                            <?php endif; ?>
-                                        </p>
-
-                                        <?php if (in_array($accesoInfo['estado'], ['sin_solicitud', 'rechazado', 'expirado'])): ?>
-                                            <button class="btn btn-primary btn-sm" id="btnSolicitarAcceso"
-                                                onclick="solicitarAcceso(<?= (int)$mascota['id_paciente'] ?>)">
-                                                <i class="bi bi-send me-1"></i>
-                                                <?= $accesoInfo['estado'] === 'sin_solicitud' ? 'Solicitar acceso al historial' : 'Solicitar nuevo acceso' ?>
-                                            </button>
-                                        <?php elseif ($accesoInfo['estado'] === 'pendiente'): ?>
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="bi bi-hourglass-split me-1"></i>En revisión
-                                            </span>
+                                <!-- ── OVERLAY DE BLOQUEO ── -->
+                                <div class="bloqueo-overlay" id="overlayHistorial">
+                                    <i class="bi bi-lock-fill"></i>
+                                    <p>
+                                        <?php if ($accesoInfo['estado'] === 'pendiente'): ?>
+                                            <strong>Solicitud pendiente.</strong><br>
+                                            Tu solicitud fue enviada. El veterinario la revisará pronto.
+                                        <?php elseif ($accesoInfo['estado'] === 'rechazado'): ?>
+                                            <strong>Solicitud rechazada.</strong><br>
+                                            <?= $accesoInfo['motivo_rechazo'] ? 'Motivo: ' . e($accesoInfo['motivo_rechazo']) : 'Contacta a tu veterinario para más información.' ?>
+                                        <?php elseif ($accesoInfo['estado'] === 'expirado'): ?>
+                                            <strong>El acceso ha expirado.</strong><br>
+                                            Puedes solicitar un nuevo acceso al veterinario.
+                                        <?php else: ?>
+                                            <strong>Sección restringida.</strong><br>
+                                            El historial clínico requiere autorización del veterinario.
                                         <?php endif; ?>
-                                    </div>
+                                    </p>
+
+                                    <?php if (in_array($accesoInfo['estado'], ['sin_solicitud', 'rechazado', 'expirado'])): ?>
+                                        <button class="btn btn-primary btn-sm" id="btnSolicitarAcceso"
+                                                onclick="solicitarAcceso(<?= (int)$mascota['id_paciente'] ?>)">
+                                            <i class="bi bi-send me-1"></i>
+                                            <?= $accesoInfo['estado'] === 'sin_solicitud' ? 'Solicitar acceso al historial' : 'Solicitar nuevo acceso' ?>
+                                        </button>
+                                    <?php elseif ($accesoInfo['estado'] === 'pendiente'): ?>
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-hourglass-split me-1"></i>En revisión
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
                                 <?php endif; ?>
 
                                 <!-- Tabla (visible si tiene acceso, borrosa si no) -->
@@ -326,13 +287,7 @@ function e($v)
                                 <div class="table-responsive d-none" id="wrapperHistorial">
                                     <table class="table table-hover align-middle">
                                         <thead class="table-light">
-                                            <tr>
-                                                <th>Fecha</th>
-                                                <th>Motivo</th>
-                                                <th>Diagnóstico</th>
-                                                <th>Tratamientos</th>
-                                                <th>Profesional</th>
-                                            </tr>
+                                            <tr><th>Fecha</th><th>Motivo</th><th>Diagnóstico</th><th>Tratamientos</th><th>Profesional</th></tr>
                                         </thead>
                                         <tbody id="bodyHistorial"></tbody>
                                     </table>
@@ -355,13 +310,7 @@ function e($v)
                                 <div class="table-responsive d-none" id="wrapperVacunas">
                                     <table class="table table-hover align-middle">
                                         <thead class="table-light">
-                                            <tr>
-                                                <th>Vacuna</th>
-                                                <th>Dosis</th>
-                                                <th>Fecha</th>
-                                                <th>Profesional</th>
-                                                <th>Observaciones</th>
-                                            </tr>
+                                            <tr><th>Vacuna</th><th>Dosis</th><th>Fecha</th><th>Profesional</th><th>Observaciones</th></tr>
                                         </thead>
                                         <tbody id="bodyVacunas"></tbody>
                                     </table>
@@ -384,14 +333,7 @@ function e($v)
                                 <div class="table-responsive d-none" id="wrapperTratamientos">
                                     <table class="table table-hover align-middle">
                                         <thead class="table-light">
-                                            <tr>
-                                                <th>Medicamento</th>
-                                                <th>Dosis</th>
-                                                <th>Inicio</th>
-                                                <th>Fin</th>
-                                                <th>Estado</th>
-                                                <th>Profesional</th>
-                                            </tr>
+                                            <tr><th>Medicamento</th><th>Dosis</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Profesional</th></tr>
                                         </thead>
                                         <tbody id="bodyTratamientos"></tbody>
                                     </table>
@@ -413,7 +355,7 @@ function e($v)
                                     $cuidados = [
                                         ['bi-speedometer2',  'Peso actual',             !empty($mascota['peso']) ? $mascota['peso'] . ' kg' : null],
                                         ['bi-activity',      'Estado de salud',          $mascota['estado_salud'] ?? null],
-                                        ['bi-calendar-check', 'Última desparasitación',   !empty($mascota['fecha_ultima_desparasitacion'])
+                                        ['bi-calendar-check','Última desparasitación',   !empty($mascota['fecha_ultima_desparasitacion'])
                                             ? date('d/m/Y', strtotime($mascota['fecha_ultima_desparasitacion'])) : null],
                                     ];
                                     foreach ($cuidados as [$icon, $label, $valor]): ?>
@@ -447,74 +389,56 @@ function e($v)
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
 
     <script>
-        /* ── Variables globales ── */
-        const BASE_URL = '<?= BASE_URL ?>';
-        const ID_PACIENTE = <?= (int)$mascota['id_paciente'] ?>;
-        const TIENE_ACCESO = <?= $tieneAcceso ? 'true' : 'false' ?>;
-        const ACCESO_INFO = <?= json_encode($accesoInfo, JSON_HEX_TAG) ?>;
-        let FICHA_DATA = null;
+    /* ── Variables globales ── */
+    const BASE_URL    = '<?= BASE_URL ?>';
+    const ID_PACIENTE = <?= (int)$mascota['id_paciente'] ?>;
+    const TIENE_ACCESO= <?= $tieneAcceso ? 'true' : 'false' ?>;
+    const ACCESO_INFO = <?= json_encode($accesoInfo, JSON_HEX_TAG) ?>;
+    let FICHA_DATA = null;
 
-        /* ── Helpers ── */
-        function esc(str) {
-            const d = document.createElement('div');
-            d.textContent = (str ?? '');
-            return d.innerHTML;
+    /* ── Helpers ── */
+    function esc(str) {
+        const d = document.createElement('div');
+        d.textContent = (str ?? '');
+        return d.innerHTML;
+    }
+    function fmtFecha(iso) {
+        if (!iso) return '<span class="text-muted">—</span>';
+        const d = new Date(iso.replace(' ','T'));
+        return d.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'})
+             + ' ' + d.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+    }
+    function fmtFechaSolo(iso) {
+        if (!iso) return '<span class="text-muted">—</span>';
+        const [y,m,d] = iso.split('-');
+        return `${d}/${m}/${y}`;
+    }
+    function badge(estado) {
+        const map = {Pendiente:'warning',Confirmada:'primary',Realizada:'success',
+                     Cancelada:'danger',Activo:'success',Completado:'secondary',Inactivo:'secondary'};
+        return `<span class="badge bg-${map[estado]||'secondary'}">${esc(estado)}</span>`;
+    }
+    function mostrarTabla(wId, lId, eId, bId, filas) {
+        document.getElementById(lId).classList.add('d-none');
+        if (!filas || !filas.length) {
+            document.getElementById(eId).classList.remove('d-none');
+        } else {
+            document.getElementById(wId).classList.remove('d-none');
+            document.getElementById(bId).innerHTML = filas;
         }
+    }
 
-        function fmtFecha(iso) {
-            if (!iso) return '<span class="text-muted">—</span>';
-            const d = new Date(iso.replace(' ', 'T'));
-            return d.toLocaleDateString('es-CO', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                }) +
-                ' ' + d.toLocaleTimeString('es-CO', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-        }
+    /* ── Carga de datos ── */
+    async function cargarFicha() {
+        const url = `${BASE_URL}/cliente/api/citas/listar?accion=ficha_paciente&id_paciente=${ID_PACIENTE}`;
+        try {
+            const res  = await fetch(url);
+            const data = await res.json();
+            if (data.status !== 'success') return;
 
-        function fmtFechaSolo(iso) {
-            if (!iso) return '<span class="text-muted">—</span>';
-            const [y, m, d] = iso.split('-');
-            return `${d}/${m}/${y}`;
-        }
-
-        function badge(estado) {
-            const map = {
-                Pendiente: 'warning',
-                Confirmada: 'primary',
-                Realizada: 'success',
-                Cancelada: 'danger',
-                Activo: 'success',
-                Completado: 'secondary',
-                Inactivo: 'secondary'
-            };
-            return `<span class="badge bg-${map[estado]||'secondary'}">${esc(estado)}</span>`;
-        }
-
-        function mostrarTabla(wId, lId, eId, bId, filas) {
-            document.getElementById(lId).classList.add('d-none');
-            if (!filas || !filas.length) {
-                document.getElementById(eId).classList.remove('d-none');
-            } else {
-                document.getElementById(wId).classList.remove('d-none');
-                document.getElementById(bId).innerHTML = filas;
-            }
-        }
-
-        /* ── Carga de datos ── */
-        async function cargarFicha() {
-            const url = `${BASE_URL}/cliente/api/citas/listar?accion=ficha_paciente&id_paciente=${ID_PACIENTE}`;
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                if (data.status !== 'success') return;
-
-                /* Citas */
-                mostrarTabla('wrapperCitas', 'loadingCitas', 'emptyCitas', 'bodyCitas',
-                    (data.citas || []).map(c => `<tr>
+            /* Citas */
+            mostrarTabla('wrapperCitas','loadingCitas','emptyCitas','bodyCitas',
+                (data.citas||[]).map(c=>`<tr>
                     <td>${fmtFecha(c.fecha_hora)}</td>
                     <td>${esc(c.servicio_nombre||c.tipo)}</td>
                     <td>${esc(c.tipo)}</td>
@@ -522,454 +446,398 @@ function e($v)
                     <td class="text-truncate" style="max-width:200px">${esc(c.observaciones)||'<span class="text-muted">—</span>'}</td>
                 </tr>`).join(''));
 
-                /* Historial clínico — solo si tiene acceso */
-                if (TIENE_ACCESO) {
-                    mostrarTabla('wrapperHistorial', 'loadingHistorial', 'emptyHistorial', 'bodyHistorial',
-                        (data.historial_clinico || []).map(h => `<tr>
+            /* Historial clínico — solo si tiene acceso */
+            if (TIENE_ACCESO) {
+                mostrarTabla('wrapperHistorial','loadingHistorial','emptyHistorial','bodyHistorial',
+                    (data.historial_clinico||[]).map(h=>`<tr>
                         <td>${fmtFecha(h.fecha_atencion)}</td>
                         <td>${esc(h.motivo_consulta)}</td>
                         <td>${esc(h.diagnostico)||'<span class="text-muted">—</span>'}</td>
                         <td>${esc(h.tratamientos_aplicados)||'<span class="text-muted">—</span>'}</td>
                         <td>${esc(h.profesional_nombre)}</td>
                     </tr>`).join(''));
-                }
+            }
 
-                /* Vacunas */
-                mostrarTabla('wrapperVacunas', 'loadingVacunas', 'emptyVacunas', 'bodyVacunas',
-                    (data.vacunas || []).map(v => `<tr>
+            /* Vacunas */
+            mostrarTabla('wrapperVacunas','loadingVacunas','emptyVacunas','bodyVacunas',
+                (data.vacunas||[]).map(v=>`<tr>
                     <td>${esc(v.tipo_vacuna)}</td><td>${esc(v.dosis)}</td>
                     <td>${fmtFechaSolo(v.fecha_aplicacion)}</td>
                     <td>${esc(v.profesional_nombre)}</td>
                     <td>${esc(v.observaciones)||'<span class="text-muted">—</span>'}</td>
                 </tr>`).join(''));
 
-                /* Tratamientos */
-                mostrarTabla('wrapperTratamientos', 'loadingTratamientos', 'emptyTratamientos', 'bodyTratamientos',
-                    (data.tratamientos || []).map(t => `<tr>
+            /* Tratamientos */
+            mostrarTabla('wrapperTratamientos','loadingTratamientos','emptyTratamientos','bodyTratamientos',
+                (data.tratamientos||[]).map(t=>`<tr>
                     <td>${esc(t.medicamento)}</td><td>${esc(t.dosis)}</td>
                     <td>${fmtFechaSolo(t.fecha_inicio)}</td><td>${fmtFechaSolo(t.fecha_fin)}</td>
                     <td>${badge(t.estado)}</td><td>${esc(t.profesional_nombre)}</td>
                 </tr>`).join(''));
 
-                FICHA_DATA = data;
+            FICHA_DATA = data;
 
-            } catch (e) {
-                console.error('Error cargando ficha:', e);
-            }
-        }
+        } catch(e) { console.error('Error cargando ficha:', e); }
+    }
 
-        /* ── Solicitar acceso ── */
-        async function solicitarAcceso(id_paciente) {
-            const btn = document.getElementById('btnSolicitarAcceso');
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Enviando...';
-            }
+    /* ── Solicitar acceso ── */
+    async function solicitarAcceso(id_paciente) {
+        const btn = document.getElementById('btnSolicitarAcceso');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Enviando...'; }
 
-            try {
-                const res = await fetch(`${BASE_URL}/cliente/api/historial/acceso/solicitar`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        id_paciente
-                    }),
-                });
-                const data = await res.json();
+        try {
+            const res  = await fetch(`${BASE_URL}/cliente/api/historial/acceso/solicitar`, {
+                method : 'POST',
+                headers: {'Content-Type':'application/json'},
+                body   : JSON.stringify({id_paciente}),
+            });
+            const data = await res.json();
 
-                if (data.status === 'ok') {
-                    /* Reemplazar overlay con mensaje de pendiente */
-                    const overlay = document.getElementById('overlayHistorial');
-                    if (overlay) {
-                        overlay.innerHTML = `
+            if (data.status === 'ok') {
+                /* Reemplazar overlay con mensaje de pendiente */
+                const overlay = document.getElementById('overlayHistorial');
+                if (overlay) {
+                    overlay.innerHTML = `
                         <i class="bi bi-hourglass-split" style="font-size:2.5rem;color:#ffc107"></i>
                         <p><strong>Solicitud enviada.</strong><br>
                            El veterinario recibirá una notificación y revisará tu solicitud pronto.</p>
                         <span class="badge bg-warning text-dark">
                             <i class="bi bi-clock me-1"></i>En revisión
                         </span>`;
-                    }
-                } else if (data.code === 'ya_existe') {
-                    alert('Ya tienes una solicitud pendiente o un acceso activo.');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-send me-1"></i>Solicitar acceso';
-                    }
-                } else {
-                    alert('No se pudo enviar la solicitud. Intenta de nuevo.');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-send me-1"></i>Solicitar acceso';
-                    }
                 }
-            } catch (e) {
-                alert('Error de conexión. Verifica tu internet.');
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-send me-1"></i>Solicitar acceso';
-                }
+            } else if (data.code === 'ya_existe') {
+                alert('Ya tienes una solicitud pendiente o un acceso activo.');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-send me-1"></i>Solicitar acceso'; }
+            } else {
+                alert('No se pudo enviar la solicitud. Intenta de nuevo.');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-send me-1"></i>Solicitar acceso'; }
             }
+        } catch(e) {
+            alert('Error de conexión. Verifica tu internet.');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-send me-1"></i>Solicitar acceso'; }
         }
+    }
 
-        /* ── Cuenta regresiva de acceso ── */
-        function iniciarCuentaRegresiva() {
-            const timerEl = document.getElementById('countdownTimer');
-            const textoEl = document.getElementById('timerTexto');
-            if (!timerEl || !textoEl) return;
+    /* ── Cuenta regresiva de acceso ── */
+    function iniciarCuentaRegresiva() {
+        const timerEl = document.getElementById('countdownTimer');
+        const textoEl = document.getElementById('timerTexto');
+        if (!timerEl || !textoEl) return;
 
-            const expira = new Date(timerEl.dataset.expira.replace(' ', 'T'));
+        const expira = new Date(timerEl.dataset.expira.replace(' ','T'));
 
-            function actualizar() {
-                const diff = expira - Date.now();
-                if (diff <= 0) {
-                    /* Acceso expirado: recargar para mostrar overlay */
-                    location.reload();
-                    return;
-                }
-                const h = Math.floor(diff / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-                textoEl.textContent = `Acceso expira en ${h}h ${m}m ${s}s`;
-
-                /* Cambiar a rojo si quedan menos de 30 min */
-                timerEl.classList.toggle('expira-pronto', diff < 1800000);
-            }
-
-            actualizar();
-            setInterval(actualizar, 1000);
-        }
-
-        /* ── Generar PDF ── */
-        /* ── Convierte una imagen a base64, recortada en círculo o esquinas redondeadas ── */
-        function cargarImagenBase64(url, size = 128, forma = 'redondeado', radio = 14) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    try {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = size;
-                        canvas.height = size;
-                        const ctx = canvas.getContext('2d');
-
-                        // Cubrir el cuadro manteniendo proporción (como background-size: cover)
-                        const escala = Math.max(size / img.naturalWidth, size / img.naturalHeight);
-                        const w = img.naturalWidth * escala;
-                        const h = img.naturalHeight * escala;
-                        const dx = (size - w) / 2;
-                        const dy = (size - h) / 2;
-
-                        // Definir la máscara de recorte
-                        ctx.save();
-                        ctx.beginPath();
-                        if (forma === 'circulo') {
-                            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-                        } else {
-                            const r = radio;
-                            ctx.moveTo(r, 0);
-                            ctx.arcTo(size, 0, size, size, r);
-                            ctx.arcTo(size, size, 0, size, r);
-                            ctx.arcTo(0, size, 0, 0, r);
-                            ctx.arcTo(0, 0, size, 0, r);
-                        }
-                        ctx.closePath();
-                        ctx.clip();
-
-                        ctx.drawImage(img, dx, dy, w, h);
-                        ctx.restore();
-
-                        resolve(canvas.toDataURL('image/png'));
-                    } catch (e) {
-                        resolve(null);
-                    }
-                };
-                img.onerror = () => resolve(null);
-                img.src = url;
-            });
-        }
-
-        async function generarPDF() {
-            if (!TIENE_ACCESO) {
-                alert('Necesitas permiso del veterinario para descargar el PDF del historial clínico.');
+        function actualizar() {
+            const diff = expira - Date.now();
+            if (diff <= 0) {
+                /* Acceso expirado: recargar para mostrar overlay */
+                location.reload();
                 return;
             }
-            if (!FICHA_DATA) {
-                alert('Espera a que se cargue la información antes de exportar el PDF.');
-                return;
-            }
+            const h  = Math.floor(diff / 3600000);
+            const m  = Math.floor((diff % 3600000) / 60000);
+            const s  = Math.floor((diff % 60000) / 1000);
+            textoEl.textContent = `Acceso expira en ${h}h ${m}m ${s}s`;
 
-            const btnPdf = document.querySelector('[onclick="generarPDF()"]');
-            if (btnPdf) {
-                btnPdf.disabled = true;
-                btnPdf.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Generando...';
-            }
+            /* Cambiar a rojo si quedan menos de 30 min */
+            timerEl.classList.toggle('expira-pronto', diff < 1800000);
+        }
 
-            const {
-                jsPDF
-            } = window.jspdf;
-            const doc = new jsPDF({
-                unit: 'pt',
-                format: 'letter'
-            });
-            const paciente = FICHA_DATA.paciente || {};
-            const pageW = doc.internal.pageSize.getWidth();
-            const pageH = doc.internal.pageSize.getHeight();
-            const margin = 48;
+        actualizar();
+        setInterval(actualizar, 1000);
+    }
 
-            /* ── Paleta clínica ── */
-            const azulPrincipal = [13, 94, 138]; // header / marca
-            const azulOscuro = [8, 56, 84]; // títulos
-            const tealAcento = [16, 140, 120]; // citas
-            const moradoSalud = [99, 78, 168]; // historial clínico
-            const verdeVacunas = [56, 142, 60]; // vacunas
-            const naranjaTrat = [196, 110, 18]; // tratamientos
-            const grisTexto = [55, 58, 56];
-            const grisClaro = [120, 122, 119];
-            const fondoTarjeta = [244, 247, 249];
-            const bordeSutil = [220, 226, 230];
+/* ── Generar PDF ── */
+    /* ── Convierte una imagen a base64, recortada en círculo o esquinas redondeadas ── */
+    function cargarImagenBase64(url, size = 128, forma = 'redondeado', radio = 14) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
 
-            const seccionColor = {
-                1: tealAcento,
-                2: moradoSalud,
-                3: verdeVacunas,
-                4: naranjaTrat
+                    // Cubrir el cuadro manteniendo proporción (como background-size: cover)
+                    const escala = Math.max(size / img.naturalWidth, size / img.naturalHeight);
+                    const w = img.naturalWidth * escala;
+                    const h = img.naturalHeight * escala;
+                    const dx = (size - w) / 2;
+                    const dy = (size - h) / 2;
+
+                    // Definir la máscara de recorte
+                    ctx.save();
+                    ctx.beginPath();
+                    if (forma === 'circulo') {
+                        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+                    } else {
+                        const r = radio;
+                        ctx.moveTo(r, 0);
+                        ctx.arcTo(size, 0, size, size, r);
+                        ctx.arcTo(size, size, 0, size, r);
+                        ctx.arcTo(0, size, 0, 0, r);
+                        ctx.arcTo(0, 0, size, 0, r);
+                    }
+                    ctx.closePath();
+                    ctx.clip();
+
+                    ctx.drawImage(img, dx, dy, w, h);
+                    ctx.restore();
+
+                    resolve(canvas.toDataURL('image/png'));
+                } catch (e) {
+                    resolve(null);
+                }
             };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+    }
 
-            let y = 0;
-            let pageNum = 1;
+    async function generarPDF() {
+        if (!TIENE_ACCESO) {
+            alert('Necesitas permiso del veterinario para descargar el PDF del historial clínico.');
+            return;
+        }
+        if (!FICHA_DATA) {
+            alert('Espera a que se cargue la información antes de exportar el PDF.');
+            return;
+        }
 
-            /* ── Encabezado ── */
-            function dibujarEncabezado(esPrimera) {
-                const altoHeader = esPrimera ? 96 : 58;
-                doc.setFillColor(...azulPrincipal);
-                doc.rect(0, 0, pageW, altoHeader, 'F');
-                doc.setFillColor(...azulOscuro);
-                doc.rect(0, altoHeader - 3, pageW, 3, 'F');
+        const btnPdf = document.querySelector('[onclick="generarPDF()"]');
+        if (btnPdf) { btnPdf.disabled = true; btnPdf.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Generando...'; }
 
-                if (esPrimera) {
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(20);
-                    doc.text('Historial médico', margin, 40);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+        const paciente = FICHA_DATA.paciente || {};
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const margin = 48;
 
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(10);
-                    doc.setTextColor(220, 235, 242);
-                    doc.text('VetWilling · Sistema de gestión veterinaria', margin, 58);
+        /* ── Paleta clínica ── */
+        const azulPrincipal = [13, 94, 138];   // header / marca
+        const azulOscuro    = [8, 56, 84];     // títulos
+        const tealAcento    = [16, 140, 120];  // citas
+        const moradoSalud   = [99, 78, 168];   // historial clínico
+        const verdeVacunas  = [56, 142, 60];   // vacunas
+        const naranjaTrat   = [196, 110, 18];  // tratamientos
+        const grisTexto     = [55, 58, 56];
+        const grisClaro     = [120, 122, 119];
+        const fondoTarjeta  = [244, 247, 249];
+        const bordeSutil    = [220, 226, 230];
 
-                    doc.setFontSize(9);
-                    const fechaGen = `Generado el ${new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' })}`;
-                    doc.text(fechaGen, pageW - margin, 58, {
-                        align: 'right'
-                    });
-                } else {
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(12);
-                    doc.text(`Historial médico — ${paciente.nombre || 'Paciente'}`, margin, altoHeader / 2 + 4);
-                }
-                return altoHeader + 24;
-            }
+        const seccionColor = { 1: tealAcento, 2: moradoSalud, 3: verdeVacunas, 4: naranjaTrat };
 
-            function dibujarPie() {
-                const yPie = pageH - 36;
-                doc.setDrawColor(...bordeSutil);
-                doc.setLineWidth(0.5);
-                doc.line(margin, yPie, pageW - margin, yPie);
+        let y = 0;
+        let pageNum = 1;
+
+        /* ── Encabezado ── */
+        function dibujarEncabezado(esPrimera) {
+            const altoHeader = esPrimera ? 96 : 58;
+            doc.setFillColor(...azulPrincipal);
+            doc.rect(0, 0, pageW, altoHeader, 'F');
+            doc.setFillColor(...azulOscuro);
+            doc.rect(0, altoHeader - 3, pageW, 3, 'F');
+
+            if (esPrimera) {
+                doc.setTextColor(255, 255, 255);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(20);
+                doc.text('Historial médico', margin, 40);
+
                 doc.setFont('helvetica', 'normal');
-                doc.setFontSize(8);
-                doc.setTextColor(...grisClaro);
-                doc.text('Documento confidencial · Uso exclusivo del propietario registrado', margin, yPie + 14);
-                doc.text(`Página ${pageNum}`, pageW - margin, yPie + 14, {
-                    align: 'right'
-                });
+                doc.setFontSize(10);
+                doc.setTextColor(220, 235, 242);
+                doc.text('VetWilling · Sistema de gestión veterinaria', margin, 58);
+
+                doc.setFontSize(9);
+                const fechaGen = `Generado el ${new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' })}`;
+                doc.text(fechaGen, pageW - margin, 58, { align: 'right' });
+            } else {
+                doc.setTextColor(255, 255, 255);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.text(`Historial médico — ${paciente.nombre || 'Paciente'}`, margin, altoHeader / 2 + 4);
             }
+            return altoHeader + 24;
+        }
 
-            doc.setProperties({
-                title: `Historial médico - ${paciente.nombre || 'mascota'}`
-            });
-
-            y = dibujarEncabezado(true);
-            dibujarPie();
-
-            /* ── Cargar foto de la mascota (recortada en canvas, sin afectar el estado gráfico del PDF) ── */
-            const nombreImg = paciente.img_mascota || 'default.png';
-            const urlImg = `${BASE_URL}/public/uploads/mascotas/${nombreImg}`;
-            const imgRecortada = await cargarImagenBase64(urlImg, 128, 'redondeado', 20);
-
-            /* ── Tarjeta de datos de la mascota ── */
-            const altoTarjeta = 96;
-            doc.setFillColor(...fondoTarjeta);
+        function dibujarPie() {
+            const yPie = pageH - 36;
             doc.setDrawColor(...bordeSutil);
             doc.setLineWidth(0.5);
-            doc.roundedRect(margin, y, pageW - margin * 2, altoTarjeta, 8, 8, 'FD');
-
-            const fotoSize = 64;
-            const fotoX = margin + 14;
-            const fotoY = y + (altoTarjeta - fotoSize) / 2;
-
-            if (imgRecortada) {
-                doc.addImage(imgRecortada, 'PNG', fotoX, fotoY, fotoSize, fotoSize);
-                doc.setDrawColor(...azulPrincipal);
-                doc.setLineWidth(1);
-                doc.roundedRect(fotoX, fotoY, fotoSize, fotoSize, 10, 10, 'S');
-            } else {
-                doc.setFillColor(...azulPrincipal);
-                doc.roundedRect(fotoX, fotoY, fotoSize, fotoSize, 10, 10, 'F');
-                doc.setTextColor(255, 255, 255);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(22);
-                doc.text((paciente.nombre || '?').charAt(0).toUpperCase(), fotoX + fotoSize / 2, fotoY + fotoSize / 2 + 8, {
-                    align: 'center'
-                });
-            }
-
-            const colX = fotoX + fotoSize + 18;
-            doc.setTextColor(...azulOscuro);
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(15);
-            doc.text(paciente.nombre || '—', colX, y + 28);
-
+            doc.line(margin, yPie, pageW - margin, yPie);
             doc.setFont('helvetica', 'normal');
-            doc.setFontSize(9.5);
+            doc.setFontSize(8);
             doc.setTextColor(...grisClaro);
-            doc.text(`${paciente.especie || '—'} · ${paciente.raza || '—'} · ${paciente.sexo || '—'}`, colX, y + 43);
-
-            const datosGrid = [
-                ['Edad', paciente.edad_numero ? `${paciente.edad_numero} ${paciente.edad_unidad || ''}` : '—'],
-                ['Peso', paciente.peso ? `${paciente.peso} kg` : '—'],
-                ['Estado de salud', paciente.estado_salud || '—'],
-            ];
-            let gx = colX;
-            datosGrid.forEach(([label, valor]) => {
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(8.5);
-                doc.setTextColor(...grisClaro);
-                doc.text(label, gx, y + 66);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10.5);
-                doc.setTextColor(...grisTexto);
-                doc.text(valor, gx, y + 80);
-                gx += 145;
-            });
-
-            y += altoTarjeta + 28;
-
-            /* ── Sección con tabla ── */
-            function appendSection(numero, title, headers, rows) {
-                if (!rows || !rows.length) return;
-                const color = seccionColor[numero];
-
-                if (y + 50 > pageH - 50) {
-                    doc.addPage();
-                    pageNum++;
-                    y = dibujarEncabezado(false);
-                    dibujarPie();
-                }
-
-                doc.setFillColor(...color);
-                doc.circle(margin + 8, y + 4, 9, 'F');
-                doc.setTextColor(255, 255, 255);
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9);
-                doc.text(String(numero), margin + 8, y + 7, {
-                    align: 'center'
-                });
-
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(12.5);
-                doc.setTextColor(...color);
-                doc.text(title, margin + 24, y + 8);
-
-                y += 20;
-
-                doc.autoTable({
-                    head: [headers],
-                    body: rows,
-                    startY: y,
-                    theme: 'striped',
-                    styles: {
-                        fontSize: 8.5,
-                        textColor: grisTexto,
-                        cellPadding: {
-                            top: 6,
-                            bottom: 6,
-                            left: 8,
-                            right: 8
-                        },
-                        lineColor: bordeSutil,
-                        lineWidth: 0.5,
-                    },
-                    headStyles: {
-                        fillColor: color,
-                        textColor: [255, 255, 255],
-                        fontStyle: 'bold',
-                        fontSize: 8.5,
-                    },
-                    alternateRowStyles: {
-                        fillColor: fondoTarjeta
-                    },
-                    margin: {
-                        left: margin,
-                        right: margin,
-                        bottom: 50
-                    },
-                    didDrawPage: () => {
-                        if (doc.internal.getCurrentPageInfo().pageNumber > pageNum) {
-                            pageNum = doc.internal.getCurrentPageInfo().pageNumber;
-                            dibujarEncabezado(false);
-                            dibujarPie();
-                        }
-                    },
-                });
-
-                y = doc.lastAutoTable.finalY + 32;
-            }
-
-            appendSection(1, 'Citas', ['Fecha', 'Servicio', 'Tipo', 'Estado', 'Observaciones'],
-                (FICHA_DATA.citas || []).map(c => [
-                    fmtFecha(c.fecha_hora), c.servicio_nombre || c.tipo || '—',
-                    c.tipo || '—', c.estado || '—', c.observaciones || '—',
-                ])
-            );
-
-            appendSection(2, 'Historial clínico', ['Fecha', 'Motivo', 'Diagnóstico', 'Tratamientos', 'Profesional'],
-                (FICHA_DATA.historial_clinico || []).map(h => [
-                    fmtFecha(h.fecha_atencion), h.motivo_consulta || '—',
-                    h.diagnostico || '—', h.tratamientos_aplicados || '—', h.profesional_nombre || '—',
-                ])
-            );
-
-            appendSection(3, 'Vacunas', ['Vacuna', 'Dosis', 'Fecha', 'Profesional', 'Observaciones'],
-                (FICHA_DATA.vacunas || []).map(v => [
-                    v.tipo_vacuna || '—', v.dosis || '—', fmtFechaSolo(v.fecha_aplicacion),
-                    v.profesional_nombre || '—', v.observaciones || '—',
-                ])
-            );
-
-            appendSection(4, 'Tratamientos', ['Medicamento', 'Dosis', 'Inicio', 'Fin', 'Estado', 'Profesional'],
-                (FICHA_DATA.tratamientos || []).map(t => [
-                    t.medicamento || '—', t.dosis || '—', fmtFechaSolo(t.fecha_inicio),
-                    fmtFechaSolo(t.fecha_fin), t.estado || '—', t.profesional_nombre || '—',
-                ])
-            );
-
-            const filename = `historial_${(paciente.nombre || 'mascota').replace(/\s+/g, '_')}.pdf`;
-            doc.save(filename);
-
-            if (btnPdf) {
-                btnPdf.disabled = false;
-                btnPdf.innerHTML = '<i class="bi bi-file-pdf me-1"></i>PDF';
-            }
+            doc.text('Documento confidencial · Uso exclusivo del propietario registrado', margin, yPie + 14);
+            doc.text(`Página ${pageNum}`, pageW - margin, yPie + 14, { align: 'right' });
         }
 
-        /* ── Init ── */
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarFicha();
-            if (TIENE_ACCESO) iniciarCuentaRegresiva();
+        doc.setProperties({ title: `Historial médico - ${paciente.nombre || 'mascota'}` });
+
+        y = dibujarEncabezado(true);
+        dibujarPie();
+
+        /* ── Cargar foto de la mascota (recortada en canvas, sin afectar el estado gráfico del PDF) ── */
+        const nombreImg = paciente.img_mascota || 'default.png';
+        const urlImg = `${BASE_URL}/public/uploads/mascotas/${nombreImg}`;
+        const imgRecortada = await cargarImagenBase64(urlImg, 128, 'redondeado', 20);
+
+        /* ── Tarjeta de datos de la mascota ── */
+        const altoTarjeta = 96;
+        doc.setFillColor(...fondoTarjeta);
+        doc.setDrawColor(...bordeSutil);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(margin, y, pageW - margin * 2, altoTarjeta, 8, 8, 'FD');
+
+        const fotoSize = 64;
+        const fotoX = margin + 14;
+        const fotoY = y + (altoTarjeta - fotoSize) / 2;
+
+        if (imgRecortada) {
+            doc.addImage(imgRecortada, 'PNG', fotoX, fotoY, fotoSize, fotoSize);
+            doc.setDrawColor(...azulPrincipal);
+            doc.setLineWidth(1);
+            doc.roundedRect(fotoX, fotoY, fotoSize, fotoSize, 10, 10, 'S');
+        } else {
+            doc.setFillColor(...azulPrincipal);
+            doc.roundedRect(fotoX, fotoY, fotoSize, fotoSize, 10, 10, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(22);
+            doc.text((paciente.nombre || '?').charAt(0).toUpperCase(), fotoX + fotoSize / 2, fotoY + fotoSize / 2 + 8, { align: 'center' });
+        }
+
+        const colX = fotoX + fotoSize + 18;
+        doc.setTextColor(...azulOscuro);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text(paciente.nombre || '—', colX, y + 28);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9.5);
+        doc.setTextColor(...grisClaro);
+        doc.text(`${paciente.especie || '—'} · ${paciente.raza || '—'} · ${paciente.sexo || '—'}`, colX, y + 43);
+
+        const datosGrid = [
+            ['Edad', paciente.edad_numero ? `${paciente.edad_numero} ${paciente.edad_unidad || ''}` : '—'],
+            ['Peso', paciente.peso ? `${paciente.peso} kg` : '—'],
+            ['Estado de salud', paciente.estado_salud || '—'],
+        ];
+        let gx = colX;
+        datosGrid.forEach(([label, valor]) => {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(...grisClaro);
+            doc.text(label, gx, y + 66);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10.5);
+            doc.setTextColor(...grisTexto);
+            doc.text(valor, gx, y + 80);
+            gx += 145;
         });
+
+        y += altoTarjeta + 28;
+
+        /* ── Sección con tabla ── */
+        function appendSection(numero, title, headers, rows) {
+            if (!rows || !rows.length) return;
+            const color = seccionColor[numero];
+
+            if (y + 50 > pageH - 50) {
+                doc.addPage();
+                pageNum++;
+                y = dibujarEncabezado(false);
+                dibujarPie();
+            }
+
+            doc.setFillColor(...color);
+            doc.circle(margin + 8, y + 4, 9, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.text(String(numero), margin + 8, y + 7, { align: 'center' });
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12.5);
+            doc.setTextColor(...color);
+            doc.text(title, margin + 24, y + 8);
+
+            y += 20;
+
+            doc.autoTable({
+                head: [headers],
+                body: rows,
+                startY: y,
+                theme: 'striped',
+                styles: {
+                    fontSize: 8.5,
+                    textColor: grisTexto,
+                    cellPadding: { top: 6, bottom: 6, left: 8, right: 8 },
+                    lineColor: bordeSutil,
+                    lineWidth: 0.5,
+                },
+                headStyles: {
+                    fillColor: color,
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    fontSize: 8.5,
+                },
+                alternateRowStyles: { fillColor: fondoTarjeta },
+                margin: { left: margin, right: margin, bottom: 50 },
+                didDrawPage: () => {
+                    if (doc.internal.getCurrentPageInfo().pageNumber > pageNum) {
+                        pageNum = doc.internal.getCurrentPageInfo().pageNumber;
+                        dibujarEncabezado(false);
+                        dibujarPie();
+                    }
+                },
+            });
+
+            y = doc.lastAutoTable.finalY + 32;
+        }
+
+        appendSection(1, 'Citas', ['Fecha', 'Servicio', 'Tipo', 'Estado', 'Observaciones'],
+            (FICHA_DATA.citas || []).map(c => [
+                fmtFecha(c.fecha_hora), c.servicio_nombre || c.tipo || '—',
+                c.tipo || '—', c.estado || '—', c.observaciones || '—',
+            ])
+        );
+
+        appendSection(2, 'Historial clínico', ['Fecha', 'Motivo', 'Diagnóstico', 'Tratamientos', 'Profesional'],
+            (FICHA_DATA.historial_clinico || []).map(h => [
+                fmtFecha(h.fecha_atencion), h.motivo_consulta || '—',
+                h.diagnostico || '—', h.tratamientos_aplicados || '—', h.profesional_nombre || '—',
+            ])
+        );
+
+        appendSection(3, 'Vacunas', ['Vacuna', 'Dosis', 'Fecha', 'Profesional', 'Observaciones'],
+            (FICHA_DATA.vacunas || []).map(v => [
+                v.tipo_vacuna || '—', v.dosis || '—', fmtFechaSolo(v.fecha_aplicacion),
+                v.profesional_nombre || '—', v.observaciones || '—',
+            ])
+        );
+
+        appendSection(4, 'Tratamientos', ['Medicamento', 'Dosis', 'Inicio', 'Fin', 'Estado', 'Profesional'],
+            (FICHA_DATA.tratamientos || []).map(t => [
+                t.medicamento || '—', t.dosis || '—', fmtFechaSolo(t.fecha_inicio),
+                fmtFechaSolo(t.fecha_fin), t.estado || '—', t.profesional_nombre || '—',
+            ])
+        );
+
+        const filename = `historial_${(paciente.nombre || 'mascota').replace(/\s+/g, '_')}.pdf`;
+        doc.save(filename);
+
+        if (btnPdf) { btnPdf.disabled = false; btnPdf.innerHTML = '<i class="bi bi-file-pdf me-1"></i>PDF'; }
+    }
+
+    /* ── Init ── */
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarFicha();
+        if (TIENE_ACCESO) iniciarCuentaRegresiva();
+    });
     </script>
 </body>
-
 </html>

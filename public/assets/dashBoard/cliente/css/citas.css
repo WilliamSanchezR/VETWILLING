@@ -693,9 +693,7 @@ body {
     white-space: nowrap;
     margin: 6px 4px;
 }
-.btn-accion .btn-ver{
-    margin: 20px !important;
-}
+
 
 .btn-accion:last-child { border-right: none; }
 .btn-accion i { font-size: 13px; }

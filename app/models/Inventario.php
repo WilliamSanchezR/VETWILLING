@@ -347,9 +347,55 @@ class Inventario
     // ============================================================
 
     /**
+     * Obtiene un lote activo verificando que pertenezca a la veterinaria de sesión.
+     * Centraliza la validación de propiedad antes de editar o eliminar.
+     */
+    public function obtenerLoteActivoDeVeterinaria(int $id_inventario, int $id_veterinaria): array|false
+    {
+        try {
+            $sql = "SELECT
+                        i.id_inventario,
+                        i.id_veterinaria,
+                        i.cantidad,
+                        i.categoria,
+                        i.numero_lote,
+                        i.stock_minimo,
+                        i.detalle_almacenamiento,
+                        i.estado,
+                        p.id_producto,
+                        p.nombre,
+                        p.descripcion,
+                        p.proveedor,
+                        p.precio,
+                        p.precio_venta,
+                        p.costo_mayorista,
+                        p.fecha_vencimiento,
+                        p.imagen
+                    FROM inventario i
+                    INNER JOIN producto p ON p.id_inventario = i.id_inventario
+                    WHERE i.id_inventario  = :id_inventario
+                      AND i.id_veterinaria = :id_veterinaria
+                      AND i.estado = 1
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_inventario',  $id_inventario,  PDO::PARAM_INT);
+            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $lote = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $lote ?: false;
+
+        } catch (PDOException $e) {
+            error_log('Error en Inventario::obtenerLoteActivoDeVeterinaria - ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Marca el lote como eliminado (estado = 0).
-     * El producto asociado queda oculto porque listarInventario()
-     * filtra con WHERE estado = 1.
+     * Soft-delete: conserva filas en inventario, producto y movimiento_stock
+     * para que reportes históricos sigan referenciando los mismos IDs.
      *
      * @param int $id_inventario   ID del lote a eliminar
      * @param int $id_veterinaria  Seguridad extra: solo borra si pertenece a esta veterinaria
@@ -358,12 +404,12 @@ class Inventario
     public function eliminarLote(int $id_inventario, int $id_veterinaria): bool
     {
         try {
-            // El filtro id_veterinaria impide que un representante elimine
-            // lotes de otra veterinaria manipulando el ID en el formulario
+            // Solo lotes activos; nunca DELETE físico
             $sql = "UPDATE inventario
                     SET estado = 0
                     WHERE id_inventario  = :id_inventario
-                      AND id_veterinaria = :id_veterinaria";
+                      AND id_veterinaria = :id_veterinaria
+                      AND estado = 1";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_inventario',  $id_inventario,  PDO::PARAM_INT);
@@ -371,8 +417,6 @@ class Inventario
 
             $stmt->execute();
 
-            // rowCount() devuelve cuántas filas se modificaron
-            // Si es 0, el ID no existía o no pertenecía a esta veterinaria
             return $stmt->rowCount() > 0;
 
         } catch (PDOException $e) {
@@ -500,6 +544,56 @@ class Inventario
             error_log('Error en Inventario::obtenerProductosProximosAVencer - ' . $e->getMessage());
             return [];
         }
+    }
+
+    /**
+     * Genera alertas automáticas de inventario y las registra en el sistema de notificaciones.
+     * Detecta stock bajo y productos próximos a vencer.
+     *
+     * @param int $id_veterinaria ID de la veterinaria
+     * @param int $id_usuario ID del usuario para notificaciones
+     * @param int $dias_vencimiento Días de anticipación para alertas de vencimiento (default 30)
+     * @return array Resumen de alertas generadas ['stock_bajo' => int, 'vencimiento' => int]
+     */
+    public function generarAlertasInventario(int $id_veterinaria, int $id_usuario, int $dias_vencimiento = 30): array
+    {
+        require_once __DIR__ . '/Notificacion.php';
+        $modeloNotificacion = new Notificacion();
+
+        $alertas = ['stock_bajo' => 0, 'vencimiento' => 0];
+
+        // Detectar stock bajo
+        $lotesStockBajo = $this->obtenerLotesStockBajo($id_veterinaria);
+        foreach ($lotesStockBajo as $lote) {
+            $mensaje = "Stock crítico: {$lote['nombre']} (Lote {$lote['numero_lote']}) - Stock actual: {$lote['cantidad']}, Mínimo: {$lote['stock_minimo']}";
+            $modeloNotificacion->registrar(
+                $id_usuario,
+                'Alerta de Inventario',
+                $mensaje,
+                'warning',
+                $lote['id_inventario']
+            );
+            $alertas['stock_bajo']++;
+        }
+
+        // Detectar vencimientos próximos
+        $productosVencer = $this->obtenerProductosProximosAVencer($id_veterinaria, $dias_vencimiento);
+        foreach ($productosVencer as $producto) {
+            $dias = $producto['dias_para_vencer'];
+            $estado = $dias < 0 ? 'VENCIDO' : 'Próximo a vencer';
+            $mensaje = "{$estado}: {$producto['nombre']} (Lote {$producto['numero_lote']}) - {$producto['fecha_vencimiento']} ({$dias} días)";
+            $tipo = $dias < 0 ? 'danger' : 'warning';
+            $modeloNotificacion->registrar(
+                $id_usuario,
+                'Alerta de Vencimiento',
+                $mensaje,
+                $tipo,
+                $producto['id_inventario']
+            );
+            $alertas['vencimiento']++;
+        }
+
+        return $alertas;
     }
 
     /**
