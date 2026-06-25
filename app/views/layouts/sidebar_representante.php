@@ -179,6 +179,12 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             <i class="bi bi-box-seam"></i>
                             <span class="nav-text">Reportes Inventario</span>
                         </a></li>
+                    <li><a href="<?= BASE_URL ?>/representante/historial-ventas"
+                            class="nav-item <?= $final_path == 'historial-ventas' ? 'active' : '' ?>"
+                            data-section="reportes">
+                            <i class="bi bi-receipt-cutoff"></i>
+                            <span class="nav-text">Historial de Ventas</span>
+                        </a></li>
                 </ul>
             </div>
 
