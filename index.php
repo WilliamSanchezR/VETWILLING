@@ -585,7 +585,11 @@ switch ($request) {
         break;
 
     case "/cliente/notificaciones":
-        require BASE_PATH . "/app/views/dashboard/cliente/notificaciones.php";
+        require BASE_PATH . "/app/controllers/NotificacioneController.php";
+        break;
+
+    case "/paciente/api/notificaciones":
+        require BASE_PATH . "/app/controllers/api/notificaciones_api.php"; // ← antes era NotificacioneController
         break;
 
     //----------ACCIONES DEL PACIENTE---------//

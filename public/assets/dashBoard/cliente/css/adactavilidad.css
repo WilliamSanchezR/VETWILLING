@@ -1,0 +1,28 @@
+/* ============================================================
+   1. SINCRONIZACIÓN CON SIDEBAR.CSS
+      .contenido-principal hereda el mismo comportamiento
+      que .main-content definido en sidebar.css.
+      Así el banner NO queda debajo del sidebar.
+   ============================================================ */
+.contenido-principal {
+    margin-left: var(--sidebar-width);
+    /* 260px — igual que sidebar.css */
+    min-height: 100vh;
+    background: var(--bg-main);
+    /* #f5f7fb — variable de sidebar.css */
+    transition: margin-left var(--transition-base);
+    /* sincroniza con la animación del sidebar */
+}
+
+/* Cuando el sidebar colapsa, el contenido se expande */
+.sidebar.collapsed~.contenido-principal {
+    margin-left: var(--sidebar-collapsed-width);
+    /* 80px */
+}
+
+/* Móvil: sin margen, ocupa toda la pantalla */
+@media (max-width: 768px) {
+    .contenido-principal {
+        margin-left: 0 !important;
+    }
+}

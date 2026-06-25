@@ -1,272 +1,159 @@
-// =====================================================
-// DASHBOARD MANAGER - VERSIÓN PROFESIONAL FINAL
-// =====================================================
+/**
+ * dashboard-cliente.js
+ * Versión : 2.0
+ * Scope   : Solo el dashboard del propietario.
+ */
 
-class DashboardManager {
+/* ============================================================
+   PANEL DE NOTIFICACIONES
+   ============================================================ */
+class PanelNotificaciones {
     constructor() {
-        document.addEventListener('DOMContentLoaded', () => this.init());
+        this.overlay   = document.getElementById('notifOverlay');
+        this.panel     = document.getElementById('notifPanel');
+        this.btnAbrir  = document.getElementById('btnNotificaciones');
+        this.btnCerrar = document.getElementById('btnCerrarNotif');
+
+        if (!this.panel) return;
+
+        this._bindEvents();
     }
 
-    init() {
-        this.cacheDom();
-        this.bindEvents();
-
-        this.restoreSidebarState();
-        this.restoreSubmenusState();
-        this.restoreTheme();
-        this.marcarItemActivo();
-
-        console.log("✅ Dashboard cargado correctamente");
-    }
-
-    // =====================================================
-    // CACHE DE ELEMENTOS
-    // =====================================================
-    cacheDom() {
-        this.sidebar = document.getElementById("sidebar");
-        this.sidebarToggle = document.getElementById("sidebarToggle");
-        this.content = document.getElementById("contenidoPrincipal");
-        this.inputBusqueda = document.getElementById("inputBusqueda");
-        this.themeIcon = document.getElementById("themeIcon");
-    }
-
-    // =====================================================
-    // EVENTOS PRINCIPALES
-    // =====================================================
-    bindEvents() {
-
-        // Toggle sidebar
-        if (this.sidebarToggle)
-            this.sidebarToggle.addEventListener("click", () => this.toggleSidebar());
-
-        // Click fuera para cerrar
-        document.addEventListener("click", (e) => {
-            this.handleOutsideClick(e);
-            this.closeDropdowns(e);
+    _bindEvents() {
+        this.btnAbrir?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.abrir();
         });
 
-        // Búsqueda
-        if (this.inputBusqueda)
-            this.inputBusqueda.addEventListener("input", this.debounce((e) => {
-                const term = e.target.value.trim().toLowerCase();
-                this.realizarBusqueda(term);
-            }, 300));
+        this.btnCerrar?.addEventListener('click', () => this.cerrar());
+        this.overlay?.addEventListener('click', () => this.cerrar());
 
-        // Delegación global
-        document.addEventListener("click", (e) => {
-            const { action, id, nombre, tipo } = e.target.dataset;
-
-            if (action === "dropdown") this.toggleDropdown(tipo);
-            if (action === "theme") this.toggleTheme();
-            if (action === "chat-open") this.abrirChat(nombre, id);
-            if (action === "chat-back") this.volverLista();
-            if (action === "chat-send") this.enviarMensaje();
-        });
-
-        // Auto-expansión del textarea del chat
-        const inputMsg = document.getElementById("inputMensaje");
-        if (inputMsg) {
-            inputMsg.addEventListener("input", () => {
-                inputMsg.style.height = "auto";
-                inputMsg.style.height = `${inputMsg.scrollHeight}px`;
-            });
-        }
-    }
-
-    // =====================================================
-    // SIDEBAR (SIN ANIMACIONES FEAS)
-    // =====================================================
-    toggleSidebar() {
-        this.sidebar.classList.toggle("collapsed");
-        this.content?.classList.toggle("contenido-expandido");
-
-        // guardar en localStorage
-        localStorage.setItem("sidebarCollapsed", this.sidebar.classList.contains("collapsed"));
-    }
-
-    restoreSidebarState() {
-        const collapsed = localStorage.getItem("sidebarCollapsed") === "true";
-        if (collapsed) {
-            this.sidebar.classList.add("collapsed");
-            this.content?.classList.add("contenido-expandido");
-        }
-    }
-
-    // Ocultar sidebar en pantallas pequeñas
-    handleOutsideClick(e) {
-        if (window.innerWidth <= 768) {
-            if (!e.target.closest("#sidebar") && !e.target.closest("#sidebarToggle")) {
-                this.sidebar.classList.add("collapsed");
-            }
-        }
-    }
-
-    // =====================================================
-    // SUBMENÚS
-    // =====================================================
-    restoreSubmenusState() {
-        document.querySelectorAll(".submenu").forEach(submenu => {
-            const id = submenu.querySelector(".submenu-toggle")?.dataset.menuId;
-            if (localStorage.getItem(`submenu-${id}`) === "true") {
-                submenu.classList.add("activo");
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.panel.classList.contains('activo')) {
+                this.cerrar();
             }
         });
     }
 
-    // =====================================================
-    // DROPDOWNS
-    // =====================================================
-    toggleDropdown(tipo) {
-        const dropdown = document.getElementById(`dropdown${tipo}`);
-        if (!dropdown) return;
+    abrir() {
+        this.panel.classList.add('activo');
+        this.overlay?.classList.add('activo');
+        document.body.style.overflow = 'hidden';
+        this.btnCerrar?.focus();
 
-        document.querySelectorAll(".dropdown-menu").forEach(d => d.classList.remove("show"));
-        dropdown.classList.add("show");
+        // Marcar como leídas después de 2 seg
+        // TODO: cuando el backend esté listo, hacer fetch aquí también:
+        // fetch('/notificaciones/marcar-leidas', { method: 'POST' })
+        setTimeout(() => this._marcarLeidas(), 2000);
     }
 
-    closeDropdowns(e) {
-        if (!e.target.closest(".navbar-derecha")) {
-            document.querySelectorAll(".dropdown-menu").forEach(d => d.classList.remove("show"));
-        }
+    cerrar() {
+        this.panel.classList.remove('activo');
+        this.overlay?.classList.remove('activo');
+        document.body.style.overflow = '';
+        this.btnAbrir?.focus();
     }
 
-    // =====================================================
-    // TEMA
-    // =====================================================
-    toggleTheme() {
-        document.body.classList.toggle("dark-mode");
-
-        const dark = document.body.classList.contains("dark-mode");
-        this.themeIcon?.classList.toggle("bi-sun-fill", dark);
-        this.themeIcon?.classList.toggle("bi-moon-stars-fill", !dark);
-
-        localStorage.setItem("theme", dark ? "dark" : "light");
-    }
-
-    restoreTheme() {
-        const saved = localStorage.getItem("theme");
-        if (saved === "dark") {
-            document.body.classList.add("dark-mode");
-            this.themeIcon?.classList.replace("bi-moon-stars-fill", "bi-sun-fill");
-        }
-    }
-
-    // =====================================================
-    // BÚSQUEDA
-    // =====================================================
-    realizarBusqueda(termino) {
-        document.querySelectorAll("[data-searchable]").forEach(el => {
-            el.style.display = el.textContent.toLowerCase().includes(termino)
-                ? ""
-                : "none";
+    _marcarLeidas() {
+        document.querySelectorAll('.notif-item.no-leida').forEach(item => {
+            item.classList.remove('no-leida');
+            item.querySelector('.notif-punto')?.remove();
         });
+
+        const btnBadge = document.querySelector('#btnNotificaciones .notification-badge');
+        if (btnBadge) btnBadge.style.display = 'none';
     }
-
-    debounce(fn, delay) {
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => fn.apply(this, args), delay);
-        };
-    }
-
-    // =====================================================
-    // CHAT
-    // =====================================================
-    abrirChat(nombre, id) {
-        const chatWindow = document.getElementById("chatWindow");
-        const lista = document.getElementById("conversacionesList");
-
-        if (!chatWindow || !lista) return;
-
-        document.getElementById("chatNombre").textContent = nombre;
-
-        lista.style.display = "none";
-        chatWindow.classList.add("show");
-
-        this.scrollChatBottom();
-        this.cargarMensajes(id);
-    }
-
-    volverLista() {
-        document.getElementById("chatWindow")?.classList.remove("show");
-        document.getElementById("conversacionesList").style.display = "block";
-    }
-
-    enviarMensaje() {
-        const input = document.getElementById("inputMensaje");
-        const cont = document.getElementById("mensajesContainer");
-
-        if (!input || !cont) return;
-
-        const msg = input.value.trim();
-        if (!msg) return;
-
-        cont.insertAdjacentHTML("beforeend", this.renderMensaje(msg));
-
-        input.value = "";
-        input.style.height = "auto";
-
-        this.scrollChatBottom();
-        this.enviarMensajeServidor(msg);
-    }
-
-    renderMensaje(texto) {
-        const hora = new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
-
-        return `
-            <div class="mensaje enviado">
-                <div>
-                    <div class="mensaje-bubble">${this.escapeHtml(texto)}</div>
-                    <div class="mensaje-hora">${hora}</div>
-                </div>
-            </div>
-        `;
-    }
-
-    scrollChatBottom() {
-        const cont = document.getElementById("mensajesContainer");
-        if (cont) cont.scrollTop = cont.scrollHeight;
-    }
-
-    enviarMensajeServidor(msg) {
-        console.log("📨 Mensaje enviado al servidor:", msg);
-    }
-
-    cargarMensajes(idChat) {
-        console.log("📥 Cargar mensajes del chat:", idChat);
-    }
-
-    escapeHtml(text) {
-        return text.replace(/[&<>"']/g, (m) =>
-            ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])
-        );
-    }
-
-    // =====================================================
-    // MARCAR ELEMENTO ACTIVO
-    // =====================================================
-    marcarItemActivo() {
-        const actual = window.location.pathname.toLowerCase();
-
-        document.querySelectorAll(".nav-item").forEach(item => {
-            let href = item.getAttribute("href");
-
-            if (!href) return;
-
-            // Normaliza rutas
-            href = new URL(href, window.location.origin).pathname.toLowerCase();
-
-            // Si la ruta actual contiene la del item → activo
-            if (actual.startsWith(href)) {
-                item.classList.add("active");
-            } else {
-                item.classList.remove("active");
-            }
-        });
-    }
-
 }
 
-// Inicializar
-new DashboardManager();
+
+/* ============================================================
+   FECHA DINÁMICA EN EL BANNER
+   ============================================================ */
+function inyectarFecha() {
+    const el = document.getElementById('dashFecha');
+    if (!el) return;
+
+    const texto = new Date().toLocaleDateString('es-CO', {
+        weekday : 'long',
+        year    : 'numeric',
+        month   : 'long',
+        day     : 'numeric',
+    });
+
+    el.textContent = texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+
+/* ============================================================
+   ANIMACIONES DE ENTRADA
+   ============================================================ */
+function iniciarAnimacionesEntrada() {
+    const elementos = document.querySelectorAll('.dash-fade-in');
+
+    // Sin animación si el usuario lo prefiere
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        elementos.forEach(el => el.classList.add('visible'));
+        return;
+    }
+
+    const MAX_DELAY = 300; // ms — evita que elementos tardíos entren demasiado tarde
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (!entry.isIntersecting) return;
+
+            const delay = Math.min(i * 80, MAX_DELAY);
+            setTimeout(() => entry.target.classList.add('visible'), delay);
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.08 });
+
+    elementos.forEach(el => observer.observe(el));
+}
+
+
+/* ============================================================
+   TOOLTIPS ACCESIBLES EN CHIPS (teclado + mouse)
+   ============================================================ */
+function iniciarTooltipsChips() {
+    document.querySelectorAll('.chip-recordatorio').forEach(chip => {
+        const tooltip = chip.querySelector('.chip-tooltip');
+        if (!tooltip) return;
+
+        // Vincular tooltip al chip para lectores de pantalla
+        const id = 'tt-' + Math.random().toString(36).slice(2, 7);
+        tooltip.id = id;
+        chip.setAttribute('aria-describedby', id);
+
+        const mostrar = () => {
+            tooltip.style.opacity   = '1';
+            tooltip.style.transform = 'translateX(-50%) scale(1)';
+        };
+
+        const ocultar = () => {
+            tooltip.style.opacity   = '';
+            tooltip.style.transform = '';
+        };
+
+        chip.addEventListener('focus', mostrar);
+        chip.addEventListener('blur',  ocultar);
+
+        chip.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                chip.click();
+            }
+        });
+    });
+}
+
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+    new PanelNotificaciones();
+    inyectarFecha();
+    iniciarAnimacionesEntrada();
+    iniciarTooltipsChips();
+});
