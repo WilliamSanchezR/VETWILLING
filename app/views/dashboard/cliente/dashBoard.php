@@ -1,394 +1,423 @@
-    <?php
-    require_once BASE_PATH . '/app/helpers/session_propietario.php';
-    require_once BASE_PATH . '/app/models/CitasCliente.php';
+<?php
 
-    $usuario = $_SESSION['user'] ?? [];
-    $id_propietario = $_SESSION['user']['id_propietario'] ?? null;
+/**
+ * dashboard_cliente.php  —  v2.0
+ * Vista principal del propietario (cliente).
+ *
+ * Variables disponibles desde session_propietario.php:
+ *   $usuario['nombres']    — Nombre(s) del propietario
+ *   $usuario['apellidos']  — Apellidos
+ *
+ * Los arrays $citas, $chips, $recordatorios y $notificaciones
+ * son datos de ejemplo. Reemplazar por consultas al modelo
+ * cuando el backend esté listo.
+ */
+require_once BASE_PATH . '/app/helpers/session_propietario.php';
+// esta parte es para lo que seria cargar las citas y recomendaciones
+require_once BASE_PATH . '/app/models/CitasCliente.php';
 
-    if (!$id_propietario && isset($_SESSION['user']['id_usuario'])) {
-        $modeloCitas = new CitasCliente();
-        $id_propietario = $modeloCitas->obtenerIdPropietarioPorUsuario((int)$_SESSION['user']['id_usuario']);
-        if ($id_propietario) {
-            $_SESSION['user']['id_propietario'] = $id_propietario;
-        }
-    }
+$usuario = $_SESSION['user'] ?? [];
+$id_propietario = $_SESSION['user']['id_propietario'] ?? null;
 
-    $proximasCitas = [];
-
+if (!$id_propietario && isset($_SESSION['user']['id_usuario'])) {
+    $modeloCitas = new CitasCliente();
+    $id_propietario = $modeloCitas->obtenerIdPropietarioPorUsuario((int)$_SESSION['user']['id_usuario']);
     if ($id_propietario) {
-        if (!isset($modeloCitas)) {
-            $modeloCitas = new CitasCliente();
-        }
-
-        $filtros = ['fecha_inicio' => date('Y-m-d')];
-        $citas = $modeloCitas->listarCitasPropietario($id_propietario, $filtros);
-
-        $proximasCitas = array_filter($citas, function ($cita) {
-            return !in_array($cita['estado'], ['Cancelada', 'Realizada']) &&
-                strtotime($cita['fecha_hora']) >= strtotime(date('Y-m-d') . ' 00:00:00');
-        });
-
-        usort($proximasCitas, function ($a, $b) {
-            return strtotime($a['fecha_hora']) - strtotime($b['fecha_hora']);
-        });
-
-        $proximasCitas = array_slice($proximasCitas, 0, 3);
+        $_SESSION['user']['id_propietario'] = $id_propietario;
     }
+}
 
-    function formatCitaFechaDia($fechaHora)
-    {
-        $dt = new DateTime($fechaHora);
-        return $dt->format('d');
-    }
+$proximasCitas = [];
 
-    function formatCitaFechaMes($fechaHora)
-    {
-        $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-        $dt = new DateTime($fechaHora);
-        return $meses[(int)$dt->format('n') - 1];
-    }
-
-    function formatCitaHora($fechaHora)
-    {
-        $dt = new DateTime($fechaHora);
-        return $dt->format('h:i A');
-    }
-
-    function cleanText($texto)
-    {
-        return htmlspecialchars($texto ?? '', ENT_QUOTES, 'UTF-8');
-    }
-
-    function formatReminderDate($fecha)
-    {
-        if (empty($fecha)) {
-            return 'Fecha no disponible';
-        }
-
-        try {
-            $dt = new DateTime($fecha);
-            return $dt->format('d/m/Y');
-        } catch (Exception $e) {
-            return 'Fecha no válida';
-        }
-    }
-
-    function obtenerRecordatorios($id_propietario)
-    {
-        $recordatorios = [];
+if ($id_propietario) {
+    if (!isset($modeloCitas)) {
         $modeloCitas = new CitasCliente();
-        $mascotas = $modeloCitas->obtenerMascotasPropietario($id_propietario);
-        $hoy = new DateTime('today');
+    }
 
-        foreach ($mascotas as $mascota) {
-            $id_paciente = (int)$mascota['id_paciente'];
-            $vacunas = $modeloCitas->obtenerVacunasPorPaciente($id_propietario, $id_paciente);
+    $filtros = ['fecha_inicio' => date('Y-m-d')];
+    $citas = $modeloCitas->listarCitasPropietario($id_propietario, $filtros);
 
-            foreach ($vacunas as $vacuna) {
-                try {
-                    $fechaAplicacion = new DateTime($vacuna['fecha_aplicacion']);
-                } catch (Exception $e) {
-                    continue;
-                }
+    $proximasCitas = array_filter($citas, function ($cita) {
+        return !in_array($cita['estado'], ['Cancelada', 'Realizada']) &&
+            strtotime($cita['fecha_hora']) >= strtotime(date('Y-m-d') . ' 00:00:00');
+    });
 
-                if ($fechaAplicacion >= $hoy) {
-                    $recordatorios[] = [
-                        'tipo' => 'vacuna',
-                        'mascota' => $mascota['nombre'] ?? 'Mascota',
-                        'titulo' => $vacuna['tipo_vacuna'] ?: 'Vacuna próxima',
-                        'detalle' => trim(($vacuna['dosis'] ? $vacuna['dosis'] . ' - ' : '') . 'Profesional: ' . ($vacuna['profesional_nombre'] ?? 'No especificado')),
-                        'fecha' => $vacuna['fecha_aplicacion'],
-                    ];
-                }
+    usort($proximasCitas, function ($a, $b) {
+        return strtotime($a['fecha_hora']) - strtotime($b['fecha_hora']);
+    });
+
+    $proximasCitas = array_slice($proximasCitas, 0, 3);
+}
+
+function formatCitaFechaDia($fechaHora)
+{
+    $dt = new DateTime($fechaHora);
+    return $dt->format('d');
+}
+
+function formatCitaFechaMes($fechaHora)
+{
+    $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    $dt = new DateTime($fechaHora);
+    return $meses[(int)$dt->format('n') - 1];
+}
+
+function formatCitaHora($fechaHora)
+{
+    $dt = new DateTime($fechaHora);
+    return $dt->format('h:i A');
+}
+
+function cleanText($texto)
+{
+    return htmlspecialchars($texto ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+function formatReminderDate($fecha)
+{
+    if (empty($fecha)) {
+        return 'Fecha no disponible';
+    }
+
+    try {
+        $dt = new DateTime($fecha);
+        return $dt->format('d/m/Y');
+    } catch (Exception $e) {
+        return 'Fecha no válida';
+    }
+}
+
+function obtenerRecordatorios($id_propietario)
+{
+    $recordatorios = [];
+    $modeloCitas = new CitasCliente();
+    $mascotas = $modeloCitas->obtenerMascotasPropietario($id_propietario);
+    $hoy = new DateTime('today');
+
+    foreach ($mascotas as $mascota) {
+        $id_paciente = (int)$mascota['id_paciente'];
+        $vacunas = $modeloCitas->obtenerVacunasPorPaciente($id_propietario, $id_paciente);
+
+        foreach ($vacunas as $vacuna) {
+            try {
+                $fechaAplicacion = new DateTime($vacuna['fecha_aplicacion']);
+            } catch (Exception $e) {
+                continue;
             }
 
-            $tratamientos = $modeloCitas->obtenerTratamientosPorPaciente($id_propietario, $id_paciente);
+            if ($fechaAplicacion >= $hoy) {
+                $recordatorios[] = [
+                    'tipo' => 'vacuna',
+                    'mascota' => $mascota['nombre'] ?? 'Mascota',
+                    'titulo' => $vacuna['tipo_vacuna'] ?: 'Vacuna próxima',
+                    'detalle' => trim(($vacuna['dosis'] ? $vacuna['dosis'] . ' - ' : '') . 'Profesional: ' . ($vacuna['profesional_nombre'] ?? 'No especificado')),
+                    'fecha' => $vacuna['fecha_aplicacion'],
+                ];
+            }
+        }
 
-            foreach ($tratamientos as $tratamiento) {
-                $estado = strtolower(trim($tratamiento['estado'] ?? ''));
-                $fechaFin = $tratamiento['fecha_fin'] ?? null;
-                $fechaInicio = $tratamiento['fecha_inicio'] ?? null;
-                $vencimientoOK = false;
+        $tratamientos = $modeloCitas->obtenerTratamientosPorPaciente($id_propietario, $id_paciente);
 
-                try {
-                    $fechaFinObj = $fechaFin ? new DateTime($fechaFin) : null;
-                    if ($fechaFinObj) {
-                        $vencimientoOK = $fechaFinObj >= $hoy;
-                    } else {
-                        $vencimientoOK = true;
-                    }
-                } catch (Exception $e) {
+        foreach ($tratamientos as $tratamiento) {
+            $estado = strtolower(trim($tratamiento['estado'] ?? ''));
+            $fechaFin = $tratamiento['fecha_fin'] ?? null;
+            $fechaInicio = $tratamiento['fecha_inicio'] ?? null;
+            $vencimientoOK = false;
+
+            try {
+                $fechaFinObj = $fechaFin ? new DateTime($fechaFin) : null;
+                if ($fechaFinObj) {
+                    $vencimientoOK = $fechaFinObj >= $hoy;
+                } else {
                     $vencimientoOK = true;
                 }
+            } catch (Exception $e) {
+                $vencimientoOK = true;
+            }
 
-                if (($estado === 'activo' || $estado === 'en curso' || $estado === 'en proceso') && $vencimientoOK) {
-                    $recordatorios[] = [
-                        'tipo' => 'tratamiento',
-                        'mascota' => $mascota['nombre'] ?? 'Mascota',
-                        'titulo' => ($tratamiento['medicamento'] ?: 'Tratamiento en proceso') . ($tratamiento['dosis'] ? ' - ' . $tratamiento['dosis'] : ''),
-                        'detalle' => trim('Desde: ' . ($fechaInicio ?? 'N/A') . ($fechaFin ? ' Hasta: ' . $fechaFin : '')),
-                        'fecha' => $fechaFin ?: $fechaInicio,
-                    ];
-                }
+            if (($estado === 'activo' || $estado === 'en curso' || $estado === 'en proceso') && $vencimientoOK) {
+                $recordatorios[] = [
+                    'tipo' => 'tratamiento',
+                    'mascota' => $mascota['nombre'] ?? 'Mascota',
+                    'titulo' => ($tratamiento['medicamento'] ?: 'Tratamiento en proceso') . ($tratamiento['dosis'] ? ' - ' . $tratamiento['dosis'] : ''),
+                    'detalle' => trim('Desde: ' . ($fechaInicio ?? 'N/A') . ($fechaFin ? ' Hasta: ' . $fechaFin : '')),
+                    'fecha' => $fechaFin ?: $fechaInicio,
+                ];
             }
         }
-
-        usort($recordatorios, function ($a, $b) {
-            $fechaA = strtotime($a['fecha'] ?? '9999-12-31');
-            $fechaB = strtotime($b['fecha'] ?? '9999-12-31');
-            return $fechaA - $fechaB;
-        });
-
-        return array_slice($recordatorios, 0, 4);
     }
 
-    $recordatorios = [];
-    if ($id_propietario) {
-        $recordatorios = obtenerRecordatorios($id_propietario);
-    }
+    usort($recordatorios, function ($a, $b) {
+        $fechaA = strtotime($a['fecha'] ?? '9999-12-31');
+        $fechaB = strtotime($b['fecha'] ?? '9999-12-31');
+        return $fechaA - $fechaB;
+    });
 
-    ?>
+    return array_slice($recordatorios, 0, 4);
+}
 
-    <!DOCTYPE html>
-    <html lang="es">
+$recordatorios = [];
+if ($id_propietario) {
+    $recordatorios = obtenerRecordatorios($id_propietario);
+}
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Cliente - Dashboard</title>
+?>
+
+<!-- Aca se finaliza lo que seria todo el php de las citas y los recorfatorios -->
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — VetWilling</title>
 
         <!-- Bootstrap -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        <!-- Iconos -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
 
+    <!-- CSS del módulo cliente (sidebar, navbar, base) -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/adactavilidad.css">
 
-        <!-- Favicon -->
-        <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
 
-        <!-- CSS -->
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-    </head>
+    <!-- CSS exclusivo de ESTA vista -->
+    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/dashboard-cliente.css"> -->
+</head>
 
-    <body>
+<body>
 
-        <!-- SIDEBAR -->
-        <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
+    <!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+    <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
 
-        <!-- CONTENIDO PRINCIPAL -->
-        <main class="contenido-principal" id="contenidoPrincipal">
 
-            <!-- NAVBAR SUPERIOR -->
-            <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
+    <!-- ============================================================
+     CONTENIDO PRINCIPAL
+     ============================================================ -->
+    <main class="contenido-principal" id="contenidoPrincipal">
 
-            <div class="area-contenido">
+        <!-- Navbar superior -->
+        <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
 
-                <!-- DASHBOARD CONTENT -->
-                <div class="container-dashboard">
+        <div class="area-contenido">
+            <div class="container-dashboard">
 
-                    <!-- BIENVENIDA -->
-                    <div class="bienvenida-card">
-                        <h2>¡Bienvenido, <?= $usuario['nombres'] ?>! <i class="bi bi-person" style="color: #ffffff; font-size: 0.9em;"></i></h2>
-                        <p>Nos alegra verte nuevamente. En VetWilling cuidamos de tus mascotas con amor, profesionalismo y dedicación.</p>
-                        <p class="frase">Tu familia está en buenas patas.</p>
-                    </div> 
+                <!-- ------------------------------------------------
+                 BANNER DE BIENVENIDA
+                 ------------------------------------------------ -->
+                <div class="bienvenida-banner dash-fade-in">
 
-                    <!-- ALERTA -->
-                    <div class="alert-box">
-                        <div class="alert-icon"><i class="bi bi-exclamation-circle" style="color: #dc3545;"></i></div>
-                        <div class="alert-content">
-                            <?php if (!empty($recordatorios)): ?>
-                                <h3>Recordatorio Importante</h3>
-                                <p><?= cleanText($recordatorios[0]['titulo'] . ' de ' . $recordatorios[0]['mascota'] . ' para el ' . formatReminderDate($recordatorios[0]['fecha'])) ?></p>
-                            <?php else: ?>
-                                <h3>Recordatorios al día</h3>
-                                <p>No hay vacunas próximas ni tratamientos activos pendientes.</p>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                    <div class="row align-items-center">
 
-                    <!-- CITAS Y RECORDATORIOS -->
-                    <div class="content-grid">
-
-                        <!-- PRÓXIMAS CITAS -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title"><i class="bi bi-calendar2-week"></i> Próximas Citas</h2>
-                                <a href="<?= BASE_URL ?>/cliente/citas" class="card-action">Ver todas</a>
+                        <!-- COL IZQUIERDA: texto -->
+                        <div class="col-md-6 ban-col-left">
+                            <div class="bienvenida-fecha">
+                                <i class="bi bi-calendar3" aria-hidden="true"></i>
+                                <span id="dashFecha">Cargando fecha…</span>
                             </div>
 
-                            <?php if (!empty($proximasCitas)): ?>
-                                <?php foreach ($proximasCitas as $cita): ?>
-                                    <div class="cita-item<?= strtolower($cita['tipo'] ?? '') === 'urgente' ? ' urgente' : '' ?>">
-                                        <div class="cita-fecha">
-                                            <div class="cita-dia"><?= formatCitaFechaDia($cita['fecha_hora']) ?></div>
-                                            <div class="cita-mes"><?= formatCitaFechaMes($cita['fecha_hora']) ?></div>
-                                        </div>
-                                        <div class="cita-info">
-                                            <div class="cita-mascota"><?= cleanText($cita['mascota_nombre'] . ' - ' . ($cita['tipo'] ?: 'Cita')) ?></div>
-                                            <div class="cita-detalles"><?= cleanText($cita['veterinario_nombre'] . ' - ' . ($cita['subservicio_nombre'] ?: $cita['servicio_nombre'] ?: 'Sin servicio')) ?></div>
-                                        </div>
-                                        <div class="cita-hora"><?= formatCitaHora($cita['fecha_hora']) ?></div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <div class="cita-item">
-                                    <div class="cita-info">
-                                        <div class="cita-mascota">No hay citas próximas</div>
-                                        <div class="cita-detalles">Agrega una nueva cita para empezar</div>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
+                            <p class="bienvenida-saludo">Te damos la bienvenida</p>
+
+                            <h2 class="bienvenida-nombre">
+                                <?= htmlspecialchars($datosUsuario['nombres']) ?>
+                                <?= htmlspecialchars($datosUsuario['apellidos']) ?>
+                            </h2>
+
+                            <p class="bienvenida-frase">
+                                En VetWilling cuidamos de tus mascotas con amor y profesionalismo.
+                                <strong>Tu familia está en buenas patas.</strong>
+                            </p>
                         </div>
 
-                        <!-- RECORDATORIOS -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title"><i class="bi bi-bell-fill"></i> Recordatorios</h2>
+                        <!-- COL DERECHA: avatar + stats -->
+                        <div class="col-md-6 ban-col-right">
+
+                            <div class="bienvenida-avatar">
+                                <i class="bi bi-heart-pulse"></i>
                             </div>
 
-                            <?php if (!empty($recordatorios)): ?>
-                                <?php foreach ($recordatorios as $item): ?>
-                                    <div class="recordatorio-item">
-                                        <div class="recordatorio-icon"><span><i class="<?= $item['tipo'] === 'vacuna' ? 'bi bi-heart-pulse-fill' : 'bi bi-capsule' ?>"></i></span></div>
-                                        <div class="recordatorio-texto">
-                                            <h4><?= cleanText($item['titulo'] . ' - ' . $item['mascota']) ?></h4>
-                                            <p><?= cleanText($item['detalle'] . ' · ' . formatReminderDate($item['fecha'])) ?></p>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <div class="recordatorio-item">
-                                    <div class="recordatorio-icon"><span><i class="bi bi-bell"></i></span></div>
-                                    <div class="recordatorio-texto">
-                                        <h4>No hay recordatorios</h4>
-                                        <p>No se encontraron vacunas próximas ni tratamientos activos.</p>
-                                    </div>
+                            <div class="bienvenida-stats">
+                                <div class="banner-stat">
+                                    <span class="banner-stat-num">1</span>
+                                    <span class="banner-stat-lbl">Citas</span>
                                 </div>
-                            <?php endif; ?>
+
+                                <div class="banner-stat">
+                                    <span class="banner-stat-num">2</span>
+                                    <span class="banner-stat-lbl">Mascotas</span>
+                                </div>
+
+                                <div class="banner-stat">
+                                    <span class="banner-stat-num">4</span>
+                                    <span class="banner-stat-lbl">Alertas</span>
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>
 
                 </div>
 
-            </div>
 
-        </main>
+                <!-- ------------------------------------------------
+                 CHIPS DE RECORDATORIO
+                 ------------------------------------------------ -->
 
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
-        <!-- JavaScript -->
-        <script>
-            // Toggle Sidebar
-            const toggleBtn = document.getElementById('toggleSidebar');
-            const sidebar = document.getElementById('sidebar');
 
-            toggleBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('collapsed');
+                <!-- ------------------------------------------------
+                 GRID: CITAS + RECORDATORIOS DETALLADOS
+                 ------------------------------------------------ -->
+                <div class="dash-content-grid">
 
-                // Guardar estado
-                const isCollapsed = sidebar.classList.contains('collapsed');
-                localStorage.setItem('sidebarCollapsed', isCollapsed);
-            });
+                    <!-- PRÓXIMAS CITAS -->
+                    <div class="dash-card dash-fade-in" aria-label="Próximas citas">
+                        <div class="dash-card-header">
+                            <h3 class="dash-card-titulo">
+                                <i class="bi bi-calendar2-week" aria-hidden="true"></i>
+                                Próximas citas
+                            </h3>
+                            <a href="<?= BASE_URL ?>/cliente/citas" class="dash-card-accion">Ver todas</a>
+                        </div>
 
-            // Restaurar estado del sidebar
-            window.addEventListener('load', function() {
-                const savedState = localStorage.getItem('sidebarCollapsed');
-                if (savedState === 'true') {
-                    sidebar.classList.add('collapsed');
-                }
-            });
+                        <div class="citas-lista">
 
-            // Menú móvil
-            if (window.innerWidth <= 768) {
-                toggleBtn.addEventListener('click', function() {
-                    sidebar.classList.toggle('active');
-                });
+                            <?php if (empty($proximasCitas)): ?>
+                                <div class="citas-vacio">
+                                    <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                                    <p>No tienes citas programadas</p>
+                                </div>
+                            <?php else: ?>
 
-                // Cerrar sidebar al hacer click fuera
-                document.addEventListener('click', function(e) {
-                    if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-                        sidebar.classList.remove('active');
-                    }
-                });
-            }
+                                <?php foreach ($proximasCitas as $cita): ?>
 
-            // Animación de entrada
-            document.addEventListener('DOMContentLoaded', function() {
-                const elements = document.querySelectorAll('.mascota-card, .card, .cita-item, .recordatorio-item');
+                                    <div class="cita-row <?= strtolower($cita['tipo'] ?? '') === 'urgente' ? 'es-urgente' : '' ?>">
 
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach((entry, index) => {
-                        if (entry.isIntersecting) {
-                            setTimeout(() => {
-                                entry.target.style.opacity = '1';
-                                entry.target.style.transform = 'translateY(0)';
-                            }, index * 100);
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, {
-                    threshold: 0.1
-                });
+                                        <div class="cita-fecha-bloque" aria-hidden="true">
+                                            <span class="cita-dia-num">
+                                                <?= formatCitaFechaDia($cita['fecha_hora']) ?>
+                                            </span>
 
-                elements.forEach(el => {
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(20px)';
-                    el.style.transition = 'all 0.5s ease';
-                    observer.observe(el);
-                });
+                                            <span class="cita-mes-txt">
+                                                <?= formatCitaFechaMes($cita['fecha_hora']) ?>
+                                            </span>
+                                        </div>
 
-                // Efecto ripple en botones
-                document.querySelectorAll('.btn-mascota').forEach(button => {
-                    button.addEventListener('click', function(e) {
-                        const ripple = document.createElement('span');
-                        const rect = this.getBoundingClientRect();
-                        const size = Math.max(rect.width, rect.height);
-                        const x = e.clientX - rect.left - size / 2;
-                        const y = e.clientY - rect.top - size / 2;
+                                        <div class="cita-info-bloque">
 
-                        ripple.style.cssText = `
-                            position: absolute;
-                            border-radius: 50%;
-                            background: rgba(255,255,255,0.6);
-                            width: ${size}px;
-                            height: ${size}px;
-                            left: ${x}px;
-                            top: ${y}px;
-                            pointer-events: none;
-                            animation: ripple 0.6s ease-out;
-                        `;
+                                            <div class="cita-nombre">
+                                                <?= cleanText($cita['mascota_nombre'] . ' - ' . ($cita['tipo'] ?: 'Cita')) ?>
+                                            </div>
 
-                        this.style.position = 'relative';
-                        this.style.overflow = 'hidden';
-                        this.appendChild(ripple);
+                                            <div class="cita-detalle">
+                                                <?= cleanText(
+                                                    $cita['veterinario_nombre']
+                                                        . ' - '
+                                                        . ($cita['subservicio_nombre']
+                                                            ?: $cita['servicio_nombre']
+                                                            ?: 'Sin servicio')
+                                                ) ?>
+                                            </div>
 
-                        setTimeout(() => ripple.remove(), 600);
-                    });
-                });
+                                        </div>
 
-                console.log('✅ Dashboard VetWilling cargado correctamente');
-            });
+                                        <span class="cita-hora-tag">
+                                            <?= formatCitaHora($cita['fecha_hora']) ?>
+                                        </span>
 
-            // Keyframes para ripple
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes ripple {
-                    to {
-                        transform: scale(2);
-                        opacity: 0;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-        </script>
-    </body>
+                                    </div>
 
-    </html>
+                                <?php endforeach; ?>
+
+                            <?php endif; ?>
+
+                        </div>
+                    </div>
+
+
+                    <!-- RECORDATORIOS DETALLADOS -->
+                    <div class="dash-card dash-fade-in" aria-label="Recordatorios detallados">
+                        <div class="dash-card-header">
+                            <h3 class="dash-card-titulo">
+                                <i class="bi bi-bell-fill" aria-hidden="true"></i>
+                                Recordatorios
+                            </h3>
+                        </div>
+
+                        <div class="recordatorios-lista">
+
+                            <?php if (!empty($recordatorios)): ?>
+
+                                <?php foreach ($recordatorios as $item): ?>
+
+                                    <div
+                                        class="recordatorio-row"
+                                        style="
+                                --rec-color: <?= $item['tipo'] === 'vacuna' ? '#dc3545' : '#0d6efd' ?>;
+                                --rec-bg: <?= $item['tipo'] === 'vacuna' ? '#fdeaea' : '#eaf2ff' ?>;
+                            ">
+
+                                        <div class="recordatorio-icono">
+                                            <i class="bi <?= $item['tipo'] === 'vacuna'
+                                                                ? 'bi-heart-pulse-fill'
+                                                                : 'bi-capsule' ?>"
+                                                aria-hidden="true"></i>
+                                        </div>
+
+                                        <div class="recordatorio-info">
+
+                                            <div class="recordatorio-titulo-item">
+                                                <?= cleanText($item['titulo'] . ' - ' . $item['mascota']) ?>
+                                            </div>
+
+                                            <div class="recordatorio-desc">
+                                                <?= cleanText($item['detalle'] . ' · ' . formatReminderDate($item['fecha'])) ?>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                <?php endforeach; ?>
+
+                            <?php else: ?>
+
+                                <div class="citas-vacio">
+                                    <i class="bi bi-bell" aria-hidden="true"></i>
+                                    <p>No hay recordatorios programados</p>
+                                </div>
+
+                            <?php endif; ?>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div><!-- /container-dashboard -->
+        </div><!-- /area-contenido -->
+
+    </main>
+
+
+    <!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/dashboard-cliente.js"></script> -->
+
+</body>
+
+</html>
