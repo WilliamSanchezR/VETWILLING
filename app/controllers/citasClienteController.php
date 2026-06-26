@@ -6,12 +6,14 @@
  * ═══════════════════════════════════════════════════════════════════
  */
 
-session_start();
+require_once BASE_PATH . '/app/helpers/session_helper.php';
+initSession();
 
 require_once __DIR__ . '/../models/CitasCliente.php';
 require_once __DIR__ . '/../models/Profesional.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
 require_once __DIR__ . '/../helpers/notificacion_helper.php';
+require_once BASE_PATH . '/app/helpers/notification/notificacion_helper.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -282,7 +284,21 @@ function crearCitaCliente()
                 error_log("⚠️ Excepción al enviar email de confirmación: " . $e->getMessage());
                 // No detenemos el proceso si falla el email, la cita ya fue creada
             }
-            
+
+            // Notificación in-app al veterinario asignado
+            if (!empty($id_usuario_veterinario) && !empty($detallesCita)) {
+                $fechaCita     = date('d/m/Y H:i', strtotime($data['fecha_hora']));
+                $nombreMascota = $detallesCita['nombre_mascota'] ?? 'un paciente';
+                notificar(
+                    'cita',
+                    'Nueva cita agendada',
+                    "Se agendó una cita para {$nombreMascota} el {$fechaCita}.",
+                    (int) $id_usuario_veterinario,
+                    (int) $data['id_paciente'],
+                    '/veterinario/citas'
+                );
+            }
+
             header('Content-Type: application/json');
             http_response_code(201);
             echo json_encode([
@@ -442,6 +458,25 @@ function cancelarCitaCliente()
             error_log("⚠️ Advertencia: el slot del agendamiento {$id_agendamiento} no pudo verificarse como liberado");
         }
 
+        // Notificación in-app al veterinario sobre la cancelación
+        try {
+            $detalleCancelada = $modeloCitas->obtenerDetallesCita($id_agendamiento);
+            if (!empty($detalleCancelada['id_usuario'])) {
+                $fechaCita     = date('d/m/Y H:i', strtotime($detalleCancelada['fecha_hora']));
+                $nombreMascota = $detalleCancelada['nombre_mascota'] ?? 'un paciente';
+                notificar(
+                    'cita',
+                    'Cita cancelada por el propietario',
+                    "Se canceló la cita de {$nombreMascota} del {$fechaCita}. Motivo: {$motivo_cancelacion}",
+                    (int) $detalleCancelada['id_usuario'],
+                    (int) $detalleCancelada['id_paciente'],
+                    '/veterinario/citas'
+                );
+            }
+        } catch (\Throwable $e) {
+            error_log('citasClienteController: error al notificar cancelación: ' . $e->getMessage());
+        }
+
         header('Content-Type: application/json');
         echo json_encode([
             'status' => 'success',
@@ -510,6 +545,25 @@ function modificarCitaCliente()
         );
 
         if ($resultado) {
+            // Notificación in-app al veterinario sobre el reagendamiento
+            try {
+                $detalleModif = $modeloCitas->obtenerDetallesCita($id_agendamiento);
+                if (!empty($detalleModif['id_usuario'])) {
+                    $fechaNueva    = date('d/m/Y H:i', strtotime($nueva_fecha_hora));
+                    $nombreMascota = $detalleModif['nombre_mascota'] ?? 'un paciente';
+                    notificar(
+                        'cita',
+                        'Cita reagendada',
+                        "El propietario modificó la cita de {$nombreMascota}. Nueva fecha: {$fechaNueva}.",
+                        (int) $detalleModif['id_usuario'],
+                        (int) $detalleModif['id_paciente'],
+                        '/veterinario/citas'
+                    );
+                }
+            } catch (\Throwable $e) {
+                error_log('citasClienteController: error al notificar reagendamiento: ' . $e->getMessage());
+            }
+
             header('Content-Type: application/json');
             echo json_encode([
                 'status' => 'success',
