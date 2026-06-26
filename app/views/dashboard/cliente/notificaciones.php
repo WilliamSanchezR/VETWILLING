@@ -143,9 +143,12 @@
         .notif-card:hover { box-shadow: var(--notif-shadow-hover); transform: translateY(-2px); }
 
         .notif-card.no-leida { border-left-width: 3px; border-left-style: solid; }
-        .notif-card.no-leida.tipo-cita        { border-left-color: var(--c-cita-accent);   }
-        .notif-card.no-leida.tipo-vacuna       { border-left-color: var(--c-vacuna-accent); }
-        .notif-card.no-leida.tipo-tratamiento  { border-left-color: var(--c-trat-accent);   }
+        .notif-card.no-leida.tipo-cita             { border-left-color: var(--c-cita-accent);   }
+        .notif-card.no-leida.tipo-vacuna           { border-left-color: var(--c-vacuna-accent); }
+        .notif-card.no-leida.tipo-tratamiento      { border-left-color: var(--c-trat-accent);   }
+        .notif-card.no-leida.tipo-seguimiento      { border-left-color: #198754; }
+        .notif-card.no-leida.tipo-acceso_historial { border-left-color: #ffc107; }
+        .notif-card.no-leida.tipo-general          { border-left-color: #6c757d; }
 
         .notif-card.leida { opacity: .65; }
         .notif-card.leida:hover { opacity: 1; }
@@ -158,9 +161,12 @@
             font-size: 1.15rem; color: #fff; flex-shrink: 0;
         }
 
-        .tipo-cita        .notif-icon-wrap { background: var(--c-cita-accent);   }
-        .tipo-vacuna      .notif-icon-wrap { background: var(--c-vacuna-accent);  }
-        .tipo-tratamiento .notif-icon-wrap { background: var(--c-trat-accent);    }
+        .tipo-cita             .notif-icon-wrap { background: var(--c-cita-accent);   }
+        .tipo-vacuna           .notif-icon-wrap { background: var(--c-vacuna-accent);  }
+        .tipo-tratamiento      .notif-icon-wrap { background: var(--c-trat-accent);    }
+        .tipo-seguimiento      .notif-icon-wrap { background: #198754; }
+        .tipo-acceso_historial .notif-icon-wrap { background: #ffc107; color: #212529 !important; }
+        .tipo-general          .notif-icon-wrap { background: #6c757d; }
 
         /* ── Cuerpo ─────────────────────────────────────────────────── */
         .notif-body { flex: 1; min-width: 0; }
@@ -180,9 +186,12 @@
             padding: 2px 9px; border-radius: var(--notif-radius-pill);
         }
 
-        .tipo-cita        .notif-pill { background: var(--c-cita-soft);   color: var(--c-cita-text);   }
-        .tipo-vacuna      .notif-pill { background: var(--c-vacuna-soft);  color: var(--c-vacuna-text); }
-        .tipo-tratamiento .notif-pill { background: var(--c-trat-soft);    color: var(--c-trat-text);   }
+        .tipo-cita             .notif-pill { background: var(--c-cita-soft);   color: var(--c-cita-text);   }
+        .tipo-vacuna           .notif-pill { background: var(--c-vacuna-soft);  color: var(--c-vacuna-text); }
+        .tipo-tratamiento      .notif-pill { background: var(--c-trat-soft);    color: var(--c-trat-text);   }
+        .tipo-seguimiento      .notif-pill { background: #e6f4ed; color: #146c43; }
+        .tipo-acceso_historial .notif-pill { background: #fff3cd; color: #856404; }
+        .tipo-general          .notif-pill { background: #e9ecef; color: #495057; }
 
         .notif-time { font-size: .78rem; color: var(--c-text-hint); white-space: nowrap; }
 

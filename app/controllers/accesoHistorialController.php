@@ -200,8 +200,8 @@ if ($uri === '/veterinaria/api/historial/acceso/rechazar' && $method === 'POST')
 ────────────────────────────────────────────────────────────── */
 
 /**
- * Inserta una notificación en la tabla `notificaciones` para el veterinario.
- * Usa la estructura: usuario_id, tipo, mensaje, leido, estado, canal, referencia_id
+ * Crea una notificación en la tabla canónica `notificacion` para el veterinario
+ * que atendió por última vez a la mascota.
  */
 function _crearNotificacionVeterinario(
     int $id_acceso,
@@ -210,14 +210,11 @@ function _crearNotificacionVeterinario(
     array $mascota,
     AccesoHistorial $modelo
 ): void {
-    global $db;
-
     try {
-        require_once BASE_PATH . '/app/models/Database.php';
-        $db = Database::getConnection();
+        $cnx = (new Conexion())->getConexion();
 
         /* Obtener el veterinario asignado a la mascota (último que atendió) */
-        $stmt = $db->prepare(
+        $stmt = $cnx->prepare(
             "SELECT DISTINCT hc.id_usuario_veterinario
              FROM historial_clinico hc
              WHERE hc.id_paciente = :pac
@@ -227,26 +224,29 @@ function _crearNotificacionVeterinario(
         $stmt->execute([':pac' => $id_paciente]);
         $id_vet_usuario = $stmt->fetchColumn();
 
-        if (!$id_vet_usuario) return; /* Sin veterinario asignado, no se puede notificar */
+        if (!$id_vet_usuario) return;
 
-        $nombre_mascota    = $mascota['nombre'] ?? 'la mascota';
-        $nombre_propietario= trim(($mascota['propietario_nombres'] ?? '') . ' ' . ($mascota['propietario_apellidos'] ?? ''));
+        $nombre_mascota     = $mascota['nombre'] ?? 'la mascota';
+        $nombre_propietario = trim(
+            ($mascota['propietario_nombres']   ?? '') . ' ' .
+            ($mascota['propietario_apellidos'] ?? '')
+        );
         $mensaje = "El propietario {$nombre_propietario} solicita acceso al historial clínico de {$nombre_mascota}.";
 
-        $ins = $db->prepare(
-            "INSERT INTO notificaciones
-                 (usuario_id, tipo, mensaje, leido, referencia_id, fecha)
-             VALUES
-                 (:uid, 'acceso_historial', :msg, 0, :ref, NOW())"
-        );
-        $ins->execute([
-            ':uid' => $id_vet_usuario,
-            ':msg' => $mensaje,
-            ':ref' => $id_acceso,
+        require_once BASE_PATH . '/app/models/Notificacion.php';
+        $notifModel = new Notificacion();
+        $id_notif   = $notifModel->crear([
+            'id_usuario'  => (int) $id_vet_usuario,
+            'tipo'        => 'acceso_historial',
+            'titulo'      => 'Solicitud de acceso al historial',
+            'mensaje'     => $mensaje,
+            'url_accion'  => '/veterinaria/historial/acceso/pendientes',
+            'id_paciente' => $id_paciente,
         ]);
 
-        $id_notif = (int) $db->lastInsertId();
-        $modelo->vincularNotificacion($id_acceso, $id_notif);
+        if ($id_notif) {
+            $modelo->vincularNotificacion($id_acceso, $id_notif);
+        }
 
     } catch (\Exception $e) {
         error_log('accesoHistorialController: error al crear notificación vet - ' . $e->getMessage());
@@ -254,7 +254,8 @@ function _crearNotificacionVeterinario(
 }
 
 /**
- * Inserta una notificación en la tabla `notificaciones` para el propietario.
+ * Crea una notificación en la tabla canónica `notificacion` para el propietario
+ * informándole el resultado de su solicitud de acceso al historial.
  */
 function _notificarPropietario(
     int    $id_propietario,
@@ -264,11 +265,10 @@ function _notificarPropietario(
     string $motivo = ''
 ): void {
     try {
-        require_once BASE_PATH . '/app/models/Database.php';
-        $db2 = Database::getConnection();
+        $cnx = (new Conexion())->getConexion();
 
         /* Obtener id_usuario del propietario */
-        $stmt = $db2->prepare(
+        $stmt = $cnx->prepare(
             "SELECT id_usuario FROM propietarios WHERE id_propietario = :id LIMIT 1"
         );
         $stmt->execute([':id' => $id_propietario]);
@@ -276,7 +276,7 @@ function _notificarPropietario(
         if (!$id_usuario_prop) return;
 
         /* Nombre de la mascota */
-        $stmt2 = $db2->prepare("SELECT nombre FROM pacientes WHERE id_paciente = :id LIMIT 1");
+        $stmt2 = $cnx->prepare("SELECT nombre FROM pacientes WHERE id_paciente = :id LIMIT 1");
         $stmt2->execute([':id' => $id_paciente]);
         $nombre_mascota = $stmt2->fetchColumn() ?: 'tu mascota';
 
@@ -287,21 +287,22 @@ function _notificarPropietario(
                 48     => '48 horas',
                 default=> '24 horas',
             };
+            $titulo  = 'Acceso al historial aprobado';
             $mensaje = "Tu solicitud de acceso al historial clínico de {$nombre_mascota} fue aprobada por {$label}.";
         } else {
+            $titulo  = 'Solicitud de historial rechazada';
             $mensaje = "Tu solicitud de acceso al historial clínico de {$nombre_mascota} fue rechazada."
                      . ($motivo ? " Motivo: {$motivo}" : '');
         }
 
-        $db2->prepare(
-            "INSERT INTO notificaciones
-                 (usuario_id, tipo, mensaje, leido, referencia_id, fecha)
-             VALUES
-                 (:uid, 'acceso_historial_respuesta', :msg, 0, :ref, NOW())"
-        )->execute([
-            ':uid' => $id_usuario_prop,
-            ':msg' => $mensaje,
-            ':ref' => $id_paciente,
+        require_once BASE_PATH . '/app/models/Notificacion.php';
+        (new Notificacion())->crear([
+            'id_usuario'  => (int) $id_usuario_prop,
+            'tipo'        => 'acceso_historial_respuesta',
+            'titulo'      => $titulo,
+            'mensaje'     => $mensaje,
+            'url_accion'  => '/paciente/mascotas/' . $id_paciente . '/historial',
+            'id_paciente' => $id_paciente,
         ]);
 
     } catch (\Exception $e) {

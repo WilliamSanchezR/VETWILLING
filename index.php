@@ -112,7 +112,7 @@ switch ($request) {
 
     case "/veterinario/api/notificaciones":
     case "/veterinaria/api/notificaciones":
-        require BASE_PATH . "/app/controllers/NotificacioneController.php";
+        require BASE_PATH . "/app/controllers/api/notificaciones_api.php";
         break;
 
     case "/veterinario/agregar-disponibilidad-agenda":
@@ -646,15 +646,12 @@ switch ($request) {
     case "/cliente/actualizar-contrasena":
         require BASE_PATH . "/app/controllers/usuarioController.php";
         break;
-    case "/paciente/api/notificaciones":
-        require BASE_PATH . "/app/controllers/NotificacioneController.php";
-        break;
     case "/preferencias-notificacion":
         require BASE_PATH .
             "/app/controllers/preferenciasNotificacionController.php";
         break;
     case "/representante/api/notificaciones":
-        require BASE_PATH . "/app/controllers/NotificacioneController.php";
+        require BASE_PATH . "/app/controllers/api/notificaciones_api.php";
         break;
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//

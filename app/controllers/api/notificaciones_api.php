@@ -10,8 +10,10 @@
  * Formato B (notificaciones-paciente.js) → ?accion=listar | leida | todas | stream
  */
 
+ob_start();
 require_once BASE_PATH . '/app/helpers/session_helper.php';
 require_once BASE_PATH . '/app/models/Notificacion.php';
+ob_end_clean();
 
 header('Content-Type: application/json');
 
@@ -58,9 +60,32 @@ switch ($action) {
 
         // Normalizar campos para que el JS los entienda
         $notificaciones = array_map(function ($n) {
+            $colorMap = [
+                'cita'             => 'azul',
+                'vacuna'           => 'rojo',
+                'seguimiento'      => 'verde',
+                'acceso_historial' => 'naranja',
+                'general'          => 'azul',
+            ];
+            $iconoMap = [
+                'cita'             => 'bi bi-calendar-check',
+                'vacuna'           => 'bi bi-syringe',
+                'seguimiento'      => 'bi bi-activity',
+                'acceso_historial' => 'bi bi-file-earmark-text',
+                'general'          => 'bi bi-bell',
+            ];
+            $tipo   = $n['tipo'] ?? 'general';
+            $fecha  = new DateTime($n['fecha_creacion']);
+            $diff   = time() - $fecha->getTimestamp();
+            if ($diff < 60)      $tiempo = 'Hace un momento';
+            elseif ($diff < 3600)  $tiempo = 'Hace ' . floor($diff / 60)   . ' min';
+            elseif ($diff < 86400) $tiempo = 'Hace ' . floor($diff / 3600) . ' h';
+            elseif ($diff < 604800) $tiempo = 'Hace ' . floor($diff / 86400) . ' días';
+            else                    $tiempo = $fecha->format('d/m/Y');
+
             return [
                 'id'             => $n['id_notificacion'],
-                'tipo'           => $n['tipo'],
+                'tipo'           => $tipo,
                 'titulo'         => $n['titulo'],
                 'mensaje'        => $n['mensaje'],
                 'leido'          => (bool)$n['leida'],
@@ -69,6 +94,9 @@ switch ($action) {
                 'fecha_creacion' => $n['fecha_creacion'],
                 'url_accion'     => $n['url_accion'],
                 'id_paciente'    => $n['id_paciente'],
+                'color'          => $colorMap[$tipo] ?? 'azul',
+                'icono'          => $iconoMap[$tipo] ?? 'bi bi-bell',
+                'tiempo'         => $tiempo,
             ];
         }, $filas);
 
@@ -139,21 +167,6 @@ switch ($action) {
             'status'   => 'success',
             'sin_leer' => $modelo->contarNoLeidas($id_usuario),
         ]);
-        break;
-
-    // ── Stream SSE (notificaciones-paciente.js lo pide) ───────────────────────
-    // Por ahora retorna vacío — implementar con SSE real si se necesita
-    case 'stream':
-        header('Content-Type: text/event-stream');
-        header('Cache-Control: no-cache');
-        header('X-Accel-Buffering: no');
-
-        $sinLeer = $modelo->contarNoLeidas($id_usuario);
-        $data    = json_encode(['notificaciones' => [], 'sin_leer' => $sinLeer]);
-
-        echo "event: notify\n";
-        echo "data: {$data}\n\n";
-        flush();
         break;
 
     default:

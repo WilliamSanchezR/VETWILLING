@@ -354,7 +354,7 @@ class Eventos
     public function obtenerDetallesCita($id_agendamiento)
     {
         try {
-            $consulta = "SELECT 
+            $consulta = "SELECT
                             a.id_agendamiento,
                             a.tipo,
                             a.observaciones,
@@ -363,6 +363,7 @@ class Eventos
                             a.estado,
                             prop.id_propietario,
                             CONCAT(prop.nombres, ' ', prop.apellidos) as nombre_propietario,
+                            u.id_usuario as id_usuario_propietario,
                             u.email as email_propietario,
                             pac.id_paciente,
                             pac.nombre as nombre_mascota,
