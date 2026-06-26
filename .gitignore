@@ -77,3 +77,5 @@ bootstrap.php
 docs/
 # Excepción: mantener el README principal si existe
 !README.md
+AUDITORIA_NOTIFICACIONES_VETWILLING.md
+informe_proyecto.html

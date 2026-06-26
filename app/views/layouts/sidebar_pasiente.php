@@ -7,6 +7,7 @@
 <!-- SIDEBAR PC — se oculta en móvil via CSS -->
 <aside class="sidebar" id="sidebar">
 
+    <!-- ► HEADER: no se modifica, usa tus logos originales -->
     <div class="sidebar-header">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-NEGATIVO.png"
             alt="VetWilling"
@@ -16,40 +17,62 @@
             class="sidebar-logo-icon">
     </div>
 
+    <!-- ► NAV: rediseñado con contenedor de ícono -->
     <nav class="sidebar-nav">
         <div class="nav-section">
+
             <span class="nav-section-title">General</span>
 
-            <a href="<?= BASE_URL ?>/cliente/dashboard" class="nav-item" data-section="dashboard" data-tooltip="Inicio">
-                <i class="bi bi-house-door"></i>
+            <a href="<?= BASE_URL ?>/cliente/dashboard"
+               class="nav-item"
+               data-section="dashboard"
+               data-tooltip="Inicio">
+                <div class="nav-icon"><i class="bi bi-house-door"></i></div>
                 <span class="nav-text">Inicio</span>
             </a>
-            <a href="<?= BASE_URL ?>/cliente/mascotas" class="nav-item" data-section="mascotas" data-tooltip="Mascotas">
-                <i class="bi bi-bluesky"></i>
+
+            <a href="<?= BASE_URL ?>/cliente/mascotas"
+               class="nav-item"
+               data-section="mascotas"
+               data-tooltip="Mis Mascotas">
+                <div class="nav-icon"><i class="bi bi-bluesky"></i></div>
                 <span class="nav-text">Mis Mascotas</span>
             </a>
-            <a href="<?= BASE_URL ?>/cliente/citas" class="nav-item" data-section="citas" data-tooltip="Citas">
-                <i class="bi bi-calendar-check"></i>
+
+            <a href="<?= BASE_URL ?>/cliente/citas"
+               class="nav-item"
+               data-section="citas"
+               data-tooltip="Citas">
+                <div class="nav-icon"><i class="bi bi-calendar-check"></i></div>
                 <span class="nav-text">Citas</span>
             </a>
-            <a href="<?= BASE_URL ?>/cliente/tienda" class="nav-item" data-section="tienda" data-tooltip="Catalogo">
-                <i class="bi bi-bag-plus"></i>
-                <span class="nav-text">Catalogo</span>
+
+            <a href="<?= BASE_URL ?>/cliente/tienda"
+               class="nav-item"
+               data-section="tienda"
+               data-tooltip="Catálogo">
+                <div class="nav-icon"><i class="bi bi-bag-plus"></i></div>
+                <span class="nav-text">Catálogo</span>
             </a>
 
             <span class="nav-section-title">Comunicación</span>
 
-            <a href="<?= BASE_URL ?>/cliente/notificaciones" class="nav-item" data-section="tienda" data-tooltip="Catalogo">
-                <i class="bi bi-bag-plus"></i>
+            <a href="<?= BASE_URL ?>/cliente/notificaciones"
+               class="nav-item"
+               data-section="notificaciones"
+               data-tooltip="Notificaciones">
+                <div class="nav-icon"><i class="bi bi-bell"></i></div>
                 <span class="nav-text">Notificaciones</span>
             </a>
+
         </div>
     </nav>
 
     <!-- Toggle solo PC -->
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar" type="button">
-        <i class="bi bi-list"></i>
+        <i class="bi bi-chevron-left"></i>
     </button>
+
 </aside>
 
 <!-- ============================================================
@@ -62,6 +85,7 @@
 <!-- Panel lateral móvil (desliza desde la izquierda) -->
 <div class="mobile-panel" id="mobilePanel" role="dialog" aria-modal="true" aria-label="Menú de navegación">
 
+    <!-- ► HEADER MÓVIL: usa tu logo positivo original -->
     <div class="mobile-panel-header">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-POSITIVO.png"
             alt="VetWilling"
@@ -71,30 +95,39 @@
         </button>
     </div>
 
+    <!-- ► NAV MÓVIL -->
     <nav class="mobile-panel-nav">
+
         <span class="mobile-nav-section-title">General</span>
 
         <a href="<?= BASE_URL ?>/cliente/dashboard" class="mobile-nav-item" data-section="dashboard">
-            <i class="bi bi-house-door"></i>
+            <div class="mobile-nav-icon"><i class="bi bi-house-door"></i></div>
             <span>Inicio</span>
         </a>
         <a href="<?= BASE_URL ?>/cliente/mascotas" class="mobile-nav-item" data-section="mascotas">
-            <i class="bi bi-bluesky"></i>
+            <div class="mobile-nav-icon"><i class="bi bi-bluesky"></i></div>
             <span>Mis Mascotas</span>
         </a>
         <a href="<?= BASE_URL ?>/cliente/citas" class="mobile-nav-item" data-section="citas">
-            <i class="bi bi-calendar-check"></i>
+            <div class="mobile-nav-icon"><i class="bi bi-calendar-check"></i></div>
             <span>Citas</span>
         </a>
         <a href="<?= BASE_URL ?>/cliente/tienda" class="mobile-nav-item" data-section="tienda">
-            <i class="bi bi-bag-plus"></i>
-            <span>Tienda</span>
+            <div class="mobile-nav-icon"><i class="bi bi-bag-plus"></i></div>
+            <span>Catálogo</span>
         </a>
+
+        <span class="mobile-nav-section-title">Comunicación</span>
+
+        <a href="<?= BASE_URL ?>/cliente/notificaciones" class="mobile-nav-item" data-section="notificaciones">
+            <div class="mobile-nav-icon"><i class="bi bi-bell"></i></div>
+            <span>Notificaciones</span>
+        </a>
+
     </nav>
 </div>
 
-
-<!-- Burbuja flotante (abajo a la derecha) — solo visible en móvil -->
+<!-- Burbuja flotante — solo visible en móvil -->
 <button
     type="button"
     class="fab-menu"
@@ -106,29 +139,34 @@
 </button>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
 
         /* ── Referencias ── */
-        var sidebar = document.getElementById('sidebar');
+        var sidebar       = document.getElementById('sidebar');
         var sidebarToggle = document.getElementById('sidebarToggle');
-        var fabMenu = document.getElementById('fabMenu');
-        var fabIcon = document.getElementById('fabIcon');
-        var mobilePanel = document.getElementById('mobilePanel');
+        var fabMenu       = document.getElementById('fabMenu');
+        var fabIcon       = document.getElementById('fabIcon');
+        var mobilePanel   = document.getElementById('mobilePanel');
         var mobileOverlay = document.getElementById('mobileOverlay');
-        var panelClose = document.getElementById('mobilePanelClose');
+        var panelClose    = document.getElementById('mobilePanelClose');
 
-        /* ── Helpers ── */
-        function isMobile() {
-            return window.innerWidth <= 768;
-        }
+        /* ── Helper ── */
+        function isMobile() { return window.innerWidth <= 768; }
 
         /* ══════════════════════════════════════
            PC: toggle colapsar / expandir sidebar
            ══════════════════════════════════════ */
-        sidebarToggle?.addEventListener('click', function() {
+        sidebarToggle?.addEventListener('click', function () {
             if (isMobile()) return;
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            /* Rotar ícono del toggle */
+            var icon = sidebarToggle.querySelector('i');
+            if (icon) {
+                icon.className = sidebar.classList.contains('collapsed')
+                    ? 'bi bi-chevron-right'
+                    : 'bi bi-chevron-left';
+            }
         });
 
         /* ══════════════════════════════════════
@@ -150,7 +188,7 @@
             fabIcon.className = 'bi bi-grid-fill';
         }
 
-        fabMenu?.addEventListener('click', function() {
+        fabMenu?.addEventListener('click', function () {
             mobilePanel.classList.contains('open') ? cerrarPanel() : abrirPanel();
         });
 
@@ -158,14 +196,14 @@
         mobileOverlay?.addEventListener('click', cerrarPanel);
 
         /* Cerrar con Escape */
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') cerrarPanel();
         });
 
         /* ══════════════════════════════════════
-           Resize: limpiar estados correctamente
+           Resize: limpiar estados
            ══════════════════════════════════════ */
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             if (!isMobile()) {
                 cerrarPanel();
                 var wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
@@ -181,24 +219,20 @@
         if (!isMobile()) {
             var wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             sidebar?.classList.toggle('collapsed', wasCollapsed);
-        } else {
-            sidebar?.classList.remove('collapsed');
+            /* Ícono correcto al cargar */
+            var icon = sidebarToggle?.querySelector('i');
+            if (icon && wasCollapsed) icon.className = 'bi bi-chevron-right';
         }
 
         /* ══════════════════════════════════════
            Marcar ítem activo según URL actual
            ══════════════════════════════════════ */
         var currentPath = window.location.pathname;
-        document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(function(link) {
-            if (currentPath.includes(link.dataset.section)) {
+        document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(function (link) {
+            if (link.dataset.section && currentPath.includes(link.dataset.section)) {
                 link.classList.add('active');
             }
         });
 
     });
-
-    /* Nota: el listener de sidebarToggle vive únicamente dentro de DOMContentLoaded
-       (arriba). El bloque redundante que existía aquí fue eliminado porque
-       'sidebarToggle' era undefined en este scope (var declarado dentro del callback)
-       y con optional-chaining (?.) era un no-op silencioso. */
 </script>
