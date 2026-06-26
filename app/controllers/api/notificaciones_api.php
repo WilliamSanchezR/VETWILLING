@@ -10,8 +10,10 @@
  * Formato B (notificaciones-paciente.js) → ?accion=listar | leida | todas | stream
  */
 
+ob_start();
 require_once BASE_PATH . '/app/helpers/session_helper.php';
 require_once BASE_PATH . '/app/models/Notificacion.php';
+ob_end_clean();
 
 header('Content-Type: application/json');
 
