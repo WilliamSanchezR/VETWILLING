@@ -295,15 +295,8 @@
     }
 
     function connectNotificationStream() {
-        if (!window.EventSource) return;
-        requestNotificationPermission();
-
-        const source = new EventSource(`${API_URL}?accion=stream`);
-        source.addEventListener('notify', handleNotificationStreamEvent);
-        source.onerror = () => {
-            source.close();
-            setTimeout(connectNotificationStream, 10000);
-        };
+        // SSE eliminado (Opción B): el polling cada 30 s es suficiente en Apache/XAMPP.
+        // Ver: fix/consolidacion-notificaciones
     }
 
     async function markRead(id) {

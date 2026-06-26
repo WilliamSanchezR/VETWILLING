@@ -445,31 +445,7 @@ class PanelSuperiorRepresentante {
     }
 
     async connectNotificationStream() {
-        if (!window.EventSource) {
-            setInterval(() => this.loadNotifications(), 30000);
-            return;
-        }
-
-        const streamUrl = `${this.notificationsApiUrl}?accion=stream`;
-        const source = new EventSource(streamUrl);
-
-        source.addEventListener('notify', event => {
-            try {
-                const data = JSON.parse(event.data);
-                if (Array.isArray(data.notificaciones) && data.notificaciones.length > 0) {
-                    this.notifications = this.notifications.concat(data.notificaciones);
-                    this.renderNotifications(this.notifications);
-                }
-                this.updateBadge(Number.isInteger(data.no_leidas) ? data.no_leidas : 0);
-            } catch (error) {
-                console.error('Error parseando stream de notificaciones representante:', error);
-            }
-        });
-
-        source.onerror = () => {
-            source.close();
-            setTimeout(() => this.connectNotificationStream(), 10000);
-        };
+        setInterval(() => this.loadNotifications(), 30000);
     }
 
     async marcarTodasLeidas() {

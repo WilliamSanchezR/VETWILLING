@@ -351,29 +351,8 @@
     }
 
     function connectNotificationStream() {
-        if (!window.EventSource) {
-            setInterval(cargarNotificacionesDropdown, 30000);
-            return;
-        }
-
         requestBrowserNotificationPermission();
-
-        const streamUrl = `${notificationsApiUrl}?accion=stream`;
-        let source = new EventSource(streamUrl);
-
-        source.addEventListener('notify', event => {
-            try {
-                const data = JSON.parse(event.data);
-                handleNotificationEvent(data);
-            } catch (error) {
-                console.error('Error parsing notification stream data:', error);
-            }
-        });
-
-        source.onerror = () => {
-            source.close();
-            setTimeout(connectNotificationStream, 10000);
-        };
+        setInterval(cargarNotificacionesDropdown, 30000);
     }
 
     if (btnNotif && panelNotif) {

@@ -141,21 +141,6 @@ switch ($action) {
         ]);
         break;
 
-    // ── Stream SSE (notificaciones-paciente.js lo pide) ───────────────────────
-    // Por ahora retorna vacío — implementar con SSE real si se necesita
-    case 'stream':
-        header('Content-Type: text/event-stream');
-        header('Cache-Control: no-cache');
-        header('X-Accel-Buffering: no');
-
-        $sinLeer = $modelo->contarNoLeidas($id_usuario);
-        $data    = json_encode(['notificaciones' => [], 'sin_leer' => $sinLeer]);
-
-        echo "event: notify\n";
-        echo "data: {$data}\n\n";
-        flush();
-        break;
-
     default:
         http_response_code(400);
         echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => 'Acción no reconocida: ' . htmlspecialchars($action)]);
