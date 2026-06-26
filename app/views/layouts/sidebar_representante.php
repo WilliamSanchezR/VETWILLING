@@ -40,6 +40,13 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                 <span class="nav-text">Inicio</span>
             </a>
 
+            <a href="<?= BASE_URL ?>/directorio"
+                class="nav-item <?= $final_path == 'directorio' ? 'active' : '' ?>"
+                data-section="directorio" data-tooltip-menu="Directorio">
+                <i class="bi bi-people-fill"></i>
+                <span class="nav-text">Directorio</span>
+            </a>
+
             <!-- GESTION COMO ADMINISTRADOR -->
             <div class="submenu">
                 <div class="submenu-toggle" data-tooltip-menu="Gestión Administrador">
@@ -178,6 +185,12 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
                             data-section="reportes">
                             <i class="bi bi-box-seam"></i>
                             <span class="nav-text">Reportes Inventario</span>
+                        </a></li>
+                    <li><a href="<?= BASE_URL ?>/representante/historial-ventas"
+                            class="nav-item <?= $final_path == 'historial-ventas' ? 'active' : '' ?>"
+                            data-section="reportes">
+                            <i class="bi bi-receipt-cutoff"></i>
+                            <span class="nav-text">Historial de Ventas</span>
                         </a></li>
                 </ul>
             </div>

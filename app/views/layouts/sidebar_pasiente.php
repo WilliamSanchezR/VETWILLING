@@ -54,6 +54,10 @@
                 <div class="nav-icon"><i class="bi bi-bag-plus"></i></div>
                 <span class="nav-text">Catálogo</span>
             </a>
+            <a href="<?= BASE_URL ?>/directorio" class="nav-item" data-section="directorio" data-tooltip="Directorio">
+                <i class="bi bi-people-fill"></i>
+                <span class="nav-text">Directorio</span>
+            </a>
 
             <span class="nav-section-title">Comunicación</span>
 
@@ -124,6 +128,10 @@
             <span>Notificaciones</span>
         </a>
 
+        <a href="<?= BASE_URL ?>/directorio" class="mobile-nav-item" data-section="directorio">
+            <i class="bi bi-people-fill"></i>
+            <span>Directorio</span>
+        </a>
     </nav>
 </div>
 

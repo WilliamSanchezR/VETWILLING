@@ -161,7 +161,7 @@ class Venta
     /**
      * Lista ventas de una veterinaria con filtros opcionales.
      */
-    public function listarVentas(int $id_veterinaria, ?string $fecha_inicio = null, ?string $fecha_fin = null): array
+    public function listarVentas(int $id_veterinaria, ?string $fecha_inicio = null, ?string $fecha_fin = null, ?int $id_cliente = null, ?string $producto = null, ?string $estado = 'todos'): array
     {
         try {
             $sql = "SELECT v.id_venta, v.id_cliente, v.subtotal, v.descuento, v.impuesto, v.total, 
@@ -179,6 +179,25 @@ class Venta
                 $params[':fecha_fin'] = $fecha_fin;
             }
 
+            if ($id_cliente !== null && $id_cliente > 0) {
+                $sql .= " AND v.id_cliente = :id_cliente";
+                $params[':id_cliente'] = $id_cliente;
+            }
+
+            if (!empty($producto)) {
+                // Sub-query: venta must have at least one item whose product name matches
+                $sql .= " AND v.id_venta IN (
+                            SELECT dv.id_venta FROM detalle_venta dv
+                            INNER JOIN producto pr ON dv.id_inventario = pr.id_inventario
+                            WHERE pr.nombre LIKE :producto)";
+                $params[':producto'] = '%' . $producto . '%';
+            }
+
+            if (!empty($estado) && $estado !== 'todos') {
+                $sql .= " AND COALESCE(v.estado, 'completada') = :estado";
+                $params[':estado'] = $estado;
+            }
+
             $sql .= " ORDER BY v.fecha_venta DESC";
 
             $stmt = $this->conexion->prepare($sql);
@@ -191,6 +210,66 @@ class Venta
 
         } catch (PDOException $e) {
             error_log('Error en Venta::listarVentas - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Resumen agregado de ventas para el período (totales y conteo).
+     */
+    public function obtenerResumenVentas(int $id_veterinaria, ?string $fecha_inicio = null, ?string $fecha_fin = null, ?int $id_cliente = null, ?string $producto = null, ?string $estado = 'todos'): array
+    {
+        try {
+            $sql = "SELECT COUNT(*) AS total_ventas,
+                           COALESCE(SUM(v.total), 0) AS monto_total,
+                           COALESCE(SUM(v.descuento), 0) AS total_descuentos,
+                           COALESCE(SUM(v.impuesto), 0) AS total_impuestos,
+                           COALESCE(AVG(v.total), 0) AS promedio_venta
+                    FROM venta v
+                    WHERE v.id_veterinaria = :id_veterinaria";
+
+            $params = [':id_veterinaria' => $id_veterinaria];
+
+            if ($fecha_inicio && $fecha_fin) {
+                $sql .= " AND DATE(v.fecha_venta) BETWEEN :fecha_inicio AND :fecha_fin";
+                $params[':fecha_inicio'] = $fecha_inicio;
+                $params[':fecha_fin'] = $fecha_fin;
+            }
+
+            $stmt = $this->conexion->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        } catch (PDOException $e) {
+            error_log('Error en Venta::obtenerResumenVentas - ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Lista de propietarios que han realizado compras en esta veterinaria.
+     */
+    public function listarClientesConVentas(int $id_veterinaria): array
+    {
+        try {
+            $sql = "SELECT DISTINCT p.id_propietario, p.nombre
+                    FROM venta v
+                    INNER JOIN propietario p ON v.id_cliente = p.id_propietario
+                    WHERE v.id_veterinaria = :id_veterinaria
+                    ORDER BY p.nombre ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        } catch (PDOException $e) {
+            error_log('Error en Venta::listarClientesConVentas - ' . $e->getMessage());
             return [];
         }
     }
