@@ -1,0 +1,126 @@
+/* ── Medios de Envío — estilos del panel admin ─────────────── */
+
+/* Tarjetas de canal (Tab 1) */
+.canal-card {
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    transition: box-shadow .2s;
+}
+.canal-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+
+.canal-card .canal-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    background: #e8f5e9;
+    color: #007832;
+}
+
+.canal-card .badge-estado {
+    font-size: .75rem;
+    padding: .35em .65em;
+    border-radius: 6px;
+}
+
+/* Toggle switch para habilitar/deshabilitar */
+.form-switch .form-check-input {
+    cursor: pointer;
+    width: 3em;
+    height: 1.5em;
+}
+.form-switch .form-check-input:checked { background-color: #007832; border-color: #007832; }
+
+/* Tarjetas de formulario (Tab 2) */
+.canal-config-card {
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+.canal-config-card .card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 12px 12px 0 0;
+    padding: .85rem 1.25rem;
+}
+
+/* Botones de selección de canal (Tab 2) */
+.btn-canal-sel {
+    border-radius: 8px;
+    font-size: .85rem;
+    padding: .4rem .85rem;
+    border: 1px solid #ced4da;
+    background: #fff;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+}
+.btn-canal-sel:hover,
+.btn-canal-sel.activo {
+    background: #007832;
+    color: #fff;
+    border-color: #007832;
+}
+
+/* Variables disponibles (Tab 3) */
+.vars-badge-list { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .25rem; }
+.var-badge {
+    font-size: .78rem;
+    background: #e8f5e9;
+    color: #007832;
+    border: 1px solid #a5d6a7;
+    border-radius: 6px;
+    padding: .2em .55em;
+    cursor: pointer;
+    font-family: monospace;
+    transition: background .15s;
+}
+.var-badge:hover { background: #007832; color: #fff; }
+
+/* Tabla de fallos (Tab 4) */
+.tabla-admin {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .88rem;
+}
+.tabla-admin th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    padding: .65rem .85rem;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.tabla-admin td {
+    padding: .6rem .85rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+}
+.tabla-admin tbody tr:hover { background: #f8fffe; }
+
+.badge-fallido  { background: #f8d7da; color: #842029; }
+.badge-exitoso  { background: #d1e7dd; color: #0a3622; }
+.badge-pendiente{ background: #fff3cd; color: #664d03; }
+
+/* Tarjetas de resumen de monitoreo */
+.card-resumen {
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    text-align: center;
+    padding: 1rem .75rem;
+}
+.card-resumen .cifra {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+.card-resumen .cifra.danger  { color: #dc3545; }
+.card-resumen .cifra.success { color: #007832; }
+.card-resumen .cifra.warning { color: #fd7e14; }
+.card-resumen .etiqueta { font-size: .8rem; color: #6c757d; }
+
+/* Toast */
+#toastMensaje.bg-success { --bs-bg-opacity: .9; }
+#toastMensaje.bg-danger  { --bs-bg-opacity: .9; }
