@@ -6,7 +6,8 @@
  * ═══════════════════════════════════════════════════════════════════
  */
 
-session_start();
+require_once BASE_PATH . '/app/helpers/session_helper.php';
+initSession();
 
 require_once __DIR__ . '/../models/usuario.php';
 require_once __DIR__ . '/../models/Notificacion.php';
@@ -149,6 +150,17 @@ function actualizarPreferencia()
         $resultado = $modeloUsuario->actualizarPreferenciaNotificacion($id_usuario, $preferencia);
 
         if ($resultado) {
+            // Sincronizar con el archivo JSON para mantener consistencia
+            try {
+                if (!class_exists('PreferenciasManager')) {
+                    require_once __DIR__ . '/../services/PreferenciasManager.php';
+                }
+                $pm = new PreferenciasManager($id_usuario);
+                $pm->guardar(['notificaciones' => $preferencia]);
+            } catch (\Throwable $e) {
+                error_log('preferenciasNotificacion: no se pudo sincronizar JSON — ' . $e->getMessage());
+            }
+
             header('Content-Type: application/json; charset=utf-8');
             http_response_code(200);
             echo json_encode([
@@ -223,11 +235,9 @@ function obtenerNotificaciones()
 
         $id_usuario = $_SESSION['user']['id_usuario'];
         $limite = isset($_GET['limite']) ? max(1, min((int) $_GET['limite'], 100)) : 20;
-        $pagina = isset($_GET['pagina']) ? max(1, (int) $_GET['pagina']) : 1;
-        $offset = ($pagina - 1) * $limite;
 
         $modeloNotificacion = new Notificacion();
-        $notificaciones = $modeloNotificacion->obtenerPorUsuario($id_usuario, $limite, $offset);
+        $notificaciones = $modeloNotificacion->listarParaUsuario($id_usuario, $limite);
         $noLeidas = $modeloNotificacion->contarNoLeidas($id_usuario);
 
         header('Content-Type: application/json; charset=utf-8');
@@ -235,7 +245,6 @@ function obtenerNotificaciones()
             'status' => 'success',
             'notificaciones' => $notificaciones,
             'no_leidas' => $noLeidas,
-            'pagina' => $pagina,
             'limite' => $limite
         ], JSON_UNESCAPED_UNICODE);
         exit();

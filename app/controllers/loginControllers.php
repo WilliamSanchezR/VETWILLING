@@ -72,6 +72,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'estado' => $resultado['estado'],
     ];
 
+    // Cargar preferencias del usuario al iniciar sesión
+    if ((int)$resultado['id_rol'] === 3) {
+        if (!class_exists('PreferenciasManager')) {
+            require_once __DIR__ . '/../services/PreferenciasManager.php';
+        }
+        $_pm_login = new PreferenciasManager((int)$resultado['id_usuario']);
+        $_prefs_login = $_pm_login->obtener();
+        $_SESSION['lang'] = $_prefs_login['idioma'];
+        $_SESSION['user']['tema'] = $_prefs_login['tema'];
+    }
+
     $rol = $resultado['id_rol'];
 
     // Validamos si el usuario retorna mas de un id_veterinaria (caso veterinarios asociados a varias veterinarias)

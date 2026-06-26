@@ -1,123 +1,132 @@
 <?php
 
 /**
- * Helper de Notificaciones
- * Fachada de alto nivel para disparar notificaciones desde cualquier controlador.
- * Usa function_exists para ser seguro ante inclusiones múltiples.
+ * Fachada de notificaciones — VetWilling
+ *
+ * Funciones de alto nivel para disparar notificaciones in-app
+ * desde cualquier controlador o helper. Escribe siempre en la
+ * tabla canónica `notificacion` a través de Notificacion::crear()
+ * y Notificacion::crearBatch().
+ *
+ * Uso básico:
+ *   require_once BASE_PATH . '/app/helpers/notification/notificacion_helper.php';
+ *   notificar('cita', 'Tu cita está próxima', 'Tienes una cita mañana a las 10:00.', $id_usuario);
  */
 
 if (!function_exists('notificar')) {
 
     require_once __DIR__ . '/../../models/Notificacion.php';
 
-    // ── Catálogo de tipos ─────────────────────────────────────────────────────
-    // Cada tipo mapea a [icono_remixicon, clase_color_css, titulo_por_defecto]
-
-    function _catalogoNotificacion()
+    // -------------------------------------------------------------------------
+    // Catálogo de tipos — icono Remixicon, clase CSS, título por defecto
+    // -------------------------------------------------------------------------
+    function _catalogoNotificacion(): array
     {
         return [
-            'actividad_nueva'       => ['ri-book-2-line',         'info',    'Nueva actividad'],
-            'calificacion_publicada' => ['ri-check-double-fill',   'success', 'Calificación publicada'],
-            'entrega_recibida'       => ['ri-mail-send-line',      'info',    'Entrega recibida'],
-            'evento_nuevo'           => ['ri-calendar-event-line', 'warning', 'Nuevo evento'],
-            'asistencia_ausente'     => ['ri-alarm-warning-line',  'warning', 'Ausencia registrada'],
-            'general'                => ['ri-notification-3-line', 'info',    'Notificación'],
+            'cita'                       => ['ri-calendar-check-line',   'info',    'Recordatorio de cita'],
+            'vacuna'                     => ['ri-syringe-line',           'warning', 'Vacuna próxima'],
+            'tratamiento'                => ['ri-medicine-bottle-line',   'info',    'Seguimiento de tratamiento'],
+            'inventario'                 => ['ri-inbox-archive-line',     'warning', 'Alerta de inventario'],
+            'acceso_historial'           => ['ri-file-lock-line',         'info',    'Solicitud de acceso al historial'],
+            'acceso_historial_respuesta' => ['ri-file-check-line',        'success', 'Respuesta a solicitud de historial'],
+            'general'                    => ['ri-notification-3-line',    'info',    'Notificación'],
         ];
     }
 
     /**
-     * Retorna [icono, clase_color, titulo_defecto] para un tipo dado.
+     * Devuelve [icono, clase_color, titulo_defecto] para un tipo.
      * Si el tipo no existe en el catálogo retorna los valores de 'general'.
      */
-    function metadataNotificacion($tipo)
+    function metadataNotificacion(string $tipo): array
     {
         $catalogo = _catalogoNotificacion();
         return $catalogo[$tipo] ?? $catalogo['general'];
     }
 
-    // ── Funciones de disparo ──────────────────────────────────────────────────
+    // -------------------------------------------------------------------------
+    // Funciones de disparo
+    // -------------------------------------------------------------------------
 
     /**
-     * Crear una notificación individual.
+     * Crea una notificación in-app para un único usuario.
      *
-     * @param string      $tipo            Clave del catálogo
-     * @param string      $titulo          Título corto visible en la tarjeta
-     * @param string      $mensaje         Cuerpo del mensaje
-     * @param int         $id_destinatario id_usuario del destinatario
-     * @param int         $id_institucion
-     * @param string|null $url_accion      URL al pulsar la notificación
-     * @param string|null $entidad_tipo    'actividad' | 'calificacion' | 'entrega'
-     * @param int|null    $entidad_id      ID de la entidad relacionada
-     * @return bool
+     * @param string   $tipo        Clave del catálogo (cita, vacuna, tratamiento…)
+     * @param string   $titulo      Texto corto visible en la tarjeta
+     * @param string   $mensaje     Cuerpo del mensaje
+     * @param int      $id_usuario  id_usuario del destinatario
+     * @param int|null $id_paciente Mascota relacionada (opcional)
+     * @param string|null $url_accion Ruta relativa al pulsar la notificación
+     * @return bool    true si se insertó, false si falló
      */
-    function notificar($tipo, $titulo, $mensaje, $id_destinatario, $id_institucion, $url_accion = null, $entidad_tipo = null, $entidad_id = null)
-    {
-        if ((int)$id_destinatario <= 0 || (int)$id_institucion <= 0) {
-            return false;
-        }
+    function notificar(
+        string  $tipo,
+        string  $titulo,
+        string  $mensaje,
+        int     $id_usuario,
+        ?int    $id_paciente = null,
+        ?string $url_accion  = null
+    ): bool {
+        if ($id_usuario <= 0) return false;
+
         try {
-            $model = new Notificacion();
+            $model  = new Notificacion();
             $result = $model->crear([
-                'id_institucion'  => (int)$id_institucion,
-                'id_destinatario' => (int)$id_destinatario,
-                'tipo'            => $tipo,
-                'titulo'          => $titulo,
-                'mensaje'         => $mensaje,
-                'url_accion'      => $url_accion,
-                'entidad_tipo'    => $entidad_tipo,
-                'entidad_id'      => $entidad_id,
+                'id_usuario'  => $id_usuario,
+                'tipo'        => $tipo,
+                'titulo'      => $titulo,
+                'mensaje'     => $mensaje,
+                'url_accion'  => $url_accion,
+                'id_paciente' => $id_paciente,
             ]);
             return $result !== false;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             error_log('[notificar] ' . $e->getMessage());
             return false;
         }
     }
 
     /**
-     * Crear notificaciones en batch (fanout on write).
-     * Todos los destinatarios reciben el mismo contenido en filas independientes.
+     * Crea la misma notificación para múltiples usuarios (fan-out on write).
+     * Cada destinatario recibe su propia fila en la tabla `notificacion`.
      *
      * @param string   $tipo
      * @param string   $titulo
      * @param string   $mensaje
-     * @param int[]    $destinatarios    Array de id_usuario
-     * @param int      $id_institucion
+     * @param int[]    $destinatarios  Array de id_usuario
+     * @param int|null $id_paciente    Mascota relacionada (opcional, misma para todos)
      * @param string|null $url_accion
-     * @param string|null $entidad_tipo
-     * @param int|null    $entidad_id
-     * @return int Número de notificaciones insertadas
+     * @return int Número de notificaciones insertadas correctamente
      */
-    function notificarBatch($tipo, $titulo, $mensaje, array $destinatarios, $id_institucion, $url_accion = null, $entidad_tipo = null, $entidad_id = null)
-    {
+    function notificarBatch(
+        string  $tipo,
+        string  $titulo,
+        string  $mensaje,
+        array   $destinatarios,
+        ?int    $id_paciente = null,
+        ?string $url_accion  = null
+    ): int {
         $destinatarios = array_values(array_filter(
             array_map('intval', $destinatarios),
-            function ($id) {
-                return $id > 0;
-            }
+            static fn(int $id) => $id > 0
         ));
 
-        if (empty($destinatarios) || (int)$id_institucion <= 0) {
-            return 0;
-        }
+        if (empty($destinatarios)) return 0;
 
-        $notificaciones = array_map(function ($id_dest) use ($tipo, $titulo, $mensaje, $id_institucion, $url_accion, $entidad_tipo, $entidad_id) {
-            return [
-                'id_institucion'  => (int)$id_institucion,
-                'id_destinatario' => $id_dest,
-                'tipo'            => $tipo,
-                'titulo'          => $titulo,
-                'mensaje'         => $mensaje,
-                'url_accion'      => $url_accion,
-                'entidad_tipo'    => $entidad_tipo,
-                'entidad_id'      => $entidad_id,
-            ];
-        }, $destinatarios);
+        $notificaciones = array_map(
+            static fn(int $id) => [
+                'id_usuario'  => $id,
+                'tipo'        => $tipo,
+                'titulo'      => $titulo,
+                'mensaje'     => $mensaje,
+                'url_accion'  => $url_accion,
+                'id_paciente' => $id_paciente,
+            ],
+            $destinatarios
+        );
 
         try {
-            $model = new Notificacion();
-            return $model->crearBatch($notificaciones);
-        } catch (Throwable $e) {
+            return (new Notificacion())->crearBatch($notificaciones);
+        } catch (\Throwable $e) {
             error_log('[notificarBatch] ' . $e->getMessage());
             return 0;
         }

@@ -161,7 +161,7 @@ class Venta
     /**
      * Lista ventas de una veterinaria con filtros opcionales.
      */
-    public function listarVentas(int $id_veterinaria, ?string $fecha_inicio = null, ?string $fecha_fin = null): array
+    public function listarVentas(int $id_veterinaria, ?string $fecha_inicio = null, ?string $fecha_fin = null, ?int $id_cliente = null, ?string $producto = null, ?string $estado = 'todos'): array
     {
         try {
             $sql = "SELECT v.id_venta, v.id_cliente, v.subtotal, v.descuento, v.impuesto, v.total, 
@@ -217,7 +217,7 @@ class Venta
     /**
      * Resumen agregado de ventas para el período (totales y conteo).
      */
-    public function obtenerResumenVentas(int $id_veterinaria, ?string $fecha_inicio = null, ?string $fecha_fin = null): array
+    public function obtenerResumenVentas(int $id_veterinaria, ?string $fecha_inicio = null, ?string $fecha_fin = null, ?int $id_cliente = null, ?string $producto = null, ?string $estado = 'todos'): array
     {
         try {
             $sql = "SELECT COUNT(*) AS total_ventas,

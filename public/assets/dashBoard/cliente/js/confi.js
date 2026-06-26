@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetch(
       BASE_URL +
-        "/app/controllers/preferenciasNotificacionController.php?accion=historial&limite=10",
+        "/preferencias-notificacion?accion=historial&limite=10",
     )
       .then(function (r) {
         return r.json();
@@ -306,7 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!id) return;
       btn.disabled = true;
       btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Cerrando…';
-      fetch(BASE_URL + "/cliente/cerrar-sesion", {
+      fetch(BASE_URL + "/cliente/api/sesiones/cerrar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_sesion: id }),
@@ -350,7 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btnTodasSesiones.disabled = true;
       btnTodasSesiones.innerHTML =
         '<i class="bi bi-hourglass-split"></i> Cerrando…';
-      fetch(BASE_URL + "/cliente/cerrar-todas-sesiones", { method: "POST" })
+      fetch(BASE_URL + "/cliente/api/sesiones/cerrar-todas", { method: "POST" })
         .then(function (r) {
           return r.json();
         })

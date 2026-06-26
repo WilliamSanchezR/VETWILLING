@@ -337,7 +337,7 @@
 
 .btn-next,
 .btn-submit {
-    background: var(--color-primario);
+    background: var(--primary-color);
     color: #fff;
     margin-left: auto;
 }

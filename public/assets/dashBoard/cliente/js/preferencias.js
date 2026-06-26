@@ -456,87 +456,10 @@ function eliminarFoto() {
 }
 
 /* ================================================================
-   CONTRASEÑA
+   CONTRASEÑA — las funciones de validación usan los IDs de confi.php
+   (inp-pass-nueva, inp-pass-conf, strengthFill, [data-req=...]).
+   confi.js implementa: evaluarPassword(), validarCampo(), togglePass().
 ================================================================ */
-function togglePassword(inputId, button) {
-  const input = document.getElementById(inputId);
-  const icon = button.querySelector("i");
-  if (input.type === "password") {
-    input.type = "text";
-    icon.classList.replace("bi-eye", "bi-eye-slash");
-  } else {
-    input.type = "password";
-    icon.classList.replace("bi-eye-slash", "bi-eye");
-  }
-}
-
-function checkPasswordStrength() {
-  const password = document.getElementById("newPassword")?.value || "";
-  const indicator = document.getElementById("strengthIndicator");
-  const fill = document.getElementById("strengthFill");
-  const text = document.getElementById("strengthText");
-
-  if (!indicator) return;
-
-  if (!password.length) {
-    indicator.style.display = "none";
-    return;
-  }
-  indicator.style.display = "block";
-
-  const checks = {
-    length: password.length >= 8,
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
-    number: /[0-9]/.test(password),
-    special: /[^A-Za-z0-9]/.test(password),
-  };
-
-  const strength = Object.values(checks).filter(Boolean).length * 20;
-
-  fill.style.width = strength + "%";
-  const niveles = [
-    [40, "#ef4444", Preferencias.t("seg.pass.debil")],
-    [60, "#f59e0b", Preferencias.t("seg.pass.media")],
-    [80, "#3b82f6", Preferencias.t("seg.pass.buena")],
-    [101, "#10b981", Preferencias.t("seg.pass.excelente")],
-  ];
-  const [, color, label] = niveles.find(([max]) => strength <= max);
-  fill.style.background = color;
-  text.textContent = label;
-  text.style.color = color;
-
-  _updateRequirement("req-length", checks.length);
-  _updateRequirement("req-uppercase", checks.uppercase);
-  _updateRequirement("req-number", checks.number);
-}
-
-function _updateRequirement(id, met) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const icon = el.querySelector("i");
-  el.style.color = met ? "#10b981" : "#94a3b8";
-  icon?.classList.toggle("bi-circle", !met);
-  icon?.classList.toggle("bi-check-circle-fill", met);
-}
-
-function checkPasswordMatch() {
-  const nueva = document.getElementById("newPassword")?.value || "";
-  const confirmar = document.getElementById("confirmPassword")?.value || "";
-  const indicator = document.getElementById("matchIndicator");
-  if (!indicator) return;
-
-  if (!confirmar.length) {
-    indicator.innerHTML = "";
-    return;
-  }
-
-  if (nueva === confirmar) {
-    indicator.innerHTML = `<i class="bi bi-check-circle-fill" style="color:#10b981"></i> <span style="color:#10b981">${Preferencias.t("seg.pass.match")}</span>`;
-  } else {
-    indicator.innerHTML = `<i class="bi bi-x-circle-fill" style="color:#ef4444"></i> <span style="color:#ef4444">${Preferencias.t("seg.pass.no_match")}</span>`;
-  }
-}
 
 /* ================================================================
    TABS
@@ -561,61 +484,12 @@ function cambiarTab(tab) {
   }
 }
 
-/* ================================================================
-   FAQ
-================================================================ */
-function toggleFAQ(btn) {
-  const item = btn.closest(".faq-item");
-  const icon = btn.querySelector("i");
-  const isOpen = item.classList.contains("active");
-
-  document.querySelectorAll(".faq-item.active").forEach((el) => {
-    el.classList.remove("active");
-    el.querySelector(".faq-question i")?.style.setProperty(
-      "transform",
-      "rotate(0deg)",
-    );
-  });
-
-  if (!isOpen) {
-    item.classList.add("active");
-    if (icon) icon.style.transform = "rotate(180deg)";
-  }
-}
+/* toggleFAQ está definido en confi.js (con soporte para aria-expanded) */
 
 /* ================================================================
-   VALIDACIÓN DE FORMULARIO DE CONTRASEÑA
+   VALIDACIÓN DE TELÉFONO / DOCUMENTO / FORMULARIO PRINCIPAL
 ================================================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  const passwordForm = document.getElementById("passwordForm");
-  if (passwordForm) {
-    passwordForm.addEventListener("submit", (e) => {
-      const nueva = document.getElementById("newPassword")?.value || "";
-      const confirmar = document.getElementById("confirmPassword")?.value || "";
-
-      if (nueva !== confirmar) {
-        e.preventDefault();
-        Toast.mostrar(Preferencias.t("seg.pass.no_match"), "error");
-        return;
-      }
-      if (nueva.length < 8) {
-        e.preventDefault();
-        Toast.mostrar(Preferencias.t("seg.pass.corta"), "error");
-        return;
-      }
-      if (!/[A-Z]/.test(nueva)) {
-        e.preventDefault();
-        Toast.mostrar(Preferencias.t("seg.pass.mayus"), "error");
-        return;
-      }
-      if (!/[0-9]/.test(nueva)) {
-        e.preventDefault();
-        Toast.mostrar(Preferencias.t("seg.pass.numero"), "error");
-        return;
-      }
-    });
-  }
-
   /* Validación de teléfono */
   document.querySelectorAll('input[type="tel"]').forEach((input) => {
     input.addEventListener("input", () => {

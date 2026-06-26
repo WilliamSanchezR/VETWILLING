@@ -147,4 +147,4 @@ define('MP_ACCESS_TOKEN', env_value('MP_ACCESS_TOKEN', ''));
 // ═══════════════════════════════════════════════════════════════════════════
 // BOOTSTRAP GLOBAL (sesión + i18n + helpers)
 // ═══════════════════════════════════════════════════════════════════════════
-// require_once $projectRoot . '/bootstrap.php';
+require_once $projectRoot . '/bootstrap.php';

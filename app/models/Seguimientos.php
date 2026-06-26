@@ -857,13 +857,25 @@ class Seguimientos
         $creadas = 0;
 
         if (!empty($seguimiento['propietario_usuario_id'])) {
-            if (!$modeloNotificacion->crear((int) $seguimiento['propietario_usuario_id'], $titulo, $mensaje, 'INFO', (int) $seguimiento['id_seguimiento'])) {
+            if (!$modeloNotificacion->crear([
+                'id_usuario'  => (int) $seguimiento['propietario_usuario_id'],
+                'tipo'        => 'tratamiento',
+                'titulo'      => $titulo,
+                'mensaje'     => $mensaje,
+                'id_paciente' => (int) $seguimiento['id_paciente'],
+            ])) {
                 throw new RuntimeException('No se pudo notificar al propietario.');
             }
             $creadas++;
         }
 
-        if (!$modeloNotificacion->crear($id_usuario, $titulo, $mensaje, 'INFO', (int) $seguimiento['id_seguimiento'])) {
+        if (!$modeloNotificacion->crear([
+            'id_usuario'  => $id_usuario,
+            'tipo'        => 'tratamiento',
+            'titulo'      => $titulo,
+            'mensaje'     => $mensaje,
+            'id_paciente' => (int) $seguimiento['id_paciente'],
+        ])) {
             throw new RuntimeException('No se pudo registrar la notificación del profesional.');
         }
 

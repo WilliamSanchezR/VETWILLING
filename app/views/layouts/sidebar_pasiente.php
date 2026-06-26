@@ -1,4 +1,38 @@
+<?php
+// ── Cargar preferencias e i18n si la vista no lo hizo ya ──────────────────
+if (!isset($prefs)) {
+    if (!class_exists('PreferenciasManager')) {
+        require_once BASE_PATH . '/app/services/PreferenciasManager.php';
+    }
+    $_pm_sb = new PreferenciasManager((int)$_SESSION['user']['id_usuario']);
+    $prefs  = $_pm_sb->obtener();
+}
+if (!isset($t)) {
+    if (!class_exists('I18n')) {
+        require_once BASE_PATH . '/app/lang/i18n.php';
+    }
+    $t = I18n::cargar($prefs['idioma']);
+}
+?>
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
+
+<?php
+// ── Inyectar prefs y strings en window para que theme.js e i18n.js los usen
+// Solo se inyecta si aún no lo hizo la vista (confi.php lo hace en <head>)
+if (!isset($vw_prefs_injected)):
+    $vw_prefs_injected = true;
+?>
+<script>
+if (typeof window.__prefs === 'undefined') {
+    window.__prefs    = <?= json_encode($prefs) ?>;
+    window.__lang_all = <?= json_encode([
+        'es' => I18n::obtenerStrings('es'),
+        'en' => I18n::obtenerStrings('en'),
+        'pt' => I18n::obtenerStrings('pt'),
+    ]) ?>;
+}
+</script>
+<?php endif; ?>
 
 <!-- ============================================================
      SIDEBAR  (PC: colapsable | Móvil: burbuja + panel lateral)
@@ -7,6 +41,7 @@
 <!-- SIDEBAR PC — se oculta en móvil via CSS -->
 <aside class="sidebar" id="sidebar">
 
+    <!-- ► HEADER: no se modifica, usa tus logos originales -->
     <div class="sidebar-header">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-NEGATIVO.png"
             alt="VetWilling"
@@ -16,44 +51,73 @@
             class="sidebar-logo-icon">
     </div>
 
+    <!-- ► NAV: rediseñado con contenedor de ícono -->
     <nav class="sidebar-nav">
         <div class="nav-section">
-            <span class="nav-section-title">General</span>
 
-            <a href="<?= BASE_URL ?>/cliente/dashboard" class="nav-item" data-section="dashboard" data-tooltip="Inicio">
-                <i class="bi bi-house-door"></i>
-                <span class="nav-text">Inicio</span>
+            <span class="nav-section-title" data-i18n="sidebar.seccion.general"><?= $t('sidebar.seccion.general') ?></span>
+
+            <a href="<?= BASE_URL ?>/cliente/dashboard"
+                class="nav-item"
+                data-section="dashboard"
+                data-tooltip="<?= $t('sidebar.inicio') ?>">
+                <div class="nav-icon"><i class="bi bi-house-door"></i></div>
+                <span class="nav-text" data-i18n="sidebar.inicio"><?= $t('sidebar.inicio') ?></span>
             </a>
-            <a href="<?= BASE_URL ?>/cliente/mascotas" class="nav-item" data-section="mascotas" data-tooltip="Mascotas">
-                <i class="bi bi-bluesky"></i>
-                <span class="nav-text">Mis Mascotas</span>
+
+            <a href="<?= BASE_URL ?>/cliente/mascotas"
+                class="nav-item"
+                data-section="mascotas"
+                data-tooltip="<?= $t('sidebar.mascotas') ?>">
+                <div class="nav-icon"><i class="bi bi-bluesky"></i></div>
+                <span class="nav-text" data-i18n="sidebar.mascotas"><?= $t('sidebar.mascotas') ?></span>
             </a>
-            <a href="<?= BASE_URL ?>/cliente/citas" class="nav-item" data-section="citas" data-tooltip="Citas">
-                <i class="bi bi-calendar-check"></i>
-                <span class="nav-text">Citas</span>
+
+            <a href="<?= BASE_URL ?>/cliente/citas"
+                class="nav-item"
+                data-section="citas"
+                data-tooltip="<?= $t('sidebar.citas') ?>">
+                <div class="nav-icon"><i class="bi bi-calendar-check"></i></div>
+                <span class="nav-text" data-i18n="sidebar.citas"><?= $t('sidebar.citas') ?></span>
             </a>
-            <a href="<?= BASE_URL ?>/cliente/tienda" class="nav-item" data-section="tienda" data-tooltip="Catalogo">
-                <i class="bi bi-bag-plus"></i>
-                <span class="nav-text">Catalogo</span>
+
+            <a href="<?= BASE_URL ?>/cliente/tienda"
+                class="nav-item"
+                data-section="tienda"
+                data-tooltip="<?= $t('sidebar.catalogo') ?>">
+                <div class="nav-icon"><i class="bi bi-bag-plus"></i></div>
+                <span class="nav-text" data-i18n="sidebar.catalogo"><?= $t('sidebar.catalogo') ?></span>
             </a>
-            <a href="<?= BASE_URL ?>/directorio" class="nav-item" data-section="directorio" data-tooltip="Directorio">
-                <i class="bi bi-people-fill"></i>
+            <a href="<?= BASE_URL ?>/directorio"
+                class="nav-item"
+                data-section="directorio"
+                data-tooltip="Directorio">
+
+                <div class="nav-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+
                 <span class="nav-text">Directorio</span>
-            </a>
 
+            </a>
             <span class="nav-section-title">Comunicación</span>
 
-            <a href="<?= BASE_URL ?>/cliente/notificaciones" class="nav-item" data-section="tienda" data-tooltip="Catalogo">
-                <i class="bi bi-bag-plus"></i>
-                <span class="nav-text">Notificaciones</span>
+            <a href="<?= BASE_URL ?>/cliente/notificaciones"
+                class="nav-item"
+                data-section="notificaciones"
+                data-tooltip="<?= $t('nav.notificaciones') ?>">
+                <div class="nav-icon"><i class="bi bi-bell"></i></div>
+                <span class="nav-text" data-i18n="nav.notificaciones"><?= $t('nav.notificaciones') ?></span>
             </a>
+
         </div>
     </nav>
 
     <!-- Toggle solo PC -->
     <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar" type="button">
-        <i class="bi bi-list"></i>
+        <i class="bi bi-chevron-left"></i>
     </button>
+
 </aside>
 
 <!-- ============================================================
@@ -66,6 +130,7 @@
 <!-- Panel lateral móvil (desliza desde la izquierda) -->
 <div class="mobile-panel" id="mobilePanel" role="dialog" aria-modal="true" aria-label="Menú de navegación">
 
+    <!-- ► HEADER MÓVIL: usa tu logo positivo original -->
     <div class="mobile-panel-header">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-POSITIVO.png"
             alt="VetWilling"
@@ -75,25 +140,35 @@
         </button>
     </div>
 
+    <!-- ► NAV MÓVIL -->
     <nav class="mobile-panel-nav">
-        <span class="mobile-nav-section-title">General</span>
+
+        <span class="mobile-nav-section-title" data-i18n="sidebar.seccion.general"><?= $t('sidebar.seccion.general') ?></span>
 
         <a href="<?= BASE_URL ?>/cliente/dashboard" class="mobile-nav-item" data-section="dashboard">
-            <i class="bi bi-house-door"></i>
-            <span>Inicio</span>
+            <div class="mobile-nav-icon"><i class="bi bi-house-door"></i></div>
+            <span data-i18n="sidebar.inicio"><?= $t('sidebar.inicio') ?></span>
         </a>
         <a href="<?= BASE_URL ?>/cliente/mascotas" class="mobile-nav-item" data-section="mascotas">
-            <i class="bi bi-bluesky"></i>
-            <span>Mis Mascotas</span>
+            <div class="mobile-nav-icon"><i class="bi bi-bluesky"></i></div>
+            <span data-i18n="sidebar.mascotas"><?= $t('sidebar.mascotas') ?></span>
         </a>
         <a href="<?= BASE_URL ?>/cliente/citas" class="mobile-nav-item" data-section="citas">
-            <i class="bi bi-calendar-check"></i>
-            <span>Citas</span>
+            <div class="mobile-nav-icon"><i class="bi bi-calendar-check"></i></div>
+            <span data-i18n="sidebar.citas"><?= $t('sidebar.citas') ?></span>
         </a>
         <a href="<?= BASE_URL ?>/cliente/tienda" class="mobile-nav-item" data-section="tienda">
-            <i class="bi bi-bag-plus"></i>
-            <span>Tienda</span>
+            <div class="mobile-nav-icon"><i class="bi bi-bag-plus"></i></div>
+            <span data-i18n="sidebar.catalogo"><?= $t('sidebar.catalogo') ?></span>
         </a>
+
+        <span class="mobile-nav-section-title">Comunicación</span>
+
+        <a href="<?= BASE_URL ?>/cliente/notificaciones" class="mobile-nav-item" data-section="notificaciones">
+            <div class="mobile-nav-icon"><i class="bi bi-bell"></i></div>
+            <span>Notificaciones</span>
+        </a>
+
         <a href="<?= BASE_URL ?>/directorio" class="mobile-nav-item" data-section="directorio">
             <i class="bi bi-people-fill"></i>
             <span>Directorio</span>
@@ -101,8 +176,7 @@
     </nav>
 </div>
 
-
-<!-- Burbuja flotante (abajo a la derecha) — solo visible en móvil -->
+<!-- Burbuja flotante — solo visible en móvil -->
 <button
     type="button"
     class="fab-menu"
@@ -125,7 +199,7 @@
         var mobileOverlay = document.getElementById('mobileOverlay');
         var panelClose = document.getElementById('mobilePanelClose');
 
-        /* ── Helpers ── */
+        /* ── Helper ── */
         function isMobile() {
             return window.innerWidth <= 768;
         }
@@ -137,6 +211,13 @@
             if (isMobile()) return;
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            /* Rotar ícono del toggle */
+            var icon = sidebarToggle.querySelector('i');
+            if (icon) {
+                icon.className = sidebar.classList.contains('collapsed') ?
+                    'bi bi-chevron-right' :
+                    'bi bi-chevron-left';
+            }
         });
 
         /* ══════════════════════════════════════
@@ -171,7 +252,7 @@
         });
 
         /* ══════════════════════════════════════
-           Resize: limpiar estados correctamente
+           Resize: limpiar estados
            ══════════════════════════════════════ */
         window.addEventListener('resize', function() {
             if (!isMobile()) {
@@ -189,8 +270,9 @@
         if (!isMobile()) {
             var wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             sidebar?.classList.toggle('collapsed', wasCollapsed);
-        } else {
-            sidebar?.classList.remove('collapsed');
+            /* Ícono correcto al cargar */
+            var icon = sidebarToggle?.querySelector('i');
+            if (icon && wasCollapsed) icon.className = 'bi bi-chevron-right';
         }
 
         /* ══════════════════════════════════════
@@ -198,15 +280,10 @@
            ══════════════════════════════════════ */
         var currentPath = window.location.pathname;
         document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(function(link) {
-            if (currentPath.includes(link.dataset.section)) {
+            if (link.dataset.section && currentPath.includes(link.dataset.section)) {
                 link.classList.add('active');
             }
         });
 
     });
-
-    /* Nota: el listener de sidebarToggle vive únicamente dentro de DOMContentLoaded
-       (arriba). El bloque redundante que existía aquí fue eliminado porque
-       'sidebarToggle' era undefined en este scope (var declarado dentro del callback)
-       y con optional-chaining (?.) era un no-op silencioso. */
 </script>

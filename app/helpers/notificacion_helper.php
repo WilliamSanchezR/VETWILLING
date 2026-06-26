@@ -330,6 +330,87 @@ function existeNotificacionExitosa($idAgendamiento, $medioNotificacion = 'email'
     }
 }
 
+// =========================================
+//  RFS 254: FUNCIONES DE CANAL-AWARE SENDING
+//  Verifican estado del canal y usan plantillas de BD
+// =========================================
+
+/**
+ * Verifica si un canal de envío está habilitado.
+ * Devuelve false sin lanzar excepciones para que los callers puedan decidir.
+ *
+ * @param string $codigoCanal 'email' | 'in_app' | 'push'
+ */
+function canalHabilitado(string $codigoCanal): bool
+{
+    try {
+        require_once __DIR__ . '/../models/CanalEnvio.php';
+        return (new CanalEnvio())->estaHabilitado($codigoCanal);
+    } catch (Throwable $e) {
+        error_log("[canalHabilitado] $codigoCanal: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Renderiza una plantilla de mensaje desde BD para un canal y tipo dados.
+ * Si no existe plantilla, devuelve null.
+ *
+ * @param string $codigoCanal 'email' | 'in_app' | 'push'
+ * @param string $tipo        'cita' | 'recordatorio' | 'vacuna' | 'inventario' | 'general'
+ * @param array  $vars        Variables para sustituir en la plantilla
+ * @return array|null ['asunto'=>..., 'cuerpo_html'=>..., 'cuerpo_texto'=>...]
+ */
+function renderizarPlantillaCanal(string $codigoCanal, string $tipo, array $vars): ?array
+{
+    try {
+        require_once __DIR__ . '/../models/CanalEnvio.php';
+        $model  = new CanalEnvio();
+        $canal  = $model->obtenerPorCodigo($codigoCanal);
+        if (!$canal) return null;
+
+        $plantilla = $model->obtenerPlantilla((int)$canal['id_canal'], $tipo);
+        if (!$plantilla) return null;
+
+        return [
+            'asunto'       => CanalEnvio::renderizar($plantilla['asunto']       ?? '', $vars),
+            'cuerpo_html'  => CanalEnvio::renderizar($plantilla['cuerpo_html']  ?? '', $vars),
+            'cuerpo_texto' => CanalEnvio::renderizar($plantilla['cuerpo_texto'] ?? '', $vars),
+        ];
+    } catch (Throwable $e) {
+        error_log("[renderizarPlantillaCanal] $codigoCanal/$tipo: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Registra un intento de envío y, si el canal está deshabilitado o
+ * el envío falla, lo deja en estado 'fallido' con mensaje descriptivo.
+ * Wrapper seguro que combina verificación de canal + registro de auditoría.
+ *
+ * @param array  $datosFallido  Misma estructura que registrarNotificacionEnviada()
+ * @param string $codigoCanal   Canal que intentó enviar
+ * @param bool   $envioExitoso  Resultado del intento externo
+ * @param string $errorMsg      Mensaje de error si $envioExitoso = false
+ * @return int|false ID del registro creado
+ */
+function registrarResultadoEnvio(
+    array  $datos,
+    bool   $envioExitoso,
+    string $errorMsg = ''
+): int|false {
+    $datos['estado_envio']  = $envioExitoso ? 'exitoso' : 'fallido';
+    $datos['mensaje_error'] = $envioExitoso ? null : $errorMsg;
+
+    $id = registrarNotificacionEnviada($datos);
+
+    if (!$envioExitoso) {
+        error_log("[registrarResultadoEnvio] Fallo en canal '{$datos['medio_notificacion']}': $errorMsg");
+    }
+
+    return $id;
+}
+
 /**
  * LIMPIAR NOTIFICACIONES ANTIGUAS
  * 

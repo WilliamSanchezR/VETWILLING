@@ -1,11 +1,24 @@
+<?php
+if (!isset($prefs)) {
+    if (!class_exists('PreferenciasManager')) { require_once BASE_PATH . '/app/services/PreferenciasManager.php'; }
+    $_pm = new PreferenciasManager((int)$_SESSION['user']['id_usuario']);
+    $prefs = $_pm->obtener();
+}
+if (!isset($t)) {
+    if (!class_exists('I18n')) { require_once BASE_PATH . '/app/lang/i18n.php'; }
+    $t = I18n::cargar($prefs['idioma']);
+}
+?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?= $prefs['idioma'] === 'pt' ? 'pt-BR' : $prefs['idioma'] ?>">
 <head>
 
     <meta charset="UTF-8">
+    <script>(function(){var p=<?= json_encode($prefs) ?>;document.documentElement.setAttribute('data-tema',p.tema);if(p.tema==='oscuro'&&document.body)document.body.classList.add('dark-theme');}());</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notificaciones | VetWilling</title>
 
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png">
@@ -43,6 +56,18 @@
             --c-text-main: #1a1d23;
             --c-text-muted: #6c757d;
             --c-text-hint : #adb5bd;
+        }
+
+        body.dark-theme {
+            --c-surface   : var(--card-light, #1a1a2e);
+            --c-border    : rgba(255,255,255,.08);
+            --c-text-main : var(--text-light, #f0f4f8);
+            --c-text-muted: var(--text-secondary-light, #9ca3af);
+            --c-text-hint : var(--text-muted-light, #6b7280);
+            --c-cita-soft  : rgba(13,110,253,.15);
+            --c-vacuna-soft: rgba(220,53,69,.15);
+            --c-trat-soft  : rgba(25,135,84,.15);
+            --notif-shadow-hover: 0 6px 24px rgba(0,0,0,.40);
         }
 
         .notif-page { padding: 2rem; }
@@ -143,9 +168,12 @@
         .notif-card:hover { box-shadow: var(--notif-shadow-hover); transform: translateY(-2px); }
 
         .notif-card.no-leida { border-left-width: 3px; border-left-style: solid; }
-        .notif-card.no-leida.tipo-cita        { border-left-color: var(--c-cita-accent);   }
-        .notif-card.no-leida.tipo-vacuna       { border-left-color: var(--c-vacuna-accent); }
-        .notif-card.no-leida.tipo-tratamiento  { border-left-color: var(--c-trat-accent);   }
+        .notif-card.no-leida.tipo-cita             { border-left-color: var(--c-cita-accent);   }
+        .notif-card.no-leida.tipo-vacuna           { border-left-color: var(--c-vacuna-accent); }
+        .notif-card.no-leida.tipo-tratamiento      { border-left-color: var(--c-trat-accent);   }
+        .notif-card.no-leida.tipo-seguimiento      { border-left-color: #198754; }
+        .notif-card.no-leida.tipo-acceso_historial { border-left-color: #ffc107; }
+        .notif-card.no-leida.tipo-general          { border-left-color: #6c757d; }
 
         .notif-card.leida { opacity: .65; }
         .notif-card.leida:hover { opacity: 1; }
@@ -158,9 +186,12 @@
             font-size: 1.15rem; color: #fff; flex-shrink: 0;
         }
 
-        .tipo-cita        .notif-icon-wrap { background: var(--c-cita-accent);   }
-        .tipo-vacuna      .notif-icon-wrap { background: var(--c-vacuna-accent);  }
-        .tipo-tratamiento .notif-icon-wrap { background: var(--c-trat-accent);    }
+        .tipo-cita             .notif-icon-wrap { background: var(--c-cita-accent);   }
+        .tipo-vacuna           .notif-icon-wrap { background: var(--c-vacuna-accent);  }
+        .tipo-tratamiento      .notif-icon-wrap { background: var(--c-trat-accent);    }
+        .tipo-seguimiento      .notif-icon-wrap { background: #198754; }
+        .tipo-acceso_historial .notif-icon-wrap { background: #ffc107; color: #212529 !important; }
+        .tipo-general          .notif-icon-wrap { background: #6c757d; }
 
         /* ── Cuerpo ─────────────────────────────────────────────────── */
         .notif-body { flex: 1; min-width: 0; }
@@ -180,9 +211,12 @@
             padding: 2px 9px; border-radius: var(--notif-radius-pill);
         }
 
-        .tipo-cita        .notif-pill { background: var(--c-cita-soft);   color: var(--c-cita-text);   }
-        .tipo-vacuna      .notif-pill { background: var(--c-vacuna-soft);  color: var(--c-vacuna-text); }
-        .tipo-tratamiento .notif-pill { background: var(--c-trat-soft);    color: var(--c-trat-text);   }
+        .tipo-cita             .notif-pill { background: var(--c-cita-soft);   color: var(--c-cita-text);   }
+        .tipo-vacuna           .notif-pill { background: var(--c-vacuna-soft);  color: var(--c-vacuna-text); }
+        .tipo-tratamiento      .notif-pill { background: var(--c-trat-soft);    color: var(--c-trat-text);   }
+        .tipo-seguimiento      .notif-pill { background: #e6f4ed; color: #146c43; }
+        .tipo-acceso_historial .notif-pill { background: #fff3cd; color: #856404; }
+        .tipo-general          .notif-pill { background: #e9ecef; color: #495057; }
 
         .notif-time { font-size: .78rem; color: var(--c-text-hint); white-space: nowrap; }
 
@@ -239,9 +273,10 @@
     </style>
 
 </head>
-<body>
+<body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
 
 <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
+
 
 <main class="contenido-principal" id="contenidoPrincipal">
 
@@ -493,5 +528,7 @@ function mostrarVacioSiNecesario() {
 }
 </script>
 
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js"></script>
 </body>
 </html>

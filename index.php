@@ -112,7 +112,7 @@ switch ($request) {
 
     case "/veterinario/api/notificaciones":
     case "/veterinaria/api/notificaciones":
-        require BASE_PATH . "/app/controllers/NotificacioneController.php";
+        require BASE_PATH . "/app/controllers/api/notificaciones_api.php";
         break;
 
     case "/veterinario/agregar-disponibilidad-agenda":
@@ -507,6 +507,14 @@ switch ($request) {
         require BASE_PATH . "/app/controllers/propetarioController.php";
         break;
 
+    // RFS 254: Medios de envío — vista y API
+    case "/admin/medios-envio":
+        require BASE_PATH . "/app/views/dashboard/administrador/mediosEnvio.php";
+        break;
+    case "/admin/api/medios-envio":
+        require BASE_PATH . "/app/controllers/mediosEnvioController.php";
+        break;
+
     // RFS 14: Gestión de reportes — administrador
     case "/admin/reportes":
         require BASE_PATH .
@@ -646,15 +654,12 @@ switch ($request) {
     case "/cliente/actualizar-contrasena":
         require BASE_PATH . "/app/controllers/usuarioController.php";
         break;
-    case "/paciente/api/notificaciones":
-        require BASE_PATH . "/app/controllers/NotificacioneController.php";
-        break;
     case "/preferencias-notificacion":
         require BASE_PATH .
             "/app/controllers/preferenciasNotificacionController.php";
         break;
     case "/representante/api/notificaciones":
-        require BASE_PATH . "/app/controllers/NotificacioneController.php";
+        require BASE_PATH . "/app/controllers/api/notificaciones_api.php";
         break;
 
     // ---------------------------------------GENERACION DE PDFS-------------------------------------//
@@ -956,6 +961,10 @@ switch ($request) {
 
     case "/cliente/api/preferencias/reset":
         require BASE_PATH . "/app/controllers/preferenciasController.php";
+        break;
+
+    case "/cliente/api/preferencias/lang":
+        require BASE_PATH . "/app/controllers/langController.php";
         break;
 
     // ── API: Acceso temporal al historial clínico ──

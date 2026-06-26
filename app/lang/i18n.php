@@ -197,8 +197,12 @@ class I18n
             'nav.mis_mascotas'             => 'Mis Mascotas',
             'nav.mis_citas'                => 'Mis Citas',
             'nav.configuracion'            => 'Configuración',
+            'nav.soporte'                  => 'Soporte',
             'nav.cerrar_sesion'            => 'Cerrar Sesión',
             'nav.notificaciones'           => 'Notificaciones',
+            'nav.marcar_todas'             => 'Marcar todas como leídas',
+            'nav.ver_todas'                => 'Ver todas las notificaciones',
+            'nav.buscar.ph'                => 'Buscar mascotas, citas, servicios...',
 
             // ── NUEVO: Dashboard ──────────────────────────────────────────
             'dashboard.bienvenida'         => '¡Bienvenido',
@@ -585,8 +589,12 @@ class I18n
             'nav.mis_mascotas'             => 'My Pets',
             'nav.mis_citas'                => 'My Appointments',
             'nav.configuracion'            => 'Settings',
+            'nav.soporte'                  => 'Support',
             'nav.cerrar_sesion'            => 'Sign Out',
             'nav.notificaciones'           => 'Notifications',
+            'nav.marcar_todas'             => 'Mark all as read',
+            'nav.ver_todas'                => 'View all notifications',
+            'nav.buscar.ph'                => 'Search pets, appointments, services...',
 
             'dashboard.bienvenida'         => 'Welcome',
             'dashboard.subtitulo'          => 'Great to see you again. At VetWilling we care for your pets with love, professionalism and dedication.',
@@ -962,8 +970,12 @@ class I18n
             'nav.mis_mascotas'             => 'Meus Animais',
             'nav.mis_citas'                => 'Minhas Consultas',
             'nav.configuracion'            => 'Configurações',
+            'nav.soporte'                  => 'Suporte',
             'nav.cerrar_sesion'            => 'Sair',
             'nav.notificaciones'           => 'Notificações',
+            'nav.marcar_todas'             => 'Marcar todas como lidas',
+            'nav.ver_todas'                => 'Ver todas as notificações',
+            'nav.buscar.ph'                => 'Pesquisar animais, consultas, serviços...',
 
             'dashboard.bienvenida'         => 'Bem-vindo',
             'dashboard.subtitulo'          => 'Que bom te ver novamente. Na VetWilling cuidamos dos seus animais com amor, profissionalismo e dedicação.',
