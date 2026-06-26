@@ -566,13 +566,14 @@ class Inventario
         $lotesStockBajo = $this->obtenerLotesStockBajo($id_veterinaria);
         foreach ($lotesStockBajo as $lote) {
             $mensaje = "Stock crítico: {$lote['nombre']} (Lote {$lote['numero_lote']}) - Stock actual: {$lote['cantidad']}, Mínimo: {$lote['stock_minimo']}";
-            $modeloNotificacion->registrar(
-                $id_usuario,
-                'Alerta de Inventario',
-                $mensaje,
-                'warning',
-                $lote['id_inventario']
-            );
+            $modeloNotificacion->crear([
+                'id_usuario'  => $id_usuario,
+                'tipo'        => 'inventario',
+                'titulo'      => 'Alerta de Inventario',
+                'mensaje'     => $mensaje,
+                'url_accion'  => '/veterinario/inventario',
+                'id_paciente' => null,
+            ]);
             $alertas['stock_bajo']++;
         }
 
@@ -582,14 +583,14 @@ class Inventario
             $dias = $producto['dias_para_vencer'];
             $estado = $dias < 0 ? 'VENCIDO' : 'Próximo a vencer';
             $mensaje = "{$estado}: {$producto['nombre']} (Lote {$producto['numero_lote']}) - {$producto['fecha_vencimiento']} ({$dias} días)";
-            $tipo = $dias < 0 ? 'danger' : 'warning';
-            $modeloNotificacion->registrar(
-                $id_usuario,
-                'Alerta de Vencimiento',
-                $mensaje,
-                $tipo,
-                $producto['id_inventario']
-            );
+            $modeloNotificacion->crear([
+                'id_usuario'  => $id_usuario,
+                'tipo'        => 'inventario',
+                'titulo'      => 'Alerta de Vencimiento',
+                'mensaje'     => $mensaje,
+                'url_accion'  => '/veterinario/inventario',
+                'id_paciente' => null,
+            ]);
             $alertas['vencimiento']++;
         }
 
