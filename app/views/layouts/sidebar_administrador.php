@@ -100,6 +100,14 @@ $final_path = end($path_parts); // Obtiene el último elemento
                 <i class="bi bi-bar-chart-line-fill"></i>
                 <span class="nav-text">Reportes</span>
             </a>
+
+            <!-- RFS 254: Medios de Envío -->
+            <a href="<?= BASE_URL ?>/admin/medios-envio"
+                class="nav-item <?= $final_path == 'medios-envio' ? 'active' : '' ?>"
+                data-tooltip="Medios de Envío">
+                <i class="bi bi-send-check-fill"></i>
+                <span class="nav-text">Medios de Envío</span>
+            </a>
         </div>
 
     </nav>
