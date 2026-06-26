@@ -4,6 +4,16 @@
  * RFS 27 – Vista de historial médico con control de acceso temporal
  */
 require_once BASE_PATH . '/app/helpers/session_propietario.php';
+// Cargar preferencias e i18n
+if (!isset($prefs)) {
+    if (!class_exists('PreferenciasManager')) { require_once BASE_PATH . '/app/services/PreferenciasManager.php'; }
+    $_pm = new PreferenciasManager((int)$_SESSION['user']['id_usuario']);
+    $prefs = $_pm->obtener();
+}
+if (!isset($t)) {
+    if (!class_exists('I18n')) { require_once BASE_PATH . '/app/lang/i18n.php'; }
+    $t = I18n::cargar($prefs['idioma']);
+}
 require_once BASE_PATH . '/app/models/CitasCliente.php';
 require_once BASE_PATH . '/app/models/AccesoHistorial.php';
 
@@ -37,12 +47,14 @@ $accesoInfo['estado'] = 'aprobado';
 function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?= $prefs['idioma'] === 'pt' ? 'pt-BR' : $prefs['idioma'] ?>">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var p=<?= json_encode($prefs) ?>;document.documentElement.setAttribute('data-tema',p.tema);if(p.tema==='oscuro'&&document.body)document.body.classList.add('dark-theme');}());</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historial Médico - <?= e($mascota['nombre']) ?></title>
 
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
@@ -99,7 +111,7 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
     </style>
 </head>
 
-<body>
+<body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
     <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
 
     <main class="contenido-principal" id="contenidoPrincipal">
@@ -868,5 +880,7 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
         if (TIENE_ACCESO) iniciarCuentaRegresiva();
     });
     </script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js"></script>
 </body>
 </html>

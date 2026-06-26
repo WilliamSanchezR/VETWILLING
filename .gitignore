@@ -78,6 +78,8 @@ docs/
 # Excepción: mantener el README principal si existe
 !README.md
 AUDITORIA_NOTIFICACIONES_VETWILLING.md
+AUDITORIA_CONFIGURACION_CLIENTE.md
+informe_proyecto.html
 informe_proyecto.html
 
 sql/*

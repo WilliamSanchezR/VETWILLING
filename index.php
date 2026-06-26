@@ -963,6 +963,10 @@ switch ($request) {
         require BASE_PATH . "/app/controllers/preferenciasController.php";
         break;
 
+    case "/cliente/api/preferencias/lang":
+        require BASE_PATH . "/app/controllers/langController.php";
+        break;
+
     // ── API: Acceso temporal al historial clínico ──
 
     // Cliente

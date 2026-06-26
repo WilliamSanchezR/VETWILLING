@@ -150,6 +150,17 @@ function actualizarPreferencia()
         $resultado = $modeloUsuario->actualizarPreferenciaNotificacion($id_usuario, $preferencia);
 
         if ($resultado) {
+            // Sincronizar con el archivo JSON para mantener consistencia
+            try {
+                if (!class_exists('PreferenciasManager')) {
+                    require_once __DIR__ . '/../services/PreferenciasManager.php';
+                }
+                $pm = new PreferenciasManager($id_usuario);
+                $pm->guardar(['notificaciones' => $preferencia]);
+            } catch (\Throwable $e) {
+                error_log('preferenciasNotificacion: no se pudo sincronizar JSON — ' . $e->getMessage());
+            }
+
             header('Content-Type: application/json; charset=utf-8');
             http_response_code(200);
             echo json_encode([

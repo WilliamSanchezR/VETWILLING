@@ -1,4 +1,38 @@
+<?php
+// ── Cargar preferencias e i18n si la vista no lo hizo ya ──────────────────
+if (!isset($prefs)) {
+    if (!class_exists('PreferenciasManager')) {
+        require_once BASE_PATH . '/app/services/PreferenciasManager.php';
+    }
+    $_pm_sb = new PreferenciasManager((int)$_SESSION['user']['id_usuario']);
+    $prefs  = $_pm_sb->obtener();
+}
+if (!isset($t)) {
+    if (!class_exists('I18n')) {
+        require_once BASE_PATH . '/app/lang/i18n.php';
+    }
+    $t = I18n::cargar($prefs['idioma']);
+}
+?>
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
+
+<?php
+// ── Inyectar prefs y strings en window para que theme.js e i18n.js los usen
+// Solo se inyecta si aún no lo hizo la vista (confi.php lo hace en <head>)
+if (!isset($vw_prefs_injected)):
+    $vw_prefs_injected = true;
+?>
+<script>
+if (typeof window.__prefs === 'undefined') {
+    window.__prefs    = <?= json_encode($prefs) ?>;
+    window.__lang_all = <?= json_encode([
+        'es' => I18n::obtenerStrings('es'),
+        'en' => I18n::obtenerStrings('en'),
+        'pt' => I18n::obtenerStrings('pt'),
+    ]) ?>;
+}
+</script>
+<?php endif; ?>
 
 <!-- ============================================================
      SIDEBAR  (PC: colapsable | Móvil: burbuja + panel lateral)
@@ -21,52 +55,59 @@
     <nav class="sidebar-nav">
         <div class="nav-section">
 
-            <span class="nav-section-title">General</span>
+            <span class="nav-section-title" data-i18n="sidebar.seccion.general"><?= $t('sidebar.seccion.general') ?></span>
 
             <a href="<?= BASE_URL ?>/cliente/dashboard"
-               class="nav-item"
-               data-section="dashboard"
-               data-tooltip="Inicio">
+                class="nav-item"
+                data-section="dashboard"
+                data-tooltip="<?= $t('sidebar.inicio') ?>">
                 <div class="nav-icon"><i class="bi bi-house-door"></i></div>
-                <span class="nav-text">Inicio</span>
+                <span class="nav-text" data-i18n="sidebar.inicio"><?= $t('sidebar.inicio') ?></span>
             </a>
 
             <a href="<?= BASE_URL ?>/cliente/mascotas"
-               class="nav-item"
-               data-section="mascotas"
-               data-tooltip="Mis Mascotas">
+                class="nav-item"
+                data-section="mascotas"
+                data-tooltip="<?= $t('sidebar.mascotas') ?>">
                 <div class="nav-icon"><i class="bi bi-bluesky"></i></div>
-                <span class="nav-text">Mis Mascotas</span>
+                <span class="nav-text" data-i18n="sidebar.mascotas"><?= $t('sidebar.mascotas') ?></span>
             </a>
 
             <a href="<?= BASE_URL ?>/cliente/citas"
-               class="nav-item"
-               data-section="citas"
-               data-tooltip="Citas">
+                class="nav-item"
+                data-section="citas"
+                data-tooltip="<?= $t('sidebar.citas') ?>">
                 <div class="nav-icon"><i class="bi bi-calendar-check"></i></div>
-                <span class="nav-text">Citas</span>
+                <span class="nav-text" data-i18n="sidebar.citas"><?= $t('sidebar.citas') ?></span>
             </a>
 
             <a href="<?= BASE_URL ?>/cliente/tienda"
-               class="nav-item"
-               data-section="tienda"
-               data-tooltip="Catálogo">
+                class="nav-item"
+                data-section="tienda"
+                data-tooltip="<?= $t('sidebar.catalogo') ?>">
                 <div class="nav-icon"><i class="bi bi-bag-plus"></i></div>
-                <span class="nav-text">Catálogo</span>
+                <span class="nav-text" data-i18n="sidebar.catalogo"><?= $t('sidebar.catalogo') ?></span>
             </a>
-            <a href="<?= BASE_URL ?>/directorio" class="nav-item" data-section="directorio" data-tooltip="Directorio">
-                <i class="bi bi-people-fill"></i>
-                <span class="nav-text">Directorio</span>
-            </a>
+            <a href="<?= BASE_URL ?>/directorio"
+                class="nav-item"
+                data-section="directorio"
+                data-tooltip="Directorio">
 
+                <div class="nav-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+
+                <span class="nav-text">Directorio</span>
+
+            </a>
             <span class="nav-section-title">Comunicación</span>
 
             <a href="<?= BASE_URL ?>/cliente/notificaciones"
-               class="nav-item"
-               data-section="notificaciones"
-               data-tooltip="Notificaciones">
+                class="nav-item"
+                data-section="notificaciones"
+                data-tooltip="<?= $t('nav.notificaciones') ?>">
                 <div class="nav-icon"><i class="bi bi-bell"></i></div>
-                <span class="nav-text">Notificaciones</span>
+                <span class="nav-text" data-i18n="nav.notificaciones"><?= $t('nav.notificaciones') ?></span>
             </a>
 
         </div>
@@ -102,23 +143,23 @@
     <!-- ► NAV MÓVIL -->
     <nav class="mobile-panel-nav">
 
-        <span class="mobile-nav-section-title">General</span>
+        <span class="mobile-nav-section-title" data-i18n="sidebar.seccion.general"><?= $t('sidebar.seccion.general') ?></span>
 
         <a href="<?= BASE_URL ?>/cliente/dashboard" class="mobile-nav-item" data-section="dashboard">
             <div class="mobile-nav-icon"><i class="bi bi-house-door"></i></div>
-            <span>Inicio</span>
+            <span data-i18n="sidebar.inicio"><?= $t('sidebar.inicio') ?></span>
         </a>
         <a href="<?= BASE_URL ?>/cliente/mascotas" class="mobile-nav-item" data-section="mascotas">
             <div class="mobile-nav-icon"><i class="bi bi-bluesky"></i></div>
-            <span>Mis Mascotas</span>
+            <span data-i18n="sidebar.mascotas"><?= $t('sidebar.mascotas') ?></span>
         </a>
         <a href="<?= BASE_URL ?>/cliente/citas" class="mobile-nav-item" data-section="citas">
             <div class="mobile-nav-icon"><i class="bi bi-calendar-check"></i></div>
-            <span>Citas</span>
+            <span data-i18n="sidebar.citas"><?= $t('sidebar.citas') ?></span>
         </a>
         <a href="<?= BASE_URL ?>/cliente/tienda" class="mobile-nav-item" data-section="tienda">
             <div class="mobile-nav-icon"><i class="bi bi-bag-plus"></i></div>
-            <span>Catálogo</span>
+            <span data-i18n="sidebar.catalogo"><?= $t('sidebar.catalogo') ?></span>
         </a>
 
         <span class="mobile-nav-section-title">Comunicación</span>
@@ -147,33 +188,35 @@
 </button>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
 
         /* ── Referencias ── */
-        var sidebar       = document.getElementById('sidebar');
+        var sidebar = document.getElementById('sidebar');
         var sidebarToggle = document.getElementById('sidebarToggle');
-        var fabMenu       = document.getElementById('fabMenu');
-        var fabIcon       = document.getElementById('fabIcon');
-        var mobilePanel   = document.getElementById('mobilePanel');
+        var fabMenu = document.getElementById('fabMenu');
+        var fabIcon = document.getElementById('fabIcon');
+        var mobilePanel = document.getElementById('mobilePanel');
         var mobileOverlay = document.getElementById('mobileOverlay');
-        var panelClose    = document.getElementById('mobilePanelClose');
+        var panelClose = document.getElementById('mobilePanelClose');
 
         /* ── Helper ── */
-        function isMobile() { return window.innerWidth <= 768; }
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
 
         /* ══════════════════════════════════════
            PC: toggle colapsar / expandir sidebar
            ══════════════════════════════════════ */
-        sidebarToggle?.addEventListener('click', function () {
+        sidebarToggle?.addEventListener('click', function() {
             if (isMobile()) return;
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
             /* Rotar ícono del toggle */
             var icon = sidebarToggle.querySelector('i');
             if (icon) {
-                icon.className = sidebar.classList.contains('collapsed')
-                    ? 'bi bi-chevron-right'
-                    : 'bi bi-chevron-left';
+                icon.className = sidebar.classList.contains('collapsed') ?
+                    'bi bi-chevron-right' :
+                    'bi bi-chevron-left';
             }
         });
 
@@ -196,7 +239,7 @@
             fabIcon.className = 'bi bi-grid-fill';
         }
 
-        fabMenu?.addEventListener('click', function () {
+        fabMenu?.addEventListener('click', function() {
             mobilePanel.classList.contains('open') ? cerrarPanel() : abrirPanel();
         });
 
@@ -204,14 +247,14 @@
         mobileOverlay?.addEventListener('click', cerrarPanel);
 
         /* Cerrar con Escape */
-        document.addEventListener('keydown', function (e) {
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') cerrarPanel();
         });
 
         /* ══════════════════════════════════════
            Resize: limpiar estados
            ══════════════════════════════════════ */
-        window.addEventListener('resize', function () {
+        window.addEventListener('resize', function() {
             if (!isMobile()) {
                 cerrarPanel();
                 var wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
@@ -236,7 +279,7 @@
            Marcar ítem activo según URL actual
            ══════════════════════════════════════ */
         var currentPath = window.location.pathname;
-        document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(function (link) {
+        document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(function(link) {
             if (link.dataset.section && currentPath.includes(link.dataset.section)) {
                 link.classList.add('active');
             }

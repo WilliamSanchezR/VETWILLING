@@ -19,7 +19,27 @@ require_once BASE_PATH . "/app/services/SessionManager.php";
 require_once BASE_PATH . "/app/services/PreferenciasManager.php";
 
 $sm = new SessionManager($_SESSION["user"]["id_usuario"]);
-$sesiones = $sm->listar();
+$sesiones = array_map(function ($s) {
+    // Aplanar arrays de detección (navegador, so, tipo, marca son arrays con 'nombre'+'icono')
+    foreach (['navegador', 'so', 'tipo', 'marca'] as $campo) {
+        if (is_array($s[$campo] ?? null)) {
+            $s[$campo . '_icono'] = $s[$campo]['icono'] ?? '';
+            $s[$campo]            = $s[$campo]['nombre'] ?? '';
+        }
+    }
+    // Mapear claves internas a las que usa la vista
+    if (!isset($s['actual'])) $s['actual'] = $s['is_current'] ?? false;
+    if (!isset($s['nueva']))  $s['nueva']  = $s['es_nueva']   ?? false;
+    if (!isset($s['id']))     $s['id']     = $s['token']      ?? '';
+    if (!isset($s['dispositivo']) || $s['dispositivo'] === '') {
+        $partes = array_filter([$s['tipo'] ?? '', $s['so'] ?? '']);
+        $s['dispositivo'] = implode(' / ', $partes) ?: 'Dispositivo desconocido';
+    }
+    if (!isset($s['ultimo_acceso']) && isset($s['last_seen'])) {
+        $s['ultimo_acceso'] = date('d/m/Y H:i', $s['last_seen']);
+    }
+    return $s;
+}, $sm->listar());
 
 $pm = new PreferenciasManager($_SESSION["user"]["id_usuario"]);
 $prefs = $pm->obtener();
@@ -984,14 +1004,10 @@ $val
                                                 <?php endif; ?>
                                             </div>
                                             <div class="sesion-meta">
-                                                <?php if (
-                                                    !empty($s["navegador"])
-                                                ): ?>
+                                                <?php if (!empty($s["navegador"])): ?>
                                                     <span>
-                                                        <i class="bi bi-globe" aria-hidden="true"></i>
-                                                        <?= e(
-                                                            $s["navegador"],
-                                                        ) ?>
+                                                        <i class="bi <?= e($s["navegador_icono"] ?? 'bi-globe') ?>" aria-hidden="true"></i>
+                                                        <?= e($s["navegador"]) ?>
                                                     </span>
                                                 <?php endif; ?>
                                                 <?php if (!empty($s["ip"])): ?>

@@ -12,6 +12,16 @@
  */
 
 require_once BASE_PATH . '/app/helpers/session_propietario.php';
+// Cargar preferencias e i18n
+if (!isset($prefs)) {
+    if (!class_exists('PreferenciasManager')) { require_once BASE_PATH . '/app/services/PreferenciasManager.php'; }
+    $_pm = new PreferenciasManager((int)$_SESSION['user']['id_usuario']);
+    $prefs = $_pm->obtener();
+}
+if (!isset($t)) {
+    if (!class_exists('I18n')) { require_once BASE_PATH . '/app/lang/i18n.php'; }
+    $t = I18n::cargar($prefs['idioma']);
+}
 
 // $datosUsuario viene de session_propietario.php (cargado arriba)
 // Contiene: nombre_veterinaria, nombres, apellidos, email, etc.
@@ -176,13 +186,15 @@ $productos = [
 $totalProductos = count($productos);
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?= $prefs['idioma'] === 'pt' ? 'pt-BR' : $prefs['idioma'] ?>">
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var p=<?= json_encode($prefs) ?>;document.documentElement.setAttribute('data-tema',p.tema);if(p.tema==='oscuro'&&document.body)document.body.classList.add('dark-theme');}());</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo – <?= $nombreVet ?></title>
 
     <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -199,7 +211,7 @@ $totalProductos = count($productos);
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/tienda.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
 </head>
-<body>
+<body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
 
     <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
 
@@ -507,5 +519,7 @@ $totalProductos = count($productos);
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/tienda.js"></script>
 
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js"></script>
 </body>
 </html>

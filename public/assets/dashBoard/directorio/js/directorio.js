@@ -1,15 +1,16 @@
 /* ================================================================
-   Directorio de Profesionales — Issue #240
+   Directorio de Profesionales — VetWilling
+   Versión : 2.0
    ================================================================ */
 
 let todosLosProfesionales = [];
 
-/* ── Helpers ─────────────────────────────────────────────────────── */
+/* ── Helpers ──────────────────────────────────────────────────── */
 function estrellas(promedio) {
     const llenas = Math.round(promedio || 0);
     let html = '';
     for (let i = 1; i <= 5; i++) {
-        html += `<i class="bi bi-star${i <= llenas ? '-fill' : ''}"></i>`;
+        html += `<i class="bi bi-star${i <= llenas ? '-fill' : ''}" aria-hidden="true"></i>`;
     }
     return html;
 }
@@ -18,76 +19,116 @@ function claseBadge(estado) {
     return 'badge-' + (estado || 'No-disponible').replace(/ /g, '-');
 }
 
-function avatarSrc(img) {
-    if (!img) return `https://ui-avatars.com/api/?name=VW&background=0a932c&color=fff&size=80`;
-    return `${BASE_URL}/public/uploads/profesionales/${img}`;
+// Genera iniciales para el avatar (máx. 2 letras)
+function iniciales(nombres, apellidos) {
+    const n = (nombres || '').trim().charAt(0).toUpperCase();
+    const a = (apellidos || '').trim().charAt(0).toUpperCase();
+    return n + a || 'VW';
 }
 
-/* ── Renderizar cards ────────────────────────────────────────────── */
+// Devuelve el HTML del avatar: foto real si existe, iniciales si no
+function avatarHTML(p) {
+    const inis = iniciales(p.nombres, p.apellidos);
+
+    if (p.img_perfil) {
+        return `<div class="avatar-wrap">
+            <img
+                src="${BASE_URL}/public/uploads/profesionales/${p.img_perfil}"
+                alt="${p.nombres || ''}"
+                onerror="this.parentElement.innerHTML='<span>${inis}</span>'"
+            >
+        </div>`;
+    }
+
+    // Sin foto: iniciales con color generado desde el id para que
+    // cada profesional tenga su propio color consistente
+    const colores = [
+        'linear-gradient(135deg,#0a932c,#077522)',
+        'linear-gradient(135deg,#0369a1,#075985)',
+        'linear-gradient(135deg,#7c3aed,#5b21b6)',
+        'linear-gradient(135deg,#b45309,#92400e)',
+        'linear-gradient(135deg,#0891b2,#0e7490)',
+        'linear-gradient(135deg,#dc2626,#b91c1c)',
+    ];
+    const bg = colores[(p.id_usuario || 0) % colores.length];
+
+    return `<div class="avatar-wrap" style="background:${bg};">
+        <span>${inis}</span>
+    </div>`;
+}
+
+/* ── Renderizar cards ─────────────────────────────────────────── */
 function renderCards(lista) {
     const grid  = document.getElementById('gridProfesionales');
     const total = document.getElementById('totalResultados');
 
-    total.textContent = lista.length === 0
-        ? ''
-        : `${lista.length} profesional${lista.length !== 1 ? 'es' : ''} encontrado${lista.length !== 1 ? 's' : ''}`;
-
-    if (!lista.length) {
-        grid.innerHTML = `<div class="empty-state">
-            <i class="bi bi-person-x"></i>
+    if (lista.length === 0) {
+        total.innerHTML = '';
+        grid.innerHTML  = `<div class="empty-state">
+            <i class="bi bi-person-x" aria-hidden="true"></i>
             <p>No se encontraron profesionales con los filtros aplicados.</p>
         </div>`;
         return;
     }
 
-    const cols = lista.map(p => {
+    const plural = lista.length !== 1;
+    total.innerHTML = `<strong>${lista.length}</strong> profesional${plural ? 'es' : ''} encontrado${plural ? 's' : ''}`;
+
+    grid.innerHTML = lista.map(p => {
         const tags = p.especialidades
-            ? p.especialidades.split(',').map(e => `<span class="esp-tag">${e.trim()}</span>`).join('')
-            : '<span class="text-muted small">Sin especialidad</span>';
+            ? p.especialidades.split(',').map(e =>
+                `<span class="esp-tag">${e.trim()}</span>`
+              ).join('')
+            : '<span style="font-size:11px;color:var(--txt2)">Sin especialidad</span>';
 
-        const nombreEnc = encodeURIComponent((p.nombres || 'V') + ' ' + (p.apellidos || 'T'));
+        const calificacion = p.calificacion_promedio
+            ? Number(p.calificacion_promedio).toFixed(1)
+            : '—';
 
-        return `<div class="col-xl-3 col-lg-4 col-md-6 col-12">
-            <div class="card-prof card">
-                <div class="card-body text-center p-4">
-                    <div class="avatar-wrap">
-                        <img src="${avatarSrc(p.img_perfil)}"
-                             alt="${p.nombres}"
-                             onerror="this.src='https://ui-avatars.com/api/?name=${nombreEnc}&background=0a932c&color=fff&size=80'">
-                    </div>
-                    <div class="nombre">${p.nombres} ${p.apellidos}</div>
-                    <div class="licencia"><i class="bi bi-patch-check"></i> ${p.registro_medico || 'Sin registro'}</div>
-                    <span class="badge-estado ${claseBadge(p.estado_directorio)}">${p.estado_directorio || 'No disponible'}</span>
-                    <div class="esp-tags mt-2">${tags}</div>
-                    <div class="rating">
-                        ${estrellas(p.calificacion_promedio)}
-                        <span>${p.calificacion_promedio ? Number(p.calificacion_promedio).toFixed(1) : '—'}</span>
-                        <span class="total">(${p.total_resenias || 0})</span>
-                    </div>
-                    <div class="vet-clinic"><i class="bi bi-hospital"></i> ${p.veterinaria || '—'}</div>
-                    <button class="btn-ver-perfil" onclick="verPerfil(${p.id_usuario})">
-                        <i class="bi bi-person-lines-fill"></i> Ver Perfil
-                    </button>
-                </div>
+        return `
+        <div class="card-prof">
+            ${avatarHTML(p)}
+            <div class="nombre">${p.nombres || ''} ${p.apellidos || ''}</div>
+            <div class="licencia">
+                <i class="bi bi-patch-check" aria-hidden="true"></i>
+                ${p.registro_medico || 'Sin registro'}
             </div>
+            <div class="esp-tags">${tags}</div>
+            <div class="rating">
+                ${estrellas(p.calificacion_promedio)}
+                <span>${calificacion}</span>
+                <span class="total">(${p.total_resenias || 0})</span>
+            </div>
+            <div class="vet-clinic">
+                <i class="bi bi-hospital" aria-hidden="true"></i>
+                ${p.veterinaria || '—'}
+            </div>
+            <span class="badge-estado ${claseBadge(p.estado_directorio)}">
+                ${p.estado_directorio || 'No disponible'}
+            </span>
+            <hr class="card-sep">
+            <button class="btn-ver-perfil" onclick="verPerfil(${p.id_usuario})">
+                <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+                Ver perfil
+            </button>
         </div>`;
     }).join('');
-
-    grid.innerHTML = `<div class="row g-4">${cols}</div>`;
 }
 
-/* ── Cargar directorio desde la API ──────────────────────────────── */
+/* ── Cargar directorio desde la API ──────────────────────────── */
 async function cargarDirectorio(filtros = {}) {
     const params = new URLSearchParams();
-    if (filtros.busqueda)      params.set('busqueda',      filtros.busqueda);
-    if (filtros.especialidad)  params.set('especialidad',  filtros.especialidad);
+    if (filtros.busqueda)       params.set('busqueda',       filtros.busqueda);
+    if (filtros.especialidad)   params.set('especialidad',   filtros.especialidad);
     if (filtros.disponibilidad) params.set('disponibilidad', filtros.disponibilidad);
 
-    const grid = document.getElementById('gridProfesionales');
-    grid.innerHTML = `<div class="spinner-wrap">
-        <div class="spinner-border text-success" role="status"></div>
-        <p class="mt-2 small text-muted">Cargando…</p>
-    </div>`;
+    document.getElementById('gridProfesionales').innerHTML = `
+        <div class="spinner-wrap">
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Cargando…</span>
+            </div>
+            <p class="mt-2 small">Cargando directorio…</p>
+        </div>`;
 
     try {
         const res  = await fetch(`${BASE_URL}/directorio/profesionales?${params}`);
@@ -96,14 +137,15 @@ async function cargarDirectorio(filtros = {}) {
         renderCards(todosLosProfesionales);
         poblarFiltroEsp(todosLosProfesionales);
     } catch {
-        grid.innerHTML = `<div class="empty-state">
-            <i class="bi bi-exclamation-triangle"></i>
-            <p>Error al cargar el directorio. Intenta de nuevo.</p>
-        </div>`;
+        document.getElementById('gridProfesionales').innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                <p>Error al cargar el directorio. Intenta de nuevo.</p>
+            </div>`;
     }
 }
 
-/* ── Filtro de especialidades dinámico ───────────────────────────── */
+/* ── Filtro de especialidades dinámico ───────────────────────── */
 function poblarFiltroEsp(lista) {
     const sel    = document.getElementById('filtroEsp');
     const actual = sel.value;
@@ -117,25 +159,26 @@ function poblarFiltroEsp(lista) {
 
     sel.innerHTML = '<option value="">Todas las especialidades</option>';
     [...espSet].sort().forEach(e => {
-        const opt    = document.createElement('option');
-        opt.value    = e;
+        const opt       = document.createElement('option');
+        opt.value       = e;
         opt.textContent = e;
         if (e === actual) opt.selected = true;
         sel.appendChild(opt);
     });
 }
 
-/* ── Navegar a perfil ────────────────────────────────────────────── */
+/* ── Navegar a perfil ────────────────────────────────────────── */
 function verPerfil(id) {
     window.location.href = `${BASE_URL}/directorio/ver-perfil?id_usuario=${id}`;
 }
 
-/* ── Guardar estado propio (veterinario) ─────────────────────────── */
+/* ── Guardar estado propio (solo veterinario) ────────────────── */
 async function guardarEstado() {
     const estado = document.getElementById('selectEstadoPropio').value;
     const btn    = document.getElementById('btnGuardarEstado');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+    btn.disabled    = true;
+    btn.innerHTML   = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando…';
 
     try {
         const fd = new FormData();
@@ -145,25 +188,23 @@ async function guardarEstado() {
         const res  = await fetch(`${BASE_URL}/directorio/actualizar-estado`, { method: 'POST', body: fd });
         const data = await res.json();
 
-        btn.innerHTML = data.success
-            ? '<i class="bi bi-check-circle-fill"></i> Guardado'
-            : '<i class="bi bi-x-circle-fill"></i> Error';
-
         if (data.success) {
+            btn.innerHTML = '<i class="bi bi-check-circle-fill" aria-hidden="true"></i> Guardado';
             setTimeout(() => {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-check-lg"></i> Guardar';
+                btn.disabled  = false;
+                btn.innerHTML = '<i class="bi bi-check-lg" aria-hidden="true"></i> Guardar';
             }, 2000);
         } else {
-            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-x-circle-fill" aria-hidden="true"></i> Error';
+            btn.disabled  = false;
         }
     } catch {
-        btn.innerHTML = '<i class="bi bi-x-circle-fill"></i> Error';
+        btn.innerHTML = '<i class="bi bi-x-circle-fill" aria-hidden="true"></i> Error';
         btn.disabled  = false;
     }
 }
 
-/* ── Aplicar filtros ─────────────────────────────────────────────── */
+/* ── Aplicar filtros ─────────────────────────────────────────── */
 function aplicarFiltros() {
     cargarDirectorio({
         busqueda:       document.getElementById('inputBusqueda').value.trim(),
@@ -172,11 +213,12 @@ function aplicarFiltros() {
     });
 }
 
-/* ── Event listeners ─────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', function () {
+/* ── Init ────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
 
+    // Búsqueda con debounce de 350 ms
     let debounce;
-    document.getElementById('inputBusqueda').addEventListener('input', function () {
+    document.getElementById('inputBusqueda').addEventListener('input', () => {
         clearTimeout(debounce);
         debounce = setTimeout(aplicarFiltros, 350);
     });
@@ -184,15 +226,16 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('filtroEsp').addEventListener('change', aplicarFiltros);
     document.getElementById('filtroDisp').addEventListener('change', aplicarFiltros);
 
-    document.getElementById('btnLimpiar').addEventListener('click', function () {
+    document.getElementById('btnLimpiar').addEventListener('click', () => {
         document.getElementById('inputBusqueda').value = '';
         document.getElementById('filtroEsp').value     = '';
         document.getElementById('filtroDisp').value    = '';
         cargarDirectorio();
     });
 
-    const btnGuardar = document.getElementById('btnGuardarEstado');
-    if (btnGuardar) btnGuardar.addEventListener('click', guardarEstado);
+    // Botón guardar estado (solo existe en rol veterinario)
+    document.getElementById('btnGuardarEstado')?.addEventListener('click', guardarEstado);
 
+    // Carga inicial
     cargarDirectorio();
 });

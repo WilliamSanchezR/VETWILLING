@@ -1,6 +1,16 @@
 <?php
 // Subtarea 7: autenticación PRIMERO — antes de cualquier query a la BD
 require_once BASE_PATH . '/app/helpers/session_propietario.php';
+// Cargar preferencias e i18n
+if (!isset($prefs)) {
+    if (!class_exists('PreferenciasManager')) { require_once BASE_PATH . '/app/services/PreferenciasManager.php'; }
+    $_pm = new PreferenciasManager((int)$_SESSION['user']['id_usuario']);
+    $prefs = $_pm->obtener();
+}
+if (!isset($t)) {
+    if (!class_exists('I18n')) { require_once BASE_PATH . '/app/lang/i18n.php'; }
+    $t = I18n::cargar($prefs['idioma']);
+}
 
 $id_mascota = (int)($_GET['id'] ?? 0);
 if ($id_mascota <= 0) {
@@ -32,14 +42,16 @@ if (!$_propRow || (int)$mascota['id_propietario'] !== (int)$_propRow['id_propiet
 unset($_dbOwn, $_connOwn, $_stmtOwn, $_propRow);
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?= $prefs['idioma'] === 'pt' ? 'pt-BR' : $prefs['idioma'] ?>">
 
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var p=<?= json_encode($prefs) ?>;document.documentElement.setAttribute('data-tema',p.tema);if(p.tema==='oscuro'&&document.body)document.body.classList.add('dark-theme');}());</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Mascota - VetCare</title>
 
     <!-- Bootstrap -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
@@ -53,7 +65,7 @@ unset($_dbOwn, $_connOwn, $_stmtOwn, $_propRow);
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/cliente/css/noche.css">
 </head>
 
-<body>
+<body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
     <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>
 
@@ -556,6 +568,8 @@ unset($_dbOwn, $_connOwn, $_stmtOwn, $_propRow);
         console.log('Editando mascota ID:', <?= $mascota['id_paciente'] ?>);
     </script>
 
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js"></script>
 </body>
 
 </html>

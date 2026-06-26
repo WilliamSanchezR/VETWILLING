@@ -57,6 +57,21 @@
     --z-tooltip: 99999;   /* siempre por encima de todo */
 }
 
+body.dark-theme {
+    --bg-sidebar   : #16213e;
+    --bg-main      : #0f0f1a;
+    --bg-hover     : #1e3a2e;
+    --bg-active    : rgba(10, 155, 66, 0.18);
+    --bg-danger-light: #1c0707;
+    --text-primary : #e8edf2;
+    --text-secondary: #9ca3af;
+    --text-muted   : #6b7280;
+    --border-color : rgba(255,255,255,.08);
+    --shadow-sm    : 0 2px 8px rgba(0,0,0,.30);
+    --shadow-md    : 0 4px 12px rgba(0,0,0,.40);
+    --shadow-lg    : 0 8px 24px rgba(0,0,0,.50);
+}
+
 
 /* ========================================================================
    2. RESET Y BASE
