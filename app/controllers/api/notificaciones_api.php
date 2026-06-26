@@ -60,9 +60,32 @@ switch ($action) {
 
         // Normalizar campos para que el JS los entienda
         $notificaciones = array_map(function ($n) {
+            $colorMap = [
+                'cita'             => 'azul',
+                'vacuna'           => 'rojo',
+                'seguimiento'      => 'verde',
+                'acceso_historial' => 'naranja',
+                'general'          => 'azul',
+            ];
+            $iconoMap = [
+                'cita'             => 'bi bi-calendar-check',
+                'vacuna'           => 'bi bi-syringe',
+                'seguimiento'      => 'bi bi-activity',
+                'acceso_historial' => 'bi bi-file-earmark-text',
+                'general'          => 'bi bi-bell',
+            ];
+            $tipo   = $n['tipo'] ?? 'general';
+            $fecha  = new DateTime($n['fecha_creacion']);
+            $diff   = time() - $fecha->getTimestamp();
+            if ($diff < 60)      $tiempo = 'Hace un momento';
+            elseif ($diff < 3600)  $tiempo = 'Hace ' . floor($diff / 60)   . ' min';
+            elseif ($diff < 86400) $tiempo = 'Hace ' . floor($diff / 3600) . ' h';
+            elseif ($diff < 604800) $tiempo = 'Hace ' . floor($diff / 86400) . ' días';
+            else                    $tiempo = $fecha->format('d/m/Y');
+
             return [
                 'id'             => $n['id_notificacion'],
-                'tipo'           => $n['tipo'],
+                'tipo'           => $tipo,
                 'titulo'         => $n['titulo'],
                 'mensaje'        => $n['mensaje'],
                 'leido'          => (bool)$n['leida'],
@@ -71,6 +94,9 @@ switch ($action) {
                 'fecha_creacion' => $n['fecha_creacion'],
                 'url_accion'     => $n['url_accion'],
                 'id_paciente'    => $n['id_paciente'],
+                'color'          => $colorMap[$tipo] ?? 'azul',
+                'icono'          => $iconoMap[$tipo] ?? 'bi bi-bell',
+                'tiempo'         => $tiempo,
             ];
         }, $filas);
 

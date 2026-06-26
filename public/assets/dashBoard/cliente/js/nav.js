@@ -269,11 +269,11 @@ class NavbarManager {
 
       this.actualizarContadorNotificaciones();
 
-      // Enviar a servidor
-      /* await fetch(`/api/notificaciones/${notifId}/marcar-leida`, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            }); */
+      await fetch(`${BASE_URL}/paciente/api/notificaciones?action=leer`, {
+        method: 'POST',
+        credentials: 'include',
+        body: new URLSearchParams({ id: notifId })
+      });
     } catch (error) {
       console.error("Error al marcar notificación:", error);
     }
@@ -291,11 +291,10 @@ class NavbarManager {
 
       this.actualizarContadorNotificaciones();
 
-      // Enviar a servidor
-      /* await fetch('/api/notificaciones/marcar-todas-leidas', {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            }); */
+      await fetch(`${BASE_URL}/paciente/api/notificaciones?action=leer_todas`, {
+        method: 'POST',
+        credentials: 'include'
+      });
     } catch (error) {
       console.error("Error al marcar todas como leídas:", error);
     }
