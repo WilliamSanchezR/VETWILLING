@@ -201,52 +201,13 @@ class NavbarManager {
   }
 
   async fetchNotificaciones() {
-    // Simulación - reemplazar con llamada real a API
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            tipo: "recordatorio",
-            titulo: "Recordatorio de vacuna para Max",
-            tiempo: "Hace 5 min",
-            leida: false,
-            icono: "bi-bell-fill",
-            color: "azul",
-          },
-          {
-            id: 2,
-            tipo: "confirmacion",
-            titulo: "Cita confirmada para mañana",
-            tiempo: "Hace 1 hora",
-            leida: true,
-            icono: "bi-check-circle-fill",
-            color: "verde",
-          },
-          {
-            id: 3,
-            tipo: "mensaje",
-            titulo: "Nuevo mensaje del veterinario",
-            tiempo: "Hace 3 horas",
-            leida: false,
-            icono: "bi-chat-dots-fill",
-            color: "naranja",
-          },
-        ]);
-      }, 500);
+    const res = await fetch(`${BASE_URL}/paciente/api/notificaciones?accion=listar`, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
     });
-
-    /* CÓDIGO REAL PARA API:
-        const response = await fetch('/api/notificaciones', {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        });
-
-        if (!response.ok) throw new Error('Error al cargar notificaciones');
-        return await response.json();
-        */
+    if (!res.ok) throw new Error('Error al cargar notificaciones');
+    const data = await res.json();
+    return Array.isArray(data.notificaciones) ? data.notificaciones : [];
   }
 
   renderNotificaciones(notificaciones) {
