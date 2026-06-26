@@ -13,6 +13,13 @@
     transition: margin-left var(--transition-base);
     /* sincroniza con la animación del sidebar */
 }
+/* Este es apra lo que tengan area de contenido se puedan adactar mejor */
+.area-contenido{
+    padding: 30px;
+
+}
+
+
 
 /* Cuando el sidebar colapsa, el contenido se expande */
 .sidebar.collapsed~.contenido-principal {

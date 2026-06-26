@@ -21,6 +21,21 @@ require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 $id = $_SESSION['user']['id_usuario'];
 $usuario = mostrarPerfil($id);
 
+// 5. i18n — usar $t y $prefs del scope global si existen; sino cargar aquí
+if (!isset($t)) {
+    if (!isset($prefs)) {
+        if (!class_exists('PreferenciasManager')) {
+            require_once BASE_PATH . '/app/services/PreferenciasManager.php';
+        }
+        $_pm_nav = new PreferenciasManager((int)$id);
+        $prefs = $_pm_nav->obtener();
+    }
+    if (!class_exists('I18n')) {
+        require_once BASE_PATH . '/app/lang/i18n.php';
+    }
+    $t = I18n::cargar($prefs['idioma']);
+}
+
 // Función helper para sanitizar output (solo para imprimir en HTML)
 function safe_echo($value, $default = '')
 {
@@ -84,30 +99,30 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name="
         </div>
 
         <a href="<?= BASE_URL ?>/cliente/perfil" class="bubble-item">
-            <span class="bubble-icon"><i class="bi bi-person-fill"></i></span> Mi Perfil
+            <span class="bubble-icon"><i class="bi bi-person-fill"></i></span> <?= $t('nav.perfil') ?>
         </a>
         <a href="<?= BASE_URL ?>/cliente/mascotas" class="bubble-item">
-            <span class="bubble-icon"><i class="bi bi-heart-pulse-fill"></i></span> Mis Mascotas
+            <span class="bubble-icon"><i class="bi bi-heart-pulse-fill"></i></span> <?= $t('nav.mis_mascotas') ?>
         </a>
         <a href="<?= BASE_URL ?>/cliente/citas" class="bubble-item">
-            <span class="bubble-icon"><i class="bi bi-calendar-check-fill"></i></span> Mis Citas
+            <span class="bubble-icon"><i class="bi bi-calendar-check-fill"></i></span> <?= $t('nav.mis_citas') ?>
         </a>
 
         <div class="bubble-divider"></div>
 
         <a href="<?= BASE_URL ?>/cliente/configuracion" class="bubble-item">
-            <span class="bubble-icon"><i class="bi bi-gear-fill"></i></span> Configuración
+            <span class="bubble-icon"><i class="bi bi-gear-fill"></i></span> <?= $t('nav.configuracion') ?>
         </a>
         <!-- CORRECCIÓN: type="button" para evitar submit accidental dentro de formularios -->
         <button type="button" class="bubble-item" data-modal="soporte">
-            <span class="bubble-icon"><i class="bi bi-question-circle"></i></span> Soporte
+            <span class="bubble-icon"><i class="bi bi-question-circle"></i></span> <?= $t('nav.soporte') ?>
         </button>
 
         <div class="bubble-spacer"></div>
         <div class="bubble-divider"></div>
 
         <a href="<?= BASE_URL ?>/cerrar-sesion" class="bubble-item bubble-danger">
-            <span class="bubble-icon"><i class="bi bi-box-arrow-right"></i></span> Cerrar Sesión
+            <span class="bubble-icon"><i class="bi bi-box-arrow-right"></i></span> <?= $t('nav.cerrar_sesion') ?>
         </a>
     </div>
 
@@ -168,11 +183,9 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name="
             role="menu"
             aria-labelledby="btnNotificaciones">
             <div class="dropdown-header">
-                <h6>Notificaciones</h6>
+                <h6 data-i18n="nav.notificaciones"><?= $t('nav.notificaciones') ?></h6>
                 <!-- CORRECCIÓN: type="button" explícito -->
-                <button type="button" class="btn-marcar-leidas" data-action="marcar-leidas">
-                    Marcar todas como leídas
-                </button>
+                <button type="button" class="btn-marcar-leidas" data-action="marcar-leidas"><span data-i18n="notificaciones.marcar_leidas"><?= $t('notificaciones.marcar_leidas') ?></span></button>
             </div>
             <div class="dropdown-body" id="listaNotificaciones">
                 <div class="loading-notificaciones">
@@ -181,9 +194,7 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name="
                 </div>
             </div>
             <div class="dropdown-footer">
-                <a href="<?= BASE_URL ?>/cliente/notificaciones" class="btn-ver-todas">
-                    Ver todas las notificaciones
-                </a>
+                <a href="<?= BASE_URL ?>/cliente/notificaciones" class="btn-ver-todas"><span data-i18n="notificaciones.titulo"><?= $t('nav.ver_todas') ?></span></a>
             </div>
         </div>
 
@@ -243,34 +254,34 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name="
 
             <a href="<?= BASE_URL ?>/cliente/perfil" class="dropdown-item" role="menuitem">
                 <i class="bi bi-person-fill" aria-hidden="true"></i>
-                <span>Mi Perfil</span>
+                <span data-i18n="nav.perfil"><?= $t('nav.perfil') ?></span>
             </a>
             <a href="<?= BASE_URL ?>/cliente/mascotas" class="dropdown-item" role="menuitem">
                 <i class="bi bi-heart-pulse-fill" aria-hidden="true"></i>
-                <span>Mis Mascotas</span>
+                <span data-i18n="nav.mis_mascotas"><?= $t('nav.mis_mascotas') ?></span>
             </a>
             <a href="<?= BASE_URL ?>/cliente/citas" class="dropdown-item" role="menuitem">
                 <i class="bi bi-calendar-check-fill" aria-hidden="true"></i>
-                <span>Mis Citas</span>
+                <span data-i18n="nav.mis_citas"><?= $t('nav.mis_citas') ?></span>
             </a>
 
             <div class="dropdown-divider" role="separator"></div>
 
             <a href="<?= BASE_URL ?>/cliente/configuracion" class="dropdown-item" role="menuitem">
                 <i class="bi bi-gear-fill" aria-hidden="true"></i>
-                <span>Configuración</span>
+                <span data-i18n="nav.configuracion"><?= $t('nav.configuracion') ?></span>
             </a>
             <!-- CORRECCIÓN: type="button" explícito -->
             <button type="button" class="dropdown-item" data-modal="soporte" role="menuitem">
                 <i class="bi bi-question-circle" aria-hidden="true"></i>
-                <span>Soporte</span>
+                <span data-i18n="nav.soporte"><?= $t('nav.soporte') ?></span>
             </button>
 
             <div class="dropdown-divider" role="separator"></div>
 
             <a href="<?= BASE_URL ?>/cerrar-sesion" class="dropdown-item text-danger" role="menuitem">
                 <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-                <span>Cerrar Sesión</span>
+                <span data-i18n="nav.cerrar_sesion"><?= $t('nav.cerrar_sesion') ?></span>
             </a>
         </div>
 

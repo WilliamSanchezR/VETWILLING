@@ -136,6 +136,26 @@ class PreferenciasManager
             $this->sincronizarSesion($prefs['idioma']);
         }
 
+        // Sincronizar preferencia de notificación con la BD para mantener consistencia
+        if (array_key_exists('notificaciones', $cambios)) {
+            try {
+                if (!class_exists('Usuario')) {
+                    $modelPath = defined('BASE_PATH')
+                        ? BASE_PATH . '/app/models/usuario.php'
+                        : __DIR__ . '/../models/usuario.php';
+                    if (file_exists($modelPath)) {
+                        require_once $modelPath;
+                    }
+                }
+                if (class_exists('Usuario')) {
+                    $u = new Usuario();
+                    $u->actualizarPreferenciaNotificacion($this->id_usuario, $prefs['notificaciones']);
+                }
+            } catch (\Throwable $e) {
+                error_log('PreferenciasManager: no se pudo sincronizar notificaciones con BD — ' . $e->getMessage());
+            }
+        }
+
         return $prefs;
     }
 
