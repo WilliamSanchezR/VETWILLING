@@ -4,6 +4,7 @@ session_start();
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
+require_once __DIR__ . '/../helpers/notification/notificacion_helper.php';
 require_once __DIR__ . '/../models/Calendario.php';
 require_once __DIR__ . '/../models/Eventos.php';
 require_once __DIR__ . '/../models/DisponibilidadUsuario.php';
@@ -355,6 +356,30 @@ function crearAgendamientoAjax()
             } catch (Exception $e) {
                 error_log("Error al enviar notificacion: " . $e->getMessage());
                 // No detenemos el proceso si falla el envio del email
+            }
+
+            // NOTIFICACIÓN IN-APP AL PROPIETARIO
+            try {
+                if (!isset($detallesCita)) {
+                    $detallesCita = $objEventos->obtenerDetallesCita($id_generado);
+                }
+                $idUsuarioProp = (int)($detallesCita['id_usuario_propietario'] ?? 0);
+                if ($idUsuarioProp > 0) {
+                    $nombreMascota = $detallesCita['nombre_mascota'] ?? 'su mascota';
+                    $fechaCita     = date('d/m/Y H:i', strtotime($detallesCita['fecha_hora']));
+                    $idPaciente    = !empty($detallesCita['id_paciente']) ? (int)$detallesCita['id_paciente'] : null;
+                    notificar(
+                        'cita',
+                        'Nueva cita agendada',
+                        "Se ha agendado una cita para {$nombreMascota} el {$fechaCita}.",
+                        $idUsuarioProp,
+                        $idPaciente,
+                        '/cliente/agenda'
+                    );
+                }
+            } catch (Exception $e) {
+                error_log("Error al crear notificación in-app de cita: " . $e->getMessage());
+                // No detenemos el proceso si falla la notificación in-app
             }
 
             echo json_encode(['status' => 'success', 'message' => 'Agendamiento creado con éxito', 'id' => $id_generado]);

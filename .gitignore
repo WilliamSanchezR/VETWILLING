@@ -74,5 +74,6 @@ bootstrap.php
 # ── Documentación de desarrollo (no se sube al repo) ──────────────────────
 # Archivos .md generados durante el desarrollo local
 *.md
+docs/
 # Excepción: mantener el README principal si existe
 !README.md
