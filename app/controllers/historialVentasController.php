@@ -89,7 +89,7 @@ function construirPayloadVentas(int $idVeterinaria): array
 
     $model  = new Venta();
     $ventas = $model->listarVentas($idVeterinaria, $inicio, $fin, $idCliente, $producto ?: null, $estado);
-    $resumen = $model->obtenerResumenVentas($idVeterinaria, $inicio, $fin);
+    $resumen = $model->obtenerResumenVentas($idVeterinaria, $inicio, $fin, $idCliente, $producto, $estado);
     $clientes = $model->listarClientesConVentas($idVeterinaria);
 
     return [
