@@ -105,6 +105,14 @@ $seccionActual = $final_path ?? '';
                 <i class="bi bi-bar-chart"></i>
                 <span class="sv-text">Reportes</span>
             </a>
+
+            <a href="<?= BASE_URL ?>/directorio"
+               class="sv-item <?= $seccionActual === 'directorio' ? 'active' : '' ?>"
+               data-section="directorio"
+               data-tooltip="Directorio">
+                <i class="bi bi-people-fill"></i>
+                <span class="sv-text">Directorio</span>
+            </a>
         </div>
 
         <div class="sv-divider"></div>
@@ -205,6 +213,9 @@ $seccionActual = $final_path ?? '';
             </a>
             <a href="<?= BASE_URL ?>/veterinaria/reportes" class="sv-sheet-grid-item <?= $seccionActual === 'reportes' ? 'active' : '' ?>">
                 <i class="bi bi-bar-chart" aria-hidden="true"></i>Reportes
+            </a>
+            <a href="<?= BASE_URL ?>/directorio" class="sv-sheet-grid-item <?= $seccionActual === 'directorio' ? 'active' : '' ?>">
+                <i class="bi bi-people-fill" aria-hidden="true"></i>Directorio
             </a>
 
         </div>

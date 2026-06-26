@@ -1661,8 +1661,8 @@ class Veterinario
     public function actualizarImagen($id_usuario, $img_perfil)
     {
         try {
-            $actualizar = "UPDATE veterinario 
-                        SET img_perfil = :img_perfil 
+            $actualizar = "UPDATE veterinario
+                        SET img_perfil = :img_perfil
                         WHERE id_usuario = :id_usuario";
 
             $resultado = $this->conexion->prepare($actualizar);
@@ -1672,6 +1672,276 @@ class Veterinario
         } catch (PDOException $e) {
             error_log("Error en veterinario::actualizarImagen - " . $e->getMessage());
             return false;
+        }
+    }
+
+    // =========================================
+    //  DIRECTORIO DE VETERINARIOS - Issue #240
+    // =========================================
+
+    private function asegurarColumnaEstadoDirectorio(): void
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM information_schema.COLUMNS
+                    WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = 'profesional'
+                    AND COLUMN_NAME = 'estado_directorio'";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute();
+            if ((int) $stmt->fetchColumn() === 0) {
+                $this->conexion->exec(
+                    "ALTER TABLE profesional ADD COLUMN estado_directorio
+                     ENUM('Activo','En consulta','De vacaciones','No disponible')
+                     NOT NULL DEFAULT 'Activo' AFTER direccion"
+                );
+            }
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::asegurarColumnaEstadoDirectorio - " . $e->getMessage());
+        }
+    }
+
+    private function asegurarTablaResenias(): bool
+    {
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS resenia_profesional (
+                        id_resenia INT AUTO_INCREMENT PRIMARY KEY,
+                        id_usuario_profesional INT NOT NULL,
+                        id_usuario_autor INT NOT NULL,
+                        calificacion TINYINT NOT NULL,
+                        comentario TEXT NULL,
+                        estado ENUM('Activo','Inactivo') NOT NULL DEFAULT 'Activo',
+                        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        INDEX idx_resp_profesional (id_usuario_profesional),
+                        INDEX idx_resp_autor (id_usuario_autor),
+                        CONSTRAINT fk_resp_profesional FOREIGN KEY (id_usuario_profesional)
+                            REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                        CONSTRAINT fk_resp_autor FOREIGN KEY (id_usuario_autor)
+                            REFERENCES usuario (id_usuario) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                        CONSTRAINT chk_resp_calificacion CHECK (calificacion BETWEEN 1 AND 5)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+            $this->conexion->exec($sql);
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::asegurarTablaResenias - " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function listarDirectorioProfesionales(?int $id_veterinaria = null, array $filtros = []): array
+    {
+        try {
+            $this->asegurarColumnaEstadoDirectorio();
+            $this->asegurarTablaResenias();
+
+            $sql = "SELECT
+                        p.id_profesional,
+                        p.id_usuario,
+                        p.nombres,
+                        p.apellidos,
+                        p.registro_medico,
+                        p.telefono,
+                        p.img_perfil,
+                        p.direccion,
+                        p.estado_directorio,
+                        us.email,
+                        v.id_veterinaria,
+                        v.nombre AS veterinaria,
+                        GROUP_CONCAT(DISTINCT esp.nombre ORDER BY esp.nombre SEPARATOR ', ') AS especialidades,
+                        ROUND(AVG(r.calificacion), 1) AS calificacion_promedio,
+                        COUNT(DISTINCT r.id_resenia) AS total_resenias
+                    FROM profesional_veterinaria pv
+                    INNER JOIN profesional p ON p.id_profesional = pv.id_profesional
+                    INNER JOIN usuario us ON p.id_usuario = us.id_usuario
+                    INNER JOIN veterinaria v ON pv.id_veterinaria = v.id_veterinaria
+                    LEFT JOIN profesional_especialidad pe ON p.id_usuario = pe.id_usuario
+                        AND pe.estado = 'Activo' AND pe.id_veterinaria = pv.id_veterinaria
+                    LEFT JOIN especialidad esp ON pe.id_especialidad = esp.id_especialidad
+                    LEFT JOIN resenia_profesional r ON r.id_usuario_profesional = p.id_usuario
+                        AND r.estado = 'Activo'
+                    WHERE pv.estado = 'Activo' AND us.estado = 'activo'";
+
+            $params = [];
+
+            if ($id_veterinaria !== null) {
+                $sql .= " AND pv.id_veterinaria = :id_veterinaria";
+                $params[':id_veterinaria'] = $id_veterinaria;
+            }
+
+            if (!empty($filtros['disponibilidad'])) {
+                $sql .= " AND p.estado_directorio = :disponibilidad";
+                $params[':disponibilidad'] = $filtros['disponibilidad'];
+            }
+
+            if (!empty($filtros['busqueda'])) {
+                $sql .= " AND (p.nombres LIKE :busqueda OR p.apellidos LIKE :busqueda2
+                           OR CONCAT(p.nombres, ' ', p.apellidos) LIKE :busqueda3)";
+                $params[':busqueda']  = '%' . $filtros['busqueda'] . '%';
+                $params[':busqueda2'] = '%' . $filtros['busqueda'] . '%';
+                $params[':busqueda3'] = '%' . $filtros['busqueda'] . '%';
+            }
+
+            $sql .= " GROUP BY p.id_profesional, p.id_usuario, pv.id_veterinaria";
+
+            if (!empty($filtros['especialidad'])) {
+                $sql .= " HAVING especialidades LIKE :especialidad";
+                $params[':especialidad'] = '%' . $filtros['especialidad'] . '%';
+            }
+
+            $sql .= " ORDER BY calificacion_promedio DESC, p.nombres ASC";
+
+            $stmt = $this->conexion->prepare($sql);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::listarDirectorioProfesionales - " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function obtenerPerfilDirectorio(int $id_usuario): ?array
+    {
+        try {
+            $this->asegurarColumnaEstadoDirectorio();
+            $this->asegurarTablaResenias();
+
+            $sql = "SELECT
+                        p.id_profesional,
+                        p.id_usuario,
+                        p.nombres,
+                        p.apellidos,
+                        p.registro_medico,
+                        p.telefono,
+                        p.img_perfil,
+                        p.direccion,
+                        p.estado_directorio,
+                        us.email,
+                        v.id_veterinaria,
+                        v.nombre AS veterinaria,
+                        GROUP_CONCAT(DISTINCT esp.nombre ORDER BY esp.nombre SEPARATOR ', ') AS especialidades,
+                        ROUND(AVG(r.calificacion), 1) AS calificacion_promedio,
+                        COUNT(DISTINCT r.id_resenia) AS total_resenias
+                    FROM profesional p
+                    INNER JOIN usuario us ON p.id_usuario = us.id_usuario
+                    INNER JOIN profesional_veterinaria pv ON p.id_profesional = pv.id_profesional
+                        AND pv.estado = 'Activo'
+                    INNER JOIN veterinaria v ON pv.id_veterinaria = v.id_veterinaria
+                    LEFT JOIN profesional_especialidad pe ON p.id_usuario = pe.id_usuario
+                        AND pe.estado = 'Activo' AND pe.id_veterinaria = pv.id_veterinaria
+                    LEFT JOIN especialidad esp ON pe.id_especialidad = esp.id_especialidad
+                    LEFT JOIN resenia_profesional r ON r.id_usuario_profesional = p.id_usuario
+                        AND r.estado = 'Activo'
+                    WHERE p.id_usuario = :id_usuario
+                    GROUP BY p.id_profesional, v.id_veterinaria
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            $perfil = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$perfil) {
+                return null;
+            }
+
+            $sqlHorarios = "SELECT
+                                du.dia_semana,
+                                CASE du.dia_semana
+                                    WHEN 1 THEN 'Lunes'   WHEN 2 THEN 'Martes'
+                                    WHEN 3 THEN 'Miércoles' WHEN 4 THEN 'Jueves'
+                                    WHEN 5 THEN 'Viernes' WHEN 6 THEN 'Sábado'
+                                    WHEN 7 THEN 'Domingo'
+                                END AS dia,
+                                du.hora_inicio,
+                                du.hora_fin,
+                                esp.nombre AS especialidad
+                            FROM disponibilidad_usuario du
+                            LEFT JOIN especialidad esp ON du.id_especialidad = esp.id_especialidad
+                            WHERE du.id_usuario = :id_usuario AND du.estado = 'Activo'
+                            ORDER BY du.dia_semana ASC, du.hora_inicio ASC";
+
+            $stmtH = $this->conexion->prepare($sqlHorarios);
+            $stmtH->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmtH->execute();
+            $perfil['horarios'] = $stmtH->fetchAll(PDO::FETCH_ASSOC);
+
+            return $perfil;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::obtenerPerfilDirectorio - " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function actualizarEstadoDirectorio(int $id_usuario, string $estado): bool
+    {
+        $estados_validos = ['Activo', 'En consulta', 'De vacaciones', 'No disponible'];
+        if (!in_array($estado, $estados_validos, true)) {
+            return false;
+        }
+        try {
+            $this->asegurarColumnaEstadoDirectorio();
+            $sql = "UPDATE profesional SET estado_directorio = :estado WHERE id_usuario = :id_usuario";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':estado', $estado, PDO::PARAM_STR);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::actualizarEstadoDirectorio - " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function agregarResenia(array $data): bool
+    {
+        if (!$this->asegurarTablaResenias()) {
+            return false;
+        }
+        $calificacion = (int) ($data['calificacion'] ?? 0);
+        if ($calificacion < 1 || $calificacion > 5) {
+            return false;
+        }
+        try {
+            $sql = "INSERT INTO resenia_profesional
+                        (id_usuario_profesional, id_usuario_autor, calificacion, comentario)
+                    VALUES (:id_usuario_profesional, :id_usuario_autor, :calificacion, :comentario)";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario_profesional', $data['id_usuario_profesional'], PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario_autor',       $data['id_usuario_autor'],       PDO::PARAM_INT);
+            $stmt->bindParam(':calificacion',           $calificacion,                   PDO::PARAM_INT);
+            $stmt->bindParam(':comentario',             $data['comentario'],             PDO::PARAM_STR);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::agregarResenia - " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function listarResenias(int $id_usuario): array
+    {
+        if (!$this->asegurarTablaResenias()) {
+            return [];
+        }
+        try {
+            $sql = "SELECT
+                        r.id_resenia,
+                        r.calificacion,
+                        r.comentario,
+                        r.created_at,
+                        CONCAT(pr.nombres, ' ', pr.apellidos) AS autor_nombre
+                    FROM resenia_profesional r
+                    LEFT JOIN propietario pr ON r.id_usuario_autor = pr.id_usuario
+                    WHERE r.id_usuario_profesional = :id_usuario AND r.estado = 'Activo'
+                    ORDER BY r.created_at DESC";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::listarResenias - " . $e->getMessage());
+            return [];
         }
     }
 }

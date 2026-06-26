@@ -36,6 +36,10 @@
                 <i class="bi bi-bag-plus"></i>
                 <span class="nav-text">Catalogo</span>
             </a>
+            <a href="<?= BASE_URL ?>/directorio" class="nav-item" data-section="directorio" data-tooltip="Directorio">
+                <i class="bi bi-people-fill"></i>
+                <span class="nav-text">Directorio</span>
+            </a>
 
             <span class="nav-section-title">Comunicación</span>
 
@@ -89,6 +93,10 @@
         <a href="<?= BASE_URL ?>/cliente/tienda" class="mobile-nav-item" data-section="tienda">
             <i class="bi bi-bag-plus"></i>
             <span>Tienda</span>
+        </a>
+        <a href="<?= BASE_URL ?>/directorio" class="mobile-nav-item" data-section="directorio">
+            <i class="bi bi-people-fill"></i>
+            <span>Directorio</span>
         </a>
     </nav>
 </div>

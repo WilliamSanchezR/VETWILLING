@@ -352,6 +352,20 @@ switch ($request) {
             "/app/controllers/fichaClinicaPacientePdfController.php";
         break;
 
+    // ---------------------------------------DIRECTORIO DE VETERINARIOS - Issue #240-----//
+    case "/directorio":
+        require BASE_PATH . "/app/views/dashboard/directorio/directorio.php";
+        break;
+    case "/directorio/ver-perfil":
+        require BASE_PATH . "/app/views/dashboard/directorio/perfilProfesional.php";
+        break;
+    case "/directorio/profesionales":
+    case "/directorio/perfil":
+    case "/directorio/resenia":
+    case "/directorio/actualizar-estado":
+        require BASE_PATH . "/app/controllers/directorioProfesionalesController.php";
+        break;
+
     case "/veterinario/guardar-veterinario":
         require BASE_PATH . "/app/controllers/veterinarioController.php";
         break;
