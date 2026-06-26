@@ -1,180 +1,269 @@
 <?php
-/**
- * Modelo: Notificacion
- * Responsabilidad: Acceso a datos de notificaciones (solo lógica de BD)
- */
+
 require_once __DIR__ . '/../../config/database.php';
 
-class Notificacion {
-    private $conexion;
+class Notificacion
+{
+    private PDO $conexion;
 
-    public function __construct() {
-        $db = new Conexion();
+    public function __construct()
+    {
+        $db             = new Conexion();
         $this->conexion = $db->getConexion();
     }
 
-    /** Cuenta notificaciones no leídas (leido = 0) de un usuario */
-    public function contarNoLeidas(int $usuario_id): int {
-        $stmt = $this->conexion->prepare(
-            "SELECT COUNT(*) FROM notificaciones
-             WHERE usuario_id = ? AND leido = 0"
-        );
-        $stmt->execute([$usuario_id]);
-        return (int) $stmt->fetchColumn();
-    }
+    // =========================================================================
+    // ESCRITURA
+    // =========================================================================
 
-    /** Lista notificaciones del usuario con paginación */
-    public function obtenerPorUsuario(int $usuario_id, int $limite = 10, int $offset = 0): array {
-        $limite = max(1, $limite);
-        $offset = max(0, $offset);
+    /**
+     * Crear una notificación para un usuario.
+     *
+     * Campos obligatorios en $datos:
+     *   - id_usuario  (int)
+     *   - tipo        (string) 'cita' | 'vacuna' | 'tratamiento'
+     *   - titulo      (string)
+     *   - mensaje     (string)
+     *
+     * Campos opcionales:
+     *   - url_accion  (string|null)
+     *   - id_paciente (int|null)
+     *
+     * @return int|false  ID insertado o false si falla.
+     */
+    public function crear(array $datos): int|false
+    {
+        try {
+            $sql = "INSERT INTO notificacion
+                        (id_usuario, tipo, titulo, mensaje, url_accion, id_paciente)
+                    VALUES
+                        (:id_usuario, :tipo, :titulo, :mensaje, :url_accion, :id_paciente)";
 
-        $stmt = $this->conexion->prepare(
-            "SELECT id, usuario_id, tipo, mensaje, leido, referencia_id, fecha
-             FROM notificaciones
-             WHERE usuario_id = ?
-             ORDER BY fecha DESC
-             LIMIT {$limite} OFFSET {$offset}"
-        );
-        $stmt->execute([$usuario_id]);
-        return $this->enriquecerFilas($stmt->fetchAll(PDO::FETCH_ASSOC));
-    }
+            $stmt = $this->conexion->prepare($sql);
 
-    /** Obtiene una notificación por ID, validando que pertenezca al usuario */
-    public function obtenerPorId(int $id, int $usuario_id): ?array {
-        $stmt = $this->conexion->prepare(
-            "SELECT id, usuario_id, tipo, mensaje, leido, referencia_id, fecha
-             FROM notificaciones
-             WHERE id = ? AND usuario_id = ?
-             LIMIT 1"
-        );
-        $stmt->execute([$id, $usuario_id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? $this->enriquecerFila($row) : null;
-    }
+            $urlAccion  = $datos['url_accion']  ?? null;
+            $idPaciente = isset($datos['id_paciente']) ? (int)$datos['id_paciente'] : null;
 
-    /** Notificaciones nuevas desde un ID (polling / SSE) */
-    public function obtenerNuevas(int $usuario_id, int $desde_id = 0): array {
-        if ($desde_id <= 0) {
-            return [];
+            $stmt->bindParam(':id_usuario',  $datos['id_usuario'], PDO::PARAM_INT);
+            $stmt->bindParam(':tipo',        $datos['tipo'],       PDO::PARAM_STR);
+            $stmt->bindParam(':titulo',      $datos['titulo'],     PDO::PARAM_STR);
+            $stmt->bindParam(':mensaje',     $datos['mensaje'],    PDO::PARAM_STR);
+            $stmt->bindValue(':url_accion',  $urlAccion,  $urlAccion  !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindValue(':id_paciente', $idPaciente, $idPaciente !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
+
+            $stmt->execute();
+            return (int)$this->conexion->lastInsertId();
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::crear] ' . $e->getMessage());
+            return false;
         }
-
-        $stmt = $this->conexion->prepare(
-            "SELECT id, usuario_id, tipo, mensaje, leido, referencia_id, fecha
-             FROM notificaciones
-             WHERE usuario_id = ? AND id > ?
-             ORDER BY fecha ASC"
-        );
-        $stmt->execute([$usuario_id, $desde_id]);
-        return $this->enriquecerFilas($stmt->fetchAll(PDO::FETCH_ASSOC));
-    }
-
-    public function obtenerUltimoId(int $usuario_id): int {
-        $stmt = $this->conexion->prepare(
-            "SELECT COALESCE(MAX(id), 0) FROM notificaciones WHERE usuario_id = ?"
-        );
-        $stmt->execute([$usuario_id]);
-        return (int) $stmt->fetchColumn();
     }
 
     /**
-     * Registra una notificación no leída.
-     * Mapeo: leido=0 equivale a status 'unread'.
+     * Crear múltiples notificaciones en una sola transacción.
+     * Útil para notificar a varios usuarios a la vez (ej: recordatorios masivos).
+     *
+     * @param  array[] $notificaciones  Array de arrays con las mismas claves que crear().
+     * @return int     Cantidad de filas insertadas exitosamente.
      */
-    public function registrar(
-        int $usuario_id,
-        string $titulo,
-        string $mensaje,
-        string $tipo = 'info',
-        ?int $referencia_id = null
-    ): int {
-        return $this->crear($usuario_id, $titulo, $mensaje, $tipo, $referencia_id);
+    public function crearBatch(array $notificaciones): int
+    {
+        if (empty($notificaciones)) return 0;
+
+        $insertadas = 0;
+
+        try {
+            $this->conexion->beginTransaction();
+
+            $sql = "INSERT INTO notificacion
+                        (id_usuario, tipo, titulo, mensaje, url_accion, id_paciente)
+                    VALUES
+                        (:id_usuario, :tipo, :titulo, :mensaje, :url_accion, :id_paciente)";
+
+            $stmt = $this->conexion->prepare($sql);
+
+            foreach ($notificaciones as $datos) {
+                $urlAccion  = $datos['url_accion']  ?? null;
+                $idPaciente = isset($datos['id_paciente']) ? (int)$datos['id_paciente'] : null;
+
+                $stmt->bindParam(':id_usuario',  $datos['id_usuario'], PDO::PARAM_INT);
+                $stmt->bindParam(':tipo',        $datos['tipo'],       PDO::PARAM_STR);
+                $stmt->bindParam(':titulo',      $datos['titulo'],     PDO::PARAM_STR);
+                $stmt->bindParam(':mensaje',     $datos['mensaje'],    PDO::PARAM_STR);
+                $stmt->bindValue(':url_accion',  $urlAccion,  $urlAccion  !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+                $stmt->bindValue(':id_paciente', $idPaciente, $idPaciente !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
+
+                if ($stmt->execute()) $insertadas++;
+            }
+
+            $this->conexion->commit();
+            return $insertadas;
+
+        } catch (PDOException $e) {
+            if ($this->conexion->inTransaction()) $this->conexion->rollBack();
+            error_log('[Notificacion::crearBatch] ' . $e->getMessage());
+            return 0;
+        }
     }
 
-    /** Alias usado por otros módulos (Seguimientos, etc.) */
-    public function crear(
-        int $usuario_id,
-        string $titulo,
-        string $mensaje,
-        string $tipo = 'info',
-        ?int $referencia_id = null
-    ): int {
-        $texto = $this->componerMensaje($titulo, $mensaje);
+    // =========================================================================
+    // LECTURA
+    // =========================================================================
 
-        $stmt = $this->conexion->prepare(
-            "INSERT INTO notificaciones
-             (usuario_id, tipo, mensaje, leido, referencia_id, fecha)
-             VALUES (?, ?, ?, 0, ?, NOW())"
-        );
-        $stmt->execute([$usuario_id, $tipo, $texto, $referencia_id]);
-        return (int) $this->conexion->lastInsertId();
+    /**
+     * Listar todas las notificaciones no descartadas de un usuario,
+     * ordenadas de más reciente a más antigua.
+     *
+     * @param  int   $id_usuario
+     * @param  int   $limite     Máximo de filas a retornar (default 50).
+     * @return array
+     */
+    public function listarParaUsuario(int $id_usuario, int $limite = 50): array
+    {
+        try {
+            $sql = "SELECT
+                        id_notificacion,
+                        id_usuario,
+                        id_paciente,
+                        tipo,
+                        titulo,
+                        mensaje,
+                        url_accion,
+                        leida,
+                        descartada,
+                        fecha_creacion
+                    FROM notificacion
+                    WHERE id_usuario  = :id_usuario
+                      AND descartada  = 0
+                    ORDER BY fecha_creacion DESC
+                    LIMIT :limite";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':limite',     $limite,     PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::listarParaUsuario] ' . $e->getMessage());
+            return [];
+        }
     }
 
-    /** Marca una notificación como leída (leido = 1, status 'read') */
-    public function marcarLeida(int $id_notificacion, int $usuario_id): bool {
-        $stmt = $this->conexion->prepare(
-            "UPDATE notificaciones SET leido = 1
-             WHERE id = ? AND usuario_id = ? AND leido = 0"
-        );
-        $stmt->execute([$id_notificacion, $usuario_id]);
-        return $stmt->rowCount() > 0;
+    /**
+     * Contar notificaciones no leídas (valor del badge en el sidebar/header).
+     *
+     * @param  int $id_usuario
+     * @return int
+     */
+    public function contarNoLeidas(int $id_usuario): int
+    {
+        try {
+            $sql = "SELECT COUNT(*) AS total
+                    FROM notificacion
+                    WHERE id_usuario = :id_usuario
+                      AND leida      = 0
+                      AND descartada = 0";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int)($fila['total'] ?? 0);
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::contarNoLeidas] ' . $e->getMessage());
+            return 0;
+        }
     }
 
-    public function marcarTodasLeidas(int $usuario_id): bool {
-        $stmt = $this->conexion->prepare(
-            "UPDATE notificaciones SET leido = 1
-             WHERE usuario_id = ? AND leido = 0"
-        );
-        $stmt->execute([$usuario_id]);
-        return $stmt->rowCount() > 0;
-    }
+    // =========================================================================
+    // ACTUALIZACIÓN DE ESTADO
+    // =========================================================================
 
-    public function modificar(int $id, int $usuario_id, string $mensaje, ?string $tipo = null): bool {
-        $stmt = $this->conexion->prepare(
-            "UPDATE notificaciones
-             SET mensaje = ?, tipo = COALESCE(?, tipo)
-             WHERE id = ? AND usuario_id = ?"
-        );
-        $stmt->execute([$mensaje, $tipo, $id, $usuario_id]);
-        return $stmt->rowCount() > 0;
-    }
+    /**
+     * Marcar una notificación como leída.
+     * El WHERE incluye id_usuario para evitar que otro usuario marque ajenas.
+     *
+     * @param  int  $id_notificacion
+     * @param  int  $id_usuario
+     * @return bool
+     */
+    public function marcarLeida(int $id_notificacion, int $id_usuario): bool
+    {
+        try {
+            $sql = "UPDATE notificacion
+                    SET leida = 1
+                    WHERE id_notificacion = :id_notificacion
+                      AND id_usuario      = :id_usuario";
 
-    public function cancelar(int $id, int $usuario_id, ?string $motivo = null): bool {
-        $notif = $this->obtenerPorId($id, $usuario_id);
-        if (!$notif) {
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_notificacion', $id_notificacion, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario',      $id_usuario,      PDO::PARAM_INT);
+
+            return $stmt->execute();
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::marcarLeida] ' . $e->getMessage());
             return false;
         }
+    }
 
-        $mensaje = $notif['mensaje'];
-        if ($motivo) {
-            $mensaje .= ' [Cancelada: ' . $motivo . ']';
+    /**
+     * Marcar todas las notificaciones no leídas de un usuario como leídas.
+     *
+     * @param  int  $id_usuario
+     * @return bool
+     */
+    public function marcarTodasLeidas(int $id_usuario): bool
+    {
+        try {
+            $sql = "UPDATE notificacion
+                    SET leida = 1
+                    WHERE id_usuario = :id_usuario
+                      AND leida      = 0
+                      AND descartada = 0";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+
+            return $stmt->execute();
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::marcarTodasLeidas] ' . $e->getMessage());
+            return false;
         }
-
-        $stmt = $this->conexion->prepare(
-            "UPDATE notificaciones SET mensaje = ?, leido = 1
-             WHERE id = ? AND usuario_id = ?"
-        );
-        $stmt->execute([$mensaje, $id, $usuario_id]);
-        return $stmt->rowCount() > 0;
     }
 
-    private function componerMensaje(string $titulo, string $mensaje): string {
-        $titulo  = trim($titulo);
-        $mensaje = trim($mensaje);
+    /**
+     * Descartar (ocultar) una notificación — soft delete.
+     * También la marca como leída para que no sume al badge.
+     *
+     * @param  int  $id_notificacion
+     * @param  int  $id_usuario
+     * @return bool
+     */
+    public function descartar(int $id_notificacion, int $id_usuario): bool
+    {
+        try {
+            $sql = "UPDATE notificacion
+                    SET descartada = 1,
+                        leida      = 1
+                    WHERE id_notificacion = :id_notificacion
+                      AND id_usuario      = :id_usuario";
 
-        if ($titulo !== '' && $mensaje !== '' && $titulo !== $mensaje) {
-            return "{$titulo}: {$mensaje}";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_notificacion', $id_notificacion, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario',      $id_usuario,      PDO::PARAM_INT);
+
+            return $stmt->execute();
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::descartar] ' . $e->getMessage());
+            return false;
         }
-
-        return $mensaje !== '' ? $mensaje : $titulo;
-    }
-
-    /** Agrega campo de estado legible para la API */
-    private function enriquecerFila(array $row): array {
-        $row['estado_lectura'] = !empty($row['leido']) ? 'read' : 'unread';
-        return $row;
-    }
-
-    private function enriquecerFilas(array $filas): array {
-        return array_map([$this, 'enriquecerFila'], $filas);
     }
 }

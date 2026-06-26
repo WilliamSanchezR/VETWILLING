@@ -9,11 +9,11 @@
 
     <div class="sidebar-header">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-NEGATIVO.png"
-             alt="VetWilling"
-             class="sidebar-logo-full">
+            alt="VetWilling"
+            class="sidebar-logo-full">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-VERTICAL-NEGATIVA.png"
-             alt="VW"
-             class="sidebar-logo-icon">
+            alt="VW"
+            class="sidebar-logo-icon">
     </div>
 
     <nav class="sidebar-nav">
@@ -36,6 +36,17 @@
                 <i class="bi bi-bag-plus"></i>
                 <span class="nav-text">Catalogo</span>
             </a>
+            <a href="<?= BASE_URL ?>/directorio" class="nav-item" data-section="directorio" data-tooltip="Directorio">
+                <i class="bi bi-people-fill"></i>
+                <span class="nav-text">Directorio</span>
+            </a>
+
+            <span class="nav-section-title">Comunicación</span>
+
+            <a href="<?= BASE_URL ?>/cliente/notificaciones" class="nav-item" data-section="tienda" data-tooltip="Catalogo">
+                <i class="bi bi-bag-plus"></i>
+                <span class="nav-text">Notificaciones</span>
+            </a>
         </div>
     </nav>
 
@@ -57,8 +68,8 @@
 
     <div class="mobile-panel-header">
         <img src="<?= BASE_URL ?>/public/assets/webSite/img/LOGO-POSITIVO.png"
-             alt="VetWilling"
-             class="mobile-panel-logo">
+            alt="VetWilling"
+            class="mobile-panel-logo">
         <button type="button" class="mobile-panel-close" id="mobilePanelClose" aria-label="Cerrar menú">
             <i class="bi bi-x-lg"></i>
         </button>
@@ -83,6 +94,10 @@
             <i class="bi bi-bag-plus"></i>
             <span>Tienda</span>
         </a>
+        <a href="<?= BASE_URL ?>/directorio" class="mobile-nav-item" data-section="directorio">
+            <i class="bi bi-people-fill"></i>
+            <span>Directorio</span>
+        </a>
     </nav>
 </div>
 
@@ -99,99 +114,99 @@
 </button>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
 
-    /* ── Referencias ── */
-    var sidebar      = document.getElementById('sidebar');
-    var sidebarToggle = document.getElementById('sidebarToggle');
-    var fabMenu      = document.getElementById('fabMenu');
-    var fabIcon      = document.getElementById('fabIcon');
-    var mobilePanel  = document.getElementById('mobilePanel');
-    var mobileOverlay = document.getElementById('mobileOverlay');
-    var panelClose   = document.getElementById('mobilePanelClose');
+        /* ── Referencias ── */
+        var sidebar = document.getElementById('sidebar');
+        var sidebarToggle = document.getElementById('sidebarToggle');
+        var fabMenu = document.getElementById('fabMenu');
+        var fabIcon = document.getElementById('fabIcon');
+        var mobilePanel = document.getElementById('mobilePanel');
+        var mobileOverlay = document.getElementById('mobileOverlay');
+        var panelClose = document.getElementById('mobilePanelClose');
 
-    /* ── Helpers ── */
-    function isMobile() {
-        return window.innerWidth <= 768;
-    }
+        /* ── Helpers ── */
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
 
-    /* ══════════════════════════════════════
-       PC: toggle colapsar / expandir sidebar
-       ══════════════════════════════════════ */
-    sidebarToggle?.addEventListener('click', function () {
-        if (isMobile()) return;
-        sidebar.classList.toggle('collapsed');
-        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-    });
+        /* ══════════════════════════════════════
+           PC: toggle colapsar / expandir sidebar
+           ══════════════════════════════════════ */
+        sidebarToggle?.addEventListener('click', function() {
+            if (isMobile()) return;
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
 
-    /* ══════════════════════════════════════
-       MÓVIL: abrir / cerrar panel lateral
-       ══════════════════════════════════════ */
-    function abrirPanel() {
-        mobilePanel.classList.add('open');
-        mobileOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        fabMenu.setAttribute('aria-expanded', 'true');
-        fabIcon.className = 'bi bi-x-lg';
-    }
+        /* ══════════════════════════════════════
+           MÓVIL: abrir / cerrar panel lateral
+           ══════════════════════════════════════ */
+        function abrirPanel() {
+            mobilePanel.classList.add('open');
+            mobileOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            fabMenu.setAttribute('aria-expanded', 'true');
+            fabIcon.className = 'bi bi-x-lg';
+        }
 
-    function cerrarPanel() {
-        mobilePanel.classList.remove('open');
-        mobileOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-        fabMenu.setAttribute('aria-expanded', 'false');
-        fabIcon.className = 'bi bi-grid-fill';
-    }
+        function cerrarPanel() {
+            mobilePanel.classList.remove('open');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            fabMenu.setAttribute('aria-expanded', 'false');
+            fabIcon.className = 'bi bi-grid-fill';
+        }
 
-    fabMenu?.addEventListener('click', function () {
-        mobilePanel.classList.contains('open') ? cerrarPanel() : abrirPanel();
-    });
+        fabMenu?.addEventListener('click', function() {
+            mobilePanel.classList.contains('open') ? cerrarPanel() : abrirPanel();
+        });
 
-    panelClose?.addEventListener('click', cerrarPanel);
-    mobileOverlay?.addEventListener('click', cerrarPanel);
+        panelClose?.addEventListener('click', cerrarPanel);
+        mobileOverlay?.addEventListener('click', cerrarPanel);
 
-    /* Cerrar con Escape */
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') cerrarPanel();
-    });
+        /* Cerrar con Escape */
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') cerrarPanel();
+        });
 
-    /* ══════════════════════════════════════
-       Resize: limpiar estados correctamente
-       ══════════════════════════════════════ */
-    window.addEventListener('resize', function () {
+        /* ══════════════════════════════════════
+           Resize: limpiar estados correctamente
+           ══════════════════════════════════════ */
+        window.addEventListener('resize', function() {
+            if (!isMobile()) {
+                cerrarPanel();
+                var wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+                sidebar?.classList.toggle('collapsed', wasCollapsed);
+            } else {
+                sidebar?.classList.remove('collapsed');
+            }
+        });
+
+        /* ══════════════════════════════════════
+           Inicializar estado al cargar
+           ══════════════════════════════════════ */
         if (!isMobile()) {
-            cerrarPanel();
             var wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             sidebar?.classList.toggle('collapsed', wasCollapsed);
         } else {
             sidebar?.classList.remove('collapsed');
         }
+
+        /* ══════════════════════════════════════
+           Marcar ítem activo según URL actual
+           ══════════════════════════════════════ */
+        var currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(function(link) {
+            if (currentPath.includes(link.dataset.section)) {
+                link.classList.add('active');
+            }
+        });
+
     });
 
-    /* ══════════════════════════════════════
-       Inicializar estado al cargar
-       ══════════════════════════════════════ */
-    if (!isMobile()) {
-        var wasCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        sidebar?.classList.toggle('collapsed', wasCollapsed);
-    } else {
-        sidebar?.classList.remove('collapsed');
-    }
-
-    /* ══════════════════════════════════════
-       Marcar ítem activo según URL actual
-       ══════════════════════════════════════ */
-    var currentPath = window.location.pathname;
-    document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(function (link) {
-        if (currentPath.includes(link.dataset.section)) {
-            link.classList.add('active');
-        }
-    });
-
-});
-
-/* Nota: el listener de sidebarToggle vive únicamente dentro de DOMContentLoaded
-   (arriba). El bloque redundante que existía aquí fue eliminado porque
-   'sidebarToggle' era undefined en este scope (var declarado dentro del callback)
-   y con optional-chaining (?.) era un no-op silencioso. */
+    /* Nota: el listener de sidebarToggle vive únicamente dentro de DOMContentLoaded
+       (arriba). El bloque redundante que existía aquí fue eliminado porque
+       'sidebarToggle' era undefined en este scope (var declarado dentro del callback)
+       y con optional-chaining (?.) era un no-op silencioso. */
 </script>

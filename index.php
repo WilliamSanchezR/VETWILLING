@@ -200,6 +200,29 @@ switch ($request) {
             "/app/controllers/reportesInventarioRepresentanteController.php";
         break;
 
+    // Historial de ventas (Issue #244)
+    case "/representante/historial-ventas":
+        require BASE_PATH .
+            "/app/views/dashboard/representante/historialVentas.php";
+        break;
+
+    case "/representante/historial-ventas/data":
+        require BASE_PATH .
+            "/app/controllers/historialVentasController.php";
+        break;
+
+    case "/representante/historial-ventas/pdf":
+        $_GET["action"] = "pdf";
+        require BASE_PATH .
+            "/app/controllers/historialVentasController.php";
+        break;
+
+    case "/representante/historial-ventas/excel":
+        $_GET["action"] = "excel";
+        require BASE_PATH .
+            "/app/controllers/historialVentasController.php";
+        break;
+
     // RUTAS DEL CONTROLADOR DE CALENDARIO
     case "/calendario/cargar":
         require BASE_PATH . "/app/controllers/calendarioController.php";
@@ -327,6 +350,20 @@ switch ($request) {
     case "/veterinaria/gestion-pacientes/pdf-mascota":
         require BASE_PATH .
             "/app/controllers/fichaClinicaPacientePdfController.php";
+        break;
+
+    // ---------------------------------------DIRECTORIO DE VETERINARIOS - Issue #240-----//
+    case "/directorio":
+        require BASE_PATH . "/app/views/dashboard/directorio/directorio.php";
+        break;
+    case "/directorio/ver-perfil":
+        require BASE_PATH . "/app/views/dashboard/directorio/perfilProfesional.php";
+        break;
+    case "/directorio/profesionales":
+    case "/directorio/perfil":
+    case "/directorio/resenia":
+    case "/directorio/actualizar-estado":
+        require BASE_PATH . "/app/controllers/directorioProfesionalesController.php";
         break;
 
     case "/veterinario/guardar-veterinario":
@@ -585,7 +622,11 @@ switch ($request) {
         break;
 
     case "/cliente/notificaciones":
-        require BASE_PATH . "/app/views/dashboard/cliente/notificaciones.php";
+        require BASE_PATH . "/app/controllers/NotificacioneController.php";
+        break;
+
+    case "/paciente/api/notificaciones":
+        require BASE_PATH . "/app/controllers/api/notificaciones_api.php"; // ← antes era NotificacioneController
         break;
 
     //----------ACCIONES DEL PACIENTE---------//

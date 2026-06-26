@@ -1,0 +1,221 @@
+/* ================================================================
+   Directorio de Profesionales — Issue #240
+   Hoja de estilos principal del módulo de directorio
+   ================================================================ */
+
+/* ── Barra de filtros ──────────────────────────────────────────── */
+.dir-filtros {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .08);
+    margin-bottom: 24px;
+}
+
+.dir-input-wrap {
+    position: relative;
+}
+
+.dir-input-wrap .bi {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.dir-input {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px 14px 10px 38px;
+    width: 100%;
+    font-size: .9rem;
+    outline: none;
+    transition: border-color .2s;
+}
+
+.dir-input:focus {
+    border-color: #0a932c;
+}
+
+.dir-select {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: .9rem;
+    background: #fff;
+    width: 100%;
+}
+
+.dir-select:focus {
+    border-color: #0a932c;
+    outline: none;
+}
+
+/* ── Cards de profesional ──────────────────────────────────────── */
+.card-prof {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+    transition: transform .2s, box-shadow .2s;
+    overflow: hidden;
+    height: 100%;
+}
+
+.card-prof:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .14);
+}
+
+.card-prof .avatar-wrap {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #e9f5ec;
+    margin: 0 auto 12px;
+}
+
+.card-prof .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-prof .nombre {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 2px;
+}
+
+.card-prof .licencia {
+    font-size: .78rem;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.card-prof .esp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.card-prof .esp-tag {
+    background: #e9f5ec;
+    color: #0a932c;
+    border-radius: 20px;
+    font-size: .72rem;
+    padding: 2px 8px;
+}
+
+.card-prof .rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: center;
+    font-size: .85rem;
+    color: #f59e0b;
+    margin-bottom: 6px;
+}
+
+.card-prof .rating .total {
+    color: #999;
+    font-size: .78rem;
+}
+
+.card-prof .vet-clinic {
+    font-size: .78rem;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.card-prof .vet-clinic i {
+    color: #0a932c;
+}
+
+/* ── Badges de disponibilidad ──────────────────────────────────── */
+.badge-estado {
+    font-size: .72rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.badge-Activo        { background: #d1fae5; color: #065f46; }
+.badge-En-consulta   { background: #fef9c3; color: #92400e; }
+.badge-De-vacaciones { background: #dbeafe; color: #1e40af; }
+.badge-No-disponible { background: #f3f4f6; color: #6b7280; }
+
+/* ── Botón ver perfil ──────────────────────────────────────────── */
+.btn-ver-perfil {
+    background: #0a932c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: background .2s;
+    width: 100%;
+}
+
+.btn-ver-perfil:hover {
+    background: #077522;
+}
+
+/* ── Estado vacío y spinner ────────────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #aaa;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.spinner-wrap {
+    text-align: center;
+    padding: 60px;
+    color: #0a932c;
+}
+
+/* ── Banner estado propio (veterinario) ────────────────────────── */
+.banner-estado {
+    background: linear-gradient(135deg, #0a932c, #077522);
+    color: #fff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.banner-estado select {
+    border-radius: 8px;
+    border: none;
+    padding: 6px 12px;
+    font-size: .85rem;
+}
+
+.banner-estado .lbl {
+    font-weight: 600;
+    font-size: .95rem;
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+@media (max-width: 576px) {
+    .dir-filtros .row > div {
+        margin-bottom: 10px;
+    }
+}
