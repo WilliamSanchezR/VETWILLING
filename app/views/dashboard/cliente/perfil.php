@@ -21,8 +21,12 @@ $mascotas = listarMascotas();
 // ── Gestor de sesiones ────────────────────────────────────────────────────
 $sm = new SessionManager($id);
 $sm->registrar();                    // Registra / actualiza la sesión actual
-$sesiones  = $sm->listar();          // Lista para mostrar en la vista
+$sesiones    = $sm->listar();        // Lista para mostrar en la vista
 $sesionNueva = $sm->esNueva();       // ¿Primer login desde este dispositivo?
+
+// ── Estadísticas dinámicas del propietario ────────────────────────────────
+$stats = ($rol == 3) ? obtenerEstadisticasPerfil($id) : ['total_citas' => 0, 'vacunas_aplicadas' => 0, 'anio_registro' => null];
+$anioRegistro = !empty($stats['anio_registro']) ? $stats['anio_registro'] : date('Y');
 
 // ── Ruta de imagen de perfil ──────────────────────────────────────────────
 $fotoUsuario    = $usuario['img_perfil'] ?? '';
@@ -74,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
 
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/perfil.css">
 </head>
 
@@ -119,8 +122,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
             </p>
             <div class="badges-perfil">
               <span class="badge-item"><i class="bi bi-star-fill"></i> Cliente VIP</span>
-              <span class="badge-item"><i class="bi bi-calendar-check"></i> Miembro desde 2023</span>
-              <span class="badge-item"><i class="bi bi-heart-fill"></i> <?= count($mascotas) ?> Mascotas</span>
+              <span class="badge-item"><i class="bi bi-calendar-check"></i> Miembro desde <?= $anioRegistro ?></span>
+              <span class="badge-item"><i class="bi bi-heart-fill"></i> <?= count($mascotas) ?> <?= count($mascotas) === 1 ? 'Mascota' : 'Mascotas' ?></span>
             </div>
           </div>
         </div>
@@ -140,22 +143,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
           <div class="stat-card">
             <div class="stat-card-icon"><i class="bi bi-calendar2-check-fill"></i></div>
             <div class="stat-card-data">
-              <div class="stat-card-number">12</div>
+              <div class="stat-card-number"><?= $stats['total_citas'] ?></div>
               <div class="stat-card-label">Citas Totales</div>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-card-icon"><i class="bi bi-shield-fill-check"></i></div>
             <div class="stat-card-data">
-              <div class="stat-card-number">8</div>
+              <div class="stat-card-number"><?= $stats['vacunas_aplicadas'] ?></div>
               <div class="stat-card-label">Vacunas Aplicadas</div>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-card-icon"><i class="bi bi-star-fill"></i></div>
+            <div class="stat-card-icon"><i class="bi bi-calendar3"></i></div>
             <div class="stat-card-data">
-              <div class="stat-card-number">4.9</div>
-              <div class="stat-card-label">Calificación</div>
+              <div class="stat-card-number"><?= $anioRegistro ?></div>
+              <div class="stat-card-label">Año de Registro</div>
             </div>
           </div>
         </div>

@@ -1021,3 +1021,59 @@ body::-webkit-scrollbar-thumb { background: #c1c8d0; border-radius: 4px; }
     .cita-row,
     .recordatorio-row { transition: none; }
 }
+
+
+/* ============================================================
+   DARK MODE — Overrides de colores hardcodeados
+   Las variables de :root ya se sobreescriben arriba (línea 45).
+   Aquí solo se corrigen selectores con colores literales.
+   ============================================================ */
+
+/* Botón "Ver todas" */
+body.dark-theme .dash-card-accion {
+    color       : #4ade80;
+    background  : rgba(10,147,44,.18);
+    border-color: rgba(10,147,44,.30);
+}
+body.dark-theme .dash-card-accion:hover {
+    background  : rgba(10,147,44,.28);
+    border-color: rgba(10,147,44,.50);
+    color       : #86efac;
+}
+
+/* Cita urgente */
+body.dark-theme .cita-row.es-urgente { background: rgba(239,68,68,.10); }
+
+/* Hora-tag en lista de citas */
+body.dark-theme .cita-hora-tag {
+    color      : #4ade80;
+    background : rgba(10,147,44,.20);
+}
+body.dark-theme .cita-row.es-urgente .cita-hora-tag {
+    color      : #f87171;
+    background : rgba(239,68,68,.20);
+}
+
+/* Chips de recordatorio */
+body.dark-theme .chip-vacuna   { color: #c4b5fd; background: rgba(124,58,237,.18); border-color: rgba(124,58,237,.30); }
+body.dark-theme .chip-medicina { color: #7dd3fc; background: rgba(3,105,161,.18);  border-color: rgba(3,105,161,.30); }
+body.dark-theme .chip-control  { color: #4ade80; background: rgba(22,101,52,.20);  border-color: rgba(22,101,52,.35); }
+body.dark-theme .chip-bano     { color: #67e8f9; background: rgba(8,145,178,.18);  border-color: rgba(8,145,178,.30); }
+
+/* Panel de notificaciones */
+body.dark-theme .notif-panel-cerrar:hover {
+    background  : rgba(239,68,68,.18);
+    border-color: rgba(239,68,68,.30);
+    color       : #f87171;
+}
+body.dark-theme .notif-item.no-leida {
+    background  : rgba(10,147,44,.10);
+    border-color: rgba(10,147,44,.20);
+}
+body.dark-theme .notif-panel-body::-webkit-scrollbar-thumb { background: #374151; }
+
+/* Iconos de notificación */
+body.dark-theme .notif-icono-wrap.verde   { background: rgba(22,101,52,.25);   color: #4ade80; }
+body.dark-theme .notif-icono-wrap.azul    { background: rgba(29,78,216,.25);   color: #60a5fa; }
+body.dark-theme .notif-icono-wrap.rojo    { background: rgba(220,38,38,.25);   color: #f87171; }
+body.dark-theme .notif-icono-wrap.naranja { background: rgba(194,65,12,.25);   color: #fb923c; }

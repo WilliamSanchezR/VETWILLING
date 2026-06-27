@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // 2. Validar sesión
 if (!isset($_SESSION['user'])) {
     if (!headers_sent()) {
-        header('Location: /vetwilling/login');
+        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
     }
     exit();
 }

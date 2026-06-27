@@ -1475,3 +1475,30 @@ body.dark-theme .sesiones-footer {
         break-inside: avoid;
     }
 }
+
+
+/* ========================================================================
+   28. DARK MODE — overrides de colores hardcodeados
+   (Las variables CSS ya se sobreescriben en theme.css)
+======================================================================== */
+
+/* Botón eliminar foto */
+body.dark-theme .btn-remove {
+    background  : rgba(239,68,68,.15);
+    border-color: rgba(239,68,68,.30);
+    color       : #f87171;
+}
+body.dark-theme .btn-remove:hover {
+    background  : rgba(239,68,68,.25);
+    border-color: rgba(239,68,68,.50);
+}
+
+/* Toggle switch del panel de privacidad */
+body.dark-theme .toggle-switch {
+    background: #374151;
+}
+
+/* Hover de ítem de sesión */
+body.dark-theme .sesion-item:hover {
+    border-color: rgba(255,255,255,.20);
+}
