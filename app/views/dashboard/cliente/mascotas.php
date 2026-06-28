@@ -23,7 +23,7 @@ $mascotas = listarMascotas();
     <title>Mis Mascotas - VetWilling</title>
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css?v=<?= APP_VERSION ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Bootstrap Icons -->
@@ -36,9 +36,9 @@ $mascotas = listarMascotas();
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
     <!-- CSS propios -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/mascotas.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/mascotas.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css?v=<?= APP_VERSION ?>">
 </head>
 
 <body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
@@ -150,7 +150,7 @@ $mascotas = listarMascotas();
                                 <!-- Avatar -->
                                 <div class="mascota-avatar-grande">
                                     <img
-                                        src="<?= BASE_URL ?>/public/uploads/mascotas/<?= htmlspecialchars($m['img_mascota']) ?>"
+                                        src="<?= BASE_URL ?>/public/uploads/mascotas/<?= htmlspecialchars($m['img_mascota'] ?? '') ?>"
                                         alt="Foto de <?= htmlspecialchars($m['nombre']) ?>"
                                         onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'">
                                     <span class="avatar-fallback" style="display:none">

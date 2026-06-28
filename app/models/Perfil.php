@@ -96,6 +96,31 @@ class Perfil
         }
     }
 
+    public function actualizarDatosPropietario(int $id_usuario, array $datos): bool
+    {
+        try {
+            $sql = "UPDATE propietario
+                    SET nombres   = :nombres,
+                        apellidos = :apellidos,
+                        telefono  = :telefono,
+                        direccion = :direccion
+                    WHERE id_usuario = :id_usuario
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':nombres',    trim($datos['nombres'])    ?? '', PDO::PARAM_STR);
+            $stmt->bindValue(':apellidos',  trim($datos['apellidos'])  ?? '', PDO::PARAM_STR);
+            $stmt->bindValue(':telefono',   trim($datos['telefono'])   ?? '', PDO::PARAM_STR);
+            $stmt->bindValue(':direccion',  trim($datos['direccion'])  ?? '', PDO::PARAM_STR);
+            $stmt->bindValue(':id_usuario', $id_usuario,                     PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error en Perfil::actualizarDatosPropietario " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function obtenerEstadisticasPropietario(int $id_usuario): array
     {
         $stats = ['total_citas' => 0, 'vacunas_aplicadas' => 0, 'anio_registro' => null];

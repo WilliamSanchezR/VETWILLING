@@ -185,7 +185,7 @@ if ($id_propietario) {
     <title>Dashboard — VetWilling</title>
 
         <!-- Bootstrap -->
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css?v=<?= APP_VERSION ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Bootstrap Icons -->
@@ -196,10 +196,10 @@ if ($id_propietario) {
 
 
     <!-- CSS del módulo cliente (sidebar, navbar, base) -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/adactavilidad.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/adactavilidad.css?v=<?= APP_VERSION ?>">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css?v=<?= APP_VERSION ?>">
 
     <!-- CSS exclusivo de ESTA vista -->
     <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/dashboard-cliente.css"> -->
@@ -427,11 +427,11 @@ if ($id_propietario) {
      SCRIPTS
      ============================================================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js?v=<?= APP_VERSION ?>"></script>
     <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/dashboard-cliente.js"></script> -->
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js?v=<?= APP_VERSION ?>"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js?v=<?= APP_VERSION ?>"></script>
 </body>
 
 </html>

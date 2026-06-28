@@ -23,20 +23,83 @@ if (!isset($t)) {
     $t = I18n::cargar($prefs['idioma']);
 }
 
-// $datosUsuario viene de session_propietario.php (cargado arriba)
-// Contiene: nombre_veterinaria, nombres, apellidos, email, etc.
-$nombreVet   = htmlspecialchars($datosUsuario['nombre_veterinaria'] ?? 'VetWilling', ENT_QUOTES, 'UTF-8');
+// $datosUsuario viene de panel_superio_paciente.php (incluido en el body)
+$nombreVet = 'VetWilling'; // se sobreescribe después de incluir el panel
 
 // Número de WhatsApp de la clínica — cámbialo aquí o tráelo de la BD/config
 // $whatsappNum = defined('WHATSAPP_CLINICA') ? WHATSAPP_CLINICA : '573000000000';
 
 /* ====================================================================
-   PRODUCTOS
-   En producción reemplaza este array con:
-   require_once BASE_PATH . '/app/controllers/tiendaController.php';
-   $productos = listarProductos();
+   PRODUCTOS — cargados desde el inventario real de la veterinaria
    ==================================================================== */
-$productos = [
+require_once BASE_PATH . '/app/models/Inventario.php';
+
+$id_veterinaria = (int)($_SESSION['user']['id_veterinaria'] ?? 0);
+
+/* Mapeo de categorías DB → íconos Bootstrap Icons */
+$iconosPorCategoria = [
+    'alimentos'    => 'bi-box-seam',
+    'medicamentos' => 'bi-capsule',
+    'higiene'      => 'bi-droplet-half',
+    'accesorios'   => 'bi-tag',
+    'juguetes'     => 'bi-controller',
+    'camas'        => 'bi-house-heart',
+    'suplementos'  => 'bi-capsule',
+    'antiparasitarios' => 'bi-shield-check',
+];
+
+function mapearProductoInventario(array $row, array $iconos): array {
+    $cat      = strtolower($row['categoria'] ?? 'otros');
+    $cantidad = (int)($row['cantidad']    ?? 0);
+    $stockMin = (int)($row['stock_minimo'] ?? 0);
+
+    if ($cantidad <= 0) {
+        $stockLabel = 'Agotado temporalmente';
+    } elseif ((int)($row['alerta_stock'] ?? 0)) {
+        $stockLabel = 'Pocas unidades';
+    } else {
+        $stockLabel = 'Disponible en clínica';
+    }
+
+    $imagenUrl = null;
+    if (!empty($row['imagen'])) {
+        $imagenUrl = BASE_URL . '/public/uploads/productos/' . $row['imagen'];
+    }
+
+    return [
+        'id'          => (int)$row['id_inventario'],
+        'nombre'      => $row['nombre']      ?? '',
+        'descripcion' => $row['descripcion'] ?? '',
+        'categoria'   => $cat,
+        'cat_label'   => ucfirst($cat),
+        'precio'      => (float)($row['precio'] ?? 0),
+        'precio_ant'  => null,
+        'para'        => '',
+        'peso'        => !empty($row['numero_lote']) ? 'Lote: ' . $row['numero_lote'] : '',
+        'disponible'  => $cantidad > 0,
+        'stock_label' => $stockLabel,
+        'icono'       => $iconos[$cat] ?? 'bi-bag',
+        'etiqueta'    => (int)($row['alerta_stock'] ?? 0) ? 'oferta' : null,
+        'et_texto'    => (int)($row['alerta_stock'] ?? 0) ? 'Stock bajo' : null,
+        'imagen_url'  => $imagenUrl,
+    ];
+}
+
+$productosRaw = [];
+if ($id_veterinaria > 0) {
+    $_inventario = new Inventario();
+    $productosRaw = $_inventario->listarInventario($id_veterinaria);
+}
+
+/* Mapear y filtrar solo productos con precio > 0 */
+$productos = array_values(array_filter(
+    array_map(fn($r) => mapearProductoInventario($r, $iconosPorCategoria), $productosRaw),
+    fn($p) => $p['precio'] > 0
+));
+
+/* Fallback si el inventario está vacío */
+if (empty($productos)) {
+    $productos = [
     [
         'id'          => 1,
         'nombre'      => 'Alimento Premium Adultos',
@@ -181,7 +244,8 @@ $productos = [
         'etiqueta'    => null,
         'et_texto'    => null,
     ],
-];
+]; /* fin del array de fallback */
+} /* fin del if (empty($productos)) */
 
 $totalProductos = count($productos);
 ?>
@@ -194,21 +258,16 @@ $totalProductos = count($productos);
     <title>Catálogo – <?= $nombreVet ?></title>
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css?v=<?= APP_VERSION ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <!-- Favicon -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
-    <!--
-        CORRECCIÓN: sidebar.css va primero porque define el layout base
-        (.contenido-principal, .area-contenido). Si va al final puede ser
-        pisado por tienda.css.
-    -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/tienda.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/tienda.css?v=<?= APP_VERSION ?>">
 </head>
 <body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
 
@@ -494,7 +553,7 @@ $totalProductos = count($productos);
                         <!-- Opción 2: WhatsApp
                              CORRECCIÓN: número extraído a $whatsappNum definido arriba.
                              El texto del mensaje incluye el nombre del producto dinámicamente. -->
-                        <a href="https://wa.me/<?= htmlspecialchars($whatsappNum, ENT_QUOTES, 'UTF-8') ?>?text=Hola,%20quiero%20consultar%20disponibilidad%20del%20producto:%20"
+                        <!-- <a href="https://wa.me/<?= htmlspecialchars($whatsappNum, ENT_QUOTES, 'UTF-8') ?>?text=Hola,%20quiero%20consultar%20disponibilidad%20del%20producto:%20" -->
                            id="modalWhatsapp"
                            target="_blank"
                            rel="noopener noreferrer"
@@ -515,10 +574,10 @@ $totalProductos = count($productos);
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/tienda.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js?v=<?= APP_VERSION ?>"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/tienda.js?v=<?= APP_VERSION ?>"></script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js?v=<?= APP_VERSION ?>"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js?v=<?= APP_VERSION ?>"></script>
 </body>
 </html>
