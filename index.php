@@ -507,6 +507,14 @@ switch ($request) {
         require BASE_PATH . "/app/controllers/propetarioController.php";
         break;
 
+    // RFS 254: Medios de envío — vista y API
+    case "/admin/medios-envio":
+        require BASE_PATH . "/app/views/dashboard/administrador/mediosEnvio.php";
+        break;
+    case "/admin/api/medios-envio":
+        require BASE_PATH . "/app/controllers/mediosEnvioController.php";
+        break;
+
     // RFS 14: Gestión de reportes — administrador
     case "/admin/reportes":
         require BASE_PATH .
