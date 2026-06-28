@@ -255,7 +255,43 @@ if (!empty($fotoUsuario) && $fotoUsuario !== "default-avatar.png") {
                     <div class="col-md-6">
                         <div class="consultas-notas">
                             <div class="row g-3">
-                                <!-- Certificaciones y Documentos... (mantener el contenido existente) -->
+                                <div class="col-12">
+                                    <div class="card-documentos">
+                                        <h5>
+                                            <i class="bi bi-file-earmark-text me-2"></i>
+                                            Certificaciones y Documentos
+                                        </h5>
+                                        <ul class="list-group list-group-flush mt-3">
+                                            <li class="list-group-item d-flex align-items-center gap-3">
+                                                <i class="bi bi-patch-check text-success"></i>
+                                                <div>
+                                                    <span>Título Médico Veterinario</span><br>
+                                                    <small>Registrado en sistema</small>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        <button class="btn btn-outline-success btn-sm mt-3 w-100">
+                                            <i class="bi bi-upload me-1"></i> Subir documento
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="card-notas">
+                                        <h5>
+                                            <i class="bi bi-journal-text me-2"></i>
+                                            Notas Clínicas
+                                        </h5>
+                                        <ul class="list-group list-group-flush mt-3">
+                                            <li class="list-group-item text-center text-muted py-3">
+                                                <i class="bi bi-inbox d-block mb-1" style="font-size:1.5rem;"></i>
+                                                Sin notas registradas
+                                            </li>
+                                        </ul>
+                                        <button class="btn btn-outline-success btn-sm mt-3 w-100">
+                                            <i class="bi bi-plus-circle me-1"></i> Nueva nota
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
