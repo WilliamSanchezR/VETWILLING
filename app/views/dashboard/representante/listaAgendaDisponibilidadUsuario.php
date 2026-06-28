@@ -115,7 +115,7 @@ $listaUsuarios = listaUsuarios($_SESSION['user']['id_veterinaria']);
                                 <td><?= htmlspecialchars($usuario['rol']) ?></td>
                                 <td><?= htmlspecialchars($usuario['especialidad']) ?></td>
                                 <td>
-                                    <button class="btn btn-primary btn-sm btn-ver-agenda" data-id="<?= htmlspecialchars($usuario['id_usuario']) ?>" type="button">
+                                    <button class="btn-agregar btn-ver-agenda" data-id="<?= htmlspecialchars($usuario['id_usuario']) ?>" type="button">
                                         Ver Agenda
                                     </button>
                                 </td>

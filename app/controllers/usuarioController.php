@@ -290,7 +290,7 @@ function cambioContrasena()
             'success',
             'Contraseña actualizada',
             'La contraseña han sido actualizada correctamente',
-            '/vetwilling/admin/perfil-administrador'
+            BASE_URL . '/admin/perfil-administrador'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la contraseña');
@@ -338,7 +338,7 @@ function vetContrasena()
             'success',
             'Contraseña actualizada',
             'La contraseña han sido actualizada correctamente',
-            '/vetwilling/veterinario/consultar-perfil'
+            BASE_URL . '/veterinario/consultar-perfil'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la contraseña');
@@ -439,7 +439,7 @@ function actualizarFotoPerfil()
                 'success',
                 'Imagen actualizada',
                 'La imagen de perfil ha sido actualizada correctamente',
-                '/vetwilling/admin/perfil-administrador'
+                BASE_URL . '/admin/perfil-administrador'
             );
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la imagen de perfil');

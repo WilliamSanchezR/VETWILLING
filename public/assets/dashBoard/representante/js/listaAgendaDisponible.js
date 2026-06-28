@@ -20,35 +20,32 @@ class ListaDisponibilidadProfesionales {
         this.btnExportarCSV = document.getElementById('btnExportprof');
         this.inputBuscarProfesionales = document.getElementById('buscarProfesional');
         this.limpiarBusqueda = document.querySelector('.campo-buscar i');
-        this.btnVerAgenda = document.querySelectorAll('.btn-ver-agenda');
+        this.contenedorTabla = document.querySelector('.contenedor-tabla');
     }
 
     bindEvents() {
-        // Aquí puedes agregar los event listeners
         if (this.ordebarBtn) {
             this.ordebarBtn.onclick = () => this.ordenarProfesionales();
         }
         if (this.btnExportarCSV) {
             this.btnExportarCSV.onclick = () => this.exportarCSV();
         }
-
         if (this.inputBuscarProfesionales) {
             this.inputBuscarProfesionales.oninput = () => this.buscarProfesionales();
         }
-
         if (this.limpiarBusqueda) {
             this.limpiarBusqueda.onclick = () => {
                 this.inputBuscarProfesionales.value = '';
                 this.buscarProfesionales();
-            }
-        };
-
-        if (this.btnVerAgenda) {
-            this.btnVerAgenda.forEach(boton => {
-                boton.onclick = (event) => {
-                    const idUsuario = event.currentTarget.getAttribute('data-id');
+            };
+        }
+        if (this.contenedorTabla) {
+            this.contenedorTabla.addEventListener('click', (event) => {
+                const btn = event.target.closest('.btn-ver-agenda');
+                if (btn) {
+                    const idUsuario = btn.getAttribute('data-id');
                     window.location.href = `${baseUrl}/representante/agenda-usuario?id=${idUsuario}`;
-                };
+                }
             });
         }
     }
