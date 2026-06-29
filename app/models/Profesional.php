@@ -390,7 +390,7 @@ class Profesional
         }
     }
 
-    function registrarServicioProfesional($idUsuario, $servicios)
+    function registrarServicioProfesional($idProfesional, $servicios)
     {
         $estado = 'Activo';
 
@@ -401,7 +401,7 @@ class Profesional
                                         VALUES(:id_servicio, :id_profesional, :estado)";
 
                 $stmtServ = $this->conexion->prepare($sqlServ);
-                $stmtServ->bindParam(':id_profesional', $idUsuario);
+                $stmtServ->bindParam(':id_profesional', $idProfesional);
                 $stmtServ->bindParam(':id_servicio', $idServicio->id);
                 $stmtServ->bindParam(':estado', $estado);
                 $stmtServ->execute();
