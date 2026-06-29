@@ -212,11 +212,12 @@ class AgendaProfesional {
       !data.id_usuario ||
       !data.id_veterinaria ||
       !data.dia_semana ||
-      !data.duracion_minutos
+      !data.duracion_minutos ||
+      !data.id_especialidad
     ) {
       this.mostrarMensajeError(
         "Campos vacíos",
-        "Por favor complete todos los campos obligatorios",
+        "Por favor complete todos los campos obligatorios (incluyendo la especialidad)",
       );
       return;
     }
@@ -310,8 +311,8 @@ class AgendaProfesional {
           }, 1500);
         } else {
           this.mostrarMensajeError(
-            result.message || "Error al registrar",
-            result.details || "Hubo un problema al registrar la disponibilidad."
+            "Error al registrar",
+            result.details || result.message || "Hubo un problema al registrar la disponibilidad.",
           );
         }
       })
@@ -319,7 +320,7 @@ class AgendaProfesional {
         console.error("Error en fetch:", error);
         this.mostrarMensajeError(
           "Error al registrar",
-          "Hubo un problema al registrar la disponibilidad."
+          "Hubo un problema al registrar la disponibilidad. Intente nuevamente.",
         );
       });
   }
