@@ -132,7 +132,7 @@ function registrarUsuario()
             'success',
             'Usuario registrado',
             'El usuario ha sido creado correctamente',
-            '/vetwilling/admin/listar-usuarios'
+            BASE_URL . '/admin/listar-usuarios'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo registrar el usuario');
@@ -220,7 +220,7 @@ function actualizarUsuario()
             'success',
             'Usuario actualizado',
             'Los datos han sido actualizados correctamente',
-            '/vetwilling/admin/listar-usuarios'
+            BASE_URL . '/admin/listar-usuarios'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar el usuario');
@@ -240,7 +240,7 @@ function eliminarUsuario($id)
             'success',
             'Usuario Inhabilitado',
             'El usuario ha sido Inhabilitado',
-            '/vetwilling/admin/listar-usuarios'
+            BASE_URL . '/admin/listar-usuarios'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el usuario');
@@ -387,7 +387,7 @@ function modiContrasena()
             'success',
             'Contraseña actualizada',
             'La contraseña han sido actualizada correctamente',
-            '/vetwilling/login'
+            BASE_URL . '/login'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la contraseña');

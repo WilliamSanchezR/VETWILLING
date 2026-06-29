@@ -179,7 +179,7 @@ function registrarVeterinaria()
             $emailEnviado
                 ? 'La veterinaria ha sido creada correctamente y el correo fue enviado.'
                 : 'La veterinaria ha sido creada correctamente, pero no se pudo enviar el correo.',
-            '/vetwilling/admin/listar-veterinarias'
+            BASE_URL . '/admin/listar-veterinarias'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo registrar la veterinaria');
@@ -382,7 +382,7 @@ function actualizarVeterinaria()
             'success',
             'Veterinaria actualizada',
             'Los datos han sido actualizados correctamente',
-            '/vetwilling/admin/listar-veterinarias'
+            BASE_URL . '/admin/listar-veterinarias'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la veterinaria');
@@ -404,7 +404,7 @@ function eliminarVeterinaria($id)
             'success',
             'Veterinaria eliminada',
             'La veterinaria ha sido eliminada correctamente',
-            '/vetwilling/admin/listar-veterinarias'
+            BASE_URL . '/admin/listar-veterinarias'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar la veterinaria');
@@ -480,7 +480,7 @@ function actualizarInfoVeterinaria()
             'success',
             'Veterinaria actualizada',
             'Los datos han sido actualizados correctamente',
-            '/vetwilling/representante/veterinaria_info'
+            BASE_URL . '/representante/veterinaria_info'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la veterinaria');

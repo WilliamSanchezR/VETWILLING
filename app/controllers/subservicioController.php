@@ -136,7 +136,7 @@ function eliminarSubservicio($id_subservicio)
             'success',
             'Subservicio Eliminado',
             'El subservicio ha sido eliminado correctamente',
-            '/vetwilling/representante/listar-subservicios'
+            BASE_URL . '/representante/listar-subservicios'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el subservicio');

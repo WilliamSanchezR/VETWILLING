@@ -168,7 +168,7 @@ function eliminarServicio($id_servicio)
             'success',
             'Servicio Eliminado',
             'El servicio ha sido eliminado correctamente',
-            '/vetwilling/representante/listar-servicios'
+            BASE_URL . '/representante/listar-servicios'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el servicio');
