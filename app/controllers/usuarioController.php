@@ -56,11 +56,11 @@ function registrarUsuario()
 {
     // Capturamos los datos enviados por el formulario
     $email = $_POST['email'] ?? '';
-    $password = '123';
     $estado = 'activo';
     $id_rol = $_POST['rol'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
+    $password = !empty($numero_documento) ? $numero_documento : '123';
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
