@@ -46,22 +46,22 @@ class DisponibilidadUsuario
     {
         try {
 
-            if ($this->validarDisponibilidad(
-                $data['id_usuario'],
-                $data['id_especialidad'],
-                $data['id_veterinaria'],
-                $data['dia_semana'],
-                $data['hora_inicio'],
-                $data['hora_fin']
-            ) === false) {
-                error_log("El horario se cruza con otro existente");
-                return false;
-            }
-
             if (!empty($data['hora_inicio']) && !empty($data['hora_fin'])) {
-                $sql = "INSERT INTO disponibilidad_usuario 
-                    (id_usuario, id_especialidad, id_veterinaria, dia_semana, hora_inicio, hora_fin, duracion_minutos) 
-                    VALUES 
+                if ($this->validarDisponibilidad(
+                    $data['id_usuario'],
+                    $data['id_especialidad'],
+                    $data['id_veterinaria'],
+                    $data['dia_semana'],
+                    $data['hora_inicio'],
+                    $data['hora_fin']
+                ) === false) {
+                    error_log("El horario se cruza con otro existente");
+                    return ['ok' => false, 'message' => 'El horario de la primera franja se cruza con una disponibilidad ya registrada para ese día'];
+                }
+
+                $sql = "INSERT INTO disponibilidad_usuario
+                    (id_usuario, id_especialidad, id_veterinaria, dia_semana, hora_inicio, hora_fin, duracion_minutos)
+                    VALUES
                     (:id_usuario, :id_especialidad, :id_veterinaria, :dia_semana, :hora_inicio, :hora_fin, :duracion_minutos)";
 
                 $stmt = $this->conexion->prepare($sql);
@@ -73,14 +73,13 @@ class DisponibilidadUsuario
                 $stmt->bindParam(':hora_fin', $data['hora_fin'], PDO::PARAM_STR);
                 $stmt->bindParam(':duracion_minutos', $data['duracion_minutos'], PDO::PARAM_INT);
 
-                $estadoRespuesta  = $stmt->execute();
-
-                if (!$estadoRespuesta) {
+                if (!$stmt->execute()) {
                     error_log("Error al insertar la primera franja: " . implode(" | ", $stmt->errorInfo()));
-                    return false;
+                    return ['ok' => false, 'message' => 'No se pudo guardar la primera franja horaria. Intente nuevamente'];
                 }
             }
-            // Si se insertó la primera franja, verificar y agregar la segunda si existe
+
+            // Verificar y agregar la segunda franja si existe
             if (!empty($data['hora_inicio_seccond']) && !empty($data['hora_fin_seccond'])) {
 
                 if ($this->validarDisponibilidad(
@@ -92,12 +91,12 @@ class DisponibilidadUsuario
                     $data['hora_fin_seccond']
                 ) === false) {
                     error_log("El horario de la segunda franja se cruza con otro existente");
-                    return false;
+                    return ['ok' => false, 'message' => 'El horario de la segunda franja se cruza con una disponibilidad ya registrada para ese día'];
                 }
 
-                $sql2 = "INSERT INTO disponibilidad_usuario 
-                            (id_usuario, id_especialidad, id_veterinaria, dia_semana, hora_inicio, hora_fin, duracion_minutos) 
-                            VALUES 
+                $sql2 = "INSERT INTO disponibilidad_usuario
+                            (id_usuario, id_especialidad, id_veterinaria, dia_semana, hora_inicio, hora_fin, duracion_minutos)
+                            VALUES
                             (:id_usuario, :id_especialidad, :id_veterinaria, :dia_semana, :hora_inicio, :hora_fin, :duracion_minutos)";
 
                 $stmt2 = $this->conexion->prepare($sql2);
@@ -109,15 +108,16 @@ class DisponibilidadUsuario
                 $stmt2->bindParam(':hora_fin', $data['hora_fin_seccond'], PDO::PARAM_STR);
                 $stmt2->bindParam(':duracion_minutos', $data['duracion_minutos'], PDO::PARAM_INT);
 
-                $estadoRespuesta2  = $stmt2->execute();
-
-                return $estadoRespuesta2;
+                if (!$stmt2->execute()) {
+                    error_log("Error al insertar la segunda franja: " . implode(" | ", $stmt2->errorInfo()));
+                    return ['ok' => false, 'message' => 'No se pudo guardar la segunda franja horaria. Intente nuevamente'];
+                }
             }
 
-            return true;
+            return ['ok' => true];
         } catch (PDOException $e) {
             error_log("Error en DisponibilidadUsuario::agregarDisponibilidadAgenda -> " . $e->getMessage());
-            return false;
+            return ['ok' => false, 'message' => 'Error interno al registrar la disponibilidad. Contacte al administrador'];
         }
     }
 
