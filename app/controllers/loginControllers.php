@@ -63,7 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-    // session_start();
     $_SESSION['user'] = [
         'id_usuario' => $resultado['id_usuario'],
         'id_rol' => $resultado['id_rol'],

@@ -207,7 +207,7 @@ class Ticket
     {
         try {
             $sql = "SELECT ht.fecha, ht.descripcion, ht.tipo, ht.valor_anterior, ht.valor_nuevo, CONCAT(adm.nombres, ' ', adm.apellidos) AS usuario
-            FROM historico_tickets ht
+            FROM historico_tikects ht
             INNER JOIN usuario u ON ht.usuario_id = u.id_usuario
            	LEFT JOIN administrador adm ON u.id_usuario = adm.id_usuario
             WHERE ht.ticket_id = :ticketId
@@ -254,7 +254,7 @@ class Ticket
     function registrarHistoricoTicket($ticketId, $tipo, $valorAnterior, $valorNuevo, $descripcion, $usuarioId)
     {
         try {
-            $sql = "INSERT INTO historico_tickets (ticket_id, usuario_id, tipo, valor_anterior, valor_nuevo, descripcion, fecha) VALUES (:ticketId, :usuarioId, :tipo, :valorAnterior, :valorNuevo, :descripcion, NOW())";
+            $sql = "INSERT INTO historico_tikects (ticket_id, usuario_id, tipo, valor_anterior, valor_nuevo, descripcion, fecha) VALUES (:ticketId, :usuarioId, :tipo, :valorAnterior, :valorNuevo, :descripcion, NOW())";
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':ticketId', $ticketId, PDO::PARAM_INT);
             $stmt->bindParam(':tipo', $tipo);
