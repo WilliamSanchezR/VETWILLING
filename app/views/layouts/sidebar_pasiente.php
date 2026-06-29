@@ -14,7 +14,7 @@ if (!isset($t)) {
     $t = I18n::cargar($prefs['idioma']);
 }
 ?>
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css?v=<?= APP_VERSION ?>">
 
 <?php
 // ── Inyectar prefs y strings en window para que theme.js e i18n.js los usen
@@ -88,17 +88,13 @@ if (typeof window.__prefs === 'undefined') {
                 <div class="nav-icon"><i class="bi bi-bag-plus"></i></div>
                 <span class="nav-text" data-i18n="sidebar.catalogo"><?= $t('sidebar.catalogo') ?></span>
             </a>
+
             <a href="<?= BASE_URL ?>/directorio"
                 class="nav-item"
                 data-section="directorio"
                 data-tooltip="Directorio">
-
-                <div class="nav-icon">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-
+                <div class="nav-icon"><i class="bi bi-people-fill"></i></div>
                 <span class="nav-text">Directorio</span>
-
             </a>
             <span class="nav-section-title">Comunicación</span>
 
@@ -170,7 +166,7 @@ if (typeof window.__prefs === 'undefined') {
         </a>
 
         <a href="<?= BASE_URL ?>/directorio" class="mobile-nav-item" data-section="directorio">
-            <i class="bi bi-people-fill"></i>
+            <div class="mobile-nav-icon"><i class="bi bi-people-fill"></i></div>
             <span>Directorio</span>
         </a>
     </nav>

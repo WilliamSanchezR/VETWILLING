@@ -1658,3 +1658,81 @@ body {
         color: #c62828;
     }
 }
+
+/* ========================================================================
+   DARK MODE
+======================================================================== */
+body.dark-theme .navbar-superior {
+    background: #16213e;
+    box-shadow: 0 2px 10px rgba(0,0,0,.45);
+}
+body.dark-theme body { background: #0f0f1a; }
+body.dark-theme .btn-menu-mobile,
+body.dark-theme .btn-navbar,
+body.dark-theme .btn-perfil        { background: #1e2d40; color: #9ca3af; }
+body.dark-theme .btn-menu-mobile:hover,
+body.dark-theme .btn-navbar:hover  { background: #243a50; color: #4ade80; }
+body.dark-theme .btn-perfil:hover,
+body.dark-theme .btn-perfil.active { background: #243a50; }
+body.dark-theme .input-buscar {
+    background: #1e2d40;
+    border-color: rgba(255,255,255,.10);
+    color: #f0f4f8;
+}
+body.dark-theme .input-buscar:focus {
+    background: #16213e;
+    border-color: #0a932c;
+}
+body.dark-theme .input-buscar::placeholder { color: #6b7280; }
+body.dark-theme .navbar-separador   { background: rgba(255,255,255,.08); }
+body.dark-theme .nombre-usuario     { color: #e8edf2; }
+body.dark-theme .rol-usuario        { color: #9ca3af; }
+body.dark-theme .badge-notif        { border-color: #16213e; }
+body.dark-theme .ubicacion-actual   { color: #9ca3af; }
+body.dark-theme .texto-ubicacion    { color: #e8edf2; }
+body.dark-theme .separador          { color: rgba(255,255,255,.2); }
+/* Dropdowns */
+body.dark-theme .dropdown-menu      { background: #16213e; box-shadow: 0 8px 30px rgba(0,0,0,.6); }
+body.dark-theme .dropdown-header    { background: #0d1a2d; border-bottom-color: rgba(255,255,255,.08); }
+body.dark-theme .dropdown-header h6 { color: #e8edf2; }
+body.dark-theme .dropdown-footer    { background: #0d1a2d; border-top-color: rgba(255,255,255,.08); }
+body.dark-theme .dropdown-divider   { background: rgba(255,255,255,.08); }
+body.dark-theme .dropdown-item      { color: #d1d9e6; }
+body.dark-theme .dropdown-item:hover             { background: #1e2d40; color: #4ade80; }
+body.dark-theme .dropdown-item.text-danger       { color: #f87171; }
+body.dark-theme .dropdown-item.text-danger:hover { background: rgba(244,67,54,.12); color: #fca5a5; }
+body.dark-theme .notificacion-item:hover         { background: #1e2d40; }
+body.dark-theme .notificacion-item.no-leida      { background: rgba(59,130,246,.10); }
+body.dark-theme .notif-icono.notif-azul          { background: rgba(33,150,243,.18); }
+body.dark-theme .notif-icono.notif-verde         { background: rgba(76,175,80,.18); }
+body.dark-theme .notif-icono.notif-naranja       { background: rgba(255,152,0,.18); }
+body.dark-theme .notif-icono.notif-rojo          { background: rgba(244,67,54,.18); }
+body.dark-theme .notif-texto    { color: #d1d9e6; }
+body.dark-theme .notif-tiempo   { color: #9ca3af; }
+body.dark-theme .nombre-completo { color: #e8edf2; }
+body.dark-theme .dropdown-body::-webkit-scrollbar-thumb       { background: #3a4a5e; }
+body.dark-theme .dropdown-body::-webkit-scrollbar-thumb:hover { background: #4a5a6e; }
+/* Carrito */
+body.dark-theme .carrito-sidebar    { background: #16213e; border-left-color: rgba(255,255,255,.08); }
+body.dark-theme .carrito-item       { border-bottom-color: rgba(255,255,255,.08); color: #d1d9e6; }
+body.dark-theme .carrito-footer     { border-top-color: rgba(255,255,255,.08); }
+body.dark-theme .cerrar-btn         { color: #9ca3af; }
+/* Modales */
+body.dark-theme .modal-reloj-contenido {
+    background: #16213e;
+    color: #e8edf2;
+    box-shadow: 0 20px 60px rgba(0,0,0,.65);
+}
+body.dark-theme .modal-soporte .modal-contenido   { background: #16213e; color: #e8edf2; }
+body.dark-theme .modal-soporte .modal-descripcion { color: #9ca3af; }
+body.dark-theme .modal-soporte .form-control {
+    background: #1e2d40;
+    border-color: rgba(255,255,255,.12);
+    color: #f0f4f8;
+}
+body.dark-theme .mensaje-exito      { background: rgba(40,167,69,.18); border-color: rgba(40,167,69,.3); color: #4ade80; }
+body.dark-theme .skeleton           { background: linear-gradient(90deg, #1a2535 25%, #1e2d40 50%, #1a2535 75%); }
+/* Bubble móvil */
+body.dark-theme .bubble-panel       { background: #1a2535; }
+body.dark-theme .bubble-item        { color: #d1d9e6; }
+body.dark-theme .bubble-item:hover  { background: rgba(255,255,255,.06); }

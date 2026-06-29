@@ -95,4 +95,64 @@ class Perfil
             return null;
         }
     }
+
+    public function actualizarDatosPropietario(int $id_usuario, array $datos): bool
+    {
+        try {
+            $sql = "UPDATE propietario
+                    SET nombres   = :nombres,
+                        apellidos = :apellidos,
+                        telefono  = :telefono,
+                        direccion = :direccion
+                    WHERE id_usuario = :id_usuario
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindValue(':nombres',    trim($datos['nombres'])    ?? '', PDO::PARAM_STR);
+            $stmt->bindValue(':apellidos',  trim($datos['apellidos'])  ?? '', PDO::PARAM_STR);
+            $stmt->bindValue(':telefono',   trim($datos['telefono'])   ?? '', PDO::PARAM_STR);
+            $stmt->bindValue(':direccion',  trim($datos['direccion'])  ?? '', PDO::PARAM_STR);
+            $stmt->bindValue(':id_usuario', $id_usuario,                     PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error en Perfil::actualizarDatosPropietario " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function obtenerEstadisticasPropietario(int $id_usuario): array
+    {
+        $stats = ['total_citas' => 0, 'vacunas_aplicadas' => 0, 'anio_registro' => null];
+
+        try {
+            $sql = "SELECT
+                        COUNT(DISTINCT a.id_agendamiento) AS total_citas,
+                        COUNT(DISTINCT pv.id_vacuna)      AS vacunas_aplicadas,
+                        YEAR(u.fecha_creacion)            AS anio_registro
+                    FROM propietario pr
+                    INNER JOIN usuario u ON u.id_usuario = pr.id_usuario
+                    LEFT JOIN paciente pac ON pac.id_propietario = pr.id_propietario
+                    LEFT JOIN agendamiento a ON a.id_paciente = pac.id_paciente
+                    LEFT JOIN paciente_vacuna pv ON pv.id_paciente = pac.id_paciente
+                    WHERE pr.id_usuario = :id_usuario
+                    GROUP BY pr.id_propietario, u.fecha_creacion
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($row) {
+                $stats['total_citas']       = (int)($row['total_citas'] ?? 0);
+                $stats['vacunas_aplicadas'] = (int)($row['vacunas_aplicadas'] ?? 0);
+                $stats['anio_registro']     = $row['anio_registro'] ?? null;
+            }
+        } catch (PDOException $e) {
+            error_log("Error en Perfil::obtenerEstadisticasPropietario " . $e->getMessage());
+        }
+
+        return $stats;
+    }
 }

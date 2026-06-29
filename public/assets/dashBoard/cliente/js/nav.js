@@ -1099,22 +1099,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 */
 
-/* Guard: .btn-perfil puede no existir en vistas sin panel_superio_paciente.php */
-const btnProfile = document.querySelector(".btn-perfil");
-if (btnProfile) {
-  btnProfile.addEventListener("click", () => {
-    const isActive = btnProfile.classList.toggle("active");
-    btnProfile.setAttribute("aria-expanded", isActive);
-  });
-}
-
-// esta parte es de las notificaciones para si funciona si
-
 // ═══════════════════════════════════════════
 // NOTIFICACIONES - Campañita 🔔
 // ═══════════════════════════════════════════
 
-const BASE_URL = window.BASE_URL;
+// Usa window.BASE_URL directamente para evitar conflicto con var BASE_URL declarado en vistas
+var _NAV_BASE_URL = window.BASE_URL;
 
 // Iconos según tipo
 function iconoTipo(tipo) {
@@ -1143,7 +1133,7 @@ function formatearFecha(fecha) {
 async function cargarNotificaciones() {
   try {
     const res = await fetch(
-      `${BASE_URL}/preferencias-notificacion?accion=obtener`,
+      `${_NAV_BASE_URL}/preferencias-notificacion?accion=obtener`,
     );
     const data = await res.json();
 
@@ -1195,7 +1185,7 @@ async function cargarNotificaciones() {
       item.addEventListener("click", async () => {
         const id = item.dataset.id;
         await fetch(
-          `${BASE_URL}/preferencias-notificacion?accion=marcar_leida`,
+          `${_NAV_BASE_URL}/preferencias-notificacion?accion=marcar_leida`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1220,7 +1210,7 @@ async function cargarNotificaciones() {
 document
   .querySelector('[data-action="marcar-leidas"]')
   ?.addEventListener("click", async () => {
-    await fetch(`${BASE_URL}/preferencias-notificacion?accion=marcar_todas`, {
+    await fetch(`${_NAV_BASE_URL}/preferencias-notificacion?accion=marcar_todas`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     });

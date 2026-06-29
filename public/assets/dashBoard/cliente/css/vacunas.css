@@ -257,3 +257,33 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ================================================================
+   DARK MODE
+================================================================ */
+body.dark-theme .vaccine-section {
+    background: #1a1a2e;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+body.dark-theme .section-header { border-bottom-color: rgba(255,255,255,.08); }
+body.dark-theme .section-title,
+body.dark-theme .vaccine-name,
+body.dark-theme .detail-value,
+body.dark-theme .empty-state h4 { color: #f0f4f8; }
+body.dark-theme .detail-label,
+body.dark-theme .empty-state    { color: #9ca3af; }
+body.dark-theme .vaccine-card {
+    background: #1a1a2e;
+    border-color: rgba(255,255,255,.08);
+    color: #f0f4f8;
+}
+body.dark-theme .vaccine-card:hover {
+    border-color: rgba(102,126,234,.35);
+    box-shadow: 0 4px 12px rgba(0,0,0,.45);
+}
+body.dark-theme .vaccine-details { border-top-color: rgba(255,255,255,.08); }
+body.dark-theme .price-tag        { background: rgba(133,100,4,.25); color: #fbbf24; }
+body.dark-theme .section-badge    { background: rgba(25,118,210,.20); color: #60a5fa; }
+body.dark-theme .vaccine-status.applied  { background: rgba(40,167,69,.20);  color: #4ade80; }
+body.dark-theme .vaccine-status.pending  { background: rgba(220,53,69,.20);  color: #f87171; }
+body.dark-theme .vaccine-status.upcoming { background: rgba(23,162,184,.20); color: #67e8f9; }
