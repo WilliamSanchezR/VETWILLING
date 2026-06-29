@@ -73,6 +73,11 @@ $datosVeterinaria = listarVeterinariasRegistradas();
                 <div class="step active">
                     <h3><i class="bi bi-motherboard"></i>Datos del Usuario</h3>
 
+                    <div class="alert alert-info d-flex align-items-center gap-2 mb-3" role="alert">
+                        <i class="bi bi-info-circle-fill fs-5 flex-shrink-0"></i>
+                        <span>La contraseña inicial del usuario será su <strong>número de documento</strong>. Podrá modificarla desde los ajustes del sistema tras el primer inicio de sesión.</span>
+                    </div>
+
                     <div class="row">
 
                         <div class="col-md-6">
