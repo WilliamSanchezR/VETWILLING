@@ -72,8 +72,11 @@
 }
 
 #btn_ingresar:hover {
-    background-color: var(--green-background);
-    color: var(--neutral-color);
+    background-color: var(--primary-hover);
+    color: #0A932C;
+    border-color: #0A932C;
+    border: solid 3px #0A932C;
+    transform: translateY(-2px);
 }
 
 #btn_ingresar a {
@@ -82,7 +85,7 @@
 }
 
 #btn_ingresar a:hover {
-    color: var(--neutral-color);
+    color: #ffffff;
 }
 
 .cont-rigth {

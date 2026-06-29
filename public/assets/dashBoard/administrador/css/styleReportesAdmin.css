@@ -386,3 +386,369 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ── 11. Rep-wrapper layout (reportesServicios) ─────────────────────────── */
+.rep-wrapper {
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* ── 12. Rep-header ──────────────────────────────────────────────────────── */
+.rep-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    background: #ffffff;
+    border: 1px solid var(--clr-gray-200);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem 1.75rem;
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+}
+
+.rep-header__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.rep-header__titulo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--clr-gray-900);
+    letter-spacing: -.03em;
+    margin: 0;
+}
+
+.rep-header__subtitulo {
+    font-size: 0.875rem;
+    color: var(--clr-gray-500);
+    margin: 0;
+}
+
+.rep-header__periodo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--clr-primary-700);
+    background: var(--clr-primary-50);
+    border: 1px solid var(--clr-primary-200);
+    border-radius: var(--radius-pill);
+    padding: 0.2rem 0.65rem;
+    margin-top: 0.25rem;
+    width: fit-content;
+}
+
+.rep-header__acciones {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* ── 13. Rep-sel-vet ─────────────────────────────────────────────────────── */
+.rep-sel-vet {
+    border: 1px solid var(--clr-gray-300);
+    border-radius: var(--radius-md);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--clr-gray-800);
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.rep-sel-vet:focus {
+    outline: none;
+    border-color: var(--clr-primary-500);
+    box-shadow: 0 0 0 3px rgba(10, 147, 44, .15);
+}
+
+/* ── 14. Btn-exportar variants ───────────────────────────────────────────── */
+.btn-exportar--pdf  { background-color: var(--clr-danger-500); }
+.btn-exportar--pdf:hover  { background-color: var(--clr-danger-700); }
+.btn-exportar--excel { background-color: var(--clr-primary-600); }
+.btn-exportar--excel:hover { background-color: var(--clr-primary-700); }
+
+/* ── 15. Rep-filtros ─────────────────────────────────────────────────────── */
+.rep-filtros {
+    background: #ffffff;
+    border: 1px solid var(--clr-gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.rep-filtros__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--clr-gray-500);
+    white-space: nowrap;
+}
+
+.rep-filtros__periodos {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.rep-filtros__rango {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.rep-filtros__rango input[type="date"] {
+    border: 1px solid var(--clr-gray-300);
+    border-radius: var(--radius-md);
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--clr-gray-800);
+}
+
+.rep-filtros__sep {
+    font-size: 0.8125rem;
+    color: var(--clr-gray-500);
+}
+
+/* ── 16. KPI cards ───────────────────────────────────────────────────────── */
+.rep-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.kpi-card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid var(--clr-gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.375rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow: hidden;
+    --kpi-accent: var(--clr-primary-600);
+    --kpi-bg: var(--clr-primary-50);
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--kpi-accent);
+}
+
+.kpi-card--verde { --kpi-accent: var(--clr-primary-600); --kpi-bg: var(--clr-primary-50); }
+.kpi-card--rojo  { --kpi-accent: var(--clr-danger-500);  --kpi-bg: var(--clr-danger-50); }
+.kpi-card--amarillo { --kpi-accent: var(--clr-warn-500); --kpi-bg: var(--clr-warn-50); }
+
+.kpi-card__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.kpi-card__etiqueta {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--clr-gray-500);
+}
+
+.kpi-card__icono {
+    width: 2rem;
+    height: 2rem;
+    background: var(--kpi-bg);
+    color: var(--kpi-accent);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.kpi-card__valor {
+    font-size: 1.875rem;
+    font-weight: 800;
+    color: var(--clr-gray-900);
+    letter-spacing: -.03em;
+    line-height: 1.1;
+}
+
+.kpi-card__pie {
+    font-size: 0.75rem;
+    color: var(--clr-gray-500);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* ── 17. Rep-seccion ─────────────────────────────────────────────────────── */
+.rep-seccion {
+    background: #ffffff;
+    border: 1px solid var(--clr-gray-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.rep-seccion__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.125rem 1.5rem;
+    border-bottom: 1px solid var(--clr-gray-200);
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.rep-seccion__titulo {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--clr-gray-800);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+}
+
+.rep-seccion__titulo i { color: var(--clr-primary-600); }
+
+.rep-seccion__acciones {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rep-seccion__cuerpo {
+    padding: 1.25rem 1.5rem;
+}
+
+.rep-seccion__cuerpo--tabla {
+    padding: 0;
+}
+
+/* ── 18. Rep-tabla ───────────────────────────────────────────────────────── */
+.rep-tabla-scroll {
+    overflow-x: auto;
+}
+
+.rep-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+}
+
+.rep-tabla thead tr {
+    background: var(--clr-gray-50);
+    border-bottom: 2px solid var(--clr-gray-200);
+}
+
+.rep-tabla thead th {
+    padding: 0.875rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--clr-gray-500);
+    white-space: nowrap;
+    text-align: left;
+}
+
+.rep-tabla tbody tr {
+    border-bottom: 1px solid var(--clr-gray-200);
+    transition: background-color 0.15s ease;
+}
+
+.rep-tabla tbody tr:last-child { border-bottom: none; }
+.rep-tabla tbody tr:hover { background-color: var(--clr-primary-50); }
+
+.rep-tabla tbody td {
+    padding: 0.875rem 1rem;
+    color: var(--clr-gray-700);
+    vertical-align: middle;
+}
+
+.rep-tabla__nombre { font-weight: 600; color: var(--clr-gray-900); }
+.col-center { text-align: center !important; }
+.col-right  { text-align: right !important; }
+.text-strong { font-weight: 700; }
+.num-money { font-variant-numeric: tabular-nums; }
+
+/* ── 19. Badges ──────────────────────────────────────────────────────────── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.badge--ok     { background: var(--clr-primary-100); color: var(--clr-primary-700); }
+.badge--warn   { background: var(--clr-warn-100);    color: var(--clr-warn-700); }
+.badge--danger { background: var(--clr-danger-100);  color: var(--clr-danger-700); }
+
+/* ── 20. Tabla-vacia ─────────────────────────────────────────────────────── */
+.tabla-vacia td {
+    text-align: center;
+    padding: 3rem 1rem !important;
+    color: var(--clr-gray-400);
+    font-size: 0.875rem;
+}
+
+.tabla-vacia td i {
+    display: block;
+    font-size: 1.75rem;
+    margin-bottom: 0.4rem;
+    color: var(--clr-primary-500);
+}
+
+/* ── 21. Rep-spinner ─────────────────────────────────────────────────────── */
+.rep-spinner {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, .75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.rep-spinner__anillo {
+    width: 44px;
+    height: 44px;
+    border: 4px solid var(--clr-gray-200);
+    border-top-color: var(--clr-primary-600);
+    border-radius: 50%;
+    animation: spin-anim .7s linear infinite;
+}
+
+/* ── 22. Responsive (rep-wrapper) ───────────────────────────────────────── */
+@media (max-width: 768px) {
+    .rep-wrapper { padding: 1rem; }
+    .rep-header { flex-direction: column; }
+    .rep-kpis { grid-template-columns: repeat(2, 1fr); }
+    .kpi-card__valor { font-size: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+    .rep-kpis { grid-template-columns: 1fr; }
+    .rep-filtros { flex-direction: column; align-items: flex-start; }
+}

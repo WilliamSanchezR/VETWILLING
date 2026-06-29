@@ -361,7 +361,7 @@ function actualizarFotoPerfil()
                     'success',
                     '¡Foto actualizada!',
                     'Tu foto de perfil se ha actualizado correctamente',
-                    '/vetwilling/veterinario/consultar-perfil'
+                    BASE_URL . '/veterinario/consultar-perfil'
                 );
             } else {
                 mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la imagen en la base de datos');

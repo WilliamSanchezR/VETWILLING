@@ -60,6 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Si pasa esta linea, el usuario es valido
 
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     // session_start();
     $_SESSION['user'] = [
         'id_usuario' => $resultado['id_usuario'],
