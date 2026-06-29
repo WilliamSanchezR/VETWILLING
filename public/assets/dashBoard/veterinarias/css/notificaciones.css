@@ -140,7 +140,7 @@
 }
 
 /* ---------- Item de notificación ---------- */
-.notification-item {
+.notifications-page-list .notification-item {
     display: grid;
     grid-template-columns: 10px 1fr auto;
     align-items: center;
@@ -152,25 +152,26 @@
     position: relative;
 }
 
-.notification-item:last-child {
+.notifications-page-list .notification-item:last-child {
     border-bottom: none;
 }
 
-.notification-item:hover {
+.notifications-page-list .notification-item:hover {
     background: var(--notif-hover-bg);
     box-shadow: inset 3px 0 0 var(--notif-accent);
 }
 
-.notification-item.unread {
+.notifications-page-list .notification-item.unread {
     background: var(--notif-unread-bg);
 }
 
-.notification-item.unread:hover {
+.notifications-page-list .notification-item.unread:hover {
     background: #e6f6f1;
 }
 
 /* ---------- Indicador de estado ---------- */
-.notification-indicator {
+.notifications-page-list .notification-indicator {
+    display: block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -179,13 +180,13 @@
     transition: transform 0.16s;
 }
 
-.notification-indicator.unread {
+.notifications-page-list .notification-indicator.unread {
     background: var(--notif-unread-dot);
     box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
     animation: pulse-dot 2.2s ease-in-out infinite;
 }
 
-.notification-indicator.read {
+.notifications-page-list .notification-indicator.read {
     background: var(--notif-read-dot);
 }
 
@@ -195,14 +196,15 @@
 }
 
 /* ---------- Contenido ---------- */
-.notification-content {
+.notifications-page-list .notification-content {
     display: flex;
     flex-direction: column;
     gap: 3px;
     min-width: 0;
+    flex: unset;
 }
 
-.notification-header {
+.notifications-page-list .notification-header {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -210,7 +212,7 @@
     flex-wrap: wrap;
 }
 
-.notification-header h3 {
+.notifications-page-list .notification-header h3 {
     font-family: var(--font-body);
     font-size: 14px;
     font-weight: 500;
@@ -223,19 +225,19 @@
     max-width: 520px;
 }
 
-.notification-item.unread .notification-header h3 {
+.notifications-page-list .notification-item.unread .notification-header h3 {
     font-weight: 600;
     color: #1a1a1a;
 }
 
-.notification-time {
+.notifications-page-list .notification-time {
     font-size: 12px;
     color: #888780;
     flex-shrink: 0;
     white-space: nowrap;
 }
 
-.notification-content p {
+.notifications-page-list .notification-content p {
     font-size: 12.5px;
     color: #888780;
     margin: 0;
@@ -245,7 +247,7 @@
 }
 
 /* ---------- Etiqueta de tipo ---------- */
-.notification-type {
+.notifications-page-list .notification-type {
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.04em;
@@ -257,6 +259,7 @@
     white-space: nowrap;
     align-self: center;
     text-transform: capitalize;
+    display: inline-flex;
 }
 
 /* ---------- Estado vacío ---------- */
@@ -327,18 +330,18 @@
         justify-content: center;
     }
 
-    .notification-item {
+    .notifications-page-list .notification-item {
         grid-template-columns: 10px 1fr;
         grid-template-rows: auto auto;
     }
 
-    .notification-type {
+    .notifications-page-list .notification-type {
         grid-column: 2;
         justify-self: start;
         margin-top: 2px;
     }
 
-    .notification-header h3 {
+    .notifications-page-list .notification-header h3 {
         max-width: 100%;
         white-space: normal;
     }

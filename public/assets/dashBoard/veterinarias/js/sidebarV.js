@@ -1,13 +1,15 @@
 /**
  * sidebarV.js — VetWilling · Sidebar Veterinario
- * Versión: 2.1 — Corregido
+ * Versión: 2.2 — Corregido
  *
- * Correcciones:
- *  1. closeSheet despacha el evento sv:sheetClosed para que el navbar
- *     pueda sincronizar aria-expanded del btnMenuMobile.
- *  2. markActive limpia activos previos antes de marcar nuevos.
- *  3. Drag-to-dismiss con umbral de 120px y snap-back correcto.
- *  4. API pública expone openSheet y closeSheet.
+ * Correcciones respecto a 2.1:
+ *  1. markActive() ahora compara el ÚLTIMO segmento de la URL de forma EXACTA
+ *     (antes usaba path.includes(seg), que casaba por substring y era frágil).
+ *  2. Se eliminó el bucle de respaldo por data-section (ya no hace falta y
+ *     evitaba un falso negativo por mayúsculas en 'dashBoard').
+ *  3. closeSheet despacha sv:sheetClosed para sincronizar el navbar.
+ *  4. Drag-to-dismiss con umbral de 120px y snap-back.
+ *  5. API pública: collapse/expand/toggle/openSheet/closeSheet/markActive.
  */
 
 (function () {
@@ -29,6 +31,10 @@
 
     /* ── Utilidades ────────────────────────────────────────────── */
     const isMobile = () => window.innerWidth <= 768;
+
+    /* Último segmento limpio de una ruta. Ej: "/veterinaria/calendario" → "calendario" */
+    const lastSegment = (path) =>
+        (path || '').split('?')[0].split('#')[0].split('/').filter(Boolean).pop() || '';
 
     /* ════════════════════════════════════════════════════════════
        SIDEBAR ESCRITORIO — colapsar / expandir
@@ -63,34 +69,27 @@
 
     /* ════════════════════════════════════════════════════════════
        MARCAR ÍTEM ACTIVO SEGÚN URL
+       Coincidencia EXACTA del último segmento (no substring).
     ════════════════════════════════════════════════════════════ */
     function markActive() {
-        const path = window.location.pathname;
+        const actual = lastSegment(window.location.pathname);
 
         /* Limpiar estado previo */
         document.querySelectorAll(
             '.sv-item.active, .sv-sheet-grid-item.active, .sv-sheet-list-item.active'
         ).forEach(el => el.classList.remove('active'));
 
-        /* Sidebar escritorio — por href */
-        document.querySelectorAll('.sv-item[href]').forEach(el => {
-            const seg = el.getAttribute('href').split('/').filter(Boolean).pop();
-            if (seg && path.includes(seg)) el.classList.add('active');
-        });
+        if (!actual) return;
 
-        /* Sidebar escritorio — por data-section (respaldo) */
-        document.querySelectorAll('.sv-item[data-section]').forEach(el => {
-            if (el.classList.contains('active')) return;
-            const sec = el.getAttribute('data-section');
-            if (sec && path.includes(sec)) el.classList.add('active');
-        });
-
-        /* Bottom sheet */
+        /* Marcar todos los enlaces (escritorio + sheet) cuyo último segmento coincide */
         document.querySelectorAll(
-            '.sv-sheet-grid-item[href], .sv-sheet-list-item[href]'
+            '.sv-item[href], .sv-sheet-grid-item[href], .sv-sheet-list-item[href]'
         ).forEach(el => {
-            const seg = el.getAttribute('href').split('/').filter(Boolean).pop();
-            if (seg && path.includes(seg)) el.classList.add('active');
+            /* No marcar el logout como activo */
+            if (el.classList.contains('sv-danger')) return;
+            if (lastSegment(el.getAttribute('href')) === actual) {
+                el.classList.add('active');
+            }
         });
     }
 
@@ -139,8 +138,8 @@
         sheetOpen ? closeSheet() : openSheet();
     }
 
-    fab?.addEventListener('click',    toggleSheet);
-    overlay?.addEventListener('click', closeSheet);
+    fab?.addEventListener('click',      toggleSheet);
+    overlay?.addEventListener('click',  closeSheet);
     closeBtn?.addEventListener('click', closeSheet);
 
     /* Cerrar con Escape */
@@ -149,13 +148,14 @@
     });
 
     /* Cerrar al navegar desde un ítem del sheet */
-    sheet?.querySelectorAll('a.sv-sheet-grid-item, a.sv-sheet-list-item')
-        .forEach(el => {
-            el.addEventListener('click', () => {
-                /* Delay breve para que el usuario vea el estado activo */
-                setTimeout(closeSheet, 180);
-            });
+    sheet?.querySelectorAll(
+        'a.sv-sheet-grid-item, a.sv-sheet-list-item, a.sv-sheet-logout'
+    ).forEach(el => {
+        el.addEventListener('click', () => {
+            /* Delay breve para que el usuario vea el estado activo */
+            setTimeout(closeSheet, 180);
         });
+    });
 
     /* ════════════════════════════════════════════════════════════
        DRAG-TO-DISMISS
@@ -236,7 +236,7 @@
         if (!badge) return;
 
         if (count > 0) {
-            badge.textContent  = count > 99 ? '99+' : String(count);
+            badge.textContent   = count > 99 ? '99+' : String(count);
             badge.style.display = 'flex';
         } else {
             badge.style.display = 'none';
@@ -247,9 +247,9 @@
        API PÚBLICA
     ════════════════════════════════════════════════════════════ */
     window.sidebarVet = {
-        collapse:   () => { collapsed = true;  localStorage.setItem(STORAGE_KEY, 'true');  setCollapsed(true);  },
-        expand:     () => { collapsed = false; localStorage.setItem(STORAGE_KEY, 'false'); setCollapsed(false); },
-        toggle:     toggleCollapse,
+        collapse: () => { collapsed = true;  localStorage.setItem(STORAGE_KEY, 'true');  setCollapsed(true);  },
+        expand:   () => { collapsed = false; localStorage.setItem(STORAGE_KEY, 'false'); setCollapsed(false); },
+        toggle:   toggleCollapse,
         openSheet,
         closeSheet,
         markActive,
