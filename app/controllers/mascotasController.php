@@ -545,7 +545,7 @@ function eliminarMascota($id)
                 'success',
                 'Mascota inactivada',
                 'La mascota fue marcada como inactiva correctamente. El registro y su historial médico se conservan en la auditoría.',
-                '/vetwilling/cliente/mascotas'
+                BASE_URL . '/cliente/mascotas'
             );
         } else {
             mostrarSweetAlert(
