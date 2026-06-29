@@ -1,37 +1,34 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_propietario.php';
+
+if (!isset($prefs)) {
+    if (!class_exists('PreferenciasManager')) { require_once BASE_PATH . '/app/services/PreferenciasManager.php'; }
+    $_pm = new PreferenciasManager((int)$_SESSION['user']['id_usuario']);
+    $prefs = $_pm->obtener();
+}
 ?>
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="<?= $prefs['idioma'] === 'pt' ? 'pt-BR' : $prefs['idioma'] ?>">
 
 <head>
     <meta charset="UTF-8">
+    <script>(function(){var p=<?= json_encode($prefs) ?>;document.documentElement.setAttribute('data-tema',p.tema);if(p.tema==='oscuro'&&document.body)document.body.classList.add('dark-theme');}());</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cliente - Dashboard VetCare</title>
+    <title>Registrar Mascota | VetWilling</title>
 
-    <!-- Bootstrap -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Iconos -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-
-    <!-- Favicon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-
-    <!-- CSS -->
-
-
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/registro.css">
 </head>
 
-<body>
+<body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
 
     <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_pasiente.php'; ?>

@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // validamos si hay una secion activa
 
 if (!isset($_SESSION['user'])) {
-    header('Location: /vetwilling/login');
+    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
     exit();
 }
 

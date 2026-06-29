@@ -906,3 +906,25 @@ body { font-family: var(--font); background: var(--surface-2); color: var(--ink)
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* ── Dark Mode ────────────────────────────────────────────── */
+body.dark-theme {
+    --ink         : #f0f4f8;
+    --ink-soft    : #d1d9e6;
+    --ink-muted   : #9ca3af;
+    --ink-faint   : #6b7280;
+    --surface     : #1a1a2e;
+    --surface-2   : #1e2535;
+    --surface-3   : #0f0f1a;
+    --border      : rgba(255,255,255,.08);
+    --border-soft : rgba(255,255,255,.05);
+    --green-pale  : rgba(10,147,44,.14);
+    --red-pale    : rgba(239,68,68,.12);
+    --red-border  : rgba(239,68,68,.25);
+    --amber-pale  : rgba(245,158,11,.12);
+    --blue-pale   : rgba(59,130,246,.12);
+    --shadow-xs   : 0 1px 3px rgba(0,0,0,.35);
+    --shadow-sm   : 0 4px 12px rgba(0,0,0,.45);
+    --shadow-md   : 0 8px 24px rgba(0,0,0,.55);
+    --shadow-green: 0 8px 30px rgba(10,147,44,.18);
+}

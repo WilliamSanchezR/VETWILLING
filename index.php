@@ -17,7 +17,7 @@ $requestURI = $_SERVER["REQUEST_URI"];
 // de la carpeta "/vetwilling" (ej: localhost/vetwilling/login), mientras
 // que en producción se ejecuta desde la raíz del dominio (ej: vetwilling.com/login).
 // De esta manera el router puede trabajar con rutas limpias como "/login".
-$request = str_replace($baseFolder, "", $requestURI);
+$request = str_ireplace($baseFolder, "", $requestURI);
 
 // Quitar parametros tipo ?id=123
 
@@ -598,15 +598,9 @@ switch ($request) {
     // case '/cliente/citas':
     //     require BASE_PATH . '/app/views/dashboard/cliente/citas.php';
     //     break;
-    case "/cliente/agenda":
-        require BASE_PATH . "/app/views/dashboard/cliente/agenda.php";
-        break;
     // case '/cliente/agendar-cita':
     //     require BASE_PATH . '/app/views/dashboard/cliente/agendarCita.php';
     //     break;
-    case "/cliente/historial":
-        require BASE_PATH . "/app/views/dashboard/cliente/historial.php";
-        break;
     case "/cliente/tienda":
         require BASE_PATH . "/app/views/dashboard/cliente/tienda.php";
         break;
@@ -625,8 +619,15 @@ switch ($request) {
     case "/cliente/historial-mascota":
         require BASE_PATH . "/app/views/dashboard/cliente/historialMascota.php";
         break;
+    case "/cliente/historial-compras":
+        require BASE_PATH . "/app/views/dashboard/cliente/historialCompras.php";
+        break;
     case "/cliente/vacunas-mascota":
         require BASE_PATH . "/app/views/dashboard/cliente/vacunas.php";
+        break;
+
+    case "/cliente/api/vacunas":
+        require BASE_PATH . "/app/controllers/vacunasClienteController.php";
         break;
 
     case "/cliente/notificaciones":
@@ -649,6 +650,10 @@ switch ($request) {
         break;
     case "/cliente/eliminar-mascota":
         require BASE_PATH . "/app/controllers/mascotasController.php";
+        break;
+
+    case "/cliente/actualizar-datos":
+        require BASE_PATH . "/app/controllers/actualizarDatosPropietarioController.php";
         break;
 
     case "/cliente/actualizar-contrasena":
@@ -676,10 +681,6 @@ switch ($request) {
     case "/historial-clinico-pdf":
         require BASE_PATH . "/app/controllers/reportesPdfControllers.php";
         historialClinicoPdf();
-        break;
-    default:
-        http_response_code(404);
-        require BASE_PATH . "/app/views/auth/error404.php";
         break;
 
     // ---------------------------------------REPRESENTANTE-------------------------------------//
@@ -989,5 +990,10 @@ switch ($request) {
 
     case "/veterinaria/api/historial/acceso/rechazar":
         require BASE_PATH . "/app/controllers/accesoHistorialController.php";
+        break;
+
+    default:
+        http_response_code(404);
+        require BASE_PATH . "/app/views/auth/error404.php";
         break;
 }

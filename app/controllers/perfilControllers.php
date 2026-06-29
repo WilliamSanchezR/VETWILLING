@@ -9,3 +9,9 @@ function mostrarPerfil($id)
 
     return $usuario;
 }
+
+function obtenerEstadisticasPerfil(int $id_usuario): array
+{
+    $objPerfil = new Perfil();
+    return $objPerfil->obtenerEstadisticasPropietario($id_usuario);
+}

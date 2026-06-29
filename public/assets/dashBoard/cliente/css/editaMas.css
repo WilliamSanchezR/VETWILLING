@@ -514,3 +514,53 @@
         flex-wrap: nowrap;
     }
 }
+
+/* ================================================================
+   DARK MODE
+================================================================ */
+body.dark-theme .form-card {
+    background: #1a1a2e;
+    box-shadow: 0 2px 15px rgba(0,0,0,.4);
+}
+body.dark-theme .tabs-editar       { border-bottom-color: rgba(255,255,255,.08); }
+body.dark-theme .tab-btn           { color: #9ca3af; }
+body.dark-theme .tab-btn:hover,
+body.dark-theme .tab-btn.active    { color: #4ade80; }
+body.dark-theme .tab-btn.active    { border-bottom-color: #4ade80; }
+body.dark-theme .form-group label  { color: #d1d9e6; }
+body.dark-theme .form-group label .required { color: #f87171; }
+body.dark-theme .form-group input,
+body.dark-theme .form-group select,
+body.dark-theme .form-group textarea {
+    background: #1e2535;
+    border-color: rgba(255,255,255,.12);
+    color: #f0f4f8;
+}
+body.dark-theme .form-group input:focus,
+body.dark-theme .form-group select:focus,
+body.dark-theme .form-group textarea:focus {
+    border-color: #0a932c;
+    background: #16213e;
+    box-shadow: 0 0 0 4px rgba(10,147,44,.15);
+}
+body.dark-theme .foto-editar-section { background: #16213e; }
+body.dark-theme .foto-info-editar h4 { color: #f0f4f8; }
+body.dark-theme .foto-info-editar p  { color: #9ca3af; }
+body.dark-theme .foto-preview-editar { border-color: #16213e; }
+body.dark-theme .radio-label {
+    background: #1e2535;
+    border-color: rgba(255,255,255,.12);
+    color: #9ca3af;
+}
+body.dark-theme .checkbox-item        { background: #1e2535; }
+body.dark-theme .checkbox-item:hover  { background: #243044; }
+body.dark-theme .checkbox-item label  { color: #d1d9e6; }
+body.dark-theme .form-actions         { border-top-color: rgba(255,255,255,.08); }
+body.dark-theme .btn-secondary        { background: #1e2535; color: #9ca3af; }
+body.dark-theme .btn-secondary:hover  { background: #243044; }
+body.dark-theme .btn-danger           { background: rgba(244,67,54,.15); color: #f87171; }
+body.dark-theme .btn-danger:hover     { background: #f44336; color: white; }
+body.dark-theme .alert-success        { background: rgba(46,125,50,.22); color: #4ade80; }
+body.dark-theme .alert-warning        { background: rgba(133,100,4,.22); color: #fbbf24; }
+body.dark-theme .estado-badge.activo  { background: rgba(46,125,50,.22); color: #4ade80; }
+body.dark-theme .estado-badge.inactivo{ background: rgba(198,40,40,.22); color: #f87171; }

@@ -20,6 +20,11 @@
     --bg-hover: #e8f7ef;
     --bg-active: rgba(10, 155, 66, 0.10);
     --bg-danger-light: #fff5f5;
+    --bg-sidebar-header: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+    --tooltip-bg        : #ffffff;
+    --tooltip-text      : #1a2332;
+    --scrollbar-thumb: #d0d0d0;
+    --scrollbar-thumb-hover: #b0b0b0;
 
     /* Textos */
     --text-primary: #1a2332;
@@ -58,18 +63,24 @@
 }
 
 body.dark-theme {
-    --bg-sidebar   : #16213e;
-    --bg-main      : #0f0f1a;
-    --bg-hover     : #1e3a2e;
-    --bg-active    : rgba(10, 155, 66, 0.18);
-    --bg-danger-light: #1c0707;
-    --text-primary : #e8edf2;
-    --text-secondary: #9ca3af;
-    --text-muted   : #6b7280;
-    --border-color : rgba(255,255,255,.08);
-    --shadow-sm    : 0 2px 8px rgba(0,0,0,.30);
-    --shadow-md    : 0 4px 12px rgba(0,0,0,.40);
-    --shadow-lg    : 0 8px 24px rgba(0,0,0,.50);
+    --bg-sidebar         : #16213e;
+    --bg-main            : #0f0f1a;
+    --bg-hover           : #1e3a2e;
+    --bg-active          : rgba(10, 155, 66, 0.18);
+    --bg-danger-light    : #1c0707;
+    --bg-sidebar-header  : linear-gradient(180deg, #0d1117 0%, #16213e 100%);
+    --text-primary       : #e8edf2;
+    --text-secondary     : #9ca3af;
+    --text-muted         : #6b7280;
+    --border-color       : rgba(255,255,255,.08);
+    --shadow-sm          : 0 2px 8px rgba(0,0,0,.30);
+    --shadow-md          : 0 4px 12px rgba(0,0,0,.40);
+    --shadow-lg          : 0 8px 24px rgba(0,0,0,.50);
+    --bg-sidebar-header  : linear-gradient(180deg, #0d1117 0%, #16213e 100%);
+    --tooltip-bg         : #1e2d40;
+    --tooltip-text       : #e8edf2;
+    --scrollbar-thumb    : #3a4a5e;
+    --scrollbar-thumb-hover: #4a5a6e;
 }
 
 
@@ -124,7 +135,7 @@ body {
     align-items: center;
     justify-content: center;
     min-height: var(--sidebar-header-height);
-    background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+    background: var(--bg-sidebar-header);
     position: relative;
     flex-shrink: 0;
 }
@@ -160,8 +171,8 @@ body {
 
 .sidebar-nav::-webkit-scrollbar        { width: 6px; }
 .sidebar-nav::-webkit-scrollbar-track  { background: transparent; margin: 8px 0; }
-.sidebar-nav::-webkit-scrollbar-thumb  { background: #d0d0d0; border-radius: 10px; }
-.sidebar-nav::-webkit-scrollbar-thumb:hover { background: #b0b0b0; }
+.sidebar-nav::-webkit-scrollbar-thumb  { background: var(--scrollbar-thumb); border-radius: 10px; }
+.sidebar-nav::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 
 /* En colapsado el nav tampoco recorta los tooltips */
 .sidebar.collapsed .sidebar-nav,
@@ -369,8 +380,8 @@ body {
     top: 50%;
     transform: translateY(-50%) scale(0.92);
 
-    background: #ffffff;
-    color: #1a2332;
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
     font-size: 13px;
     font-weight: 600;
     font-family: 'Inter', 'Segoe UI', sans-serif;
@@ -396,7 +407,7 @@ body {
     transform: translateY(-50%) scale(0.92);
 
     border: 6px solid transparent;
-    border-right-color: #ffffff;
+    border-right-color: var(--tooltip-bg);
 
     opacity: 0;
     pointer-events: none;

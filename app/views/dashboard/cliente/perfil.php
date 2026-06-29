@@ -21,14 +21,20 @@ $mascotas = listarMascotas();
 // ── Gestor de sesiones ────────────────────────────────────────────────────
 $sm = new SessionManager($id);
 $sm->registrar();                    // Registra / actualiza la sesión actual
-$sesiones  = $sm->listar();          // Lista para mostrar en la vista
+$sesiones    = $sm->listar();        // Lista para mostrar en la vista
 $sesionNueva = $sm->esNueva();       // ¿Primer login desde este dispositivo?
+
+// ── Estadísticas dinámicas del propietario ────────────────────────────────
+$stats = ($rol == 3) ? obtenerEstadisticasPerfil($id) : ['total_citas' => 0, 'vacunas_aplicadas' => 0, 'anio_registro' => null];
+$anioRegistro = !empty($stats['anio_registro']) ? $stats['anio_registro'] : date('Y');
 
 // ── Ruta de imagen de perfil ──────────────────────────────────────────────
 $fotoUsuario    = $usuario['img_perfil'] ?? '';
 $carpetaUsuario = 'usuarios';
 $nombreCompleto = trim(($usuario['nombres'] ?? '') . ' ' . ($usuario['apellidos'] ?? ''));
-$fallbackAvatar = "https://ui-avatars.com/api/?name=" . urlencode($nombreCompleto) . "&background=4e9af1&color=fff&size=128";
+
+require_once BASE_PATH . '/app/helpers/avatar_helper.php';
+$fallbackAvatar = generarAvatarSVG($usuario['nombres'] ?? '', $usuario['apellidos'] ?? '');
 $rutaImagen     = $fallbackAvatar;
 
 if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
@@ -67,15 +73,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mi Perfil – VetCare</title>
 
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css?v=<?= APP_VERSION ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/perfil.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css?v=<?= APP_VERSION ?>">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css?v=<?= APP_VERSION ?>">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/perfil.css?v=<?= APP_VERSION ?>">
 </head>
 
 <body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
@@ -119,8 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
             </p>
             <div class="badges-perfil">
               <span class="badge-item"><i class="bi bi-star-fill"></i> Cliente VIP</span>
-              <span class="badge-item"><i class="bi bi-calendar-check"></i> Miembro desde 2023</span>
-              <span class="badge-item"><i class="bi bi-heart-fill"></i> <?= count($mascotas) ?> Mascotas</span>
+              <span class="badge-item"><i class="bi bi-calendar-check"></i> Miembro desde <?= $anioRegistro ?></span>
+              <span class="badge-item"><i class="bi bi-heart-fill"></i> <?= count($mascotas) ?> <?= count($mascotas) === 1 ? 'Mascota' : 'Mascotas' ?></span>
             </div>
           </div>
         </div>
@@ -140,22 +145,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
           <div class="stat-card">
             <div class="stat-card-icon"><i class="bi bi-calendar2-check-fill"></i></div>
             <div class="stat-card-data">
-              <div class="stat-card-number">12</div>
+              <div class="stat-card-number"><?= $stats['total_citas'] ?></div>
               <div class="stat-card-label">Citas Totales</div>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-card-icon"><i class="bi bi-shield-fill-check"></i></div>
             <div class="stat-card-data">
-              <div class="stat-card-number">8</div>
+              <div class="stat-card-number"><?= $stats['vacunas_aplicadas'] ?></div>
               <div class="stat-card-label">Vacunas Aplicadas</div>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-card-icon"><i class="bi bi-star-fill"></i></div>
+            <div class="stat-card-icon"><i class="bi bi-calendar3"></i></div>
             <div class="stat-card-data">
-              <div class="stat-card-number">4.9</div>
-              <div class="stat-card-label">Calificación</div>
+              <div class="stat-card-number"><?= $anioRegistro ?></div>
+              <div class="stat-card-label">Año de Registro</div>
             </div>
           </div>
         </div>
@@ -189,24 +194,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
                 <i class="bi bi-person-circle"></i>
                 Datos Personales
               </h2>
-              <a href="<?= BASE_URL ?>/cliente/editar-perfil" class="btn-editar">
+              <button type="button" class="btn-editar" onclick="abrirModalEditar()">
                 <i class="bi bi-pencil-fill"></i> Editar
-              </a>
+              </button>
             </div>
 
-            <div class="info-grid">
+            <div class="info-grid" id="vistaPersonal">
               <div class="info-item">
                 <div class="info-item-icon"><i class="bi bi-person-fill"></i></div>
                 <div class="info-content">
                   <div class="info-label">Nombres</div>
-                  <div class="info-valor"><?= htmlspecialchars($usuario['nombres']) ?></div>
+                  <div class="info-valor" id="txt-nombres"><?= htmlspecialchars($usuario['nombres']) ?></div>
                 </div>
               </div>
               <div class="info-item">
                 <div class="info-item-icon"><i class="bi bi-person-fill"></i></div>
                 <div class="info-content">
                   <div class="info-label">Apellidos</div>
-                  <div class="info-valor"><?= htmlspecialchars($usuario['apellidos']) ?></div>
+                  <div class="info-valor" id="txt-apellidos"><?= htmlspecialchars($usuario['apellidos']) ?></div>
                 </div>
               </div>
               <div class="info-item">
@@ -234,14 +239,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
                 <div class="info-item-icon"><i class="bi bi-telephone-fill"></i></div>
                 <div class="info-content">
                   <div class="info-label">Teléfono</div>
-                  <div class="info-valor">+57 <?= htmlspecialchars($usuario['telefono']) ?></div>
+                  <div class="info-valor" id="txt-telefono">+57 <?= htmlspecialchars($usuario['telefono']) ?></div>
                 </div>
               </div>
               <div class="info-item full-col">
                 <div class="info-item-icon"><i class="bi bi-geo-alt-fill"></i></div>
                 <div class="info-content">
                   <div class="info-label">Dirección</div>
-                  <div class="info-valor"><?= htmlspecialchars($usuario['direccion']) ?></div>
+                  <div class="info-valor" id="txt-direccion"><?= htmlspecialchars($usuario['direccion']) ?></div>
                 </div>
               </div>
             </div>
@@ -452,9 +457,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
                 <div class="mascota-mini-item">
                   <div class="mascota-mini-avatar">
                     <img
-                      src="<?= BASE_URL ?>/public/uploads/mascotas/<?= htmlspecialchars($m['img_mascota']) ?>"
+                      src="<?= BASE_URL ?>/public/uploads/mascotas/<?= htmlspecialchars($m['img_mascota'] ?? '') ?>"
                       alt="<?= htmlspecialchars($m['nombre']) ?>"
-                      onerror="this.onerror=null;this.src='<?= BASE_URL ?>/public/assets/webSite/img/default-pet.png'">
+                      onerror="this.onerror=null;this.src='<?= BASE_URL ?>/public/assets/webSite/img/perrito.png'">
                   </div>
                   <div class="mascota-mini-info">
                     <div class="mascota-mini-nombre"><?= htmlspecialchars($m['nombre']) ?></div>
@@ -522,8 +527,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
-  <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/perfil.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js?v=<?= APP_VERSION ?>"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/perfil.js?v=<?= APP_VERSION ?>"></script>
 
   <!-- URL base para el JS -->
   <script>
@@ -651,8 +656,160 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
 
     })();
   </script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js?v=<?= APP_VERSION ?>"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js?v=<?= APP_VERSION ?>"></script>
+
+<!-- ══ MODAL EDITAR DATOS PERSONALES ══ -->
+<div id="modalEditar" style="display:none;position:fixed;inset:0;z-index:1055;
+     background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--color-bg-card,#fff);border-radius:1rem;
+              width:100%;max-width:520px;box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden">
+
+    <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--color-border,#e9ecef);
+                display:flex;align-items:center;justify-content:space-between">
+      <h5 style="margin:0;font-weight:600"><i class="bi bi-pencil-fill me-2"></i>Editar datos personales</h5>
+      <button type="button" onclick="cerrarModalEditar()"
+              style="background:none;border:none;font-size:1.25rem;cursor:pointer;color:inherit;line-height:1">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <form id="formEditarDatos" style="padding:1.5rem" onsubmit="guardarDatos(event)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+
+        <div>
+          <label style="font-size:.85rem;font-weight:500;display:block;margin-bottom:.4rem">
+            Nombres <span style="color:#dc3545">*</span>
+          </label>
+          <input type="text" id="edit-nombres" name="nombres" required
+                 value="<?= htmlspecialchars($usuario['nombres'] ?? '') ?>"
+                 style="width:100%;padding:.5rem .75rem;border:1px solid var(--color-border,#ced4da);
+                        border-radius:.5rem;font-size:.95rem;background:var(--color-input-bg,#fff);
+                        color:inherit;box-sizing:border-box">
+        </div>
+
+        <div>
+          <label style="font-size:.85rem;font-weight:500;display:block;margin-bottom:.4rem">
+            Apellidos <span style="color:#dc3545">*</span>
+          </label>
+          <input type="text" id="edit-apellidos" name="apellidos" required
+                 value="<?= htmlspecialchars($usuario['apellidos'] ?? '') ?>"
+                 style="width:100%;padding:.5rem .75rem;border:1px solid var(--color-border,#ced4da);
+                        border-radius:.5rem;font-size:.95rem;background:var(--color-input-bg,#fff);
+                        color:inherit;box-sizing:border-box">
+        </div>
+
+        <div>
+          <label style="font-size:.85rem;font-weight:500;display:block;margin-bottom:.4rem">Teléfono</label>
+          <input type="tel" id="edit-telefono" name="telefono"
+                 value="<?= htmlspecialchars($usuario['telefono'] ?? '') ?>"
+                 placeholder="Ej: 3001234567"
+                 style="width:100%;padding:.5rem .75rem;border:1px solid var(--color-border,#ced4da);
+                        border-radius:.5rem;font-size:.95rem;background:var(--color-input-bg,#fff);
+                        color:inherit;box-sizing:border-box">
+        </div>
+
+        <div style="grid-column:1/-1">
+          <label style="font-size:.85rem;font-weight:500;display:block;margin-bottom:.4rem">Dirección</label>
+          <input type="text" id="edit-direccion" name="direccion"
+                 value="<?= htmlspecialchars($usuario['direccion'] ?? '') ?>"
+                 style="width:100%;padding:.5rem .75rem;border:1px solid var(--color-border,#ced4da);
+                        border-radius:.5rem;font-size:.95rem;background:var(--color-input-bg,#fff);
+                        color:inherit;box-sizing:border-box">
+        </div>
+      </div>
+
+      <div id="edit-error" style="display:none;margin-top:.75rem;padding:.6rem 1rem;
+           background:#fff3cd;border:1px solid #ffc107;border-radius:.5rem;font-size:.9rem;color:#664d03"></div>
+
+      <div style="display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.25rem">
+        <button type="button" onclick="cerrarModalEditar()"
+                style="padding:.5rem 1.25rem;border:1px solid var(--color-border,#ced4da);
+                       border-radius:.5rem;background:transparent;cursor:pointer;color:inherit">
+          Cancelar
+        </button>
+        <button type="submit" id="btn-guardar-datos"
+                style="padding:.5rem 1.5rem;border:none;border-radius:.5rem;
+                       background:#4e9af1;color:#fff;font-weight:600;cursor:pointer">
+          <i class="bi bi-check-lg me-1"></i>Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const _API_DATOS = '<?= BASE_URL ?>/cliente/actualizar-datos';
+
+  function abrirModalEditar() {
+    document.getElementById('modalEditar').style.display = 'flex';
+    document.getElementById('edit-error').style.display  = 'none';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarModalEditar() {
+    document.getElementById('modalEditar').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  /* Cerrar al hacer clic fuera */
+  document.getElementById('modalEditar').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalEditar();
+  });
+
+  async function guardarDatos(e) {
+    e.preventDefault();
+    const btn     = document.getElementById('btn-guardar-datos');
+    const errDiv  = document.getElementById('edit-error');
+    const payload = {
+      nombres   : document.getElementById('edit-nombres').value.trim(),
+      apellidos : document.getElementById('edit-apellidos').value.trim(),
+      telefono  : document.getElementById('edit-telefono').value.trim(),
+      direccion : document.getElementById('edit-direccion').value.trim(),
+    };
+
+    btn.disabled    = true;
+    btn.textContent = 'Guardando…';
+    errDiv.style.display = 'none';
+
+    try {
+      const res  = await fetch(_API_DATOS, {
+        method  : 'POST',
+        headers : { 'Content-Type': 'application/json' },
+        body    : JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data.status === 'ok') {
+        /* Actualizar vista sin recargar */
+        document.getElementById('txt-nombres').textContent    = payload.nombres;
+        document.getElementById('txt-apellidos').textContent  = payload.apellidos;
+        document.getElementById('txt-telefono').textContent   = '+57 ' + payload.telefono;
+        document.getElementById('txt-direccion').textContent  = payload.direccion;
+
+        /* Actualizar cabecera del hero */
+        const h1 = document.querySelector('.info-perfil-header h1');
+        if (h1) h1.textContent = payload.nombres + ' ' + payload.apellidos;
+
+        cerrarModalEditar();
+
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({ icon:'success', title:'¡Listo!', text: data.message,
+                      timer:2000, showConfirmButton:false });
+        }
+      } else {
+        errDiv.textContent     = data.message || 'No se pudo guardar.';
+        errDiv.style.display   = 'block';
+      }
+    } catch (_) {
+      errDiv.textContent   = 'Error de conexión. Intenta de nuevo.';
+      errDiv.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Guardar';
+    }
+  }
+</script>
 </body>
 
 </html>

@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // 2. Validar sesión
 if (!isset($_SESSION['user'])) {
     if (!headers_sent()) {
-        header('Location: /vetwilling/login');
+        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
     }
     exit();
 }
@@ -53,20 +53,20 @@ $datosUsuario = [
     'email'              => safe_echo($usuario['email']              ?? '')
 ];
 
-// CORRECCIÓN: Usar el valor crudo para verificar rutas del sistema de archivos,
-// evitando que htmlspecialchars corrompa el nombre del archivo (ej: & → &amp;)
+// CORRECCIÓN: Usar el valor crudo para verificar rutas del sistema de archivos
 $fotoRaw = $usuario['img_perfil'] ?? '';
 
-$imagenFallback = "https://ui-avatars.com/api/?name="
-    . urlencode(($usuario['nombres'] ?? '') . '+' . ($usuario['apellidos'] ?? ''))
-    . "&background=4e9af1&color=fff&size=128";
+require_once BASE_PATH . '/app/helpers/avatar_helper.php';
+$avatarSVG = generarAvatarSVG(
+    $usuario['nombres']   ?? '',
+    $usuario['apellidos'] ?? ''
+);
 
-$rutaImagen = $imagenFallback;
+$rutaImagen = $avatarSVG;
 
 if (!empty($fotoRaw) && $fotoRaw !== 'default-avatar.png') {
     $rutaAbsoluta = BASE_PATH . "/public/uploads/usuarios/" . $fotoRaw;
     if (file_exists($rutaAbsoluta)) {
-        // Al imprimir en HTML usamos safe_echo implícitamente ya que $datosUsuario['img_perfil'] fue escapado
         $rutaImagen = BASE_URL . "/public/uploads/usuarios/" . $datosUsuario['img_perfil'];
     }
 } else {
@@ -76,17 +76,15 @@ if (!empty($fotoRaw) && $fotoRaw !== 'default-avatar.png') {
     }
 }
 
-$fallbackOnerror = "https://ui-avatars.com/api/?name="
-    . urlencode(($usuario['nombres'] ?? '') . '+' . ($usuario['apellidos'] ?? ''))
-    . "&background=4e9af1&color=fff&size=128";
+$fallbackOnerror = $avatarSVG;
 ?>
 
 <script>
     window.BASE_URL = "<?= BASE_URL ?>";
 </script>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css?v=<?= APP_VERSION ?>">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css?v=<?= APP_VERSION ?>">
 
 <!-- NAVBAR SUPERIOR -->
 <nav class="navbar-superior" role="navigation" aria-label="Navegación principal">
@@ -436,7 +434,7 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name="
     </div>
 </div>
 
-<script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/nav.js" defer></script>
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/nav.js?v=<?= APP_VERSION ?>" defer></script>
 
 <!-- Datos del usuario para JavaScript -->
 <!-- CORRECCIÓN: Solo se expone el id y el nombre; el email se elimina del objeto global
@@ -475,19 +473,6 @@ $fallbackOnerror = "https://ui-avatars.com/api/?name="
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') toggleBubble(true);
-        });
-
-        // CORRECCIÓN: Actualizar aria-expanded en los dropdowns de la navbar
-        document.querySelectorAll('[data-dropdown]').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                const expanded = this.getAttribute('aria-expanded') === 'true';
-                // Cerrar todos primero
-                document.querySelectorAll('[data-dropdown]').forEach(function (b) {
-                    b.setAttribute('aria-expanded', 'false');
-                });
-                // Abrir/cerrar el clickeado
-                this.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-            });
         });
 
     });

@@ -160,3 +160,100 @@ a:hover {
 .modal-header .btn-close {
     filter: brightness(0) invert(1);
 }
+
+
+/* ========================================================================
+   DARK MODE — body.dark-theme
+   Sobreescribe variables de Bootstrap 5.3 y aplica overrides directos
+   para los componentes usados en historialMascota.php
+======================================================================== */
+body.dark-theme {
+    /* Bootstrap CSS variable overrides */
+    --bs-body-bg            : #0f0f1a;
+    --bs-body-color         : #f0f4f8;
+    --bs-secondary-color    : #9ca3af;
+    --bs-border-color       : rgba(255,255,255,.12);
+    --bs-secondary-bg       : #1e2535;
+    --bs-tertiary-bg        : #12121f;
+    --bs-emphasis-color     : #f0f4f8;
+    --bs-card-bg            : #1a1a2e;
+    --bs-card-border-color  : rgba(255,255,255,.08);
+    --bs-card-color         : #f0f4f8;
+    --bs-table-color        : #e2e8f0;
+    --bs-table-bg           : transparent;
+    --bs-table-border-color : rgba(255,255,255,.08);
+    --bs-table-striped-bg   : rgba(255,255,255,.04);
+    --bs-table-hover-bg     : rgba(255,255,255,.06);
+    --bs-link-color         : #4ade80;
+    --bs-link-hover-color   : #22c55e;
+    --bs-nav-tabs-border-color: rgba(255,255,255,.12);
+    --bs-nav-tabs-link-active-bg: #1a1a2e;
+    --bs-nav-tabs-link-active-color: #f0f4f8;
+    --bs-nav-tabs-link-active-border-color: rgba(255,255,255,.12) rgba(255,255,255,.12) #1a1a2e;
+}
+
+/* Cards Bootstrap */
+body.dark-theme .card {
+    background-color : var(--bs-card-bg);
+    border-color     : var(--bs-card-border-color);
+    color            : var(--bs-body-color);
+}
+body.dark-theme .card-header,
+body.dark-theme .card-footer {
+    background-color : var(--bs-secondary-bg);
+    border-color     : var(--bs-card-border-color);
+    color            : var(--bs-body-color);
+}
+
+/* Tablas Bootstrap */
+body.dark-theme .table-light {
+    --bs-table-bg   : #1e2535;
+    --bs-table-color: #f0f4f8;
+}
+body.dark-theme .table > :not(caption) > * > * {
+    background-color: var(--bs-table-bg);
+    color           : var(--bs-table-color, var(--bs-body-color));
+}
+
+/* Navegación de pestañas Bootstrap */
+body.dark-theme .nav-tabs                              { border-bottom-color: rgba(255,255,255,.12); }
+body.dark-theme .nav-tabs .nav-link                    { color: #9ca3af; }
+body.dark-theme .nav-tabs .nav-link:hover,
+body.dark-theme .nav-tabs .nav-link:focus              { border-color: rgba(255,255,255,.12); color: #f0f4f8; }
+body.dark-theme .nav-tabs .nav-link.active             { background-color: #1a1a2e; border-color: rgba(255,255,255,.12) rgba(255,255,255,.12) #1a1a2e; color: #f0f4f8; }
+
+/* Alertas */
+body.dark-theme .alert-success {
+    background    : rgba(10,147,44,.15);
+    color         : #4ade80;
+    border-color  : rgba(10,147,44,.30);
+}
+
+/* Utilidades de texto Bootstrap */
+body.dark-theme .text-muted  { color: #9ca3af !important; }
+body.dark-theme .text-dark   { color: #f0f4f8 !important; }
+body.dark-theme .fw-bold     { color: inherit; }
+
+/* Botones outline Bootstrap */
+body.dark-theme .btn-outline-secondary {
+    border-color: rgba(255,255,255,.20);
+    color       : #9ca3af;
+}
+body.dark-theme .btn-outline-secondary:hover {
+    background-color: rgba(255,255,255,.10);
+    border-color    : rgba(255,255,255,.30);
+    color           : #f0f4f8;
+}
+
+/* Overlay de bloqueo */
+body.dark-theme .bloqueo-overlay {
+    background: rgba(15,15,26,.85);
+    color      : #f0f4f8;
+}
+
+/* Temporizador de acceso */
+body.dark-theme .acceso-timer {
+    background: rgba(10,147,44,.15);
+    color      : #4ade80;
+    border-color: rgba(10,147,44,.30);
+}
