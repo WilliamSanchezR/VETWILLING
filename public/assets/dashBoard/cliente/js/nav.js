@@ -1,15 +1,25 @@
 /**
  * Navbar Manager - Sistema completo de navegación
- * @version 2.0
+ * @version 2.1 (consolidado)
+ *
+ * NOTA IMPORTANTE: las notificaciones ahora se manejan EXCLUSIVAMENTE dentro de
+ * NavbarManager (un solo sistema). Se eliminó el bloque suelto duplicado que
+ * usaba otro markup/endpoint y se pisaba con este.
+ *
+ * >>> VERIFICA QUE COINCIDA CON TU BACKEND <<<
+ * - Endpoint usado: `${BASE_URL}/preferencias-notificacion?accion=obtener`
+ * - Marcar una:     `?accion=marcar_leida`  (POST, body JSON {id})
+ * - Marcar todas:   `?accion=marcar_todas`  (POST)
+ * - Respuesta esperada: { status:"success", no_leidas:Number, notificaciones:[
+ *     { id, tipo, titulo, mensaje, fecha, leido } ] }
+ * El render maneja de forma defensiva tanto `leido` (0/1) como `leida` (bool).
  */
 
 class NavbarManager {
   constructor() {
-    // Helpers de selección
     this.$ = (s) => document.querySelector(s);
     this.$$ = (s) => document.querySelectorAll(s);
 
-    // Cache de elementos DOM
     this.elements = {
       navbar: this.$(".navbar-superior"),
       dropdowns: {
@@ -41,7 +51,6 @@ class NavbarManager {
       },
     };
 
-    // Estado de la aplicación
     this.state = {
       activeDropdown: null,
       notificacionesSinLeer: 0,
@@ -51,11 +60,12 @@ class NavbarManager {
       loadingNotifications: false,
     };
 
-    // Configuración
     this.config = {
       searchDebounceTime: 300,
-      notificationRefreshInterval: 30000, // 30 segundos
+      notificationRefreshInterval: 60000, // 60 segundos
       animationDuration: 300,
+      // Base de la API. Usa la global definida en la vista o cadena vacía.
+      baseUrl: (typeof window !== "undefined" && window.BASE_URL) ? window.BASE_URL : "",
     };
 
     this.init();
@@ -71,7 +81,6 @@ class NavbarManager {
       this.initScrollEffects();
       this.initKeyboardNavigation();
       this.initAccessibility();
-
       console.log("✅ Navbar Manager inicializado correctamente");
     } catch (error) {
       console.error("❌ Error al inicializar NavbarManager:", error);
@@ -81,7 +90,6 @@ class NavbarManager {
   /* ==================== DROPDOWNS ==================== */
 
   initDropdowns() {
-    // Event delegation para botones con dropdown
     this.$$("[data-dropdown]").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -90,14 +98,12 @@ class NavbarManager {
       });
     });
 
-    // Cerrar dropdowns al hacer click fuera
     document.addEventListener("click", (e) => {
       if (!e.target.closest(".navbar-derecha")) {
         this.closeAllDropdowns();
       }
     });
 
-    // Prevenir cierre al hacer click dentro del dropdown
     this.$$(".dropdown-menu").forEach((menu) => {
       menu.addEventListener("click", (e) => e.stopPropagation());
     });
@@ -108,26 +114,16 @@ class NavbarManager {
     if (!dropdown) return;
 
     const isOpen = dropdown.classList.contains("show");
-
-    // Cerrar todos primero
     this.closeAllDropdowns();
 
     if (!isOpen) {
-      // Abrir el dropdown
       dropdown.classList.add("show");
       this.state.activeDropdown = tipo;
+      if (button) button.setAttribute("aria-expanded", "true");
 
-      // Actualizar ARIA
-      if (button) {
-        button.setAttribute("aria-expanded", "true");
-      }
-
-      // Cargar notificaciones si es necesario
       if (tipo === "notificaciones" && !this.state.loadingNotifications) {
         this.cargarNotificaciones();
       }
-
-      // Manejar foco
       this.setFocusInDropdown(dropdown);
     } else if (button) {
       button.setAttribute("aria-expanded", "false");
@@ -137,13 +133,9 @@ class NavbarManager {
   closeAllDropdowns() {
     Object.entries(this.elements.dropdowns).forEach(([tipo, dropdown]) => {
       dropdown?.classList.remove("show");
-
       const button = this.$(`[data-dropdown="${tipo}"]`);
-      if (button) {
-        button.setAttribute("aria-expanded", "false");
-      }
+      if (button) button.setAttribute("aria-expanded", "false");
     });
-
     this.state.activeDropdown = null;
   }
 
@@ -154,21 +146,20 @@ class NavbarManager {
     }, 100);
   }
 
-  /* ==================== NOTIFICACIONES ==================== */
+  /* ==================== NOTIFICACIONES (sistema único) ==================== */
 
   initNotifications() {
-    // Marcar todas como leídas
     this.elements.buttons.marcarLeidas?.addEventListener("click", () => {
       this.marcarTodasComoLeidas();
     });
 
-    // Cargar notificaciones inicial
-    this.cargarNotificaciones();
+    // Carga inicial (solo badge + lista en caché)
+    this.cargarNotificaciones(true);
 
-    // Auto-refresh cada 30 segundos
+    // Auto-refresh silencioso
     setInterval(() => {
       if (!this.state.activeDropdown) {
-        this.cargarNotificaciones(true); // silent refresh
+        this.cargarNotificaciones(true);
       }
     }, this.config.notificationRefreshInterval);
   }
@@ -184,9 +175,7 @@ class NavbarManager {
     }
 
     try {
-      // Aquí harías la petición real a tu API
       const notificaciones = await this.fetchNotificaciones();
-
       this.state.notificaciones = notificaciones;
       this.renderNotificaciones(notificaciones);
       this.actualizarContadorNotificaciones();
@@ -201,44 +190,95 @@ class NavbarManager {
   }
 
   async fetchNotificaciones() {
-    const res = await fetch(`${BASE_URL}/paciente/api/notificaciones?accion=listar`, {
-      credentials: 'include',
-      headers: { 'Accept': 'application/json' }
-    });
-    if (!res.ok) throw new Error('Error al cargar notificaciones');
+    const res = await fetch(
+      `${this.config.baseUrl}/preferencias-notificacion?accion=obtener`,
+      { credentials: "include", headers: { Accept: "application/json" } },
+    );
+    if (!res.ok) throw new Error("Error al cargar notificaciones");
+
     const data = await res.json();
+    if (data.status && data.status !== "success") return [];
+
     return Array.isArray(data.notificaciones) ? data.notificaciones : [];
+  }
+
+  // Normaliza el estado "no leída" aceptando varios formatos del backend.
+  esNoLeida(n) {
+    if (typeof n.leida === "boolean") return !n.leida;
+    if (n.leido !== undefined) return Number(n.leido) === 0;
+    if (n.leida !== undefined) return Number(n.leida) === 0;
+    return false;
+  }
+
+  iconoTipo(tipo) {
+    const iconos = {
+      INFO: "bi bi-info-circle-fill",
+      info: "bi bi-info-circle-fill",
+      alerta: "bi bi-exclamation-triangle-fill",
+      advertencia: "bi bi-exclamation-circle-fill",
+      error: "bi bi-x-circle-fill",
+    };
+    return iconos[tipo] || "bi bi-bell-fill";
+  }
+
+  colorTipo(tipo) {
+    const colores = {
+      INFO: "azul",
+      info: "azul",
+      alerta: "naranja",
+      advertencia: "naranja",
+      error: "rojo",
+      exito: "verde",
+    };
+    return colores[tipo] || "azul";
+  }
+
+  formatearFecha(fecha) {
+    if (!fecha) return "";
+    const d = new Date(fecha);
+    if (isNaN(d.getTime())) return String(fecha);
+    return d.toLocaleDateString("es-CO", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 
   renderNotificaciones(notificaciones) {
     const container = this.$("#listaNotificaciones");
     if (!container) return;
 
-    if (notificaciones.length === 0) {
+    if (!notificaciones || notificaciones.length === 0) {
       container.innerHTML = this.getEmptyNotificationsTemplate();
       return;
     }
 
     container.innerHTML = notificaciones
-      .map(
-        (n) => `
+      .map((n) => {
+        const noLeida = this.esNoLeida(n);
+        const color = n.color || this.colorTipo(n.tipo);
+        const icono = n.icono || this.iconoTipo(n.tipo);
+        const titulo = n.titulo ?? n.tipo ?? "Notificación";
+        const tiempo = n.tiempo ?? this.formatearFecha(n.fecha);
+        return `
             <a href="#"
-               class="notificacion-item ${!n.leida ? "no-leida" : ""}"
+               class="notificacion-item ${noLeida ? "no-leida" : ""}"
                data-notif-id="${n.id}"
                role="menuitem">
-                <div class="notif-icono notif-${n.color}">
-                    <i class="${n.icono}" aria-hidden="true"></i>
+                <div class="notif-icono notif-${color}">
+                    <i class="${icono}" aria-hidden="true"></i>
                 </div>
                 <div class="notif-contenido">
-                    <p class="notif-texto">${this.escapeHtml(n.titulo)}</p>
-                    <span class="notif-tiempo">${this.escapeHtml(n.tiempo)}</span>
+                    <p class="notif-texto">${this.escapeHtml(titulo)}</p>
+                    ${n.mensaje ? `<p class="notif-texto" style="font-weight:400">${this.escapeHtml(n.mensaje)}</p>` : ""}
+                    <span class="notif-tiempo">${this.escapeHtml(tiempo)}</span>
                 </div>
-            </a>
-        `,
-      )
+            </a>`;
+      })
       .join("");
 
-    // Agregar event listeners a las notificaciones
     this.$$(".notificacion-item").forEach((item) => {
       item.addEventListener("click", (e) => {
         e.preventDefault();
@@ -248,32 +288,32 @@ class NavbarManager {
   }
 
   handleNotificacionClick(item) {
-    const notifId = parseInt(item.dataset.notifId);
-
+    const notifId = parseInt(item.dataset.notifId, 10);
     if (item.classList.contains("no-leida")) {
       this.marcarComoLeida(notifId);
       item.classList.remove("no-leida");
     }
-
-    // Aquí puedes agregar lógica para navegar o mostrar detalles
     console.log("Notificación clickeada:", notifId);
   }
 
   async marcarComoLeida(notifId) {
     try {
-      // Actualizar estado local
-      const notif = this.state.notificaciones.find((n) => n.id === notifId);
+      const notif = this.state.notificaciones.find((n) => n.id == notifId);
       if (notif) {
         notif.leida = true;
+        notif.leido = 1;
       }
-
       this.actualizarContadorNotificaciones();
 
-      await fetch(`${BASE_URL}/paciente/api/notificaciones?action=leer`, {
-        method: 'POST',
-        credentials: 'include',
-        body: new URLSearchParams({ id: notifId })
-      });
+      await fetch(
+        `${this.config.baseUrl}/preferencias-notificacion?accion=marcar_leida`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: notifId }),
+        },
+      );
     } catch (error) {
       console.error("Error al marcar notificación:", error);
     }
@@ -281,27 +321,32 @@ class NavbarManager {
 
   async marcarTodasComoLeidas() {
     try {
-      // Actualizar estado local
-      this.state.notificaciones.forEach((n) => (n.leida = true));
-
-      // Actualizar UI
-      this.$$(".notificacion-item.no-leida").forEach((item) => {
-        item.classList.remove("no-leida");
+      this.state.notificaciones.forEach((n) => {
+        n.leida = true;
+        n.leido = 1;
       });
-
+      this.$$(".notificacion-item.no-leida").forEach((item) =>
+        item.classList.remove("no-leida"),
+      );
       this.actualizarContadorNotificaciones();
 
-      await fetch(`${BASE_URL}/paciente/api/notificaciones?action=leer_todas`, {
-        method: 'POST',
-        credentials: 'include'
-      });
+      await fetch(
+        `${this.config.baseUrl}/preferencias-notificacion?accion=marcar_todas`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     } catch (error) {
       console.error("Error al marcar todas como leídas:", error);
     }
   }
 
   actualizarContadorNotificaciones() {
-    const sinLeer = this.state.notificaciones.filter((n) => !n.leida).length;
+    const sinLeer = this.state.notificaciones.filter((n) =>
+      this.esNoLeida(n),
+    ).length;
     const badge = this.$("#badgeNotificaciones");
 
     if (badge) {
@@ -310,11 +355,11 @@ class NavbarManager {
         badge.style.display = "flex";
         badge.setAttribute("aria-label", `${sinLeer} notificaciones sin leer`);
       } else {
+        badge.textContent = "";
         badge.style.display = "none";
         badge.setAttribute("aria-label", "Sin notificaciones");
       }
     }
-
     this.state.notificacionesSinLeer = sinLeer;
   }
 
@@ -325,8 +370,7 @@ class NavbarManager {
             <div class="loading-notificaciones">
                 <div class="spinner"></div>
                 <p>Cargando notificaciones...</p>
-            </div>
-        `;
+            </div>`;
   }
 
   getErrorTemplate() {
@@ -337,8 +381,7 @@ class NavbarManager {
                 <button onclick="window.navbarManager.cargarNotificaciones()" class="btn-retry">
                     Reintentar
                 </button>
-            </div>
-        `;
+            </div>`;
   }
 
   getEmptyNotificationsTemplate() {
@@ -346,8 +389,7 @@ class NavbarManager {
             <div class="empty-notificaciones">
                 <i class="bi bi-bell-slash"></i>
                 <p>No tienes notificaciones</p>
-            </div>
-        `;
+            </div>`;
   }
 
   /* ==================== BÚSQUEDA ==================== */
@@ -358,15 +400,12 @@ class NavbarManager {
 
     searchInput.addEventListener("input", (e) => {
       clearTimeout(this.state.searchDebounce);
-
       const query = e.target.value.trim();
-
       this.state.searchDebounce = setTimeout(() => {
         this.performSearch(query);
       }, this.config.searchDebounceTime);
     });
 
-    // Limpiar búsqueda con ESC
     searchInput.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         searchInput.value = "";
@@ -381,25 +420,11 @@ class NavbarManager {
       this.clearSearchResults();
       return;
     }
-
     console.log("Buscando:", query);
-
-    // Aquí implementarías la búsqueda real
-    // Podría ser búsqueda local o llamada a API
-
-    /* Ejemplo con API:
-        try {
-            const response = await fetch(`/api/buscar?q=${encodeURIComponent(query)}`);
-            const resultados = await response.json();
-            this.mostrarResultadosBusqueda(resultados);
-        } catch (error) {
-            console.error('Error en búsqueda:', error);
-        }
-        */
+    // Implementa aquí la búsqueda real (local o por API).
   }
 
   clearSearchResults() {
-    // Limpiar resultados de búsqueda
     const items = this.$$("[data-searchable]");
     items.forEach((el) => (el.style.display = ""));
   }
@@ -414,7 +439,6 @@ class NavbarManager {
       "scroll",
       () => {
         lastScroll = window.pageYOffset;
-
         if (!ticking) {
           window.requestAnimationFrame(() => {
             this.handleScroll(lastScroll);
@@ -430,24 +454,14 @@ class NavbarManager {
   handleScroll(scrollPos) {
     const navbar = this.elements.navbar;
     if (!navbar) return;
-
-    if (scrollPos > 50) {
-      navbar.classList.add("scrolled");
-    } else {
-      navbar.classList.remove("scrolled");
-    }
+    navbar.classList.toggle("scrolled", scrollPos > 50);
   }
 
   /* ==================== NAVEGACIÓN POR TECLADO ==================== */
 
   initKeyboardNavigation() {
     document.addEventListener("keydown", (e) => {
-      // ESC para cerrar dropdowns
-      if (e.key === "Escape") {
-        this.closeAllDropdowns();
-      }
-
-      // Tab trap en dropdowns abiertos
+      if (e.key === "Escape") this.closeAllDropdowns();
       if (e.key === "Tab" && this.state.activeDropdown) {
         this.handleTabInDropdown(e);
       }
@@ -461,7 +475,6 @@ class NavbarManager {
     const focusableElements = activeDropdown.querySelectorAll(
       'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
-
     if (focusableElements.length === 0) return;
 
     const firstElement = focusableElements[0];
@@ -479,13 +492,11 @@ class NavbarManager {
   /* ==================== ACCESIBILIDAD ==================== */
 
   initAccessibility() {
-    // Anunciar cambios dinámicos a lectores de pantalla
     this.createAriaLiveRegion();
   }
 
   createAriaLiveRegion() {
     if (this.$("#aria-live-region")) return;
-
     const liveRegion = document.createElement("div");
     liveRegion.id = "aria-live-region";
     liveRegion.className = "sr-only";
@@ -506,24 +517,14 @@ class NavbarManager {
 
   escapeHtml(text) {
     const div = document.createElement("div");
-    div.textContent = text;
+    div.textContent = text ?? "";
     return div.innerHTML;
-  }
-
-  debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
   }
 }
 
 /* ==================== CARRITO ==================== */
+/* Nota: este módulo solo actúa si el HTML del carrito existe en la página.
+   En vistas sin carrito queda inactivo (todos los guards devuelven temprano). */
 
 class CarritoManager {
   constructor() {
@@ -536,6 +537,8 @@ class CarritoManager {
       btnPagar: document.querySelector(".btn-pagar"),
     };
 
+    // Si no hay contenedor de items, el carrito no existe en esta vista.
+    if (!this.elements.items) return;
     this.init();
   }
 
@@ -545,51 +548,33 @@ class CarritoManager {
   }
 
   initEventListeners() {
-    // Toggle carrito
     document
       .querySelectorAll('[data-action="toggle-carrito"]')
-      .forEach((btn) => {
-        btn.addEventListener("click", () => this.toggle());
-      });
+      .forEach((btn) => btn.addEventListener("click", () => this.toggle()));
 
-    // Cerrar con ESC
     document.addEventListener("keydown", (e) => {
-      if (
-        e.key === "Escape" &&
-        this.elements.sidebar?.classList.contains("open")
-      ) {
+      if (e.key === "Escape" && this.elements.sidebar?.classList.contains("open")) {
         this.toggle();
       }
     });
 
-    // Proceder al pago
-    this.elements.btnPagar?.addEventListener("click", () =>
-      this.procesarPago(),
-    );
+    this.elements.btnPagar?.addEventListener("click", () => this.procesarPago());
   }
 
   toggle() {
     this.elements.sidebar?.classList.toggle("open");
-
-    if (this.elements.sidebar?.classList.contains("open")) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = this.elements.sidebar?.classList.contains("open")
+      ? "hidden"
+      : "";
   }
 
   agregar(producto) {
     const existe = this.carrito.find((item) => item.id === producto.id);
-
     if (existe) {
       existe.cantidad++;
     } else {
-      this.carrito.push({
-        ...producto,
-        cantidad: 1,
-      });
+      this.carrito.push({ ...producto, cantidad: 1 });
     }
-
     this.actualizar();
     this.saveToStorage();
     this.mostrarNotificacion(`${producto.nombre} agregado al carrito`);
@@ -618,9 +603,8 @@ class CarritoManager {
                 <div class="carrito-vacio">
                     <i class="bi bi-cart-x"></i>
                     <p>Tu carrito está vacío</p>
-                </div>
-            `;
-      this.elements.btnPagar.disabled = true;
+                </div>`;
+      if (this.elements.btnPagar) this.elements.btnPagar.disabled = true;
     } else {
       this.elements.items.innerHTML = this.carrito
         .map(
@@ -638,36 +622,32 @@ class CarritoManager {
                         <button class="btn-cantidad" onclick="window.carritoManager.cambiarCantidad(${item.id}, ${item.cantidad + 1})">
                             <i class="bi bi-plus"></i>
                         </button>
-                        <button class="btn-eliminar" onclick="window.carritoManager.eliminar(${item.id})" aria-label="Eliminar ${item.nombre}">
+                        <button class="btn-eliminar" onclick="window.carritoManager.eliminar(${item.id})" aria-label="Eliminar ${this.escapeHtml(item.nombre)}">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
-                </div>
-            `,
+                </div>`,
         )
         .join("");
-      this.elements.btnPagar.disabled = false;
+      if (this.elements.btnPagar) this.elements.btnPagar.disabled = false;
     }
 
     const total = this.carrito.reduce(
       (sum, item) => sum + item.precio * item.cantidad,
       0,
     );
-    this.elements.total.textContent = `$${total.toFixed(2)}`;
+    if (this.elements.total) this.elements.total.textContent = `$${total.toFixed(2)}`;
 
-    const totalItems = this.carrito.reduce(
-      (sum, item) => sum + item.cantidad,
-      0,
-    );
-    this.elements.contador.textContent = totalItems;
-    this.elements.contador.style.display = totalItems > 0 ? "flex" : "none";
+    const totalItems = this.carrito.reduce((sum, item) => sum + item.cantidad, 0);
+    if (this.elements.contador) {
+      this.elements.contador.textContent = totalItems;
+      this.elements.contador.style.display = totalItems > 0 ? "flex" : "none";
+    }
   }
 
   procesarPago() {
     if (this.carrito.length === 0) return;
-
     console.log("Procesando pago...", this.carrito);
-    // Aquí iría la lógica de pago
     alert("Funcionalidad de pago en desarrollo");
   }
 
@@ -690,13 +670,11 @@ class CarritoManager {
   }
 
   mostrarNotificacion(mensaje) {
-    // Crear notificación toast
     const toast = document.createElement("div");
     toast.className = "toast-notification";
     toast.innerHTML = `
             <i class="bi bi-check-circle-fill"></i>
-            <span>${this.escapeHtml(mensaje)}</span>
-        `;
+            <span>${this.escapeHtml(mensaje)}</span>`;
     document.body.appendChild(toast);
 
     setTimeout(() => toast.classList.add("show"), 10);
@@ -708,7 +686,7 @@ class CarritoManager {
 
   escapeHtml(text) {
     const div = document.createElement("div");
-    div.textContent = text;
+    div.textContent = text ?? "";
     return div.innerHTML;
   }
 }
@@ -719,12 +697,12 @@ class SoporteModal {
   constructor() {
     this.elements = {
       modal: document.getElementById("modalSoporte"),
+      // OJO: #formularioSoporte es un <div>, NO un <form>.
       form: document.getElementById("formularioSoporte"),
-      btnEnviar: null,
+      btnEnviar: document.getElementById("btnEnviarSoporte"),
     };
 
     if (this.elements.modal && this.elements.form) {
-      this.elements.btnEnviar = this.elements.form.querySelector(".btn-enviar");
       this.init();
     }
   }
@@ -735,7 +713,6 @@ class SoporteModal {
   }
 
   initEventListeners() {
-    // Abrir modal
     document.querySelectorAll('[data-modal="soporte"]').forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -743,41 +720,33 @@ class SoporteModal {
       });
     });
 
-    // Cerrar modal
     document.querySelectorAll('[data-modal-close="soporte"]').forEach((btn) => {
       btn.addEventListener("click", () => this.cerrar());
     });
 
-    // Cerrar con click fuera
     this.elements.modal?.addEventListener("click", (e) => {
-      if (e.target === this.elements.modal) {
-        this.cerrar();
-      }
+      if (e.target === this.elements.modal) this.cerrar();
     });
 
-    // Cerrar con ESC
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && this.elements.modal?.style.display === "flex") {
         this.cerrar();
       }
     });
 
-    // Submit form
-    this.elements.form?.addEventListener("submit", (e) => {
-      e.preventDefault();
-      this.enviarFormulario();
-    });
+    // CORRECCIÓN CLAVE: un <div> nunca dispara "submit".
+    // El envío se engancha al clic del botón.
+    this.elements.btnEnviar?.addEventListener("click", () =>
+      this.enviarFormulario(),
+    );
   }
 
   initValidacion() {
     const campos = this.elements.form?.querySelectorAll(".form-control");
-
     campos?.forEach((campo) => {
       campo.addEventListener("blur", () => this.validarCampo(campo));
       campo.addEventListener("input", () => {
-        if (campo.classList.contains("error")) {
-          this.validarCampo(campo);
-        }
+        if (campo.classList.contains("error")) this.validarCampo(campo);
       });
     });
   }
@@ -787,13 +756,14 @@ class SoporteModal {
     const errorSpan = campo.nextElementSibling;
     let error = "";
 
-    if (campo.hasAttribute("required") && !valor) {
+    const esRequerido =
+      campo.hasAttribute("required") || campo.getAttribute("aria-required") === "true";
+
+    if (esRequerido && !valor) {
       error = "Este campo es obligatorio";
     } else if (campo.type === "email" && valor) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(valor)) {
-        error = "Email inválido";
-      }
+      if (!emailRegex.test(valor)) error = "Email inválido";
     } else if (campo.tagName === "TEXTAREA" && valor.length < 10) {
       error = "Mínimo 10 caracteres";
     }
@@ -805,62 +775,64 @@ class SoporteModal {
         errorSpan.style.display = "block";
       }
       return false;
-    } else {
-      campo.classList.remove("error");
-      if (errorSpan && errorSpan.classList.contains("error-message")) {
-        errorSpan.style.display = "none";
-      }
-      return true;
     }
+    campo.classList.remove("error");
+    if (errorSpan && errorSpan.classList.contains("error-message")) {
+      errorSpan.style.display = "none";
+    }
+    return true;
   }
 
   validarFormulario() {
-    const campos = this.elements.form.querySelectorAll(
-      ".form-control[required]",
-    );
+    // Validamos todos los .form-control (todos llevan aria-required en el HTML).
+    const campos = this.elements.form.querySelectorAll(".form-control");
     let valido = true;
-
     campos.forEach((campo) => {
-      if (!this.validarCampo(campo)) {
-        valido = false;
-      }
+      if (!this.validarCampo(campo)) valido = false;
     });
-
     return valido;
   }
 
+  // Recolecta los datos manualmente (no usamos FormData porque no hay <form>).
+  recolectarDatos() {
+    const f = this.elements.form;
+    return {
+      nombre: f.querySelector("#nombreSoporte")?.value.trim() || "",
+      email: f.querySelector("#emailSoporte")?.value.trim() || "",
+      tipo_problema: f.querySelector("#tipoProblema")?.value || "",
+      descripcion: f.querySelector("#descripcionProblema")?.value.trim() || "",
+    };
+  }
+
   async enviarFormulario() {
-    if (!this.validarFormulario()) {
-      return;
-    }
+    if (!this.validarFormulario()) return;
 
-    const formData = new FormData(this.elements.form);
-    const data = Object.fromEntries(formData.entries());
+    const data = this.recolectarDatos();
+    const btn = this.elements.btnEnviar;
+    const spinner = btn?.querySelector(".loading-spinner");
+    const span = btn?.querySelector("span");
 
-    // Deshabilitar botón
-    this.elements.btnEnviar.disabled = true;
-    const spinner = this.elements.btnEnviar.querySelector(".loading-spinner");
-    const span = this.elements.btnEnviar.querySelector("span");
-
+    if (btn) btn.disabled = true;
     if (spinner) spinner.style.display = "inline-block";
     if (span) span.textContent = "Enviando...";
 
     try {
-      // Simular envío
+      // Simulación de envío. Reemplaza por tu petición real:
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      /* CÓDIGO REAL:
-            const response = await fetch('/api/soporte', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) throw new Error('Error al enviar');
-            */
+      /* CÓDIGO REAL (ejemplo):
+      const baseUrl = window.BASE_URL || "";
+      const response = await fetch(`${baseUrl}/api/soporte`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Error al enviar");
+      */
 
       this.mostrarExito();
       setTimeout(() => this.cerrar(), 2000);
@@ -868,7 +840,7 @@ class SoporteModal {
       console.error("Error:", error);
       alert("Error al enviar el mensaje. Por favor, intenta de nuevo.");
     } finally {
-      this.elements.btnEnviar.disabled = false;
+      if (btn) btn.disabled = false;
       if (spinner) spinner.style.display = "none";
       if (span) span.textContent = "Enviar Mensaje";
     }
@@ -876,54 +848,48 @@ class SoporteModal {
 
   mostrarExito() {
     const mensajeExito = this.elements.modal?.querySelector(".mensaje-exito");
-    if (mensajeExito) {
-      mensajeExito.style.display = "block";
-    }
+    const formContainer = this.elements.form;
+    if (mensajeExito) mensajeExito.style.display = "block";
+    if (formContainer) formContainer.style.display = "none";
+  }
+
+  resetCampos() {
+    this.elements.form?.querySelectorAll(".form-control").forEach((campo) => {
+      if (campo.tagName === "SELECT") {
+        campo.selectedIndex = 0;
+      } else {
+        campo.value = "";
+      }
+    });
   }
 
   abrir() {
     this.elements.modal.style.display = "flex";
     document.body.style.overflow = "hidden";
-
     setTimeout(() => {
-      const primerInput = this.elements.form.querySelector("input");
-      primerInput?.focus();
+      this.elements.form.querySelector("input")?.focus();
     }, 100);
   }
 
   cerrar() {
     this.elements.modal.style.display = "none";
     document.body.style.overflow = "";
-    this.elements.form?.reset();
 
-    // Limpiar errores
-    this.elements.form?.querySelectorAll(".error").forEach((el) => {
-      el.classList.remove("error");
-    });
+    // Limpiar errores y volver a mostrar el formulario por si quedó en "éxito"
+    this.elements.form?.querySelectorAll(".error").forEach((el) =>
+      el.classList.remove("error"),
+    );
     this.elements.form?.querySelectorAll(".error-message").forEach((el) => {
       el.style.display = "none";
     });
 
     const mensajeExito = this.elements.modal?.querySelector(".mensaje-exito");
-    if (mensajeExito) {
-      mensajeExito.style.display = "none";
-    }
+    if (mensajeExito) mensajeExito.style.display = "none";
+    if (this.elements.form) this.elements.form.style.display = "";
   }
 }
 
-/* ==================== INICIALIZACIÓN GLOBAL ==================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.navbarManager = new NavbarManager();
-  window.carritoManager = new CarritoManager();
-  window.soporteModal = new SoporteModal();
-
-  console.log("🚀 Sistema de navegación cargado completamente");
-});
-// reloj
-// ===================================
-// MÓDULO DE RELOJ EN VIVO
-// ===================================
+/* ==================== MÓDULO DE RELOJ EN VIVO ==================== */
 
 class RelojEnVivo {
   constructor() {
@@ -938,103 +904,56 @@ class RelojEnVivo {
     this.zonaHoraria = document.getElementById("zonaHoraria");
 
     this.diasSemana = [
-      "Domingo",
-      "Lunes",
-      "Martes",
-      "Miércoles",
-      "Jueves",
-      "Viernes",
-      "Sábado",
+      "Domingo", "Lunes", "Martes", "Miércoles",
+      "Jueves", "Viernes", "Sábado",
     ];
     this.meses = [
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre",
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
     ];
 
     this.init();
   }
 
   init() {
-    // Iniciar actualización del reloj
     this.actualizarReloj();
     setInterval(() => this.actualizarReloj(), 1000);
 
-    // Event listeners
-    if (this.btnReloj) {
-      this.btnReloj.addEventListener("click", () => this.abrirModal());
-    }
+    this.btnReloj?.addEventListener("click", () => this.abrirModal());
+    this.btnCerrar?.addEventListener("click", () => this.cerrarModal());
 
-    if (this.btnCerrar) {
-      this.btnCerrar.addEventListener("click", () => this.cerrarModal());
-    }
+    this.modalReloj?.addEventListener("click", (e) => {
+      if (e.target === this.modalReloj) this.cerrarModal();
+    });
 
-    if (this.modalReloj) {
-      this.modalReloj.addEventListener("click", (e) => {
-        if (e.target === this.modalReloj) {
-          this.cerrarModal();
-        }
-      });
-    }
-
-    // Cerrar con ESC
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && this.modalReloj.classList.contains("activo")) {
+      // CORRECCIÓN: guard contra modalReloj null.
+      if (e.key === "Escape" && this.modalReloj?.classList.contains("activo")) {
         this.cerrarModal();
       }
     });
 
-    // Actualizar zona horaria
     this.actualizarZonaHoraria();
   }
 
   actualizarReloj() {
     const ahora = new Date();
 
-    // Actualizar hora en navbar (formato 12h con AM/PM)
     const horas12 = ahora.getHours() % 12 || 12;
     const minutos = String(ahora.getMinutes()).padStart(2, "0");
     const ampm = ahora.getHours() >= 12 ? "PM" : "AM";
+    if (this.horaNavbar) this.horaNavbar.textContent = `${horas12}:${minutos} ${ampm}`;
 
-    if (this.horaNavbar) {
-      this.horaNavbar.textContent = `${horas12}:${minutos} ${ampm}`;
-    }
-
-    // Actualizar reloj digital en modal (formato 24h simple)
     const horas24 = String(ahora.getHours()).padStart(2, "0");
     const segundos = String(ahora.getSeconds()).padStart(2, "0");
+    if (this.relojDigital) this.relojDigital.textContent = `${horas24}:${minutos}:${segundos}`;
 
-    if (this.relojDigital) {
-      this.relojDigital.textContent = `${horas24}:${minutos}:${segundos}`;
-    }
-
-    // Actualizar fecha
     const dia = ahora.getDate();
     const mes = this.meses[ahora.getMonth()];
-    const año = ahora.getFullYear();
-
-    if (this.relojFecha) {
-      this.relojFecha.textContent = `${dia} de ${mes} de ${año}`;
-    }
-
-    // Actualizar día de la semana
-    if (this.diaSemana) {
-      this.diaSemana.textContent = this.diasSemana[ahora.getDay()];
-    }
-
-    // Actualizar período del día
-    if (this.periodo) {
-      this.periodo.textContent = this.obtenerPeriodo(ahora.getHours());
-    }
+    const anio = ahora.getFullYear();
+    if (this.relojFecha) this.relojFecha.textContent = `${dia} de ${mes} de ${anio}`;
+    if (this.diaSemana) this.diaSemana.textContent = this.diasSemana[ahora.getDay()];
+    if (this.periodo) this.periodo.textContent = this.obtenerPeriodo(ahora.getHours());
   }
 
   obtenerPeriodo(hora) {
@@ -1045,16 +964,14 @@ class RelojEnVivo {
   }
 
   actualizarZonaHoraria() {
-    if (this.zonaHoraria) {
-      try {
-        const zona = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const offset = new Date().getTimezoneOffset();
-        const offsetHoras = Math.abs(offset / 60);
-        const signo = offset <= 0 ? "+" : "-";
-        this.zonaHoraria.textContent = `UTC${signo}${offsetHoras}`;
-      } catch (e) {
-        this.zonaHoraria.textContent = "Local";
-      }
+    if (!this.zonaHoraria) return;
+    try {
+      const offset = new Date().getTimezoneOffset();
+      const offsetHoras = Math.abs(offset / 60);
+      const signo = offset <= 0 ? "+" : "-";
+      this.zonaHoraria.textContent = `UTC${signo}${offsetHoras}`;
+    } catch (e) {
+      this.zonaHoraria.textContent = "Local";
     }
   }
 
@@ -1073,157 +990,13 @@ class RelojEnVivo {
   }
 }
 
-// Inicializar cuando el DOM esté listo
+/* ==================== INICIALIZACIÓN GLOBAL ==================== */
+
 document.addEventListener("DOMContentLoaded", () => {
-  new RelojEnVivo();
+  window.navbarManager = new NavbarManager();
+  window.carritoManager = new CarritoManager();
+  window.soporteModal = new SoporteModal();
+  window.relojEnVivo = new RelojEnVivo();
+
+  console.log("🚀 Sistema de navegación cargado completamente");
 });
-
-// ===================================
-// INTEGRACIÓN CON nav.js EXISTENTE
-// ===================================
-
-// Si ya tienes un nav.js, agrega esta función al final
-// o integra la clase RelojEnVivo en tu código existente
-
-// Ejemplo de integración:
-/*
-// En tu nav.js existente, agrega:
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Tu código existente...
-
-    // Inicializar reloj
-    const reloj = new RelojEnVivo();
-
-    // Continúa con tu código...
-});
-*/
-
-// ═══════════════════════════════════════════
-// NOTIFICACIONES - Campañita 🔔
-// ═══════════════════════════════════════════
-
-// Usa window.BASE_URL directamente para evitar conflicto con var BASE_URL declarado en vistas
-var _NAV_BASE_URL = window.BASE_URL;
-
-// Iconos según tipo
-function iconoTipo(tipo) {
-  const iconos = {
-    INFO: "bi-info-circle-fill text-primary",
-    alerta: "bi-exclamation-triangle-fill text-warning",
-    error: "bi-x-circle-fill text-danger",
-    advertencia: "bi-exclamation-circle-fill text-warning",
-  };
-  return iconos[tipo] || "bi-bell-fill text-secondary";
-}
-
-// Formatear fecha
-function formatearFecha(fecha) {
-  const d = new Date(fecha);
-  return d.toLocaleDateString("es-CO", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-// Cargar notificaciones desde el servidor
-async function cargarNotificaciones() {
-  try {
-    const res = await fetch(
-      `${_NAV_BASE_URL}/preferencias-notificacion?accion=obtener`,
-    );
-    const data = await res.json();
-
-    const lista = document.getElementById("listaNotificaciones");
-    const badge = document.getElementById("badgeNotificaciones");
-
-    if (data.status !== "success") return;
-
-    // Actualizar badge
-    const noLeidas = Number.isInteger(data.no_leidas) ? data.no_leidas : 0;
-    if (badge) {
-      badge.textContent = noLeidas > 0 ? noLeidas : "";
-      badge.style.display = noLeidas > 0 ? "flex" : "none";
-    }
-
-    // Renderizar lista
-    if (
-      !Array.isArray(data.notificaciones) ||
-      data.notificaciones.length === 0
-    ) {
-      lista.innerHTML = `
-                <div class="sin-notificaciones">
-                    <i class="bi bi-bell-slash"></i>
-                    <p>No tienes notificaciones</p>
-                </div>`;
-      return;
-    }
-
-    lista.innerHTML = data.notificaciones
-      .map(
-        (n) => `
-            <div class="notif-item ${n.leido == 0 ? "no-leida" : ""}" data-id="${n.id}">
-                <div class="notif-icono">
-                    <i class="bi ${iconoTipo(n.tipo)}"></i>
-                </div>
-                <div class="notif-contenido">
-                    <p class="notif-titulo">${n.titulo ?? n.tipo ?? "Notificación"}</p>
-                    <p class="notif-mensaje">${n.mensaje}</p>
-                    <span class="notif-fecha">${formatearFecha(n.fecha)}</span>
-                </div>
-                ${n.leido == 0 ? `<span class="notif-punto"></span>` : ""}
-            </div>
-        `,
-      )
-      .join("");
-
-    // Click en una notificación = marcar como leída
-    lista.querySelectorAll(".notif-item.no-leida").forEach((item) => {
-      item.addEventListener("click", async () => {
-        const id = item.dataset.id;
-        await fetch(
-          `${_NAV_BASE_URL}/preferencias-notificacion?accion=marcar_leida`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id }),
-          },
-        );
-        item.classList.remove("no-leida");
-        item.querySelector(".notif-punto")?.remove();
-        // Restar del badge
-        const actual = parseInt(badge.textContent) || 0;
-        const nuevo = actual - 1;
-        badge.textContent = nuevo > 0 ? nuevo : "";
-        badge.style.display = nuevo > 0 ? "flex" : "none";
-      });
-    });
-  } catch (err) {
-    console.error("Error cargando notificaciones:", err);
-  }
-}
-
-// Marcar todas como leídas
-document
-  .querySelector('[data-action="marcar-leidas"]')
-  ?.addEventListener("click", async () => {
-    await fetch(`${_NAV_BASE_URL}/preferencias-notificacion?accion=marcar_todas`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
-    cargarNotificaciones(); // Recargar la lista
-  });
-
-// Cargar al abrir el dropdown
-document.getElementById("btnNotificaciones")?.addEventListener("click", () => {
-  cargarNotificaciones();
-});
-
-// Cargar badge al iniciar la página (sin abrir el dropdown)
-cargarNotificaciones();
-
-// Recargar automáticamente cada 60 segundos
-setInterval(cargarNotificaciones, 60000);
