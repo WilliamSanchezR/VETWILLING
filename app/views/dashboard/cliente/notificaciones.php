@@ -270,7 +270,28 @@ if (!isset($t)) {
             .notif-meta    { flex-direction: column; align-items: flex-start; }
             .notif-header  { flex-direction: column; align-items: flex-start; }
         }
+
+        /* ── RFS 43: estados y nuevos botones ──────────────────────────── */
+        .notif-card.notif-cancelada { opacity: .55; }
+        .notif-card.notif-cancelada:hover { opacity: .8; }
+
+        .notif-pill-estado--pendiente  { background: #fff3cd; color: #856404; }
+        .notif-pill-estado--cancelada  { background: #fdecea; color: #b02a37; }
+
+        .notif-motivo-cancelacion {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: .78rem; color: #b02a37; font-style: italic;
+        }
+        .notif-motivo-cancelacion i { flex-shrink: 0; }
+
+        .btn-notif-edit   { border-color: #0d6efd; color: #0d6efd; }
+        .btn-notif-edit:hover   { background: #e8f0fe; }
+
+        .btn-notif-cancel { border-color: #fd7e14; color: #fd7e14; }
+        .btn-notif-cancel:hover { background: #fff3e6; }
     </style>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 </head>
 <body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
@@ -340,15 +361,22 @@ if (!isset($t)) {
                     <div class="notif-list" id="notif-list">
 
                         <?php foreach ($notificaciones as $notif):
-                            $tipo   = htmlspecialchars($notif['tipo']);
-                            $leida  = (bool)$notif['leida'];
-                            $clases = 'notif-card tipo-' . $tipo . ($leida ? ' leida' : ' no-leida');
+                            $tipo      = htmlspecialchars($notif['tipo']);
+                            $leida     = (bool)$notif['leida'];
+                            $estado    = $notif['estado'] ?? 'enviada';
+                            $cancelada = $estado === 'cancelada';
+                            $clases    = 'notif-card tipo-' . $tipo
+                                       . ($leida     ? ' leida'          : ' no-leida')
+                                       . ($cancelada ? ' notif-cancelada' : '');
                         ?>
 
                         <div
                             class="<?= $clases ?>"
                             id="notif-<?= $notif['id_notificacion'] ?>"
                             data-leida="<?= $leida ? '1' : '0' ?>"
+                            data-estado="<?= htmlspecialchars($estado) ?>"
+                            data-titulo="<?= htmlspecialchars($notif['titulo'], ENT_QUOTES) ?>"
+                            data-mensaje="<?= htmlspecialchars($notif['mensaje'], ENT_QUOTES) ?>"
                         >
                             <div class="notif-icon-wrap" aria-hidden="true">
                                 <i class="bi <?= iconoNotificacion($tipo) ?>"></i>
@@ -359,6 +387,11 @@ if (!isset($t)) {
                                     <div class="notif-title-row">
                                         <p class="notif-title"><?= htmlspecialchars($notif['titulo']) ?></p>
                                         <span class="notif-pill"><?= etiquetaNotificacion($tipo) ?></span>
+                                        <?php if ($estado !== 'enviada'): ?>
+                                        <span class="notif-pill notif-pill-estado--<?= $estado ?>">
+                                            <?= $estado === 'pendiente' ? 'Pendiente' : 'Cancelada' ?>
+                                        </span>
+                                        <?php endif; ?>
                                     </div>
                                     <span class="notif-time"><?= tiempoRelativo($notif['fecha_creacion']) ?></span>
                                 </div>
@@ -375,6 +408,30 @@ if (!isset($t)) {
                                         <i class="bi bi-check-circle" aria-hidden="true"></i>
                                         Marcar como leída
                                     </button>
+                                    <?php endif; ?>
+
+                                    <?php if (!$cancelada): ?>
+                                    <button
+                                        class="btn-notif btn-notif-edit"
+                                        onclick="modificarNotif(<?= $notif['id_notificacion'] ?>)"
+                                        aria-label="Modificar notificación"
+                                    >
+                                        <i class="bi bi-pencil" aria-hidden="true"></i>
+                                        Modificar
+                                    </button>
+                                    <button
+                                        class="btn-notif btn-notif-cancel"
+                                        onclick="cancelarNotif(<?= $notif['id_notificacion'] ?>)"
+                                        aria-label="Cancelar notificación"
+                                    >
+                                        <i class="bi bi-slash-circle" aria-hidden="true"></i>
+                                        Cancelar
+                                    </button>
+                                    <?php else: ?>
+                                    <span class="notif-motivo-cancelacion">
+                                        <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                                        <?= htmlspecialchars($notif['motivo_cancelacion'] ?? '') ?>
+                                    </span>
                                     <?php endif; ?>
 
                                     <button
@@ -405,8 +462,16 @@ if (!isset($t)) {
 
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 const API = '<?= BASE_URL ?>/paciente/api/notificaciones';
+
+/* ── Helpers ───────────────────────────────────────────────────────────── */
+function escHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str ?? '';
+    return d.innerHTML;
+}
 
 /* ── Filtro tabs ───────────────────────────────────────────────────────── */
 function filtrar(tipo, tabEl) {
@@ -525,6 +590,132 @@ function mostrarVacioSiNecesario() {
                 <p>Cuando haya actividad relacionada con tus mascotas aparecerá aquí.</p>
             </div>`;
     }
+}
+
+/* ── RFS 43: Modificar notificación ───────────────────────────────────── */
+function modificarNotif(id) {
+    const card         = document.getElementById('notif-' + id);
+    const tituloActual = card?.dataset.titulo  || '';
+    const mensajeActual= card?.dataset.mensaje || '';
+
+    Swal.fire({
+        title: 'Modificar notificación',
+        html: `
+            <div class="text-start mb-2">
+                <label class="form-label fw-semibold small mb-1">Título</label>
+                <input id="swal-titulo" class="swal2-input mt-0"
+                       value="${escHtml(tituloActual)}">
+            </div>
+            <div class="text-start">
+                <label class="form-label fw-semibold small mb-1">Mensaje</label>
+                <textarea id="swal-mensaje" class="swal2-textarea mt-0"
+                          rows="3">${escHtml(mensajeActual)}</textarea>
+            </div>`,
+        confirmButtonText:  'Guardar cambios',
+        cancelButtonText:   'Cancelar',
+        showCancelButton:   true,
+        confirmButtonColor: '#0a932c',
+        focusConfirm: false,
+        preConfirm: () => {
+            const titulo  = document.getElementById('swal-titulo').value.trim();
+            const mensaje = document.getElementById('swal-mensaje').value.trim();
+            if (!titulo || !mensaje) {
+                Swal.showValidationMessage('El título y el mensaje son obligatorios');
+                return false;
+            }
+            return { titulo, mensaje };
+        }
+    }).then(result => {
+        if (!result.isConfirmed) return;
+
+        fetch(API + '?action=modificar', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ id, titulo: result.value.titulo, mensaje: result.value.mensaje })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.ok) {
+                if (card) {
+                    card.querySelector('.notif-title').textContent   = result.value.titulo;
+                    card.querySelector('.notif-message').textContent = result.value.mensaje;
+                    card.dataset.titulo  = result.value.titulo;
+                    card.dataset.mensaje = result.value.mensaje;
+                }
+                Swal.fire({ icon: 'success', title: 'Notificación actualizada',
+                    timer: 1500, showConfirmButton: false });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: res.mensaje || 'No se pudo actualizar.' });
+            }
+        })
+        .catch(() => Swal.fire({ icon: 'error', title: 'Error de conexión' }));
+    });
+}
+
+/* ── RFS 43: Cancelar notificación ────────────────────────────────────── */
+function cancelarNotif(id) {
+    Swal.fire({
+        title: 'Cancelar notificación',
+        icon:  'warning',
+        input: 'textarea',
+        inputLabel: 'Motivo de cancelación (obligatorio)',
+        inputPlaceholder: 'Describe el motivo por el que cancelas esta notificación...',
+        showCancelButton:   true,
+        confirmButtonText:  'Confirmar cancelación',
+        cancelButtonText:   'Volver',
+        confirmButtonColor: '#dc3545',
+        inputValidator: value => {
+            if (!value || !value.trim()) return 'El motivo de cancelación es obligatorio';
+        }
+    }).then(result => {
+        if (!result.isConfirmed) return;
+
+        fetch(API + '?action=cancelar', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ id, motivo: result.value.trim() })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.ok) {
+                const card = document.getElementById('notif-' + id);
+                if (card) {
+                    card.dataset.estado = 'cancelada';
+                    card.classList.add('notif-cancelada');
+
+                    const actions = card.querySelector('.notif-actions');
+                    if (actions) {
+                        actions.querySelectorAll(
+                            '.btn-notif-edit, .btn-notif-cancel, .btn-notif-read'
+                        ).forEach(b => b.remove());
+
+                        const motivo = document.createElement('span');
+                        motivo.className = 'notif-motivo-cancelacion';
+                        motivo.innerHTML =
+                            `<i class="bi bi-x-circle-fill" aria-hidden="true"></i> ${escHtml(result.value.trim())}`;
+                        actions.prepend(motivo);
+                    }
+
+                    const titleRow = card.querySelector('.notif-title-row');
+                    if (titleRow && !titleRow.querySelector('.notif-pill-estado--cancelada')) {
+                        const pill = document.createElement('span');
+                        pill.className   = 'notif-pill notif-pill-estado--cancelada';
+                        pill.textContent = 'Cancelada';
+                        titleRow.appendChild(pill);
+                    }
+
+                    card.querySelector('.notif-pip')?.remove();
+                    card.dataset.leida = '1';
+                    actualizarContadores(res.sin_leer);
+                }
+                Swal.fire({ icon: 'success', title: 'Notificación cancelada',
+                    timer: 1500, showConfirmButton: false });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: res.mensaje || 'No se pudo cancelar.' });
+            }
+        })
+        .catch(() => Swal.fire({ icon: 'error', title: 'Error de conexión' }));
+    });
 }
 </script>
 

@@ -8,6 +8,11 @@
  *
  * Formato A (vista nueva)       → ?action=leer | descartar | leer_todas | contar
  * Formato B (notificaciones-paciente.js) → ?accion=listar | leida | todas | stream
+ *
+ * RFS 43 (nuevas acciones):
+ *   GET  ?action=consultar&id=N  → obtiene una notificación por ID
+ *   POST ?action=modificar        → { id, titulo, mensaje }
+ *   POST ?action=cancelar         → { id, motivo }
  */
 
 ob_start();
@@ -84,19 +89,21 @@ switch ($action) {
             else                    $tiempo = $fecha->format('d/m/Y');
 
             return [
-                'id'             => $n['id_notificacion'],
-                'tipo'           => $tipo,
-                'titulo'         => $n['titulo'],
-                'mensaje'        => $n['mensaje'],
-                'leido'          => (bool)$n['leida'],
-                'leida'          => (bool)$n['leida'],
-                'fecha'          => $n['fecha_creacion'],
-                'fecha_creacion' => $n['fecha_creacion'],
-                'url_accion'     => $n['url_accion'],
-                'id_paciente'    => $n['id_paciente'],
-                'color'          => $colorMap[$tipo] ?? 'azul',
-                'icono'          => $iconoMap[$tipo] ?? 'bi bi-bell',
-                'tiempo'         => $tiempo,
+                'id'                 => $n['id_notificacion'],
+                'tipo'               => $tipo,
+                'titulo'             => $n['titulo'],
+                'mensaje'            => $n['mensaje'],
+                'estado'             => $n['estado']             ?? 'enviada',
+                'motivo_cancelacion' => $n['motivo_cancelacion'] ?? null,
+                'leido'              => (bool)$n['leida'],
+                'leida'              => (bool)$n['leida'],
+                'fecha'              => $n['fecha_creacion'],
+                'fecha_creacion'     => $n['fecha_creacion'],
+                'url_accion'         => $n['url_accion'],
+                'id_paciente'        => $n['id_paciente'],
+                'color'              => $colorMap[$tipo] ?? 'azul',
+                'icono'              => $iconoMap[$tipo] ?? 'bi bi-bell',
+                'tiempo'             => $tiempo,
             ];
         }, $filas);
 
@@ -165,6 +172,73 @@ switch ($action) {
         echo json_encode([
             'ok'       => true,
             'status'   => 'success',
+            'sin_leer' => $modelo->contarNoLeidas($id_usuario),
+        ]);
+        break;
+
+    // ── RFS 43: Consultar notificación por ID ─────────────────────────────────
+    case 'consultar':
+        $id_notificacion = (int)($_GET['id'] ?? 0);
+
+        if ($id_notificacion <= 0) {
+            http_response_code(400);
+            echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => 'ID inválido']);
+            exit;
+        }
+
+        $notif = $modelo->obtenerPorId($id_notificacion, $id_usuario);
+
+        if ($notif === null) {
+            http_response_code(404);
+            echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => 'Notificación no encontrada']);
+            exit;
+        }
+
+        echo json_encode(['ok' => true, 'status' => 'success', 'notificacion' => $notif]);
+        break;
+
+    // ── RFS 43: Modificar título y mensaje ────────────────────────────────────
+    case 'modificar':
+        $id_notificacion = getNotifId($bodyJson);
+        $titulo  = trim($bodyJson['titulo']  ?? '');
+        $mensaje = trim($bodyJson['mensaje'] ?? '');
+
+        if ($id_notificacion <= 0 || $titulo === '' || $mensaje === '') {
+            http_response_code(400);
+            echo json_encode(['ok' => false, 'status' => 'error',
+                'mensaje' => 'ID, título y mensaje son obligatorios']);
+            exit;
+        }
+
+        $resultado = $modelo->modificar($id_notificacion, $id_usuario, $titulo, $mensaje);
+        echo json_encode([
+            'ok'     => $resultado,
+            'status' => $resultado ? 'success' : 'error',
+            'mensaje' => $resultado
+                ? 'Notificación actualizada correctamente.'
+                : 'No se pudo actualizar. Puede que ya esté cancelada o no le pertenezca.',
+        ]);
+        break;
+
+    // ── RFS 43: Cancelar notificación ─────────────────────────────────────────
+    case 'cancelar':
+        $id_notificacion = getNotifId($bodyJson);
+        $motivo = trim($bodyJson['motivo'] ?? '');
+
+        if ($id_notificacion <= 0 || $motivo === '') {
+            http_response_code(400);
+            echo json_encode(['ok' => false, 'status' => 'error',
+                'mensaje' => 'ID y motivo de cancelación son obligatorios']);
+            exit;
+        }
+
+        $resultado = $modelo->cancelar($id_notificacion, $id_usuario, $motivo);
+        echo json_encode([
+            'ok'     => $resultado,
+            'status' => $resultado ? 'success' : 'error',
+            'mensaje' => $resultado
+                ? 'Notificación cancelada correctamente.'
+                : 'No se pudo cancelar. Puede que ya esté cancelada o no le pertenezca.',
             'sin_leer' => $modelo->contarNoLeidas($id_usuario),
         ]);
         break;
