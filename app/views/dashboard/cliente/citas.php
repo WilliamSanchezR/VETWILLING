@@ -44,29 +44,24 @@ $id_usuario = $_SESSION['user']['id_usuario'];
     <title>Mis Citas - VetWilling</title>
 
     <!-- Bootstrap CSS (una sola vez) -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css?v=<?= APP_VERSION ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-    <!-- SweetAlert2 CSS + JS
-         CORRECCIÓN: antes solo se cargaba el JS sin el CSS,
-         lo que hacía que los modales aparecieran sin estilos. -->
+    <!-- SweetAlert2 CSS + JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
     <!-- Favicon -->
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
-    <!-- CSS propios
-         CORRECCIÓN: sidebar.css agregado — antes faltaba y el sidebar
-         y la burbuja FAB no tenían estilos en esta vista. -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/citas.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+    <!-- CSS propios -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/citas.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css?v=<?= APP_VERSION ?>">
 </head>
 
 <body class="<?= $prefs['tema'] === 'oscuro' ? 'dark-theme' : '' ?>" data-tema="<?= $prefs['tema'] ?>">
@@ -188,7 +183,7 @@ $id_usuario = $_SESSION['user']['id_usuario'];
     <!-- Bootstrap JS (una sola vez)
          CORRECCIÓN: antes se repetía varias veces. -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js?v=<?= APP_VERSION ?>"></script>
 
     <script>
     /* ================================================================
@@ -198,7 +193,8 @@ $id_usuario = $_SESSION['user']['id_usuario'];
     const URLS = {
         MIS_CITAS:          window.BASE_URL + '/cliente/api/citas/listar?accion=listar',
         HISTORIAL_PACIENTE: window.BASE_URL + '/cliente/api/citas/listar?accion=historial_paciente',
-        CANCELAR_CITA:      window.BASE_URL + '/cliente/api/citas/cancelar'
+        CANCELAR_CITA:      window.BASE_URL + '/cliente/api/citas/cancelar',
+        MODIFICAR_CITA:     window.BASE_URL + '/cliente/api/citas/modificar'
     };
 
     let citasData    = [];
@@ -636,15 +632,133 @@ $id_usuario = $_SESSION['user']['id_usuario'];
         });
     }
 
-    /* Reagendar — pendiente de implementación */
-    function reagendarCita(id) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Reagendar Cita',
-            text: 'Esta función estará disponible próximamente. Por favor, contacta a la veterinaria.',
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: '#0a932c'
+    /* ── Reagendar cita ─────────────────────────────────────────── */
+    async function reagendarCita(idAgendamiento) {
+        /* Buscar la cita en el array para mostrar datos actuales */
+        const citaActual = citasData.find(c => c.id_agendamiento == idAgendamiento);
+        const fechaMin   = new Date();
+        fechaMin.setHours(fechaMin.getHours() + 24);
+        const fechaMinISO = fechaMin.toISOString().slice(0, 16); /* YYYY-MM-DDTHH:MM */
+
+        const { value: formValues, isConfirmed } = await Swal.fire({
+            title            : 'Reagendar Cita',
+            html             : `
+                <p style="font-size:.875rem;color:var(--text-secondary,#6b7280);margin-bottom:1rem">
+                    Selecciona la nueva fecha y hora. Solo puedes reagendar con al menos
+                    <strong>24 horas de anticipación</strong>.
+                </p>
+                <label style="display:block;text-align:left;font-size:.8rem;font-weight:600;margin-bottom:.3rem">
+                    Nueva fecha y hora de inicio
+                </label>
+                <input id="swal-fecha-inicio" type="datetime-local"
+                       class="swal2-input" min="${fechaMinISO}"
+                       value="${fechaMinISO}" style="width:100%;font-size:.9rem">
+                <label style="display:block;text-align:left;font-size:.8rem;font-weight:600;margin:.75rem 0 .3rem">
+                    Hora de fin (estimada)
+                </label>
+                <input id="swal-fecha-fin" type="datetime-local"
+                       class="swal2-input" min="${fechaMinISO}"
+                       style="width:100%;font-size:.9rem">
+            `,
+            confirmButtonText : 'Confirmar reagendamiento',
+            confirmButtonColor: '#0a932c',
+            cancelButtonText  : 'Cancelar',
+            showCancelButton  : true,
+            focusConfirm      : false,
+            didOpen() {
+                /* Al cambiar inicio, adelantar fin 30 min automáticamente */
+                const inpInicio = document.getElementById('swal-fecha-inicio');
+                const inpFin    = document.getElementById('swal-fecha-fin');
+                inpInicio.addEventListener('change', function () {
+                    if (this.value) {
+                        const fin = new Date(this.value);
+                        fin.setMinutes(fin.getMinutes() + 30);
+                        inpFin.value = fin.toISOString().slice(0, 16);
+                        inpFin.min   = this.value;
+                    }
+                });
+                /* Disparar evento para pre-llenar fin */
+                inpInicio.dispatchEvent(new Event('change'));
+            },
+            preConfirm() {
+                const inicio = document.getElementById('swal-fecha-inicio').value;
+                const fin    = document.getElementById('swal-fecha-fin').value;
+
+                if (!inicio || !fin) {
+                    Swal.showValidationMessage('Debes seleccionar fecha de inicio y fin.');
+                    return false;
+                }
+
+                const ahora    = new Date();
+                const dtInicio = new Date(inicio);
+                const dtFin    = new Date(fin);
+                const horasDif = (dtInicio - ahora) / 3600000;
+
+                if (horasDif < 24) {
+                    Swal.showValidationMessage(
+                        'Debes reagendar con al menos 24 horas de anticipación.'
+                    );
+                    return false;
+                }
+                if (dtFin <= dtInicio) {
+                    Swal.showValidationMessage('La hora de fin debe ser posterior a la de inicio.');
+                    return false;
+                }
+
+                return { inicio, fin };
+            }
         });
+
+        if (!isConfirmed || !formValues) return;
+
+        /* Formatear para la API: "YYYY-MM-DD HH:MM:SS" */
+        const toApiDate = (localStr) => localStr.replace('T', ' ') + ':00';
+
+        try {
+            Swal.fire({
+                title           : 'Reagendando...',
+                allowOutsideClick: false,
+                didOpen()       { Swal.showLoading(); }
+            });
+
+            const res  = await fetch(URLS.MODIFICAR_CITA, {
+                method : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body   : JSON.stringify({
+                    id_agendamiento : idAgendamiento,
+                    fecha_hora      : toApiDate(formValues.inicio),
+                    fecha_hora_fin  : toApiDate(formValues.fin)
+                })
+            });
+
+            const data = await res.json();
+
+            if (data.status === 'ok' || data.status === 'success') {
+                await Swal.fire({
+                    icon            : 'success',
+                    title           : '¡Cita reagendada!',
+                    text            : 'Tu cita ha sido reprogramada correctamente.',
+                    confirmButtonColor: '#0a932c'
+                });
+                /* Refrescar lista sin recargar la página */
+                cargarCitas();
+            } else {
+                Swal.fire({
+                    icon : 'error',
+                    title: 'No se pudo reagendar',
+                    text : data.message || 'El horario solicitado no está disponible.',
+                    confirmButtonColor: '#0a932c'
+                });
+            }
+        } catch (err) {
+            console.error('reagendarCita:', err);
+            Swal.fire({
+                icon : 'error',
+                title: 'Error de conexión',
+                text : 'No se pudo conectar con el servidor. Intenta nuevamente.',
+                confirmButtonColor: '#0a932c'
+            });
+        }
     }
 
     /* Ver historial de la mascota en modal */
@@ -787,7 +901,7 @@ $id_usuario = $_SESSION['user']['id_usuario'];
     }
     </script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js?v=<?= APP_VERSION ?>"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js?v=<?= APP_VERSION ?>"></script>
 </body>
 </html>

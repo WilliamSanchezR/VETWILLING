@@ -24,7 +24,7 @@ $mascotas = listarMascotas();
     <title>Agendar Cita - VetWilling</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css?v=<?= APP_VERSION ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
@@ -35,9 +35,8 @@ $mascotas = listarMascotas();
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
     <!-- CSS Personalizados -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/noche.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css?v=<?= APP_VERSION ?>">
 
     <style>
         /* ═══════════════════════════════════════════════════════════ */
@@ -444,6 +443,114 @@ $mascotas = listarMascotas();
                 justify-content: center;
             }
         }
+
+        /* ═══════════════════════════════════════════════════════════ */
+        /*  DARK MODE — body.dark-theme                                */
+        /* ═══════════════════════════════════════════════════════════ */
+
+        body.dark-theme .form-card {
+            background : #1a1a2e;
+            box-shadow : 0 5px 20px rgba(0,0,0,.45);
+        }
+
+        body.dark-theme .form-section-title {
+            color        : #d1d9e6;
+            border-bottom-color: #0a932c;
+        }
+
+        body.dark-theme .form-label-custom {
+            color: #d1d9e6;
+        }
+
+        body.dark-theme .form-control-custom {
+            background   : #1e2535;
+            border-color : rgba(255,255,255,.12);
+            color        : #f0f4f8;
+        }
+
+        body.dark-theme .form-control-custom::placeholder {
+            color: #6b7280;
+        }
+
+        body.dark-theme .form-control-custom:focus {
+            background   : #243044;
+            border-color : #0a932c;
+            box-shadow   : 0 0 0 4px rgba(10,147,44,.15);
+        }
+
+        body.dark-theme .form-control-custom:disabled {
+            background   : #12121f;
+            opacity      : 0.5;
+        }
+
+        body.dark-theme .form-helper-text {
+            color: #6b7280;
+        }
+
+        body.dark-theme .mascota-card-selector {
+            background   : #1a1a2e;
+            border-color : rgba(255,255,255,.12);
+        }
+
+        body.dark-theme .mascota-card-selector:hover {
+            border-color : #0a932c;
+            box-shadow   : 0 8px 20px rgba(10,147,44,.20);
+        }
+
+        body.dark-theme .mascota-card-selector.selected {
+            background   : rgba(10,147,44,.10);
+            border-color : #0a932c;
+            box-shadow   : 0 8px 20px rgba(10,147,44,.25);
+        }
+
+        body.dark-theme .mascota-avatar-selector {
+            border-color : rgba(255,255,255,.15);
+        }
+
+        body.dark-theme .mascota-nombre-selector {
+            color: #f0f4f8;
+        }
+
+        body.dark-theme .mascota-especie-selector {
+            color: #9ca3af;
+        }
+
+        body.dark-theme .btn-cancelar {
+            background   : #1e2535;
+            border-color : rgba(255,255,255,.15);
+            color        : #9ca3af;
+        }
+
+        body.dark-theme .btn-cancelar:hover {
+            background   : #243044;
+            border-color : rgba(255,255,255,.25);
+            color        : #d1d9e6;
+        }
+
+        body.dark-theme .steps-indicator::before {
+            background: rgba(255,255,255,.10);
+        }
+
+        body.dark-theme .step-circle {
+            background : #1e2535;
+            color      : #6b7280;
+        }
+
+        body.dark-theme .step-label {
+            color: #6b7280;
+        }
+
+        body.dark-theme .btn-fecha-disponible {
+            background   : #1e2535;
+            border-color : rgba(255,255,255,.12);
+            color        : #d1d9e6;
+        }
+
+        body.dark-theme .btn-fecha-disponible:hover {
+            border-color : #0a932c;
+            background   : rgba(10,147,44,.12);
+            color        : #4ade80;
+        }
     </style>
 </head>
 
@@ -518,9 +625,10 @@ $mascotas = listarMascotas();
                                     <div class="mascota-card-selector" 
                                          data-mascota-id="<?= $mascota['id_paciente'] ?>"
                                          data-mascota-nombre="<?= htmlspecialchars($mascota['nombre']) ?>">
-                                        <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= $mascota['img_mascota'] ?>" 
+                                        <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= htmlspecialchars($mascota['img_mascota'] ?? '') ?>"
                                              alt="<?= htmlspecialchars($mascota['nombre']) ?>"
-                                             class="mascota-avatar-selector">
+                                             class="mascota-avatar-selector"
+                                             onerror="this.onerror=null;this.src='<?= BASE_URL ?>/public/assets/webSite/img/perrito.png'">
                                         <div class="mascota-nombre-selector">
                                             <?= htmlspecialchars($mascota['nombre']) ?>
                                         </div>
@@ -705,7 +813,7 @@ $mascotas = listarMascotas();
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js?v=<?= APP_VERSION ?>"></script>
 
     <script>
         // ═══════════════════════════════════════════════════════════
@@ -1235,8 +1343,8 @@ $mascotas = listarMascotas();
         console.log('✅ Vista de Agendar Cita cargada correctamente');
     </script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/theme.js?v=<?= APP_VERSION ?>"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/i18n.js?v=<?= APP_VERSION ?>"></script>
 </body>
 
 </html>

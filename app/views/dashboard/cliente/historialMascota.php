@@ -54,13 +54,13 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historial Médico - <?= e($mascota['nombre']) ?></title>
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/theme.css?v=<?= APP_VERSION ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/historialM.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/sidebar.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/historialM.css?v=<?= APP_VERSION ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/clientes.css?v=<?= APP_VERSION ?>">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -130,11 +130,18 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
                     </div>
                     <div class="d-flex gap-2 flex-wrap align-items-center">
                         <?php if ($tieneAcceso): ?>
-                            <span class="acceso-timer" id="countdownTimer"
-                                  data-expira="<?= e($accesoInfo['fecha_expiracion']) ?>">
-                                <i class="bi bi-clock"></i>
-                                <span id="timerTexto">Calculando...</span>
-                            </span>
+                            <?php if (!empty($accesoInfo['fecha_expiracion'])): ?>
+                                <span class="acceso-timer" id="countdownTimer"
+                                      data-expira="<?= e($accesoInfo['fecha_expiracion']) ?>">
+                                    <i class="bi bi-clock"></i>
+                                    <span id="timerTexto">Calculando...</span>
+                                </span>
+                            <?php else: ?>
+                                <span class="acceso-timer" style="background:rgba(10,147,44,.12);color:#0a932c;border-color:rgba(10,147,44,.25)">
+                                    <i class="bi bi-unlock-fill"></i>
+                                    Acceso directo
+                                </span>
+                            <?php endif; ?>
                         <?php endif; ?>
                         <a href="<?= BASE_URL ?>/cliente/mascotas" class="btn btn-outline-secondary btn-sm">
                             <i class="bi bi-arrow-left me-1"></i>Volver
@@ -152,9 +159,9 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-md-2 text-center mb-3 mb-md-0">
-                                <img src="<?= BASE_URL ?>/public/uploads/mascotas/<?= e($mascota['img_mascota'] ?? 'default.png') ?>"
+                                <img src="<?= !empty($mascota['img_mascota']) ? BASE_URL . '/public/uploads/mascotas/' . e($mascota['img_mascota']) : BASE_URL . '/public/assets/webSite/img/perrito.png' ?>"
                                      alt="<?= e($mascota['nombre']) ?>"
-                                     onerror="this.src='<?= BASE_URL ?>/public/assets/webSite/img/default-pet.png'"
+                                     onerror="this.onerror=null;this.src='<?= BASE_URL ?>/public/assets/webSite/img/perrito.png'"
                                      style="width:90px;height:90px;border-radius:50%;object-fit:cover;">
                             </div>
                             <div class="col-md-10">
@@ -399,7 +406,7 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js?v=<?= APP_VERSION ?>"></script>
 
     <script>
     /* ── Variables globales ── */
@@ -467,12 +474,20 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
         const url = `${BASE_URL}/cliente/api/citas/listar?accion=ficha_paciente&id_paciente=${ID_PACIENTE}`;
         try {
             const res  = await fetch(url);
-            const data = await res.json();
-            if (data.status !== 'success') {
-                console.warn('API ficha_paciente devolvió error:', data);
+            if (!res.ok) {
+                console.error('API ficha_paciente HTTP', res.status, '— id_paciente:', ID_PACIENTE);
                 resolverCargaConError();
                 return;
             }
+            const data = await res.json();
+            if (data.status !== 'success') {
+                console.error('API ficha_paciente error:', data.message, '| id_paciente:', ID_PACIENTE);
+                resolverCargaConError();
+                return;
+            }
+            console.log('ficha_paciente OK — citas:', (data.citas||[]).length,
+                        '| historial:', (data.historial_clinico||[]).length,
+                        '| vacunas:', (data.vacunas||[]).length);
 
             /* Citas */
             mostrarTabla('wrapperCitas','loadingCitas','emptyCitas','bodyCitas',
@@ -565,7 +580,10 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
         const textoEl = document.getElementById('timerTexto');
         if (!timerEl || !textoEl) return;
 
-        const expira = new Date(timerEl.dataset.expira.replace(' ','T'));
+        const expiraStr = timerEl.dataset.expira;
+        if (!expiraStr) return;
+        const expira = new Date(expiraStr.replace(' ','T'));
+        if (isNaN(expira.getTime())) return;
 
         function actualizar() {
             const diff = expira - Date.now();
@@ -722,8 +740,10 @@ function e($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
         dibujarPie();
 
         /* ── Cargar foto de la mascota (recortada en canvas, sin afectar el estado gráfico del PDF) ── */
-        const nombreImg = paciente.img_mascota || 'default.png';
-        const urlImg = `${BASE_URL}/public/uploads/mascotas/${nombreImg}`;
+        const nombreImg = paciente.img_mascota || '';
+        const urlImg = nombreImg
+            ? `${BASE_URL}/public/uploads/mascotas/${nombreImg}`
+            : `${BASE_URL}/public/assets/webSite/img/perrito.png`;
         const imgRecortada = await cargarImagenBase64(urlImg, 128, 'redondeado', 20);
 
         /* ── Tarjeta de datos de la mascota ── */

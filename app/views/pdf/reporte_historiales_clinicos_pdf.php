@@ -42,19 +42,37 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 8px;
+            table-layout: fixed;
         }
 
         .grid th,
         .grid td {
             border: 1px solid #d1d5db;
-            padding: 6px;
+            padding: 5px 4px;
             text-align: left;
             vertical-align: top;
+            font-size: 10px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .grid th {
             background: #f3f4f6;
+            font-size: 10px;
+            font-weight: bold;
         }
+
+        /* Anchos explícitos por columna */
+        .col-paciente    { width: 8%; }
+        .col-especie     { width: 9%; }
+        .col-fecha       { width: 9%; }
+        .col-veterinario { width: 11%; }
+        .col-motivo      { width: 10%; }
+        .col-diagnostico { width: 10%; }
+        .col-tratamiento { width: 10%; }
+        .col-medicacion  { width: 9%; }
+        .col-obs         { width: 20%; }
+        .col-version     { width: 4%; text-align: center; }
 
         .texto-vacio {
             color: #6b7280;
@@ -102,32 +120,32 @@
     <table class="grid">
         <thead>
             <tr>
-                <th>Paciente</th>
-                <th>Especie / Raza</th>
-                <th>Fecha atención</th>
-                <th>Veterinario</th>
-                <th>Motivo</th>
-                <th>Diagnóstico</th>
-                <th>Tratamiento</th>
-                <th>Medicación</th>
-                <th>Observaciones</th>
-                <th>Versión</th>
+                <th class="col-paciente">Paciente</th>
+                <th class="col-especie">Especie / Raza</th>
+                <th class="col-fecha">Fecha atención</th>
+                <th class="col-veterinario">Veterinario</th>
+                <th class="col-motivo">Motivo</th>
+                <th class="col-diagnostico">Diagnóstico</th>
+                <th class="col-tratamiento">Tratamiento</th>
+                <th class="col-medicacion">Medicación</th>
+                <th class="col-obs">Observaciones</th>
+                <th class="col-version">Ver.</th>
             </tr>
         </thead>
         <tbody>
             <?php if (!empty($payload['historiales'])): ?>
                 <?php foreach ($payload['historiales'] as $item): ?>
                     <tr>
-                        <td><?= htmlspecialchars($item['paciente_nombre'] ?? 'N/A') ?></td>
-                        <td><?= htmlspecialchars(($item['especie'] ?? 'N/A') . ' / ' . ($item['raza'] ?? 'N/A')) ?></td>
-                        <td><?= htmlspecialchars(!empty($item['fecha_atencion']) ? substr($item['fecha_atencion'], 0, 16) : 'N/A') ?></td>
-                        <td><?= htmlspecialchars($item['veterinario_responsable'] ?? 'N/A') ?></td>
-                        <td><?= htmlspecialchars($item['motivo_consulta'] ?? '') ?></td>
-                        <td><?= htmlspecialchars($item['diagnostico'] ?? '') ?></td>
-                        <td><?= htmlspecialchars($item['tratamientos_aplicados'] ?? '') ?></td>
-                        <td><?= htmlspecialchars($item['medicacion_recetada'] ?? '') ?></td>
-                        <td><?= htmlspecialchars($item['observaciones_adicionales'] ?? '') ?></td>
-                        <td><?= htmlspecialchars(!empty($item['version_registro']) ? ('v' . $item['version_registro']) : 'N/A') ?></td>
+                        <td class="col-paciente"><?= htmlspecialchars($item['paciente_nombre'] ?? 'N/A') ?></td>
+                        <td class="col-especie"><?= htmlspecialchars(($item['especie'] ?? 'N/A') . ' / ' . ($item['raza'] ?? 'N/A')) ?></td>
+                        <td class="col-fecha"><?= htmlspecialchars(!empty($item['fecha_atencion']) ? substr($item['fecha_atencion'], 0, 16) : 'N/A') ?></td>
+                        <td class="col-veterinario"><?= htmlspecialchars($item['veterinario_responsable'] ?? 'N/A') ?></td>
+                        <td class="col-motivo"><?= htmlspecialchars($item['motivo_consulta'] ?? '') ?></td>
+                        <td class="col-diagnostico"><?= htmlspecialchars($item['diagnostico'] ?? '') ?></td>
+                        <td class="col-tratamiento"><?= htmlspecialchars($item['tratamientos_aplicados'] ?? '') ?></td>
+                        <td class="col-medicacion"><?= htmlspecialchars($item['medicacion_recetada'] ?? '') ?></td>
+                        <td class="col-obs"><?= htmlspecialchars($item['observaciones_adicionales'] ?? '') ?></td>
+                        <td class="col-version"><?= htmlspecialchars(!empty($item['version_registro']) ? ('v' . $item['version_registro']) : 'N/A') ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

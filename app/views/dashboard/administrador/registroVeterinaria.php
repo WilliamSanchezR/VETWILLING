@@ -302,6 +302,18 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                     <h1>¿Deseas confirmar el envío del formulario?</h1>
                     <p>Por favor, revisa que toda la información sea correcta antes de continuar.</p>
 
+                    <div class="alert alert-info d-flex gap-3 align-items-start mt-3" role="alert">
+                        <i class="bi bi-info-circle-fill fs-4 flex-shrink-0 mt-1"></i>
+                        <div>
+                            <strong>Próximos pasos tras el registro:</strong>
+                            <ol class="mb-0 mt-2 ps-3">
+                                <li>El representante legal inicia sesión con las credenciales creadas en este formulario.</li>
+                                <li>Desde su panel, registra los profesionales (veterinarios) de la clínica.</li>
+                                <li>Cada profesional configura sus horarios de disponibilidad desde la sección <strong>"Mi Disponibilidad"</strong>.</li>
+                            </ol>
+                        </div>
+                    </div>
+
                     <div class="buttons">
                         <button type="button" class="btn btn-secondary" id="btnVolver">Volver a revisar</button>
                         <button type="submit" class="btn btn-success" id="btnConfirmarVeterinaria">Confirmar y enviar</button>

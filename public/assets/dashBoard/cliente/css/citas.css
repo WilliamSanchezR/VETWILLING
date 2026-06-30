@@ -796,34 +796,81 @@ body {
 
 
 /* ========================================================================
-   18. DARK MODE
-   — Se activa con la clase .dark-mode en el <body>.
+   18. DARK MODE — body.dark-theme
 ======================================================================== */
-body.dark-mode .stat-item,
-body.dark-mode .timeline-dia,
-body.dark-mode .filtros-avanzados,
-body.dark-mode .estado-vacio,
-body.dark-mode .loading-container,
-body.dark-mode .tabs-container         { background: #1e1e1e; }
 
-body.dark-mode .stat-content h3,
-body.dark-mode .dia-fecha h3,
-body.dark-mode .estado-vacio h3,
-body.dark-mode .hora-h,
-body.dark-mode .cita-nombre-mascota     { color: #f9fafb; }
+/* ── Sobreescritura de variables CSS del :root ── */
+body.dark-theme {
+    --bg-page            : #0f0f1a;
+    --bg-white           : #1a1a2e;
+    --bg-gray-light      : #1e2535;
+    --bg-gray            : #243044;
+    --text-primary       : #f0f4f8;
+    --text-secondary     : #9ca3af;
+    --text-muted         : #6b7280;
+    --border-color       : rgba(255,255,255,.08);
+    --primary-green-light: rgba(10,147,44,.18);
+    --shadow-sm          : 0 2px 8px rgba(0,0,0,.35);
+    --shadow-md          : 0 2px 12px rgba(0,0,0,.45);
+    --shadow-lg          : 0 8px 25px rgba(0,0,0,.55);
+    --shadow-green       : 0 4px 15px rgba(10,147,44,.20);
+    --shadow-green-hover : 0 6px 25px rgba(10,147,44,.30);
+}
 
-body.dark-mode .cita-card               { background: #1f2937; border-color: #374151; }
-body.dark-mode .cita-card-header        { border-color: #374151; }
-body.dark-mode .cita-notas              { background: #111827; border-color: #374151; color: #9ca3af; }
-body.dark-mode .cita-acciones           { border-color: #374151; }
-body.dark-mode .btn-accion              { border-color: #374151; }
-body.dark-mode .btn-ver                 { background: #374151; color: #d1d5db; }
-body.dark-mode .btn-historial           { background: #164e63; color: #bae6fd; }
-body.dark-mode .dia-header              { border-color: #374151; }
-body.dark-mode .tab-btn                 { color: #d1d5db; }
-body.dark-mode .tab-btn:hover           { background: #2d2d2d; }
-body.dark-mode .filtro-grupo select,
-body.dark-mode .filtro-grupo input      { background: #2d2d2d; border-color: #4b5563; color: #f9fafb; }
+/* ── Separadores hardcodeados ── */
+body.dark-theme .dia-header         { border-bottom-color: rgba(255,255,255,.08); }
+body.dark-theme .cita-card-header   { border-bottom-color: rgba(255,255,255,.08); }
+body.dark-theme .cita-card:hover    { border-color: rgba(255,255,255,.15); }
+body.dark-theme .cita-card.urgente  { border-color: rgba(239,68,68,.30); background: #1f1a1a; }
+
+/* ── Notas y acciones de tarjeta ── */
+body.dark-theme .cita-notas {
+    background     : #12121f;
+    border-top-color: rgba(255,255,255,.06);
+    color          : var(--text-secondary);
+}
+body.dark-theme .cita-acciones      { border-top-color: rgba(255,255,255,.06); }
+body.dark-theme .btn-accion         { border-right-color: rgba(255,255,255,.06); }
+
+/* ── Botones de acción ── */
+body.dark-theme .btn-ver            { background: #1e2535; color: #d1d9e6; }
+body.dark-theme .btn-ver:hover      { background: #243044; color: #f0f4f8; }
+body.dark-theme .btn-historial      { background: rgba(14,116,144,.22); color: #67e8f9; }
+body.dark-theme .btn-historial:hover{ background: rgba(14,116,144,.35); }
+body.dark-theme .btn-reagendar      { background: rgba(217,119,6,.18);  color: #fbbf24; }
+body.dark-theme .btn-reagendar:hover{ background: rgba(217,119,6,.28);  color: #f59e0b; }
+
+/* ── Badges de tipo de cita ── */
+body.dark-theme .tipo-badge.emergencia         { background: rgba(220,38,38,.20);  color: #fca5a5; }
+body.dark-theme .tipo-badge.emergencia::before { background: #f87171; }
+body.dark-theme .tipo-badge.consulta           { background: rgba(37,99,235,.20);  color: #93c5fd; }
+body.dark-theme .tipo-badge.consulta::before   { background: #60a5fa; }
+body.dark-theme .tipo-badge.vacuna             { background: rgba(5,150,105,.20);  color: #6ee7b7; }
+body.dark-theme .tipo-badge.vacuna::before     { background: #34d399; }
+body.dark-theme .tipo-badge.control            { background: rgba(217,119,6,.20);  color: #fcd34d; }
+body.dark-theme .tipo-badge.control::before    { background: #fbbf24; }
+body.dark-theme .tipo-badge.bano               { background: rgba(99,102,241,.20); color: #c4b5fd; }
+body.dark-theme .tipo-badge.bano::before       { background: #a78bfa; }
+
+/* ── Badges de estado ── */
+body.dark-theme .estado-badge.confirmada         { background: rgba(37,99,235,.20);  color: #93c5fd; }
+body.dark-theme .estado-badge.confirmada::before { background: #60a5fa; }
+body.dark-theme .estado-badge.pendiente          { background: rgba(217,119,6,.20);  color: #fcd34d; }
+body.dark-theme .estado-badge.pendiente::before  { background: #fbbf24; }
+body.dark-theme .estado-badge.realizada          { background: rgba(5,150,105,.20);  color: #6ee7b7; }
+body.dark-theme .estado-badge.realizada::before  { background: #34d399; }
+body.dark-theme .estado-badge.cancelada          { background: rgba(220,38,38,.20);  color: #fca5a5; }
+body.dark-theme .estado-badge.cancelada::before  { background: #f87171; }
+
+/* ── Spinner y estado vacío ── */
+body.dark-theme .spinner        { border-color: #1e2535; border-top-color: var(--primary-green); }
+body.dark-theme .estado-vacio i { color: #2d3748; }
+
+/* ── Bordes en responsive móvil ── */
+@media (max-width: 768px) {
+    body.dark-theme .cita-acciones { border-top-color: rgba(255,255,255,.06); }
+    body.dark-theme .btn-accion    { border-right-color: rgba(255,255,255,.06); border-bottom-color: rgba(255,255,255,.06); }
+}
 
 
 /* ========================================================================

@@ -153,7 +153,7 @@ function registrarProfesional()
             $emailEnviado
                 ? 'El profesional ha sido creado correctamente y el correo fue enviado.'
                 : 'El profesional ha sido creado correctamente, pero no se pudo enviar el correo.',
-            '/vetwilling/representante/listar-profesionales'
+            BASE_URL . '/representante/listar-profesionales'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo registrar el profesional');
@@ -280,7 +280,7 @@ function eliminarEspecialidadDeProfesional($id_profesional, $id_especialidad)
             'success',
             'Especialidad Eliminada',
             'La especialidad ha sido eliminada correctamente',
-            '/vetwilling/representante/editar-profesional?id=' . $id_profesional
+            BASE_URL . '/representante/editar-profesional?id=' . $id_profesional
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar la especialidad');
@@ -299,7 +299,7 @@ function eliminarServicioDeProfesional($id_servicio, $id_usario)
             'success',
             'Servicio Eliminado',
             'El servicio ha sido eliminado correctamente',
-            '/vetwilling/representante/editar-profesional?id=' . $id_usario
+            BASE_URL . '/representante/editar-profesional?id=' . $id_usario
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el servicio');
@@ -413,7 +413,7 @@ function actualizarProfesional()
             'success',
             'Profesional actualizado',
             'El profesional ha sido actualizado correctamente',
-            '/vetwilling/representante/listar-profesionales'
+            BASE_URL . '/representante/listar-profesionales'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar el profesional');
@@ -432,7 +432,7 @@ function eliminarProfesional($id)
             'success',
             'Profesional Eliminado',
             'El profesional ha sido eliminado correctamente',
-            '/vetwilling/representante/listar-profesionales'
+            BASE_URL . '/representante/listar-profesionales'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el profesional');

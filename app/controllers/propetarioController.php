@@ -232,7 +232,7 @@ function actualizarPropietario()
     $resultado = $prop->actualizar($data, $actualizarImagen);
 
     if ($resultado === true) {
-        mostrarSweetAlert('success', 'Actualización exitosa', 'Datos actualizados correctamente', '/vetwilling/cliente/perfil');
+        mostrarSweetAlert('success', 'Actualización exitosa', 'Datos actualizados correctamente', BASE_URL . '/cliente/perfil');
     } else {
         mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el propietario. Intenta nuevamente');
     }
@@ -354,7 +354,7 @@ function fotoPerfil()
                     'success',
                     '¡Foto actualizada!',
                     'Tu foto de perfil se ha actualizado correctamente',
-                    '/vetwilling/cliente/perfil'
+                    BASE_URL . '/cliente/perfil'
                 );
             } else {
                 mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la imagen en la base de datos');

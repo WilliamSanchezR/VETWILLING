@@ -54,74 +54,32 @@ date_default_timezone_set('America/Bogota');
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DETECTAR EL PROTOCOLO DEL SITIO (HTTP o HTTPS)
+// URL BASE DEL PROYECTO — detección automática de entorno
 // ═══════════════════════════════════════════════════════════════════════════
-// Algunos servidores usan HTTPS y otros HTTP.
-// También soporta proxys/túneles como ngrok mediante X-Forwarded-Proto.
-$httpsActivo = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-$forwardedProto = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
-$protocolo = ($httpsActivo || $forwardedProto === 'https') ? 'https://' : 'http://';
+// Usa dirname(SCRIPT_NAME) para detectar automáticamente la carpeta base
+// sin necesidad de variables de entorno ni configuración manual.
+//
+// Cómo funciona:
+//   XAMPP local  → SCRIPT_NAME = /vetwilling/index.php
+//                  BASE_URL    = http://localhost/vetwilling
+//
+//   Hostinger    → SCRIPT_NAME = /index.php
+//                  BASE_URL    = https://vetwilling.com
+//
+// También soporta proxies/CDN (Hostinger LiteSpeed) con X-Forwarded-Proto.
+$_vw_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+          || strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
+$_vw_proto  = $_vw_https ? 'https' : 'http';
+$_vw_host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$baseFolder = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/index.php'), '/\\');
+define('BASE_URL', $_vw_proto . '://' . $_vw_host . $baseFolder);
+unset($_vw_https, $_vw_proto, $_vw_host);
 
-
-// ═══════════════════════════════════════════════════════════════════════════
-// OBTENER EL HOST DEL SERVIDOR
-// ═══════════════════════════════════════════════════════════════════════════
-// Obtiene el dominio o dirección del servidor actual.
-// Ejemplos:
-// localhost
-// vetwilling.com
-// www.vetwilling.com
-// Fallback para ejecución por CLI (cron)
-$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-
-
-// ═══════════════════════════════════════════════════════════════════════════
-// DETECTAR SI EL PROYECTO SE EJECUTA EN LOCALHOST
-// ═══════════════════════════════════════════════════════════════════════════
-// Si la dirección IP del servidor es 127.0.0.1 o ::1 significa que
-// el proyecto está ejecutándose en el entorno local del desarrollador.
-// En CLI no existe REMOTE_ADDR, por lo que asumimos entorno local.
-$remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-$isLocal = in_array($remoteAddr, ['127.0.0.1', '::1']);
-
-
-// ═══════════════════════════════════════════════════════════════════════════
-// DEFINIR CARPETA BASE DEL PROYECTO
-// ═══════════════════════════════════════════════════════════════════════════
-// En desarrollo local el proyecto se encuentra dentro de una carpeta
-// llamada "vetwilling", por ejemplo:
-//
-// http://localhost/vetwilling
-//
-// En producción (hosting) el proyecto está en la raíz del dominio:
-//
-// https://vetwilling.com
-//
-// Por lo tanto:
-// - En LOCAL se usa "/vetwilling"
-// - En PRODUCCIÓN se usa ""
-$baseFolder = env_value('BASE_FOLDER', $isLocal ? '/vetwilling' : '');
-
-
-// ═══════════════════════════════════════════════════════════════════════════
-// URL BASE DEL PROYECTO
-// ═══════════════════════════════════════════════════════════════════════════
-// Construye la URL completa del proyecto combinando:
-//
-// protocolo + dominio + carpeta base
-//
-// Ejemplos:
-//
-// LOCAL
-// http://localhost/vetwilling
-//
-// PRODUCCIÓN
-// https://vetwilling.com
-//
-// Esta constante se usa para generar rutas dinámicas en todo el sistema.
-$baseUrlDetectada = $protocolo . $host . $baseFolder;
-$baseUrlPublica = rtrim((string) env_value('APP_PUBLIC_URL', ''), '/');
-define('BASE_URL', $baseUrlPublica !== '' ? $baseUrlPublica : $baseUrlDetectada);
+// ── Versión de assets ─────────────────────────────────────────────────────
+// Incrementar este valor cada vez que se suban cambios de CSS o JS a
+// producción. Eso fuerza al navegador y a LiteSpeed Cache a descargar
+// los archivos nuevos en lugar de servir la copia cacheada.
+define('APP_VERSION', '1.0.0');
 
 
 // ═══════════════════════════════════════════════════════════════════════════

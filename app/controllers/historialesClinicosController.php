@@ -43,4 +43,4 @@ ob_start();
 require BASE_PATH . '/app/views/pdf/reporte_historiales_clinicos_pdf.php';
 $html = ob_get_clean();
 
-generarPDF($html, 'reporte_historiales_clinicos.pdf', false);
+generarPDF($html, 'reporte_historiales_clinicos.pdf', false, 'landscape');

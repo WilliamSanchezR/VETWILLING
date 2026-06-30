@@ -197,9 +197,9 @@ $datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_vete
                         <!-- Servicios  -->
                         <div class="col-md-6">
                             <div class="col-md-12">
-                                <div class="form-group">
+                                <div class="form-group position-relative">
                                     <label for="">Servicios</label>
-                                    <button type="button" class="btn btn-primary btn-sm" id="agregarServicioBtn">
+                                    <button type="button" class="btn-agregar btn-sm" id="agregarServicioBtn">
                                         <i class="bi bi-plus-lg"></i> Agregar Servicio
                                     </button>
 
@@ -224,16 +224,14 @@ $datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_vete
                         <!-- Especialidades  -->
                         <div class="col-md-6">
                             <div class="col-md-12">
-                                <div class="form-group">
+                                <div class="form-group position-relative">
                                     <label for="">Especialidades</label>
-                                    <button type="button" class="btn btn-primary btn-sm" id="agregarEspecialidadBtn">
+                                    <button type="button" class="btn-agregar btn-sm" id="agregarEspecialidadBtn">
                                         <i class="bi bi-plus-lg"></i> Agregar Especialidad
                                     </button>
 
                                     <div class="listEspecialidades">
-                                        <ul>
-                                            
-                                        </ul>
+                                        <ul></ul>
                                     </div>
                                 </div>
                             </div>
