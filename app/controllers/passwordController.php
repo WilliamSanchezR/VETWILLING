@@ -21,7 +21,7 @@ $email = $_POST['email'] ?? '';
             'success',
             'Nueva Clave Generada',
             'Se ha enviado una nueva clave a tu correo electrónico',
-            '/vetwilling/login'
+            BASE_URL . '/login'
         );
     } else {
         mostrarSweetAlert(

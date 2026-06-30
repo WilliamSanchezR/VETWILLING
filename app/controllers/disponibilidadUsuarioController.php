@@ -68,12 +68,12 @@ function agregarDisponibilidadAgenda()
     $disponibilidadUsuarioModel = new DisponibilidadUsuario();
 
     // Validar campos obligatorios básicos
-    if (empty($data['id_usuario']) || empty($data['id_veterinaria']) || empty($data['dia_semana']) || empty($data['duracion_minutos'])) {
+    if (empty($data['id_usuario']) || empty($data['id_veterinaria']) || empty($data['dia_semana']) || empty($data['duracion_minutos']) || empty($data['id_especialidad'])) {
         header('Content-Type: application/json');
         echo json_encode([
             'status' => 'error',
             'message' => 'Campos vacíos',
-            'details' => 'Por favor complete todos los campos obligatorios'
+            'details' => 'Por favor complete todos los campos obligatorios (incluyendo la especialidad)'
         ]);
         exit();
     }
@@ -123,10 +123,11 @@ function agregarDisponibilidadAgenda()
     $resultado = $disponibilidadUsuarioModel->agregarDisponibilidadAgenda($data);
 
     header('Content-Type: application/json');
-    echo json_encode([
-        'status' => $resultado ?  'success' : 'error',
-        'resultado' => $resultado
-    ]);
+    if ($resultado['ok']) {
+        echo json_encode(['status' => 'success', 'message' => 'Disponibilidad registrada correctamente']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => $resultado['message']]);
+    }
     exit();
 }
 

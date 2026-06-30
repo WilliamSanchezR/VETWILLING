@@ -583,7 +583,7 @@ function crearAgendamiento()
             'success',
             'Agendamiento creado',
             'El agendamiento ha sido creado correctamente',
-            '/vetwilling/admin/calendario'
+            BASE_URL . '/admin/calendario'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo crear el agendamiento');
@@ -651,7 +651,7 @@ function actualizarAgendamiento()
             'success',
             'Agendamiento actualizado',
             'El agendamiento ha sido actualizado correctamente',
-            '/vetwilling/admin/calendario'
+            BASE_URL . '/admin/calendario'
         );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar el agendamiento');
@@ -697,7 +697,7 @@ function eliminarAgendamiento($id)
                 'success',
                 'Agendamiento eliminado',
                 'El agendamiento ha sido eliminado correctamente',
-                '/vetwilling/admin/calendario'
+                BASE_URL . '/admin/calendario'
             );
         }
     } else {

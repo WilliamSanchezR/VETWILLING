@@ -993,6 +993,13 @@ switch ($request) {
         break;
 
     default:
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (!isset($_SESSION['user'])) {
+            header('Location: ' . BASE_URL . '/login');
+            exit();
+        }
         http_response_code(404);
         require BASE_PATH . "/app/views/auth/error404.php";
         break;

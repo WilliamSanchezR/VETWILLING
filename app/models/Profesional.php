@@ -20,17 +20,15 @@ class Profesional
 
     function registrarProfesional($data)
     {
+        $this->conexion->beginTransaction();
         try {
-            // Creamso el usuario 
             $idUsuario = $this->registrarUsuario($data);
 
             if ($idUsuario == 0) {
-                // Realizamos un rollback si falla alguna inserción
                 $this->conexion->rollBack();
                 return false;
             }
 
-            // Creamos el profesional
             $idProfesional = $this->registrarProfesionalNuevo($data, $idUsuario);
 
             if ($idProfesional == 0) {
@@ -38,7 +36,6 @@ class Profesional
                 return false;
             }
 
-            // Registramos el prosional en la veterinaria
             $statudRegPV = $this->registrarVeterinariaProfesional($idProfesional, $data['id_veterinaria']);
 
             if (!$statudRegPV) {
@@ -59,10 +56,12 @@ class Profesional
                 $this->registrarServicioProfesional($idProfesional, json_decode($data['servicios']));
             }
 
+            $this->conexion->commit();
             return true;
 
         } catch (PDOException $e) {
-            error_log("Error en Usuario::registrar -> " . $e->getMessage());
+            $this->conexion->rollBack();
+            error_log("Error en Profesional::registrarProfesional -> " . $e->getMessage());
             return false;
         }
     }

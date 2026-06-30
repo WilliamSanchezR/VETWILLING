@@ -129,6 +129,8 @@ class Notificacion
                         tipo,
                         titulo,
                         mensaje,
+                        estado,
+                        motivo_cancelacion,
                         url_accion,
                         leida,
                         descartada,
@@ -264,6 +266,135 @@ class Notificacion
         } catch (PDOException $e) {
             error_log('[Notificacion::descartar] ' . $e->getMessage());
             return false;
+        }
+    }
+
+    // =========================================================================
+    // RFS 43 — MODIFICACIÓN Y CANCELACIÓN
+    // =========================================================================
+
+    /**
+     * Obtener una notificación por ID, validando que pertenezca al usuario.
+     */
+    public function obtenerPorId(int $id_notificacion, int $id_usuario): ?array
+    {
+        try {
+            $sql = "SELECT id_notificacion, id_usuario, id_paciente, tipo,
+                           titulo, mensaje, estado, motivo_cancelacion,
+                           url_accion, leida, descartada, fecha_creacion
+                    FROM notificacion
+                    WHERE id_notificacion = :id
+                      AND id_usuario      = :id_usuario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id',          $id_notificacion, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario',  $id_usuario,      PDO::PARAM_INT);
+            $stmt->execute();
+
+            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $fila ?: null;
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::obtenerPorId] ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Modificar título y mensaje de una notificación no cancelada.
+     * Solo actúa si la notificación pertenece al usuario y no está cancelada.
+     */
+    public function modificar(int $id_notificacion, int $id_usuario, string $titulo, string $mensaje): bool
+    {
+        try {
+            $sql = "UPDATE notificacion
+                    SET titulo  = :titulo,
+                        mensaje = :mensaje
+                    WHERE id_notificacion = :id
+                      AND id_usuario      = :id_usuario
+                      AND estado         != 'cancelada'
+                      AND descartada      = 0";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':titulo',      $titulo,          PDO::PARAM_STR);
+            $stmt->bindParam(':mensaje',     $mensaje,         PDO::PARAM_STR);
+            $stmt->bindParam(':id',          $id_notificacion, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario',  $id_usuario,      PDO::PARAM_INT);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) {
+                $this->registrarHistorial($id_notificacion, $id_usuario, 'modificada',
+                    mb_substr($titulo, 0, 200));
+                return true;
+            }
+            return false;
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::modificar] ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Cancelar una notificación programada/enviada con un motivo.
+     * La marca como leída para que no sume al badge.
+     */
+    public function cancelar(int $id_notificacion, int $id_usuario, string $motivo): bool
+    {
+        try {
+            $sql = "UPDATE notificacion
+                    SET estado             = 'cancelada',
+                        motivo_cancelacion = :motivo,
+                        leida              = 1
+                    WHERE id_notificacion = :id
+                      AND id_usuario      = :id_usuario
+                      AND estado         != 'cancelada'
+                      AND descartada      = 0";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':motivo',      $motivo,          PDO::PARAM_STR);
+            $stmt->bindParam(':id',          $id_notificacion, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario',  $id_usuario,      PDO::PARAM_INT);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) {
+                $this->registrarHistorial($id_notificacion, $id_usuario, 'cancelada',
+                    mb_substr($motivo, 0, 500));
+                return true;
+            }
+            return false;
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::cancelar] ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Registrar un cambio en el historial de la notificación.
+     */
+    private function registrarHistorial(
+        int     $id_notificacion,
+        int     $id_usuario_accion,
+        string  $accion,
+        ?string $detalle
+    ): void {
+        try {
+            $sql = "INSERT INTO notificacion_historial
+                        (id_notificacion, id_usuario_accion, accion, detalle)
+                    VALUES
+                        (:id_notif, :id_usuario, :accion, :detalle)";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_notif',   $id_notificacion,   PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario', $id_usuario_accion, PDO::PARAM_INT);
+            $stmt->bindParam(':accion',     $accion,            PDO::PARAM_STR);
+            $stmt->bindValue(':detalle',    $detalle,
+                $detalle !== null ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->execute();
+
+        } catch (PDOException $e) {
+            error_log('[Notificacion::registrarHistorial] ' . $e->getMessage());
         }
     }
 }
