@@ -177,8 +177,8 @@ function registrarVeterinaria()
             'success',
             'Veterinaria registrada',
             $emailEnviado
-                ? 'La veterinaria ha sido creada correctamente y el correo fue enviado.'
-                : 'La veterinaria ha sido creada correctamente, pero no se pudo enviar el correo.',
+                ? 'La veterinaria ha sido creada correctamente y el correo fue enviado. El representante ya puede iniciar sesión y registrar los profesionales para configurar sus horarios de disponibilidad.'
+                : 'La veterinaria ha sido creada correctamente. El representante ya puede iniciar sesión y registrar los profesionales para configurar sus horarios de disponibilidad.',
             BASE_URL . '/admin/listar-veterinarias'
         );
     } else {
