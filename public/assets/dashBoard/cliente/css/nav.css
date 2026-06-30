@@ -216,7 +216,8 @@ body {
     outline: none;
     border-color: #0A932C;
     background: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    /* CORRECCIÓN: morado -> verde de la paleta */
+    box-shadow: 0 4px 12px rgba(10, 147, 44, 0.15);
 }
 
 .input-buscar::placeholder {
@@ -440,7 +441,8 @@ body {
 }
 
 .btn-marcar-leidas:hover {
-    color: #5568d3;
+    /* CORRECCIÓN: morado -> verde oscuro de la paleta */
+    color: #087a24;
     text-decoration: underline;
 }
 
@@ -474,6 +476,7 @@ body {
     color: inherit;
     transition: all 0.3s ease;
     border-left: 3px solid transparent;
+    cursor: pointer;
 }
 
 .notificacion-item:hover {
@@ -534,6 +537,37 @@ body {
     color: #7f8c8d;
 }
 
+/* Estados vacío / error de notificaciones */
+.empty-notificaciones,
+.error-notificaciones {
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: #999;
+}
+
+.empty-notificaciones i,
+.error-notificaciones i {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    opacity: 0.5;
+}
+
+.btn-retry {
+    margin-top: 0.75rem;
+    background: #0A932C;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-retry:hover {
+    background: #087a24;
+}
+
 .dropdown-footer {
     padding: 12px 20px;
     border-top: 1px solid #e9ecef;
@@ -551,7 +585,8 @@ body {
 }
 
 .btn-ver-todas:hover {
-    color: #5568d3;
+    /* CORRECCIÓN: morado -> verde oscuro de la paleta */
+    color: #087a24;
     text-decoration: underline;
 }
 /* coso del carrito */
@@ -651,7 +686,6 @@ body {
     display: flex;
     gap: 15px;
     align-items: center;
-    /* background: #6b6b6b70; */
     color: #000;
 }
 
@@ -684,6 +718,11 @@ body {
     color: #2c3e50;
     font-size: 14px;
     transition: all 0.3s ease;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
 }
 
 .dropdown-item:hover {
@@ -808,7 +847,8 @@ body {
     background: linear-gradient(135deg, #0A932C, #9DE795);
     border: none;
     border-radius: 50%;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    /* CORRECCIÓN: morado -> verde de la paleta */
+    box-shadow: 0 8px 25px rgba(10, 147, 44, 0.4);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -821,7 +861,8 @@ body {
 
 .btn-mensajes-float:hover {
     transform: scale(1.1);
-    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+    /* CORRECCIÓN: morado -> verde de la paleta */
+    box-shadow: 0 12px 35px rgba(10, 147, 44, 0.6);
 }
 
 .btn-mensajes-float .badge-msg {
@@ -900,8 +941,7 @@ body {
     color: #2b9b7f;
 }
 
-/* esta parte el del modal del soporte */
-/* Modal de Soporte - CORREGIDO PARA Z-INDEX */
+/* Modal de Soporte */
 .modal-soporte {
     display: none;
     position: fixed;
@@ -1184,7 +1224,6 @@ body {
     }
 }
 
-/* reloj */
 /* ===================================
    MÓDULO DE RELOJ EN VIVO - MINIMALISTA
    =================================== */
@@ -1343,7 +1382,7 @@ body {
     align-items: center;
     gap: 6px;
 
-    min-width: 0; /* 🔑 evita overflow en grid */
+    min-width: 0; /* evita overflow en grid */
 }
 
 
@@ -1379,16 +1418,16 @@ body {
     .modal-reloj-contenido {
         padding: 25px 20px;
     }
-    
+
     .reloj-digital {
         font-size: 2.5rem;
     }
-    
+
     .reloj-info {
         grid-template-columns: 1fr;
         gap: 8px;
     }
-    
+
     .btn-reloj {
         min-width: 50px;
     }
@@ -1398,7 +1437,7 @@ body {
     .hora-actual {
         font-size: 0.7rem;
     }
-    
+
     .btn-reloj i {
         font-size: 1rem;
     }
@@ -1662,11 +1701,13 @@ body {
 /* ========================================================================
    DARK MODE
 ======================================================================== */
+/* CORRECCIÓN: era "body.dark-theme body" (imposible). Ahora aplica al propio body. */
+body.dark-theme { background: #0f0f1a; }
+
 body.dark-theme .navbar-superior {
     background: #16213e;
     box-shadow: 0 2px 10px rgba(0,0,0,.45);
 }
-body.dark-theme body { background: #0f0f1a; }
 body.dark-theme .btn-menu-mobile,
 body.dark-theme .btn-navbar,
 body.dark-theme .btn-perfil        { background: #1e2d40; color: #9ca3af; }

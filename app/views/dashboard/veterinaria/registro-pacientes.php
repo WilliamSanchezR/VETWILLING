@@ -3,14 +3,15 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Paciente</title>
+    <title>Registro de Paciente</title>
+
     <!-- Icono de la página -->
-    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
+    <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image/png">
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -19,72 +20,67 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
     <!-- Bootstrap Iconos -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-    <!-- SweetAlert2 - AGREGAR ANTES DE TUS SCRIPTS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Tipografías (Fredoka + Open Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..600&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <!-- Propio -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/formulario.css">
 
-
     <!-- Global Styles -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
-
 </head>
 
 <body>
 
     <!-- BARRA LATERAL IZQUIERDA -->
-    <!-- Aqui va el include -->
-    <?php
-    include_once __DIR__ . '/../../layouts/sidebar_veterinario.php'
-    ?>
-
-
-    <!-- PANEL DERECHO -->
-    <!-- aqui va el inclunde notifi -->
-    <?php
-    // include_once __DIR__ . '/../../layouts/sidebar_notifi_veterinario.php'
-    ?>
+    <?php include_once __DIR__ . '/../../layouts/sidebar_veterinario.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="contenido-principal" id="contenidoPrincipal">
-        <!-- NAVBAR SUPERIOR -->
 
-        <!-- Aqui va el include de navbar superior -->
-        <?php
-        include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php'
-        ?>
+        <!-- NAVBAR SUPERIOR -->
+        <?php include_once __DIR__ . '/../../layouts/panel_superior_veterinario.php'; ?>
 
         <!-- FORMULARIO DE REGISTRO -->
         <div class="wizard-container">
+
             <div class="wizard-header">
-                <i class="bi bi-flask"></i>
-                <h2>Registro de Paciente</h2>
-                <p class="text-muted">Complete todos los campos requeridos para registrar un nuevo paciente</p>
+                <span class="wizard-chip"><i class="bi bi-clipboard2-pulse"></i></span>
+                <h2>Registro de paciente</h2>
+                <p>Completa los datos del propietario y sus mascotas para crear el historial.</p>
             </div>
 
-            <div class="progress-wrapper">
-                <div class="progress">
-                    <div id="bar1" class="progress-bar active"></div>
-                    <div id="bar2" class="progress-bar"></div>
-                    <div id="bar3" class="progress-bar"></div>
-                </div>
-                <div class="progress-labels">
-                    <span class="active">Propietario</span>
-                    <span>Mascota</span>
-                    <span>Confirmar</span>
+            <!-- Stepper -->
+            <div class="wz-progress">
+                <div class="wz-steps" role="list" aria-label="Progreso del registro">
+                    <div class="wz-track"><div class="wz-track-fill" id="wzFill"></div></div>
+                    <div class="wz-step is-active" role="listitem">
+                        <span class="wz-step-num">1</span>
+                        <span class="wz-step-label">Propietario</span>
+                    </div>
+                    <div class="wz-step" role="listitem">
+                        <span class="wz-step-num">2</span>
+                        <span class="wz-step-label">Mascota</span>
+                    </div>
+                    <div class="wz-step" role="listitem">
+                        <span class="wz-step-num">3</span>
+                        <span class="wz-step-label">Confirmar</span>
+                    </div>
                 </div>
             </div>
 
-            <form id="vetForm">
+            <!-- novalidate: la validación la maneja el JS por pasos -->
+            <form id="vetForm" novalidate>
 
-                <!-- Paso 1: Datos del Propietario -->
+                <!-- Paso 1: Datos del propietario -->
                 <div class="step active">
-                    <h3><i class="bi bi-person-badge me-2"></i>Datos del Propietario</h3>
+                    <h3><i class="bi bi-person-badge"></i> Datos del propietario</h3>
 
                     <div class="row">
                         <div class="col-md-6">
@@ -116,7 +112,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-hash"></i> Número de documento *</label>
-                                <input type="text" id="numeroDocumento" required placeholder="12345678">
+                                <input type="text" id="numeroDocumento" required
+                                       inputmode="numeric" maxlength="12"
+                                       placeholder="12345678">
                             </div>
                         </div>
                     </div>
@@ -125,13 +123,17 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                <input type="tel" id="telefono" required placeholder="+57 300 123 4567">
+                                <input type="tel" id="telefono" required
+                                       inputmode="tel" maxlength="20"
+                                       placeholder="+57 300 123 4567">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                <input type="email" id="email" required placeholder="ejemplo@correo.com">
+                                <input type="email" id="email" required
+                                       inputmode="email"
+                                       placeholder="ejemplo@correo.com">
                             </div>
                         </div>
                     </div>
@@ -149,10 +151,10 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                 </div>
 
-                <!-- Paso 2: Datos de la Mascota -->
+                <!-- Paso 2: Datos de la mascota -->
                 <div class="step">
-                    <h3><i class="bi bi-heart me-2"></i>Datos de la Mascota</h3>
-                    <p class="text-muted mb-4">Puedes registrar varias mascotas para el mismo propietario.</p>
+                    <h3><i class="bi bi-heart-pulse"></i> Datos de la mascota</h3>
+                    <p class="step-sub">Puedes registrar varias mascotas para el mismo propietario.</p>
 
                     <div class="row">
                         <div class="col-md-6">
@@ -218,15 +220,15 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
 
                     <div class="mascotas-acciones">
-                        <button type="button" class="btn btn-outline-success" id="btnAgregarMascota">
+                        <button type="button" class="btn-add-mascota" id="btnAgregarMascota">
                             <i class="bi bi-plus-circle"></i> Agregar mascota
                         </button>
                     </div>
 
                     <div class="mascotas-agregadas" id="mascotasAgregadasContainer">
-                        <h4><i class="bi bi-list-check me-2"></i>Mascotas agregadas</h4>
+                        <h4><i class="bi bi-list-check"></i> Mascotas agregadas</h4>
                         <div id="listaMascotasAgregadas" class="lista-mascotas-agregadas">
-                            <div class="empty-mascotas">Aún no hay mascotas agregadas.</div>
+                            <div class="empty-mascotas"><i class="bi bi-clipboard-heart"></i> Aún no hay mascotas agregadas.</div>
                         </div>
                     </div>
 
@@ -240,21 +242,24 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                     </div>
                 </div>
 
-                <!--Paso de confirmación -->
+                <!-- Paso 3: Confirmación -->
                 <div class="step">
-                    <h1>¿Deseas confirmar el envío del formulario?</h1>
-                    <p>Por favor, revisa que toda la información sea correcta antes de continuar.</p>
+                    <h3><i class="bi bi-check2-circle"></i> Confirma el registro</h3>
+                    <p class="step-sub">Revisa que toda la información sea correcta antes de continuar.</p>
 
                     <div class="buttons">
-                        <button type="button" class="btn btn-secondary" id="btnVolver">Volver a revisar</button>
-                        <button type="submit" class="btn btn-success" id="btnConfirmar">Confirmar y enviar</button>
+                        <button type="button" class="btn-prev" id="btnVolver">
+                            <i class="bi bi-arrow-left"></i> Volver a revisar
+                        </button>
+                        <button type="submit" class="btn-submit" id="btnConfirmar">
+                            <i class="bi bi-send-check"></i> Confirmar y enviar
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
 
     </div>
-
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -272,7 +277,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <!-- Propio -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/registroPacientes.js"></script>
-
 
 </body>
 

@@ -126,92 +126,86 @@
     gap: 10px;
 }
 
-/* ============================================================
-   TARJETA DE NOTIFICACIÓN (igual al diseño cliente)
-   ============================================================ */
-.notif-card {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    background: #fff;
-    border-radius: var(--notif-radius);
-    border: 1px solid rgba(0,0,0,.08);
-    padding: 16px 18px;
-    transition: box-shadow var(--notif-transition), transform var(--notif-transition), opacity var(--notif-transition);
-    cursor: default;
-}
-
-.notif-card:hover {
-    box-shadow: var(--notif-shadow-hover);
-    transform: translateY(-2px);
-}
-
-/* Borde izquierdo coloreado para no leídas */
-.notif-card.no-leida { border-left-width: 3px; border-left-style: solid; }
-.notif-card.no-leida.tipo-cita             { border-left-color: #0d6efd; }
-.notif-card.no-leida.tipo-vacuna           { border-left-color: #dc3545; }
-.notif-card.no-leida.tipo-seguimiento      { border-left-color: #198754; }
-.notif-card.no-leida.tipo-tratamiento      { border-left-color: #198754; }
-.notif-card.no-leida.tipo-acceso_historial { border-left-color: #ffc107; }
-.notif-card.no-leida.tipo-general          { border-left-color: #6c757d; }
-
-.notif-card.leida { opacity: .65; }
-.notif-card.leida:hover { opacity: 1; }
-
-/* ---------- Icono ---------- */
-.notif-icon-wrap {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
+/* ---------- Item de notificación ---------- */
+.notifications-page-list .notification-item {
+    display: grid;
+    grid-template-columns: 10px 1fr auto;
     align-items: center;
-    justify-content: center;
-    font-size: 1.15rem;
-    color: #fff;
+    gap: 1rem;
+    padding: 1rem 1.35rem;
+    border-bottom: 1px solid #F1EFE8;
+    cursor: pointer;
+    transition: background 0.16s, box-shadow 0.16s;
+    position: relative;
+}
+
+.notifications-page-list .notification-item:last-child {
+    border-bottom: none;
+}
+
+.notifications-page-list .notification-item:hover {
+    background: var(--notif-hover-bg);
+    box-shadow: inset 3px 0 0 var(--notif-accent);
+}
+
+.notifications-page-list .notification-item.unread {
+    background: var(--notif-unread-bg);
+}
+
+.notifications-page-list .notification-item.unread:hover {
+    background: #e6f6f1;
+}
+
+/* ---------- Indicador de estado ---------- */
+.notifications-page-list .notification-indicator {
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     flex-shrink: 0;
 }
 
-.tipo-cita             .notif-icon-wrap { background: #0d6efd; }
-.tipo-vacuna           .notif-icon-wrap { background: #dc3545; }
-.tipo-seguimiento      .notif-icon-wrap { background: #198754; }
-.tipo-tratamiento      .notif-icon-wrap { background: #198754; }
-.tipo-acceso_historial .notif-icon-wrap { background: #ffc107; color: #212529 !important; }
-.tipo-general          .notif-icon-wrap { background: #6c757d; }
+.notifications-page-list .notification-indicator.unread {
+    background: var(--notif-unread-dot);
+    box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
+    animation: pulse-dot 2.2s ease-in-out infinite;
+}
 
-/* ---------- Cuerpo ---------- */
-.notif-body {
-    flex: 1;
+.notifications-page-list .notification-indicator.read {
+    background: var(--notif-read-dot);
+}
+
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(29,158,117,0.15); }
+    50%       { box-shadow: 0 0 0 5px rgba(29,158,117,0.08); }
+}
+
+/* ---------- Contenido ---------- */
+.notifications-page-list .notification-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     min-width: 0;
+    flex: unset;
 }
 
-.notif-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 5px;
-}
-
-.notif-title-row {
+.notifications-page-list .notification-header {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
 }
 
-.notif-title {
-    font-size: .9rem;
-    font-weight: 600;
-    color: #1a1d23;
+.notifications-page-list .notification-header h3 {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: #2C2C2A;
     margin: 0;
     line-height: 1.3;
 }
 
-.notif-pill {
-    display: inline-flex;
-    align-items: center;
-    font-size: .7rem;
+.notifications-page-list .notification-item.unread .notification-header h3 {
     font-weight: 600;
     padding: 2px 9px;
     border-radius: var(--notif-radius-pill);
@@ -221,36 +215,33 @@
     white-space: nowrap;
 }
 
-.notif-time {
-    font-size: .78rem;
-    color: #adb5bd;
+.notifications-page-list .notification-time {
+    font-size: 12px;
+    color: #888780;
+    flex-shrink: 0;
     white-space: nowrap;
 }
 
-.notif-message {
-    font-size: .85rem;
-    color: #6c757d;
-    line-height: 1.6;
+.notifications-page-list .notification-content p {
+    font-size: 12.5px;
+    color: #888780;
     margin: 0;
 }
 
-.notif-cancel-reason {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: .78rem;
-    color: #b02a37;
-    font-style: italic;
-    margin-top: 4px;
-}
-
-/* ---------- Pip sin leer ---------- */
-.notif-pip {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+/* ---------- Etiqueta de tipo ---------- */
+.notifications-page-list .notification-type {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--notif-accent-mid);
+    background: var(--notif-accent-light);
+    padding: 3px 9px;
+    border-radius: 20px;
     flex-shrink: 0;
-    margin-top: 5px;
+    white-space: nowrap;
+    align-self: center;
+    text-transform: capitalize;
+    display: inline-flex;
 }
 
 .tipo-cita             .notif-pip { background: #0d6efd; }
@@ -312,11 +303,33 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
-    .page-section__header { flex-direction: column; gap: 1rem; }
-    .page-actions { width: 100%; }
-    .btn { flex: 1; justify-content: center; }
+    .page-section__header {
+        flex-direction: column;
+        gap: 1rem;
+    }
 
-    .notif-card { padding: 14px 14px; gap: 10px; }
-    .notif-icon-wrap { width: 38px; height: 38px; font-size: 1rem; }
-    .notif-meta { flex-direction: column; align-items: flex-start; }
+    .page-actions {
+        width: 100%;
+    }
+
+    .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .notifications-page-list .notification-item {
+        grid-template-columns: 10px 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .notifications-page-list .notification-type {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: 2px;
+    }
+
+    .notifications-page-list .notification-header h3 {
+        max-width: 100%;
+        white-space: normal;
+    }
 }
