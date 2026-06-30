@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../vendor/dompdf/autoload.inc.php';
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-function generarPDF($html, $filename = "documento.pdf", $download = false)
+function generarPDF($html, $filename = "documento.pdf", $download = false, $orientation = 'portrait')
 {
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
@@ -22,8 +22,8 @@ function generarPDF($html, $filename = "documento.pdf", $download = false)
     // Cargar el HTML recibido
     $dompdf->loadHtml($html);
 
-    // Opcional: tamaño y orientación
-    $dompdf->setPaper('A4', 'portrait');
+    // Tamaño y orientación
+    $dompdf->setPaper('A4', $orientation);
 
     // Renderizar
     $dompdf->render();
