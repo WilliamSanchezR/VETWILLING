@@ -36,26 +36,62 @@
         }
     }
 
+    const ICONO_MAP = {
+        'cita':             'bi-calendar-check',
+        'vacuna':           'bi-syringe',
+        'seguimiento':      'bi-activity',
+        'tratamiento':      'bi-capsule',
+        'acceso_historial': 'bi-file-earmark-text',
+        'general':          'bi-bell',
+    };
+
+    const ETIQUETA_MAP = {
+        'cita':             'Cita',
+        'vacuna':           'Vacuna',
+        'seguimiento':      'Seguimiento',
+        'tratamiento':      'Tratamiento',
+        'acceso_historial': 'Historial',
+        'general':          'General',
+    };
+
     function buildItem(item) {
-        const statusClass = item.leido ? '' : 'unread';
-        const typeLabel = escapeHtml(item.tipo || 'Notificación');
-        const message = escapeHtml(item.mensaje || 'Sin mensaje');
-        const detail = item.canal ? `Canal: ${escapeHtml(item.canal)}` : item.referencia_id ? `Ref: ${escapeHtml(String(item.referencia_id))}` : '';
+        const tipo      = item.tipo || 'general';
+        const leida     = item.leido || item.leida;
+        const estado    = item.estado || 'enviada';
+        const cardClass = `notif-card tipo-${escapeHtml(tipo)} ${leida ? 'leida' : 'no-leida'}`;
+        const icono     = ICONO_MAP[tipo]    || 'bi-bell';
+        const etiqueta  = ETIQUETA_MAP[tipo] || tipo;
+        const titulo    = escapeHtml(item.titulo  || item.mensaje || 'Sin título');
+        const mensaje   = escapeHtml(item.mensaje || '');
+        const tiempo    = escapeHtml(item.tiempo  || formatDate(item.fecha || item.fecha_creacion));
+
         let html = `
-            <article class="notification-item ${statusClass}" data-notification-id="${item.id}">
-                <div class="notification-indicator ${item.leido ? 'read' : 'unread'}"></div>
-                <div class="notification-content">
-                    <div class="notification-header">
-                        <h3>${message}</h3>
-                        <span class="notification-time">${formatDate(item.fecha)}</span>
+            <div class="${cardClass}" data-notification-id="${item.id}">
+                <div class="notif-icon-wrap">
+                    <i class="bi ${icono}" aria-hidden="true"></i>
+                </div>
+                <div class="notif-body">
+                    <div class="notif-meta">
+                        <div class="notif-title-row">
+                            <p class="notif-title">${titulo}</p>
+                            <span class="notif-pill">${etiqueta}</span>
+                        </div>
+                        <span class="notif-time">${tiempo}</span>
                     </div>
-                    <p>${detail}</p>
-        `;
-        // Mostrar motivo de cancelación si aplica
-        if (item.estado === 'cancelada' && item.motivo_cancelacion) {
-            html += `<div class="notification-cancel-reason"><i class="bi bi-x-octagon"></i> ${escapeHtml(item.motivo_cancelacion)}</div>`;
+                    ${mensaje ? `<p class="notif-message">${mensaje}</p>` : ''}`;
+
+        if (estado === 'cancelada' && item.motivo_cancelacion) {
+            html += `<div class="notif-cancel-reason">
+                         <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                         ${escapeHtml(item.motivo_cancelacion)}
+                     </div>`;
         }
-        html += `</div><div class="notification-type">${typeLabel}</div></article>`;
+
+        html += `</div>`;
+        if (!leida) {
+            html += `<span class="notif-pip" title="Sin leer"></span>`;
+        }
+        html += `</div>`;
         return html;
     }
 
@@ -131,7 +167,7 @@
     }
 
     pageList?.addEventListener('click', async event => {
-        const row = event.target.closest('.notification-item');
+        const row = event.target.closest('.notif-card');
         if (!row) return;
         const id = row.dataset.notificationId;
         if (!id) return;

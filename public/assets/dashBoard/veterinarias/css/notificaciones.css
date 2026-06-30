@@ -1,6 +1,6 @@
 /* ============================================================
-   notificaciones.css
-   Estilos para la página de notificaciones del veterinario
+   notificaciones.css — Veterinario
+   Estilo card-based idéntico a la vista cliente
    ============================================================ */
 
 /* ---------- Variables ---------- */
@@ -8,20 +8,15 @@
     --notif-accent:       #1D9E75;
     --notif-accent-light: #E1F5EE;
     --notif-accent-mid:   #0F6E56;
-    --notif-unread-dot:   #1D9E75;
-    --notif-read-dot:     #B4B2A9;
-    --notif-border:       rgba(0, 0, 0, 0.08);
-    --notif-hover-bg:     #F7FAF9;
-    --notif-unread-bg:    #F2FAF7;
-    --notif-radius:       12px;
-    --notif-radius-sm:    8px;
-    --notif-shadow:       0 1px 4px rgba(0,0,0,0.06);
-    --notif-shadow-hover: 0 4px 16px rgba(29,158,117,0.10);
-    --font-display:       'DM Sans', 'Segoe UI', sans-serif;
+    --notif-radius:       16px;
+    --notif-radius-sm:    10px;
+    --notif-radius-pill:  999px;
+    --notif-shadow-hover: 0 6px 24px rgba(0,0,0,.12);
+    --notif-transition:   .22s ease;
     --font-body:          'DM Sans', 'Segoe UI', sans-serif;
+    --font-display:       'DM Sans', 'Segoe UI', sans-serif;
 }
 
-/* ---- Importar fuente ---- */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 /* ---------- Layout de sección ---------- */
@@ -45,13 +40,13 @@
     display: inline-block;
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.10em;
+    letter-spacing: .10em;
     text-transform: uppercase;
     color: var(--notif-accent-mid);
     background: var(--notif-accent-light);
     padding: 3px 10px;
     border-radius: 20px;
-    margin-bottom: 0.5rem;
+    margin-bottom: .5rem;
 }
 
 .page-section__header h1 {
@@ -59,7 +54,7 @@
     font-size: 1.75rem;
     font-weight: 600;
     color: #1a1a1a;
-    margin: 0 0 0.35rem;
+    margin: 0 0 .35rem;
     line-height: 1.2;
 }
 
@@ -75,7 +70,7 @@
 .page-actions {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: .65rem;
     flex-shrink: 0;
     flex-wrap: wrap;
 }
@@ -91,25 +86,22 @@
     font-weight: 500;
     cursor: pointer;
     border: 1.5px solid transparent;
-    transition: background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s, transform 0.12s;
+    transition: background .18s, border-color .18s, color .18s, box-shadow .18s, transform .12s;
     text-decoration: none;
     white-space: nowrap;
 }
 
-.btn:active {
-    transform: scale(0.97);
-}
+.btn:active { transform: scale(.97); }
 
 .btn-primary {
     background: var(--notif-accent);
     color: #fff;
     border-color: var(--notif-accent);
 }
-
 .btn-primary:hover {
     background: var(--notif-accent-mid);
     border-color: var(--notif-accent-mid);
-    box-shadow: 0 2px 10px rgba(29,158,117,0.22);
+    box-shadow: 0 2px 10px rgba(29,158,117,.22);
 }
 
 .btn-secondary {
@@ -117,162 +109,174 @@
     color: #444441;
     border-color: #D3D1C7;
 }
-
 .btn-secondary:hover {
     background: #F1EFE8;
     border-color: #B4B2A9;
 }
 
-/* ---------- Tarjeta contenedora ---------- */
+/* ---------- Contenedor principal ---------- */
 .notifications-page-card {
-    background: #fff;
-    border: 1px solid var(--notif-border);
-    border-radius: var(--notif-radius);
-    box-shadow: var(--notif-shadow);
-    overflow: hidden;
     min-height: 200px;
 }
 
-/* ---------- Lista de notificaciones ---------- */
+/* ---------- Lista = columna de tarjetas ---------- */
 .notifications-page-list {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
-/* ---------- Item de notificación ---------- */
-.notification-item {
-    display: grid;
-    grid-template-columns: 10px 1fr auto;
+/* ============================================================
+   TARJETA DE NOTIFICACIÓN (igual al diseño cliente)
+   ============================================================ */
+.notif-card {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #fff;
+    border-radius: var(--notif-radius);
+    border: 1px solid rgba(0,0,0,.08);
+    padding: 16px 18px;
+    transition: box-shadow var(--notif-transition), transform var(--notif-transition), opacity var(--notif-transition);
+    cursor: default;
+}
+
+.notif-card:hover {
+    box-shadow: var(--notif-shadow-hover);
+    transform: translateY(-2px);
+}
+
+/* Borde izquierdo coloreado para no leídas */
+.notif-card.no-leida { border-left-width: 3px; border-left-style: solid; }
+.notif-card.no-leida.tipo-cita             { border-left-color: #0d6efd; }
+.notif-card.no-leida.tipo-vacuna           { border-left-color: #dc3545; }
+.notif-card.no-leida.tipo-seguimiento      { border-left-color: #198754; }
+.notif-card.no-leida.tipo-tratamiento      { border-left-color: #198754; }
+.notif-card.no-leida.tipo-acceso_historial { border-left-color: #ffc107; }
+.notif-card.no-leida.tipo-general          { border-left-color: #6c757d; }
+
+.notif-card.leida { opacity: .65; }
+.notif-card.leida:hover { opacity: 1; }
+
+/* ---------- Icono ---------- */
+.notif-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.35rem;
-    border-bottom: 1px solid #F1EFE8;
-    cursor: pointer;
-    transition: background 0.16s, box-shadow 0.16s;
-    position: relative;
+    justify-content: center;
+    font-size: 1.15rem;
+    color: #fff;
+    flex-shrink: 0;
 }
 
-.notification-item:last-child {
-    border-bottom: none;
+.tipo-cita             .notif-icon-wrap { background: #0d6efd; }
+.tipo-vacuna           .notif-icon-wrap { background: #dc3545; }
+.tipo-seguimiento      .notif-icon-wrap { background: #198754; }
+.tipo-tratamiento      .notif-icon-wrap { background: #198754; }
+.tipo-acceso_historial .notif-icon-wrap { background: #ffc107; color: #212529 !important; }
+.tipo-general          .notif-icon-wrap { background: #6c757d; }
+
+/* ---------- Cuerpo ---------- */
+.notif-body {
+    flex: 1;
+    min-width: 0;
 }
 
-.notification-item:hover {
-    background: var(--notif-hover-bg);
-    box-shadow: inset 3px 0 0 var(--notif-accent);
+.notif-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
 }
 
-.notification-item.unread {
-    background: var(--notif-unread-bg);
+.notif-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-.notification-item.unread:hover {
-    background: #e6f6f1;
+.notif-title {
+    font-size: .9rem;
+    font-weight: 600;
+    color: #1a1d23;
+    margin: 0;
+    line-height: 1.3;
 }
 
-/* ---------- Indicador de estado ---------- */
-.notification-indicator {
+.notif-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: .7rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: var(--notif-radius-pill);
+    background: var(--notif-accent-light);
+    color: var(--notif-accent-mid);
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.notif-time {
+    font-size: .78rem;
+    color: #adb5bd;
+    white-space: nowrap;
+}
+
+.notif-message {
+    font-size: .85rem;
+    color: #6c757d;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.notif-cancel-reason {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: .78rem;
+    color: #b02a37;
+    font-style: italic;
+    margin-top: 4px;
+}
+
+/* ---------- Pip sin leer ---------- */
+.notif-pip {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
-    align-self: center;
-    transition: transform 0.16s;
+    margin-top: 5px;
 }
 
-.notification-indicator.unread {
-    background: var(--notif-unread-dot);
-    box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
-    animation: pulse-dot 2.2s ease-in-out infinite;
-}
+.tipo-cita             .notif-pip { background: #0d6efd; }
+.tipo-vacuna           .notif-pip { background: #dc3545; }
+.tipo-seguimiento      .notif-pip { background: #198754; }
+.tipo-tratamiento      .notif-pip { background: #198754; }
+.tipo-acceso_historial .notif-pip { background: #ffc107; }
+.tipo-general          .notif-pip { background: #6c757d; }
 
-.notification-indicator.read {
-    background: var(--notif-read-dot);
-}
-
-@keyframes pulse-dot {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(29,158,117,0.15); }
-    50%       { box-shadow: 0 0 0 5px rgba(29,158,117,0.08); }
-}
-
-/* ---------- Contenido ---------- */
-.notification-content {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 0;
-}
-
-.notification-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.notification-header h3 {
-    font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 500;
-    color: #2C2C2A;
-    margin: 0;
-    line-height: 1.4;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 520px;
-}
-
-.notification-item.unread .notification-header h3 {
-    font-weight: 600;
-    color: #1a1a1a;
-}
-
-.notification-time {
-    font-size: 12px;
-    color: #888780;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
-.notification-content p {
-    font-size: 12.5px;
-    color: #888780;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ---------- Etiqueta de tipo ---------- */
-.notification-type {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    color: var(--notif-accent-mid);
-    background: var(--notif-accent-light);
-    padding: 3px 9px;
-    border-radius: 20px;
-    flex-shrink: 0;
-    white-space: nowrap;
-    align-self: center;
-    text-transform: capitalize;
-}
-
-/* ---------- Estado vacío ---------- */
+/* ============================================================
+   ESTADO VACÍO
+   ============================================================ */
 .empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 4rem 2rem;
+    background: #fff;
+    border-radius: var(--notif-radius);
+    border: 1px solid rgba(0,0,0,.08);
     text-align: center;
-    gap: 0.75rem;
+    gap: .75rem;
 }
 
-.empty-state.is-hidden {
-    display: none;
-}
+.empty-state.is-hidden { display: none; }
 
 .empty-icon {
     width: 64px;
@@ -282,13 +286,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: .5rem;
 }
 
-.empty-icon i {
-    font-size: 28px;
-    color: var(--notif-accent-mid);
-}
+.empty-icon i { font-size: 28px; color: var(--notif-accent-mid); }
 
 .empty-state h2 {
     font-family: var(--font-display);
@@ -307,39 +308,15 @@
 }
 
 /* ---------- Utilidad ---------- */
-.is-hidden {
-    display: none !important;
-}
+.is-hidden { display: none !important; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
-    .page-section__header {
-        flex-direction: column;
-        gap: 1rem;
-    }
+    .page-section__header { flex-direction: column; gap: 1rem; }
+    .page-actions { width: 100%; }
+    .btn { flex: 1; justify-content: center; }
 
-    .page-actions {
-        width: 100%;
-    }
-
-    .btn {
-        flex: 1;
-        justify-content: center;
-    }
-
-    .notification-item {
-        grid-template-columns: 10px 1fr;
-        grid-template-rows: auto auto;
-    }
-
-    .notification-type {
-        grid-column: 2;
-        justify-self: start;
-        margin-top: 2px;
-    }
-
-    .notification-header h3 {
-        max-width: 100%;
-        white-space: normal;
-    }
+    .notif-card { padding: 14px 14px; gap: 10px; }
+    .notif-icon-wrap { width: 38px; height: 38px; font-size: 1rem; }
+    .notif-meta { flex-direction: column; align-items: flex-start; }
 }
