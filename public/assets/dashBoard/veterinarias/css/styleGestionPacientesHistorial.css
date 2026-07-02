@@ -508,6 +508,265 @@
     background: rgba(220, 38, 38, 0.06);
 }
 
+.btn-mini-success {
+    border-color: #bbf7d0;
+    color: #15803d;
+}
+
+.btn-mini-success:hover {
+    border-color: #16a34a;
+    color: #15803d;
+    background: rgba(22, 163, 74, 0.08);
+}
+
+/* ---------- Modal Nueva Atención ---------- */
+
+/* Los tokens deben estar en .hist-modal para que las clases internas hereden vars */
+.hist-modal {
+    --hist-primary: #0a932c;
+    --hist-primary-600: #097a25;
+    --hist-primary-50: rgba(10, 147, 44, 0.07);
+    --hist-primary-100: rgba(10, 147, 44, 0.14);
+    --hist-ink: #0f172a;
+    --hist-ink-soft: #334155;
+    --hist-muted: #64748b;
+    --hist-border: #e6ebf0;
+    --hist-border-strong: #d8e0e8;
+    --hist-surface: #ffffff;
+    --hist-surface-soft: #f7faf8;
+    --hist-bg: #f5f8f6;
+    --hist-radius: 14px;
+    --hist-radius-sm: 10px;
+    --hist-radius-pill: 999px;
+    --hist-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --hist-shadow-md: 0 6px 18px -8px rgba(15, 23, 42, 0.18);
+    --hist-focus: 0 0 0 3px rgba(10, 147, 44, 0.18);
+    --hist-fs-xs: 11px;
+    --hist-fs-sm: 12.5px;
+    --hist-fs-md: 14px;
+
+    border: none;
+    border-radius: var(--hist-radius);
+    overflow: hidden;
+    font-family: 'Open Sans', sans-serif;
+    color: var(--hist-ink);
+}
+
+/* Header */
+.hist-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    background: var(--hist-primary);
+    gap: 12px;
+}
+
+.hist-modal-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hist-modal-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.hist-modal-header .modal-title {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.01em;
+}
+
+.hist-modal-header small {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.78);
+    display: block;
+    margin-top: 2px;
+}
+
+.hist-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.18s ease;
+    flex-shrink: 0;
+}
+.hist-modal-close:hover {
+    background: rgba(255, 255, 255, 0.28);
+    color: #fff;
+}
+
+/* Body */
+.hist-modal-body {
+    padding: 22px;
+    background: var(--hist-bg);
+    overflow-y: auto;
+}
+
+/* Footer */
+.hist-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 22px;
+    background: var(--hist-surface);
+    border-top: 1px solid var(--hist-border);
+}
+
+/* Hint / loading */
+.hist-modal-hint {
+    font-size: var(--hist-fs-sm);
+    color: var(--hist-muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hist-modal-loading {
+    text-align: center;
+    padding: 32px 0;
+    color: var(--hist-muted);
+    font-size: var(--hist-fs-sm);
+}
+
+/* ---------- Tarjetas de citas pendientes ---------- */
+.cita-pendiente-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--hist-border);
+    border-radius: var(--hist-radius-sm);
+    background: var(--hist-surface);
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    margin-bottom: 10px;
+}
+
+.cita-pendiente-item:last-child {
+    margin-bottom: 0;
+}
+
+.cita-pendiente-item:hover {
+    border-color: var(--hist-primary);
+    background: var(--hist-primary-50);
+    box-shadow: var(--hist-shadow-md);
+}
+
+.cita-pendiente-item .cita-icono {
+    width: 42px;
+    height: 42px;
+    background: var(--hist-primary-50);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hist-primary);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.cita-pendiente-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.cita-pendiente-info strong {
+    font-size: var(--hist-fs-md);
+    color: var(--hist-ink);
+    font-weight: 600;
+}
+
+.cita-pendiente-info small {
+    font-size: var(--hist-fs-sm);
+    color: var(--hist-muted);
+}
+
+.cita-pendiente-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    min-width: 120px;
+}
+
+.cita-pendiente-meta .cita-fecha {
+    font-size: var(--hist-fs-sm);
+    color: var(--hist-ink-soft);
+    font-weight: 600;
+    text-align: right;
+}
+
+.cita-pendiente-meta small {
+    font-size: var(--hist-fs-xs);
+    color: var(--hist-muted);
+}
+
+.cita-pendiente-empty {
+    text-align: center;
+    padding: 28px 16px;
+    color: var(--hist-muted);
+    background: var(--hist-surface);
+    border: 1.5px dashed var(--hist-border-strong);
+    border-radius: var(--hist-radius-sm);
+}
+
+.cita-pendiente-empty i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--hist-border-strong);
+}
+
+/* Botón "Atender" dentro de cada cita */
+.btn-atender-cita {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    background: var(--hist-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: var(--hist-fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.18s ease, transform 0.1s ease;
+}
+
+.btn-atender-cita:hover {
+    background: var(--hist-primary-600);
+    transform: translateY(-1px);
+}
+
+.btn-atender-cita:active {
+    transform: translateY(0);
+}
+
 /* ---------- Panel de detalle ---------- */
 .panel-seguridad {
     border: 1px dashed var(--hist-primary-100);

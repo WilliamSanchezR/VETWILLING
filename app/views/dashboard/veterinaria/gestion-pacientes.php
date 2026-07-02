@@ -524,6 +524,114 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
         </div>
     </div>
 
+    <!-- ===== MODAL NUEVA ATENCIÓN ===== -->
+    <div class="modal fade" id="modalNuevaAtencion" tabindex="-1" aria-labelledby="modalNuevaAtencionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content hist-modal">
+
+                <div class="hist-modal-header">
+                    <div class="hist-modal-header-info">
+                        <div class="hist-modal-icon">
+                            <i class="bi bi-clipboard2-pulse"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-0" id="modalNuevaAtencionLabel">
+                                <span id="modalTitulo">Nueva Atención</span>
+                            </h5>
+                            <small>Registro clínico del paciente</small>
+                        </div>
+                    </div>
+                    <button type="button" class="hist-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div class="hist-modal-body">
+
+                    <!-- PASO 1: Lista de mascotas asignadas -->
+                    <div id="modalSeccionCitas">
+                        <p class="hist-modal-hint">
+                            <i class="bi bi-heart-pulse me-1"></i>
+                            Selecciona la mascota para registrar una nueva atención clínica.
+                        </p>
+                        <div id="modalListaCitas">
+                            <div class="hist-modal-loading">
+                                <i class="bi bi-hourglass-split"></i> Cargando pacientes...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PASO 2: Formulario de atención -->
+                    <div id="modalSeccionFormulario" class="d-none">
+
+                        <div class="resumen-paciente mb-4">
+                            <div class="resumen-paciente-head">
+                                <i class="bi bi-heart-pulse"></i>
+                                <div>
+                                    <strong id="modalPacienteNombre">--</strong>
+                                    <small id="modalPacienteMeta">--</small>
+                                </div>
+                            </div>
+                            <span class="badge-version" id="modalModoLabel">Nueva</span>
+                        </div>
+
+                        <form id="formModalAtencion" class="d-flex flex-column gap-3">
+                            <input type="hidden" id="modalIdPaciente">
+                            <input type="hidden" id="modalIdHistorial">
+                            <input type="hidden" id="modalIdCita">
+
+                            <div class="campos-grid">
+                                <div>
+                                    <label for="modalFechaAtencion" class="label-historial">
+                                        Fecha de atención <span class="text-danger">*</span>
+                                    </label>
+                                    <input id="modalFechaAtencion" class="input-historial" type="date">
+                                </div>
+                                <div>
+                                    <label for="modalMotivo" class="label-historial">
+                                        Motivo de consulta <span class="text-danger">*</span>
+                                    </label>
+                                    <input id="modalMotivo" class="input-historial" type="text" placeholder="Describe el motivo...">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="modalDiagnostico" class="label-historial">Diagnóstico</label>
+                                <textarea id="modalDiagnostico" class="textarea-historial" rows="2"></textarea>
+                            </div>
+                            <div>
+                                <label for="modalTratamiento" class="label-historial">Tratamientos aplicados</label>
+                                <textarea id="modalTratamiento" class="textarea-historial" rows="2"></textarea>
+                            </div>
+                            <div>
+                                <label for="modalMedicacion" class="label-historial">Medicación recetada</label>
+                                <textarea id="modalMedicacion" class="textarea-historial" rows="2"></textarea>
+                            </div>
+                            <div>
+                                <label for="modalObservaciones" class="label-historial">Observaciones adicionales</label>
+                                <textarea id="modalObservaciones" class="textarea-historial" rows="2"></textarea>
+                            </div>
+                        </form>
+                    </div>
+
+                </div><!-- /.hist-modal-body -->
+
+                <div class="hist-modal-footer">
+                    <button type="button" class="btn-secundario d-none" id="modalBtnVolver">
+                        <i class="bi bi-arrow-left me-1"></i> Volver
+                    </button>
+                    <button type="button" class="btn-secundario" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Cancelar
+                    </button>
+                    <button type="button" class="boton-agregar d-none" id="modalBtnGuardar">
+                        <i class="bi bi-check2-circle me-1"></i> Guardar atención
+                    </button>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /#modalNuevaAtencion -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/gestion-pacientes.js"></script>
 </body>

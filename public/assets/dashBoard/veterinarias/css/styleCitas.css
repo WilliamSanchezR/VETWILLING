@@ -1,546 +1,541 @@
-/* ═══════════════════════════════════════════
-   GESTIÓN DE CITAS — styleCitas.css
-   Estilos de página ÚNICAMENTE (no tocar body/*)
-═══════════════════════════════════════════ */
+/* ============================================================
+   Gestión de Citas — Vista del Veterinario
+   Diseño integrado con el dashboard shell
+   ============================================================ */
 
-/* Paleta de estado */
-:root {
-    --cita-pendiente:  #f59e0b;
-    --cita-confirmada: #3b82f6;
-    --cita-completada: #0a932c;
-    --cita-cancelada:  #ef4444;
-    --cita-urgente:    #dc2626;
-}
-
-/* ── Shell principal ── */
+/* Tokens locales */
 .citas-shell {
+    --c-primary:   #0a932c;
+    --c-primary-d: #097a25;
+    --c-primary-50: rgba(10,147,44,0.07);
+    --c-primary-100: rgba(10,147,44,0.14);
+    --c-amber:  #f59e0b;
+    --c-blue:   #3b82f6;
+    --c-green:  #22c55e;
+    --c-red:    #ef4444;
+    --c-ink:    #0f172a;
+    --c-ink-soft: #334155;
+    --c-muted:  #64748b;
+    --c-border: #e6ebf0;
+    --c-border-s: #d8e0e8;
+    --c-surface: #ffffff;
+    --c-bg:     #f5f8f6;
+    --c-radius: 14px;
+    --c-radius-sm: 10px;
+    --c-shadow-sm: 0 1px 3px rgba(15,23,42,0.06);
+    --c-shadow-md: 0 6px 18px -8px rgba(15,23,42,0.18);
+
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 20px;
+    font-family: 'Open Sans', sans-serif;
+    color: var(--c-ink);
 }
 
-/* ══ ENCABEZADO ══════════════════════════ */
-.encabezado-citas {
+/* ---------- Header ---------- */
+.citas-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 16px;
+    background: var(--c-surface);
+    border-radius: var(--c-radius);
+    padding: 20px 24px;
+    box-shadow: var(--c-shadow-sm);
+    border: 1px solid var(--c-border);
 }
 
-.titulo-citas {
-    font-family: 'Fredoka', sans-serif;
-    font-size: 1.55rem;
-    font-weight: 700;
-    color: #1e2d3d;
+.citas-header-left {
     display: flex;
     align-items: center;
-    gap: .5rem;
+    gap: 14px;
+}
+
+.citas-header-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--c-primary-50);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-primary);
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.citas-titulo {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--c-ink);
     margin: 0;
 }
 
-.titulo-citas i {
-    color: var(--cita-completada);
-    font-size: 1.4rem;
-}
-
-.subtitulo-citas {
-    font-size: .85rem;
-    color: #6b7280;
-    margin-top: .2rem;
+.citas-subtitulo {
+    font-size: 0.8rem;
+    color: var(--c-muted);
+    margin: 2px 0 0;
 }
 
 .btn-nueva-cita {
     display: inline-flex;
     align-items: center;
-    gap: .5rem;
-    padding: .55rem 1.25rem;
-    background: #0a932c;
+    gap: 8px;
+    padding: 11px 22px;
+    background: var(--c-primary);
     color: #fff;
     border: none;
-    border-radius: 10px;
-    font-size: .875rem;
-    font-weight: 600;
+    border-radius: var(--c-radius-sm);
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
     cursor: pointer;
-    transition: background .2s, transform .15s;
+    transition: background 0.18s ease, transform 0.1s ease, box-shadow 0.18s ease;
+    box-shadow: 0 4px 12px rgba(10,147,44,0.28);
     white-space: nowrap;
 }
 
 .btn-nueva-cita:hover {
-    background: #087a25;
-    transform: translateY(-1px);
+    background: var(--c-primary-d);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(10,147,44,0.38);
 }
 
-/* ══ STAT CARDS ══════════════════════════ */
-/* JS usa: document.querySelectorAll('.stat-card')[n].querySelector('h3') */
+/* ---------- Stats ---------- */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+@media (max-width: 1100px) { .stats-container { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .stats-container { grid-template-columns: 1fr; } }
+
 .stat-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 1.1rem 1.25rem;
+    background: var(--c-surface);
+    border-radius: var(--c-radius);
+    padding: 20px;
+    box-shadow: var(--c-shadow-sm);
+    border: 1px solid var(--c-border);
     display: flex;
     align-items: center;
-    gap: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-    border: 1px solid #f0f0f0;
-    transition: transform .2s, box-shadow .2s;
+    gap: 16px;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    border-left: 4px solid transparent;
 }
 
-.stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,.1);
-}
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--c-shadow-md); }
+
+.stat-card.pendientes  { border-left-color: var(--c-amber); }
+.stat-card.confirmadas { border-left-color: var(--c-blue); }
+.stat-card.completadas { border-left-color: var(--c-green); }
+.stat-card.canceladas  { border-left-color: var(--c-red); }
 
 .stat-icon {
-    width: 48px;
-    height: 48px;
+    width: 54px; height: 54px;
     border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
     flex-shrink: 0;
 }
 
-.stat-icon.pendientes  { background: rgba(245,158,11,.12); color: var(--cita-pendiente); }
-.stat-icon.confirmadas { background: rgba(59,130,246,.12); color: var(--cita-confirmada); }
-.stat-icon.completadas { background: rgba(10,147,44,.12);  color: var(--cita-completada); }
-.stat-icon.canceladas  { background: rgba(239,68,68,.12);  color: var(--cita-cancelada); }
+.stat-icon.pendientes  { background: rgba(245,158,11,0.1);  color: var(--c-amber); }
+.stat-icon.confirmadas { background: rgba(59,130,246,0.1);  color: var(--c-blue); }
+.stat-icon.completadas { background: rgba(34,197,94,0.1);   color: var(--c-green); }
+.stat-icon.canceladas  { background: rgba(239,68,68,0.1);   color: var(--c-red); }
 
 .stat-content h3 {
-    font-size: 1.65rem;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #1e2d3d;
+    color: var(--c-ink);
+    margin: 0 0 2px;
     line-height: 1;
-    margin: 0;
 }
 
 .stat-content p {
-    font-size: .78rem;
-    color: #6b7280;
-    margin: .25rem 0 0;
-    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--c-muted);
+    margin: 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
-/* Borde izquierdo de color por variante */
-.stat-card.pendientes  { border-left: 4px solid var(--cita-pendiente); }
-.stat-card.confirmadas { border-left: 4px solid var(--cita-confirmada); }
-.stat-card.completadas { border-left: 4px solid var(--cita-completada); }
-.stat-card.canceladas  { border-left: 4px solid var(--cita-cancelada); }
-
-/* ══ CONTROL CARD (filtros + tabs) ══════ */
-.citas-control-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 1.25rem 1.4rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-    border: 1px solid #f0f0f0;
-}
-
-.filtros-row {
+/* ---------- Toolbar (búsqueda + tabs) ---------- */
+.citas-toolbar {
     display: flex;
     align-items: center;
-    gap: .75rem;
+    justify-content: space-between;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
+    gap: 12px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-radius);
+    padding: 14px 20px;
+    box-shadow: var(--c-shadow-sm);
 }
 
 .campo-busqueda {
-    flex: 1;
-    min-width: 200px;
     position: relative;
-    display: flex;
-    align-items: center;
+    flex: 1;
+    min-width: 220px;
+    max-width: 380px;
 }
 
-.campo-busqueda > i {
+.campo-busqueda i {
     position: absolute;
-    left: .85rem;
-    color: #9ca3af;
-    font-size: .9rem;
-    pointer-events: none;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--c-primary);
+    font-size: 1rem;
 }
 
 .campo-busqueda input {
     width: 100%;
-    padding: .55rem .9rem .55rem 2.3rem;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
-    font-size: .875rem;
-    color: #374151;
-    background: #f9fafb;
-    outline: none;
-    transition: border-color .2s, background .2s;
+    padding: 9px 14px 9px 36px;
+    border: 1.5px solid var(--c-border-s);
+    border-radius: var(--c-radius-sm);
+    font-size: 0.875rem;
+    font-family: 'Open Sans', sans-serif;
+    background: var(--c-bg);
+    color: var(--c-ink);
+    transition: border-color 0.18s, box-shadow 0.18s;
 }
 
 .campo-busqueda input:focus {
-    border-color: #0a932c;
-    background: #fff;
-}
-
-.filtro-select {
-    padding: .55rem .9rem;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
-    font-size: .875rem;
-    color: #374151;
-    background: #f9fafb;
     outline: none;
-    cursor: pointer;
-    transition: border-color .2s;
-}
-
-.filtro-select:focus {
-    border-color: #0a932c;
+    border-color: var(--c-primary);
     background: #fff;
+    box-shadow: 0 0 0 3px rgba(10,147,44,0.12);
 }
 
-/* ── Tabs ── */
-/* JS usa: document.querySelectorAll('.tab-btn') + '.active' */
 .tabs-container {
     display: flex;
-    align-items: center;
-    gap: .4rem;
+    gap: 6px;
     flex-wrap: wrap;
-    border-top: 1px solid #f3f4f6;
-    padding-top: 1rem;
 }
 
 .tab-btn {
     display: inline-flex;
     align-items: center;
-    gap: .4rem;
-    padding: .45rem 1rem;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f9fafb;
-    color: #6b7280;
-    font-size: .825rem;
+    gap: 6px;
+    padding: 8px 18px;
+    border: 1.5px solid var(--c-border);
+    background: transparent;
+    color: var(--c-muted);
+    border-radius: var(--c-radius-sm);
+    font-family: 'Open Sans', sans-serif;
     font-weight: 600;
+    font-size: 0.82rem;
     cursor: pointer;
-    transition: all .2s;
+    transition: all 0.18s ease;
+    white-space: nowrap;
 }
 
 .tab-btn:hover {
-    border-color: #0a932c;
-    color: #0a932c;
-    background: #f0fdf4;
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    background: var(--c-primary-50);
 }
 
 .tab-btn.active {
-    background: #0a932c;
+    background: var(--c-primary);
     color: #fff;
-    border-color: #0a932c;
-    box-shadow: 0 2px 8px rgba(10,147,44,.25);
+    border-color: var(--c-primary);
+    box-shadow: 0 4px 10px rgba(10,147,44,0.28);
 }
 
-/* ══ LISTA DE CITAS ══════════════════════ */
+/* ---------- Grid de citas (3 por fila) ---------- */
 .citas-lista {
-    display: block;
-    width: 100%;
-}
-
-/* ── Cita card ──
-   JS usa: cita.style.display = 'grid' para mostrar, 'none' para ocultar.
-   NO cambiar este display. ──────────────────────────────────── */
-.cita-card {
     display: grid;
-    grid-template-columns: 100px 1fr;
-    width: 100%;
-    box-sizing: border-box;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-    border: 1px solid #f0f0f0;
-    overflow: hidden;
-    transition: box-shadow .2s, transform .15s;
-    margin-bottom: 1rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: start;
 }
 
-.cita-card:last-child {
-    margin-bottom: 0;
+/* Skeleton y empty ocupan todo el ancho */
+.citas-skeleton,
+.citas-empty {
+    grid-column: 1 / -1;
+}
+
+.citas-skeleton {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--c-radius);
+    padding: 48px;
+    text-align: center;
+    color: var(--c-muted);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.citas-skeleton i { font-size: 1.2rem; }
+
+.citas-empty {
+    background: var(--c-surface);
+    border: 1.5px dashed var(--c-border-s);
+    border-radius: var(--c-radius);
+    padding: 56px 40px;
+    text-align: center;
+    color: var(--c-muted);
+}
+
+.citas-empty i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+    color: var(--c-border-s);
+}
+
+.citas-empty h4 {
+    font-family: 'Fredoka', sans-serif;
+    color: var(--c-ink-soft);
+    margin-bottom: 6px;
+}
+
+/* ---------- Tarjeta vertical ---------- */
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.cita-card {
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--c-radius);
+    box-shadow: var(--c-shadow-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    animation: fadeSlideIn 0.3s ease both;
 }
 
 .cita-card:hover {
-    box-shadow: 0 6px 20px rgba(0,0,0,.1);
-    transform: translateY(-1px);
+    box-shadow: var(--c-shadow-md);
+    transform: translateY(-3px);
+    border-color: var(--c-primary);
 }
 
-/* Borde izquierdo por estado */
-.cita-card[data-estado="pendiente"]  { border-left: 4px solid var(--cita-pendiente); }
-.cita-card[data-estado="confirmada"] { border-left: 4px solid var(--cita-confirmada); }
-.cita-card[data-estado="completada"] { border-left: 4px solid var(--cita-completada); }
-.cita-card[data-estado="cancelada"]  { border-left: 4px solid var(--cita-cancelada); }
+.cita-card[data-estado="confirmada"]:hover  { border-color: var(--c-blue); }
+.cita-card[data-estado="completada"]:hover { border-color: var(--c-green); }
+.cita-card[data-estado="cancelada"]        { opacity: 0.7; }
 
-.cita-card.urgente {
-    border-left: 4px solid var(--cita-urgente);
-    background: #fffbfb;
+/* Cabecera de color con hora */
+.cita-header-color {
+    background: var(--c-primary);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
 
-/* Columna 1 — Tiempo */
-.cita-tiempo {
+.cita-card[data-estado="confirmada"]  .cita-header-color { background: var(--c-blue); }
+.cita-card[data-estado="completada"] .cita-header-color { background: var(--c-green); }
+.cita-card[data-estado="cancelada"]  .cita-header-color { background: #94a3b8; }
+
+.cita-hora-bloque {
     display: flex;
     flex-direction: column;
+    color: #fff;
+}
+
+.cita-hora-bloque .hora {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.cita-hora-bloque .fecha-corta {
+    font-size: 0.75rem;
+    opacity: 0.88;
+    margin-top: 3px;
+}
+
+/* Badge de estado en la cabecera */
+.badge-estado {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* Cuerpo de la tarjeta */
+.cita-body {
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+/* Fila paciente */
+.cita-paciente-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.paciente-avatar-cita {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid var(--c-primary-100);
+    flex-shrink: 0;
+}
+
+.paciente-avatar-placeholder {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--c-primary-50);
+    border: 2.5px solid var(--c-primary-100);
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.25rem .75rem;
-    background: rgba(245,158,11,.07);
-    gap: .2rem;
-    border-right: 1px solid #f3f4f6;
+    color: var(--c-primary);
+    font-size: 1.2rem;
+    flex-shrink: 0;
 }
 
-.cita-tiempo.confirmada { background: rgba(59,130,246,.07); }
-.cita-tiempo.completada { background: rgba(10,147,44,.07); }
-.cita-tiempo.cancelada  { background: rgba(239,68,68,.07); }
-
-.cita-tiempo .hora {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #1e2d3d;
-    line-height: 1;
-    font-family: 'Fredoka', sans-serif;
-}
-
-.cita-tiempo .fecha {
-    font-size: .7rem;
-    color: #9ca3af;
-    font-weight: 500;
-    text-align: center;
-}
-
-/* Columna 2 — Info */
-.cita-info {
-    padding: 1rem 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: .75rem;
+.paciente-datos {
     min-width: 0;
 }
 
-.cita-header {
-    display: flex;
-    align-items: center;
-    gap: .8rem;
-}
-
-.paciente-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #f3f4f6;
-    object-fit: cover;
-    flex-shrink: 0;
-    border: 2px solid #e5e7eb;
-}
-
-.paciente-nombre {
-    font-size: .975rem;
-    font-weight: 700;
-    color: #1e2d3d;
-    margin: 0;
-    line-height: 1.3;
-}
-
-.tipo-mascota {
-    display: inline-flex;
-    align-items: center;
-    gap: .25rem;
-    font-size: .72rem;
-    background: #f3f4f6;
-    color: #6b7280;
-    padding: .2rem .55rem;
-    border-radius: 5px;
+.paciente-datos h4 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1rem;
     font-weight: 600;
+    color: var(--c-ink);
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* ── Estado badges ── */
-/* JS usa: .estado-badge con clase de estado */
-.estado-badge {
+.badge-especie {
     display: inline-flex;
     align-items: center;
-    padding: .2rem .65rem;
-    border-radius: 5px;
-    font-size: .72rem;
+    gap: 4px;
+    padding: 3px 9px;
+    background: var(--c-primary-50);
+    color: var(--c-primary);
+    border-radius: 99px;
+    font-size: 0.7rem;
     font-weight: 700;
-    letter-spacing: .02em;
-    text-transform: capitalize;
 }
 
-.estado-badge.pendiente  { background: rgba(245,158,11,.12); color: #b45309; }
-.estado-badge.confirmada { background: rgba(59,130,246,.12); color: #1d4ed8; }
-.estado-badge.completada { background: rgba(10,147,44,.12);  color: #065f2e; }
-.estado-badge.cancelada  { background: rgba(239,68,68,.12);  color: #b91c1c; }
+/* Separador */
+.cita-divider {
+    height: 1px;
+    background: var(--c-border);
+}
 
 /* Detalles */
 .cita-detalles {
     display: flex;
-    flex-wrap: wrap;
-    gap: .4rem .9rem;
+    flex-direction: column;
+    gap: 7px;
 }
 
 .detalle-item {
     display: flex;
-    align-items: center;
-    gap: .35rem;
-    font-size: .78rem;
-    color: #6b7280;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--c-ink-soft);
+    line-height: 1.4;
 }
 
 .detalle-item i {
-    color: #9ca3af;
-    font-size: .8rem;
+    color: var(--c-primary);
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    margin-top: 1px;
 }
 
-/* Botones de acción — fila horizontal al pie de .cita-info */
-.cita-acciones {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: .4rem;
-    padding-top: .75rem;
-    border-top: 1px solid #f3f4f6;
-}
-
-/* Botones de acción */
-/* JS usa: .btn-confirmar / .btn-completar / .btn-cancelar / .btn-editar */
-.btn-accion {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .35rem;
-    padding: .45rem .75rem;
-    border: 1.5px solid transparent;
-    border-radius: 8px;
-    font-size: .78rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .2s;
+.detalle-item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.btn-confirmar {
-    background: rgba(59,130,246,.1);
-    color: #1d4ed8;
-    border-color: rgba(59,130,246,.25);
-}
-
-.btn-confirmar:hover {
-    background: #3b82f6;
-    color: #fff;
-    border-color: #3b82f6;
-}
-
-.btn-completar {
-    background: rgba(10,147,44,.1);
-    color: #065f2e;
-    border-color: rgba(10,147,44,.25);
-}
-
-.btn-completar:hover {
-    background: #0a932c;
-    color: #fff;
-    border-color: #0a932c;
-}
-
-.btn-cancelar {
-    background: rgba(239,68,68,.08);
-    color: #b91c1c;
-    border-color: rgba(239,68,68,.2);
-}
-
-.btn-cancelar:hover {
-    background: #ef4444;
-    color: #fff;
-    border-color: #ef4444;
-}
-
-.btn-editar {
-    background: rgba(107,114,128,.1);
-    color: #374151;
-    border-color: rgba(107,114,128,.2);
-}
-
-.btn-editar:hover {
-    background: #374151;
-    color: #fff;
-    border-color: #374151;
-}
-
-.btn-accion-neutral {
-    background: rgba(10,147,44,.08);
-    color: #065f2e;
-    border-color: rgba(10,147,44,.2);
-}
-
-.btn-accion-neutral:hover {
-    background: #0a932c;
-    color: #fff;
-    border-color: #0a932c;
-}
-
-/* ══ ESTADO VACÍO ════════════════════════ */
-/* JS crea e inyecta .empty-state dinámicamente vía innerHTML.
-   Debe estar visible por CSS (el JS no le pone inline style). */
-.empty-state {
+/* Footer de acciones */
+.cita-acciones {
+    padding: 12px 18px;
+    border-top: 1px solid var(--c-border);
     display: flex;
-    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-cita {
+    flex: 1;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 3.5rem 2rem;
-    text-align: center;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-    border: 2px dashed #e5e7eb;
-    color: #9ca3af;
-    gap: .75rem;
+    gap: 5px;
+    padding: 9px 10px;
+    border: none;
+    border-radius: 9px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: filter 0.18s ease, transform 0.1s ease;
+    white-space: nowrap;
 }
 
-.empty-state i {
-    font-size: 2.5rem;
-    color: #d1d5db;
+.btn-cita:hover  { filter: brightness(0.9); transform: translateY(-1px); }
+.btn-cita:active { transform: translateY(0); }
+.btn-cita:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.btn-cita-confirmar { background: var(--c-blue);    color: #fff; }
+.btn-cita-atender   { background: var(--c-primary); color: #fff; }
+.btn-cita-cancelar  {
+    background: transparent;
+    color: #b91c1c;
+    border: 1.5px solid rgba(239,68,68,0.3);
+}
+.btn-cita-cancelar:hover { background: rgba(239,68,68,0.06); filter: none; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1200px) {
+    .citas-lista { grid-template-columns: repeat(2, 1fr); }
 }
 
-.empty-state h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #6b7280;
-    margin: 0;
+@media (max-width: 700px) {
+    .citas-lista { grid-template-columns: 1fr; }
+    .citas-toolbar { flex-direction: column; align-items: stretch; }
+    .campo-busqueda { max-width: 100%; }
 }
 
-.empty-state p {
-    font-size: .85rem;
-    margin: 0;
-}
-
-/* ══ RESPONSIVE ══════════════════════════ */
-@media (max-width: 768px) {
-    .cita-card {
-        grid-template-columns: 1fr;
-    }
-
-    .cita-tiempo {
-        flex-direction: row;
-        justify-content: flex-start;
-        padding: .75rem 1rem;
-        border-right: none;
-        border-bottom: 1px solid #f3f4f6;
-        gap: .5rem;
-    }
-
-    .cita-tiempo .hora {
-        font-size: 1.1rem;
-    }
-
-    .encabezado-citas {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .filtros-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .campo-busqueda { min-width: unset; }
-}
+/* ---------- Modal Nueva Cita (SweetAlert) ---------- */
+.form-agendamiento { max-height: 500px; overflow-y: auto; padding: 0 4px; }
+.form-agendamiento::-webkit-scrollbar { width: 6px; }
+.form-agendamiento::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+.form-group-ag { margin-bottom: 20px; }
+.form-label-ag { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; font-weight: 600; color: #0f172a; font-size: 0.875rem; }
+.form-label-ag i { font-size: 1rem; color: #0a932c; }
+.form-label-ag .required { color: #ef4444; margin-left: 2px; }
+.form-control-ag { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 0.875rem; font-family: 'Open Sans', sans-serif; transition: border-color 0.18s, box-shadow 0.18s; box-sizing: border-box; }
+.form-control-ag:focus { outline: none; border-color: #0a932c; box-shadow: 0 0 0 3px rgba(10,147,44,0.12); }
+.form-control-ag:disabled { background: #f1f5f9; cursor: not-allowed; color: #94a3b8; }
+textarea.form-control-ag { resize: vertical; min-height: 90px; line-height: 1.5; }
+.form-divider { height: 1px; background: #e2e8f0; margin: 20px 0; }

@@ -6,9 +6,9 @@
  */
 
 // ── Sesión ─────────────────────────────────────────────────────────────────
-if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
-    session_start();
-}
+// if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+//     session_start();
+// }
 
 // ── I18n ───────────────────────────────────────────────────────────────────
 if (!class_exists('I18n')) {

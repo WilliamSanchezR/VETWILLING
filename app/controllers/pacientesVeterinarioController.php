@@ -95,6 +95,10 @@ switch ($accion) {
         eliminarNotaClinica($model, $idUsuario, $payload);
         break;
 
+    case 'listar_citas_pendientes':
+        listarCitasPendientes($model, $idUsuario);
+        break;
+
     case 'listar_historiales':
         listarHistorialesClinicos($model, $idUsuario, $payload);
         break;
@@ -696,6 +700,16 @@ function listarVersionesHistorialClinico(Veterinario $model, int $idUsuario, arr
         'status' => 'success',
         'message' => 'Versiones consultadas correctamente',
         'data' => $versiones,
+    ]);
+}
+
+function listarCitasPendientes(Veterinario $model, int $idUsuario): void
+{
+    $citas = $model->listarCitasPendientesParaAtencion($idUsuario);
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Citas pendientes cargadas',
+        'data' => $citas,
     ]);
 }
 
