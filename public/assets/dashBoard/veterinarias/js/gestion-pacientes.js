@@ -1106,7 +1106,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   btnNuevaAtencion.addEventListener("click", function () {
     if (!campoIdPaciente.value) {
-      // Guiar al usuario: mostrar el panel de listado y destacar la tabla
       activarVentana("listado");
       showToast(
         "Selecciona primero un paciente en la tabla para registrar una nueva atención.",
@@ -1132,8 +1131,32 @@ document.addEventListener("DOMContentLoaded", function () {
     campos.tratamiento.value = "";
     campos.medicacion.value = "";
     campos.observaciones.value = "";
-    detalleVersion.textContent = "Nueva";
-    detalleActualizacion.textContent = "--";
+
+    if (selectVersionHistorial) {
+      selectVersionHistorial.innerHTML =
+        '<option value="">Selecciona una atención</option>';
+    }
+
+    if (detalleVersion) detalleVersion.textContent = "Nueva";
+    if (detalleActualizacion) detalleActualizacion.textContent = "--";
+
+    if (detalleEstadoEdicion) {
+      detalleEstadoEdicion.innerHTML =
+        '<i class="bi bi-plus-circle"></i> Nueva atención';
+    }
+    if (detallePacienteMeta) {
+      const especie = campos.especie ? campos.especie.value : "";
+      const raza = campos.raza ? campos.raza.value : "";
+      detallePacienteMeta.textContent =
+        (especie || "Especie no registrada") +
+        " · " +
+        (raza || "Raza no registrada") +
+        " · Hoy";
+    }
+
+    if (campos.motivo) campos.motivo.focus();
+
+    showToast("Formulario listo. Completa los campos y guarda la nueva atención.", "success");
   });
 
   btnExportarPdf.addEventListener("click", function () {
