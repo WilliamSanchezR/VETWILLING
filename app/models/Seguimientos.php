@@ -31,52 +31,84 @@ class Seguimientos
     public function obtenerSeguimientosPorProfesional($id_usuario, $id_veterinaria = null)
     {
         try {
-            // Usar la vista optimizada
-            $sql = "SELECT 
-                        s.*,
-                        -- Última cita desde agendamiento
-                        (SELECT fecha_hora 
-                         FROM agendamiento 
-                         WHERE id_paciente = s.id_paciente 
-                         AND id_usuario = s.id_usuario_profesional
-                         AND fecha_hora < NOW()
-                         ORDER BY fecha_hora DESC 
-                         LIMIT 1) AS ultima_cita,
-                        
-                        -- Próxima cita programada
-                        (SELECT fecha_hora 
-                         FROM agendamiento 
-                         WHERE id_paciente = s.id_paciente 
-                         AND id_usuario = s.id_usuario_profesional
-                         AND fecha_hora > NOW()
-                         AND estado != 'Cancelada'
-                         ORDER BY fecha_hora ASC 
-                         LIMIT 1) AS proxima_cita,
-                        
-                        -- Último diagnóstico / observaciones (agendamiento usa 'observaciones')
-                        (SELECT observaciones 
-                         FROM agendamiento 
-                         WHERE id_paciente = s.id_paciente 
-                         AND id_usuario = s.id_usuario_profesional
-                         AND observaciones IS NOT NULL
-                         AND observaciones != ''
-                         ORDER BY fecha_hora DESC 
-                         LIMIT 1) AS ultimo_diagnostico
-                        
-                    FROM vista_seguimientos_activos s
-                    WHERE s.id_usuario_profesional = :id_usuario";
-            
+            // Consulta directa sobre seguimientos_paciente para incluir TODOS los estados
+            // (la vista solo devuelve activos/pausados, lo que rompe el filtro "Completados")
+            $sql = "SELECT
+                        sp.id_seguimiento,
+                        sp.id_paciente,
+                        sp.id_usuario_profesional,
+                        sp.id_asignacion,
+                        sp.id_veterinaria,
+                        sp.tipo_seguimiento,
+                        sp.motivo,
+                        sp.diagnostico_principal,
+                        sp.objetivo_tratamiento,
+                        sp.tratamiento_actual,
+                        sp.observaciones_generales,
+                        sp.prioridad,
+                        sp.prioridad          AS prioridad_calculada,
+                        sp.estado,
+                        sp.progreso_porcentaje,
+                        sp.proxima_revision,
+                        sp.alerta_critica,
+                        p.nombre              AS paciente_nombre,
+                        p.especie,
+                        p.raza,
+                        p.edad_numero,
+                        p.edad_unidad,
+                        p.sexo,
+                        p.img_mascota,
+                        prop.id_propietario,
+                        prop.nombres          AS propietario_nombres,
+                        prop.apellidos        AS propietario_apellidos,
+                        prop.telefono         AS propietario_telefono,
+                        (SELECT COUNT(*)
+                         FROM agendamiento a
+                         WHERE a.id_paciente = sp.id_paciente
+                           AND a.id_usuario  = sp.id_usuario_profesional) AS total_citas_realizadas,
+                        (SELECT fecha_hora
+                         FROM agendamiento
+                         WHERE id_paciente = sp.id_paciente
+                           AND id_usuario  = sp.id_usuario_profesional
+                           AND fecha_hora  < NOW()
+                         ORDER BY fecha_hora DESC LIMIT 1) AS ultima_cita,
+                        (SELECT fecha_hora
+                         FROM agendamiento
+                         WHERE id_paciente = sp.id_paciente
+                           AND id_usuario  = sp.id_usuario_profesional
+                           AND fecha_hora  > NOW()
+                           AND estado     != 'Cancelada'
+                         ORDER BY fecha_hora ASC LIMIT 1)  AS proxima_cita,
+                        (SELECT observaciones
+                         FROM agendamiento
+                         WHERE id_paciente    = sp.id_paciente
+                           AND id_usuario     = sp.id_usuario_profesional
+                           AND observaciones IS NOT NULL
+                           AND observaciones != ''
+                         ORDER BY fecha_hora DESC LIMIT 1)  AS ultimo_diagnostico,
+                        CASE WHEN sp.proxima_revision IS NOT NULL
+                              AND sp.proxima_revision <= NOW() THEN 1 ELSE 0
+                        END AS requiere_atencion,
+                        DATEDIFF(CURDATE(),
+                            IFNULL((SELECT MAX(fecha_hora)
+                                    FROM agendamiento
+                                    WHERE id_paciente = sp.id_paciente
+                                      AND id_usuario  = sp.id_usuario_profesional), CURDATE())
+                        ) AS dias_sin_cita
+                    FROM seguimientos_paciente sp
+                    JOIN paciente   p    ON sp.id_paciente    = p.id_paciente
+                    JOIN propietario prop ON p.id_propietario = prop.id_propietario
+                    WHERE sp.id_usuario_profesional = :id_usuario";
+
             if ($id_veterinaria) {
-                // La vista `vista_seguimientos_activos` no expone siempre `id_veterinaria`.
-                // Usar subconsulta EXISTS para filtrar por veterinaria en la tabla principal.
-                $sql .= " AND EXISTS (SELECT 1 FROM seguimientos_paciente sp WHERE sp.id_seguimiento = s.id_seguimiento AND sp.id_veterinaria = :id_veterinaria)";
+                $sql .= " AND sp.id_veterinaria = :id_veterinaria";
             }
-            
-            $sql .= " ORDER BY 
-                        FIELD(s.prioridad_calculada, 'critica', 'alta', 'normal', 'baja'),
-                        s.requiere_atencion DESC,
-                        s.dias_sin_cita DESC,
-                        s.proxima_revision ASC";
+
+            $sql .= " ORDER BY
+                        FIELD(sp.prioridad, 'critica', 'alta', 'normal', 'baja'),
+                        requiere_atencion DESC,
+                        dias_sin_cita DESC,
+                        sp.proxima_revision ASC";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
@@ -654,6 +686,10 @@ class Seguimientos
             return 'programado';
         }
 
+        if ($seguimiento['estado'] === 'completado') {
+            return 'completado';
+        }
+
         if ($seguimiento['estado'] === 'activo') {
             return 'activo';
         }
@@ -853,29 +889,19 @@ class Seguimientos
 
     private function crearNotificacionesSeguimiento(array $seguimiento, string $titulo, string $mensaje, int $id_usuario): int
     {
-        $modeloNotificacion = new Notificacion();
-        $creadas = 0;
+        require_once BASE_PATH . '/app/helpers/notification/notificacion_helper.php';
+
+        $creadas    = 0;
+        $idPaciente = (int) $seguimiento['id_paciente'];
 
         if (!empty($seguimiento['propietario_usuario_id'])) {
-            if (!$modeloNotificacion->crear([
-                'id_usuario'  => (int) $seguimiento['propietario_usuario_id'],
-                'tipo'        => 'tratamiento',
-                'titulo'      => $titulo,
-                'mensaje'     => $mensaje,
-                'id_paciente' => (int) $seguimiento['id_paciente'],
-            ])) {
+            if (!notificar('tratamiento', $titulo, $mensaje, (int) $seguimiento['propietario_usuario_id'], $idPaciente)) {
                 throw new RuntimeException('No se pudo notificar al propietario.');
             }
             $creadas++;
         }
 
-        if (!$modeloNotificacion->crear([
-            'id_usuario'  => $id_usuario,
-            'tipo'        => 'tratamiento',
-            'titulo'      => $titulo,
-            'mensaje'     => $mensaje,
-            'id_paciente' => (int) $seguimiento['id_paciente'],
-        ])) {
+        if (!notificar('tratamiento', $titulo, $mensaje, $id_usuario, $idPaciente)) {
             throw new RuntimeException('No se pudo registrar la notificación del profesional.');
         }
 

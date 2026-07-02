@@ -179,7 +179,7 @@
 
     async function fetchNotifications(params = '') {
         try {
-            const response = await fetch(`${notificationsApiUrl}?accion=listar${params}`);
+            const response = await fetch(`${notificationsApiUrl}?accion=listar${params}`, { credentials: 'include' });
             if (!response.ok) {
                 throw new Error('No se pudo obtener notificaciones');
             }
@@ -270,7 +270,8 @@
             const response = await fetch(`${notificationsApiUrl}?accion=todas`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({})
+                body: JSON.stringify({}),
+                credentials: 'include'
             });
             const data = await response.json();
             if (data.status === 'success') {
@@ -352,7 +353,34 @@
 
     function connectNotificationStream() {
         requestBrowserNotificationPermission();
-        setInterval(cargarNotificacionesDropdown, 30000);
+
+        const _pollingId = setInterval(cargarNotificacionesDropdown, 30000);
+
+        if (window.EventSource) {
+            const _es = new EventSource(`${notificationsApiUrl}?accion=stream`, { withCredentials: true });
+
+            _es.addEventListener('notificacion', e => {
+                try {
+                    const data = JSON.parse(e.data);
+                    // Actualizar badge inmediatamente con el conteo del servidor
+                    const noLeidas = Number.isInteger(data.sin_leer) ? data.sin_leer : 0;
+                    actualizarBadgeNotif(noLeidas, noLeidas);
+                    // Recargar lista si el panel está abierto
+                    if (!panelNotif?.classList.contains('is-hidden')) {
+                        cargarNotificacionesDropdown();
+                    }
+                    // Propagar evento para que notificaciones.js lo capture
+                    window.dispatchEvent(new CustomEvent('notificacion:nueva', { detail: data }));
+                } catch (_) { /* JSON inválido — ignorar */ }
+            });
+
+            window.addEventListener('beforeunload', () => {
+                clearInterval(_pollingId);
+                _es.close();
+            }, { once: true });
+        } else {
+            window.addEventListener('beforeunload', () => clearInterval(_pollingId), { once: true });
+        }
     }
 
     if (btnNotif && panelNotif) {

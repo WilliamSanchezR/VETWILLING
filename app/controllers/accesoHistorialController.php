@@ -233,16 +233,15 @@ function _crearNotificacionVeterinario(
         );
         $mensaje = "El propietario {$nombre_propietario} solicita acceso al historial clínico de {$nombre_mascota}.";
 
-        require_once BASE_PATH . '/app/models/Notificacion.php';
-        $notifModel = new Notificacion();
-        $id_notif   = $notifModel->crear([
-            'id_usuario'  => (int) $id_vet_usuario,
-            'tipo'        => 'acceso_historial',
-            'titulo'      => 'Solicitud de acceso al historial',
-            'mensaje'     => $mensaje,
-            'url_accion'  => '/veterinaria/historial/acceso/pendientes',
-            'id_paciente' => $id_paciente,
-        ]);
+        require_once BASE_PATH . '/app/helpers/notification/notificacion_helper.php';
+        $id_notif = notificar(
+            'acceso_historial',
+            'Solicitud de acceso al historial',
+            $mensaje,
+            (int) $id_vet_usuario,
+            $id_paciente,
+            '/veterinaria/historial/acceso/pendientes'
+        );
 
         if ($id_notif) {
             $modelo->vincularNotificacion($id_acceso, $id_notif);
@@ -295,15 +294,15 @@ function _notificarPropietario(
                      . ($motivo ? " Motivo: {$motivo}" : '');
         }
 
-        require_once BASE_PATH . '/app/models/Notificacion.php';
-        (new Notificacion())->crear([
-            'id_usuario'  => (int) $id_usuario_prop,
-            'tipo'        => 'acceso_historial_respuesta',
-            'titulo'      => $titulo,
-            'mensaje'     => $mensaje,
-            'url_accion'  => '/paciente/mascotas/' . $id_paciente . '/historial',
-            'id_paciente' => $id_paciente,
-        ]);
+        require_once BASE_PATH . '/app/helpers/notification/notificacion_helper.php';
+        notificar(
+            'acceso_historial_respuesta',
+            $titulo,
+            $mensaje,
+            (int) $id_usuario_prop,
+            $id_paciente,
+            '/paciente/mascotas/' . $id_paciente . '/historial'
+        );
 
     } catch (\Exception $e) {
         error_log('accesoHistorialController: error al notificar propietario - ' . $e->getMessage());

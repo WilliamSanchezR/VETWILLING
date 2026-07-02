@@ -84,6 +84,16 @@
 }
 
 /* â”€â”€ BUSCADOR DE PACIENTES â”€â”€ */
+
+/* El card de búsqueda necesita z-index explícito para que las sugerencias
+   (position:absolute) queden por encima del siguiente card hermano en el
+   flexbox, que de otro modo se pinta sobre él al ser posterior en el DOM. */
+.receta-search-card {
+    position: relative;
+    z-index: 10;
+    overflow: visible !important;
+}
+
 .receta-search-wrapper {
     position: relative;
 }
@@ -683,15 +693,35 @@
 
 /* â”€â”€ PRINT â”€â”€ */
 @media print {
-    body > *:not(#cont-imprimir) {
-        display: none !important;
+    /* Oculta visualmente todo el árbol del body sin sacarlo del flujo */
+    body * {
+        visibility: hidden !important;
     }
 
+    /* El contenedor de la receta y todos sus hijos son visibles */
+    #cont-imprimir,
+    #cont-imprimir * {
+        visibility: visible !important;
+    }
+
+    /* Saca el contenedor del flujo del modal y lo ancla al origen de la página */
     #cont-imprimir {
-        padding: 20mm;
-        min-height: unset;
-        border: none;
-        box-shadow: none;
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 15mm 20mm !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+        z-index: 99999 !important;
+        overflow: visible !important;
+    }
+
+    /* Suprime el backdrop oscuro del modal */
+    .modal-backdrop {
+        display: none !important;
     }
 }
 
