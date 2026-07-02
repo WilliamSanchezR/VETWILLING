@@ -62,53 +62,76 @@
             verificarCitasVisibles();
         });
 
-        // ACCIONES DE BOTONES
-        document.querySelectorAll('.btn-confirmar').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const card = this.closest('.cita-card');
-                const badge = card.querySelector('.estado-badge');
-                
-                badge.textContent = 'Confirmada';
-                badge.className = 'estado-badge confirmada';
-                card.dataset.estado = 'confirmada';
+        // ACCIONES DE BOTONES — delegación de eventos para cubrir tarjetas renderizadas
+        document.getElementById('citasLista').addEventListener('click', function (e) {
+            const btnConfirmar = e.target.closest('.btn-confirmar');
+            const btnCompletar = e.target.closest('.btn-completar');
+            const btnCancelar  = e.target.closest('.btn-cancelar');
+            const btnEditar    = e.target.closest('.btn-editar');
 
-                mostrarNotificacion('Cita confirmada exitosamente', 'success');
-            });
+            if (btnConfirmar) accionCita(btnConfirmar, 'confirmar');
+            else if (btnCompletar) accionCita(btnCompletar, 'completar');
+            else if (btnCancelar)  accionCita(btnCancelar,  'cancelar');
+            else if (btnEditar)    mostrarNotificacion('Función de edición en desarrollo', 'info');
         });
 
-        document.querySelectorAll('.btn-completar').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const card = this.closest('.cita-card');
+        async function accionCita(btn, accion) {
+            const card = btn.closest('.cita-card');
+            const id   = parseInt(card.dataset.idAgendamiento || '0', 10);
+            const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
+
+            if (!id) {
+                mostrarNotificacion('No se encontró el ID de la cita', 'error');
+                return;
+            }
+            if (accion === 'cancelar' && !confirm('¿Está seguro de cancelar esta cita?')) return;
+
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch(baseUrl + '/veterinaria/api/citas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ accion, id_agendamiento: id }),
+                });
+                const data = await resp.json();
+                if (data.status !== 'success') throw new Error(data.message || 'Error en el servidor');
+
+                const ui = {
+                    confirmar: { label: 'Confirmada', key: 'confirmada', msg: 'Cita confirmada exitosamente',     tipo: 'success' },
+                    completar: { label: 'Completada', key: 'completada', msg: 'Cita marcada como completada',     tipo: 'success' },
+                    cancelar:  { label: 'Cancelada',  key: 'cancelada',  msg: 'Cita cancelada',                   tipo: 'warning' },
+                }[accion];
+
+                // Actualizar badge y estado
                 const badge = card.querySelector('.estado-badge');
-                
-                badge.textContent = 'Completada';
-                badge.className = 'estado-badge completada';
-                card.dataset.estado = 'completada';
+                badge.textContent = ui.label;
+                badge.className   = 'estado-badge ' + ui.key;
+                card.dataset.estado = ui.key;
 
-                mostrarNotificacion('Cita marcada como completada', 'success');
-            });
-        });
+                // Actualizar color del bloque de tiempo
+                const tiempo = card.querySelector('.cita-tiempo');
+                tiempo.className = 'cita-tiempo ' + ui.key;
 
-        document.querySelectorAll('.btn-cancelar').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (confirm('¿Está seguro de cancelar esta cita?')) {
-                    const card = this.closest('.cita-card');
-                    const badge = card.querySelector('.estado-badge');
-                    
-                    badge.textContent = 'Cancelada';
-                    badge.className = 'estado-badge cancelada';
-                    card.dataset.estado = 'cancelada';
-
-                    mostrarNotificacion('Cita cancelada', 'warning');
+                // Reemplazar botones según nuevo estado
+                const acciones = card.querySelector('.cita-acciones');
+                if (accion === 'confirmar') {
+                    acciones.innerHTML = `
+                        <button class="btn-accion btn-completar"><i class="bi bi-check-circle-fill"></i> Completar</button>
+                        <button class="btn-accion btn-editar"><i class="bi bi-pencil-fill"></i> Editar</button>
+                        <button class="btn-accion btn-cancelar"><i class="bi bi-x-lg"></i> Cancelar</button>`;
+                } else {
+                    acciones.innerHTML = `
+                        <button class="btn-accion btn-editar btn-accion-neutral"><i class="bi bi-eye-fill"></i> Ver Detalles</button>`;
                 }
-            });
-        });
 
-        document.querySelectorAll('.btn-editar').forEach(btn => {
-            btn.addEventListener('click', function() {
-                mostrarNotificacion('Función de edición en desarrollo', 'info');
-            });
-        });
+                actualizarEstadisticas();
+                mostrarNotificacion(ui.msg, ui.tipo);
+            } catch (err) {
+                btn.disabled = false;
+                mostrarNotificacion('Error: ' + err.message, 'error');
+            }
+        }
 
         // NUEVA CITA
         window.nuevaCita = async function() {
