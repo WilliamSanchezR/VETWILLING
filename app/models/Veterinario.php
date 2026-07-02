@@ -180,6 +180,126 @@ class Veterinario
         }
     }
 
+    public function listarCitasPendientesParaAtencion($id_usuario): array
+    {
+        try {
+            $sql = "SELECT
+                        a.id_agendamiento,
+                        a.fecha_hora,
+                        a.tipo,
+                        a.estado,
+                        a.observaciones AS observaciones_cita,
+                        p.id_paciente,
+                        p.nombre AS paciente_nombre,
+                        p.especie,
+                        p.raza,
+                        TRIM(CONCAT(COALESCE(pr.nombres,''), ' ', COALESCE(pr.apellidos,''))) AS propietario_nombre
+                    FROM agendamiento a
+                    INNER JOIN paciente p ON p.id_paciente = a.id_paciente
+                    LEFT JOIN propietario pr ON pr.id_propietario = p.id_propietario
+                    WHERE a.id_usuario = :id_usuario
+                    AND UPPER(a.estado) IN ('PENDIENTE', 'CONFIRMADA')
+                    AND DATE(a.fecha_hora) >= CURDATE()
+                    ORDER BY a.fecha_hora ASC
+                    LIMIT 50";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::listarCitasPendientesParaAtencion - " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function listarCitasVistaVeterinario(int $id_usuario): array
+    {
+        try {
+            $sql = "SELECT
+                        a.id_agendamiento,
+                        a.fecha_hora,
+                        a.fecha_hora_fin,
+                        a.tipo,
+                        a.estado,
+                        a.observaciones,
+                        p.id_paciente,
+                        p.nombre  AS paciente_nombre,
+                        p.especie,
+                        p.raza,
+                        p.img_mascota,
+                        TRIM(CONCAT(COALESCE(prop.nombres,''), ' ', COALESCE(prop.apellidos,'')))
+                            AS propietario_nombre,
+                        prop.telefono AS propietario_telefono
+                    FROM agendamiento a
+                    INNER JOIN paciente p    ON p.id_paciente   = a.id_paciente
+                    LEFT  JOIN propietario prop ON prop.id_propietario = p.id_propietario
+                    WHERE a.id_usuario = :id_usuario
+                      AND (
+                          (UPPER(a.estado) IN ('PENDIENTE','CONFIRMADA') AND DATE(a.fecha_hora) >= CURDATE())
+                          OR
+                          (UPPER(a.estado) = 'COMPLETADA' AND DATE(a.fecha_hora) >= DATE_SUB(CURDATE(), INTERVAL 60 DAY))
+                      )
+                    ORDER BY a.fecha_hora ASC
+                    LIMIT 150";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::listarCitasVistaVeterinario - " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function contarCitasPorEstadoVeterinario(int $id_usuario): array
+    {
+        try {
+            $sql = "SELECT UPPER(estado) AS estado, COUNT(*) AS total
+                    FROM agendamiento
+                    WHERE id_usuario = :id_usuario
+                    GROUP BY UPPER(estado)";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $counts = ['PENDIENTE' => 0, 'CONFIRMADA' => 0, 'COMPLETADA' => 0, 'CANCELADA' => 0];
+            foreach ($rows as $r) {
+                $key = $r['estado'];
+                if (array_key_exists($key, $counts)) {
+                    $counts[$key] = (int) $r['total'];
+                }
+            }
+            return $counts;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::contarCitasPorEstadoVeterinario - " . $e->getMessage());
+            return ['PENDIENTE' => 0, 'CONFIRMADA' => 0, 'COMPLETADA' => 0, 'CANCELADA' => 0];
+        }
+    }
+
+    public function actualizarEstadoCitaVeterinario(int $id_agendamiento, string $nuevo_estado, int $id_usuario): bool
+    {
+        try {
+            $sql = "UPDATE agendamiento
+                    SET estado = :estado
+                    WHERE id_agendamiento = :id_agendamiento
+                      AND id_usuario = :id_usuario";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':estado',          $nuevo_estado,   PDO::PARAM_STR);
+            $stmt->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario',      $id_usuario,     PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error en Veterinario::actualizarEstadoCitaVeterinario - " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function obtenerPacientesPorVeterinario($id_usuario)
     {
         try {

@@ -969,42 +969,61 @@ document.addEventListener("DOMContentLoaded", function () {
           '<td><span class="badge-version">' +
           escapeHtml(version) +
           "</span></td>" +
-          '<td><div class="acciones-registro"><button class="btn-mini" title="Seleccionar"><i class="bi bi-eye"></i></button></div></td>' +
+          '<td><div class="acciones-registro"><button class="btn-mini" data-row-action="ver" title="Ver historial"><i class="bi bi-eye"></i></button></div></td>' +
           "</tr>"
         );
       })
       .join("");
 
     const filas = tablaBody.querySelectorAll("tr[data-id-paciente]");
+
+    function registroDeFila(fila) {
+      return {
+        id_historial: fila.dataset.idHistorial || "",
+        id_paciente: fila.dataset.idPaciente || "",
+        paciente_nombre: fila.dataset.paciente || "",
+        especie: fila.dataset.especie || "",
+        raza: fila.dataset.raza || "",
+        fecha_atencion: fila.dataset.fecha || "",
+        veterinario_responsable: fila.dataset.vet || "",
+        motivo_consulta: fila.dataset.motivo || "",
+        diagnostico: fila.dataset.diagnostico || "",
+        tratamientos_aplicados: fila.dataset.tratamiento || "",
+        medicacion_recetada: fila.dataset.medicacion || "",
+        observaciones_adicionales: fila.dataset.observaciones || "",
+        acceso: fila.dataset.acceso || "Autorizado",
+        version_registro: fila.dataset.version || "",
+        updated_at: fila.dataset.updatedAt || "",
+      };
+    }
+
+    function seleccionarFila(fila) {
+      filas.forEach(function (item) {
+        item.classList.remove("active");
+      });
+      fila.classList.add("active");
+      campoIdPaciente.value = fila.dataset.idPaciente || "";
+      campos.paciente.value = fila.dataset.paciente || "";
+      campos.especie.value = fila.dataset.especie || "";
+      campos.raza.value = fila.dataset.raza || "";
+      campos.vet.value = fila.dataset.vet || "";
+    }
+
     filas.forEach(function (fila) {
-      fila.addEventListener("click", function () {
-        filas.forEach(function (item) {
-          item.classList.remove("active");
-        });
-        fila.classList.add("active");
+      fila.addEventListener("click", function (event) {
+        const botonVer = event.target.closest(
+          "button[data-row-action='ver']",
+        );
 
-        const registro = {
-          id_historial: fila.dataset.idHistorial || "",
-          id_paciente: fila.dataset.idPaciente || "",
-          paciente_nombre: fila.dataset.paciente || "",
-          especie: fila.dataset.especie || "",
-          raza: fila.dataset.raza || "",
-          fecha_atencion: fila.dataset.fecha || "",
-          veterinario_responsable: fila.dataset.vet || "",
-          motivo_consulta: fila.dataset.motivo || "",
-          diagnostico: fila.dataset.diagnostico || "",
-          tratamientos_aplicados: fila.dataset.tratamiento || "",
-          medicacion_recetada: fila.dataset.medicacion || "",
-          observaciones_adicionales: fila.dataset.observaciones || "",
-          acceso: fila.dataset.acceso || "Autorizado",
-          version_registro: fila.dataset.version || "",
-          updated_at: fila.dataset.updatedAt || "",
-        };
+        seleccionarFila(fila);
 
-        cargarDetalle(registro);
+        if (botonVer) {
+          cargarDetalle(registroDeFila(fila));
+        }
       });
     });
 
+    const abrirDetallePostGuardado = pendingSelectId !== null;
     let filaInicial = null;
     if (pendingSelectId) {
       filaInicial = tablaBody.querySelector(
@@ -1017,7 +1036,10 @@ document.addEventListener("DOMContentLoaded", function () {
     pendingSelectId = null;
 
     if (filaInicial) {
-      filaInicial.click();
+      seleccionarFila(filaInicial);
+      if (abrirDetallePostGuardado) {
+        cargarDetalle(registroDeFila(filaInicial));
+      }
     }
   }
 
@@ -1104,36 +1126,226 @@ document.addEventListener("DOMContentLoaded", function () {
     cargarHistoriales({});
   });
 
-  btnNuevaAtencion.addEventListener("click", function () {
-    if (!campoIdPaciente.value) {
-      // Guiar al usuario: mostrar el panel de listado y destacar la tabla
-      activarVentana("listado");
-      showToast(
-        "Selecciona primero un paciente en la tabla para registrar una nueva atención.",
-        "error",
-      );
-      const tabla = document.getElementById("panelListadoAtenciones");
-      if (tabla) {
-        tabla.scrollIntoView({ behavior: "smooth", block: "center" });
-        tabla.style.outline = "2px solid #b91c1c";
-        setTimeout(function () {
-          tabla.style.outline = "";
-        }, 2500);
+  // ── Referencias al modal ──────────────────────────────────────────────────
+  const modalEl = document.getElementById("modalNuevaAtencion");
+  const bsModal = modalEl ? new bootstrap.Modal(modalEl) : null;
+
+  const modalSeccionCitas = document.getElementById("modalSeccionCitas");
+  const modalSeccionFormulario = document.getElementById(
+    "modalSeccionFormulario",
+  );
+  const modalListaCitas = document.getElementById("modalListaCitas");
+  const modalTitulo = document.getElementById("modalTitulo");
+  const modalModoLabel = document.getElementById("modalModoLabel");
+  const modalPacienteNombre = document.getElementById("modalPacienteNombre");
+  const modalPacienteMeta = document.getElementById("modalPacienteMeta");
+  const modalIdPaciente = document.getElementById("modalIdPaciente");
+  const modalIdHistorial = document.getElementById("modalIdHistorial");
+  const modalIdCita = document.getElementById("modalIdCita");
+  const modalFechaAtencion = document.getElementById("modalFechaAtencion");
+  const modalMotivo = document.getElementById("modalMotivo");
+  const modalDiagnostico = document.getElementById("modalDiagnostico");
+  const modalTratamiento = document.getElementById("modalTratamiento");
+  const modalMedicacion = document.getElementById("modalMedicacion");
+  const modalObservaciones = document.getElementById("modalObservaciones");
+  const modalBtnVolver = document.getElementById("modalBtnVolver");
+  const modalBtnGuardar = document.getElementById("modalBtnGuardar");
+
+  function limpiarFormularioModal() {
+    modalIdPaciente.value = "";
+    modalIdHistorial.value = "";
+    modalIdCita.value = "";
+    modalFechaAtencion.value = new Date().toISOString().slice(0, 10);
+    modalMotivo.value = "";
+    modalDiagnostico.value = "";
+    modalTratamiento.value = "";
+    modalMedicacion.value = "";
+    modalObservaciones.value = "";
+  }
+
+  function mostrarFormularioModal(registro, modoVersion) {
+    modalSeccionCitas.classList.add("d-none");
+    modalSeccionFormulario.classList.remove("d-none");
+    modalBtnGuardar.classList.remove("d-none");
+
+    modalIdPaciente.value = registro.id_paciente || "";
+    modalIdHistorial.value = modoVersion ? registro.id_historial || "" : "";
+    modalIdCita.value = registro.id_agendamiento || "";
+
+    modalPacienteNombre.textContent =
+      registro.paciente_nombre || "Paciente sin nombre";
+    modalPacienteMeta.textContent =
+      (registro.especie || "--") +
+      " · " +
+      (registro.raza || "--") +
+      (registro.propietario_nombre
+        ? " · " + registro.propietario_nombre
+        : "");
+
+    if (modoVersion) {
+      modalTitulo.textContent = "Nueva versión de atención";
+      modalModoLabel.textContent = "Nueva versión";
+      modalMotivo.value = registro.motivo_consulta || "";
+      modalFechaAtencion.value = new Date().toISOString().slice(0, 10);
+      modalBtnVolver.classList.add("d-none");
+    } else {
+      modalTitulo.textContent = "Nueva Atención";
+      modalModoLabel.textContent = "Nueva";
+      modalFechaAtencion.value =
+        registro.fecha_hora
+          ? String(registro.fecha_hora).slice(0, 10)
+          : new Date().toISOString().slice(0, 10);
+      modalMotivo.value = registro.observaciones_cita || "";
+      modalBtnVolver.classList.remove("d-none");
+    }
+  }
+
+  function cargarPacientesModal() {
+    modalListaCitas.innerHTML =
+      '<div class="hist-modal-loading"><i class="bi bi-hourglass-split me-1"></i> Cargando pacientes...</div>';
+
+    // Deduplicar registros por id_paciente
+    const vistos = {};
+    const pacientes = [];
+    (registros || []).forEach(function (item) {
+      const idP = item.id_paciente;
+      if (idP && !vistos[idP]) {
+        vistos[idP] = true;
+        pacientes.push({
+          id_paciente:      item.id_paciente,
+          paciente_nombre:  item.paciente_nombre,
+          especie:          item.especie,
+          raza:             item.raza,
+        });
       }
+    });
+
+    if (pacientes.length === 0) {
+      modalListaCitas.innerHTML =
+        '<div class="cita-pendiente-empty">' +
+        '<i class="bi bi-heart-pulse"></i>' +
+        "No tienes pacientes asignados aún." +
+        "</div>";
       return;
     }
 
-    activarVentana("detalle");
+    modalListaCitas.innerHTML = pacientes
+      .map(function (p) {
+        return (
+          '<div class="cita-pendiente-item" data-paciente=\'' +
+          escapeHtml(JSON.stringify(p)) +
+          "'>" +
+          '<div class="cita-icono"><i class="bi bi-heart-pulse"></i></div>' +
+          '<div class="cita-pendiente-info">' +
+          "<strong>" + escapeHtml(p.paciente_nombre || "--") + "</strong>" +
+          "<small>" + escapeHtml((p.especie || "--") + " · " + (p.raza || "--")) + "</small>" +
+          "</div>" +
+          '<button type="button" class="btn-atender-cita" data-seleccionar-paciente>' +
+          '<i class="bi bi-clipboard2-plus"></i> Seleccionar' +
+          "</button>" +
+          "</div>"
+        );
+      })
+      .join("");
 
-    campoIdHistorial.value = "";
-    campos.fecha.value = new Date().toISOString().slice(0, 10);
-    campos.motivo.value = "";
-    campos.diagnostico.value = "";
-    campos.tratamiento.value = "";
-    campos.medicacion.value = "";
-    campos.observaciones.value = "";
-    detalleVersion.textContent = "Nueva";
-    detalleActualizacion.textContent = "--";
+    modalListaCitas.querySelectorAll("[data-seleccionar-paciente]").forEach(
+      function (btn) {
+        btn.addEventListener("click", function () {
+          const item = btn.closest(".cita-pendiente-item");
+          const paciente = JSON.parse(item.getAttribute("data-paciente"));
+          mostrarFormularioModal(paciente, false);
+        });
+      },
+    );
+  }
+
+  if (modalBtnVolver) {
+    modalBtnVolver.addEventListener("click", function () {
+      modalSeccionFormulario.classList.add("d-none");
+      modalSeccionCitas.classList.remove("d-none");
+      modalBtnGuardar.classList.add("d-none");
+      modalBtnVolver.classList.add("d-none");
+      modalTitulo.textContent = "Nueva Atención";
+    });
+  }
+
+  if (modalBtnGuardar) {
+    modalBtnGuardar.addEventListener("click", async function () {
+      const idPaciente = Number(modalIdPaciente.value || 0);
+      const fechaAtencion = (modalFechaAtencion.value || "").trim();
+      const motivoConsulta = (modalMotivo.value || "").trim();
+
+      if (idPaciente <= 0) {
+        showToast("No hay paciente seleccionado.", "error");
+        return;
+      }
+      if (!fechaAtencion || !motivoConsulta) {
+        showToast(
+          "La fecha de atención y el motivo son obligatorios.",
+          "error",
+        );
+        return;
+      }
+
+      modalBtnGuardar.disabled = true;
+      modalBtnGuardar.innerHTML =
+        '<i class="bi bi-hourglass-split me-1"></i> Guardando...';
+
+      try {
+        const result = await postJson({
+          accion: "guardar_historial",
+          id_historial: Number(modalIdHistorial.value || 0),
+          id_paciente: idPaciente,
+          fecha_atencion: fechaAtencion,
+          motivo_consulta: motivoConsulta,
+          diagnostico: (modalDiagnostico.value || "").trim(),
+          tratamientos_aplicados: (modalTratamiento.value || "").trim(),
+          medicacion_recetada: (modalMedicacion.value || "").trim(),
+          observaciones_adicionales: (modalObservaciones.value || "").trim(),
+        });
+
+        pendingSelectId =
+          result.data && result.data.id_historial
+            ? Number(result.data.id_historial)
+            : null;
+
+        if (bsModal) bsModal.hide();
+        await cargarHistoriales(obtenerFiltrosActuales());
+        showToast("Atención registrada correctamente.", "success");
+      } catch (error) {
+        showToast(
+          error.message || "Error al guardar la atención.",
+          "error",
+        );
+      } finally {
+        modalBtnGuardar.disabled = false;
+        modalBtnGuardar.innerHTML =
+          '<i class="bi bi-check2-circle me-1"></i> Guardar atención';
+      }
+    });
+  }
+
+  if (modalEl) {
+    modalEl.addEventListener("hidden.bs.modal", function () {
+      limpiarFormularioModal();
+      modalSeccionCitas.classList.remove("d-none");
+      modalSeccionFormulario.classList.add("d-none");
+      modalBtnGuardar.classList.add("d-none");
+      modalBtnVolver.classList.add("d-none");
+      modalTitulo.textContent = "Nueva Atención";
+    });
+  }
+
+  btnNuevaAtencion.addEventListener("click", function () {
+    if (!bsModal) return;
+    limpiarFormularioModal();
+    modalSeccionCitas.classList.remove("d-none");
+    modalSeccionFormulario.classList.add("d-none");
+    modalBtnGuardar.classList.add("d-none");
+    modalBtnVolver.classList.add("d-none");
+    modalTitulo.textContent = "Nueva Atención";
+    bsModal.show();
+    cargarPacientesModal();
   });
 
   btnExportarPdf.addEventListener("click", function () {

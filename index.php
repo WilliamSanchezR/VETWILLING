@@ -373,6 +373,10 @@ switch ($request) {
     case "/veterinario/consultar-citas":
         require BASE_PATH . "/app/views/dashboard/veterinaria/citas.php";
         break;
+
+    case "/veterinaria/api/citas":
+        require BASE_PATH . "/app/controllers/citasVeterinarioController.php";
+        break;
     // RUTA COMENTADA: Consultar veterinarios
     // case '/veterinario/consultar-veterinarios':
     //     require BASE_PATH . '/app/views/dashboard/veterinaria/consultarVet.php';
