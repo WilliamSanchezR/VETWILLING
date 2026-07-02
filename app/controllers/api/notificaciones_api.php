@@ -243,6 +243,67 @@ switch ($action) {
         ]);
         break;
 
+    // ── SSE: stream de notificaciones en tiempo real ─────────────────────────
+    case 'stream':
+        // Guardar id antes de cerrar sesión; sin session_write_close() esta
+        // conexión bloquea todas las demás requests del mismo usuario.
+        $streamUserId = $id_usuario;
+        session_write_close();
+
+        // Vaciar cualquier buffer de salida activo
+        while (ob_get_level() > 0) {
+            ob_end_flush();
+        }
+
+        header('Content-Type: text/event-stream');
+        header('Cache-Control: no-cache');
+        header('X-Accel-Buffering: no');
+        header('Connection: keep-alive');
+
+        set_time_limit(0);
+        @ini_set('output_buffering', 'off');
+        @ini_set('zlib.output_compression', false);
+
+        // Cursor: Last-Event-ID enviado por el cliente al reconectar,
+        // o bien el ID más reciente del usuario (primera conexión).
+        if (!empty($_SERVER['HTTP_LAST_EVENT_ID'])) {
+            $lastId = (int)$_SERVER['HTTP_LAST_EVENT_ID'];
+        } else {
+            $lastId = $modelo->obtenerUltimoIdParaUsuario($streamUserId);
+        }
+
+        // Intervalo de reconexión automática del EventSource (ms)
+        echo "retry: 5000\n\n";
+        @ob_flush();
+        flush();
+
+        // Mantener conexión 280 s (< timeout de Apache/XAMPP 5 min).
+        // El EventSource del cliente reconecta automáticamente al cerrar.
+        $maxTime = time() + 280;
+
+        while (!connection_aborted() && time() < $maxTime) {
+            $nuevoId = $modelo->obtenerUltimoIdParaUsuario($streamUserId);
+
+            if ($nuevoId > $lastId) {
+                $sinLeer = $modelo->contarNoLeidas($streamUserId);
+                echo "id: {$nuevoId}\n";
+                echo "event: notificacion\n";
+                echo "data: " . json_encode(['sin_leer' => $sinLeer]) . "\n\n";
+                $lastId = $nuevoId;
+            } else {
+                // Heartbeat: mantiene viva la conexión y evita timeout del proxy
+                echo ": ping\n\n";
+            }
+
+            @ob_flush();
+            flush();
+
+            if (connection_aborted()) break;
+            sleep(5);
+        }
+
+        exit;
+
     default:
         http_response_code(400);
         echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => 'Acción no reconocida: ' . htmlspecialchars($action)]);

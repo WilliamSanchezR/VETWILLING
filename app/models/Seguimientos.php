@@ -853,29 +853,19 @@ class Seguimientos
 
     private function crearNotificacionesSeguimiento(array $seguimiento, string $titulo, string $mensaje, int $id_usuario): int
     {
-        $modeloNotificacion = new Notificacion();
-        $creadas = 0;
+        require_once BASE_PATH . '/app/helpers/notification/notificacion_helper.php';
+
+        $creadas    = 0;
+        $idPaciente = (int) $seguimiento['id_paciente'];
 
         if (!empty($seguimiento['propietario_usuario_id'])) {
-            if (!$modeloNotificacion->crear([
-                'id_usuario'  => (int) $seguimiento['propietario_usuario_id'],
-                'tipo'        => 'tratamiento',
-                'titulo'      => $titulo,
-                'mensaje'     => $mensaje,
-                'id_paciente' => (int) $seguimiento['id_paciente'],
-            ])) {
+            if (!notificar('tratamiento', $titulo, $mensaje, (int) $seguimiento['propietario_usuario_id'], $idPaciente)) {
                 throw new RuntimeException('No se pudo notificar al propietario.');
             }
             $creadas++;
         }
 
-        if (!$modeloNotificacion->crear([
-            'id_usuario'  => $id_usuario,
-            'tipo'        => 'tratamiento',
-            'titulo'      => $titulo,
-            'mensaje'     => $mensaje,
-            'id_paciente' => (int) $seguimiento['id_paciente'],
-        ])) {
+        if (!notificar('tratamiento', $titulo, $mensaje, $id_usuario, $idPaciente)) {
             throw new RuntimeException('No se pudo registrar la notificación del profesional.');
         }
 
