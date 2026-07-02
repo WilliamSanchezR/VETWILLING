@@ -1,12 +1,69 @@
+/**
+ * notificaciones.js — Panel Veterinario
+ * ---------------------------------------------------------------------
+ * Consume /veterinario/api/notificaciones y pinta el listado de la vista
+ * notificaciones_veterinario.php usando las clases definidas en
+ * notificaciones.css (.notification-item, .notification-indicator, etc.)
+ *
+ * Cambios respecto a la versión anterior:
+ *   - Unifica el marcado de las tarjetas con las clases que el CSS
+ *     realmente estiliza (antes generaba .notif-card/.notif-body/...,
+ *     que no tenían ningún estilo asociado).
+ *   - Integra el renderizado de solicitudes de acceso a historial
+ *     directamente en buildItem(), en vez de un bloque de funciones
+ *     sueltas al final del archivo que nunca se invocaban.
+ *   - Agrega manejo de los estados #notificationsLoading y
+ *     #notificationsError que ahora existen en la vista.
+ *   - Elimina duplicados (escapeHtml/escHtml, formatDate/formatearFecha).
+ * ---------------------------------------------------------------------
+ */
 (function () {
     'use strict';
 
     const BASE_URL = window.BASE_URL || window.location.origin;
-    const pageList = document.getElementById('notificationsPageList');
-    const pageEmpty = document.getElementById('notificationsEmpty');
-    const btnMarkAllRead = document.getElementById('btnMarkAllRead');
-    const notificationBadge = document.getElementById('notificationBadge');
-    const apiUrl = `${BASE_URL}/veterinario/api/notificaciones`;
+    const API_NOTIFICACIONES = `${BASE_URL}/veterinario/api/notificaciones`;
+    const API_ACCESO_HISTORIAL = `${BASE_URL}/veterinaria/api/historial/acceso`;
+
+    // ---------- Referencias al DOM ----------
+    const els = {
+        list:        document.getElementById('notificationsPageList'),
+        empty:       document.getElementById('notificationsEmpty'),
+        loading:     document.getElementById('notificationsLoading'),
+        error:       document.getElementById('notificationsError'),
+        btnRetry:    document.getElementById('btnRetryNotifications'),
+        btnMarkAll:  document.getElementById('btnMarkAllRead'),
+        badge:       document.getElementById('notificationBadge'), // vive en el navbar, puede no existir aquí
+    };
+
+    // ---------- Catálogos ----------
+    const ICONO_POR_TIPO = {
+        cita:             'bi-calendar-check',
+        vacuna:           'bi-syringe',
+        seguimiento:      'bi-activity',
+        tratamiento:      'bi-capsule',
+        acceso_historial: 'bi-folder-symlink',
+        general:          'bi-bell',
+    };
+
+    const ETIQUETA_POR_TIPO = {
+        cita:             'Cita',
+        vacuna:           'Vacuna',
+        seguimiento:      'Seguimiento',
+        tratamiento:      'Tratamiento',
+        acceso_historial: 'Historial',
+        general:          'General',
+    };
+
+    const OPCIONES_DURACION_ACCESO = [
+        { horas: 24,  label: '24 horas' },
+        { horas: 48,  label: '48 horas' },
+        { horas: 72,  label: '3 días' },
+        { horas: 168, label: '7 días' },
+    ];
+
+    // =====================================================================
+    // Helpers
+    // =====================================================================
 
     function escapeHtml(value) {
         if (typeof value !== 'string') return '';
@@ -20,335 +77,286 @@
 
     function formatDate(value) {
         if (!value) return 'Sin fecha';
-        const date = new Date(value);
+        const normalized = typeof value === 'string' ? value.replace(' ', 'T') : value;
+        const date = new Date(normalized);
         if (Number.isNaN(date.getTime())) return 'Sin fecha';
         return date.toLocaleString('es-CO', {
             day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
+            hour: '2-digit', minute: '2-digit',
         });
+    }
+
+    function showToast(message, type = 'success') {
+        if (window.Toast && typeof Toast.mostrar === 'function') {
+            Toast.mostrar(message, type);
+            return;
+        }
+        // Fallback si el sistema de toasts del panel no está cargado en esta vista
+        alert(message);
     }
 
     function showError(message) {
-        if (window.Toast && Toast.mostrar) {
-            Toast.mostrar(message, 'error');
-        } else {
-            alert(message);
-        }
+        showToast(message, 'error');
     }
 
-    const ICONO_MAP = {
-        'cita':             'bi-calendar-check',
-        'vacuna':           'bi-syringe',
-        'seguimiento':      'bi-activity',
-        'tratamiento':      'bi-capsule',
-        'acceso_historial': 'bi-file-earmark-text',
-        'general':          'bi-bell',
-    };
+    function setLoading(isLoading) {
+        els.loading?.classList.toggle('is-hidden', !isLoading);
+        if (els.list) els.list.setAttribute('aria-busy', String(isLoading));
+    }
 
-    const ETIQUETA_MAP = {
-        'cita':             'Cita',
-        'vacuna':           'Vacuna',
-        'seguimiento':      'Seguimiento',
-        'tratamiento':      'Tratamiento',
-        'acceso_historial': 'Historial',
-        'general':          'General',
-    };
+    function setErrorState(hasError) {
+        els.error?.classList.toggle('is-hidden', !hasError);
+    }
 
+    // =====================================================================
+    // Render
+    // =====================================================================
+
+    function buildDurationOptions() {
+        return OPCIONES_DURACION_ACCESO
+            .map(({ horas, label }) => `<option value="${horas}">${escapeHtml(label)}</option>`)
+            .join('');
+    }
+
+    /**
+     * Construye el HTML de una notificación individual.
+     * Usa las clases .notification-item / .notification-indicator / etc.
+     * que sí están estilizadas en notificaciones.css.
+     */
     function buildItem(item) {
-        const tipo      = item.tipo || 'general';
-        const leida     = item.leido || item.leida;
-        const estado    = item.estado || 'enviada';
-        const cardClass = `notif-card tipo-${escapeHtml(tipo)} ${leida ? 'leida' : 'no-leida'}`;
-        const icono     = ICONO_MAP[tipo]    || 'bi-bell';
-        const etiqueta  = ETIQUETA_MAP[tipo] || tipo;
-        const titulo    = escapeHtml(item.titulo  || item.mensaje || 'Sin título');
-        const mensaje   = escapeHtml(item.mensaje || '');
-        const tiempo    = escapeHtml(item.tiempo  || formatDate(item.fecha || item.fecha_creacion));
+        const tipo    = item.tipo || 'general';
+        const leida   = Boolean(item.leido ?? item.leida);
+        const icono   = ICONO_POR_TIPO[tipo] || 'bi-bell';
+        const etiqueta = ETIQUETA_POR_TIPO[tipo] || tipo;
 
-        let html = `
-            <div class="${cardClass}" data-notification-id="${item.id}">
-                <div class="notif-icon-wrap">
-                    <i class="bi ${icono}" aria-hidden="true"></i>
-                </div>
-                <div class="notif-body">
-                    <div class="notif-meta">
-                        <div class="notif-title-row">
-                            <p class="notif-title">${titulo}</p>
-                            <span class="notif-pill">${etiqueta}</span>
-                        </div>
-                        <span class="notif-time">${tiempo}</span>
+        const titulo  = escapeHtml(item.titulo || item.mensaje || 'Sin título');
+        const mensaje = escapeHtml(item.mensaje || '');
+        const tiempo  = escapeHtml(item.tiempo || formatDate(item.fecha || item.fecha_creacion));
+
+        const itemClass = `notification-item tipo-${escapeHtml(tipo)} ${leida ? 'read' : 'unread'}`;
+        const indicatorClass = `notification-indicator ${leida ? 'read' : 'unread'}`;
+
+        let extraBlock = '';
+
+        if (tipo === 'acceso_historial' && item.referencia_id) {
+            extraBlock = `
+                <div class="notification-access-actions" data-ref="${item.referencia_id}">
+                    <select class="form-select form-select-sm" id="dur_${item.referencia_id}" aria-label="Duración del acceso">
+                        ${buildDurationOptions()}
+                    </select>
+                    <button type="button" class="btn btn-primary btn-sm js-aprobar-acceso" data-ref="${item.referencia_id}" data-notif="${item.id}">
+                        <i class="bi bi-check-circle me-1" aria-hidden="true"></i>Aprobar
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm js-rechazar-acceso" data-ref="${item.referencia_id}" data-notif="${item.id}">
+                        <i class="bi bi-x-circle me-1" aria-hidden="true"></i>Rechazar
+                    </button>
+                </div>`;
+        } else if (item.estado === 'cancelada' && item.motivo_cancelacion) {
+            extraBlock = `
+                <div class="notification-cancel-reason">
+                    <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                    ${escapeHtml(item.motivo_cancelacion)}
+                </div>`;
+        }
+
+        return `
+            <article class="${itemClass}" data-notification-id="${item.id}" aria-label="${leida ? 'Notificación leída' : 'Notificación sin leer'}">
+                <span class="${indicatorClass}" aria-hidden="true"></span>
+                <div class="notification-content">
+                    <div class="notification-header">
+                        <h3><i class="bi ${icono}" aria-hidden="true"></i> ${titulo}</h3>
+                        <span class="notification-time">${tiempo}</span>
                     </div>
-                    ${mensaje ? `<p class="notif-message">${mensaje}</p>` : ''}`;
-
-        if (estado === 'cancelada' && item.motivo_cancelacion) {
-            html += `<div class="notif-cancel-reason">
-                         <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
-                         ${escapeHtml(item.motivo_cancelacion)}
-                     </div>`;
-        }
-
-        html += `</div>`;
-        if (!leida) {
-            html += `<span class="notif-pip" title="Sin leer"></span>`;
-        }
-        html += `</div>`;
-        return html;
+                    ${mensaje ? `<p>${mensaje}</p>` : ''}
+                    ${extraBlock}
+                </div>
+                <span class="notification-type">${escapeHtml(etiqueta)}</span>
+            </article>`;
     }
 
-    function renderPageNotifications(items) {
-        if (!pageList) return;
+    function renderList(items) {
+        if (!els.list) return;
 
         if (!Array.isArray(items) || items.length === 0) {
-            pageList.innerHTML = '';
-            pageEmpty?.classList.remove('is-hidden');
+            els.list.innerHTML = '';
+            els.empty?.classList.remove('is-hidden');
             return;
         }
 
-        pageEmpty?.classList.add('is-hidden');
-        pageList.innerHTML = items.map(buildItem).join('');
+        els.empty?.classList.add('is-hidden');
+        els.list.innerHTML = items.map(buildItem).join('');
     }
 
     function updateBadge(count) {
-        if (!notificationBadge) return;
-        if (!count) {
-            notificationBadge.classList.add('is-hidden');
-            return;
-        }
-        notificationBadge.classList.remove('is-hidden');
-        notificationBadge.textContent = String(count);
+        if (!els.badge) return;
+        const hasUnread = Boolean(count);
+        els.badge.classList.toggle('is-hidden', !hasUnread);
+        if (hasUnread) els.badge.textContent = String(count);
     }
+
+    // =====================================================================
+    // Llamadas a la API
+    // =====================================================================
 
     async function fetchNotifications() {
-        try {
-            const response = await fetch(`${apiUrl}?accion=listar&limite=100`, { credentials: 'include' });
-            if (!response.ok) throw new Error('Error al cargar notificaciones');
-            return await response.json();
-        } catch (error) {
-            showError('No se pudieron cargar las notificaciones.');
-            return null;
-        }
+        const response = await fetch(`${API_NOTIFICACIONES}?accion=listar&limite=100`, {
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
     }
 
-    async function markAllRead() {
-        try {
-            const response = await fetch(`${apiUrl}?accion=todas`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({}),
-                credentials: 'include'
-            });
-            const data = await response.json();
-            if (data.status !== 'success') showError(data.mensaje || 'No se pudieron marcar todas como leídas.');
-            return data.status === 'success';
-        } catch (error) {
-            showError('No se pudieron marcar todas las notificaciones como leídas.');
-            return false;
-        }
+    async function postAccion(accion, payload) {
+        const response = await fetch(`${API_NOTIFICACIONES}?accion=${accion}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload || {}),
+            credentials: 'include',
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
     }
 
     async function loadNotifications() {
-        const data = await fetchNotifications();
-        if (!data) {
-            renderPageNotifications([]);
-            updateBadge(0);
-            return;
-        }
-
-        const items = data.notificaciones || [];
-        renderPageNotifications(items);
-        updateBadge(data.no_leidas || 0);
-    }
-
-    async function markAllAsRead() {
-        const ok = await markAllRead();
-        if (ok) {
-            await loadNotifications();
-        }
-    }
-
-    pageList?.addEventListener('click', async event => {
-        const row = event.target.closest('.notif-card');
-        if (!row) return;
-        const id = row.dataset.notificationId;
-        if (!id) return;
+        setLoading(true);
+        setErrorState(false);
 
         try {
-            const response = await fetch(`${apiUrl}?accion=leida`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: Number(id) }),
-                credentials: 'include'
-            });
-            const result = await response.json();
-            if (result.status === 'success') {
-                await loadNotifications();
-            } else {
+            const data = await fetchNotifications();
+            const items = data?.notificaciones || [];
+            renderList(items);
+            updateBadge(data?.no_leidas || 0);
+        } catch (error) {
+            renderList([]);
+            setErrorState(true);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function markAsRead(id) {
+        try {
+            const result = await postAccion('leida', { id: Number(id) });
+            if (result.status !== 'success') {
                 showError(result.mensaje || 'No se pudo marcar como leída.');
+                return;
             }
+            await loadNotifications();
         } catch (error) {
             showError('No se pudo marcar la notificación como leída.');
         }
+    }
+
+    async function markAllAsRead() {
+        try {
+            const result = await postAccion('todas');
+            if (result.status !== 'success') {
+                showError(result.mensaje || 'No se pudieron marcar todas como leídas.');
+                return;
+            }
+            await loadNotifications();
+        } catch (error) {
+            showError('No se pudieron marcar todas las notificaciones como leídas.');
+        }
+    }
+
+    async function aprobarAcceso(idAcceso, notifId, duracionHoras) {
+        try {
+            const response = await fetch(`${API_ACCESO_HISTORIAL}/aprobar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_acceso: idAcceso, duracion_horas: duracionHoras }),
+                credentials: 'include',
+            });
+            const data = await response.json();
+
+            if (data.status !== 'ok') {
+                showError(data.message || 'No se pudo aprobar el acceso.');
+                return;
+            }
+
+            showToast('Acceso aprobado correctamente.', 'success');
+            await markAsRead(notifId);
+        } catch (error) {
+            showError('Error de conexión al aprobar el acceso.');
+        }
+    }
+
+    async function rechazarAcceso(idAcceso, notifId) {
+        const motivo = window.prompt('Motivo del rechazo (opcional):') ?? '';
+
+        try {
+            const response = await fetch(`${API_ACCESO_HISTORIAL}/rechazar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_acceso: idAcceso, motivo }),
+                credentials: 'include',
+            });
+            const data = await response.json();
+
+            if (data.status !== 'ok') {
+                showError(data.message || 'No se pudo rechazar la solicitud.');
+                return;
+            }
+
+            showToast('Solicitud rechazada.', 'info');
+            await markAsRead(notifId);
+        } catch (error) {
+            showError('Error de conexión al rechazar la solicitud.');
+        }
+    }
+
+    // =====================================================================
+    // Eventos
+    // =====================================================================
+
+    els.list?.addEventListener('click', event => {
+        const approveBtn = event.target.closest('.js-aprobar-acceso');
+        if (approveBtn) {
+            event.stopPropagation();
+            const ref = approveBtn.dataset.ref;
+            const notifId = approveBtn.dataset.notif;
+            const duracion = parseInt(document.getElementById(`dur_${ref}`)?.value || '24', 10);
+            aprobarAcceso(ref, notifId, duracion);
+            return;
+        }
+
+        const rejectBtn = event.target.closest('.js-rechazar-acceso');
+        if (rejectBtn) {
+            event.stopPropagation();
+            rechazarAcceso(rejectBtn.dataset.ref, rejectBtn.dataset.notif);
+            return;
+        }
+
+        // Click en cualquier otra parte de la tarjeta: marcar como leída
+        const card = event.target.closest('.notification-item');
+        if (card?.dataset.notificationId) {
+            markAsRead(card.dataset.notificationId);
+        }
     });
 
-    btnMarkAllRead?.addEventListener('click', markAllAsRead);
+    els.btnMarkAll?.addEventListener('click', markAllAsRead);
+    els.btnRetry?.addEventListener('click', loadNotifications);
+
+    window.addEventListener('notificacion:nueva', () => loadNotifications());
+
+    // =====================================================================
+    // Arranque: carga inicial + polling de respaldo + SSE
+    // =====================================================================
+
     loadNotifications();
-    window.addEventListener('notificacion:nueva', () => {
-        loadNotifications();
-    });
-    // Polling automático cada 30 segundos como respaldo
-    setInterval(loadNotifications, 30000);
+
+    const POLL_INTERVAL_MS = 30000;
+    const pollingId = setInterval(loadNotifications, POLL_INTERVAL_MS);
+
+    let eventSource = null;
+    if (window.EventSource) {
+        eventSource = new EventSource(`${API_NOTIFICACIONES}?accion=stream`, { withCredentials: true });
+        eventSource.addEventListener('notificacion', () => loadNotifications());
+    }
+
+    window.addEventListener('beforeunload', () => {
+        clearInterval(pollingId);
+        eventSource?.close();
+    }, { once: true });
 })();
-
-
-/**
- * FRAGMENTO PARA AGREGAR EN notificaciones.js DEL VETERINARIO
- *
- * Agrega esto al final del archivo notificaciones.js existente.
- * Detecta notificaciones de tipo 'acceso_historial' y las renderiza
- * con botones de Aprobar / Rechazar en lugar del formato normal.
- */
-
-/* ── Duración de acceso ── */
-const OPCIONES_DURACION = [
-    { horas: 24,  label: '24 horas' },
-    { horas: 48,  label: '48 horas' },
-    { horas: 72,  label: '3 días'   },
-    { horas: 168, label: '7 días'   },
-];
-
-/**
- * Llama a esta función desde tu renderizador de notificaciones
- * cuando el tipo sea 'acceso_historial'.
- *
- * Ejemplo de uso en tu código existente:
- *
- *   if (notif.tipo === 'acceso_historial') {
- *       return renderizarSolicitudAcceso(notif);
- *   }
- */
-function renderizarSolicitudAcceso(notif) {
-    const opcionesHTML = OPCIONES_DURACION.map(o =>
-        `<option value="${o.horas}">${o.label}</option>`
-    ).join('');
-
-    return `
-        <div class="notification-item notification-item--acceso" data-id="${notif.id}" data-ref="${notif.referencia_id}">
-            <div class="notification-icon">
-                <i class="bi bi-folder-symlink" style="color:#f59e0b"></i>
-            </div>
-            <div class="notification-body" style="flex:1">
-                <p class="notification-msg">${escHtml(notif.mensaje)}</p>
-                <span class="notification-time">${formatearFecha(notif.fecha)}</span>
-
-                <div class="acceso-actions mt-2 d-flex gap-2 flex-wrap align-items-center">
-                    <select class="form-select form-select-sm" id="dur_${notif.referencia_id}"
-                            style="width:auto;min-width:120px">
-                        ${opcionesHTML}
-                    </select>
-                    <button class="btn btn-success btn-sm"
-                            onclick="aprobarAcceso(${notif.referencia_id}, ${notif.id})">
-                        <i class="bi bi-check-circle me-1"></i>Aprobar
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm"
-                            onclick="rechazarAcceso(${notif.referencia_id}, ${notif.id})">
-                        <i class="bi bi-x-circle me-1"></i>Rechazar
-                    </button>
-                </div>
-            </div>
-        </div>`;
-}
-
-async function aprobarAcceso(id_acceso, notif_id) {
-    const selectEl = document.getElementById(`dur_${id_acceso}`);
-    const duracion  = parseInt(selectEl?.value || '24');
-
-    const btn = selectEl?.closest('.acceso-actions')?.querySelector('.btn-success');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Aprobando...'; }
-
-    try {
-        const res  = await fetch(`${window.BASE_URL}/veterinaria/api/historial/acceso/aprobar`, {
-            method : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body   : JSON.stringify({ id_acceso, duracion_horas: duracion }),
-        });
-        const data = await res.json();
-
-        if (data.status === 'ok') {
-            /* Eliminar el item de la lista y marcar notificación como leída */
-            const item = document.querySelector(`.notification-item--acceso[data-ref="${id_acceso}"]`);
-            if (item) {
-                item.style.transition = 'opacity .3s';
-                item.style.opacity    = '0';
-                setTimeout(() => item.remove(), 300);
-            }
-            marcarNotificacionLeida(notif_id);
-            mostrarToast('Acceso aprobado correctamente.', 'success');
-        } else {
-            mostrarToast(data.message || 'No se pudo aprobar.', 'error');
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Aprobar'; }
-        }
-    } catch (e) {
-        mostrarToast('Error de conexión.', 'error');
-        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Aprobar'; }
-    }
-}
-
-async function rechazarAcceso(id_acceso, notif_id) {
-    const motivo = prompt('Motivo del rechazo (opcional):') ?? '';
-
-    try {
-        const res  = await fetch(`${window.BASE_URL}/veterinaria/api/historial/acceso/rechazar`, {
-            method : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body   : JSON.stringify({ id_acceso, motivo }),
-        });
-        const data = await res.json();
-
-        if (data.status === 'ok') {
-            const item = document.querySelector(`.notification-item--acceso[data-ref="${id_acceso}"]`);
-            if (item) {
-                item.style.transition = 'opacity .3s';
-                item.style.opacity    = '0';
-                setTimeout(() => item.remove(), 300);
-            }
-            marcarNotificacionLeida(notif_id);
-            mostrarToast('Solicitud rechazada.', 'info');
-        } else {
-            mostrarToast(data.message || 'No se pudo rechazar.', 'error');
-        }
-    } catch (e) {
-        mostrarToast('Error de conexión.', 'error');
-    }
-}
-
-/**
- * Marca la notificación como leída en el backend.
- * Ajusta el nombre de la función/endpoint a los que ya usas en notificaciones.js
- */
-function marcarNotificacionLeida(notif_id) {
-    fetch(`${window.BASE_URL}/veterinario/api/notificaciones`, {
-        method : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify({ accion: 'marcar_leida', id: notif_id }),
-    }).catch(() => {});
-}
-
-/* Helpers — si ya los tienes en notificaciones.js, no los dupliques */
-function escHtml(str) {
-    const d = document.createElement('div');
-    d.textContent = str ?? '';
-    return d.innerHTML;
-}
-
-function formatearFecha(iso) {
-    if (!iso) return '';
-    return new Date(iso.replace(' ', 'T'))
-        .toLocaleDateString('es-CO', { day:'2-digit', month:'2-digit', year:'numeric',
-                                       hour:'2-digit', minute:'2-digit' });
-}
-
-function mostrarToast(msg, tipo = 'success') {
-    /* Ajusta esto al sistema de toasts que ya uses en el panel vet */
-    console.log(`[${tipo}] ${msg}`);
-    alert(msg);
-}

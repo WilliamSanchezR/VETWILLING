@@ -371,6 +371,28 @@ class Notificacion
     }
 
     /**
+     * Retorna el MAX(id_notificacion) activo del usuario.
+     * Usado por el stream SSE como cursor para detectar notificaciones nuevas.
+     */
+    public function obtenerUltimoIdParaUsuario(int $id_usuario): int
+    {
+        try {
+            $sql = "SELECT COALESCE(MAX(id_notificacion), 0) AS ultimo_id
+                    FROM notificacion
+                    WHERE id_usuario = :id_usuario
+                      AND descartada = 0";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int)($row['ultimo_id'] ?? 0);
+        } catch (PDOException $e) {
+            error_log('[Notificacion::obtenerUltimoIdParaUsuario] ' . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
      * Registrar un cambio en el historial de la notificación.
      */
     private function registrarHistorial(
