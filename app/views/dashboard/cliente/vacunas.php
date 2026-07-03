@@ -80,7 +80,7 @@ if (!$_propVacRow || (int)$mascota['id_propietario'] !== (int)$_propVacRow['id_p
         <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
         <div class="area-contenido">
             <!-- Estadísticas Generales -->
-            <div class="stats-grid row row-cols-1 row-cols-md-4 g-3">
+            <div class="stats-grid">
                 <div class="stat-card success">
                     <div class="stat-value" id="totalAplicadas">0</div>
                     <div class="stat-label">Vacunas Aplicadas</div>
@@ -193,7 +193,7 @@ if (!$_propVacRow || (int)$mascota['id_propietario'] !== (int)$_propVacRow['id_p
                         </div>
                         <span class="vaccine-status applied">Aplicada</span>
                     </div>
-                    <div class="vaccine-details row row-cols-1 row-cols-md-2 g-2">
+                    <div class="vaccine-details">
                         <div class="detail-item">
                             <i class="bi bi-calendar-event detail-icon"></i>
                             <div class="detail-content">

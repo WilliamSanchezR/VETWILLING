@@ -215,12 +215,12 @@
 
   function pintarPacienteInfo(container, data) {
     container.innerHTML = `
-        <span class="col-12 col-md-6">Fecha: ${escapeHtml(data.fecha || data.fecha_orden || "—")}</span>
-        <span class="col-12 col-md-6">Propietario: ${escapeHtml(data.propietario || "—")}</span>
-        <span class="col-12 col-md-6">Nombre Paciente: ${escapeHtml(data.nombreMascota || "—")}</span>
-        <span class="col-12 col-md-6">Tipo de Animal: ${escapeHtml(data.animal || "—")}</span>
-        <span class="col-12 col-md-6">Raza: ${escapeHtml(data.raza || "—")}</span>
-        <span class="col-12 col-md-6">Sexo: ${escapeHtml(data.sexo || "—")}</span>
+        <span>Fecha: ${escapeHtml(data.fecha || data.fecha_orden || "—")}</span>
+        <span>Propietario: ${escapeHtml(data.propietario || "—")}</span>
+        <span>Nombre Paciente: ${escapeHtml(data.nombreMascota || "—")}</span>
+        <span>Tipo de Animal: ${escapeHtml(data.animal || "—")}</span>
+        <span>Raza: ${escapeHtml(data.raza || "—")}</span>
+        <span>Sexo: ${escapeHtml(data.sexo || "—")}</span>
     `;
   }
 
@@ -329,7 +329,7 @@
     labCatalogStatus.textContent = `${catalogoPruebas.length} pruebas disponibles`;
     catalogoPruebas.forEach((prueba) => {
       const item = document.createElement("label");
-      item.className = "lab-check-item col-12 col-md-6";
+      item.className = "lab-check-item";
       item.innerHTML = `
             <input type="checkbox" class="check-prueba-lab" value="${prueba.id_prueba_catalogo}">
             <div>

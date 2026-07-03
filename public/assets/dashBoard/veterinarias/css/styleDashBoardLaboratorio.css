@@ -439,9 +439,11 @@
 
 .modal-header { position: relative; }
 
-/* ── Info paciente (modal) ──
-   El grid ahora lo da Bootstrap (row gx-4 gy-1 + col-6 en el HTML/JS). */
+/* ── Info paciente (modal) ── */
 .info-paciente {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 20px;
     padding: 16px 18px;
     background: var(--lab-surface-2);
     border: 1px solid var(--lab-border);
@@ -554,8 +556,10 @@
     color: var(--lab-text-1);
 }
 
-/* El grid ahora lo da Bootstrap (row g-2 + col-12 col-sm-6 en el JS). */
 .lab-checklist {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
     max-height: 260px;
     overflow-y: auto;
     padding-right: 4px;
@@ -630,8 +634,10 @@
     .controles-derecha { width: 100%; }
     .controles-derecha { justify-content: stretch; }
     .controles-derecha button { flex: 1; justify-content: center; }
+    .info-paciente { grid-template-columns: 1fr; }
     .resultado-toolbar,
-    .lab-form-grid { grid-template-columns: 1fr; }
+    .lab-form-grid,
+    .lab-checklist { grid-template-columns: 1fr; }
     .lab-form-span-2 { grid-column: auto; }
     .encabezado-seccion { flex-direction: column; align-items: flex-start; }
 }

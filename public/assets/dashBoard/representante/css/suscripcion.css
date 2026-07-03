@@ -619,14 +619,6 @@
 /* ════════════════════════════════════
    RESPONSIVE
    ════════════════════════════════════ */
-@media (max-width: 768px) {
-  .contenido-principal,
-  .sidebar.collapsed ~ .contenido-principal,
-  #sidebar.collapsed ~ .contenido-principal {
-    margin-left: 0;
-  }
-}
-
 @media (max-width: 860px) {
   .grid {
     grid-template-columns: 1fr;

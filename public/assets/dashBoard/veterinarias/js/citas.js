@@ -77,7 +77,7 @@ function renderCitas() {
 
     if (filtradas.length === 0) {
         lista.innerHTML = `
-            <div class="citas-empty col-12">
+            <div class="citas-empty">
                 <i class="bi bi-calendar-x"></i>
                 <h4>Sin citas</h4>
                 <p>No se encontraron citas con los filtros aplicados.</p>
@@ -138,7 +138,7 @@ function cardHtml(c) {
     }
 
     return `
-    <div class="cita-card col-12 col-md-6 col-xl-4" data-estado="${estadoLow}" data-id="${c.id_agendamiento}">
+    <div class="cita-card" data-estado="${estadoLow}" data-id="${c.id_agendamiento}">
 
         <div class="cita-header-color">
             <div class="cita-hora-bloque">
@@ -346,13 +346,13 @@ function initBusqueda() {
 // ─── Utilidades de UI ────────────────────────────────────────
 function mostrarEsqueleto() {
     const lista = document.getElementById('citasLista');
-    if (lista) lista.innerHTML = '<div class="citas-skeleton col-12"><i class="bi bi-hourglass-split"></i> Cargando citas…</div>';
+    if (lista) lista.innerHTML = '<div class="citas-skeleton"><i class="bi bi-hourglass-split"></i> Cargando citas…</div>';
 }
 
 function mostrarError(msg) {
     const lista = document.getElementById('citasLista');
     if (lista) lista.innerHTML = `
-        <div class="citas-empty col-12">
+        <div class="citas-empty">
             <i class="bi bi-exclamation-circle" style="color:#fca5a5;"></i>
             <h4 style="color:#dc2626;">Error al cargar</h4>
             <p>${esc(msg)}</p>

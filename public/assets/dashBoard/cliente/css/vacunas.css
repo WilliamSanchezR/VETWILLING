@@ -45,9 +45,13 @@
     font-weight: 600;
 }
 
-/* El grid ahora lo da Bootstrap (row row-cols-2 row-cols-md-4 g-3 en el HTML). */
 .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    /* padding: 20px; */
     margin-bottom: 24px;
+    /* position: relative; */
 }
 
 .stat-card {
@@ -146,8 +150,10 @@
     color: #17a2b8;
 }
 
-/* El grid ahora lo da Bootstrap (row row-cols-1 row-cols-sm-2 g-2 en el HTML). */
 .vaccine-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid #e9ecef;
@@ -238,9 +244,17 @@
 }
 
 @media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
     .vaccine-header {
         flex-direction: column;
         gap: 12px;
+    }
+
+    .vaccine-details {
+        grid-template-columns: 1fr;
     }
 }
 

@@ -162,13 +162,13 @@ require_once BASE_PATH . "/app/helpers/session_veterinario.php"; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="info-paciente row gx-4 gy-1" id="detalleOrdenPaciente">
-                        <span class="col-12 col-md-6">Fecha: —</span>
-                        <span class="col-12 col-md-6">Propietario: —</span>
-                        <span class="col-12 col-md-6">Nombre Paciente: —</span>
-                        <span class="col-12 col-md-6">Tipo de Animal: —</span>
-                        <span class="col-12 col-md-6">Raza: —</span>
-                        <span class="col-12 col-md-6">Sexo: —</span>
+                    <div class="info-paciente" id="detalleOrdenPaciente">
+                        <span>Fecha: —</span>
+                        <span>Propietario: —</span>
+                        <span>Nombre Paciente: —</span>
+                        <span>Tipo de Animal: —</span>
+                        <span>Raza: —</span>
+                        <span>Sexo: —</span>
                     </div>
 
                     <div class="lab-order-meta mb-3" id="detalleOrdenMeta"></div>
@@ -207,13 +207,13 @@ require_once BASE_PATH . "/app/helpers/session_veterinario.php"; ?>
                 </div>
 
                 <div class="modal-body">
-                    <div class="info-paciente row gx-4 gy-1" id="resultadoPacienteInfo">
-                        <span class="col-12 col-md-6">Fecha: —</span>
-                        <span class="col-12 col-md-6">Propietario: —</span>
-                        <span class="col-12 col-md-6">Nombre Paciente: —</span>
-                        <span class="col-12 col-md-6">Tipo de Animal: —</span>
-                        <span class="col-12 col-md-6">Raza: —</span>
-                        <span class="col-12 col-md-6">Sexo: —</span>
+                    <div class="info-paciente" id="resultadoPacienteInfo">
+                        <span>Fecha: —</span>
+                        <span>Propietario: —</span>
+                        <span>Nombre Paciente: —</span>
+                        <span>Tipo de Animal: —</span>
+                        <span>Raza: —</span>
+                        <span>Sexo: —</span>
                     </div>
 
                     <div class="list-examenes">
@@ -299,7 +299,7 @@ require_once BASE_PATH . "/app/helpers/session_veterinario.php"; ?>
                             <h6 class="mb-0">Pruebas disponibles</h6>
                             <small id="labCatalogStatus" class="text-muted"></small>
                         </div>
-                        <div id="listaPruebasCatalogo" class="lab-checklist row g-2"></div>
+                        <div id="listaPruebasCatalogo" class="lab-checklist"></div>
                     </div>
                 </div>
                 <div class="modal-footer">

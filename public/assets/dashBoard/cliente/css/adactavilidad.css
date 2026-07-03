@@ -32,14 +32,4 @@
     .contenido-principal {
         margin-left: 0 !important;
     }
-
-    .area-contenido {
-        padding: 16px;
-    }
-}
-
-@media (max-width: 380px) {
-    .area-contenido {
-        padding: 12px;
-    }
 }
