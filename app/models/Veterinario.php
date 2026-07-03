@@ -280,11 +280,12 @@ class Veterinario
         }
     }
 
-    public function actualizarEstadoCitaVeterinario(int $id_agendamiento, string $nuevo_estado, int $id_usuario): bool
+    public function actualizarEstadoCitaVeterinario(int $id_agendamiento, string $nuevo_estado, int $id_usuario, ?string $motivo_cancelacion = null): bool
     {
         try {
             $sql = "UPDATE agendamiento
-                    SET estado = :estado
+                    SET estado = :estado" . ($motivo_cancelacion !== null ? ",
+                        observaciones = TRIM(CONCAT(COALESCE(observaciones, ''), ' | Motivo de cancelación: ', :motivo))" : "") . "
                     WHERE id_agendamiento = :id_agendamiento
                       AND id_usuario = :id_usuario";
 
@@ -292,6 +293,9 @@ class Veterinario
             $stmt->bindParam(':estado',          $nuevo_estado,   PDO::PARAM_STR);
             $stmt->bindParam(':id_agendamiento', $id_agendamiento, PDO::PARAM_INT);
             $stmt->bindParam(':id_usuario',      $id_usuario,     PDO::PARAM_INT);
+            if ($motivo_cancelacion !== null) {
+                $stmt->bindParam(':motivo', $motivo_cancelacion, PDO::PARAM_STR);
+            }
             $stmt->execute();
             return $stmt->rowCount() > 0;
         } catch (PDOException $e) {

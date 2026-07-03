@@ -92,6 +92,14 @@ function renderCitas() {
 }
 
 // ─── HTML de tarjeta ─────────────────────────────────────────
+function esCitaDeHoy(dt) {
+    if (!dt) return false;
+    const hoy = new Date();
+    return dt.getFullYear() === hoy.getFullYear() &&
+           dt.getMonth()    === hoy.getMonth() &&
+           dt.getDate()     === hoy.getDate();
+}
+
 function cardHtml(c) {
     const dt    = c.fecha_hora ? new Date(c.fecha_hora.replace(' ', 'T')) : null;
     const hora  = dt ? dt.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : '--:--';
@@ -104,6 +112,14 @@ function cardHtml(c) {
         ? `<img src="${BASE_URL}/public/uploads/mascotas/${esc(c.img_mascota)}" alt="${esc(c.paciente_nombre)}" class="paciente-avatar-cita">`
         : `<div class="paciente-avatar-placeholder"><i class="bi bi-heart-pulse"></i></div>`;
 
+    const btnAtender = esCitaDeHoy(dt)
+        ? `<button class="btn-cita btn-cita-atender" data-accion="atender" data-id="${c.id_agendamiento}" data-paciente="${c.id_paciente}">
+               <i class="bi bi-clipboard2-pulse"></i> Atender
+           </button>`
+        : `<button class="btn-cita btn-cita-atender" disabled title="Solo puedes atender citas programadas para el día de hoy">
+               <i class="bi bi-clipboard2-pulse"></i> Atender
+           </button>`;
+
     let botones;
     if (estadoLow === 'completada') {
         botones = `<button class="btn-cita" style="background:#f1f5f9;color:#64748b;cursor:default;" disabled>
@@ -113,13 +129,9 @@ function cardHtml(c) {
         botones = `<button class="btn-cita btn-cita-confirmar" data-accion="confirmar" data-id="${c.id_agendamiento}">
                        <i class="bi bi-check-circle"></i> Confirmar
                    </button>
-                   <button class="btn-cita btn-cita-atender" data-accion="atender" data-id="${c.id_agendamiento}" data-paciente="${c.id_paciente}">
-                       <i class="bi bi-clipboard2-pulse"></i> Atender
-                   </button>`;
+                   ${btnAtender}`;
     } else {
-        botones = `<button class="btn-cita btn-cita-atender" data-accion="atender" data-id="${c.id_agendamiento}" data-paciente="${c.id_paciente}">
-                       <i class="bi bi-clipboard2-pulse"></i> Atender
-                   </button>
+        botones = `${btnAtender}
                    <button class="btn-cita btn-cita-cancelar" data-accion="cancelar" data-id="${c.id_agendamiento}">
                        <i class="bi bi-x-circle"></i> Cancelar
                    </button>`;
@@ -175,15 +187,19 @@ async function manejarAccion(btn) {
         return;
     }
 
+    const extra = { id_agendamiento: id };
+
     if (accion === 'cancelar') {
-        if (!confirm('¿Confirmar cancelación de esta cita?')) return;
+        const motivo = await pedirMotivoCancelacion();
+        if (!motivo) return;
+        extra.motivo = motivo;
     }
 
     btn.disabled = true;
     btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
 
     try {
-        const result = await apiPost(accion, { id_agendamiento: id });
+        const result = await apiPost(accion, extra);
         if (result.status !== 'success') throw new Error(result.message);
 
         mostrarNotificacion(result.message, 'success');
@@ -372,197 +388,34 @@ _notifStyle.textContent = `
 @keyframes slideOutR { from { transform:translateX(0); opacity:1; } to { transform:translateX(110%); opacity:0; } }`;
 document.head.appendChild(_notifStyle);
 
-// ─── Nueva Cita ──────────────────────────────────────────────
-window.nuevaCita = async function () {
-    if (typeof Swal === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
-        document.head.appendChild(script);
-        await new Promise(r => { script.onload = r; });
-    }
-
-    const ahora = new Date();
-    const fechaInicio = new Date(ahora);
-    fechaInicio.setMinutes(0, 0, 0);
-    if (ahora.getMinutes() > 0) fechaInicio.setHours(fechaInicio.getHours() + 1);
-    const fechaFin = new Date(fechaInicio);
-    fechaFin.setHours(fechaFin.getHours() + 1);
-
-    try {
-        const [propietarios, subservicios] = await Promise.all([cargarPropietarios(), cargarSubservicios()]);
-
-        let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
-        propietarios.forEach(p => {
-            propietariosOptions += `<option value="${p.id_propietario}">${esc(p.nombres + ' ' + p.apellidos)}</option>`;
-        });
-
-        let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
-        subservicios.forEach(s => {
-            const precio = new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP', minimumFractionDigits:0 }).format(s.costo);
-            serviciosOptions += `<option value="${s.id_subservicio}">${esc(s.nombre_subservicio)} — ${precio}</option>`;
-        });
-
-        const result = await Swal.fire({
-            title: '<i class="bi bi-calendar-plus" style="color:#0a932c;"></i> Nueva Cita',
-            html: `<div class="form-agendamiento">
-                <div class="form-group-ag">
-                    <label class="form-label-ag"><i class="bi bi-person-fill"></i>Propietario<span class="required">*</span></label>
-                    <select id="swal-propietario" class="form-control-ag">${propietariosOptions}</select>
-                </div>
-                <div class="form-group-ag">
-                    <label class="form-label-ag"><i class="bi bi-heart-fill"></i>Mascota<span class="required">*</span></label>
-                    <select id="swal-mascota" class="form-control-ag" disabled><option value="">Primero selecciona un propietario</option></select>
-                </div>
-                <div class="form-divider"></div>
-                <div class="form-group-ag">
-                    <label class="form-label-ag"><i class="bi bi-clipboard2-pulse-fill"></i>Servicio<span class="required">*</span></label>
-                    <select id="swal-servicio" class="form-control-ag">${serviciosOptions}</select>
-                </div>
-                <div class="form-divider"></div>
-                <div class="form-group-ag">
-                    <label class="form-label-ag"><i class="bi bi-clock-fill"></i>Fecha y Hora Inicio<span class="required">*</span></label>
-                    <input type="datetime-local" id="swal-fecha-inicio" class="form-control-ag" value="${formatDateForInput(fechaInicio)}">
-                </div>
-                <div class="form-group-ag">
-                    <label class="form-label-ag"><i class="bi bi-clock-history"></i>Fecha y Hora Fin<span class="required">*</span></label>
-                    <input type="datetime-local" id="swal-fecha-fin" class="form-control-ag" value="${formatDateForInput(fechaFin)}">
-                </div>
-                <div class="form-group-ag">
-                    <label class="form-label-ag"><i class="bi bi-chat-left-text-fill"></i>Motivo / Observaciones</label>
-                    <textarea id="swal-motivo" class="form-control-ag" placeholder="Describe el motivo de la cita..."></textarea>
-                </div>
-            </div>`,
-            showCancelButton: true,
-            confirmButtonText: '<i class="bi bi-check-lg"></i> Agendar Cita',
-            cancelButtonText:  '<i class="bi bi-x-lg"></i> Cancelar',
-            width: '680px',
-            customClass: { confirmButton: 'btn btn-success px-4', cancelButton: 'btn btn-secondary px-4' },
-            buttonsStyling: false,
-            didOpen: () => setupFormHandlers(),
-            preConfirm: () => validateAndGetFormData(),
-        });
-
-        if (result.isConfirmed && result.value) {
-            await enviarCita(result.value);
-        }
-    } catch (err) {
-        console.error('Error al abrir formulario de nueva cita:', err);
-        mostrarNotificacion('Error al cargar el formulario: ' + err.message, 'error');
-    }
-};
-
-function formatDateForInput(d) {
-    const pad = n => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+// ─── SweetAlert2 (carga perezosa compartida) ──────────────────
+async function cargarSweetAlert() {
+    if (typeof Swal !== 'undefined') return;
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+    document.head.appendChild(script);
+    await new Promise(r => { script.onload = r; });
 }
 
-function formatDateForMySQL(d) {
-    const pad = n => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-}
+// ─── Motivo de cancelación ─────────────────────────────────────
+async function pedirMotivoCancelacion() {
+    await cargarSweetAlert();
 
-function setupFormHandlers() {
-    document.getElementById('swal-propietario').addEventListener('change', async function () {
-        const idProp = this.value;
-        const mascotaSelect = document.getElementById('swal-mascota');
-        if (!idProp) {
-            mascotaSelect.disabled = true;
-            mascotaSelect.innerHTML = '<option value="">Primero selecciona un propietario</option>';
-            return;
-        }
-        mascotaSelect.disabled = true;
-        mascotaSelect.innerHTML = '<option value="">Cargando mascotas…</option>';
-        try {
-            const mascotas = await cargarMascotasPorPropietario(idProp);
-            mascotaSelect.innerHTML = '<option value="">Selecciona una mascota…</option>' +
-                mascotas.map(m => `<option value="${m.id_paciente}">${esc(m.nombre)} — ${esc(m.especie)} (${esc(m.raza)})</option>`).join('');
-            mascotaSelect.disabled = false;
-        } catch {
-            mascotaSelect.innerHTML = '<option value="">Error al cargar mascotas</option>';
-        }
+    const { value: motivo, isConfirmed } = await Swal.fire({
+        title: '<i class="bi bi-x-circle" style="color:#ef4444;"></i> Cancelar cita',
+        input: 'textarea',
+        inputLabel: 'Indica el motivo de la cancelación',
+        inputPlaceholder: 'Describe brevemente por qué se cancela esta cita...',
+        inputAttributes: { 'aria-label': 'Motivo de la cancelación' },
+        showCancelButton: true,
+        confirmButtonText: '<i class="bi bi-x-circle"></i> Cancelar cita',
+        cancelButtonText: 'Volver',
+        customClass: { confirmButton: 'btn btn-danger px-4', cancelButton: 'btn btn-secondary px-4' },
+        buttonsStyling: false,
+        inputValidator: (value) => {
+            if (!value || !value.trim()) return 'Debes indicar el motivo de la cancelación';
+        },
     });
-    cargarVeterinarios();
-}
 
-function validateAndGetFormData() {
-    const propietario = document.getElementById('swal-propietario').value;
-    const mascota     = document.getElementById('swal-mascota').value;
-    const subservicio = document.getElementById('swal-servicio').value;
-    const veterinario = document.getElementById('swal-veterinario')?.value || null;
-    const fechaInicio = document.getElementById('swal-fecha-inicio').value;
-    const fechaFin    = document.getElementById('swal-fecha-fin').value;
-    const motivo      = document.getElementById('swal-motivo').value;
-
-    if (!propietario) { Swal.showValidationMessage('Selecciona un propietario'); return false; }
-    if (!mascota)     { Swal.showValidationMessage('Selecciona una mascota'); return false; }
-    if (!subservicio) { Swal.showValidationMessage('Selecciona un servicio'); return false; }
-    if (!fechaInicio || !fechaFin) { Swal.showValidationMessage('Completa las fechas'); return false; }
-    if (new Date(fechaFin) <= new Date(fechaInicio)) { Swal.showValidationMessage('La fecha de fin debe ser posterior al inicio'); return false; }
-
-    return {
-        tipo: 'Cita',
-        id_propietario: propietario,
-        id_paciente: mascota,
-        id_servicio: subservicio,
-        id_veterinario: veterinario,
-        fecha_hora: formatDateForMySQL(new Date(fechaInicio)),
-        fecha_hora_fin: formatDateForMySQL(new Date(fechaFin)),
-        observaciones: motivo,
-        estado: 'Pendiente',
-    };
-}
-
-async function enviarCita(datos) {
-    try {
-        const res = await fetch(BASE_URL + '/calendario/storeEvent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datos),
-        });
-        const result = await res.json();
-        if (result.success) {
-            await Swal.fire({ icon:'success', title:'¡Cita Agendada!', text: result.message || 'Cita agendada exitosamente',
-                confirmButtonText:'Aceptar', customClass:{ confirmButton:'btn btn-success' }, buttonsStyling:false });
-            cargarCitas();
-        } else {
-            throw new Error(result.message || 'Error al agendar la cita');
-        }
-    } catch (err) {
-        await Swal.fire({ icon:'error', title:'Error', text: err.message || 'No se pudo agendar la cita',
-            confirmButtonText:'Aceptar', customClass:{ confirmButton:'btn btn-danger' }, buttonsStyling:false });
-    }
-}
-
-async function cargarPropietarios() {
-    const res = await fetch(BASE_URL + '/calendario/getPropietarios');
-    if (!res.ok) throw new Error('Error al cargar propietarios');
-    const r = await res.json();
-    return r.status === 'success' ? r.data : [];
-}
-
-async function cargarSubservicios() {
-    const res = await fetch(BASE_URL + '/calendario/getSubservicios');
-    if (!res.ok) throw new Error('Error al cargar subservicios');
-    const r = await res.json();
-    return r.status === 'success' ? r.data : [];
-}
-
-async function cargarMascotasPorPropietario(idPropietario) {
-    const res = await fetch(BASE_URL + `/calendario/getMascotas?id_propietario=${idPropietario}`);
-    if (!res.ok) throw new Error('Error al cargar mascotas');
-    const r = await res.json();
-    return r.status === 'success' ? r.data : [];
-}
-
-async function cargarVeterinarios() {
-    try {
-        const res = await fetch(BASE_URL + '/calendario/getVeterinarios');
-        if (!res.ok) return;
-        const r   = await res.json();
-        const select = document.getElementById('swal-veterinario');
-        if (!select) return;
-        const veterinarios = r.status === 'success' ? r.data : [];
-        select.innerHTML = '<option value="">Cualquier veterinario disponible</option>' +
-            veterinarios.map(v => `<option value="${v.id_usuario}">Dr. ${esc(v.nombres + ' ' + v.apellidos)}</option>`).join('');
-    } catch { /* silencioso */ }
+    return isConfirmed ? motivo.trim() : null;
 }
