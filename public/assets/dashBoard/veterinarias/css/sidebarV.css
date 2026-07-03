@@ -859,14 +859,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-fon
 .sv-fab.open   { transform: rotate(45deg); background: var(--sv-primary-dark); }
 
 /* ========================================================================
-   RESPONSIVE — Tablet
-   ======================================================================== */
-@media (max-width: 1024px) and (min-width: 769px) {
-    :root { --sv-width: 220px; }
-}
-
-/* ========================================================================
-   RESPONSIVE — Móvil
+   RESPONSIVE
    ======================================================================== */
 @media (max-width: 768px) {
     .sidebar-vet  { display: none !important; }

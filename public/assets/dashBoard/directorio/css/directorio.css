@@ -255,9 +255,10 @@
 /* ----------------------------------------------------------------
    Grid de profesionales
    ---------------------------------------------------------------- */
-/* El grid de columnas ahora lo da Bootstrap (row g-3 + col-lg-2 col-md-3
-   col-sm-4 col-6 en el HTML/JS). Acá solo queda el alineado vertical. */
 #gridProfesionales {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: var(--gap);
     align-items: start;
 }
 
@@ -475,9 +476,20 @@
 /* ----------------------------------------------------------------
    Responsive
    ---------------------------------------------------------------- */
+@media (max-width: 1024px) {
+    #gridProfesionales {
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    }
+}
+
 @media (max-width: 768px) {
     .area-contenido {
         padding: 16px;
+    }
+
+    #gridProfesionales {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 14px;
     }
 
     .banner-estado {
@@ -495,6 +507,11 @@
 }
 
 @media (max-width: 480px) {
+    #gridProfesionales {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
     .card-prof { padding: 14px 10px 12px; }
     .card-prof .avatar-wrap { width: 54px; height: 54px; font-size: 18px; }
     .card-prof .nombre { font-size: 12px; }

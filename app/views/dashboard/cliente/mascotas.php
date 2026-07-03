@@ -3,7 +3,7 @@
 // Cargar preferencias e i18n
 if (!isset($prefs)) {
     if (!class_exists('PreferenciasManager')) { require_once BASE_PATH . '/app/services/PreferenciasManager.php'; }
-    $_pm = new PreferenciasManager((int)$GLOBALS['user']['id_usuario']);
+    $_pm = new PreferenciasManager((int)$_SESSION['user']['id_usuario']);
     $prefs = $_pm->obtener();
 }
 if (!isset($t)) {
@@ -112,11 +112,11 @@ $mascotas = listarMascotas();
             </div>
 
             <!-- ── Grid de Mascotas ── -->
-            <div class="mascotas-grid row g-3" id="mascotasGrid">
+            <div class="mascotas-grid" id="mascotasGrid">
 
                 <?php if (empty($mascotas)): ?>
                     <!-- Estado vacío -->
-                    <div class="sin-mascotas col-12">
+                    <div class="sin-mascotas">
                         <div class="sin-mascotas-icon">
                             <i class="bi bi-heart-pulse"></i>
                         </div>
@@ -139,7 +139,7 @@ $mascotas = listarMascotas();
                         $i++;
                     ?>
 
-                        <div class="mascota-card col-lg-4 col-md-6 col-12"
+                        <div class="mascota-card"
                              data-nombre="<?= htmlspecialchars(strtolower($m['nombre'])) ?>"
                              data-especie="<?= htmlspecialchars(strtolower($m['especie'])) ?>"
                              data-estado="al-dia">
@@ -185,9 +185,9 @@ $mascotas = listarMascotas();
                             <div class="mascota-card-body">
 
                                 <!-- Info detallada -->
-                                <div class="info-grid row g-2">
+                                <div class="info-grid">
 
-                                    <div class="info-item col-12 col-sm-6">
+                                    <div class="info-item">
                                         <div class="info-icon <?= $colorIco ?>">
                                             <i class="bi bi-calendar3"></i>
                                         </div>
@@ -200,7 +200,7 @@ $mascotas = listarMascotas();
                                         </div>
                                     </div>
 
-                                    <div class="info-item col-12 col-sm-6">
+                                    <div class="info-item">
                                         <div class="info-icon <?= $colorIco ?>">
                                             <i class="bi bi-box"></i>
                                         </div>
@@ -210,7 +210,7 @@ $mascotas = listarMascotas();
                                         </div>
                                     </div>
 
-                                    <div class="info-item col-12 col-sm-6">
+                                    <div class="info-item">
                                         <div class="info-icon <?= $colorIco ?>">
                                             <i class="bi bi-award"></i>
                                         </div>
@@ -220,7 +220,7 @@ $mascotas = listarMascotas();
                                         </div>
                                     </div>
 
-                                    <div class="info-item col-12 col-sm-6">
+                                    <div class="info-item">
                                         <div class="info-icon <?= $colorIco ?>">
                                             <i class="bi bi-clipboard-pulse"></i>
                                         </div>
@@ -235,26 +235,26 @@ $mascotas = listarMascotas();
                                 <div class="card-divider"></div>
 
                                 <!-- Botones de acción -->
-                                <div class="mascota-actions row g-2">
+                                <div class="mascota-actions">
 
                                     <a href="<?= BASE_URL ?>/cliente/historial-mascota?id=<?= (int)$m['id_paciente'] ?>"
-                                        class="action-btn action-btn-info col-12 col-md-6">
+                                        class="action-btn action-btn-info">
                                         <i class="bi bi-file-medical"></i> Historial
                                     </a>
 
                                     <a href="<?= BASE_URL ?>/cliente/vacunas-mascota?id=<?= (int)$m['id_paciente'] ?>"
-                                        class="action-btn action-btn-success col-12 col-md-6">
+                                        class="action-btn action-btn-success">
                                         <i class="bi bi-shield-plus"></i> Vacunas
                                     </a>
 
                                     <a href="<?= BASE_URL ?>/cliente/editar-mascota?id=<?= (int)$m['id_paciente'] ?>"
-                                        class="action-btn action-btn-secondary col-12 col-md-6">
+                                        class="action-btn action-btn-secondary">
                                         <i class="bi bi-pencil"></i> Editar
                                     </a>
 
                                     <button
                                         type="button"
-                                        class="action-btn action-btn-danger btn-eliminar-mascota col-12 col-md-6"
+                                        class="action-btn action-btn-danger btn-eliminar-mascota"
                                         data-id="<?= (int)$m['id_paciente'] ?>"
                                         data-nombre="<?= htmlspecialchars($m['nombre']) ?>"
                                         data-bs-toggle="modal"

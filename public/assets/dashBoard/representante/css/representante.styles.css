@@ -93,7 +93,6 @@
 #sidebar.collapsed ~ .contenido-principal,
 .sidebar.collapsed ~ .contenido-principal {
     margin-left: var(--sidebar-collapsed-width, 80px) !important;
-}
 
 
 /* ── 3. Wrapper principal ─────────────────────────────────────────────── */
@@ -822,14 +821,6 @@
     }
 }
 
-@media (max-width: 768px) {
-    .contenido-principal,
-    #sidebar.collapsed ~ .contenido-principal,
-    .sidebar.collapsed ~ .contenido-principal {
-        margin-left: 0 !important;
-    }
-}
-
 
 /* ── 17. Utilidades menores ──────────────────────────────────────────────── */
 
@@ -856,4 +847,5 @@
 .num-money {
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
+}
 }

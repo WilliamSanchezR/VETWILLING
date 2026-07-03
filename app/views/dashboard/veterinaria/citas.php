@@ -41,7 +41,7 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
 
             <!-- ESTADÍSTICAS -->
-            <div class="stats-container row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+            <div class="stats-container">
                 <div class="stat-card pendientes">
                     <div class="stat-icon pendientes"><i class="bi bi-clock-history"></i></div>
                     <div class="stat-content">
@@ -95,8 +95,8 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
             </div>
 
             <!-- LISTA DE CITAS -->
-            <div class="citas-lista row g-3" id="citasLista">
-                <div class="citas-skeleton col-12">
+            <div class="citas-lista" id="citasLista">
+                <div class="citas-skeleton">
                     <i class="bi bi-hourglass-split"></i>
                     Cargando citas…
                 </div>
@@ -142,14 +142,14 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <input type="hidden" id="atenderIdPaciente">
                         <input type="hidden" id="atenderIdCita">
 
-                        <div class="campos-grid row g-3">
-                            <div class="col-12 col-md-6">
+                        <div class="campos-grid">
+                            <div>
                                 <label for="atenderFecha" class="label-historial">
                                     Fecha de atención <span class="text-danger">*</span>
                                 </label>
                                 <input id="atenderFecha" class="input-historial" type="date">
                             </div>
-                            <div class="col-12 col-md-6">
+                            <div>
                                 <label for="atenderMotivo" class="label-historial">
                                     Motivo de consulta <span class="text-danger">*</span>
                                 </label>

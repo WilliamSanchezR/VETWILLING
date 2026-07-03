@@ -91,6 +91,40 @@ $rutaImagenAttr  = htmlspecialchars($rutaImagen, ENT_QUOTES, 'UTF-8');
 <!-- NAVBAR SUPERIOR -->
 <nav class="navbar-superior" role="navigation" aria-label="Navegación principal">
 
+    <!-- BURBUJA MÓVIL (panel lateral) -->
+    <div class="bubble-panel" id="bubblePanel">
+        <div class="bubble-panel-logo">
+            <i class="bi bi-hospital"></i>
+            <span><?= $datosUsuario['nombre_veterinaria'] ?></span>
+        </div>
+
+        <a href="<?= BASE_URL ?>/cliente/perfil" class="bubble-item">
+            <span class="bubble-icon"><i class="bi bi-person-fill"></i></span> <?= $t('nav.perfil') ?>
+        </a>
+        <a href="<?= BASE_URL ?>/cliente/mascotas" class="bubble-item">
+            <span class="bubble-icon"><i class="bi bi-heart-pulse-fill"></i></span> <?= $t('nav.mis_mascotas') ?>
+        </a>
+        <a href="<?= BASE_URL ?>/cliente/citas" class="bubble-item">
+            <span class="bubble-icon"><i class="bi bi-calendar-check-fill"></i></span> <?= $t('nav.mis_citas') ?>
+        </a>
+
+        <div class="bubble-divider"></div>
+
+        <a href="<?= BASE_URL ?>/cliente/configuracion" class="bubble-item">
+            <span class="bubble-icon"><i class="bi bi-gear-fill"></i></span> <?= $t('nav.configuracion') ?>
+        </a>
+        <button type="button" class="bubble-item" data-modal="soporte">
+            <span class="bubble-icon"><i class="bi bi-question-circle"></i></span> <?= $t('nav.soporte') ?>
+        </button>
+
+        <div class="bubble-spacer"></div>
+        <div class="bubble-divider"></div>
+
+        <a href="<?= BASE_URL ?>/cerrar-sesion" class="bubble-item bubble-danger">
+            <span class="bubble-icon"><i class="bi bi-box-arrow-right"></i></span> <?= $t('nav.cerrar_sesion') ?>
+        </a>
+    </div>
+
 
     <!-- Info Veterinaria -->
     <div class="info-veterinaria">
@@ -250,6 +284,16 @@ $rutaImagenAttr  = htmlspecialchars($rutaImagen, ENT_QUOTES, 'UTF-8');
     </div>
 </nav>
 
+<!-- CORRECCIÓN: Botón disparador del panel móvil. Solo se ve en móvil (CSS).
+     Antes no existía y por eso el menú no se podía abrir. -->
+<button type="button" class="bubble-trigger" id="bubbleBtn" aria-label="Abrir menú" aria-expanded="false">
+    <i class="bi bi-list" id="bubbleIcon"></i>
+</button>
+
+<!-- CORRECCIÓN: la clase ahora es "bubble-overlay" (que SÍ está estilizada en el CSS).
+     Antes era "sidebar-overlay" y quedaba invisible. -->
+<div class="bubble-overlay" id="sidebarOverlay"></div>
+
 <!-- Modal de Reloj -->
 <div id="modalReloj" class="modal-reloj" role="dialog" aria-modal="true" aria-labelledby="tituloReloj">
     <div class="modal-reloj-contenido">
@@ -405,4 +449,35 @@ $rutaImagenAttr  = htmlspecialchars($rutaImagen, ENT_QUOTES, 'UTF-8');
         id: <?= (int)$id ?>,
         nombre: <?= json_encode($datosUsuario['nombres'] . ' ' . $datosUsuario['apellidos']) ?>
     };
+</script>
+
+<!-- Toggle del panel móvil. Blindado contra elementos faltantes. -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const bubbleBtn     = document.getElementById('bubbleBtn');
+        const bubblePanel   = document.getElementById('bubblePanel');
+        const bubbleOverlay  = document.getElementById('sidebarOverlay');
+        const bubbleIcon    = document.getElementById('bubbleIcon');
+
+        // Si no existe el panel, no hay nada que hacer.
+        if (!bubblePanel) return;
+
+        function toggleBubble(forceClose = false) {
+            const isOpen = forceClose ? false : !bubblePanel.classList.contains('open');
+            bubblePanel.classList.toggle('open', isOpen);
+            bubbleBtn?.classList.toggle('open', isOpen);
+            bubbleOverlay?.classList.toggle('open', isOpen);
+            if (bubbleIcon) bubbleIcon.className = isOpen ? 'bi bi-x-lg' : 'bi bi-list';
+            bubbleBtn?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+
+        bubbleBtn?.addEventListener('click', () => toggleBubble());
+        bubbleOverlay?.addEventListener('click', () => toggleBubble(true));
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') toggleBubble(true);
+        });
+
+    });
 </script>
