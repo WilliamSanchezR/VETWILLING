@@ -38,10 +38,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
                         <p class="citas-subtitulo">Próximas citas pendientes y confirmadas</p>
                     </div>
                 </div>
-                <button class="btn-nueva-cita" onclick="nuevaCita()">
-                    <i class="bi bi-plus-circle"></i>
-                    Nueva Cita
-                </button>
             </div>
 
             <!-- ESTADÍSTICAS -->

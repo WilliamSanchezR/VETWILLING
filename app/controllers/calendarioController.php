@@ -157,7 +157,10 @@ function crearAgendamientoAjax()
         $observaciones = $data['observaciones'] ?? null;
         $fecha_hora = $data['fecha_hora'] ?? '';
         $fecha_hora_fin = $data['fecha_hora_fin'] ?? null;
-        $estado = $data['estado'] ?? 'Pendiente';
+
+        // Si quien agenda es el propio veterinario, la cita queda confirmada de inmediato:
+        // al agendarla él mismo ya la está confirmando. El estado no se toma del cliente.
+        $estado = ((int) ($_SESSION['user']['id_rol'] ?? 0) === 2) ? 'Confirmada' : ($data['estado'] ?? 'Pendiente');
 
         // Convertir el id_usuario a entero
         $id_usuario = isset($_SESSION['user']['id_usuario']) ? (int)$_SESSION['user']['id_usuario'] : null;
@@ -183,6 +186,13 @@ function crearAgendamientoAjax()
         if (empty($id_usuario)) {
             http_response_code(401);
             echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado - id_usuario no encontrado']);
+            exit();
+        }
+
+        $timestampInicio = strtotime($fecha_hora);
+        if ($timestampInicio !== false && $timestampInicio < time()) {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'No puedes agendar una cita en una fecha u hora pasada']);
             exit();
         }
 

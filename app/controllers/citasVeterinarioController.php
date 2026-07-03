@@ -59,11 +59,16 @@ switch ($accion) {
 
     case 'cancelar':
         $idAgendamiento = (int) ($payload['id_agendamiento'] ?? 0);
+        $motivo         = trim($payload['motivo'] ?? '');
         if ($idAgendamiento <= 0) {
             echo json_encode(['status' => 'error', 'message' => 'ID de cita inválido']);
             break;
         }
-        $ok = $model->actualizarEstadoCitaVeterinario($idAgendamiento, 'Cancelada', $idUsuario);
+        if ($motivo === '') {
+            echo json_encode(['status' => 'error', 'message' => 'Debes indicar el motivo de la cancelación']);
+            break;
+        }
+        $ok = $model->actualizarEstadoCitaVeterinario($idAgendamiento, 'Cancelada', $idUsuario, $motivo);
         echo json_encode([
             'status'  => $ok ? 'success' : 'error',
             'message' => $ok ? 'Cita cancelada' : 'No se pudo cancelar la cita',

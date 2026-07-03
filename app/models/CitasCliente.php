@@ -299,10 +299,13 @@ class CitasCliente
         }
     }
 
-    /** Horas mínimas de anticipación requeridas para cancelar una cita */
-    const HORAS_LIMITE_CANCELACION = 2;
+    /** Horas mínimas de anticipación requeridas para cancelar o reagendar una cita */
+    const HORAS_LIMITE_ANTICIPACION = 24;
 
-    public function validarEstadoCita($id_agendamiento)
+    /**
+     * @param string $accion 'cancelar' o 'reagendar', solo afecta el texto de los mensajes
+     */
+    public function validarEstadoCita($id_agendamiento, string $accion = 'cancelar')
     {
         try {
             $sql = "SELECT id_agendamiento, estado, fecha_hora
@@ -324,39 +327,40 @@ class CitasCliente
                 ];
             }
 
-            // Subtarea 2: no permitir cancelar si ya está Finalizada o Cancelada
+            // Subtarea 2: no permitir cancelar/reagendar si ya está Finalizada o Cancelada
             if (in_array($cita['estado'], ['Finalizada', 'Cancelada'])) {
                 return [
                     'valido' => false,
-                    'mensaje' => "No se puede cancelar una cita con estado '{$cita['estado']}'",
+                    'mensaje' => "No se puede {$accion} una cita con estado '{$cita['estado']}'",
                     'estado_actual' => $cita['estado']
                 ];
             }
 
             $timestamp_cita = strtotime($cita['fecha_hora']);
 
-            // Subtarea 3: no permitir cancelar si la cita ya pasó o está en curso
+            // Subtarea 3: no permitir cancelar/reagendar si la cita ya pasó o está en curso
             if ($timestamp_cita <= time()) {
                 return [
                     'valido' => false,
-                    'mensaje' => 'No se puede cancelar una cita ya iniciada o pasada',
+                    'mensaje' => "No se puede {$accion} una cita ya iniciada o pasada",
                     'estado_actual' => $cita['estado']
                 ];
             }
 
             // Subtarea 3: validar ventana de tiempo mínima de anticipación
             $horas_restantes = ($timestamp_cita - time()) / 3600;
-            if ($horas_restantes < self::HORAS_LIMITE_CANCELACION) {
+            if ($horas_restantes < self::HORAS_LIMITE_ANTICIPACION) {
                 return [
                     'valido' => false,
-                    'mensaje' => 'Solo puedes cancelar con al menos ' . self::HORAS_LIMITE_CANCELACION . ' horas de anticipación',
+                    'mensaje' => "Solo puedes {$accion} con al menos " . self::HORAS_LIMITE_ANTICIPACION . ' horas de anticipación',
                     'estado_actual' => $cita['estado']
                 ];
             }
 
+            $participio = $accion === 'reagendar' ? 'reagendada' : 'cancelada';
             return [
                 'valido' => true,
-                'mensaje' => 'La cita puede ser cancelada',
+                'mensaje' => "La cita puede ser {$participio}",
                 'estado_actual' => $cita['estado']
             ];
         } catch (PDOException $e) {

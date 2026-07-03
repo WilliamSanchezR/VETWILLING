@@ -904,25 +904,6 @@ body::-webkit-scrollbar-thumb { background: #c1c8d0; border-radius: 4px; }
     flex-shrink: 0;
 }
 
-.btn-ver-todas {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    background: var(--g);
-    color: white;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background 0.2s;
-}
-
-.btn-ver-todas:hover {
-    background: var(--gd);
-    color: white;
-}
-
 .notif-vacio {
     text-align: center;
     padding: 40px 20px;

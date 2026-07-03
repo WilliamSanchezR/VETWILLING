@@ -290,6 +290,11 @@ document.addEventListener('DOMContentLoaded', function () {
             return false;
         }
 
+        if (new Date(fechaInicio) < new Date()) {
+            Swal.showValidationMessage('No puedes agendar una cita en una fecha u hora pasada');
+            return false;
+        }
+
         if (new Date(fechaFin) <= new Date(fechaInicio)) {
             Swal.showValidationMessage('La fecha de fin debe ser posterior a la fecha de inicio');
             return false;
@@ -655,6 +660,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // --- INTERACCIÓN Y CREACIÓN DE EVENTOS (Selectable) ---
         selectable: true,
 
+        // No permitir seleccionar/crear citas en fechas ya pasadas
+        selectAllow: function (selectInfo) {
+            return selectInfo.start >= new Date();
+        },
+
         select: async function (info) {
             // Se ejecuta cuando el usuario selecciona un rango de fechas.
 
@@ -904,8 +914,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     Fecha y Hora de Inicio
                     <span class="required">*</span>
                 </label>
-                <input id="swal-fecha-inicio" type="datetime-local" class="form-control-ag" 
-                    value="${fechaInicioStr}">
+                <input id="swal-fecha-inicio" type="datetime-local" class="form-control-ag"
+                    value="${fechaInicioStr}" min="${formatDateForInput(new Date())}">
             </div>
             
             <div class="form-group-ag">
@@ -1135,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             Fecha y Hora de Inicio <span class="swal-required">*</span>
                         </label>
                         <input id="swal-fecha-inicio" type="datetime-local" class="swal-custom-input"
-                            value="${fechaInicioStr}">
+                            value="${fechaInicioStr}" min="${formatDateForInput(new Date())}">
                     </div>
 
                     <div class="swal-field-group">
@@ -1708,7 +1718,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <label class="form-label">
                 <i class="bi bi-clock"></i> Fecha y Hora de Inicio: *
             </label>
-            <input id="swal-fecha-inicio" type="datetime-local" class="form-control" value="${fechaInicioStr}">
+            <input id="swal-fecha-inicio" type="datetime-local" class="form-control" value="${fechaInicioStr}" min="${formatDateForInput(new Date())}">
         </div>
         
         <div class="form-group">
@@ -2137,8 +2147,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             Fecha y Hora de Inicio
                             <span class="required">*</span>
                         </label>
-                        <input type="datetime-local" id="swal-fecha-inicio" class="form-control-ag" 
-                            value="${fechaInicioStr}">
+                        <input type="datetime-local" id="swal-fecha-inicio" class="form-control-ag"
+                            value="${fechaInicioStr}" min="${formatDateForInput(new Date())}">
                     </div>
                     
                     <div class="form-group-ag">
