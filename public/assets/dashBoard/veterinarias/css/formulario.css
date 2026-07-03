@@ -428,10 +428,8 @@
 }
 
 /* ── Resumen final ──────────────────────────────────────────── */
+/* El grid ahora lo da Bootstrap (row g-3 + col-12 col-md-6 en el JS). */
 .resumen-final {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
     margin: 6px 0 8px;
 }
 
@@ -568,8 +566,6 @@
     .row { flex-direction: column; }
     .row .col-md-4,
     .row .col-md-6 { width: 100%; }
-
-    .resumen-final { grid-template-columns: 1fr; }
 
     .buttons { flex-direction: column-reverse; align-items: stretch; }
     .btn-prev, .btn-next, .btn-submit { width: 100%; justify-content: center; margin-left: 0; }

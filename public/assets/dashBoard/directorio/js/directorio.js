@@ -64,7 +64,7 @@ function renderCards(lista) {
 
     if (lista.length === 0) {
         total.innerHTML = '';
-        grid.innerHTML  = `<div class="empty-state">
+        grid.innerHTML  = `<div class="empty-state col-12">
             <i class="bi bi-person-x" aria-hidden="true"></i>
             <p>No se encontraron profesionales con los filtros aplicados.</p>
         </div>`;
@@ -86,7 +86,7 @@ function renderCards(lista) {
             : '—';
 
         return `
-        <div class="card-prof">
+        <div class="card-prof col-6 col-sm-4 col-md-3 col-lg-2">
             ${avatarHTML(p)}
             <div class="nombre">${p.nombres || ''} ${p.apellidos || ''}</div>
             <div class="licencia">
@@ -138,7 +138,7 @@ async function cargarDirectorio(filtros = {}) {
         poblarFiltroEsp(todosLosProfesionales);
     } catch {
         document.getElementById('gridProfesionales').innerHTML = `
-            <div class="empty-state">
+            <div class="empty-state col-12">
                 <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
                 <p>Error al cargar el directorio. Intenta de nuevo.</p>
             </div>`;

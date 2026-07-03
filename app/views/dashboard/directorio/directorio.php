@@ -131,8 +131,8 @@ endif;
         <p id="totalResultados" class="text-muted small mb-3"></p>
 
         <!-- Grid de profesionales (llenado por JS) -->
-        <div id="gridProfesionales">
-            <div class="spinner-wrap">
+        <div id="gridProfesionales" class="row g-3">
+            <div class="spinner-wrap col-12">
                 <div class="spinner-border text-success" role="status">
                     <span class="visually-hidden">Cargando…</span>
                 </div>
