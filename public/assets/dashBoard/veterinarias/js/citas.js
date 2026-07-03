@@ -1,719 +1,421 @@
-// FUNCIONALIDAD DE TABS
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remover active de todos
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
+/* ============================================================
+   Gestión de Citas — Veterinario
+   ============================================================ */
 
-                const filtro = this.dataset.tab;
-                filtrarCitas(filtro);
-            });
+const BASE_URL = document.querySelector('meta[name="base-url"]')?.content || '';
+
+// Estado en memoria
+let _todasLasCitas = [];
+let _tabActivo = 'todas';
+let _busqueda  = '';
+
+// ─── Inicialización ──────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    cargarCitas();
+    initTabs();
+    initBusqueda();
+    initModalAtender();
+});
+
+// ─── API ─────────────────────────────────────────────────────
+async function apiPost(accion, extra = {}) {
+    const res = await fetch(BASE_URL + '/veterinaria/api/citas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accion, ...extra }),
+    });
+    if (!res.ok) throw new Error('Error de red: ' + res.status);
+    return res.json();
+}
+
+// ─── Cargar y renderizar ─────────────────────────────────────
+async function cargarCitas() {
+    mostrarEsqueleto();
+    try {
+        const result = await apiPost('listar');
+        if (result.status !== 'success') throw new Error(result.message || 'Error al cargar');
+
+        _todasLasCitas = result.data.citas || [];
+        renderStats(result.data.stats || {});
+        renderCitas();
+    } catch (err) {
+        mostrarError(err.message);
+    }
+}
+
+function renderStats(stats) {
+    const set = (id, key) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = (stats[key] ?? 0).toLocaleString('es-CO');
+    };
+    set('statPendientes',  'PENDIENTE');
+    set('statConfirmadas', 'CONFIRMADA');
+    set('statCompletadas', 'COMPLETADA');
+    set('statCanceladas',  'CANCELADA');
+}
+
+function renderCitas() {
+    const lista = document.getElementById('citasLista');
+    if (!lista) return;
+
+    const termino = _busqueda.toLowerCase().trim();
+
+    let filtradas = _todasLasCitas.filter(c => {
+        if (_tabActivo !== 'todas' && c.estado.toLowerCase() !== _tabActivo) return false;
+        if (termino) {
+            const texto = [c.paciente_nombre, c.propietario_nombre, c.tipo, c.especie, c.raza]
+                .filter(Boolean).join(' ').toLowerCase();
+            if (!texto.includes(termino)) return false;
+        }
+        return true;
+    });
+
+    // Completadas: más recientes primero
+    if (_tabActivo === 'completada') {
+        filtradas = filtradas.slice().reverse();
+    }
+
+    if (filtradas.length === 0) {
+        lista.innerHTML = `
+            <div class="citas-empty">
+                <i class="bi bi-calendar-x"></i>
+                <h4>Sin citas</h4>
+                <p>No se encontraron citas con los filtros aplicados.</p>
+            </div>`;
+        return;
+    }
+
+    lista.innerHTML = filtradas.map(cardHtml).join('');
+    lista.querySelectorAll('[data-accion]').forEach(btn => {
+        btn.addEventListener('click', () => manejarAccion(btn));
+    });
+}
+
+// ─── HTML de tarjeta ─────────────────────────────────────────
+function esCitaDeHoy(dt) {
+    if (!dt) return false;
+    const hoy = new Date();
+    return dt.getFullYear() === hoy.getFullYear() &&
+           dt.getMonth()    === hoy.getMonth() &&
+           dt.getDate()     === hoy.getDate();
+}
+
+function cardHtml(c) {
+    const dt    = c.fecha_hora ? new Date(c.fecha_hora.replace(' ', 'T')) : null;
+    const hora  = dt ? dt.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+    const fecha = dt ? dt.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : '--';
+
+    const estadoLow  = (c.estado || '').toLowerCase();
+    const estadoLabel = { pendiente: 'Pendiente', confirmada: 'Confirmada', cancelada: 'Cancelada' }[estadoLow] || c.estado;
+
+    const avatarHtml = c.img_mascota
+        ? `<img src="${BASE_URL}/public/uploads/mascotas/${esc(c.img_mascota)}" alt="${esc(c.paciente_nombre)}" class="paciente-avatar-cita">`
+        : `<div class="paciente-avatar-placeholder"><i class="bi bi-heart-pulse"></i></div>`;
+
+    const btnAtender = esCitaDeHoy(dt)
+        ? `<button class="btn-cita btn-cita-atender" data-accion="atender" data-id="${c.id_agendamiento}" data-paciente="${c.id_paciente}">
+               <i class="bi bi-clipboard2-pulse"></i> Atender
+           </button>`
+        : `<button class="btn-cita btn-cita-atender" disabled title="Solo puedes atender citas programadas para el día de hoy">
+               <i class="bi bi-clipboard2-pulse"></i> Atender
+           </button>`;
+
+    let botones;
+    if (estadoLow === 'completada') {
+        botones = `<button class="btn-cita" style="background:#f1f5f9;color:#64748b;cursor:default;" disabled>
+                       <i class="bi bi-check-circle-fill"></i> Atendida
+                   </button>`;
+    } else if (estadoLow === 'pendiente') {
+        botones = `<button class="btn-cita btn-cita-confirmar" data-accion="confirmar" data-id="${c.id_agendamiento}">
+                       <i class="bi bi-check-circle"></i> Confirmar
+                   </button>
+                   ${btnAtender}`;
+    } else {
+        botones = `${btnAtender}
+                   <button class="btn-cita btn-cita-cancelar" data-accion="cancelar" data-id="${c.id_agendamiento}">
+                       <i class="bi bi-x-circle"></i> Cancelar
+                   </button>`;
+    }
+
+    return `
+    <div class="cita-card" data-estado="${estadoLow}" data-id="${c.id_agendamiento}">
+
+        <div class="cita-header-color">
+            <div class="cita-hora-bloque">
+                <span class="hora">${hora}</span>
+                <span class="fecha-corta">${fecha}</span>
+            </div>
+            <span class="badge-estado">${estadoLabel}</span>
+        </div>
+
+        <div class="cita-body">
+            <div class="cita-paciente-row">
+                ${avatarHtml}
+                <div class="paciente-datos">
+                    <h4 title="${esc(c.paciente_nombre || '--')}">${esc(c.paciente_nombre || '--')}</h4>
+                    <span class="badge-especie">
+                        <i class="bi bi-heart-fill"></i>
+                        ${esc(c.especie || '--')}${c.raza ? ' · ' + esc(c.raza) : ''}
+                    </span>
+                </div>
+            </div>
+
+            <div class="cita-divider"></div>
+
+            <div class="cita-detalles">
+                ${c.propietario_nombre  ? `<div class="detalle-item"><i class="bi bi-person"></i><span>${esc(c.propietario_nombre)}</span></div>` : ''}
+                ${c.propietario_telefono ? `<div class="detalle-item"><i class="bi bi-telephone"></i><span>${esc(c.propietario_telefono)}</span></div>` : ''}
+                ${c.tipo                ? `<div class="detalle-item"><i class="bi bi-clipboard-pulse"></i><span>${esc(c.tipo)}</span></div>` : ''}
+                ${c.observaciones       ? `<div class="detalle-item"><i class="bi bi-chat-left-text"></i><span>${esc(c.observaciones)}</span></div>` : ''}
+            </div>
+        </div>
+
+        <div class="cita-acciones">${botones}</div>
+    </div>`;
+}
+
+// ─── Acciones ─────────────────────────────────────────────────
+async function manejarAccion(btn) {
+    const accion   = btn.dataset.accion;
+    const id       = parseInt(btn.dataset.id, 10);
+    const idPaciente = parseInt(btn.dataset.paciente || '0', 10);
+
+    if (accion === 'atender') {
+        // Buscar la cita en memoria para prellenar el modal
+        const cita = _todasLasCitas.find(c => Number(c.id_agendamiento) === id);
+        if (cita) abrirModalAtender(cita);
+        return;
+    }
+
+    const extra = { id_agendamiento: id };
+
+    if (accion === 'cancelar') {
+        const motivo = await pedirMotivoCancelacion();
+        if (!motivo) return;
+        extra.motivo = motivo;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+    try {
+        const result = await apiPost(accion, extra);
+        if (result.status !== 'success') throw new Error(result.message);
+
+        mostrarNotificacion(result.message, 'success');
+        await cargarCitas();
+    } catch (err) {
+        mostrarNotificacion(err.message || 'Ocurrió un error', 'error');
+        btn.disabled = false;
+        renderCitas();
+    }
+}
+
+// ─── Modal Atender Cita ──────────────────────────────────────
+let _bsModalAtender = null;
+let _citaAtendiendo = null;
+
+function initModalAtender() {
+    const modalEl = document.getElementById('modalAtenderCita');
+    if (!modalEl) return;
+    _bsModalAtender = new bootstrap.Modal(modalEl);
+
+    const btnGuardar = document.getElementById('btnGuardarAtencionCita');
+    if (btnGuardar) {
+        btnGuardar.addEventListener('click', guardarAtencionCita);
+    }
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+        limpiarModalAtender();
+        _citaAtendiendo = null;
+    });
+}
+
+function abrirModalAtender(cita) {
+    if (!_bsModalAtender) initModalAtender();
+    if (!_bsModalAtender) return;
+
+    _citaAtendiendo = cita;
+    limpiarModalAtender();
+
+    // Prellenar con datos de la cita
+    document.getElementById('atenderIdPaciente').value = cita.id_paciente || '';
+    document.getElementById('atenderIdCita').value     = cita.id_agendamiento || '';
+
+    document.getElementById('atenderPacienteNombre').textContent =
+        cita.paciente_nombre || 'Paciente';
+    document.getElementById('atenderPacienteMeta').textContent =
+        [(cita.especie || '--'), (cita.raza || '--'), (cita.propietario_nombre || '')]
+            .filter(Boolean).join(' · ');
+
+    // Fecha de la cita como fecha de atención
+    const fechaCita = cita.fecha_hora ? cita.fecha_hora.slice(0, 10) : new Date().toISOString().slice(0, 10);
+    document.getElementById('atenderFecha').value = fechaCita;
+
+    // Motivo: observaciones de la cita si existen
+    document.getElementById('atenderMotivo').value = cita.observaciones || '';
+
+    _bsModalAtender.show();
+}
+
+function limpiarModalAtender() {
+    ['atenderIdPaciente','atenderIdCita','atenderFecha','atenderMotivo',
+     'atenderDiagnostico','atenderTratamiento','atenderMedicacion','atenderObservaciones']
+        .forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = id === 'atenderFecha' ? new Date().toISOString().slice(0,10) : '';
+        });
+}
+
+async function guardarAtencionCita() {
+    const idPaciente    = Number(document.getElementById('atenderIdPaciente').value || 0);
+    const idCita        = Number(document.getElementById('atenderIdCita').value || 0);
+    const fechaAtencion = (document.getElementById('atenderFecha').value || '').trim();
+    const motivo        = (document.getElementById('atenderMotivo').value || '').trim();
+
+    if (idPaciente <= 0) { mostrarNotificacion('No hay paciente seleccionado.', 'error'); return; }
+    if (!fechaAtencion || !motivo) {
+        mostrarNotificacion('La fecha de atención y el motivo son obligatorios.', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('btnGuardarAtencionCita');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Guardando...';
+
+    try {
+        // 1. Guardar historial clínico
+        const res = await fetch(BASE_URL + '/veterinaria/pacientes/acciones', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                accion:                    'guardar_historial',
+                id_historial:              0,
+                id_paciente:               idPaciente,
+                fecha_atencion:            fechaAtencion,
+                motivo_consulta:           motivo,
+                diagnostico:               (document.getElementById('atenderDiagnostico').value || '').trim(),
+                tratamientos_aplicados:    (document.getElementById('atenderTratamiento').value || '').trim(),
+                medicacion_recetada:       (document.getElementById('atenderMedicacion').value || '').trim(),
+                observaciones_adicionales: (document.getElementById('atenderObservaciones').value || '').trim(),
+            }),
         });
 
-        function filtrarCitas(filtro) {
-            const citas = document.querySelectorAll('.cita-card');
-            
-            citas.forEach(cita => {
-                const estado = cita.dataset.estado;
-                
-                if (filtro === 'todas') {
-                    cita.style.display = 'grid';
-                } else if (filtro === 'pendientes' && estado === 'pendiente') {
-                    cita.style.display = 'grid';
-                } else if (filtro === 'confirmadas' && estado === 'confirmada') {
-                    cita.style.display = 'grid';
-                } else if (filtro === 'completadas' && estado === 'completada') {
-                    cita.style.display = 'grid';
-                } else {
-                    cita.style.display = 'none';
-                }
-            });
+        const result = await res.json();
+        if (result.status !== 'success') throw new Error(result.message || 'Error al guardar');
 
-            verificarCitasVisibles();
+        // 2. Marcar la cita como Completada
+        if (idCita > 0) {
+            await apiPost('completar', { id_agendamiento: idCita });
         }
 
-        function verificarCitasVisibles() {
-            const citasVisibles = document.querySelectorAll('.cita-card[style="display: grid;"]').length;
-            const citasLista = document.getElementById('citasLista');
+        if (_bsModalAtender) _bsModalAtender.hide();
+        mostrarNotificacion('Atención registrada correctamente.', 'success');
+        await cargarCitas();
 
-            if (citasVisibles === 0) {
-                if (!document.querySelector('.empty-state')) {
-                    citasLista.innerHTML = `
-                        <div class="empty-state">
-                            <i class="bi bi-calendar-x"></i>
-                            <h3>No hay citas</h3>
-                            <p>No se encontraron citas con los filtros aplicados</p>
-                        </div>
-                    `;
-                }
-            }
-        }
+    } catch (err) {
+        mostrarNotificacion(err.message || 'Error al guardar la atención.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Guardar atención';
+    }
+}
 
-        // BÚSQUEDA
-        document.getElementById('buscarCita').addEventListener('input', function(e) {
-            const termino = e.target.value.toLowerCase();
-            const citas = document.querySelectorAll('.cita-card');
-
-            citas.forEach(cita => {
-                const texto = cita.textContent.toLowerCase();
-                cita.style.display = texto.includes(termino) ? 'grid' : 'none';
-            });
-
-            verificarCitasVisibles();
+// ─── Tabs ─────────────────────────────────────────────────────
+function initTabs() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            _tabActivo = btn.dataset.tab;
+            renderCitas();
         });
+    });
+}
 
-        // ACCIONES DE BOTONES
-        document.querySelectorAll('.btn-confirmar').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const card = this.closest('.cita-card');
-                const badge = card.querySelector('.estado-badge');
-                
-                badge.textContent = 'Confirmada';
-                badge.className = 'estado-badge confirmada';
-                card.dataset.estado = 'confirmada';
+// ─── Búsqueda ─────────────────────────────────────────────────
+function initBusqueda() {
+    const input = document.getElementById('buscarCita');
+    if (!input) return;
+    input.addEventListener('input', () => {
+        _busqueda = input.value;
+        renderCitas();
+    });
+}
 
-                mostrarNotificacion('Cita confirmada exitosamente', 'success');
-            });
-        });
+// ─── Utilidades de UI ────────────────────────────────────────
+function mostrarEsqueleto() {
+    const lista = document.getElementById('citasLista');
+    if (lista) lista.innerHTML = '<div class="citas-skeleton"><i class="bi bi-hourglass-split"></i> Cargando citas…</div>';
+}
 
-        document.querySelectorAll('.btn-completar').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const card = this.closest('.cita-card');
-                const badge = card.querySelector('.estado-badge');
-                
-                badge.textContent = 'Completada';
-                badge.className = 'estado-badge completada';
-                card.dataset.estado = 'completada';
+function mostrarError(msg) {
+    const lista = document.getElementById('citasLista');
+    if (lista) lista.innerHTML = `
+        <div class="citas-empty">
+            <i class="bi bi-exclamation-circle" style="color:#fca5a5;"></i>
+            <h4 style="color:#dc2626;">Error al cargar</h4>
+            <p>${esc(msg)}</p>
+        </div>`;
+}
 
-                mostrarNotificacion('Cita marcada como completada', 'success');
-            });
-        });
+function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-        document.querySelectorAll('.btn-cancelar').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (confirm('¿Está seguro de cancelar esta cita?')) {
-                    const card = this.closest('.cita-card');
-                    const badge = card.querySelector('.estado-badge');
-                    
-                    badge.textContent = 'Cancelada';
-                    badge.className = 'estado-badge cancelada';
-                    card.dataset.estado = 'cancelada';
+// ─── Notificaciones ──────────────────────────────────────────
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    const colores = { success: '#22c55e', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
+    const iconos  = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', warning: 'bi-exclamation-triangle-fill', info: 'bi-info-circle-fill' };
 
-                    mostrarNotificacion('Cita cancelada', 'warning');
-                }
-            });
-        });
+    const el = document.createElement('div');
+    el.style.cssText = `position:fixed;top:24px;right:24px;background:#fff;padding:16px 20px;
+        border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.14);z-index:9999;
+        display:flex;align-items:center;gap:12px;min-width:280px;
+        animation:slideInR .35s ease;border-left:4px solid ${colores[tipo]};`;
+    el.innerHTML = `<i class="bi ${iconos[tipo]}" style="font-size:1.4rem;color:${colores[tipo]};flex-shrink:0;"></i>
+        <span style="flex:1;font-weight:600;font-size:.875rem;color:#0f172a;">${esc(mensaje)}</span>
+        <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.1rem;">
+            <i class="bi bi-x-lg"></i>
+        </button>`;
+    document.body.appendChild(el);
+    setTimeout(() => { el.style.animation = 'slideOutR .35s ease'; setTimeout(() => el.remove(), 350); }, 4000);
+}
 
-        document.querySelectorAll('.btn-editar').forEach(btn => {
-            btn.addEventListener('click', function() {
-                mostrarNotificacion('Función de edición en desarrollo', 'info');
-            });
-        });
+const _notifStyle = document.createElement('style');
+_notifStyle.textContent = `
+@keyframes slideInR  { from { transform:translateX(110%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+@keyframes slideOutR { from { transform:translateX(0); opacity:1; } to { transform:translateX(110%); opacity:0; } }`;
+document.head.appendChild(_notifStyle);
 
-        // NUEVA CITA
-        window.nuevaCita = async function() {
-            // Cargar script de SweetAlert2 si no está cargado
-            if (typeof Swal === 'undefined') {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
-                document.head.appendChild(script);
-                
-                await new Promise((resolve) => {
-                    script.onload = resolve;
-                });
-            }
+// ─── SweetAlert2 (carga perezosa compartida) ──────────────────
+async function cargarSweetAlert() {
+    if (typeof Swal !== 'undefined') return;
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+    document.head.appendChild(script);
+    await new Promise(r => { script.onload = r; });
+}
 
-            // Obtener fecha y hora actual
-            const ahora = new Date();
-            
-            // Establecer hora de inicio (redondear a la próxima hora)
-            const fechaInicio = new Date(ahora);
-            fechaInicio.setMinutes(0, 0, 0);
-            if (ahora.getMinutes() > 0) {
-                fechaInicio.setHours(fechaInicio.getHours() + 1);
-            }
-            
-            // Establecer hora de fin (1 hora después)
-            const fechaFin = new Date(fechaInicio);
-            fechaFin.setHours(fechaFin.getHours() + 1);
-            
-            // Formatear fechas para los inputs
-            const fechaInicioStr = formatDateForInput(fechaInicio);
-            const fechaFinStr = formatDateForInput(fechaFin);
-            
-            try {
-                // Cargar datos desde el servidor
-                console.log('Cargando propietarios...');
-                const propietarios = await cargarPropietarios();
-                console.log('Propietarios cargados:', propietarios);
-                
-                console.log('Cargando subservicios...');
-                const subservicios = await cargarSubservicios();
-                console.log('Subservicios cargados:', subservicios);
-                
-                // Crear opciones HTML para propietarios
-                let propietariosOptions = '<option value="">Selecciona un propietario...</option>';
-                propietarios.forEach(prop => {
-                    propietariosOptions += `<option value="${prop.id_propietario}">${prop.nombres} ${prop.apellidos}</option>`;
-                });
-                
-                // Crear opciones HTML para subservicios
-                let serviciosOptions = '<option value="">Selecciona un servicio...</option>';
-                subservicios.forEach(sub => {
-                    const precio = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(sub.costo);
-                    serviciosOptions += `<option value="${sub.id_subservicio}">${sub.nombre_subservicio} - ${precio}</option>`;
-                });
-                
-                // Mostrar SweetAlert con formulario
-                const result = await Swal.fire({
-                    title: '<i class="bi bi-calendar-plus" style="color: #0a932c;"></i> Nueva Cita',
-                    html: `
-                        <style>
-                            .form-agendamiento {
-                                max-height: 500px;
-                                overflow-y: auto;
-                                padding: 0 5px;
-                            }
-                            
-                            .form-agendamiento::-webkit-scrollbar {
-                                width: 8px;
-                            }
-                            
-                            .form-agendamiento::-webkit-scrollbar-track {
-                                background: #f1f1f1;
-                                border-radius: 10px;
-                            }
-                            
-                            .form-agendamiento::-webkit-scrollbar-thumb {
-                                background: #888;
-                                border-radius: 10px;
-                            }
-                            
-                            .form-agendamiento::-webkit-scrollbar-thumb:hover {
-                                background: #555;
-                            }
-                            
-                            .form-group-ag {
-                                margin-bottom: 24px;
-                            }
-                            
-                            .form-label-ag {
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                margin-bottom: 10px;
-                                font-weight: 600;
-                                color: #00304D;
-                                font-size: 14px;
-                            }
-                            
-                            .form-label-ag i {
-                                font-size: 16px;
-                                color: #0a932c;
-                            }
-                            
-                            .form-label-ag .required {
-                                color: #e74c3c;
-                                margin-left: 2px;
-                            }
-                            
-                            .form-control-ag {
-                                width: 100%;
-                                padding: 12px 16px;
-                                border: 2px solid #e0e0e0;
-                                border-radius: 10px;
-                                font-size: 14px;
-                                font-family: inherit;
-                                transition: all 0.3s ease;
-                                background: #ffffff;
-                                box-sizing: border-box;
-                            }
-                            
-                            .form-control-ag:focus {
-                                outline: none;
-                                border-color: #0a932c;
-                                box-shadow: 0 0 0 4px rgba(10, 147, 44, 0.1);
-                                background: #ffffff;
-                            }
-                            
-                            .form-control-ag:disabled {
-                                background: #f5f5f5;
-                                cursor: not-allowed;
-                                color: #999;
-                            }
-                            
-                            textarea.form-control-ag {
-                                resize: vertical;
-                                min-height: 100px;
-                                font-family: inherit;
-                                line-height: 1.5;
-                            }
-                            
-                            .form-helper {
-                                font-size: 12px;
-                                color: #666;
-                                margin-top: 6px;
-                                display: flex;
-                                align-items: center;
-                                gap: 5px;
-                            }
-                            
-                            .form-helper i {
-                                font-size: 11px;
-                            }
-                            
-                            .form-divider {
-                                height: 1px;
-                                background: linear-gradient(to right, transparent, #e0e0e0, transparent);
-                                margin: 25px 0;
-                            }
-                        </style>
-                        
-                        <div class="form-agendamiento">
-                            <div class="form-group-ag">
-                                <label class="form-label-ag">
-                                    <i class="bi bi-person-fill"></i>
-                                    Propietario
-                                    <span class="required">*</span>
-                                </label>
-                                <select id="swal-propietario" class="form-control-ag">
-                                    ${propietariosOptions}
-                                </select>
-                                <div class="form-helper">
-                                    <i class="bi bi-info-circle"></i>
-                                    Selecciona el propietario de la mascota
-                                </div>
-                            </div>
-                            
-                            <div class="form-group-ag">
-                                <label class="form-label-ag">
-                                    <i class="bi bi-heart-fill"></i>
-                                    Mascota
-                                    <span class="required">*</span>
-                                </label>
-                                <select id="swal-mascota" class="form-control-ag" disabled>
-                                    <option value="">Primero selecciona un propietario</option>
-                                </select>
-                                <div class="form-helper">
-                                    <i class="bi bi-info-circle"></i>
-                                    Selecciona la mascota del propietario
-                                </div>
-                            </div>
-                            
-                            <div class="form-divider"></div>
-                            
-                            <div class="form-group-ag">
-                                <label class="form-label-ag">
-                                    <i class="bi bi-clipboard2-pulse-fill"></i>
-                                    Servicio
-                                    <span class="required">*</span>
-                                </label>
-                                <select id="swal-servicio" class="form-control-ag">
-                                    ${serviciosOptions}
-                                </select>
-                                <div class="form-helper">
-                                    <i class="bi bi-info-circle"></i>
-                                    Selecciona el servicio específico
-                                </div>
-                            </div>
-                            
-                            <div class="form-divider"></div>
-                            
-                            <div class="form-group-ag">
-                                <label class="form-label-ag">
-                                    <i class="bi bi-person-badge-fill"></i>
-                                    Veterinario
-                                </label>
-                                <select id="swal-veterinario" class="form-control-ag">
-                                    <option value="">Cualquier veterinario disponible</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-divider"></div>
-                            
-                            <div class="form-group-ag">
-                                <label class="form-label-ag">
-                                    <i class="bi bi-clock-fill"></i>
-                                    Fecha y Hora Inicio
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="datetime-local" id="swal-fecha-inicio" 
-                                       class="form-control-ag" value="${fechaInicioStr}">
-                            </div>
-                            
-                            <div class="form-group-ag">
-                                <label class="form-label-ag">
-                                    <i class="bi bi-clock-history"></i>
-                                    Fecha y Hora Fin
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="datetime-local" id="swal-fecha-fin" 
-                                       class="form-control-ag" value="${fechaFinStr}">
-                            </div>
-                            
-                            <div class="form-group-ag">
-                                <label class="form-label-ag">
-                                    <i class="bi bi-chat-left-text-fill"></i>
-                                    Motivo / Observaciones
-                                </label>
-                                <textarea id="swal-motivo" class="form-control-ag" 
-                                          placeholder="Describe el motivo de la cita o cualquier observación importante..."></textarea>
-                            </div>
-                        </div>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: '<i class="bi bi-check-lg"></i> Agendar Cita',
-                    cancelButtonText: '<i class="bi bi-x-lg"></i> Cancelar',
-                    width: '700px',
-                    customClass: {
-                        confirmButton: 'btn btn-success px-4',
-                        cancelButton: 'btn btn-secondary px-4'
-                    },
-                    buttonsStyling: false,
-                    didOpen: () => {
-                        setupFormHandlers();
-                    },
-                    preConfirm: () => {
-                        return validateAndGetFormData();
-                    }
-                });
+// ─── Motivo de cancelación ─────────────────────────────────────
+async function pedirMotivoCancelacion() {
+    await cargarSweetAlert();
 
-                if (result.isConfirmed && result.value) {
-                    await enviarCita(result.value);
-                }
-                
-            } catch (error) {
-                console.error('Error al abrir formulario de nueva cita:', error);
-                console.error('Stack trace:', error.stack);
-                mostrarNotificacion('Error al cargar el formulario: ' + error.message, 'error');
-            }
-        }
+    const { value: motivo, isConfirmed } = await Swal.fire({
+        title: '<i class="bi bi-x-circle" style="color:#ef4444;"></i> Cancelar cita',
+        input: 'textarea',
+        inputLabel: 'Indica el motivo de la cancelación',
+        inputPlaceholder: 'Describe brevemente por qué se cancela esta cita...',
+        inputAttributes: { 'aria-label': 'Motivo de la cancelación' },
+        showCancelButton: true,
+        confirmButtonText: '<i class="bi bi-x-circle"></i> Cancelar cita',
+        cancelButtonText: 'Volver',
+        customClass: { confirmButton: 'btn btn-danger px-4', cancelButton: 'btn btn-secondary px-4' },
+        buttonsStyling: false,
+        inputValidator: (value) => {
+            if (!value || !value.trim()) return 'Debes indicar el motivo de la cancelación';
+        },
+    });
 
-        // Función auxiliar para formatear fechas para datetime-local
-        function formatDateForInput(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
-        }
-
-        // Función auxiliar para formatear fechas para MySQL
-        function formatDateForMySQL(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        }
-
-        // Configurar los handlers del formulario
-        function setupFormHandlers() {
-            // Handler para cambio de propietario
-            document.getElementById('swal-propietario').addEventListener('change', async function() {
-                const idPropietario = this.value;
-                const mascotaSelect = document.getElementById('swal-mascota');
-                
-                if (idPropietario) {
-                    mascotaSelect.disabled = true;
-                    mascotaSelect.innerHTML = '<option value="">Cargando mascotas...</option>';
-                    
-                    try {
-                        const mascotas = await cargarMascotasPorPropietario(idPropietario);
-                        let options = '<option value="">Selecciona una mascota...</option>';
-                        mascotas.forEach(m => {
-                            options += `<option value="${m.id_paciente}">${m.nombre} - ${m.especie} (${m.raza})</option>`;
-                        });
-                        mascotaSelect.innerHTML = options;
-                        mascotaSelect.disabled = false;
-                    } catch (error) {
-                        mascotaSelect.innerHTML = '<option value="">Error al cargar mascotas</option>';
-                        console.error('Error al cargar mascotas:', error);
-                    }
-                } else {
-                    mascotaSelect.disabled = true;
-                    mascotaSelect.innerHTML = '<option value="">Primero selecciona un propietario</option>';
-                }
-            });
-
-            // Cargar veterinarios
-            cargarVeterinarios();
-        }
-
-        // Validar y obtener datos del formulario
-        function validateAndGetFormData() {
-            const propietario = document.getElementById('swal-propietario').value;
-            const mascota = document.getElementById('swal-mascota').value;
-            const subservicio = document.getElementById('swal-servicio').value; // Ahora contiene id_subservicio
-            const veterinario = document.getElementById('swal-veterinario').value || null;
-            const fechaInicio = document.getElementById('swal-fecha-inicio').value;
-            const fechaFin = document.getElementById('swal-fecha-fin').value;
-            const motivo = document.getElementById('swal-motivo').value;
-
-            // Validaciones
-            if (!propietario) {
-                Swal.showValidationMessage('Por favor selecciona un propietario');
-                return false;
-            }
-            if (!mascota) {
-                Swal.showValidationMessage('Por favor selecciona una mascota');
-                return false;
-            }
-            if (!subservicio) {
-                Swal.showValidationMessage('Por favor selecciona un servicio');
-                return false;
-            }
-            if (!fechaInicio || !fechaFin) {
-                Swal.showValidationMessage('Por favor completa las fechas');
-                return false;
-            }
-
-            const inicio = new Date(fechaInicio);
-            const fin = new Date(fechaFin);
-
-            if (fin <= inicio) {
-                Swal.showValidationMessage('La fecha de fin debe ser posterior a la de inicio');
-                return false;
-            }
-
-            return {
-                tipo: 'Cita',
-                id_propietario: propietario,
-                id_paciente: mascota,
-                id_servicio: subservicio,
-                id_veterinario: veterinario,
-                fecha_hora: formatDateForMySQL(inicio),
-                fecha_hora_fin: formatDateForMySQL(fin),
-                observaciones: motivo,
-                estado: 'Pendiente'
-            };
-        }
-
-        // Enviar cita al servidor
-        async function enviarCita(datos) {
-            try {
-                const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-                
-                const response = await fetch(baseUrl + '/calendario/storeEvent', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(datos)
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    await Swal.fire({
-                        icon: 'success',
-                        title: '¡Cita Agendada!',
-                        text: result.message || 'La cita ha sido agendada exitosamente',
-                        confirmButtonText: 'Aceptar',
-                        customClass: {
-                            confirmButton: 'btn btn-success'
-                        },
-                        buttonsStyling: false
-                    });
-                    
-                    // Recargar la página para mostrar la nueva cita
-                    location.reload();
-                } else {
-                    throw new Error(result.message || 'Error al agendar la cita');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'No se pudo agendar la cita',
-                    confirmButtonText: 'Aceptar',
-                    customClass: {
-                        confirmButton: 'btn btn-danger'
-                    },
-                    buttonsStyling: false
-                });
-            }
-        }
-
-        // Funciones para cargar datos desde el servidor
-        async function cargarPropietarios() {
-            const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-            const response = await fetch(baseUrl + '/calendario/getPropietarios');
-            if (!response.ok) throw new Error('Error al cargar propietarios');
-            const result = await response.json();
-            return result.status === 'success' ? result.data : [];
-        }
-
-        async function cargarServicios() {
-            const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-            const response = await fetch(baseUrl + '/calendario/getServicios');
-            if (!response.ok) throw new Error('Error al cargar servicios');
-            const result = await response.json();
-            return result.status === 'success' ? result.data : [];
-        }
-
-        async function cargarSubserviciosPorServicio(idServicio) {
-            const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-            const response = await fetch(baseUrl + `/calendario/getSubservicios?id_servicio=${idServicio}`);
-            if (!response.ok) throw new Error('Error al cargar subservicios');
-            const result = await response.json();
-            return result.status === 'success' ? result.data : [];
-        }
-
-        async function cargarMascotasPorPropietario(idPropietario) {
-            const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-            const response = await fetch(baseUrl + `/calendario/getMascotas?id_propietario=${idPropietario}`);
-            if (!response.ok) throw new Error('Error al cargar mascotas');
-            const result = await response.json();
-            return result.status === 'success' ? result.data : [];
-        }
-
-        async function cargarVeterinarios() {
-            try {
-                const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-                const response = await fetch(baseUrl + '/calendario/getVeterinarios');
-                if (!response.ok) throw new Error('Error al cargar veterinarios');
-                
-                const result = await response.json();
-                const veterinarios = result.status === 'success' ? result.data : [];
-                const select = document.getElementById('swal-veterinario');
-                
-                let options = '<option value="">Cualquier veterinario disponible</option>';
-                veterinarios.forEach(vet => {
-                    options += `<option value="${vet.id_usuario}">Dr. ${vet.nombres} ${vet.apellidos}</option>`;
-                });
-                
-                select.innerHTML = options;
-            } catch (error) {
-                console.error('Error al cargar veterinarios:', error);
-            }
-        }
-
-        // SISTEMA DE NOTIFICACIONES
-        function mostrarNotificacion(mensaje, tipo = 'info') {
-            const colores = {
-                success: '#22c55e',
-                warning: '#f59e0b',
-                error: '#ef4444',
-                info: '#3b82f6'
-            };
-
-            const iconos = {
-                success: 'bi-check-circle-fill',
-                warning: 'bi-exclamation-triangle-fill',
-                error: 'bi-x-circle-fill',
-                info: 'bi-info-circle-fill'
-            };
-
-            const notificacion = document.createElement('div');
-            notificacion.style.cssText = `
-                position: fixed;
-                top: 30px;
-                right: 30px;
-                background: white;
-                padding: 20px 25px;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                z-index: 10000;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                min-width: 300px;
-                animation: slideInRight 0.4s ease;
-                border-left: 5px solid ${colores[tipo]};
-            `;
-
-            notificacion.innerHTML = `
-                <i class="bi ${iconos[tipo]}" style="font-size: 28px; color: ${colores[tipo]};"></i>
-                <span style="flex: 1; font-weight: 600; color: var(--color-gris);">${mensaje}</span>
-                <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; color: #6c757d; font-size: 20px;">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            `;
-
-            document.body.appendChild(notificacion);
-
-            setTimeout(() => {
-                notificacion.style.animation = 'slideOutRight 0.4s ease';
-                setTimeout(() => notificacion.remove(), 400);
-            }, 4000);
-        }
-
-        // ANIMACIONES CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            
-            @keyframes slideOutRight {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // FILTRO POR VETERINARIO
-        document.getElementById('filtroVeterinario').addEventListener('change', function() {
-            const veterinario = this.value;
-            const citas = document.querySelectorAll('.cita-card');
-
-            citas.forEach(cita => {
-                const vetText = cita.textContent;
-                if (veterinario === '' || vetText.includes(this.options[this.selectedIndex].text)) {
-                    cita.style.display = 'grid';
-                } else {
-                    cita.style.display = 'none';
-                }
-            });
-
-            verificarCitasVisibles();
-        });
-
-        // ACTUALIZAR ESTADÍSTICAS
-        function actualizarEstadisticas() {
-            const citas = document.querySelectorAll('.cita-card');
-            const stats = {
-                pendiente: 0,
-                confirmada: 0,
-                completada: 0,
-                cancelada: 0
-            };
-
-            citas.forEach(cita => {
-                const estado = cita.dataset.estado;
-                if (stats.hasOwnProperty(estado)) {
-                    stats[estado]++;
-                }
-            });
-
-            // Actualizar los números en las tarjetas de estadísticas
-            const statCards = document.querySelectorAll('.stat-card');
-            statCards[0].querySelector('h3').textContent = stats.pendiente;
-            statCards[1].querySelector('h3').textContent = stats.confirmada;
-            statCards[2].querySelector('h3').textContent = stats.completada;
-            statCards[3].querySelector('h3').textContent = stats.cancelada;
-        }
-
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', () => {
-            actualizarEstadisticas();
-            console.log('Sistema de Gestión de Citas cargado exitosamente');
-        });
+    return isConfirmed ? motivo.trim() : null;
+}

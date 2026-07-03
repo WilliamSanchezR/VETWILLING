@@ -21,8 +21,9 @@ switch ($method) {
         if (!is_array($data)) {
             $data = [];
         }
-        $accion = $data['accion'] ?? '';
-        
+        // El frontend envía la acción como query string (?accion=...) incluso en POST
+        $accion = $_GET['accion'] ?? ($data['accion'] ?? '');
+
         switch ($accion) {
             case 'actualizar':
                 actualizarPreferencia();
@@ -239,6 +240,13 @@ function obtenerNotificaciones()
         $modeloNotificacion = new Notificacion();
         $notificaciones = $modeloNotificacion->listarParaUsuario($id_usuario, $limite);
         $noLeidas = $modeloNotificacion->contarNoLeidas($id_usuario);
+
+        // El navbar (nav.js) espera los alias "id" y "fecha" además de los nombres originales de columna
+        foreach ($notificaciones as &$n) {
+            $n['id'] = $n['id_notificacion'] ?? null;
+            $n['fecha'] = $n['fecha_creacion'] ?? null;
+        }
+        unset($n);
 
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([

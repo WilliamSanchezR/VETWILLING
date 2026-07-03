@@ -636,6 +636,20 @@ $id_usuario = $_SESSION['user']['id_usuario'];
     async function reagendarCita(idAgendamiento) {
         /* Buscar la cita en el array para mostrar datos actuales */
         const citaActual = citasData.find(c => c.id_agendamiento == idAgendamiento);
+
+        if (citaActual) {
+            const horasParaLaCita = (new Date(citaActual.fecha_hora) - new Date()) / 3600000;
+            if (horasParaLaCita < 24) {
+                await Swal.fire({
+                    icon: 'warning',
+                    title: 'No se puede reagendar',
+                    text: 'Solo puedes reagendar con al menos 24 horas de anticipación a la cita.',
+                    confirmButtonColor: '#0a932c'
+                });
+                return;
+            }
+        }
+
         const fechaMin   = new Date();
         fechaMin.setHours(fechaMin.getHours() + 24);
         const fechaMinISO = fechaMin.toISOString().slice(0, 16); /* YYYY-MM-DDTHH:MM */
@@ -840,6 +854,21 @@ $id_usuario = $_SESSION['user']['id_usuario'];
 
     /* Cancelar cita con confirmación y motivo */
     async function cancelarCita(id, nombre) {
+        var citaActual = citasData.find(function (c) { return c.id_agendamiento == id; });
+
+        if (citaActual) {
+            var horasParaLaCita = (new Date(citaActual.fecha_hora) - new Date()) / 3600000;
+            if (horasParaLaCita < 24) {
+                await Swal.fire({
+                    icon: 'warning',
+                    title: 'No se puede cancelar',
+                    text: 'Solo puedes cancelar con al menos 24 horas de anticipación a la cita.',
+                    confirmButtonColor: '#0a932c'
+                });
+                return;
+            }
+        }
+
         var result = await Swal.fire({
             title: '¿Cancelar cita?',
             html:

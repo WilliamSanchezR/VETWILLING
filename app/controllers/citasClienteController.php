@@ -527,8 +527,15 @@ function modificarCitaCliente()
             exit();
         }
 
+        $validacion = $modeloCitas->validarEstadoCita($id_agendamiento, 'reagendar');
+        if (!$validacion['valido']) {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => $validacion['mensaje']]);
+            exit();
+        }
+
         $disponible = $modeloCitas->verificarDisponibilidad(
-            $nueva_fecha_hora, 
+            $nueva_fecha_hora,
             $nueva_fecha_hora_fin,
             $id_agendamiento
         );

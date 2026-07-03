@@ -169,23 +169,25 @@
 
       /* Filtro por estado */
       if (filtro === "activos") {
-        if (!["activo", "en-tratamiento", "programado"].includes(estado))
-          return false;
+        // Activos = todo lo que NO está completado
+        if (estado === "completado") return false;
       } else if (filtro === "criticos") {
         if (!["critico", "critica"].includes(prioridad)) return false;
       } else if (filtro === "completados") {
         if (estado !== "completado") return false;
       }
 
-      /* Filtro por búsqueda — SOLO en campos de texto, NO en HTML generado.
-               Esto evitaba que "ver" encontrara todas las tarjetas por el botón "Ver Detalles" */
+      /* Búsqueda en campos de texto (incluye diagnostico_principal) */
       if (q) {
         const campos = [
           seg.paciente_nombre,
+          seg.diagnostico_principal,
           seg.ultimo_diagnostico,
+          seg.motivo,
           seg.propietario_nombres,
           seg.propietario_apellidos,
           seg.tratamiento_actual,
+          seg.objetivo_tratamiento,
           prioridad,
           estado,
         ].map((v) => (v || "").toLowerCase());
@@ -326,7 +328,7 @@
     art.dataset.prioridad = prioridad;
     art.dataset.estado = estado;
     art.dataset.paciente = (seg.paciente_nombre || "").toLowerCase();
-    art.dataset.diagnostico = (seg.ultimo_diagnostico || "").toLowerCase();
+    art.dataset.diagnostico = (seg.diagnostico_principal || seg.ultimo_diagnostico || "").toLowerCase();
     art.dataset.propietario =
       `${seg.propietario_nombres || ""} ${seg.propietario_apellidos || ""}`
         .toLowerCase()
@@ -432,7 +434,7 @@
                     <div class="card-seg-info-item">
                         <i class="bi bi-clipboard-pulse" style="color:var(--red)"></i>
                         <strong>Diagnóstico:</strong>
-                        <span>${escHtml(seg.ultimo_diagnostico || "Sin diagnóstico")}</span>
+                        <span>${escHtml(seg.diagnostico_principal || seg.ultimo_diagnostico || "Sin diagnóstico")}</span>
                     </div>
                 </div>
 

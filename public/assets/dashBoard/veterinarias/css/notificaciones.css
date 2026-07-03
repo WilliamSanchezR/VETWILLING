@@ -3,6 +3,12 @@
    Estilo card-based idéntico a la vista cliente
    ============================================================ */
 
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+/* NOTA: si esta hoja se carga junto con la vista PHP corregida, la fuente
+   ya llega precargada vía <link> + <preconnect> en el <head>. Este @import
+   se deja como fallback por si el archivo se reutiliza en otra vista que
+   no tenga ese <link>. */
+
 /* ---------- Variables ---------- */
 :root {
     --notif-accent:       #1D9E75;
@@ -11,13 +17,20 @@
     --notif-radius:       16px;
     --notif-radius-sm:    10px;
     --notif-radius-pill:  999px;
-    --notif-shadow-hover: 0 6px 24px rgba(0,0,0,.12);
+    --notif-shadow-hover: 0 6px 24px rgba(0, 0, 0, .12);
     --notif-transition:   .22s ease;
     --font-body:          'DM Sans', 'Segoe UI', sans-serif;
     --font-display:       'DM Sans', 'Segoe UI', sans-serif;
-}
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+    /* Antes referenciadas en el CSS pero nunca declaradas: el hover,
+       el fondo "no leída" y los puntos de estado se quedaban en el
+       valor por defecto del navegador. Se derivan de --notif-accent
+       para mantener consistencia con la paleta. */
+    --notif-hover-bg:   #F7F9F7;
+    --notif-unread-bg:  var(--notif-accent-light);
+    --notif-unread-dot: var(--notif-accent);
+    --notif-read-dot:   #D3D1C7;
+}
 
 /* ---------- Layout de sección ---------- */
 .page-section--notifications {
@@ -91,17 +104,20 @@
     white-space: nowrap;
 }
 
-.btn:active { transform: scale(.97); }
+.btn:active {
+    transform: scale(.97);
+}
 
 .btn-primary {
     background: var(--notif-accent);
     color: #fff;
     border-color: var(--notif-accent);
 }
+
 .btn-primary:hover {
     background: var(--notif-accent-mid);
     border-color: var(--notif-accent-mid);
-    box-shadow: 0 2px 10px rgba(29,158,117,.22);
+    box-shadow: 0 2px 10px rgba(29, 158, 117, .22);
 }
 
 .btn-secondary {
@@ -109,14 +125,76 @@
     color: #444441;
     border-color: #D3D1C7;
 }
+
 .btn-secondary:hover {
     background: #F1EFE8;
     border-color: #B4B2A9;
 }
 
+.btn-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--notif-accent-mid);
+    font-weight: 600;
+    font-size: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.btn-link:hover {
+    color: var(--notif-accent);
+}
+
 /* ---------- Contenedor principal ---------- */
 .notifications-page-card {
     min-height: 200px;
+}
+
+/* ============================================================
+   ESTADOS DE CARGA / ERROR
+   (nuevos: soportan los contenedores agregados en la vista PHP)
+   ============================================================ */
+.loading-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .6rem;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.loading-state p,
+.error-state p {
+    font-size: 13.5px;
+    color: #888780;
+    margin: 0;
+}
+
+.error-state {
+    color: #B3261E;
+}
+
+.error-state i {
+    font-size: 24px;
+    color: #B3261E;
+}
+
+.spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--notif-accent-light);
+    border-top-color: var(--notif-accent);
+    border-radius: 50%;
+    animation: notif-spin .8s linear infinite;
+}
+
+@keyframes notif-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ---------- Lista = columna de tarjetas ---------- */
@@ -135,7 +213,7 @@
     padding: 1rem 1.35rem;
     border-bottom: 1px solid #F1EFE8;
     cursor: pointer;
-    transition: background 0.16s, box-shadow 0.16s;
+    transition: background var(--notif-transition), box-shadow var(--notif-transition);
     position: relative;
 }
 
@@ -153,7 +231,7 @@
 }
 
 .notifications-page-list .notification-item.unread:hover {
-    background: #e6f6f1;
+    background: #E6F6F1;
 }
 
 /* ---------- Indicador de estado ---------- */
@@ -167,7 +245,7 @@
 
 .notifications-page-list .notification-indicator.unread {
     background: var(--notif-unread-dot);
-    box-shadow: 0 0 0 3px rgba(29,158,117,0.15);
+    box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.15);
     animation: pulse-dot 2.2s ease-in-out infinite;
 }
 
@@ -176,8 +254,15 @@
 }
 
 @keyframes pulse-dot {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(29,158,117,0.15); }
-    50%       { box-shadow: 0 0 0 5px rgba(29,158,117,0.08); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 0 0 5px rgba(29, 158, 117, 0.08);
+    }
 }
 
 /* ---------- Contenido ---------- */
@@ -244,12 +329,43 @@
     display: inline-flex;
 }
 
+/* Puntos de color por tipo, referenciados como <span class="notif-pip"> dentro
+   del badge de tipo si se desea reforzar la categoría visualmente. */
 .tipo-cita             .notif-pip { background: #0d6efd; }
 .tipo-vacuna           .notif-pip { background: #dc3545; }
 .tipo-seguimiento      .notif-pip { background: #198754; }
 .tipo-tratamiento      .notif-pip { background: #198754; }
 .tipo-acceso_historial .notif-pip { background: #ffc107; }
 .tipo-general          .notif-pip { background: #6c757d; }
+
+/* ---------- Bloque de acciones para solicitudes de acceso a historial ---------- */
+.notifications-page-list .notification-access-actions {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-top: .5rem;
+    grid-column: 2;
+}
+
+.notifications-page-list .notification-access-actions select {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    padding: 5px 8px;
+    border-radius: var(--notif-radius-sm);
+    border: 1px solid #D3D1C7;
+    background: #fff;
+    color: #2C2C2A;
+}
+
+.notifications-page-list .notification-cancel-reason {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #B3261E;
+    margin-top: 4px;
+}
 
 /* ============================================================
    ESTADO VACÍO
@@ -262,12 +378,14 @@
     padding: 4rem 2rem;
     background: #fff;
     border-radius: var(--notif-radius);
-    border: 1px solid rgba(0,0,0,.08);
+    border: 1px solid rgba(0, 0, 0, .08);
     text-align: center;
     gap: .75rem;
 }
 
-.empty-state.is-hidden { display: none; }
+.empty-state.is-hidden {
+    display: none;
+}
 
 .empty-icon {
     width: 64px;
@@ -280,7 +398,10 @@
     margin-bottom: .5rem;
 }
 
-.empty-icon i { font-size: 28px; color: var(--notif-accent-mid); }
+.empty-icon i {
+    font-size: 28px;
+    color: var(--notif-accent-mid);
+}
 
 .empty-state h2 {
     font-family: var(--font-display);
@@ -299,7 +420,9 @@
 }
 
 /* ---------- Utilidad ---------- */
-.is-hidden { display: none !important; }
+.is-hidden {
+    display: none !important;
+}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
@@ -331,5 +454,9 @@
     .notifications-page-list .notification-header h3 {
         max-width: 100%;
         white-space: normal;
+    }
+
+    .notifications-page-list .notification-access-actions {
+        grid-column: 1 / -1;
     }
 }

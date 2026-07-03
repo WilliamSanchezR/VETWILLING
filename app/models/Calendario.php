@@ -633,6 +633,7 @@ class Calendario
                             
                             -- Datos del propietario
                             pr.id_propietario,
+                            pr.id_usuario as id_usuario_propietario,
                             pr.nombres as nombre_propietario,
                             pr.apellidos as apellido_propietario,
                             CONCAT(pr.nombres, ' ', pr.apellidos) as nombre_completo_propietario,

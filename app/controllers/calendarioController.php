@@ -157,7 +157,10 @@ function crearAgendamientoAjax()
         $observaciones = $data['observaciones'] ?? null;
         $fecha_hora = $data['fecha_hora'] ?? '';
         $fecha_hora_fin = $data['fecha_hora_fin'] ?? null;
-        $estado = $data['estado'] ?? 'Pendiente';
+
+        // Si quien agenda es el propio veterinario, la cita queda confirmada de inmediato:
+        // al agendarla él mismo ya la está confirmando. El estado no se toma del cliente.
+        $estado = ((int) ($_SESSION['user']['id_rol'] ?? 0) === 2) ? 'Confirmada' : ($data['estado'] ?? 'Pendiente');
 
         // Convertir el id_usuario a entero
         $id_usuario = isset($_SESSION['user']['id_usuario']) ? (int)$_SESSION['user']['id_usuario'] : null;
@@ -183,6 +186,13 @@ function crearAgendamientoAjax()
         if (empty($id_usuario)) {
             http_response_code(401);
             echo json_encode(['status' => 'error', 'message' => 'Usuario no autenticado - id_usuario no encontrado']);
+            exit();
+        }
+
+        $timestampInicio = strtotime($fecha_hora);
+        if ($timestampInicio !== false && $timestampInicio < time()) {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'No puedes agendar una cita en una fecha u hora pasada']);
             exit();
         }
 
@@ -1273,16 +1283,37 @@ function rfs36_validarYCancelarCitaAjax()
         // SUBTAREA 4: Enviar notificación al propietario
         $datosNotificacion = $calendario->obtenerDatosParaNotificacionCancelacion($id_agendamiento);
 
-        if ($datosNotificacion && !empty($datosNotificacion['email_propietario'])) {
-            try {
-                enviarNotificacionCitaCancelada($datosNotificacion);
-                error_log("Notificación de cancelación enviada al email: " . $datosNotificacion['email_propietario']);
-            } catch (Exception $e) {
-                error_log("Error al enviar notificación de cancelación: " . $e->getMessage());
-                // No detenemos el proceso si falla el envio del email
+        if ($datosNotificacion) {
+            $nombreMascota  = $datosNotificacion['nombre_mascota'] ?? 'su mascota';
+            $fechaCita      = !empty($datosNotificacion['fecha_hora'])
+                ? date('d/m/Y H:i', strtotime($datosNotificacion['fecha_hora']))
+                : 'fecha no disponible';
+            $motivoCancel   = $datosNotificacion['motivo_cancelacion'] ?? '';
+            $msgCancelacion = "La cita del {$fechaCita} para {$nombreMascota} ha sido cancelada."
+                . ($motivoCancel ? " Motivo: {$motivoCancel}" : '');
+
+            // Notificación in-app al propietario
+            if (!empty($datosNotificacion['id_usuario_propietario'])) {
+                notificar(
+                    'cita',
+                    'Cita cancelada',
+                    $msgCancelacion,
+                    (int) $datosNotificacion['id_usuario_propietario'],
+                    !empty($datosNotificacion['id_paciente']) ? (int) $datosNotificacion['id_paciente'] : null
+                );
+            }
+
+            // Email al propietario
+            if (!empty($datosNotificacion['email_propietario'])) {
+                try {
+                    enviarNotificacionCitaCancelada($datosNotificacion);
+                    error_log("Notificación de cancelación enviada al email: " . $datosNotificacion['email_propietario']);
+                } catch (Exception $e) {
+                    error_log("Error al enviar notificación de cancelación: " . $e->getMessage());
+                }
             }
         } else {
-            error_log("No se pudo enviar notificación: propietario sin email registrado o datos incompletos");
+            error_log("No se pudo enviar notificación: datos de cancelación incompletos");
         }
 
         echo json_encode([
@@ -1349,16 +1380,37 @@ function rfs36_cancelarCita()
         // SUBTAREA 4: Enviar notificación al propietario
         $datosNotificacion = $calendario->obtenerDatosParaNotificacionCancelacion($id_agendamiento);
 
-        if ($datosNotificacion && !empty($datosNotificacion['email_propietario'])) {
-            try {
-                enviarNotificacionCitaCancelada($datosNotificacion);
-                error_log("Notificación de cancelación enviada al email: " . $datosNotificacion['email_propietario']);
-            } catch (Exception $e) {
-                error_log("Error al enviar notificación de cancelación: " . $e->getMessage());
-                // No detenemos el proceso si falla el envio del email
+        if ($datosNotificacion) {
+            $nombreMascota  = $datosNotificacion['nombre_mascota'] ?? 'su mascota';
+            $fechaCita      = !empty($datosNotificacion['fecha_hora'])
+                ? date('d/m/Y H:i', strtotime($datosNotificacion['fecha_hora']))
+                : 'fecha no disponible';
+            $motivoCancel   = $datosNotificacion['motivo_cancelacion'] ?? '';
+            $msgCancelacion = "La cita del {$fechaCita} para {$nombreMascota} ha sido cancelada."
+                . ($motivoCancel ? " Motivo: {$motivoCancel}" : '');
+
+            // Notificación in-app al propietario
+            if (!empty($datosNotificacion['id_usuario_propietario'])) {
+                notificar(
+                    'cita',
+                    'Cita cancelada',
+                    $msgCancelacion,
+                    (int) $datosNotificacion['id_usuario_propietario'],
+                    !empty($datosNotificacion['id_paciente']) ? (int) $datosNotificacion['id_paciente'] : null
+                );
+            }
+
+            // Email al propietario
+            if (!empty($datosNotificacion['email_propietario'])) {
+                try {
+                    enviarNotificacionCitaCancelada($datosNotificacion);
+                    error_log("Notificación de cancelación enviada al email: " . $datosNotificacion['email_propietario']);
+                } catch (Exception $e) {
+                    error_log("Error al enviar notificación de cancelación: " . $e->getMessage());
+                }
             }
         } else {
-            error_log("No se pudo enviar notificación: propietario sin email registrado o datos incompletos");
+            error_log("No se pudo enviar notificación: datos de cancelación incompletos");
         }
 
         mostrarSweetAlert('success', 'Éxito', 'Cita cancelada correctamente. Notificación enviada al propietario.');

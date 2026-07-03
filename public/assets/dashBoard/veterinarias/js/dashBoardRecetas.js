@@ -260,18 +260,9 @@ $('#vistaImprimir').on('hidden.bs.modal', function () {
     if (pacientesSeleccionado) setStep(2);
 });
 
-function imprimirDiv(idDiv) {
-    const contenidoOriginal = document.body.innerHTML;
-    document.title = 'Veterinario - Recetas';
-    const divParaImprimir = document.getElementById(idDiv).innerHTML;
-    document.body.innerHTML = divParaImprimir;
-    window.print();
-    document.body.innerHTML = contenidoOriginal;
-    window.location.reload();
-}
-
 $('#btn-guardar-resultados').on('click', function () {
-    imprimirDiv('cont-imprimir');
+    document.title = 'Receta Médica - VetWilling';
+    window.print();
 });
 
 // ── Init ──

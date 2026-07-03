@@ -122,7 +122,7 @@ require_once BASE_PATH . "/app/helpers/session_veterinario.php"; ?>
                     <div class="col-lg-4 d-flex flex-column gap-3">
 
                         <!-- Panel de búsqueda -->
-                        <div class="historial-card" style="overflow:visible;">
+                        <div class="historial-card receta-search-card">
                             <div class="bloque-titulo mb-3">
                                 <h5><i class="bi bi-search me-2"></i>Buscar Paciente</h5>
                             </div>

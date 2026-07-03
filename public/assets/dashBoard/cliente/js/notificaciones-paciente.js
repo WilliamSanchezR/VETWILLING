@@ -295,8 +295,13 @@
     }
 
     function connectNotificationStream() {
-        // SSE eliminado (Opción B): el polling cada 30 s es suficiente en Apache/XAMPP.
-        // Ver: fix/consolidacion-notificaciones
+        if (!window.EventSource) return;
+
+        const es = new EventSource(`${API_URL}?accion=stream`, { withCredentials: true });
+
+        es.addEventListener('notificacion', () => loadNotifications());
+
+        window.addEventListener('beforeunload', () => es.close(), { once: true });
     }
 
     async function markRead(id) {
@@ -409,7 +414,8 @@
     /* ── Arranque ── */
     loadNotifications();
     connectNotificationStream();
-    // Polling automático cada 30 segundos como respaldo
-    setInterval(loadNotifications, 30000);
+    // Polling de respaldo: cubre fallos silenciosos de SSE y navegadores sin EventSource
+    const _pollingId = setInterval(loadNotifications, 30000);
+    window.addEventListener('beforeunload', () => clearInterval(_pollingId), { once: true });
 
 })();
