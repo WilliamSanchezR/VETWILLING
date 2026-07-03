@@ -292,10 +292,9 @@ body {
 /* ========================================================================
    7. GRID DE MASCOTAS
 ======================================================================== */
+/* El grid de columnas ahora lo da Bootstrap (row g-3 + col-lg-4 col-md-6
+   en el HTML). Acá solo queda el margen inferior. */
 .mascotas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
     margin-bottom: var(--spacing-2xl);
 }
 
@@ -449,10 +448,8 @@ body {
 /* ========================================================================
    10. GRID DE INFORMACIÓN
 ======================================================================== */
+/* El grid 2 columnas ahora lo da Bootstrap (row g-2 + col-6 en el HTML). */
 .info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 9px;
     margin-bottom: 16px;
 }
 
@@ -542,11 +539,7 @@ body {
 /* ========================================================================
    12. BOTONES DE ACCIÓN DE TARJETA
 ======================================================================== */
-.mascota-actions {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-}
+/* El grid 2 columnas ahora lo da Bootstrap (row g-2 + col-6 en el HTML). */
 
 .action-btn {
     display: inline-flex;
@@ -666,16 +659,6 @@ body {
 
 
 /* ========================================================================
-   15. RESPONSIVE — Escritorios medianos (hasta 1200px)
-======================================================================== */
-@media (max-width: 1200px) {
-    .mascotas-grid {
-        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    }
-}
-
-
-/* ========================================================================
    16. RESPONSIVE — Tablets (hasta 768px)
 ======================================================================== */
 @media (max-width: 768px) {
@@ -705,12 +688,6 @@ body {
         justify-content: center;
     }
 
-    /* Grid a una columna */
-    .mascotas-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-    }
-
     /* Filtros en columna */
     .filtros-container {
         flex-direction: column;
@@ -727,10 +704,6 @@ body {
         justify-content: center;
     }
 
-    /* Acciones en una columna */
-    .mascota-actions {
-        grid-template-columns: 1fr;
-    }
 }
 
 
@@ -767,11 +740,6 @@ body {
 
     .mascota-card-body {
         padding: 14px;
-    }
-
-    /* Info en una columna en móvil muy pequeño */
-    .info-grid {
-        grid-template-columns: 1fr;
     }
 
     .action-btn {

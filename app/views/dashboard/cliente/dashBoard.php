@@ -222,7 +222,7 @@ if ($id_propietario) {
         <?php include_once __DIR__ . '/../../layouts/panel_superio_paciente.php'; ?>
 
         <div class="area-contenido">
-            <div class="container-dashboard">
+            <div class="container-dashboard container-xxl">
 
                 <!-- ------------------------------------------------
                  BANNER DE BIENVENIDA
@@ -290,10 +290,10 @@ if ($id_propietario) {
                 <!-- ------------------------------------------------
                  GRID: CITAS + RECORDATORIOS DETALLADOS
                  ------------------------------------------------ -->
-                <div class="dash-content-grid">
+                <div class="dash-content-grid row g-4">
 
                     <!-- PRÓXIMAS CITAS -->
-                    <div class="dash-card dash-fade-in" aria-label="Próximas citas">
+                    <div class="dash-card dash-fade-in col-lg-7" aria-label="Próximas citas">
                         <div class="dash-card-header">
                             <h3 class="dash-card-titulo">
                                 <i class="bi bi-calendar2-week" aria-hidden="true"></i>
@@ -358,7 +358,7 @@ if ($id_propietario) {
 
 
                     <!-- RECORDATORIOS DETALLADOS -->
-                    <div class="dash-card dash-fade-in" aria-label="Recordatorios detallados">
+                    <div class="dash-card dash-fade-in col-lg-5" aria-label="Recordatorios detallados">
                         <div class="dash-card-header">
                             <h3 class="dash-card-titulo">
                                 <i class="bi bi-bell-fill" aria-hidden="true"></i>
