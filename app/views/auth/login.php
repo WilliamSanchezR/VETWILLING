@@ -7,11 +7,25 @@
     <title>Login VetWilling</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/loginStyle.css">   
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/loginStyle.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/estilosRecuperarContraseña.css">
     <link rel="icon" href="<?= BASE_URL ?>/public/assets/webSite/img/FAVICON.png" type="image">
 
 </head>
+<style>
+    .bi-eye-slash::before {
+        position: relative !important;
+        left: 400px;
+        top: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--txt2);
+    }
+
+    .toggle-clave:hover {
+        color: var(--g);
+    }
+</style>
 
 <body>
 
@@ -34,9 +48,12 @@
                         <input type="text" id="correo" name="email" placeholder="Correo" required>
                     </div>
 
-                    <div class="cont-input"> <i class="bi bi-lock"></i>
+                    <div class="cont-input">
+                        <i class="bi bi-lock"></i>
 
                         <input type="password" id="clave" name="password" placeholder="Contraseña" required>
+
+                        <i class="bi bi-eye-slash toggle-clave" id="toggleClave" role="button" tabindex="0" aria-label="Mostrar contraseña"></i>
                     </div>
 
                     <a href="<?= BASE_URL ?>/recoverpw" id="recover">¿Olvidaste Tu Contraseña?</a>
@@ -85,6 +102,16 @@
 
             slides[index].classList.add("active");
         }, 5500); // Cambia cada 5.5 segundos
+    });
+
+    document.getElementById('toggleClave').addEventListener('click', function() {
+        const input = document.getElementById('clave');
+        const esPassword = input.type === 'password';
+
+        input.type = esPassword ? 'text' : 'password';
+        this.classList.toggle('bi-eye');
+        this.classList.toggle('bi-eye-slash');
+        this.setAttribute('aria-label', esPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
     });
 </script>
 
