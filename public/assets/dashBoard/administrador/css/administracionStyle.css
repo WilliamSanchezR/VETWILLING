@@ -24,3 +24,24 @@
     top: 0;
     z-index: 998;
 }
+
+/* ================================
+   RESPONSIVE
+================================ */
+@media (max-width: 1024px) {
+    .contenido-principal,
+    .sidebar.collapsed~.contenido-principal {
+        margin-left: var(--sidebar-collapsed-width);
+    }
+}
+
+@media (max-width: 768px) {
+    .contenido-principal,
+    .sidebar.collapsed~.contenido-principal {
+        margin-left: 0;
+    }
+
+    .barra-navegacion-superior {
+        padding: 14px 16px;
+    }
+}

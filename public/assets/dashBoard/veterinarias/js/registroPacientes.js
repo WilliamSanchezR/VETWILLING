@@ -273,8 +273,8 @@ function mostrarResumenConfirmacion() {
     const val = (id) => esc(document.getElementById(id).value);
 
     const resumenHTML = `
-        <div class="resumen-final">
-            <div class="resumen-card">
+        <div class="resumen-final row g-3">
+            <div class="resumen-card col-12 col-md-6">
                 <h4><i class="bi bi-person-check"></i> Datos del propietario</h4>
                 <ul>
                     <li><strong>Nombres:</strong> ${val('nombres')}</li>
@@ -285,7 +285,7 @@ function mostrarResumenConfirmacion() {
                     <li><strong>Dirección:</strong> ${val('direccion')}</li>
                 </ul>
             </div>
-            <div class="resumen-card">
+            <div class="resumen-card col-12 col-md-6">
                 <h4><i class="bi bi-heart-pulse"></i> Mascotas a registrar</h4>
                 <ul>${mascotasHTML}</ul>
             </div>
