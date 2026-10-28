@@ -15,6 +15,35 @@ if (file_exists($autoloadPath)) {
 	}
 }
 
+// Permite usar .env en instalaciones locales sin Composer ni phpdotenv.
+if (!class_exists('Dotenv\\Dotenv')) {
+	$dotenvPath = $projectRoot . '/.env';
+	if (is_readable($dotenvPath)) {
+		foreach (file($dotenvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+			$line = trim($line);
+			if ($line === '' || $line[0] === '#' || strpos($line, '=') === false) {
+				continue;
+			}
+
+			[$key, $value] = array_map('trim', explode('=', $line, 2));
+			if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $key)) {
+				continue;
+			}
+
+			$existingValue = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+			if ($existingValue !== false && $existingValue !== null) {
+				continue;
+			}
+
+			if (strlen($value) >= 2 && $value[0] === $value[strlen($value) - 1] && ($value[0] === '"' || $value[0] === "'")) {
+				$value = substr($value, 1, -1);
+			}
+
+			$_ENV[$key] = $value;
+		}
+	}
+}
+
 if (!function_exists('env_value')) {
 	function env_value($key, $default = '')
 	{

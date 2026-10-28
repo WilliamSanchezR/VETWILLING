@@ -16,10 +16,16 @@ define('SMTP_HOST', 'smtp.gmail.com');
 define('SMTP_PORT', 465);
 define('SMTP_ENCRYPT', 'smtps');
 define('SMTP_DEBUG', 0); // 0 = Sin debug, 1 = debug básico, 2 = debug verboso
-define('SMTP_USER', 'vetwillingsoporte@gmail.com');
-define('SMTP_PASS', 'zbfpnwrnuwykjedn'); // APP PASSWORD de Gmail
-define('SMTP_FROM_EMAIL', 'vetwillingsoporte@gmail.com');
+// Las credenciales se leen de .env (nunca se suben al repositorio)
+define('SMTP_USER', env_value('SMTP_USER', 'vetwillingsoporte@gmail.com'));
+define('SMTP_PASS', env_value('SMTP_PASS', '')); // APP PASSWORD de Gmail
+define('SMTP_FROM_EMAIL', env_value('SMTP_FROM_EMAIL', SMTP_USER));
 define('SMTP_FROM_NAME', 'VetWilling - Sistema de Gestión Veterinaria');
+
+// Transporte de correo: 'brevo' (API HTTP, puerto 443) o 'smtp' (Gmail).
+// Si hay BREVO_API_KEY en .env se usa Brevo, salvo que MAIL_DRIVER=smtp.
+define('BREVO_API_KEY', env_value('BREVO_API_KEY', ''));
+define('MAIL_DRIVER', env_value('MAIL_DRIVER', BREVO_API_KEY !== '' ? 'brevo' : 'smtp'));
 
 // Configuración de notificaciones automáticas
 define('HORAS_ANTICIPACION_RECORDATORIO', 24);
@@ -32,12 +38,22 @@ define('INTERVALO_REINTENTO_NOTIFICACION', 30);
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Inicializa una instancia de PHPMailer con configuración SMTP centralizada
+ * Inicializa una instancia de PHPMailer con configuración centralizada.
+ * Con MAIL_DRIVER=brevo devuelve un BrevoMailer (misma API, envío por HTTPS).
  *
  * @return PHPMailer Instancia configurada de PHPMailer
  */
 function mailer_init()
 {
+    if (MAIL_DRIVER === 'brevo') {
+        require_once __DIR__ . '/BrevoMailer.php';
+        $mail = new BrevoMailer(BREVO_API_KEY, true);
+        $mail->CharSet = "UTF-8";
+        $mail->isHTML(true);
+        $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
+        return $mail;
+    }
+
     // Crear instancia de PHPMailer
     $mail = new PHPMailer(true);
 
