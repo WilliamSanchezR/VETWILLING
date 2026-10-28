@@ -1,3 +1,4 @@
+<?php require_once BASE_PATH . '/app/helpers/csrf_helper.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -33,11 +34,12 @@
                     <i class="bi bi-key-fill"></i>
                 </div>
                 <h2>Recupera tu contraseña</h2>
-                <p>Ingresa tu correo electrónico y te enviaremos una contraseña nueva.</p>
+                <p>Ingresa tu correo electrónico y te enviaremos un enlace para crear una contraseña nueva.</p>
             </div>
 
             <div class="form">
-                <form id="formRecuperar" action="generar-clave" method="POST">
+                <form id="formRecuperar" action="<?= BASE_URL ?>/generar-clave" method="POST">
+                    <?= csrf_campo() ?>
                     <div class="cont-input">
                         <input
                             type="email"
@@ -50,7 +52,7 @@
 
                     <button class="btn-submit" type="submit" id="btnEnviar">
                         <i class="bi bi-send-fill"></i>
-                        Enviar contraseña de recuperación
+                        Enviar enlace de recuperación
                     </button>
                 </form>
 

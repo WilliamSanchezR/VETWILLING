@@ -4,8 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="VetWilling - Sistema de gestión veterinaria profesional">
     <title>VetWilling - Sistema de Gestión Veterinaria</title>
+    <meta name="description"
+        content="VetWilling centraliza citas, historias clínicas, clientes, inventario y ventas de tu clínica veterinaria en una sola plataforma. Prueba gratis 30 días.">
+    <meta name="theme-color" content="#0A932C">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="VetWilling - Sistema de Gestión Veterinaria">
+    <meta property="og:description"
+        content="Centraliza citas, pacientes, inventario y ventas de tu clínica veterinaria. Prueba gratis 30 días.">
+    <meta property="og:image" content="public/assets/webSite/img/LOGO-PRINCIPAL.png">
+    <meta property="og:locale" content="es_CO">
+
+    <!-- Marca la página como "con JS" antes de pintar, para las animaciones de aparición -->
+    <script>document.documentElement.classList.add('js');</script>
+
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Open+Sans:wght@400;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -15,136 +35,148 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
     <!-- Favicon -->
-    <link rel="icon" href="public/assets/webSite/img/FAVICON.png" type="image/x-icon">
+    <link rel="icon" href="public/assets/webSite/img/FAVICON.png" type="image/png">
 
     <!-- Estilos propios -->
     <link rel="stylesheet" href="public/assets/webSite/css/style-home.css">
 </head>
 
 <body>
+    <a href="#contenido" class="skip-link">Saltar al contenido</a>
 
     <header>
         <!-- NAVBAR -->
-        <nav class="navbar navbar-expand-lg bg-white custom-navbar">
+        <nav class="navbar navbar-expand-lg fixed-top custom-navbar" aria-label="Navegación principal">
             <div class="container">
-                <a class="navbar-brand" href="index.html">
-                    <img src="public/assets/webSite/img/LOGO-PRINCIPAL.png" alt="VetWilling Logo">
+                <a class="navbar-brand" href="./">
+                    <img src="public/assets/webSite/img/LOGO-PRINCIPAL.webp" alt="VetWilling" width="170"
+                        height="71">
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menú">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                    <ul class="navbar-nav align-items-center">
-                        <li class="nav-item mx-2">
-                            <a class="nav-link text-dark fw-semibold" href="#hero">Inicio</a>
-                        </li>
-                        <li class="nav-item mx-2">
-                            <a class="nav-link text-dark fw-semibold" href="#sobre-nosotros">Nosotros</a>
-                        </li>
-                        <li class="nav-item mx-2">
-                            <a class="nav-link text-dark fw-semibold" href="#modulos">Módulos</a>
-                        </li>
-                        <li class="nav-item mx-2">
-                            <a class="nav-link text-dark fw-semibold" href="#precios">Planes</a>
-                        </li>
-                        <li class="nav-item mx-2">
-                            <a class="nav-link text-dark fw-semibold" href="#equipo">Equipo</a>
-                        </li>
-                        <li class="nav-item mx-2">
-                            <a href="login" class="btn btn-success px-4 fw-semibold">Ingresar</a>
+                    <ul class="navbar-nav align-items-lg-center gap-lg-1">
+                        <li class="nav-item"><a class="nav-link" href="#hero">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#sobre-nosotros">Nosotros</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#modulos">Módulos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#precios">Planes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#equipo">Equipo</a></li>
+                        <li class="nav-item ms-lg-3">
+                            <a href="login" class="btn btn-success">
+                                <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>Ingresar
+                            </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
+    </header>
 
-        <!-- HERO SECTION CON ANIMACIONES -->
-        <section id="hero">
+    <main id="contenido">
+        <!-- HERO -->
+        <section id="hero" aria-labelledby="hero-title">
             <div class="container">
-                <div class="row align-items-center g-5">
-                    <div class="col-lg-6 hero-content">
-                        <span class="section-tag">SISTEMA DE VETERINARIA PROFESIONAL</span>
-                        <h1 class="hero-title">La gestión veterinaria que tu clínica necesita</h1>
+                <div class="row align-items-center g-4 g-lg-5">
+                    <div class="col-lg-6">
+                        <span class="section-tag">Sistema de veterinaria profesional</span>
+                        <h1 id="hero-title" class="hero-title">
+                            La gestión veterinaria que <span class="accent">tu clínica necesita</span>
+                        </h1>
                         <p class="hero-subtitle">
-                            VetWilling transforma la manera en que administras tu clínica. Centraliza citas, pacientes,
-                            inventario y ventas en una sola plataforma digital diseñada para veterinarias modernas.
-                            Mejora la comunicación con tus clientes y ofrece una experiencia digital completa para el
-                            cuidado de las mascotas
+                            Centraliza citas, pacientes, inventario y ventas en una sola plataforma. Menos papeleo
+                            para tu equipo y una experiencia digital completa para los dueños de mascotas.
                         </p>
-                        <div class="d-flex flex-wrap gap-3">
-                            <a href="https://wa.link/1s3wgw" target="_blank"
-                                class="btn btn-success btn-lg px-4 py-2 fw-semibold">
-                                <i class="bi bi-envelope me-2"></i>Contáctanos
+                        <div class="hero-actions">
+                            <a href="https://wa.link/1s3wgw" target="_blank" rel="noopener"
+                                class="btn btn-success btn-lg">
+                                <i class="bi bi-whatsapp me-2" aria-hidden="true"></i>Contáctanos
                             </a>
-                            <a href="#precios" class="btn btn-outline-success btn-lg px-4 py-2 fw-semibold">
-                                <i class="bi bi-hospital me-2"></i>Ver Planes
+                            <a href="#precios" class="btn btn-outline-success btn-lg">
+                                Ver planes<i class="bi bi-arrow-right ms-2" aria-hidden="true"></i>
                             </a>
                         </div>
-                        <div class="trust-badges">
-                            <div class="trust-badge">
-                                <i class="bi bi-shield-check"></i>
-                                <span>Datos Seguros</span>
-                            </div>
-                            <div class="trust-badge">
-                                <i class="bi bi-cloud-check"></i>
-                                <span>Cloud Backup</span>
-                            </div>
-                            <div class="trust-badge">
-                                <i class="bi bi-graph-up"></i>
-                                <span>99.9% Uptime</span>
-                            </div>
-                        </div>
+                        <ul class="trust-badges">
+                            <li class="trust-badge">
+                                <i class="bi bi-shield-check" aria-hidden="true"></i>Datos seguros
+                            </li>
+                            <li class="trust-badge">
+                                <i class="bi bi-cloud-check" aria-hidden="true"></i>Respaldo en la nube
+                            </li>
+                            <li class="trust-badge">
+                                <i class="bi bi-gift" aria-hidden="true"></i>30 días de prueba gratis
+                            </li>
+                        </ul>
                     </div>
 
                     <div class="col-lg-6">
                         <div id="heroCarousel" class="carousel slide carousel-fade carousel-container"
-                            data-bs-ride="carousel">
+                            data-bs-ride="carousel" data-bs-interval="6000" aria-label="Beneficios de VetWilling">
                             <div class="carousel-indicators">
                                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0"
-                                    class="active"></button>
-                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
+                                    class="active" aria-current="true" aria-label="Diapositiva 1"></button>
+                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"
+                                    aria-label="Diapositiva 2"></button>
+                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"
+                                    aria-label="Diapositiva 3"></button>
+                                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"
+                                    aria-label="Diapositiva 4"></button>
                             </div>
 
                             <div class="carousel-inner">
                                 <div class="carousel-item active">
-                                    <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800"
-                                        alt="Atención veterinaria profesional">
+                                    <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=900&q=75&auto=format"
+                                        srcset="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&q=75&auto=format 600w,
+                                                https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=900&q=75&auto=format 900w,
+                                                https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=1200&q=75&auto=format 1200w"
+                                        sizes="(min-width: 992px) 50vw, 100vw" width="900" height="720"
+                                        fetchpriority="high" alt="Persona acariciando a su perro">
                                     <div class="carousel-overlay">
-                                        <h3>Automatiza tu gestión</h3>
+                                        <h2>Automatiza tu gestión</h2>
                                         <p>Menos tiempo en procesos administrativos. Más tiempo cuidando mascotas.</p>
                                     </div>
                                 </div>
 
                                 <div class="carousel-item">
-                                    <img src="https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=800"
-                                        alt="Tecnología avanzada">
+                                    <img src="https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=900&q=75&auto=format"
+                                        srcset="https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=600&q=75&auto=format 600w,
+                                                https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=900&q=75&auto=format 900w,
+                                                https://images.unsplash.com/photo-1415369629372-26f2fe60c467?w=1200&q=75&auto=format 1200w"
+                                        sizes="(min-width: 992px) 50vw, 100vw" width="900" height="720"
+                                        loading="lazy" alt="Gato junto a la mano de su dueño">
                                     <div class="carousel-overlay">
-                                        <h3>Moderniza tu veterinaria</h3>
+                                        <h2>Moderniza tu veterinaria</h2>
                                         <p>Transforma la operación diaria de tu clínica.</p>
                                     </div>
                                 </div>
 
                                 <div class="carousel-item">
-                                    <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800"
-                                        alt="Equipo profesional">
+                                    <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=900&q=75&auto=format"
+                                        srcset="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&q=75&auto=format 600w,
+                                                https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=900&q=75&auto=format 900w,
+                                                https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1200&q=75&auto=format 1200w"
+                                        sizes="(min-width: 992px) 50vw, 100vw" width="900" height="720"
+                                        loading="lazy" alt="Dos perros corriendo en el campo">
                                     <div class="carousel-overlay">
-                                        <h3>Mejora la experiencia del cliente</h3>
-                                        <p>Ofrece a tus usuarios una interfaz donde puedan gestionar mascotas, citas y
-                                            seguimientos médicos.</p>
+                                        <h2>Mejora la experiencia del cliente</h2>
+                                        <p>Tus usuarios gestionan mascotas, citas y seguimientos médicos desde su
+                                            propia interfaz.</p>
                                     </div>
                                 </div>
 
                                 <div class="carousel-item">
-                                    <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800"
-                                        alt="Resultados garantizados">
+                                    <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=900&q=75&auto=format"
+                                        srcset="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&q=75&auto=format 600w,
+                                                https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=900&q=75&auto=format 900w,
+                                                https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200&q=75&auto=format 1200w"
+                                        sizes="(min-width: 992px) 50vw, 100vw" width="900" height="720"
+                                        loading="lazy" alt="Perro mirando a la cámara">
                                     <div class="carousel-overlay">
-                                        <h3>Resultados Confiables</h3>
-                                        <p>Tu clínica veterinaria, organizada y conectada</p>
+                                        <h2>Resultados confiables</h2>
+                                        <p>Tu clínica veterinaria, organizada y conectada.</p>
                                     </div>
                                 </div>
                             </div>
@@ -154,252 +186,563 @@
             </div>
         </section>
 
-    </header>
-
-    <main>
         <!-- SOBRE NOSOTROS -->
-        <section id="sobre-nosotros" class="sobre-nosotros">
+        <section id="sobre-nosotros" class="sobre-nosotros" aria-labelledby="sobre-title">
             <div class="container">
-                <div class="row align-items-center g-5">
-
-                    <div class="col-lg-6 text-center">
-                        <img src="public/assets/webSite/img/perrito.png" alt="Perrito feliz en consulta veterinaria"
-                            class="img-fluid sobre-img" loading="lazy">
-                    </div>
-
-                    <div class="col-lg-6">
-                        <span class="badge text-bg-success mb-3 px-3 py-2">Quiénes somos</span>
-
-                        <h2 class="fw-bold display-6 mb-4">
-                            <span class="text-success">Impulsamos la transformación digital veterinaria</span>
-                        </h2>
-
-                        <p class="text-muted fs-5 mb-4">
-                            VetWilling es una plataforma web creada para optimizar la gestión de clínicas veterinarias y
-                            mejorar la experiencia de los propietarios de mascotas. Nuestro objetivo es simplificar los
-                            procesos administrativos, fortalecer la relación veterinaria-cliente y brindar herramientas
-                            tecnológicas que impulsen el crecimiento del negocio.
-                        </p>
-                        <p class="text-muted fs-5 mb-4">
-                            Olvídate de agendas desordenadas, registros dispersos y seguimiento manual. VetWilling
-                            automatiza tu gestión para que operes con eficiencia, control y profesionalismo.
-                        </p>
-                        <p class="text-muted fs-5 mb-4">
-                            Creemos en la tecnología como aliada del bienestar animal y del desarrollo profesional
-                            veterinario.
-                        </p>
-
-
-                        <div class="d-flex align-items-center gap-3">
-                            <a href="https://wa.link/1s3wgw" target="_blank" class="btn btn-success btn-lg px-4">
-                                <i class="bi bi-whatsapp me-2"></i>Contáctanos
-                            </a>
-
-                            <span class="text-muted small">
-                                Atención personalizada y segura
-                            </span>
+                <div class="row align-items-center g-4 g-lg-5">
+                    <div class="col-lg-6 reveal">
+                        <div class="sobre-media">
+                            <img src="public/assets/webSite/img/perrito.webp" width="646" height="431"
+                                alt="Perro feliz envuelto en una toalla después del baño" class="sobre-img"
+                                loading="lazy">
                         </div>
                     </div>
 
+                    <div class="col-lg-6 sobre-texto reveal" style="--reveal-delay: .1s">
+                        <span class="section-tag">Quiénes somos</span>
+                        <h2 id="sobre-title" class="section-title">
+                            Impulsamos la <span class="text-success">transformación digital</span> veterinaria
+                        </h2>
+                        <p>
+                            VetWilling es una plataforma web creada para optimizar la gestión de clínicas
+                            veterinarias y mejorar la experiencia de los propietarios de mascotas. Simplificamos los
+                            procesos administrativos y fortalecemos la relación entre la veterinaria y sus clientes.
+                        </p>
+                        <p>
+                            Olvídate de agendas desordenadas, registros dispersos y seguimiento manual: opera con
+                            eficiencia, control y profesionalismo.
+                        </p>
+
+                        <ul class="check-list">
+                            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Agenda digital sin
+                                cruces ni olvidos</li>
+                            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Historias clínicas
+                                centralizadas y siempre a mano</li>
+                            <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Un portal propio para
+                                tus clientes</li>
+                        </ul>
+
+                        <a href="https://wa.link/1s3wgw" target="_blank" rel="noopener"
+                            class="btn btn-success btn-lg">
+                            <i class="bi bi-whatsapp me-2" aria-hidden="true"></i>Habla con nosotros
+                        </a>
+                    </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- CÓMO FUNCIONA -->
+        <section id="como-funciona" aria-labelledby="pasos-title">
+            <div class="container">
+                <div class="section-header reveal">
+                    <span class="section-tag">Cómo funciona</span>
+                    <h2 id="pasos-title" class="section-title">Empieza en tres pasos</h2>
+                    <p class="section-lead">Sin instalaciones ni equipos especiales: solo necesitas un navegador.</p>
+                </div>
+
+                <ol class="pasos">
+                    <li class="paso reveal">
+                        <span class="paso-num" aria-hidden="true">1</span>
+                        <div class="paso-icon"><i class="bi bi-person-plus" aria-hidden="true"></i></div>
+                        <h3>Solicita tu prueba</h3>
+                        <p>Elige un plan y crea tu cuenta en minutos. Sin tarjeta de crédito.</p>
+                    </li>
+                    <li class="paso reveal" style="--reveal-delay: .1s">
+                        <span class="paso-num" aria-hidden="true">2</span>
+                        <div class="paso-icon"><i class="bi bi-sliders" aria-hidden="true"></i></div>
+                        <h3>Configura tu clínica</h3>
+                        <p>Registra tus servicios, especialidades, horarios y equipo de trabajo.</p>
+                    </li>
+                    <li class="paso reveal" style="--reveal-delay: .2s">
+                        <span class="paso-num" aria-hidden="true">3</span>
+                        <div class="paso-icon"><i class="bi bi-heart-pulse" aria-hidden="true"></i></div>
+                        <h3>Empieza a atender</h3>
+                        <p>Agenda citas, lleva historias clínicas y conecta con tus clientes desde el primer día.</p>
+                    </li>
+                </ol>
             </div>
         </section>
 
         <!-- MÓDULOS -->
-        <section id="modulos" class="py-5 bg-success">
+        <section id="modulos" class="section-green" aria-labelledby="modulos-title">
             <div class="container">
-                <h2 class="display-6 fw-bold text-center mb-4">Módulos del Sistema</h2>
-                <p class="lead text-center mb-5">
-                    Con VetWilling, tu clínica veterinaria trabaja de manera más ágil y organizada.
-                    Gestiona tus citas de forma digital, mantén la información actualizada y
-                    administra tu agenda con total control.
-                </p>
-                <div class="row g-4">
-                    <div class="col-md-4 animate-on-scroll">
-                        <div class="modulo-card text-center">
-                            <div class="modulo-icon">
-                                <i class="bi bi-calendar-check"></i>
-                            </div>
-                            <h5>Gestión de Citas</h5>
-                            <p>Sistema de agendamiento inteligente con recordatorios automáticos, sincronización de
-                                calendarios y gestión de disponibilidad en tiempo real.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 animate-on-scroll">
-                        <div class="modulo-card text-center">
-                            <div class="modulo-icon">
-                                <i class="bi bi-people"></i>
-                            </div>
-                            <h5>Gestión de Clientes</h5>
-                            <p>Base de datos completa con historiales médicos detallados, información de contacto y
-                                seguimiento personalizado de cada paciente.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 animate-on-scroll">
-                        <div class="modulo-card text-center">
-                            <div class="modulo-icon">
-                                <i class="bi bi-clipboard-check"></i>
-                            </div>
-                            <h5>Gestión de Agenda</h5>
-                            <p>Visualización clara de actividades diarias, asignación de recursos y optimización del
-                                flujo
-                                de trabajo del consultorio.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 animate-on-scroll">
-                        <div class="modulo-card text-center">
-                            <div class="modulo-icon">
-                                <i class="bi bi-file-medical"></i>
-                            </div>
-                            <h5>Historias Clínicas</h5>
-                            <p>Registro digital completo de diagnósticos, tratamientos, vacunaciones y evolución de cada
-                                paciente con acceso instantáneo.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 animate-on-scroll">
-                        <div class="modulo-card text-center">
-                            <div class="modulo-icon">
-                                <i class="bi bi-shop"></i>
-                            </div>
-                            <h5>Tienda y comunidad (premium)</h5>
-                            <p>Expande tu clínica con ventas digitales e interacción entre clientes.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 animate-on-scroll">
-                        <div class="modulo-card text-center">
-                            <div class="modulo-icon">
-                                <i class="bi bi-person-hearts"></i>
-                            </div>
-                            <h5>Portal para clientes</h5>
-                            <p>Tus clientes pueden gestionar mascotas y citas desde su propia interfaz.</p>
-                        </div>
-                    </div>
+                <div class="section-header reveal">
+                    <span class="section-tag">Módulos</span>
+                    <h2 id="modulos-title" class="section-title">Todo tu consultorio en un solo sistema</h2>
+                    <p class="section-lead">
+                        Gestiona citas de forma digital, mantén la información actualizada y administra tu agenda
+                        con total control.
+                    </p>
                 </div>
 
+                <div class="bento">
+                    <article class="modulo-card bento-citas reveal">
+                        <div class="modulo-icon"><i class="bi bi-calendar-check" aria-hidden="true"></i></div>
+                        <h3>Gestión de citas</h3>
+                        <p>Agendamiento con recordatorios automáticos, sincronización de calendarios y
+                            disponibilidad en tiempo real.</p>
+                        <!-- Ilustración de la interfaz (decorativa) -->
+                        <div class="mini-ui mini-agenda" aria-hidden="true">
+                            <div class="mini-row">
+                                <span class="mini-hora">09:00</span>
+                                <span class="mini-texto"><strong>Luna</strong> · Vacunación</span>
+                                <span class="mini-chip mini-chip--ok">Confirmada</span>
+                            </div>
+                            <div class="mini-row">
+                                <span class="mini-hora">10:30</span>
+                                <span class="mini-texto"><strong>Max</strong> · Control general</span>
+                                <span class="mini-chip mini-chip--ok">Confirmada</span>
+                            </div>
+                            <div class="mini-row">
+                                <span class="mini-hora">11:15</span>
+                                <span class="mini-texto"><strong>Kira</strong> · Desparasitación</span>
+                                <span class="mini-chip">Pendiente</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="modulo-card bento-historias reveal" style="--reveal-delay: .08s">
+                        <div class="modulo-icon"><i class="bi bi-file-medical" aria-hidden="true"></i></div>
+                        <h3>Historias clínicas</h3>
+                        <p>Registro digital de diagnósticos, tratamientos, vacunas y evolución de cada paciente,
+                            con acceso instantáneo.</p>
+                        <div class="mini-ui mini-historia" aria-hidden="true">
+                            <div class="mini-paciente">
+                                <span class="mini-avatar"><i class="bi bi-heart-fill"></i></span>
+                                <div>
+                                    <strong>Luna</strong>
+                                    <small>Canino · 3 años</small>
+                                </div>
+                            </div>
+                            <ul>
+                                <li><i class="bi bi-check-circle-fill"></i>Rabia<span>Al día</span></li>
+                                <li><i class="bi bi-check-circle-fill"></i>Parvovirus<span>Al día</span></li>
+                                <li><i class="bi bi-clock-history"></i>Refuerzo anual<span>Próximo</span></li>
+                            </ul>
+                            <div class="mini-nota">
+                                <strong>Última consulta</strong>
+                                Control general · peso estable, sin novedades.
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="modulo-card reveal">
+                        <div class="modulo-icon"><i class="bi bi-people" aria-hidden="true"></i></div>
+                        <h3>Gestión de clientes</h3>
+                        <p>Historiales, datos de contacto y seguimiento personalizado de cada paciente.</p>
+                    </article>
+
+                    <article class="modulo-card reveal" style="--reveal-delay: .08s">
+                        <div class="modulo-icon"><i class="bi bi-clipboard-check" aria-hidden="true"></i></div>
+                        <h3>Gestión de agenda</h3>
+                        <p>Actividades del día, asignación de recursos y un flujo de trabajo optimizado.</p>
+                    </article>
+
+                    <article class="modulo-card reveal">
+                        <div class="modulo-icon"><i class="bi bi-shop" aria-hidden="true"></i></div>
+                        <h3>Tienda y comunidad <span class="tag-premium">Premium</span></h3>
+                        <p>Ventas digitales e interacción entre tus clientes.</p>
+                    </article>
+
+                    <article class="modulo-card bento-portal reveal" style="--reveal-delay: .08s">
+                        <div class="bento-portal-texto">
+                            <div class="modulo-icon"><i class="bi bi-person-hearts" aria-hidden="true"></i></div>
+                            <h3>Portal para clientes</h3>
+                            <p>Tus clientes gestionan sus mascotas y citas desde su propia interfaz.</p>
+                        </div>
+                        <div class="mini-ui mini-portal" aria-hidden="true">
+                            <small>Próxima cita</small>
+                            <strong>Max · Control general</strong>
+                            <span><i class="bi bi-calendar-event"></i>Jueves · 10:30 a. m.</span>
+                        </div>
+                    </article>
+                </div>
             </div>
         </section>
 
         <!-- PRECIOS -->
-        <section id="precios" class="py-5 bg-light">
+        <section id="precios" aria-labelledby="precios-title">
             <div class="container">
-                <h2 class="display-6 fw-bold text-center mb-5">Precios flexibles para cada modelo de clínica</h2>
+                <div class="section-header reveal">
+                    <span class="section-tag">Planes</span>
+                    <h2 id="precios-title" class="section-title">Precios flexibles para cada clínica</h2>
+                    <p class="section-lead">Todos los planes incluyen 30 días de prueba gratis, sin tarjeta de
+                        crédito.</p>
+                </div>
 
-                <div class="row g-4 justify-content-center">
-                    <!-- Plan Básico -->
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card plan h-100">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="fw-bold text-success">#Essential</h5>
-                                <p class="text-muted">Pequeñas y medianas clínicas<br>+ 30 Propietarios de mascotas /
-                                    mes</p>
-                                <h3 class="fw-bold my-3">$39.900 <small class="text-muted fs-6">COP /mes</small></h3>
-
-                                <ul class="list-unstyled mb-4 flex-grow-1">
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Cuentas
-                                        limitadas</li>
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Registros
-                                        limitados</li>
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Funciones
-                                        básicas</li>
-                                </ul>
-
-                                <button type="button" data-plan="1"
-                                    class="btn btn-outline-success rounded-pill w-100 btn_planes">SOLICITAR
-                                    PRUEBA</button>
-                            </div>
-                        </div>
+                <div class="row g-4 justify-content-center align-items-stretch">
+                    <!-- Plan Essential -->
+                    <div class="col-md-6 col-lg-4 reveal">
+                        <article class="plan">
+                            <h3 class="plan-nombre">Essential</h3>
+                            <p class="plan-publico">Clínicas pequeñas y medianas · +30 propietarios de mascotas
+                                al mes</p>
+                            <p class="plan-precio">
+                                <span class="monto">$39.900</span><span class="periodo">COP / mes</span>
+                            </p>
+                            <ul class="plan-features">
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Cuentas limitadas</li>
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Registros limitados</li>
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Funciones básicas</li>
+                            </ul>
+                            <button type="button" data-plan="1" class="btn btn-outline-success w-100 btn_planes">
+                                Solicitar prueba
+                            </button>
+                        </article>
                     </div>
 
-                    <!-- Plan Común -->
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card plan h-100 border-success">
-                            <div class="card-body d-flex flex-column">
-                                <div class="position-relative">
-                                    <span class="badge bg-success position-absolute top-0 end-0">POPULAR</span>
-                                </div>
-                                <h5 class="fw-bold text-success">#ProCare</h5>
-                                <p class="text-muted">Medianas clínicas<br>+ 80 Propietarios de mascotas / mes</p>
-                                <h3 class="fw-bold my-3">$49.900 <small class="text-muted fs-6">COP /mes</small></h3>
-
-                                <ul class="list-unstyled mb-4 flex-grow-1">
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Cuentas
-                                        limitadas</li>
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Registros
-                                        ilimitados</li>
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Funciones
-                                        avanzadas</li>
-                                </ul>
-
-                                <button type="button" data-plan="2"
-                                    class="btn btn-success rounded-pill w-100 btn_planes">SOLICITAR PRUEBA</button>
-                            </div>
-                        </div>
+                    <!-- Plan ProCare -->
+                    <div class="col-md-6 col-lg-4 reveal" style="--reveal-delay: .08s">
+                        <article class="plan plan--destacado">
+                            <span class="plan-badge">Más popular</span>
+                            <h3 class="plan-nombre">ProCare</h3>
+                            <p class="plan-publico">Clínicas medianas · +80 propietarios de mascotas al mes</p>
+                            <p class="plan-precio">
+                                <span class="monto">$49.900</span><span class="periodo">COP / mes</span>
+                            </p>
+                            <ul class="plan-features">
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Cuentas limitadas</li>
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Registros ilimitados</li>
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Funciones avanzadas</li>
+                            </ul>
+                            <button type="button" data-plan="2" class="btn btn-success w-100 btn_planes">
+                                Solicitar prueba
+                            </button>
+                        </article>
                     </div>
 
-                    <!-- Plan Deluxe -->
-                    <div class="col-lg-3 col-md-6">
-                        <div class="card plan h-100">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="fw-bold text-success">#MasterVet</h5>
-                                <p class="text-muted">Clínicas grandes<br>+ 100 Propietarios de mascotas / mes</p>
-                                <h3 class="fw-bold my-3">$69.900 <small class="text-muted fs-6">COP /mes</small></h3>
-
-                                <ul class="list-unstyled mb-4 flex-grow-1">
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Cuentas
-                                        ilimitadas</li>
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Registros
-                                        ilimitados</li>
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Tienda
-                                        virtual</li>
-                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Comunidad
-                                        de clientes</li>
-                                </ul>
-
-                                <button type="button" data-plan="3"
-                                    class="btn btn-outline-success rounded-pill w-100 btn_planes">SOLICITAR
-                                    PRUEBA</button>
-                            </div>
-                        </div>
+                    <!-- Plan MasterVet -->
+                    <div class="col-md-6 col-lg-4 reveal" style="--reveal-delay: .16s">
+                        <article class="plan">
+                            <h3 class="plan-nombre">MasterVet</h3>
+                            <p class="plan-publico">Clínicas grandes · +100 propietarios de mascotas al mes</p>
+                            <p class="plan-precio">
+                                <span class="monto">$69.900</span><span class="periodo">COP / mes</span>
+                            </p>
+                            <ul class="plan-features">
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Cuentas ilimitadas</li>
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Registros ilimitados</li>
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Tienda virtual</li>
+                                <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Comunidad de clientes</li>
+                            </ul>
+                            <button type="button" data-plan="3" class="btn btn-outline-success w-100 btn_planes">
+                                Solicitar prueba
+                            </button>
+                        </article>
                     </div>
                 </div>
-                <!-- CTA PRUEBA GRATUITA -->
-                <div class="row justify-content-center mt-5">
-                    <div class="col-lg-9">
-                        <div class=" rounded-4 p-5 text-center">
-                            <div class="card-body">
+            </div>
+        </section>
 
-                                <i class="bi bi-gift-fill text-success display-4 mb-3"></i>
+        <!-- EQUIPO -->
+        <section id="equipo" aria-labelledby="equipo-title">
+            <div class="container">
+                <div class="section-header reveal">
+                    <span class="section-tag">Equipo</span>
+                    <h2 id="equipo-title" class="section-title">Las personas detrás de VetWilling</h2>
+                    <p class="section-lead">
+                        Construimos soluciones digitales confiables para el sector veterinario, con herramientas
+                        modernas, intuitivas y seguras.
+                    </p>
+                </div>
 
-                                <h2 class="fw-bold mb-3">
-                                    ¿Aún no estás seguro?
-                                </h2>
+                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3 g-lg-4 justify-content-center">
+                    <div class="col reveal">
+                        <article class="team-card">
+                            <div class="team-card-inner">
+                                <!-- Frente -->
+                                <div class="team-front">
+                                    <img src="public/assets/webSite/img/brian.webp" width="480" height="640"
+                                        alt="Brayan Andrade" loading="lazy">
+                                    <div class="team-overlay">
+                                        <h3>Brayan Andrade</h3>
+                                        <p>Backend · Frontend</p>
+                                    </div>
+                                    <button type="button" class="team-flip" aria-expanded="false"
+                                        aria-label="Ver experiencia de Brayan Andrade">
+                                        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                                    </button>
+                                </div>
 
-                                <p class="lead text-muted mb-4">
-                                    Prueba <strong>VetWilling</strong> completamente gratis durante <strong>30
-                                        días</strong> y descubre cómo nuestra plataforma puede transformar la gestión de
-                                    tu clínica veterinaria.
-                                </p>
+                                <!-- Reverso -->
+                                <div class="team-back">
+                                    <h3>Brayan Andrade</h3>
+                                    <p class="team-role">Backend · Frontend</p>
+                                    <ul class="team-skills" aria-label="Experiencia">
+                                        <li>React</li>
+                                        <li>Vue.js</li>
+                                        <li>JavaScript</li>
+                                        <li>3+ años</li>
+                                    </ul>
+                                    <div class="social-links">
+                                        <a href="https://github.com/brayandrad3" target="_blank" rel="noopener"
+                                            aria-label="GitHub de Brayan Andrade"><i class="bi bi-github" aria-hidden="true"></i></a>
+                                        <a href="https://www.linkedin.com/in/brayan-andrad3/" target="_blank" rel="noopener"
+                                            aria-label="LinkedIn de Brayan Andrade"><i class="bi bi-linkedin" aria-hidden="true"></i></a>
+                                        <a href="mailto:brayandrade33@gmail.com" aria-label="Correo de Brayan Andrade"><i
+                                                class="bi bi-envelope" aria-hidden="true"></i></a>
+                                    </div>
+                                    <button type="button" class="team-flip team-flip--back"
+                                        aria-label="Volver a la foto de Brayan Andrade">
+                                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
 
-                                <p class="text-muted mb-4">
-                                    Sin compromiso de permanencia. Durante el periodo de prueba podrás explorar todas
-                                    las funcionalidades del plan seleccionado y comprobar cómo VetWilling optimiza tus
-                                    procesos administrativos y clínicos.
-                                </p>
+                    <div class="col reveal" style="--reveal-delay: .06s">
+                        <article class="team-card">
+                            <div class="team-card-inner">
+                                <!-- Frente -->
+                                <div class="team-front">
+                                    <img src="public/assets/webSite/img/adri.webp" width="480" height="638"
+                                        alt="Adriana Castillo" loading="lazy">
+                                    <div class="team-overlay">
+                                        <h3>Adriana Castillo</h3>
+                                        <p>Backend · Frontend</p>
+                                    </div>
+                                    <button type="button" class="team-flip" aria-expanded="false"
+                                        aria-label="Ver experiencia de Adriana Castillo">
+                                        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                                    </button>
+                                </div>
 
-                                <button type="button" data-plan="2"
-                                    class="btn btn-success btn-lg px-4 py-2 fw-semibold btn_planes">
-                                    Solicitar prueba gratuita
+                                <!-- Reverso -->
+                                <div class="team-back">
+                                    <h3>Adriana Castillo</h3>
+                                    <p class="team-role">Backend · Frontend</p>
+                                    <ul class="team-skills" aria-label="Experiencia">
+                                        <li>PHP</li>
+                                        <li>Laravel</li>
+                                        <li>MySQL</li>
+                                        <li>REST API</li>
+                                    </ul>
+                                    <div class="social-links">
+                                        <a href="https://github.com/adricas35" target="_blank" rel="noopener"
+                                            aria-label="GitHub de Adriana Castillo"><i class="bi bi-github" aria-hidden="true"></i></a>
+                                        <a href="https://www.linkedin.com/in/adriana-castillo-05aa10368/" target="_blank" rel="noopener"
+                                            aria-label="LinkedIn de Adriana Castillo"><i class="bi bi-linkedin" aria-hidden="true"></i></a>
+                                        <a href="mailto:adriana@vetwilling.com" aria-label="Correo de Adriana Castillo"><i
+                                                class="bi bi-envelope" aria-hidden="true"></i></a>
+                                    </div>
+                                    <button type="button" class="team-flip team-flip--back"
+                                        aria-label="Volver a la foto de Adriana Castillo">
+                                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col reveal" style="--reveal-delay: .12s">
+                        <article class="team-card">
+                            <div class="team-card-inner">
+                                <!-- Frente -->
+                                <div class="team-front">
+                                    <img src="public/assets/webSite/img/maic.webp" width="480" height="720"
+                                        alt="Maicol Bernal" loading="lazy">
+                                    <div class="team-overlay">
+                                        <h3>Maicol Bernal</h3>
+                                        <p>Backend Developer</p>
+                                    </div>
+                                    <button type="button" class="team-flip" aria-expanded="false"
+                                        aria-label="Ver experiencia de Maicol Bernal">
+                                        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Reverso -->
+                                <div class="team-back">
+                                    <h3>Maicol Bernal</h3>
+                                    <p class="team-role">Backend Developer</p>
+                                    <ul class="team-skills" aria-label="Experiencia">
+                                        <li>Node.js</li>
+                                        <li>Python</li>
+                                        <li>MySQL</li>
+                                        <li>GraphQL</li>
+                                    </ul>
+                                    <div class="social-links">
+                                        <a href="https://github.com/MaicBernal11" target="_blank" rel="noopener"
+                                            aria-label="GitHub de Maicol Bernal"><i class="bi bi-github" aria-hidden="true"></i></a>
+                                        <a href="https://www.linkedin.com/in/maicol-bernal-62138641b" target="_blank" rel="noopener"
+                                            aria-label="LinkedIn de Maicol Bernal"><i class="bi bi-linkedin" aria-hidden="true"></i></a>
+                                        <a href="mailto:maicol@vetwilling.com" aria-label="Correo de Maicol Bernal"><i
+                                                class="bi bi-envelope" aria-hidden="true"></i></a>
+                                    </div>
+                                    <button type="button" class="team-flip team-flip--back"
+                                        aria-label="Volver a la foto de Maicol Bernal">
+                                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col reveal" style="--reveal-delay: .18s">
+                        <article class="team-card">
+                            <div class="team-card-inner">
+                                <!-- Frente -->
+                                <div class="team-front">
+                                    <img src="public/assets/webSite/img/yahir.webp" width="480" height="640"
+                                        alt="Yair Vergara" loading="lazy">
+                                    <div class="team-overlay">
+                                        <h3>Yair Vergara</h3>
+                                        <p>Full Stack Developer</p>
+                                    </div>
+                                    <button type="button" class="team-flip" aria-expanded="false"
+                                        aria-label="Ver experiencia de Yair Vergara">
+                                        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Reverso -->
+                                <div class="team-back">
+                                    <h3>Yair Vergara</h3>
+                                    <p class="team-role">Full Stack Developer</p>
+                                    <ul class="team-skills" aria-label="Experiencia">
+                                        <li>React</li>
+                                        <li>Node.js</li>
+                                        <li>Docker</li>
+                                        <li>CI/CD</li>
+                                    </ul>
+                                    <div class="social-links">
+                                        <a href="https://github.com/yairV1" target="_blank" rel="noopener"
+                                            aria-label="GitHub de Yair Vergara"><i class="bi bi-github" aria-hidden="true"></i></a>
+                                        <a href="https://www.linkedin.com/in/yair-vergara-163043309/" target="_blank" rel="noopener"
+                                            aria-label="LinkedIn de Yair Vergara"><i class="bi bi-linkedin" aria-hidden="true"></i></a>
+                                        <a href="mailto:yair@vetwilling.com" aria-label="Correo de Yair Vergara"><i
+                                                class="bi bi-envelope" aria-hidden="true"></i></a>
+                                    </div>
+                                    <button type="button" class="team-flip team-flip--back"
+                                        aria-label="Volver a la foto de Yair Vergara">
+                                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="col reveal" style="--reveal-delay: .24s">
+                        <article class="team-card">
+                            <div class="team-card-inner">
+                                <!-- Frente -->
+                                <div class="team-front">
+                                    <img src="public/assets/webSite/img/wiii.webp" width="480" height="640"
+                                        alt="William Sánchez" loading="lazy">
+                                    <div class="team-overlay">
+                                        <h3>William Sánchez</h3>
+                                        <p>Project Manager</p>
+                                    </div>
+                                    <button type="button" class="team-flip" aria-expanded="false"
+                                        aria-label="Ver experiencia de William Sánchez">
+                                        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Reverso -->
+                                <div class="team-back">
+                                    <h3>William Sánchez</h3>
+                                    <p class="team-role">Project Manager</p>
+                                    <ul class="team-skills" aria-label="Experiencia">
+                                        <li>Scrum</li>
+                                        <li>Liderazgo</li>
+                                        <li>Planeación</li>
+                                        <li>7+ años</li>
+                                    </ul>
+                                    <div class="social-links">
+                                        <a href="https://github.com/WilliamSanchezR" target="_blank" rel="noopener"
+                                            aria-label="GitHub de William Sánchez"><i class="bi bi-github" aria-hidden="true"></i></a>
+                                        <a href="https://www.linkedin.com/in/william-andres-sanchez-rojas-1a3096264/" target="_blank" rel="noopener"
+                                            aria-label="LinkedIn de William Sánchez"><i class="bi bi-linkedin" aria-hidden="true"></i></a>
+                                        <a href="mailto:william@vetwilling.com" aria-label="Correo de William Sánchez"><i
+                                                class="bi bi-envelope" aria-hidden="true"></i></a>
+                                    </div>
+                                    <button type="button" class="team-flip team-flip--back"
+                                        aria-label="Volver a la foto de William Sánchez">
+                                        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- PREGUNTAS FRECUENTES -->
+        <section id="faq" aria-labelledby="faq-title">
+            <div class="container">
+                <div class="section-header reveal">
+                    <span class="section-tag">Preguntas frecuentes</span>
+                    <h2 id="faq-title" class="section-title">Resolvemos tus dudas</h2>
+                </div>
+
+                <div class="faq-wrap reveal">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq1" aria-expanded="false" aria-controls="faq1">
+                                    ¿Qué incluye la prueba gratuita?
                                 </button>
-
-                                <p class="small text-muted mt-3 mb-0">
-                                    No solicitamos tarjeta de crédito para comenzar.
-                                </p>
-
+                            </h3>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">Tienes 30 días para usar todas las funcionalidades del plan que elijas. No pedimos tarjeta de crédito para comenzar.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">
+                                    ¿Tengo que firmar algún contrato de permanencia?
+                                </button>
+                            </h3>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">No. VetWilling no tiene compromiso de permanencia: si la plataforma no es para tu clínica, no quedas atado a nada.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
+                                    ¿Mis datos están seguros?
+                                </button>
+                            </h3>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">Sí. La información de tu clínica se guarda en la nube con copias de respaldo, y cada persona accede solo a lo que le corresponde según su rol: administrador, veterinario o cliente.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">
+                                    ¿Mis clientes también pueden usar VetWilling?
+                                </button>
+                            </h3>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">Sí. Los propietarios de mascotas tienen su propio portal, desde donde gestionan sus mascotas y sus citas.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq5" aria-expanded="false" aria-controls="faq5">
+                                    ¿Necesito instalar algo?
+                                </button>
+                            </h3>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">No. VetWilling funciona desde el navegador, en computador, tablet o celular.</div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#faq6" aria-expanded="false" aria-controls="faq6">
+                                    ¿Cómo recibo soporte?
+                                </button>
+                            </h3>
+                            <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">Escríbenos a <a href="mailto:vetWillingsoporte@gmail.com">vetWillingsoporte@gmail.com</a>, llámanos al <a href="tel:+573108968615">+57 310 896 8615</a> o háblanos por <a href="https://wa.link/1s3wgw" target="_blank" rel="noopener">WhatsApp</a>, de lunes a viernes de 8:00 a. m. a 8:00 p. m.</div>
                             </div>
                         </div>
                     </div>
@@ -407,311 +750,74 @@
             </div>
         </section>
 
-        <!-- EQUIPO CON FLIP CARDS -->
-        <section id="equipo" class="py-5 bg-success">
+        <!-- CTA FINAL -->
+        <section id="cta-final" aria-labelledby="cta-title">
             <div class="container">
-
-                <h2 class="display-6 fw-bold text-center mb-5">Nuestro Equipo de Trabajo</h2>
-
-                <p class="lead text-center mb-5 text-white">
-                    Somos un equipo enfocado en construir soluciones digitales confiables para el sector veterinario.
-                    Nuestro compromiso es ayudarte a crecer con herramientas modernas, intuitivas y seguras.
-                </p>
-
-                <div class="row g-4 justify-content-center">
-                    <!-- Miembro 1 -->
-                    <div class="col-lg-2 col-md-3 col-sm-5">
-                        <div class="flip-card">
-                            <div class="flip-card-inner">
-                                <!-- Frente de la tarjeta -->
-                                <div class="flip-card-front">
-                                    <img src="public/assets/webSite/img/brian.jpeg" alt="Brayan Andrade">
-                                    <div class="card-overlay">
-                                        <h3>Brayan Andrade</h3>
-                                        <p>Backend - Frontend</p>
-                                        <span class="flip-hint"><i class="bi bi-arrow-repeat"></i> Toca para ver
-                                            más</span>
-                                    </div>
-                                </div>
-
-                                <!-- Reverso de la tarjeta -->
-                                <div class="flip-card-back">
-                                    <div class="back-content">
-                                        <h3>Brayan Andrade</h3>
-                                        <p class="role">Backend - Frontend Developer</p>
-
-                                        <div class="experience">
-                                            <h5><i class="bi bi-code-slash"></i> Experiencia</h5>
-                                            <ul>
-                                                <li>React.js & Vue.js</li>
-                                                <li>HTML5, CSS3, JavaScript</li>
-                                                <li>Responsive Design</li>
-                                                <li>3+ años de experiencia</li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="social-links">
-                                            <a href="https://github.com/brayandrad3" target="_blank"
-                                                aria-label="GitHub">
-                                                <i class="bi bi-github"></i>
-                                            </a>
-                                            <a href="https://www.linkedin.com/in/brayan-andrad3/" target="_blank"
-                                                aria-label="LinkedIn">
-                                                <i class="bi bi-linkedin"></i>
-                                            </a>
-                                            <a href="mailto:brayandrade33@gmail.com" aria-label="Email">
-                                                <i class="bi bi-envelope"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="cta-banner section-green reveal">
+                    <div class="cta-texto">
+                        <h2 id="cta-title">Empieza hoy tu prueba de 30 días</h2>
+                        <p>Sin tarjeta de crédito y sin permanencia. Descubre cómo VetWilling organiza tu clínica.</p>
                     </div>
-
-                    <!-- Miembro 2 -->
-                    <div class="col-lg-2 col-md-3 col-sm-5">
-                        <div class="flip-card">
-                            <div class="flip-card-inner">
-                                <div class="flip-card-front">
-                                    <img src="public/assets/webSite/img/adri.jpeg" alt="Adriana Castillo">
-                                    <div class="card-overlay">
-                                        <h3>Adriana Castillo</h3>
-                                        <p>Backend - Frontend</p>
-                                        <span class="flip-hint"><i class="bi bi-arrow-repeat"></i> Toca para ver
-                                            más</span>
-                                    </div>
-                                </div>
-
-                                <div class="flip-card-back">
-                                    <div class="back-content">
-                                        <h3>Adriana Castillo</h3>
-                                        <p class="role">Backend - Frontend Developer</p>
-
-                                        <div class="experience">
-                                            <h5><i class="bi bi-palette"></i> Experiencia</h5>
-                                            <ul>
-                                                <li>Html5, Css, JavaScript</li>
-                                                <li>MySQL</li>
-                                                <li>Php, Laravel</li>
-                                                <li>REST API</li>
-                                                <li>1 año de experiencia</li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="social-links">
-                                            <a href="https://github.com/adricas35" target="_blank" aria-label="github">
-                                                <i class="bi bi-github"></i>
-                                            </a>
-                                            <a href="https://www.linkedin.com/in/adriana-castillo-05aa10368/"
-                                                target="_blank" aria-label="LinkedIn">
-                                                <i class="bi bi-linkedin"></i>
-                                            </a>
-                                            <a href="mailto:adriana@vetwilling.com" aria-label="Email">
-                                                <i class="bi bi-envelope"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Miembro 3 el maicccccc-->
-                    <div class="col-lg-2 col-md-3 col-sm-5">
-                        <div class="flip-card">
-                            <div class="flip-card-inner">
-                                <div class="flip-card-front">
-                                    <img src="public/assets/webSite/img/maic.jpeg" alt="Maicol Bernal">
-                                    <div class="card-overlay">
-                                        <h3>Maicol Bernal</h3>
-                                        <p>Backend Developer</p>
-                                        <span class="flip-hint"><i class="bi bi-arrow-repeat"></i> Toca para ver
-                                            más</span>
-                                    </div>
-                                </div>
-
-                                <div class="flip-card-back">
-                                    <div class="back-content">
-                                        <h3>Maicol Bernal</h3>
-                                        <p class="role">Backend Developer</p>
-
-                                        <div class="experience">
-                                            <h5><i class="bi bi-server"></i> Experiencia</h5>
-                                            <ul>
-                                                <li>Node.js & Python</li>
-                                                <li>MySQL & MongoDB</li>
-                                                <li>API REST & GraphQL</li>
-                                                <li>5+ años de experiencia</li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="social-links">
-                                            <a href="https://github.com/MaicBernal11" target="_blank"
-                                                aria-label="GitHub">
-                                                <i class="bi bi-github"></i>
-                                            </a>
-                                            <a href="https://www.linkedin.com/in/maicol-bernal-62138641b?trk=recent-searches"
-                                                target="_blank" aria-label="LinkedIn">
-                                                <i class="bi bi-linkedin"></i>
-                                            </a>
-                                            <a href="mailto:maicol@vetwilling.com" aria-label="Email">
-                                                <i class="bi bi-envelope"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Miembro 4 Yahirrrrr-->
-                    <div class="col-lg-2 col-md-3 col-sm-5">
-                        <div class="flip-card">
-                            <div class="flip-card-inner">
-                                <div class="flip-card-front">
-                                    <img src="public/assets/webSite/img/yahir.jpeg" alt="Yair Vergara">
-                                    <div class="card-overlay">
-                                        <h3>Yair Vergara</h3>
-                                        <p>Full Stack Developer</p>
-                                        <span class="flip-hint"><i class="bi bi-arrow-repeat"></i> Toca para ver
-                                            más</span>
-                                    </div>
-                                </div>
-
-                                <div class="flip-card-back">
-                                    <div class="back-content">
-                                        <h3>Yair Vergara</h3>
-                                        <p class="role">Full Stack Developer</p>
-
-                                        <div class="experience">
-                                            <h5><i class="bi bi-layers"></i> Experiencia</h5>
-                                            <ul>
-                                                <li>React & Node.js</li>
-                                                <li>DevOps & CI/CD</li>
-                                                <li>AWS & Docker</li>
-                                                <li>+ años de experiencia</li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="social-links">
-                                            <a href="https://github.com/yairV1" target="_blank" aria-label="GitHub">
-                                                <i class="bi bi-github"></i>
-                                            </a>
-                                            <a href="https://www.linkedin.com/in/yair-vergara-163043309/"
-                                                target="_blank" aria-label="LinkedIn">
-                                                <i class="bi bi-linkedin"></i>
-                                            </a>
-                                            <a href="mailto:yair@vetwilling.com" aria-label="Email">
-                                                <i class="bi bi-envelope"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Miembro 5 -->
-                    <div class="col-lg-2 col-md-3 col-sm-5">
-                        <div class="flip-card">
-                            <div class="flip-card-inner">
-                                <div class="flip-card-front">
-                                    <img src="public/assets/webSite/img/wiii.jpeg" alt="William Sánchez">
-                                    <div class="card-overlay">
-                                        <h3>William Sánchez</h3>
-                                        <p>Project Manager</p>
-                                        <span class="flip-hint"><i class="bi bi-arrow-repeat"></i> Toca para ver
-                                            más</span>
-                                    </div>
-                                </div>
-
-                                <div class="flip-card-back">
-                                    <div class="back-content">
-                                        <h3>William Sánchez</h3>
-                                        <p class="role">Project Manager</p>
-
-                                        <div class="experience">
-                                            <h5><i class="bi bi-briefcase"></i> Experiencia</h5>
-                                            <ul>
-                                                <li>Scrum & Agile</li>
-                                                <li>Team Leadership</li>
-                                                <li>Project Planning</li>
-                                                <li>7+ años de experiencia</li>
-                                            </ul>
-                                        </div>
-
-                                        <div class="social-links">
-                                            <a href="https://github.com/WilliamSanchezR" target="_blank"
-                                                aria-label="Github">
-                                                <i class="bi bi-github"></i>
-                                            </a>
-                                            <a href="https://www.linkedin.com/in/william-andres-sanchez-rojas-1a3096264/"
-                                                target="_blank" aria-label="LinkedIn">
-                                                <i class="bi bi-linkedin"></i>
-                                            </a>
-                                            <a href="mailto:william@vetwilling.com" aria-label="Email">
-                                                <i class="bi bi-envelope"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="cta-acciones">
+                        <button type="button" data-plan="2" class="btn btn-light-on-green btn-lg btn_planes">
+                            Solicitar prueba gratuita
+                        </button>
+                        <a href="https://wa.link/1s3wgw" target="_blank" rel="noopener"
+                            class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-whatsapp me-2" aria-hidden="true"></i>Hablar con ventas
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Botón flotante de WhatsApp -->
+    <a href="https://wa.link/1s3wgw" target="_blank" rel="noopener" class="whatsapp-float"
+        aria-label="Escríbenos por WhatsApp">
+        <i class="bi bi-whatsapp" aria-hidden="true"></i>
+    </a>
+
     <!-- FOOTER -->
-    <footer id="footer" class="py-5">
+    <footer id="footer">
         <div class="container">
             <div class="row g-4">
-                <div class="col-lg-3 col-md-6">
-                    <img src="public/assets/webSite/img/LOGO-VERTICAL.png" alt="VetWilling Logo"
-                        class="footer-logo mb-3">
+                <div class="col-lg-4 col-md-12">
+                    <img src="public/assets/webSite/img/LOGO-PRINCIPAL.webp" alt="VetWilling" width="170"
+                        height="71" class="footer-logo" loading="lazy">
+                    <p class="footer-tagline">Gestión veterinaria inteligente para clínicas que quieren crecer.</p>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="fw-bold mb-3">Gestión veterinaria inteligente</h4>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Digitalizamos procesos</li>
-                        <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Mejoramos la experiencia del
-                            cliente
-                        </li>
-                        <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Fortalecemos tu operación.</li>
-                        <li class="mb-2"><i class="bi bi-check2 text-success me-2"></i>Más control, más eficiencia.</li>
+                <div class="col-lg-4 col-md-6">
+                    <h2>Por qué VetWilling</h2>
+                    <ul class="footer-list">
+                        <li><i class="bi bi-check2" aria-hidden="true"></i>Digitalizamos tus procesos</li>
+                        <li><i class="bi bi-check2" aria-hidden="true"></i>Mejoramos la experiencia del cliente</li>
+                        <li><i class="bi bi-check2" aria-hidden="true"></i>Fortalecemos tu operación</li>
+                        <li><i class="bi bi-check2" aria-hidden="true"></i>Más control, más eficiencia</li>
                     </ul>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="fw-bold mb-3">Contacto</h4>
-                    <p><i class="bi bi-envelope-fill text-success me-2"></i> vetWillingsoporte@gmail.com</p>
-                    <p><i class="bi bi-telephone-fill text-success me-2"></i> +57 310 8968615</p>
-                    <p><i class="bi bi-clock-fill text-success me-2"></i> Lun - Vie: 8:00am - 8:00pm</p>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <!-- <h4 class="fw-bold mb-3">Síguenos</h4>
-                    <div class="social-icons d-flex gap-3">
-                        <a href="#" class="btn btn-outline-success rounded-circle" aria-label="Facebook">
-                            <i class="bi bi-facebook"></i>
-                        </a>
-                        <a href="#" class="btn btn-outline-success rounded-circle" aria-label="Instagram">
-                            <i class="bi bi-instagram"></i>
-                        </a>
-                        <a href="#" class="btn btn-outline-success rounded-circle" aria-label="WhatsApp">
-                            <i class="bi bi-whatsapp"></i>
-                        </a>
-                    </div> -->
-                    <div class="mt-5">
-                        <p class="mb-0  text-muted">&copy; 2025 VetWilling. Todos los derechos reservados.</p>
-                    </div>
+                <div class="col-lg-4 col-md-6">
+                    <h2>Contacto</h2>
+                    <ul class="footer-list">
+                        <li><i class="bi bi-envelope-fill" aria-hidden="true"></i>
+                            <a href="mailto:vetWillingsoporte@gmail.com">vetWillingsoporte@gmail.com</a>
+                        </li>
+                        <li><i class="bi bi-telephone-fill" aria-hidden="true"></i>
+                            <a href="tel:+573108968615">+57 310 896 8615</a>
+                        </li>
+                        <li><i class="bi bi-whatsapp" aria-hidden="true"></i>
+                            <a href="https://wa.link/1s3wgw" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+                        </li>
+                        <li><i class="bi bi-clock-fill" aria-hidden="true"></i>Lun - Vie: 8:00 a. m. - 8:00 p. m.</li>
+                    </ul>
                 </div>
             </div>
 
-
-
+            <div class="footer-bottom text-center text-md-start">
+                &copy; <?= date('Y') ?> VetWilling. Todos los derechos reservados.
+            </div>
         </div>
     </footer>
 
@@ -719,23 +825,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
-
-    <!-- Script personalizado (opcional) -->
-    <script>
-        // Smooth scroll para los enlaces del menú
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
     <script src="public/assets/dashBoard/website/js/webSite.js"></script>
 </body>
 

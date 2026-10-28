@@ -50,6 +50,7 @@ switch ($request) {
         break;
 
     case "/generar-clave":
+        $accion = 'solicitar';
         require BASE_PATH . "/app/controllers/recoveryPassControllers.php";
         break;
 
@@ -65,6 +66,16 @@ switch ($request) {
 
     case "/recoverpw":
         require BASE_PATH . "/app/views/auth/recover-pass.php";
+        break;
+
+    case "/restablecer":
+        $accion = 'formulario';
+        require BASE_PATH . "/app/controllers/recoveryPassControllers.php";
+        break;
+
+    case "/restablecer/guardar":
+        $accion = 'guardar';
+        require BASE_PATH . "/app/controllers/recoveryPassControllers.php";
         break;
 
     // Fin rutas necesarias para el login
