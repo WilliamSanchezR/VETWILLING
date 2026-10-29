@@ -449,6 +449,7 @@ function acceso_cierre_sin_conexion(): void
     while (ob_get_level() > 0) {
         ob_end_clean();
     }
+    error_log('[acceso] no se pudo validar la identidad: la conexión a la base de datos terminó la petición');
     acceso_responder_503();
 }
 
