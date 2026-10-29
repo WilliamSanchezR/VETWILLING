@@ -165,7 +165,7 @@ $agendaProfesional = obtenerDisponibilidadesPorUsuario($id, $_SESSION['user']['i
 
             <div class="modal fade" id="modalAgregarAgenda" tabindex="-1" aria-labelledby="modalAgregarAgendaLabel" aria-hidden="true">
                 <div class="modal-dialog">
-                    <form id="formAgenda" method="POST" enctype="multipart/form-data">
+                    <form id="formAgenda" method="POST" action="<?= BASE_URL ?>/representante/agregar-disponibilidad-agenda" enctype="multipart/form-data">
                         <input type="hidden" name="id_usuario" value="<?= htmlspecialchars($_GET['id']) ?>">
                         <input type="hidden" name="id_veterinaria" value="<?= htmlspecialchars($_SESSION['user']['id_veterinaria']) ?>">
                         <div class="modal-content">
