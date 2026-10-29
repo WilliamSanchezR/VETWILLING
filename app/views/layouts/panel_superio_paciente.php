@@ -6,8 +6,9 @@ if (session_status() === PHP_SESSION_NONE) {
     }
 }
 
-// 2. Validar sesión
-if (!isset($_SESSION['user'])) {
+// 2. Validar sesión (solo una sesión creada por el login; ver acceso_helper.php)
+require_once BASE_PATH . '/app/helpers/acceso_helper.php';
+if (acceso_usuario() === null) {
     if (!headers_sent()) {
         header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
     }

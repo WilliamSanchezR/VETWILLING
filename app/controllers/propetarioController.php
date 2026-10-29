@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../models/Propietario.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../helpers/session_all.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -85,7 +86,7 @@ function listarPropietariosAdmin()
     }
 
     // Subtarea 1: solo el administrador puede listar
-    if (!isset($_SESSION['user']) || (int)$_SESSION['user']['id_rol'] !== 1) {
+    if (acceso_rol() !== 1) {
         http_response_code(403);
         header('Content-Type: application/json');
         echo json_encode(['status' => 'error', 'message' => 'Acceso no autorizado']);
@@ -107,7 +108,7 @@ function listarPropietarios()
 
 function consultarPropietarioId($id)
 {
-    if (!isset($_SESSION['user'])) {
+    if (acceso_usuario() === null) {
         http_response_code(401);
         return [
             'status' => 'error',
@@ -246,7 +247,7 @@ function eliminarPropietario($id)
     }
 
     // Subtarea 1: autenticación del administrador
-    if (!isset($_SESSION['user']) || (int)$_SESSION['user']['id_rol'] !== 1) {
+    if (acceso_rol() !== 1) {
         mostrarSweetAlert('error', 'Acceso denegado', 'Solo el administrador puede eliminar propietarios', BASE_URL . '/login');
         exit();
     }
@@ -402,7 +403,7 @@ function eliminarPropietarioAJAX($id)
     header('Content-Type: application/json');
 
     // Subtarea 1: autenticación del administrador
-    if (!isset($_SESSION['user']) || (int)$_SESSION['user']['id_rol'] !== 1) {
+    if (acceso_rol() !== 1) {
         http_response_code(403);
         echo json_encode(['status' => 'error', 'message' => 'Acceso no autorizado']);
         exit();
