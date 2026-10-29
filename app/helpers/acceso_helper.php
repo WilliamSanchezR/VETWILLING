@@ -188,3 +188,153 @@ function acceso_exigir_seleccion_pendiente(): array
     }
     return $usuario;
 }
+
+// ── Protección central de rutas (fase 2) ─────────────────────────────────────────
+//
+// index.php llama a acceso_verificar() antes del switch. La política de cada ruta está en
+// config/rutas_acceso.php. Modo (variable ACCESO_MODO en .env): 'aplicar' (por defecto),
+// 'observar' (solo registra lo que se habría denegado) o 'apagado'.
+
+const ACCESO_METODOS_VISTA = ['GET', 'HEAD'];
+
+function acceso_mapa(): array
+{
+    static $mapa = null;
+    return $mapa ??= require __DIR__ . '/../../config/rutas_acceso.php';
+}
+
+/**
+ * Decide qué hacer con una petición. Función pura: no lee la sesión ni envía nada.
+ *
+ * @param array|null $politica Entrada del mapa (null si la ruta no está en él)
+ * @param array|null $usuario  acceso_usuario()
+ * @param array      $query    Parámetros GET
+ * @return array{resultado: string, motivo: string}
+ *         resultado: 'permitir' | 'login' | 'seleccion' | '403' | '404' | '405'
+ */
+function acceso_decidir(?array $politica, ?array $usuario, string $metodo, array $query = []): array
+{
+    $d = fn(string $resultado, string $motivo) => ['resultado' => $resultado, 'motivo' => $motivo];
+
+    // Ruta desconocida: igual que la rama default del enrutador (login o 404)
+    if ($politica === null) {
+        return $usuario === null ? $d('login', 'ruta desconocida sin sesión') : $d('404', 'ruta desconocida');
+    }
+    $tipo = $politica['tipo'] ?? '';
+    if ($tipo === 'deshabilitada') {
+        return $d('404', 'ruta deshabilitada');
+    }
+    if ($tipo === 'vista' && empty($politica['post']) && !in_array(strtoupper($metodo), ACCESO_METODOS_VISTA, true)) {
+        return $d('405', 'una vista solo admite GET');
+    }
+
+    $publica = ($politica['roles'] ?? null) === 'publica';
+    foreach ($politica['publica_si'] ?? [] as $parametro => $valor) {
+        if (($query[$parametro] ?? null) === $valor) {
+            $publica = true;
+        }
+    }
+    if ($publica) {
+        return $d('permitir', 'ruta pública');
+    }
+
+    if ($usuario === null) {
+        return $d('login', 'sin sesión');
+    }
+    if (!empty($usuario['seleccion_pendiente'])) {
+        return $d('seleccion', 'selección de veterinaria pendiente');
+    }
+    $roles = $politica['roles'] ?? [];
+    if (!is_array($roles) || !in_array((int) $usuario['id_rol'], $roles, true)) {
+        return $d('403', 'rol no permitido');
+    }
+    return $d('permitir', 'rol permitido');
+}
+
+/**
+ * La respuesta va en JSON si la ruta es una API o la petición la hace JavaScript.
+ */
+function acceso_responder_json(?array $politica): bool
+{
+    if (($politica['tipo'] ?? '') === 'api') {
+        return true;
+    }
+    $acepta = strtolower($_SERVER['HTTP_ACCEPT'] ?? '');
+    $contenido = strtolower($_SERVER['CONTENT_TYPE'] ?? '');
+    return str_contains($acepta, 'application/json')
+        || str_contains($contenido, 'application/json')
+        || strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest';
+}
+
+/**
+ * Aplica la política de la ruta. Si la petición no está permitida, responde y termina.
+ * Los mensajes son genéricos; el motivo concreto solo se registra en el log del servidor.
+ */
+function acceso_verificar(string $ruta, string $metodo): void
+{
+    $modo = function_exists('env_value') ? (string) env_value('ACCESO_MODO', 'aplicar') : 'aplicar';
+    if ($modo === 'apagado') {
+        return;
+    }
+
+    $politica = acceso_mapa()[$ruta] ?? null;
+    $usuario = acceso_usuario();
+    $decision = acceso_decidir($politica, $usuario, $metodo, $_GET);
+    if ($decision['resultado'] === 'permitir') {
+        return;
+    }
+
+    error_log(sprintf(
+        '[acceso] %s %s %s → %s (%s, rol %s)',
+        $modo === 'observar' ? 'OBSERVADO' : 'DENEGADO',
+        strtoupper($metodo),
+        $ruta,
+        $decision['resultado'],
+        $decision['motivo'],
+        $usuario === null ? 'anónimo' : (string) $usuario['id_rol']
+    ));
+    if ($modo === 'observar') {
+        return;
+    }
+
+    $json = acceso_responder_json($politica);
+    $base = defined('BASE_URL') ? BASE_URL : '';
+    [$codigo, $mensaje] = match ($decision['resultado']) {
+        'login'     => [401, 'Debes iniciar sesión.'],
+        'seleccion' => [403, 'Selecciona una veterinaria para continuar.'],
+        '403'       => [403, 'No tienes permiso para realizar esta acción.'],
+        '404'       => [404, 'Recurso no encontrado.'],
+        '405'       => [405, 'Método no permitido.'],
+    };
+
+    if ($json) {
+        http_response_code($codigo);
+        if ($codigo === 405) {
+            header('Allow: ' . implode(', ', ACCESO_METODOS_VISTA));
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => $mensaje, 'message' => $mensaje]);
+        exit();
+    }
+
+    switch ($decision['resultado']) {
+        case 'login':
+            acceso_redirigir('/login');
+        case 'seleccion':
+            acceso_redirigir(ACCESO_RUTA_SELECCION);
+        case '403':
+            http_response_code(403);
+            require __DIR__ . '/../views/auth/error403.php';
+            exit();
+        case '404':
+            http_response_code(404);
+            require __DIR__ . '/../views/auth/error404.php';
+            exit();
+        default:
+            http_response_code(405);
+            header('Allow: ' . implode(', ', ACCESO_METODOS_VISTA));
+            header('Content-Type: text/plain; charset=utf-8');
+            echo $mensaje;
+            exit();
+    }
+}
