@@ -531,15 +531,46 @@ function acceso_credenciales_vigentes(array $usuario): bool
 
     $fila = acceso_leer_credenciales_o_503((int) $usuario['id_usuario']);
 
-    $vigente = $fila !== null
-        && (int) $fila['credenciales_version'] === $version
-        && mb_strtolower(trim((string) $fila['estado'])) === 'activo'
-        && (int) $fila['id_rol'] === (int) $usuario['id_rol'];
-    if (!$vigente) {
+    if (!acceso_fila_coincide($fila, $usuario, $version)) {
         error_log(sprintf('[acceso] sesión revocada del usuario %d (credenciales, estado o rol cambiados)', (int) $usuario['id_usuario']));
         return false;
     }
     $estado['verificado'] = $clave;
+    return true;
+}
+
+/** La fila de la base coincide con la sesión: misma versión, cuenta activa y mismo rol. */
+function acceso_fila_coincide(?array $fila, array $usuario, int $version): bool
+{
+    return $fila !== null
+        && (int) $fila['credenciales_version'] === $version
+        && mb_strtolower(trim((string) $fila['estado'])) === 'activo'
+        && (int) $fila['id_rol'] === (int) $usuario['id_rol'];
+}
+
+/**
+ * Revalidación para conexiones largas (SSE), que siguen abiertas después de cerrar la sesión:
+ * consulta la base en cada llamada, sin memoria. Si la base no responde devuelve false
+ * (fallo cerrado: el llamador corta la conexión y la reconexión pasará por la comprobación normal).
+ *
+ * @param array $usuario Copia de $_SESSION['user'] tomada al abrir la conexión
+ */
+function acceso_sesion_sigue_vigente(array $usuario): bool
+{
+    $version = filter_var($usuario['credenciales_version'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($version === false || !isset($usuario['id_usuario'])) {
+        return false;
+    }
+    try {
+        $fila = acceso_leer_credenciales((int) $usuario['id_usuario']);
+    } catch (AccesoBaseNoDisponible | PDOException $e) {
+        error_log('[acceso] conexión larga cerrada: no se pudo revalidar la identidad');
+        return false;
+    }
+    if (!acceso_fila_coincide($fila, $usuario, $version)) {
+        error_log(sprintf('[acceso] conexión larga cerrada: sesión revocada del usuario %d', (int) $usuario['id_usuario']));
+        return false;
+    }
     return true;
 }
 
