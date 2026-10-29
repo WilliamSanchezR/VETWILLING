@@ -147,6 +147,17 @@ comprobar(session_id() !== $idAntes && !isset($_SESSION['csrf_token']), '…con 
 acceso_actualizar_sesion_actual(99, 9);
 comprobar($_SESSION['user']['credenciales_version'] === 5, 'Si el cambio era de otro usuario, la sesión actual no se toca');
 
+echo "▶ Revalidación en conexiones largas (SSE)\n";
+$copia = ['id_usuario' => 7, 'id_rol' => 2, 'credenciales_version' => 5];
+$credencialesBD[7] = $fila(2, 5);
+$lecturas = 0;
+comprobar(acceso_sesion_sigue_vigente($copia) && acceso_sesion_sigue_vigente($copia) && $lecturas === 2, 'Sesión vigente: true, y consulta la base en cada vuelta del bucle');
+foreach (['versión cambiada' => $fila(2, 6), 'cuenta inactiva' => $fila(2, 5, 'inactivo'), 'rol cambiado' => $fila(4, 5), 'usuario eliminado' => null, 'base caída' => 'caida'] as $caso => $filaBD) {
+    $credencialesBD[7] = $filaBD;
+    comprobar(!acceso_sesion_sigue_vigente($copia), "Con la $caso: false (se cierra el stream)");
+}
+comprobar(!acceso_sesion_sigue_vigente(['id_usuario' => 7, 'id_rol' => 2]), 'Copia sin versión: false');
+
 echo "▶ Base de datos no disponible (fallo cerrado)\n";
 $codigo = 'require ' . var_export(dirname(__DIR__) . '/app/helpers/acceso_helper.php', true) . ';'
     . 'ini_set("session.save_path", ' . var_export($carpetaSesiones, true) . '); ini_set("session.use_cookies", "0"); session_start();'
