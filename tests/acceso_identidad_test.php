@@ -2,7 +2,8 @@
 // Pruebas de la identidad estricta (app/helpers/acceso_helper.php).
 // Ejecutar con: php tests/acceso_identidad_test.php
 //
-// No usa base de datos ni HTTP: trabaja con $_SESSION en una carpeta de sesiones temporal propia.
+// No usa base de datos ni HTTP: trabaja con $_SESSION en una carpeta de sesiones temporal propia
+// y con un lector de credenciales ficticio (nunca conecta con ninguna base).
 
 if (PHP_SAPI !== 'cli') {
     http_response_code(404);
@@ -19,6 +20,19 @@ ini_set('session.save_path', $carpetaSesiones);
 ini_set('session.use_cookies', '0');
 
 require_once dirname(__DIR__) . '/app/helpers/acceso_helper.php';
+
+// Lector de credenciales ficticio, configurado antes de cualquier otra cosa: id_usuario => fila
+$credencialesBD = [];
+$lecturas = 0;
+acceso_configurar_lector(function (int $id) use (&$credencialesBD, &$lecturas) {
+    $lecturas++;
+    if (($credencialesBD[$id] ?? null) === 'caida') {
+        throw new AccesoBaseNoDisponible('base caída (simulada)');
+    }
+    return $credencialesBD[$id] ?? null;
+});
+$fila = fn(int $rol, int $version = 1, string $estado = 'activo') => ['credenciales_version' => $version, 'estado' => $estado, 'id_rol' => $rol];
+
 require_once dirname(__DIR__) . '/app/helpers/session_helper.php';
 
 $ok = 0;
@@ -60,6 +74,7 @@ comprobar(acceso_lista_veterinarias(null) === [] && acceso_lista_veterinarias(4)
 echo "▶ Sesión creada por el login\n";
 $_SESSION = ['csrf_token' => 'anterior'];
 $idAntes = session_id();
+$credencialesBD[7] = $fila(2);
 acceso_iniciar_sesion_usuario($datosLogin());
 $u = acceso_usuario();
 comprobar($u !== null && $u['autenticado'] === true && $u['id_usuario'] === 7 && $u['id_rol'] === 2, 'Usuario válido con la marca, id_usuario e id_rol enteros');
@@ -71,10 +86,12 @@ comprobar(acceso_id_usuario() === 7 && acceso_rol() === 2 && acceso_id_veterinar
 comprobar(isSessionActive() && getCurrentUserRole() === 2 && getCurrentUserId() === 7, 'session_helper: isSessionActive y getCurrentUserRole leen id_rol');
 comprobar(hasRole(2) && !hasRole(1) && hasAnyRole([2, 4]) && !hasAnyRole([1, 3]), 'hasRole / hasAnyRole funcionan con id_rol');
 
+$credencialesBD[7] = $fila(1);
 acceso_iniciar_sesion_usuario($datosLogin(['id_rol' => 1, 'id_veterinaria' => null]));
 comprobar(acceso_id_veterinaria() === null && acceso_usuario()['veterinarias_permitidas'] === [], 'Administrador: sin clínica');
 
 echo "▶ Selección de clínica (varias clínicas)\n";
+$credencialesBD[7] = $fila(2);
 acceso_iniciar_sesion_usuario($datosLogin(['id_veterinaria' => '3, 7']));
 comprobar(acceso_seleccion_pendiente() && acceso_id_veterinaria() === null, 'Varias clínicas: selección pendiente y sin clínica activa');
 $antes = $_SESSION['user'];
@@ -90,6 +107,56 @@ $_SESSION = [];
 comprobar(!acceso_seleccionar_veterinaria(3) && !isset($_SESSION['user']), 'Sin sesión: rechazado y NO se crea $_SESSION[user]');
 $_SESSION['user'] = ['id_veterinaria' => 3, 'seleccion_pendiente' => true, 'veterinarias_permitidas' => [3]];
 comprobar(!acceso_seleccionar_veterinaria(3), 'Con una sesión parcial que imita la selección pendiente: rechazado');
+
+echo "▶ Versión de credenciales (T1)\n";
+$credencialesBD[7] = $fila(2, 4);
+acceso_iniciar_sesion_usuario($datosLogin());
+comprobar(($_SESSION['user']['credenciales_version'] ?? null) === 4, 'El login guarda la versión de credenciales de la base');
+$lecturas = 0;
+acceso_usuario(); acceso_usuario(); isSessionActive(); acceso_rol();
+comprobar($lecturas === 1, 'Una sola lectura de la base por petición aunque se consulte la identidad varias veces', "lecturas: $lecturas");
+acceso_olvidar_verificacion(); // siguiente petición
+$lecturas = 0;
+acceso_usuario();
+comprobar($lecturas === 1, 'En la siguiente petición vuelve a comprobarse (sin caché entre peticiones)');
+
+$credencialesBD[7] = $fila(2, 5);
+acceso_olvidar_verificacion();
+comprobar(acceso_usuario() === null && !isset($_SESSION['user']), 'Versión cambiada en la base (otra sesión cambió la contraseña): sesión anónima y se borra');
+foreach (['cuenta inactiva' => $fila(2, 4, 'inactivo'), 'rol cambiado' => $fila(1, 4), 'usuario eliminado' => null] as $caso => $filaBD) {
+    $credencialesBD[7] = $fila(2, 4);
+    acceso_iniciar_sesion_usuario($datosLogin());
+    $credencialesBD[7] = $filaBD;
+    acceso_olvidar_verificacion();
+    comprobar(acceso_usuario() === null, "Con la $caso: sesión anónima");
+}
+$credencialesBD[7] = $fila(2, 4);
+acceso_iniciar_sesion_usuario($datosLogin());
+unset($_SESSION['user']['credenciales_version']);
+acceso_olvidar_verificacion();
+comprobar(acceso_usuario() === null, 'Sesión sin versión de credenciales (creada antes de T1): anónima');
+
+$credencialesBD[7] = $fila(2, 4);
+acceso_iniciar_sesion_usuario($datosLogin());
+$_SESSION['csrf_token'] = 'anterior';
+$idAntes = session_id();
+$credencialesBD[7] = $fila(2, 5);
+acceso_actualizar_sesion_actual(7, 5);
+comprobar(acceso_usuario() !== null && $_SESSION['user']['credenciales_version'] === 5, 'La sesión que hizo el cambio sigue válida con la versión nueva');
+comprobar(session_id() !== $idAntes && !isset($_SESSION['csrf_token']), '…con nuevo id de sesión y nuevo token CSRF');
+acceso_actualizar_sesion_actual(99, 9);
+comprobar($_SESSION['user']['credenciales_version'] === 5, 'Si el cambio era de otro usuario, la sesión actual no se toca');
+
+echo "▶ Base de datos no disponible (fallo cerrado)\n";
+$codigo = 'require ' . var_export(dirname(__DIR__) . '/app/helpers/acceso_helper.php', true) . ';'
+    . 'ini_set("session.save_path", ' . var_export($carpetaSesiones, true) . '); ini_set("session.use_cookies", "0"); session_start();'
+    . 'acceso_configurar_lector(function () { throw new AccesoBaseNoDisponible("simulada"); });'
+    . '$_SESSION["user"] = ["id_usuario" => 7, "id_rol" => 2, "autenticado" => true, "credenciales_version" => 1];'
+    . 'acceso_usuario(); echo "CONTINUÓ";';
+exec(escapeshellarg(PHP_BINARY) . ' -r ' . escapeshellarg($codigo) . ' 2>&1', $salidaHijo, $codigoHijo);
+$salidaHijo = implode("\n", $salidaHijo);
+comprobar($codigoHijo === 1 && !str_contains($salidaHijo, 'CONTINUÓ'), 'Si no se puede validar la identidad, la petición termina (código 1) sin continuar', "código $codigoHijo");
+comprobar(str_contains($salidaHijo, 'no está disponible') && !str_contains($salidaHijo, 'simulada'), 'Solo muestra el mensaje genérico, sin detalles del error');
 
 session_write_close();
 array_map('unlink', glob("$carpetaSesiones/*") ?: []);

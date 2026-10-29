@@ -10,6 +10,9 @@
 // Veterinarios con varias clínicas: el login guarda las clínicas permitidas y deja la selección
 // pendiente; solo acceso_seleccionar_veterinaria() fija la clínica activa, y únicamente entre
 // las permitidas.
+//
+// Además, en cada petición la sesión se contrasta con la base (ver "Versión de credenciales"):
+// si cambió la versión de credenciales, el estado o el rol del usuario, deja de valer.
 
 const ACCESO_ROLES_VALIDOS = [1, 2, 3, 4, 5];
 const ACCESO_RUTA_SELECCION = '/login/seleccionarVeterinaria';
@@ -40,6 +43,11 @@ function acceso_usuario(): ?array
     $id  = filter_var($usuario['id_usuario'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
     $rol = filter_var($usuario['id_rol'] ?? null, FILTER_VALIDATE_INT);
     if ($id === false || !in_array($rol, ACCESO_ROLES_VALIDOS, true)) {
+        return null;
+    }
+    if (!acceso_credenciales_vigentes($usuario)) {
+        // Contraseña o correo cambiados, sesiones cerradas, cuenta inactiva o rol cambiado
+        unset($_SESSION['user']);
         return null;
     }
     return $usuario;
@@ -111,6 +119,7 @@ function acceso_iniciar_sesion_usuario(array $datos): void
 
     $veterinarias = acceso_lista_veterinarias($datos['id_veterinaria'] ?? null);
     $pendiente = count($veterinarias) > 1;
+    $credenciales = acceso_leer_credenciales_o_503((int) $datos['id_usuario']);
 
     // El hash de la contraseña no se guarda en sesión: ninguna vista lo necesita
     $_SESSION['user'] = [
@@ -123,8 +132,10 @@ function acceso_iniciar_sesion_usuario(array $datos): void
         'estado'                  => $datos['estado'],
         'veterinarias_permitidas' => $veterinarias,
         'seleccion_pendiente'     => $pendiente,
+        'credenciales_version'    => (int) ($credenciales['credenciales_version'] ?? 0),
         'autenticado'             => true,
     ];
+    acceso_olvidar_verificacion();
 }
 
 /**
@@ -228,13 +239,7 @@ function acceso_decidir(?array $politica, ?array $usuario, string $metodo, array
         return $d('405', 'una vista solo admite GET');
     }
 
-    $publica = ($politica['roles'] ?? null) === 'publica';
-    foreach ($politica['publica_si'] ?? [] as $parametro => $valor) {
-        if (($query[$parametro] ?? null) === $valor) {
-            $publica = true;
-        }
-    }
-    if ($publica) {
+    if (acceso_es_publica($politica, $query)) {
         return $d('permitir', 'ruta pública');
     }
 
@@ -249,6 +254,25 @@ function acceso_decidir(?array $politica, ?array $usuario, string $metodo, array
         return $d('403', 'rol no permitido');
     }
     return $d('permitir', 'rol permitido');
+}
+
+/**
+ * Ruta pública: 'roles' => 'publica', o un parámetro GET de 'publica_si' coincide (webhook de pagos).
+ */
+function acceso_es_publica(?array $politica, array $query): bool
+{
+    if ($politica === null) {
+        return false;
+    }
+    if (($politica['roles'] ?? null) === 'publica') {
+        return true;
+    }
+    foreach ($politica['publica_si'] ?? [] as $parametro => $valor) {
+        if (($query[$parametro] ?? null) === $valor) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -278,7 +302,10 @@ function acceso_verificar(string $ruta, string $metodo): void
     }
 
     $politica = acceso_mapa()[$ruta] ?? null;
-    $usuario = acceso_usuario();
+    $estado = &acceso_estado();
+    $estado['politica'] = $politica; // para responder en JSON si la base no está disponible
+    // Las rutas públicas no necesitan la identidad (ni la base de datos para validarla)
+    $usuario = acceso_es_publica($politica, $_GET) ? null : acceso_usuario();
     $decision = acceso_decidir($politica, $usuario, $metodo, $_GET);
     if ($decision['resultado'] === 'permitir') {
         return;
@@ -337,4 +364,218 @@ function acceso_verificar(string $ruta, string $metodo): void
             echo $mensaje;
             exit();
     }
+}
+
+// ── Versión de credenciales (T1) ─────────────────────────────────────────────────
+//
+// usuario.credenciales_version (migración database/credenciales_version.sql) se guarda en la
+// sesión al iniciar sesión y se compara con la base en cada petición que usa la identidad: una
+// consulta por clave primaria, una sola vez por petición y sin caché entre peticiones. Subirla
+// (acceso_rotar_credenciales) invalida todas las demás sesiones del usuario en su siguiente
+// petición. La misma consulta comprueba que la cuenta siga activa y con el mismo rol.
+//
+// Si la base no responde no se puede validar la identidad: se falla cerrado con un 503 genérico,
+// también cuando config/database.php termina con die() al no poder conectar.
+
+class AccesoBaseNoDisponible extends RuntimeException
+{
+}
+
+/**
+ * Estado interno del control de acceso durante la petición (por referencia).
+ */
+function &acceso_estado(): array
+{
+    static $estado = ['lector' => null, 'verificado' => null, 'conectando' => false, 'politica' => null, 'cierre' => false];
+    return $estado;
+}
+
+/**
+ * Obliga a volver a validar la sesión contra la base en la siguiente llamada a acceso_usuario().
+ */
+function acceso_olvidar_verificacion(): void
+{
+    $estado = &acceso_estado();
+    $estado['verificado'] = null;
+}
+
+/**
+ * Sustituye la lectura de credenciales de la base (solo para pruebas). null restaura la lectura real.
+ */
+function acceso_configurar_lector(?callable $lector): void
+{
+    $estado = &acceso_estado();
+    $estado['lector'] = $lector;
+    $estado['verificado'] = null;
+}
+
+/**
+ * Conexión de la aplicación (config/database.php). Si no se puede conectar, lanza
+ * AccesoBaseNoDisponible; si la conexión termina con die(), su salida se sustituye por un 503.
+ */
+function acceso_conexion(): PDO
+{
+    if (!class_exists('conexion')) {
+        require_once __DIR__ . '/../../config/database.php';
+    }
+    $estado = &acceso_estado();
+    if (!$estado['cierre']) {
+        register_shutdown_function('acceso_cierre_sin_conexion');
+        $estado['cierre'] = true;
+    }
+    $estado['conectando'] = true;
+    ob_start();
+    try {
+        $pdo = (new conexion())->getConexion();
+    } catch (Throwable $e) {
+        ob_end_clean();
+        $estado['conectando'] = false;
+        throw new AccesoBaseNoDisponible('La base de datos no está disponible.', 0, $e);
+    }
+    ob_end_flush();
+    $estado['conectando'] = false;
+    return $pdo;
+}
+
+/**
+ * Función de cierre: si la petición terminó mientras se conectaba (die() de config/database.php),
+ * descarta ese texto y responde con el 503 genérico.
+ */
+function acceso_cierre_sin_conexion(): void
+{
+    if (empty(acceso_estado()['conectando'])) {
+        return;
+    }
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    acceso_responder_503();
+}
+
+/**
+ * 503 genérico: no revela el motivo ni datos de la conexión.
+ */
+function acceso_responder_503(): void
+{
+    $mensaje = 'El servicio no está disponible en este momento. Inténtalo de nuevo en unos minutos.';
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, $mensaje . "\n");
+        return;
+    }
+    if (!headers_sent()) {
+        http_response_code(503);
+        header('Retry-After: 30');
+        header('Cache-Control: no-store');
+    }
+    if (acceso_responder_json(acceso_estado()['politica'])) {
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => $mensaje, 'message' => $mensaje]);
+    } else {
+        if (!headers_sent()) {
+            header('Content-Type: text/html; charset=utf-8');
+        }
+        echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Servicio no disponible</title></head>'
+            . '<body><h1>Servicio no disponible</h1><p>' . htmlspecialchars($mensaje, ENT_QUOTES, 'UTF-8') . '</p></body></html>';
+    }
+}
+
+/**
+ * Versión de credenciales, estado y rol del usuario (null si no existe).
+ *
+ * @throws AccesoBaseNoDisponible|PDOException
+ */
+function acceso_leer_credenciales(int $idUsuario): ?array
+{
+    $lector = acceso_estado()['lector'];
+    if ($lector !== null) {
+        return $lector($idUsuario);
+    }
+    $stmt = acceso_conexion()->prepare('SELECT credenciales_version, estado, id_rol FROM usuario WHERE id_usuario = ?');
+    $stmt->execute([$idUsuario]);
+    $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $fila ?: null;
+}
+
+/**
+ * acceso_leer_credenciales() con fallo cerrado: si la base no responde (o falta la columna
+ * credenciales_version porque la migración no se aplicó), termina la petición con el 503 genérico.
+ */
+function acceso_leer_credenciales_o_503(int $idUsuario): ?array
+{
+    try {
+        return acceso_leer_credenciales($idUsuario);
+    } catch (AccesoBaseNoDisponible | PDOException $e) {
+        error_log('[acceso] no se pudo validar la identidad: base de datos no disponible o sin la migración credenciales_version');
+        acceso_responder_503();
+        exit(1);
+    }
+}
+
+/**
+ * ¿La sesión sigue siendo válida según la base? (una vez por petición y por sesión).
+ * Si la base no responde, acceso_leer_credenciales_o_503() termina la petición con un 503 (fallo cerrado).
+ */
+function acceso_credenciales_vigentes(array $usuario): bool
+{
+    $version = filter_var($usuario['credenciales_version'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($version === false) {
+        return false; // sesión creada antes de la versión de credenciales: debe volver a iniciarse
+    }
+    $estado = &acceso_estado();
+    $clave = session_id() . '|' . $usuario['id_usuario'] . '|' . $version . '|' . $usuario['id_rol'];
+    if ($estado['verificado'] === $clave) {
+        return true;
+    }
+
+    $fila = acceso_leer_credenciales_o_503((int) $usuario['id_usuario']);
+
+    $vigente = $fila !== null
+        && (int) $fila['credenciales_version'] === $version
+        && mb_strtolower(trim((string) $fila['estado'])) === 'activo'
+        && (int) $fila['id_rol'] === (int) $usuario['id_rol'];
+    if (!$vigente) {
+        error_log(sprintf('[acceso] sesión revocada del usuario %d (credenciales, estado o rol cambiados)', (int) $usuario['id_usuario']));
+        return false;
+    }
+    $estado['verificado'] = $clave;
+    return true;
+}
+
+/**
+ * Sube la versión de credenciales del usuario e invalida sus tokens de recuperación pendientes.
+ * Se llama DENTRO de la transacción del cambio (contraseña, correo, "cerrar las demás sesiones");
+ * después de confirmarla, si el cambio lo hizo el propio usuario, llamar a acceso_actualizar_sesion_actual().
+ *
+ * @return int Versión nueva
+ */
+function acceso_rotar_credenciales(PDO $pdo, int $idUsuario): int
+{
+    $pdo->prepare('UPDATE usuario SET credenciales_version = credenciales_version + 1 WHERE id_usuario = ?')->execute([$idUsuario]);
+    $pdo->prepare('UPDATE password_reset SET usado_en = NOW() WHERE id_usuario = ? AND usado_en IS NULL')->execute([$idUsuario]);
+    $stmt = $pdo->prepare('SELECT credenciales_version FROM usuario WHERE id_usuario = ?');
+    $stmt->execute([$idUsuario]);
+    $version = $stmt->fetchColumn();
+    if ($version === false) {
+        throw new RuntimeException('Usuario inexistente al rotar las credenciales.');
+    }
+    return (int) $version;
+}
+
+/**
+ * Mantiene abierta la sesión que hizo el cambio: nuevo id de sesión, la versión nueva y un nuevo
+ * token CSRF. No hace nada si la sesión actual es de otro usuario (p. ej. un administrador que
+ * cambió la cuenta de otra persona).
+ */
+function acceso_actualizar_sesion_actual(int $idUsuario, int $nuevaVersion): void
+{
+    acceso_iniciar_sesion();
+    if ((int) ($_SESSION['user']['id_usuario'] ?? 0) !== $idUsuario) {
+        return;
+    }
+    session_regenerate_id(true);
+    $_SESSION['user']['credenciales_version'] = $nuevaVersion;
+    unset($_SESSION['csrf_token']);
+    acceso_olvidar_verificacion();
 }
