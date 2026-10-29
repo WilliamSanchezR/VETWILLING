@@ -8,6 +8,8 @@
  * y control de acceso por roles.
  */
 
+require_once __DIR__ . '/acceso_helper.php';
+
 /**
  * Inicia la sesión si aún no existe.
  */
@@ -19,17 +21,13 @@ function initSession()
 }
 
 /**
- * Verifica si existe una sesión activa.
+ * Verifica si existe una sesión iniciada por el login (ver acceso_usuario()).
  *
  * @return bool
  */
 function isSessionActive()
 {
-    initSession();
-
-    return isset($_SESSION['user']) &&
-           is_array($_SESSION['user']) &&
-           !empty($_SESSION['user']);
+    return acceso_usuario() !== null;
 }
 
 /**
@@ -69,13 +67,15 @@ function getCurrentUserId()
 }
 
 /**
- * Retorna el rol del usuario actual.
+ * Retorna el rol (id_rol) del usuario actual.
  *
- * @return string|null
+ * @return int|null
  */
 function getCurrentUserRole()
 {
-    return getCurrentUserData('rol');
+    $rol = getCurrentUserData('id_rol');
+
+    return $rol === null ? null : (int) $rol;
 }
 
 /**
@@ -96,7 +96,7 @@ function setUserSession(array $userData)
 /**
  * Verifica si el usuario tiene un rol específico.
  *
- * @param string $role
+ * @param int $role id_rol (1 a 5)
  * @return bool
  */
 function hasRole($role)
@@ -108,7 +108,7 @@ function hasRole($role)
 /**
  * Verifica si el usuario tiene alguno de los roles indicados.
  *
- * @param array $roles
+ * @param int[] $roles id_rol permitidos
  * @return bool
  */
 function hasAnyRole(array $roles)

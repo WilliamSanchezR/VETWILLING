@@ -1,9 +1,6 @@
 <?php
-// Helper para iniciar sesión y validar usuario paciente
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-if (!isset($_SESSION['user'])) {
-    header('Location: /vetwilling/login');
-    exit();
-}
+
+// Exige una sesión iniciada por el login (cualquier rol). Ver acceso_helper.php.
+require_once __DIR__ . '/acceso_helper.php';
+
+acceso_exigir_usuario();
