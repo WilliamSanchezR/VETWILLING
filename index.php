@@ -33,6 +33,11 @@ if ($request === "") {
     $request = "/";
 }
 
+// Control de acceso central: sesión, rol y método de cada ruta (config/rutas_acceso.php).
+// Si la petición no está permitida, responde aquí y no se ejecuta ningún controlador ni vista.
+require_once BASE_PATH . "/app/helpers/acceso_helper.php";
+acceso_verificar($request, $_SERVER["REQUEST_METHOD"] ?? "GET");
+
 // Entutamiento basico
 
 switch ($request) {
