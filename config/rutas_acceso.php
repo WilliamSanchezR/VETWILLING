@@ -154,7 +154,7 @@ return [
     '/cliente/actualizar'                              => ['tipo' => 'accion', 'roles' => [3]],
     '/cliente/guardar-mascota'                         => ['tipo' => 'accion', 'roles' => [3]],
     '/cliente/actualizar-mascota'                      => ['tipo' => 'accion', 'roles' => [3]],
-    '/cliente/eliminar-mascota'                        => ['tipo' => 'deshabilitada'],
+    '/cliente/eliminar-mascota'                        => ['tipo' => 'accion', 'roles' => [3]],
     '/cliente/actualizar-datos'                        => ['tipo' => 'api', 'roles' => [3]],
     '/cliente/actualizar-contrasena'                   => ['tipo' => 'accion', 'roles' => [3]],
     '/preferencias-notificacion'                       => ['tipo' => 'api', 'roles' => [1, 2, 3, 4]],
