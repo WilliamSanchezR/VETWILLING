@@ -406,7 +406,7 @@ $mascotas = listarMascotas();
 
                 // Enviar formulario por POST
                 var formData = new FormData(formEliminar);
-                fetch('<?= BASE_URL ?>/app/controllers/mascotasController.php', {
+                fetch('<?= BASE_URL ?>/cliente/eliminar-mascota', {
                     method: 'POST',
                     body: formData
                 })

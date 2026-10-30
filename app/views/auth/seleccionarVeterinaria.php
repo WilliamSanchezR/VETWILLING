@@ -1,10 +1,14 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_veterinario.php';
+require_once BASE_PATH . '/app/helpers/acceso_helper.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
+
+// Solo para quien inició sesión con varias veterinarias y aún no eligió una
+$usuarioSeleccion = acceso_exigir_seleccion_pendiente();
+
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 
-$veterinarias = $_SESSION['user']['id_veterinaria'];
-$veterinariasArray = explode(', ', $veterinarias);
-$veterinariasDetalles = consultarVeterinariasPorArray($veterinariasArray);
+// Las veterinarias permitidas las fija el login; no se toman de la petición
+$veterinariasDetalles = consultarVeterinariasPorArray($usuarioSeleccion['veterinarias_permitidas']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -479,12 +483,13 @@ $veterinariasDetalles = consultarVeterinariasPorArray($veterinariasArray);
 
             <form action="<?= BASE_URL ?>/login/ingresarVeterinaria" method="post">
                 <input type="hidden" name="action" value="seleccionarVeterinaria">
+                <?= csrf_campo() ?>
 
                 <div class="select-wrap">
                     <select name="id_veterinaria" required>
                         <option value="" disabled selected>¿En cuál clínica estás hoy?</option>
                         <?php foreach ($veterinariasDetalles as $veterinaria): ?>
-                            <option value="<?= $veterinaria['id_veterinaria'] ?>">
+                            <option value="<?= (int) $veterinaria['id_veterinaria'] ?>">
                                 <?= htmlspecialchars($veterinaria['nombre']) ?>
                             </option>
                         <?php endforeach; ?>
