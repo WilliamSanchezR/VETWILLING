@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/Mascotas.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -406,8 +407,8 @@ function eliminarMascota($id)
     require_once __DIR__ . '/../../config/database.php';
 
     try {
-        // 1. OBTENER DATOS DE LA SESIÓN
-        if (!isset($_SESSION['user'])) {
+        // 1. OBTENER DATOS DE LA SESIÓN (solo una sesión creada por el login)
+        if (acceso_usuario() === null) {
             mostrarSweetAlert('error', 'Sesión no válida', 'Por favor inicia sesión');
             exit();
         }

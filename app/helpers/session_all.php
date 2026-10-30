@@ -1,15 +1,6 @@
 <?php
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Exige una sesión iniciada por el login (cualquier rol). Ver acceso_helper.php.
+require_once __DIR__ . '/acceso_helper.php';
 
-// validamos si hay una secion activa
-
-if (!isset($_SESSION['user'])) {
-    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
-    exit();
-}
-
-
-?>
+acceso_exigir_usuario();

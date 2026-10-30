@@ -248,6 +248,9 @@ switch ($action) {
         // Guardar id antes de cerrar sesión; sin session_write_close() esta
         // conexión bloquea todas las demás requests del mismo usuario.
         $streamUserId = $id_usuario;
+        // Copia de la identidad para revalidarla en el bucle (T1-d): la sesión se cierra aquí,
+        // pero una contraseña cambiada o una cuenta desactivada deben cortar también este stream.
+        $streamUsuario = acceso_usuario();
         session_write_close();
 
         // Vaciar cualquier buffer de salida activo
@@ -282,6 +285,14 @@ switch ($action) {
         $maxTime = time() + 280;
 
         while (!connection_aborted() && time() < $maxTime) {
+            if ($streamUsuario === null || !acceso_sesion_sigue_vigente($streamUsuario)) {
+                echo "event: sesion_revocada\n";
+                echo "data: {}\n\n";
+                @ob_flush();
+                flush();
+                break;
+            }
+
             $nuevoId = $modelo->obtenerUltimoIdParaUsuario($streamUserId);
 
             if ($nuevoId > $lastId) {
