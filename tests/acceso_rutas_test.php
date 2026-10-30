@@ -53,7 +53,7 @@ $esperadas = ['/', '/cerrar-sesion', '/generar-clave', '/iniciar-sesion', '/logi
 comprobar($publicas === $esperadas, 'Solo son públicas las 12 rutas acordadas', implode(', ', array_diff($publicas, $esperadas)));
 comprobar(array_keys(array_filter($mapa, fn($p) => !empty($p['publica_si']))) === ['/pagos/mercadopago'], 'La única excepción pública por parámetro es el webhook de pagos');
 comprobar(array_keys(array_filter($mapa, fn($p) => !empty($p['post']))) === ['/cliente/perfil'], 'La única vista que admite POST es /cliente/perfil');
-comprobar(count(array_filter($mapa, fn($p) => $p['tipo'] === 'deshabilitada')) === 13, 'Hay 13 rutas deshabilitadas (sin llamadores vivos)');
+comprobar(count(array_filter($mapa, fn($p) => $p['tipo'] === 'deshabilitada')) === 12, 'Hay 12 rutas deshabilitadas (sin llamadores vivos)');
 
 echo "▶ Decisión para todas las rutas, identidades y métodos\n";
 $usuario = fn(int $rol, bool $pendiente = false) => ['id_usuario' => 1, 'id_rol' => $rol, 'autenticado' => true, 'seleccion_pendiente' => $pendiente];
@@ -102,6 +102,8 @@ comprobar($dec('/calendario/getVeterinarios', $usuario(3)) === 'permitir' && $de
 comprobar($dec('/pagos/mercadopago', null, 'POST', ['action' => 'webhook']) === 'permitir', 'Webhook de pagos (?action=webhook): público');
 comprobar($dec('/pagos/mercadopago', null, 'GET', ['action' => 'checkout']) === 'login' && $dec('/pagos/mercadopago', $usuario(2), 'GET', ['action' => 'checkout']) === '403', 'Resto de pagos: solo representante');
 comprobar($dec('/cliente/historial-compras', $usuario(3)) === '404', 'Ruta deshabilitada (vista inexistente): 404');
+comprobar($dec('/cliente/eliminar-mascota', $usuario(3), 'POST') === 'permitir' && $dec('/cliente/eliminar-mascota', $usuario(2), 'POST') === '403'
+    && $dec('/cliente/eliminar-mascota', null, 'POST') === 'login', 'Eliminar mascota: solo el propietario, y pasando por el enrutador');
 comprobar($dec('/ruta/que/no/existe', null) === 'login' && $dec('/ruta/que/no/existe', $usuario(1)) === '404', 'Ruta desconocida: login sin sesión, 404 con sesión (igual que antes)');
 
 echo "▶ Ningún formulario envía POST a una ruta de vista\n";
