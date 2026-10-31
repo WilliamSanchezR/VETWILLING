@@ -2,6 +2,7 @@
 
 // Enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+require_once BASE_PATH . '/app/helpers/avatar_helper.php';
 
 // asignamos el valo id del registro segun la tabla
 $id = $_SESSION['user']['id_usuario'];
@@ -110,7 +111,7 @@ $usuario = mostrarPerfil($id);
         <!-- Perfil Usuario -->
         <button class="btn-perfil" onclick="toggleDropdown('perfil')" aria-label="Perfil">
             <div class="avatar-usuario">
-                <span> <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+                <span> <img src="<?= htmlspecialchars(avatar_src($usuario['img_perfil'] ?? '', 'usuarios', $usuario['nombres'] ?? '', $usuario['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" alt="">
                 </span>
             </div>
             <div class="info-usuario">
@@ -124,7 +125,7 @@ $usuario = mostrarPerfil($id);
         <div class="dropdown-menu dropdown-perfil" id="dropdownPerfil">
             <div class="perfil-header">
                 <div class="avatar-usuario grande">
-                    <span> <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+                    <span> <img src="<?= htmlspecialchars(avatar_src($usuario['img_perfil'] ?? '', 'usuarios', $usuario['nombres'] ?? '', $usuario['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" alt="">
                     </span>
                 </div>
                 <div>
