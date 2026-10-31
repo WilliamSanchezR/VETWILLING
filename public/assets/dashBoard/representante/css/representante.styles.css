@@ -846,7 +846,8 @@
     margin: 1rem 0;
 }
 
-/* Scroll horizontal suave en tablas anchas */
+/* Scroll horizontal suave en tablas anchas (también el contenedor de Historial de ventas) */
+.tabla-contenido,
 .rep-tabla-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
