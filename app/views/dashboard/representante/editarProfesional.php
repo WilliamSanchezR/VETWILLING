@@ -16,8 +16,6 @@ $idVeterinaria = $vinculo['id_veterinaria'];
 
 $datosServicios = listaServiciosPorVeterinariaActivos($idVeterinaria);
 
-// Llamamos la función para listar los roles
-$datosRol = listarRolRepresentante();
 // Llamamos la función para listar los servicios
 
 $id = $vinculo['id_usuario'];
@@ -220,17 +218,9 @@ if (count($listaServiciosProfesional) > 0) {
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-person-rolodex"></i> Rol *</label>
-                                <select id="rol" name="rol" required>
-                                    <option value="">Seleccione un rol</option>
-
-
-                                    <?php if (!empty($datosRol)) : ?>
-                                        <?php foreach ($datosRol as $rol):  ?>
-                                            <option value="<?= $rol['id_rol'] ?>" <?= $rol['id_rol'] == $datosProfesional['id_rol'] ? 'selected' : '' ?>><?= $rol['nombre'] ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
+                                <label><i class="bi bi-person-rolodex"></i> Rol</label>
+                                <!-- El rol de la cuenta solo lo cambia el administrador -->
+                                <input type="text" id="rol" readonly value="<?= htmlspecialchars($datosProfesional['nombre'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                             </div>
                         </div>
                         <div class="col-md-6">

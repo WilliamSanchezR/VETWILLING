@@ -5,11 +5,23 @@ require_once __DIR__ . '/../models/Profesional.php';
 require_once __DIR__ . '/../helpers/mailer_helper.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
 
+// Acciones POST que admite cada ruta que incluye este controlador (las demás → 400)
+const PROFESIONAL_ACCIONES_POST = [
+    '/representante/guardar-Profesional'       => ['registrar'],
+    '/representante/actualizar-profesional'    => ['actualizar'],
+    '/representante/eliminar-profesional'      => ['eliminar'],
+    '/representante/eliminar-esp-profesional'  => ['eliminarEspProfesional'],
+    '/representante/eliminar-serv-profesional' => ['eliminarServProfesional'],
+];
+// El representante solo da de alta profesionales con este rol (veterinario)
+const PROFESIONAL_ROL_ALTA = 2;
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'POST':
-        $accion = $_POST['accion'] ?? '';
+        $accion = (string) ($_POST['accion'] ?? '');
+        acceso_exigir_accion_de_ruta($accion, PROFESIONAL_ACCIONES_POST);
         if ($accion === 'actualizar') {
             actualizarProfesional();
         } else if ($accion === 'eliminar') {
@@ -18,8 +30,7 @@ switch ($method) {
             eliminarEspecialidadDeProfesional();
         } else if ($accion === 'eliminarServProfesional') {
             eliminarServicioDeProfesional();
-        } else {
-            // Llamar a la función para guardar el profesional
+        } else if ($accion === 'registrar') {
             registrarProfesional();
         }
         break;
@@ -41,7 +52,8 @@ function registrarProfesional()
     // Obtener los datos del formulario
     $email = $_POST['email'] ?? '';
     $estado = 'Activo';
-    $id_rol = $_POST['rol'] ?? '';
+    // El rol no lo elige el formulario: el representante solo crea veterinarios
+    $id_rol = PROFESIONAL_ROL_ALTA;
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
     $password = $numero_documento !== '' ? $numero_documento : '123';
@@ -358,7 +370,6 @@ function actualizarProfesional()
     $direccion = $_POST['direccion'] ?? '';
     $listaEspecialidades = $_POST['especialidades'] ?? '';
     $registro_medico = $_POST['registro_medico'] ?? '';
-    $id_rol = $_POST['rol'] ?? '';
     $estado = ucfirst(mb_strtolower(trim((string) ($_POST['estado'] ?? ''))));
     $id_usuario = $vinculo['id_usuario'];
     $img_perfil = $_POST['img_perfil'] ?? null;
@@ -369,7 +380,7 @@ function actualizarProfesional()
     // Validamos que los campos no esten vacios
     if (
         empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
-        empty($apellidos) || empty($telefono) || empty($direccion) || empty($id_rol)
+        empty($apellidos) || empty($telefono) || empty($direccion)
     ) {
         // Mostrar alerta de error si hay campos vacíos
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
@@ -436,7 +447,6 @@ function actualizarProfesional()
         'direccion' => $direccion,
         'especialidades' => $listaEspecialidades,
         'registro_medico' => $registro_medico,
-        'id_rol' => $id_rol,
         'estado_vinculo' => $estado,
         'id_prof_veterinaria' => $vinculo['id_prof_veterinaria'],
         'id_usuario' => $id_usuario,
