@@ -47,6 +47,22 @@ if (!$ok) {
     exit('La base conectada no es la de pruebas (falta _entorno_pruebas).');
 }
 
+// La conexión de la propia aplicación (config/database.php de esta copia, que puede leer un .env
+// real) también tiene que ser la de pruebas: DB_* de arriba deben haber ganado.
+require_once $raiz . '/config/database.php';
+try {
+    $app = (new conexion())->getConexion();
+    $ok = $app->query('SELECT DATABASE()')->fetchColumn() === $_ENV['DB_NAME']
+        && $app->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '_entorno_pruebas'")->fetchColumn() == 1;
+} catch (Throwable $e) {
+    $ok = false;
+}
+unset($app);
+if (!$ok) {
+    http_response_code(500);
+    exit('La conexión de la aplicación no es la de pruebas: no se atiende la petición.');
+}
+
 // Archivos estáticos de public/ (igual que router.php)
 $ruta = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $public = realpath($raiz . '/public');
