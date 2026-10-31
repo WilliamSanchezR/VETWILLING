@@ -10,7 +10,8 @@
 // (gana la primera definición) apuntando a 127.0.0.1 en un puerto cerrado, sin Brevo. Los avisos
 // "constant already defined" van al registro del servidor, no a la respuesta.
 
-ini_set('display_errors', 'stderr');
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 define('SMTP_HOST', '127.0.0.1');
 define('SMTP_PORT', 1);
 define('SMTP_USER', 'pruebas@vetwilling.test');
