@@ -2,7 +2,8 @@
    PANEL SUPERIOR REPRESENTANTE - ESTRUCTURA DE CLASE
    ====================================================== */
 
-const baseUrl = window.BASE_URL || (() => {
+// Nombre propio: las páginas del representante declaran su propia constante global baseUrl
+const baseUrlPanel = window.BASE_URL || (() => {
     const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
     return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
 })();
@@ -57,7 +58,7 @@ class PanelSuperiorRepresentante {
             cancelar: this.$("#btnCancelar"),
         };
 
-        this.notificationsApiUrl = `${baseUrl}/representante/api/notificaciones`;
+        this.notificationsApiUrl = `${baseUrlPanel}/representante/api/notificaciones`;
         this.notificationBadge = this.$("#notificationBadge");
         this.notificationsContainer = this.$(".notifications-list");
         this.notifications = [];
@@ -281,7 +282,7 @@ class PanelSuperiorRepresentante {
         const formData = new FormData(this.forms.soporte);
 
         try {
-            const response = await fetch(`${baseUrl}/soporte/api/crear-ticket`, {
+            const response = await fetch(`${baseUrlPanel}/soporte/api/crear-ticket`, {
                 method: "POST",
                 body: formData,
             });

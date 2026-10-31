@@ -15,6 +15,7 @@
  */
 
 require_once BASE_PATH . "/app/helpers/session_propietario.php";
+require_once BASE_PATH . "/app/helpers/avatar_helper.php";
 require_once BASE_PATH . "/app/services/SessionManager.php";
 require_once BASE_PATH . "/app/services/PreferenciasManager.php";
 
@@ -245,9 +246,7 @@ $prefNotif = $prefs["notificaciones"] ?? "email";
 
                             <div class="foto-perfil-container">
                                 <div class="avatar-grande">
-                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= e(
-    $usuario["img_perfil"] ?? "",
-) ?>"
+                                    <img src="<?= e(avatar_src($usuario["img_perfil"] ?? "", "usuarios", $usuario["nombres"] ?? "", $usuario["apellidos"] ?? "")) ?>"
                                          alt="Foto de perfil de <?= e(
                                              $usuario["nombres"] ?? "",
                                          ) ?>"

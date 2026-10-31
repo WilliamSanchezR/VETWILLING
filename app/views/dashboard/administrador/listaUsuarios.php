@@ -1,6 +1,7 @@
 <?php
 // Enlazamos la ruta para tomar la session del administrador
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
+require_once BASE_PATH . '/app/helpers/avatar_helper.php';
 // Enlazamos el controlador de usuario para listar los usuarios
 require_once BASE_PATH . '/app/controllers/usuarioController.php';
 require_once BASE_PATH . '/app/helpers/csrf_helper.php';
@@ -119,7 +120,7 @@ $datos = listarUsuarios();
                         <?php if (!empty($datos)) : ?>
                             <?php foreach ($datos as $usuario):  ?>
                                 <tr class="fila-blanca">
-                                    <td class="tb_foto"><?php if (!empty($usuario['img_perfil'])): ?><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
+                                    <td class="tb_foto"><img src="<?= htmlspecialchars(avatar_src($usuario['img_perfil'] ?? '', 'usuarios', $usuario['nombres'] ?? '', $usuario['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" alt=""></td>
                                     <td><?= $usuario['tipo_documento'] ?> - <?= $usuario['numero_documento'] ?></td>
                                     <td><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></td>
                                     <td><?= $usuario['telefono'] ?></td>

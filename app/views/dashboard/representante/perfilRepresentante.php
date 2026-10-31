@@ -208,7 +208,6 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
             crossorigin="anonymous"></script>
 
         <!-- Propio -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/perfilAdministrado.js"></script>
 

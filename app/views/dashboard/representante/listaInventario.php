@@ -154,17 +154,9 @@ $totalAlertasStock = $modelInv->contarAlertasStock($id_veterinaria);
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
-                        <?php else: ?>
-                            <!-- Fila cuando no hay datos en el inventario -->
-                            <tr>
-                                <td colspan="10" style="text-align:center;padding:32px;color:#888;">
-                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                                    No hay productos registrados en el inventario.
-                                    <br>
-                                    <a href="<?= BASE_URL ?>/representante/registro-producto">Registrar el primero</a>
-                                </td>
-                            </tr>
                         <?php endif; ?>
+                        <?php /* Sin productos el cuerpo queda vacío: DataTables muestra su mensaje
+                                 (emptyTable en inventario.js) y no admite filas con colspan */ ?>
                     </tbody>
                 </table>
             </div>

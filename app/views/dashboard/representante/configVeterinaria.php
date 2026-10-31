@@ -261,9 +261,9 @@ $veterinariaData = consultarVeterinariasRegistradas($idVeterinaria);
     <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
     <!-- Script de municipios -->
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/representante/js/municipios.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/municipios.js"></script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/representante/js/configVeterinaria.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/configVeterinaria.js"></script>
 
     <!-- C:\xampp\htdocs\vetwilling\public\assets\dashBoard\representante\js\configVeterinaria.js -->
 

@@ -91,7 +91,8 @@ class GestionInventario {
             // ---- Mensajes en español ----
             language: {
                 decimal:       '',
-                emptyTable:    'No hay productos registrados en el inventario',
+                emptyTable:    '<i class="bi bi-inbox fs-2 d-block mb-2"></i>No hay productos registrados en el inventario.'
+                             + '<br><a href="' + (window.BASE_URL || '') + '/representante/registro-producto">Registrar el primero</a>',
                 info:          'Mostrando _START_ a _END_ de _TOTAL_ productos',
                 infoEmpty:     'Mostrando 0 a 0 de 0 productos',
                 infoFiltered:  '(filtrado de _MAX_ productos en total)',

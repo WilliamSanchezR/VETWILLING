@@ -936,6 +936,16 @@ body::-webkit-scrollbar-thumb { background: #c1c8d0; border-radius: 4px; }
 /* ============================================================
    13. RESPONSIVE
    ============================================================ */
+/* Todas las pantallas del propietario cargan esta hoja: en móvil el menú lateral se oculta,
+   así que el contenido no deja hueco a la izquierda (antes solo lo hacía adactavilidad.css,
+   que carga únicamente el inicio). */
+@media (max-width: 768px) {
+    .contenido-principal,
+    .sidebar.collapsed ~ .contenido-principal {
+        margin-left: 0 !important;
+    }
+}
+
 @media (max-width: 1024px) {
     .dash-content-grid {
         grid-template-columns: 1fr;

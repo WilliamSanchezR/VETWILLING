@@ -1,5 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_all.php';
+require_once BASE_PATH . '/app/helpers/avatar_helper.php';
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 
 $rol = $_SESSION['user']['id_rol'];
@@ -64,8 +65,8 @@ $usuario = mostrarPerfil($id);
                             <form class="contenedor-foto" id="form_cambio_imagen" action="<?= BASE_URL ?>/admin/cambiar-foto" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="id_usuario" value="<?= $id ?>">
                                 <input type="hidden" name="accion" value="cambiar-foto">
-                                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" class="fotito"
-                                    alt="Pedro Perez" width="100">
+                                <img src="<?= htmlspecialchars(avatar_src($usuario['img_perfil'] ?? '', 'usuarios', $usuario['nombres'] ?? '', $usuario['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" class="fotito"
+                                    alt="Foto de perfil" width="100">
                                 <div class="avatar-icon">
                                     <i class="bi bi-camera-fill"></i>
                                 </div>
@@ -184,7 +185,6 @@ $usuario = mostrarPerfil($id);
             crossorigin="anonymous"></script>
 
         <!-- Propio -->
-        <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/perfilAdministrado.js"></script>
 
