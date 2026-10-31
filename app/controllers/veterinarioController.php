@@ -8,19 +8,25 @@ require_once __DIR__ . '/../helpers/acceso_helper.php';
 
 // Creamos una variable METHOD para que capture las peticiones al servidor
 
+// Acciones POST que admite cada ruta que incluye este controlador (las demás → 400).
+// /veterinario/guardar-veterinario está deshabilitada: el veterinario no crea cuentas.
+const VETERINARIO_ACCIONES_POST = [
+    '/veterinario/actualizar-veterinario' => ['actualizar'],
+    '/veterinario/cambiar-foto'           => ['cambiar-foto'],
+];
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'POST':
 
-        $accion = $_POST['accion'] ?? '';
+        $accion = (string) ($_POST['accion'] ?? '');
+        acceso_exigir_accion_de_ruta($accion, VETERINARIO_ACCIONES_POST);
 
         if ($accion === 'actualizar') {
             actualizarVeterinario();
         } else if ($accion === 'cambiar-foto') {
             actualizarFotoPerfil();
-        }else {
-            registrarVeterinario();
         }
 
         break;
@@ -70,8 +76,11 @@ switch ($method) {
 
 
 
+// Sin ruta activa (/veterinario/guardar-veterinario está deshabilitada). Si se vuelve a usar:
+// solo el administrador crea cuentas.
 function registrarVeterinario()
 {
+    acceso_exigir_rol([1]);
     // DEBUG - Temporal para ver qué datos llegan
     error_log("POST: " . print_r($_POST, true));
     error_log("FILES: " . print_r($_FILES, true));
