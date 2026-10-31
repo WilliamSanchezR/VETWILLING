@@ -233,6 +233,23 @@ try {
     $prop->pedir('POST', '/cliente/actualizar-contrasena', ['accion' => 'modificar-contrasena', 'id_usuario' => $uProp,
         'contrasena-actual' => $clave, 'nueva-contrasena' => $nueva, 'confi-contrasena' => $nueva]);
     comprobar(password_verify($nueva, (string) valor('SELECT password_hash FROM usuario WHERE id_usuario = ?', [$uProp])), 'Propietario: accion=modificar-contrasena cambia su contraseña');
+
+    // Formulario de cliente/configuracion: se envían exactamente los campos que imprime la vista
+    [$codigo, $html] = $prop->pedir('GET', '/cliente/configuracion');
+    preg_match('#<form id="formCambioPassword".*?</form>#s', $html, $form);
+    preg_match_all('#<input\b[^>]*>#', $form[0] ?? '', $inputs);
+    $envio = [];
+    foreach ($inputs[0] as $input) {
+        if (preg_match('#\bname="([^"]+)"#', $input, $nombre)) {
+            $envio[$nombre[1]] = preg_match('#\bvalue="([^"]*)"#', $input, $v) ? html_entity_decode($v[1]) : '';
+        }
+    }
+    $otra = $nueva . 'y';
+    $envio = array_merge($envio, ['contrasena-actual' => $nueva, 'nueva-contrasena' => $otra, 'confi-contrasena' => $otra]);
+    comprobar($codigo === 200 && ($envio['accion'] ?? '') === 'modificar-contrasena' && count($envio) === 5,
+        'El formulario de configuración envía accion, id_usuario y los tres campos de contraseña', "HTTP $codigo " . json_encode(array_keys($envio)));
+    $prop->pedir('POST', '/cliente/actualizar-contrasena', $envio);
+    comprobar(password_verify($otra, (string) valor('SELECT password_hash FROM usuario WHERE id_usuario = ?', [$uProp])), 'Propietario: el formulario de configuración vuelve a cambiar la contraseña');
 } catch (Throwable $e) {
     comprobar(false, 'Excepción en la prueba', $e->getMessage() . ' @ ' . $e->getLine());
 } finally {
