@@ -172,6 +172,7 @@ html[data-theme="dark"] .fc {
     --fc-neutral-bg-color: var(--vo-superficie-2);
     --fc-border-color: var(--vo-borde);
     --fc-today-bg-color: var(--vo-verde-fondo);
+    --fc-non-business-color: rgba(255, 255, 255, 0.03);
     background-color: var(--vo-superficie);
     color: var(--vo-texto);
 }
@@ -210,3 +211,4 @@ html[data-theme="dark"] .fc :is(.fc-day-sat, .fc-day-sun, .fc-day-other) {
     background-color: var(--vo-superficie-2) !important;
 }
 html[data-theme="dark"] .fc .fc-day-other .fc-daygrid-day-number { color: var(--vo-texto-3); }
+html[data-theme="dark"] .fc .fc-non-business { background: rgba(255, 255, 255, 0.03) !important; }
