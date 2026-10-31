@@ -46,14 +46,6 @@ class ListaPropietarios {
             };
         }
 
-        if (this.btnEliminarPropietario) {
-            this.btnEliminarPropietario.forEach((btn) => {
-                btn.onclick = (event) => {
-                    const id = event.currentTarget.getAttribute("data-id");
-                    this.eliminarPropietario(id);
-                };
-            });
-        }
     }
 
     // Funcion para inicializar DataTable para la lista de laboratorios asociados
@@ -227,71 +219,11 @@ class ListaPropietarios {
                     propietario.estado.toLowerCase() === "activo" ?
                     '<span class="estado-activo">Activo</span>' :
                     '<span class="estado-inactivo">Inactivo</span>',
-                    propietario.estado.toLowerCase() === "activo" ?
-                    `<button class="btn-accion btn-eliminar" title="Eliminar" data-id="${propietario.id_propietario}">
-                                    <i class="bi bi-trash"></i>
-                            </button>` :
+                    // El representante no cambia el estado de la cuenta (solo el administrador)
                     "",
                 ])
                 .draw();
         });
-
-        // Reasignar eventos a los nuevos botones de eliminar
-        this.btnEliminarPropietario = document.querySelectorAll(".btn-eliminar");
-        if (this.btnEliminarPropietario) {
-            this.btnEliminarPropietario.forEach((btn) => {
-                btn.onclick = (event) => {
-                    const id = event.currentTarget.getAttribute("data-id");
-                    this.eliminarPropietario(id);
-                };
-            });
-        }
-    }
-
-    eliminarPropietario(id) {
-        Swal.fire({
-            title: "¿Estás seguro de eliminar este propietario?",
-            text: "¡No podrás revertir esto!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.desactivarPropietario(id);
-            }
-        });
-    }
-
-    desactivarPropietario(id) {
-        fetch(
-            `${baseUrl}/representante/api/propietarios?id=${id}`, {
-                method: "DELETE",
-            },
-        )
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.status === "success") {
-                    Swal.fire(
-                        "Propietario inhabilitado",
-                        "El propietario ha sido inhabilitado correctamente",
-                        "success",
-                    );
-                    this.listaPropietariosVeterinaria();
-                } else {
-                    Swal.fire("Error", "No se pudo eliminar", "error");
-                }
-            })
-            .catch((error) => {
-                console.error("❌ Error al inhabilitar propietario:", error);
-                Swal.fire(
-                    "Error",
-                    "No se pudo inhabilitar el propietario. Revisa la consola.",
-                    "error",
-                );
-            });
     }
 }
 

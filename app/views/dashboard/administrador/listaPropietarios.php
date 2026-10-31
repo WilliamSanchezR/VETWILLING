@@ -1,6 +1,7 @@
 <?php
 // Subtarea 1: autenticación del administrador — antes de cualquier query
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -79,6 +80,8 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
             </div>
 
         </div>
+
+        <input type="hidden" id="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
 
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
