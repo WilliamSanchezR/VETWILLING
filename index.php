@@ -4,6 +4,10 @@
 
 require_once __DIR__ . "/config/config.php";
 
+// Encabezados de seguridad HTTP: respaldo de los que pone el .htaccess (sin duplicarlos)
+require_once BASE_PATH . "/app/helpers/encabezados_seguridad_helper.php";
+encabezados_seguridad_enviar();
+
 // obtener la URL actual (por ejemplo: /nexus_center/login)
 
 $requestURI = $_SERVER["REQUEST_URI"];
