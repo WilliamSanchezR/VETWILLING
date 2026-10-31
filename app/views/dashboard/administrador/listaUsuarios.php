@@ -3,6 +3,7 @@
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
 // Enlazamos el controlador de usuario para listar los usuarios
 require_once BASE_PATH . '/app/controllers/usuarioController.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 // Llamamos la función para listar los usuarios
 $datos = listarUsuarios();
 
@@ -129,9 +130,12 @@ $datos = listarUsuarios();
                                         <button class="btn-accion btn-editar" title="Editar">
                                             <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
-                                        <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/admin/eliminar-usuario?accion=eliminar&id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-trash"></i></a>
-                                        </button>
+                                        <form action="<?= BASE_URL ?>/admin/eliminar-usuario" method="POST" style="display: inline;">
+                                            <?= csrf_campo() ?>
+                                            <input type="hidden" name="accion" value="eliminar">
+                                            <input type="hidden" name="id" value="<?= (int) $usuario['id_usuario'] ?>">
+                                            <button type="submit" class="btn-accion btn-eliminar" title="Eliminar"><i class="bi bi-trash"></i></button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
