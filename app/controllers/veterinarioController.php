@@ -4,6 +4,7 @@
 
 require __DIR__ . '/../helpers/alert_helpers.php';
 require __DIR__ . '/../models/Veterinario.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 
 // Creamos una variable METHOD para que capture las peticiones al servidor
 
@@ -31,9 +32,9 @@ switch ($method) {
 
         if ($accion === 'eliminar') {
 
-            // Esta funcion elimina el veterinario con el metodo GET
+            // Inhabilitar una cuenta no se hace por GET (este controlador se incluye desde vistas)
 
-            eliminarVeterinario($_GET['id']);
+            acceso_denegar('405', 'inhabilitar veterinario por GET');
         }
 
         if (isset($_GET['id'])) {
@@ -220,28 +221,47 @@ function listarVeterinario($id)
     return $veterinario;
 }
 
+// Veterinario que el usuario de la sesión puede ver y editar; si no, 404.
+// El veterinario solo a sí mismo; el representante, los veterinarios de su clínica (criterio
+// provisional mientras D1 esté pendiente).
+function exigirVeterinarioEnAlcance($idUsuario): array
+{
+    $usuario = acceso_exigir_rol([2, 4]);
+    $id = acceso_entero_positivo($idUsuario);
+    $veterinario = $id === null ? null : (new Veterinario())->listarVeterinario($id);
+    $enAlcance = $veterinario && ((int) $usuario['id_rol'] === 2
+        ? $id === (int) $usuario['id_usuario']
+        : (int) $veterinario['id_veterinaria'] === acceso_exigir_clinica());
+    if (!$enAlcance) {
+        acceso_denegar('404', 'veterinario fuera del alcance de la sesión', ['GET', 'HEAD', 'POST']);
+    }
+    return $veterinario;
+}
+
+// Actualiza el perfil del veterinario. El correo de acceso y el estado de la cuenta no cambian
+// por esta vía: solo el administrador los cambia.
 function actualizarVeterinario()
 {
-
+    $veterinario = exigirVeterinarioEnAlcance($_POST['id_usuario'] ?? null);
 
     // capturamos en variables los datos desde el formulario a travez del metodo POST y los name de los campos
 
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    $id_usuario = (int) $veterinario['id_usuario'];
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
-    $email = $_POST['email'] ?? '';
+    $email = $veterinario['email'];
     $id_rol = '2';
     $password_hash = '123';
-    $estado = 'activo';
+    $estado = $veterinario['estado'];
     $tipo_usuario = 'Veterinario';
-    $id_veterinaria = '1';
+    $id_veterinaria = $veterinario['id_veterinaria'];
 
     // Validamos los caampos que son obligatorios
 
-    if (empty($numero_documento) || empty($nombres) || empty($apellidos) || empty($tipo_documento) || empty($telefono) || empty($email)) {
+    if (empty($numero_documento) || empty($nombres) || empty($apellidos) || empty($tipo_documento) || empty($telefono)) {
         mostrarSweetAlert('error', 'Campos vacios', 'Por favor completar todos los campos');
         exit();
     }
@@ -261,7 +281,8 @@ function actualizarVeterinario()
         'password_hash' => $password_hash,
         'estado' => $estado,
         'tipo_usuario' => $tipo_usuario,
-        'id_veterinaria' => $id_veterinaria
+        'id_veterinaria' => $id_veterinaria,
+        'numero_licencia_profesional' => $veterinario['numero_licencia_profesional']
     ];
 
     // Enviamos la data al metodo (registrar) de la clase instanciada anteriormente (Veterinario) y esperamos una respuesta booleana del modelo en resultados
@@ -278,8 +299,11 @@ function actualizarVeterinario()
     exit();
 }
 
+// Sin llamadores vivos (/veterinario/eliminar-veterinario está deshabilitada). Si se vuelve a
+// usar: solo el administrador, por POST con token CSRF.
 function eliminarVeterinario($id)
 {
+    acceso_exigir_accion_post([1]);
 
     $objVeterinario = new Veterinario();
     $respuesta = $objVeterinario->eliminar($id);
