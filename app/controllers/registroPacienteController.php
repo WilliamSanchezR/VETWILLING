@@ -76,7 +76,6 @@ function registrarPacienteConPropietario()
 
     // Log para debug
     error_log("ID Veterinaria obtenida: " . $id_veterinaria);
-    error_log("POST recibido: " . print_r($_POST, true));
 
     // Capturar datos del propietario
     $nombres = $_POST["nombres"] ?? "";
@@ -196,10 +195,6 @@ function registrarPacienteConPropietario()
             "id_veterinaria" => $id_veterinaria,
             "email" => $email,
         ];
-
-        error_log(
-            "Datos propietario a insertar: " . print_r($dataPropietario, true),
-        );
 
         $id_propietario = $propietarioModel->registrar($dataPropietario);
 

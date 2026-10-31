@@ -81,9 +81,6 @@ switch ($method) {
 function registrarVeterinario()
 {
     acceso_exigir_rol([1]);
-    // DEBUG - Temporal para ver qué datos llegan
-    error_log("POST: " . print_r($_POST, true));
-    error_log("FILES: " . print_r($_FILES, true));
     
     session_start();
 
@@ -180,9 +177,6 @@ function registrarVeterinario()
         'img_perfil' => $ruta_img,
         'numero_licencia_profesional' => $numero_licencia_profesional
     ];
-
-    // DEBUG - Ver qué datos se envían al modelo
-    error_log("DATA PARA REGISTRAR: " . print_r($data, true));
 
     // Enviamos la data al método registrar
     try {
