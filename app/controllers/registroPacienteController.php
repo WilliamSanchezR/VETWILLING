@@ -56,8 +56,9 @@ function resolverIdVeterinariaRegistro(): ?int
 
 // EXCEPCIÓN DOCUMENTADA (F3 / P4, aprobada el 31-10-2026): crear cuentas es del administrador,
 // salvo esta vía: al registrar un paciente se crea la cuenta de su propietario, siempre con rol 3
-// (fijo en Propietario::registrar, el formulario no lo elige). La ruta /veterinario/guardar-paciente
-// admite hoy los roles 2 y 4 (config/rutas_acceso.php); la excepción aprobada es la del veterinario.
+// (fijo en Propietario::registrar, el formulario no lo elige). Aprobada para el veterinario (rol 2)
+// y el representante (rol 4), los roles que admite /veterinario/guardar-paciente en
+// config/rutas_acceso.php. Ningún otro rol ni ruta crea propietarios por esta vía.
 function registrarPacienteConPropietario()
 {
     // Establecer header JSON
