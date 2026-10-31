@@ -4,6 +4,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
 // Cargamos el modelo de inventario para consultar los productos
 require_once BASE_PATH . '/app/models/Inventario.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 
 // Obtenemos el ID de la veterinaria desde la sesion
 $id_veterinaria    = (int) $_SESSION['user']['id_veterinaria'];
@@ -143,6 +144,7 @@ $totalAlertasStock = $modelInv->contarAlertasStock($id_veterinaria);
                                               action="<?= BASE_URL ?>/representante/eliminar-producto"
                                               class="form-eliminar-inv"
                                               style="display:inline">
+                                            <?= csrf_campo() ?>
                                             <input type="hidden" name="accion" value="eliminar">
                                             <input type="hidden" name="id_inventario" value="<?= (int)$p['id_inventario'] ?>">
                                             <button type="submit" class="btn-accion btn-eliminar" title="Eliminar">
