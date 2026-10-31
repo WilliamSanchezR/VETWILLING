@@ -318,15 +318,20 @@ class PanelSuperiorRepresentante {
 
     initTheme() {
         window.toggleTheme = () => this.toggleTheme();
+        const actualizarIcono = () => {
+            const icono = document.getElementById("themeIcon");
+            if (icono && window.vwTema) {
+                icono.className = window.vwTema.obtener() === "oscuro" ? "bi bi-sun-fill" : "bi bi-moon-stars";
+            }
+        };
+        window.addEventListener("vw:tema", actualizarIcono);
+        actualizarIcono();
     }
 
+    // El tema lo aplica y guarda global/js/modo-oscuro.js (window.vwTema)
     toggleTheme() {
-        document.body.classList.toggle("dark-theme");
-
-        // Alternativamente, si se usa data-theme:
-        const isDark = document.body.classList.contains("dark-theme");
-        this.state.theme = isDark ? "dark" : "light";
-        localStorage.setItem("theme", this.state.theme);
+        if (!window.vwTema) return;
+        this.state.theme = window.vwTema.alternar() === "oscuro" ? "dark" : "light";
     }
 
     /* ================= SIDEBAR MÓVIL ================= */
