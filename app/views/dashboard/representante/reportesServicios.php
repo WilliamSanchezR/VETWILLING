@@ -21,20 +21,6 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
     <link rel="stylesheet"  href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
     <link rel="stylesheet"  href="<?= BASE_URL ?>/public/assets/dashBoard/representante/css/representante.styles.css">
     <link rel="stylesheet"  href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/styleReportesAdmin.css">
-    <style>
-        /* Fallback local para asegurar que el contenido no ocupe todo el ancho
-           cuando falten reglas específicas en otros CSS cargados */
-        .contenido-principal {
-            margin-left: var(--sidebar-width, 260px);
-            min-height: calc(100vh - var(--navbar-height, 70px));
-            padding-top: calc(var(--navbar-height, 70px) + 20px);
-            transition: margin-left 0.22s ease;
-        }
-        #sidebar.collapsed ~ .contenido-principal,
-        .sidebar.collapsed ~ .contenido-principal {
-            margin-left: var(--sidebar-collapsed-width, 80px);
-        }
-    </style>
 </head>
 
 <body   
@@ -44,20 +30,6 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 >
 
     <?php include_once __DIR__ . '/../../layouts/sidebar_representante.php'; ?>
-
-    <style>
-        /* Forzar margen del contenido después de que se carguen estilos del sidebar */
-        .contenido-principal {
-            margin-left: var(--sidebar-width, 260px) !important;
-            padding-top: calc(var(--navbar-height, 70px) + 20px) !important;
-            min-height: calc(100vh - var(--navbar-height, 70px)) !important;
-            box-sizing: border-box !important;
-        }
-        #sidebar.collapsed ~ .contenido-principal,
-        .sidebar.collapsed ~ .contenido-principal {
-            margin-left: var(--sidebar-collapsed-width, 80px) !important;
-        }
-    </style>
 
     <!-- ═══════════════════════════════ CONTENIDO PRINCIPAL ═══════════════════ -->
     <main class="contenido-principal" id="contenidoPrincipal">
