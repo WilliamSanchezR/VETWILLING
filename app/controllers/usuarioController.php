@@ -7,6 +7,18 @@ require_once __DIR__ . '/../models/usuario.php';
 // Estados de cuenta que acepta el administrador (usuario.estado)
 const USUARIO_ESTADOS_CUENTA = ['activo', 'inactivo', 'bloqueado'];
 
+// Acciones POST que admite cada ruta que incluye este controlador. Las rutas de contraseña
+// solo cambian la contraseña; crear cuentas es solo /admin/guardar-usuario (rol 1).
+const USUARIO_ACCIONES_POST = [
+    '/admin/guardar-usuario'             => ['registrar'],
+    '/admin/actualizar-usuario'          => ['actualizar'],
+    '/admin/eliminar-usuario'            => ['eliminar'],
+    '/admin/cambiar-foto'                => ['cambiar-foto'],
+    '/admin/actualizar-contrasena'       => ['actualizar-constrasena'],
+    '/veterinario/actualizar-constrasena' => ['vet-constrasena'],
+    '/cliente/actualizar-contrasena'     => ['modificar-contrasena'],
+];
+
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -14,7 +26,8 @@ switch ($method) {
 
     case 'POST':
 
-        $accion = $_POST['accion'] ?? '';
+        $accion = (string) ($_POST['accion'] ?? '');
+        acceso_exigir_accion_de_ruta($accion, USUARIO_ACCIONES_POST);
         if ($accion === 'actualizar') {
             actualizarUsuario();
         } else if ($accion  === 'actualizar-constrasena') {
@@ -27,7 +40,7 @@ switch ($method) {
             actualizarFotoPerfil();
         } else if ($accion === 'eliminar') {
             eliminarUsuario();
-        } else {
+        } else if ($accion === 'registrar') {
             registrarUsuario();
         }
         break;
@@ -58,8 +71,11 @@ switch ($method) {
 // =========================================
 
 // FUNCION PARA REGISTRAR UN NUEVO USUARIO
+// Solo el administrador crea cuentas, de cualquier rol existente.
 function registrarUsuario()
 {
+    acceso_exigir_rol([1]);
+
     // Capturamos los datos enviados por el formulario
     $email = $_POST['email'] ?? '';
     $estado = 'activo';
@@ -85,6 +101,11 @@ function registrarUsuario()
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
     }
+    if (!in_array(acceso_entero_positivo($id_rol), ACCESO_ROLES_VALIDOS, true)) {
+        mostrarSweetAlert('error', 'Rol no válido', 'Seleccione un rol de la lista');
+        exit();
+    }
+
     // Validamos que si el rol es veterinario, se seleccione una veterinaria
     if ($id_rol == '4' && empty($id_veterinaria)) {
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
