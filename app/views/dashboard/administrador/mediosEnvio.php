@@ -19,7 +19,10 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/mediosEnvio.css">
 </head>
 
-<body data-api="<?= BASE_URL ?>/admin/api/medios-envio">
+<?php require_once BASE_PATH . '/app/helpers/csrf_helper.php'; ?>
+<body data-api="<?= BASE_URL ?>/admin/api/medios-envio"
+      data-csrf="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>"
+      data-admin-email="<?= htmlspecialchars($_SESSION['user']['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
     <?php include_once __DIR__ . '/../../layouts/sidebar_administrador.php'; ?>
 
@@ -27,7 +30,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
         <?php include_once __DIR__ . '/../../layouts/panel_superior_administrador.php'; ?>
 
-        <div class="area-contenido" style="padding:1.25rem;">
+        <div class="area-contenido">
 
             <!-- Encabezado -->
             <div class="encabezado-pagina mb-3">
@@ -90,6 +93,12 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                             <i class="bi bi-envelope-at me-2 text-success"></i>Configuración SMTP — Correo Electrónico
                         </div>
                         <div class="card-body">
+                            <div class="alert alert-info mb-3" id="infoTransporte">
+                                <i class="bi bi-info-circle"></i><span>Cargando transporte…</span>
+                            </div>
+                            <div class="alert alert-warning mb-3 d-none" id="avisoCredencial" role="status">
+                                <i class="bi bi-shield-exclamation"></i><span></span>
+                            </div>
                             <form id="formSmtp" class="row g-3">
                                 <input type="hidden" name="id_canal" id="smtpIdCanal">
                                 <div class="col-md-6">
@@ -105,6 +114,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                                     <select class="form-select" name="smtp_encriptacion">
                                         <option value="smtps">SMTPS (SSL/465)</option>
                                         <option value="tls">STARTTLS (587)</option>
+                                        <option value="ninguna">Ninguna (solo servidores locales de prueba)</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -137,12 +147,16 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                                     <label class="form-label">Intervalo (seg)</label>
                                     <input type="number" class="form-control" name="intervalo_reintento_seg" min="0">
                                 </div>
+                                <div class="col-12 form-text mt-1">
+                                    Máx. reintentos e intervalo los usa "Reintentar fallidos" y el script
+                                    <code>scripts/reintentar-notificaciones.php</code> (cron).
+                                </div>
                                 <div class="col-12 d-flex gap-2">
                                     <button type="submit" class="btn btn-success">
                                         <i class="bi bi-floppy me-1"></i>Guardar configuración
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary" onclick="probarSmtp()">
-                                        <i class="bi bi-send me-1"></i>Probar conexión
+                                    <button type="button" class="btn btn-outline-secondary" id="btnProbarCorreo" onclick="probarSmtp()">
+                                        <i class="bi bi-send me-1"></i>Enviar correo de prueba
                                     </button>
                                 </div>
                             </form>
@@ -155,37 +169,18 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                             <i class="bi bi-phone me-2 text-success"></i>Configuración Push — Notificaciones Móviles
                         </div>
                         <div class="card-body">
-                            <form id="formPush" class="row g-3">
-                                <input type="hidden" name="id_canal" id="pushIdCanal">
-                                <div class="col-12">
-                                    <label class="form-label">FCM Server Key (API Key)</label>
-                                    <div class="input-group">
-                                        <input type="password" class="form-control" name="push_api_key" id="inputPushKey" autocomplete="new-password">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePass('inputPushKey')">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    </div>
-                                    <div class="form-text">Clave del servidor de Firebase Cloud Messaging.</div>
+                            <div class="alert alert-warning mb-0">
+                                <i class="bi bi-cone-striped"></i>
+                                <div>
+                                    <strong>Todavía no disponible.</strong> VetWilling aún no envía notificaciones push,
+                                    por eso este canal no se puede activar. Para implementarlo hace falta:
+                                    <ul class="mb-0 mt-2">
+                                        <li>Una app móvil o notificaciones del navegador que registren cada dispositivo.</li>
+                                        <li>Guardar el token de cada dispositivo por usuario.</li>
+                                        <li>Credenciales de Firebase (cuenta de servicio con la API HTTP v1; la "Server Key" antigua ya no funciona).</li>
+                                    </ul>
                                 </div>
-                                <div class="col-md-8">
-                                    <label class="form-label">Endpoint FCM</label>
-                                    <input type="text" class="form-control" name="push_endpoint"
-                                           placeholder="https://fcm.googleapis.com/fcm/send">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Máx. reintentos</label>
-                                    <input type="number" class="form-control" name="max_reintentos" min="1" max="10">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Intervalo (seg)</label>
-                                    <input type="number" class="form-control" name="intervalo_reintento_seg" min="0">
-                                </div>
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-floppy me-1"></i>Guardar configuración
-                                    </button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
 
@@ -200,18 +195,10 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                                 Este canal no requiere parámetros externos. Las notificaciones se almacenan
                                 directamente en la base de datos y son visibles en el panel de cada usuario.
                             </div>
-                            <form id="formInApp" class="row g-3">
-                                <input type="hidden" name="id_canal" id="inappIdCanal">
-                                <div class="col-md-3">
-                                    <label class="form-label">Máx. reintentos</label>
-                                    <input type="number" class="form-control" name="max_reintentos" min="1" max="5">
-                                </div>
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-floppy me-1"></i>Guardar
-                                    </button>
-                                </div>
-                            </form>
+                            <p class="mb-0 text-muted">
+                                Se activa o desactiva con el interruptor de la pestaña <strong>Canales</strong>.
+                                Cuando está desactivado, el sistema no crea avisos internos para ningún usuario.
+                            </p>
                         </div>
                     </div>
 
@@ -223,6 +210,13 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
                 <!-- ══════════════════ TAB 3: PLANTILLAS ══════════════════ -->
                 <div class="tab-pane fade" id="tab-plantillas" role="tabpanel">
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Estas plantillas se usan de verdad en los correos de citas: el asunto y el mensaje
+                            que escribas aquí van dentro del diseño de VetWilling, junto con un recuadro con los datos de la cita.
+                            Si desactivas o vacías una plantilla, se usa el texto por defecto.</span>
+                    </div>
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
@@ -253,12 +247,12 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                                     <input type="text" class="form-control" name="asunto" id="plantAsunto">
                                 </div>
                                 <div id="wrapHtml" class="col-12 d-none">
-                                    <label class="form-label">Cuerpo HTML (email)</label>
+                                    <label class="form-label">Mensaje principal (HTML)</label>
                                     <textarea class="form-control font-monospace" name="cuerpo_html" id="plantHtml" rows="10"></textarea>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">Cuerpo en texto plano
-                                        <span class="text-muted small">(push / in-app)</span>
+                                    <label class="form-label">Versión en texto plano
+                                        <span class="text-muted small">(para lectores de correo sin formato)</span>
                                     </label>
                                     <textarea class="form-control" name="cuerpo_texto" id="plantTexto" rows="4"></textarea>
                                 </div>
@@ -304,9 +298,9 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Canal</th>
+                                    <th>Tipo</th>
                                     <th>Destinatario</th>
-                                    <th>Propietario</th>
+                                    <th>Asunto</th>
                                     <th>Fecha envío</th>
                                     <th>Intentos</th>
                                     <th>Error</th>
@@ -334,20 +328,14 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <label class="form-label fw-semibold">Canal</label>
-                    <select class="form-select" id="selectReintentarCanal">
-                        <option value="email">Correo Electrónico</option>
-                        <option value="in_app">Notificaciones en App</option>
-                        <option value="push">Push Móvil</option>
-                    </select>
-                    <div class="form-text mt-2">
-                        Marca como "pendiente" los envíos fallidos con menos de 3 intentos
-                        para que el cron los procese nuevamente.
-                    </div>
+                    <p class="mb-2">Se volverán a enviar ahora los correos fallidos que tienen su contenido guardado
+                        y no han llegado al máximo de reintentos configurado.</p>
+                    <p class="text-muted small mb-0">Los correos con datos privados (bienvenidas con contraseña inicial,
+                        recuperación de contraseña, fichas con PDF) no guardan contenido y no se pueden reenviar desde aquí.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-warning" onclick="ejecutarReintento()">
+                    <button type="button" class="btn btn-warning" id="btnEjecutarReintento" onclick="ejecutarReintento()">
                         <i class="bi bi-arrow-repeat me-1"></i>Reintentar
                     </button>
                 </div>

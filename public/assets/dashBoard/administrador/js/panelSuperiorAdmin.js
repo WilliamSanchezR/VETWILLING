@@ -213,8 +213,25 @@ class panelSuperiorAdmin {
             case 'perfil-administrador':
                 titlePage = 'Perfil';
                 break;
+            case 'listar-propietarios':
+                titlePage = 'Propietarios';
+                break;
+            case 'listar-tickets':
+            case 'gestion-tickets':
+                titlePage = 'Tickets de soporte';
+                break;
+            case 'reportes':
+                titlePage = 'Reportes';
+                break;
+            case 'medios-envio':
+                titlePage = 'Medios de envío';
+                break;
+            case 'directorio':
+            case 'ver-perfil':
+                titlePage = 'Directorio';
+                break;
             default:
-                titlePage = 'Dashboards';
+                titlePage = 'Inicio';
                 break;
         }
 
