@@ -2,6 +2,7 @@
 
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/Subservicio.php';
 
 //CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
@@ -13,6 +14,8 @@ switch ($method) {
         $action = $_POST['action'] ?? '';
         if ($action === 'actualizar') {
             actualizarSubservicio();
+        } elseif ($action === 'eliminar') {
+            eliminarSubservicio();
         } else {
             registrarSubservicio();
         }
@@ -21,8 +24,7 @@ switch ($method) {
         // Aquí podrías manejar solicitudes GET si es necesario
         $action = $_GET['action'] ?? '';
         if ($action === 'eliminar') {
-            $id_subservicio = $_GET['id'] ?? '';
-            eliminarSubservicio($id_subservicio);
+            acceso_denegar('405', 'eliminación por GET');
         }
         break;
 
@@ -123,13 +125,20 @@ function actualizarSubservicio()
     exit();
 }
 
-function eliminarSubservicio($id_subservicio)
+// Solo subservicios de servicios de la clínica de la sesión, por POST con token CSRF (otra → 404)
+function eliminarSubservicio()
 {
+    acceso_exigir_accion_post([4]);
+    $id_veterinaria = acceso_exigir_clinica();
+    $id_subservicio = acceso_entero_positivo($_POST['id'] ?? null);
     // Creamos una instancia del modelo Subservicio
     $subservicioModel = new Subservicio();
 
     // Llamamos al método para eliminar el servicio
-    $resultado = $subservicioModel->eliminarSubservicio($id_subservicio);
+    $resultado = $id_subservicio !== null && $subservicioModel->eliminarSubservicio($id_subservicio, $id_veterinaria);
+    if (!$resultado) {
+        acceso_denegar('404', 'subservicio que no es de la clínica de la sesión');
+    }
 
     if ($resultado) {
         mostrarSweetAlert(
