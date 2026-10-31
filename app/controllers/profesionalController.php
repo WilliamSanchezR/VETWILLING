@@ -237,8 +237,8 @@ function enviarBienvenidaProfesional(array $datos): bool
             . "\nAccede desde: {$baseUrl}\n\n"
             . "VetWilling";
 
-        $mail->send();
-        return true;
+        // Se registra en Medios de envío sin guardar el contenido: lleva la contraseña inicial
+        return mailer_enviar($mail, 'bienvenida', ['guardar_contenido' => false]);
     } catch (Exception $e) {
         error_log("Error al enviar bienvenida profesional: " . $e->getMessage());
         return false;

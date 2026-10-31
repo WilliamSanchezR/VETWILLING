@@ -1,0 +1,69 @@
+/* ============================================================
+   LAYOUT DEL PANEL ADMINISTRADOR — VetWilling
+   Unifica fondo y márgenes del área de contenido en todas las
+   páginas del admin. Solo aplica cuando está la barra del admin
+   (#sidebarAdmin), así no afecta a los demás roles que también
+   usan .area-contenido.
+   ============================================================ */
+
+:root:has(#sidebarAdmin) {
+    --la-fondo: #f5f7f6;
+    --la-pad-x: 32px;
+    --la-pad-top: 28px;
+    --la-pad-bottom: 48px;
+}
+
+/* Un solo color de fondo (antes había tres grises distintos encimados) */
+:root:has(#sidebarAdmin) body,
+:root:has(#sidebarAdmin) .contenido-principal {
+    background: var(--la-fondo);
+}
+
+/* El contenido ocupa todo el ancho disponible con márgenes constantes:
+   así crece y se encoge al contraer o expandir la barra lateral */
+:root:has(#sidebarAdmin) .area-contenido {
+    max-width: none;
+    margin: 0;
+    padding: var(--la-pad-top) var(--la-pad-x) var(--la-pad-bottom);
+    background: transparent;
+    min-height: 0;
+}
+
+/* Formularios (registro, edición, tickets): mismas márgenes que el resto
+   (antes era width: 95% centrado y el margen cambiaba con la pantalla) */
+:root:has(#sidebarAdmin) .contenido-principal > .wizard-container {
+    width: auto;
+    margin: var(--la-pad-top) var(--la-pad-x) var(--la-pad-bottom);
+}
+
+/* La barra superior alinea su contenido con el del área */
+:root:has(#sidebarAdmin) .barra-navegacion-superior {
+    padding-left: var(--la-pad-x);
+    padding-right: var(--la-pad-x);
+}
+
+/* Tabla dentro de una tarjeta: el contenedor interno no dibuja otra tarjeta
+   (antes quedaba tarjeta dentro de tarjeta y la tabla muy metida) */
+:root:has(#sidebarAdmin) .grafico-card .contenedor-tabla {
+    padding: 0;
+    border: 0;
+    margin-bottom: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+@media (max-width: 991.98px) {
+    :root:has(#sidebarAdmin) {
+        --la-pad-x: 20px;
+        --la-pad-top: 20px;
+        --la-pad-bottom: 32px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    :root:has(#sidebarAdmin) {
+        --la-pad-x: 14px;
+        --la-pad-top: 16px;
+    }
+}
