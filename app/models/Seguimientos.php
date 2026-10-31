@@ -890,6 +890,13 @@ class Seguimientos
     private function crearNotificacionesSeguimiento(array $seguimiento, string $titulo, string $mensaje, int $id_usuario): int
     {
         require_once BASE_PATH . '/app/helpers/notification/notificacion_helper.php';
+        require_once __DIR__ . '/Notificacion.php';
+
+        // Notificaciones internas apagadas en Medios de envío: no es un error.
+        // Se omiten sin lanzar excepción para no revertir la actualización clínica que se está guardando.
+        if (!(new Notificacion())->canalInAppHabilitado()) {
+            return 0;
+        }
 
         $creadas    = 0;
         $idPaciente = (int) $seguimiento['id_paciente'];

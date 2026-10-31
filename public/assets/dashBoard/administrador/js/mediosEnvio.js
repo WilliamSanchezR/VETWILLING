@@ -9,14 +9,19 @@ const ICONOS_CANAL = {
     push:   'bi-phone-fill',
 };
 
+// Solo los correos que el sistema envía de verdad usando estas plantillas
 const TIPOS_NOTIFICACION = [
     { value: 'cita',         label: 'Cita agendada' },
     { value: 'recordatorio', label: 'Recordatorio de cita' },
-    { value: 'vacuna',       label: 'Alerta de vacuna' },
-    { value: 'tratamiento',  label: 'Tratamiento' },
-    { value: 'inventario',   label: 'Alerta de inventario' },
-    { value: 'general',      label: 'General' },
+    { value: 'cancelacion',  label: 'Cita cancelada' },
 ];
+
+const NOMBRES_TIPO = {
+    cita: 'Cita', recordatorio: 'Recordatorio', cancelacion: 'Cancelación',
+    bienvenida: 'Bienvenida', reporte: 'Ficha clínica', seguridad: 'Contraseña', prueba: 'Prueba',
+};
+
+let transporteCache = null;
 
 // ── Utilidades ────────────────────────────────────────────────
 
@@ -29,7 +34,7 @@ async function apiGet(accion, params = {}) {
 async function apiPost(accion, body = {}) {
     const r = await fetch(`${API}?accion=${accion}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': document.body.dataset.csrf },
         body: JSON.stringify({ ...body, accion }),
     });
     return r.json();
@@ -54,6 +59,7 @@ async function cargarCanales() {
     const res = await apiGet('canales');
     if (!res.ok) return;
     canalesCache = res.data;
+    transporteCache = res.transporte ?? null;
 
     const cont = document.getElementById('listaCanales');
     cont.innerHTML = '';
@@ -61,6 +67,7 @@ async function cargarCanales() {
     res.data.forEach(c => {
         const icono = ICONOS_CANAL[c.codigo_canal] ?? 'bi-send';
         const habilitado = +c.habilitado;
+        const disponible = c.codigo_canal !== 'push'; // el envío push aún no existe
 
         const col = document.createElement('div');
         col.className = 'col-md-4';
@@ -76,8 +83,8 @@ async function cargarCanales() {
                             <h6 class="mb-0 fw-semibold">${c.nombre_canal}</h6>
                             <small class="text-muted">${c.descripcion ?? ''}</small>
                         </div>
-                        <span class="badge badge-estado ${habilitado ? 'bg-success' : 'bg-secondary'}">
-                            ${habilitado ? 'Activo' : 'Inactivo'}
+                        <span class="badge badge-estado ${!disponible ? 'bg-warning text-dark' : habilitado ? 'bg-success' : 'bg-secondary'}">
+                            ${!disponible ? 'No disponible' : habilitado ? 'Activo' : 'Inactivo'}
                         </span>
                     </div>
                     <div class="form-check form-switch mt-2">
@@ -85,9 +92,10 @@ async function cargarCanales() {
                                id="toggle_${c.id_canal}"
                                data-id="${c.id_canal}"
                                ${habilitado ? 'checked' : ''}
+                               ${disponible ? '' : 'disabled'}
                                onchange="toggleCanal(this)">
                         <label class="form-check-label" for="toggle_${c.id_canal}">
-                            ${habilitado ? 'Habilitar' : 'Deshabilitar'}
+                            ${!disponible ? 'Próximamente' : habilitado ? 'Habilitado' : 'Deshabilitado'}
                         </label>
                     </div>
                 </div>
@@ -108,7 +116,7 @@ async function toggleCanal(chk) {
         const badge = chk.closest('.canal-card').querySelector('.badge-estado');
         badge.className = `badge badge-estado ${habilitado ? 'bg-success' : 'bg-secondary'}`;
         badge.textContent = habilitado ? 'Activo' : 'Inactivo';
-        chk.nextElementSibling.textContent = habilitado ? 'Habilitar' : 'Deshabilitar';
+        chk.nextElementSibling.textContent = habilitado ? 'Habilitado' : 'Deshabilitado';
     } else {
         toast(res.mensaje, 'danger');
         chk.checked = !habilitado;
@@ -136,7 +144,8 @@ function poblarSelectoresCanal(canales) {
         btn.addEventListener('click', () => seleccionarCanalConfig(c, btn));
         btnsCfg.appendChild(btn);
 
-        // Select Tab 3
+        // Select Tab 3: solo correo (las notificaciones internas y push no usan plantillas)
+        if (c.codigo_canal !== 'email') return;
         const opt = document.createElement('option');
         opt.value       = c.id_canal;
         opt.textContent = c.nombre_canal;
@@ -165,6 +174,19 @@ function seleccionarCanalConfig(canal, btnClicado) {
 function cargarFormSmtp(c) {
     const wrap = document.getElementById('formSmtpWrap');
     wrap.classList.remove('d-none');
+    const info = document.querySelector('#infoTransporte span');
+    if (transporteCache) {
+        info.textContent = 'Transporte en uso: ' + transporteCache.detalle;
+    }
+    // Estado de la contraseña guardada (nunca se envía al navegador, solo su estado)
+    const aviso = document.getElementById('avisoCredencial');
+    const avisos = {
+        texto_plano: 'La contraseña SMTP guardada está en texto plano. Configura APP_ENCRYPTION_KEY en .env y ejecuta scripts/cifrar-credenciales-smtp.php, o vuelve a escribirla aquí para guardarla cifrada.',
+        vacia: 'No hay contraseña SMTP guardada aquí: se usa SMTP_PASS de .env, solo si el servidor y el usuario son los de .env. Con otro servidor o usuario, escribe la contraseña aquí.',
+        ilegible: 'La contraseña SMTP guardada está cifrada pero no se puede descifrar con la APP_ENCRYPTION_KEY actual (¿cambió la clave?). El correo por SMTP no se enviará hasta que vuelvas a escribir la contraseña aquí.',
+    };
+    aviso.classList.toggle('d-none', !avisos[c.smtp_password_estado]);
+    aviso.querySelector('span').textContent = avisos[c.smtp_password_estado] ?? '';
     const form = document.getElementById('formSmtp');
     form.querySelector('[name=id_canal]').value              = c.id_canal;
     form.querySelector('[name=smtp_host]').value             = c.smtp_host ?? '';
@@ -178,23 +200,12 @@ function cargarFormSmtp(c) {
     document.getElementById('inputSmtpPass').value = '';
 }
 
-function cargarFormPush(c) {
-    const wrap = document.getElementById('formPushWrap');
-    wrap.classList.remove('d-none');
-    const form = document.getElementById('formPush');
-    form.querySelector('[name=id_canal]').value              = c.id_canal;
-    form.querySelector('[name=push_endpoint]').value         = c.push_endpoint ?? '';
-    form.querySelector('[name=max_reintentos]').value        = c.max_reintentos ?? 3;
-    form.querySelector('[name=intervalo_reintento_seg]').value = c.intervalo_reintento_seg ?? 30;
-    document.getElementById('inputPushKey').value = '';
+function cargarFormPush() {
+    document.getElementById('formPushWrap').classList.remove('d-none');
 }
 
-function cargarFormInApp(c) {
-    const wrap = document.getElementById('formInAppWrap');
-    wrap.classList.remove('d-none');
-    const form = document.getElementById('formInApp');
-    form.querySelector('[name=id_canal]').value       = c.id_canal;
-    form.querySelector('[name=max_reintentos]').value = c.max_reintentos ?? 1;
+function cargarFormInApp() {
+    document.getElementById('formInAppWrap').classList.remove('d-none');
 }
 
 // Guardar config genérica (todos los formularios de Tab 2 usan esto)
@@ -202,18 +213,57 @@ async function guardarFormConfig(form) {
     const data = Object.fromEntries(new FormData(form).entries());
     // No enviar password vacío
     if ('smtp_password' in data && data.smtp_password === '') delete data.smtp_password;
-    if ('push_api_key'  in data && data.push_api_key  === '') delete data.push_api_key;
 
-    const res = await apiPost('actualizar_config', data);
-    toast(res.mensaje, res.ok ? 'success' : 'danger');
+    await conBotonOcupado(form.querySelector('[type=submit]'), async () => {
+        const res = await apiPost('actualizar_config', data);
+        toast(res.mensaje, res.ok ? 'success' : 'danger');
+        if (res.ok) {
+            // Recarga los datos guardados y el estado de la credencial, manteniendo el canal seleccionado
+            await cargarCanales();
+            const email = canalesCache.find(c => c.codigo_canal === 'email');
+            const boton = document.querySelector('.btn-canal-sel[data-codigo="email"]');
+            if (email && boton) seleccionarCanalConfig(email, boton);
+        }
+    });
+}
+
+// Deshabilita el botón mientras dura la petición y avisa si falla la conexión
+async function conBotonOcupado(boton, accion) {
+    if (boton) {
+        boton.disabled = true;
+        boton.setAttribute('aria-busy', 'true');
+    }
+    try {
+        await accion();
+    } catch (_) {
+        toast('No se pudo contactar al servidor. Intenta de nuevo.', 'danger');
+    } finally {
+        if (boton) {
+            boton.disabled = false;
+            boton.removeAttribute('aria-busy');
+        }
+    }
 }
 
 document.getElementById('formSmtp').addEventListener('submit',  e => { e.preventDefault(); guardarFormConfig(e.target); });
-document.getElementById('formPush').addEventListener('submit',  e => { e.preventDefault(); guardarFormConfig(e.target); });
-document.getElementById('formInApp').addEventListener('submit', e => { e.preventDefault(); guardarFormConfig(e.target); });
 
+// Envía un correo real al administrador con la configuración guardada
 async function probarSmtp() {
-    toast('Función de prueba SMTP disponible vía cron de diagnóstico.', 'warning');
+    const destino = document.body.dataset.adminEmail || 'tu correo';
+    // Confirmación explícita: este botón envía un correo REAL
+    if (!confirm(`Se enviará un correo REAL de prueba a ${destino} con la configuración guardada (no la que tengas sin guardar en el formulario). ¿Continuar?`)) {
+        return;
+    }
+    const btn = document.getElementById('btnProbarCorreo');
+    btn.disabled = true;
+    try {
+        const res = await apiPost('probar_correo');
+        toast(res.mensaje, res.ok ? 'success' : 'danger');
+    } catch (_) {
+        toast('No se pudo contactar al servidor.', 'danger');
+    } finally {
+        btn.disabled = false;
+    }
 }
 window.probarSmtp = probarSmtp;
 
@@ -295,9 +345,11 @@ function cargarEditorPlantilla(idCanal, tipo, codigoCanal, plantilla) {
 document.getElementById('formPlantilla').addEventListener('submit', async e => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target).entries());
-    const res  = await apiPost('guardar_plantilla', data);
-    toast(res.mensaje, res.ok ? 'success' : 'danger');
-    if (res.ok) selCanalPlant.dispatchEvent(new Event('change')); // refresca marcas ✓
+    await conBotonOcupado(e.target.querySelector('[type=submit]'), async () => {
+        const res = await apiPost('guardar_plantilla', data);
+        toast(res.mensaje, res.ok ? 'success' : 'danger');
+        if (res.ok) selCanalPlant.dispatchEvent(new Event('change')); // refresca marcas ✓
+    });
 });
 
 // ── TAB 4: MONITOR DE FALLOS ──────────────────────────────────
@@ -314,17 +366,19 @@ function renderResumen(resumen) {
     const cont = document.getElementById('resumenMonitoreo');
     cont.innerHTML = '';
 
-    let totFallidos = 0, totExitosos = 0, totPendientes = 0;
+    let totFallidos = 0, totExitosos = 0, totPendientes = 0, totOmitidos = 0;
     resumen.forEach(r => {
-        totFallidos  += +r.fallidos;
+        totFallidos  += +r.fallidos + +(r.rechazados ?? 0);
         totExitosos  += +r.exitosos;
         totPendientes+= +r.pendientes;
+        totOmitidos  += +(r.omitidos ?? 0);
     });
 
     const tarjetas = [
         { label: 'Exitosos',   cifra: totExitosos,   clase: 'success' },
         { label: 'Fallidos',   cifra: totFallidos,   clase: 'danger'  },
         { label: 'Pendientes', cifra: totPendientes, clase: 'warning' },
+        { label: 'Omitidos (canal apagado)', cifra: totOmitidos, clase: 'secondary' },
     ];
 
     tarjetas.forEach(t => {
@@ -338,7 +392,8 @@ function renderResumen(resumen) {
         cont.appendChild(col);
     });
 
-    // Desglose por canal
+    // Desglose por canal (solo si hay más de uno)
+    if (resumen.length < 2) return;
     resumen.forEach(r => {
         const col = document.createElement('div');
         col.className = 'col-md-3 col-6';
@@ -360,13 +415,19 @@ function renderTablaFallos(filas) {
     tbody.innerHTML = filas.map((f, i) => `
     <tr>
         <td>${i + 1}</td>
-        <td><span class="badge bg-secondary">${f.medio_notificacion}</span></td>
-        <td>${f.destinatario ?? '—'}</td>
-        <td>${f.nombre_propietario ?? '—'}</td>
+        <td><span class="badge bg-secondary">${escapar(NOMBRES_TIPO[f.tipo_notificacion] ?? f.tipo_notificacion ?? f.medio_notificacion)}</span></td>
+        <td>${escapar(f.destinatario ?? '—')}</td>
+        <td>${escapar(f.asunto ?? '—')}${+f.reintentable ? '' : ' <span class="badge bg-light text-muted" title="No guarda contenido: no se puede reenviar">sin reenvío</span>'}</td>
         <td>${formatFecha(f.fecha_envio)}</td>
-        <td><span class="badge bg-warning text-dark">${f.intentos_envio}</span></td>
-        <td class="text-danger small" style="max-width:220px;word-break:break-word">${f.mensaje_error ?? '—'}</td>
+        <td><span class="badge bg-warning text-dark">${f.intentos_envio}</span>${f.estado_envio === 'rechazado' ? ' <span class="badge bg-danger" title="Error permanente: no se reintenta">rechazado</span>' : ''}</td>
+        <td class="text-danger small" style="max-width:240px;word-break:break-word">${escapar(f.mensaje_error ?? '—')}</td>
     </tr>`).join('');
+}
+
+function escapar(texto) {
+    const div = document.createElement('div');
+    div.textContent = String(texto);
+    return div.innerHTML;
 }
 
 function formatFecha(str) {
@@ -381,11 +442,18 @@ function abrirModalReintentar() {
 window.abrirModalReintentar = abrirModalReintentar;
 
 async function ejecutarReintento() {
-    const canal = document.getElementById('selectReintentarCanal').value;
-    const res   = await apiPost('reintentar', { canal });
-    bootstrap.Modal.getInstance(document.getElementById('modalReintentar')).hide();
-    toast(res.mensaje, res.ok ? 'success' : 'danger');
-    if (res.ok) cargarFallos();
+    const btn = document.getElementById('btnEjecutarReintento');
+    btn.disabled = true;
+    try {
+        const res = await apiPost('reintentar');
+        bootstrap.Modal.getInstance(document.getElementById('modalReintentar')).hide();
+        toast(res.mensaje, res.ok ? (res.fallidos > 0 ? 'warning' : 'success') : 'danger');
+        cargarFallos();
+    } catch (_) {
+        toast('No se pudo contactar al servidor.', 'danger');
+    } finally {
+        btn.disabled = false;
+    }
 }
 window.ejecutarReintento = ejecutarReintento;
 

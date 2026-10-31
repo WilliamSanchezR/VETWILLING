@@ -568,6 +568,17 @@ function enviarNotificacion()
         
         $seguimientosModel = new Seguimientos();
         $notificacionesCreadas = $seguimientosModel->enviarNotificacionSeguimiento($id_seguimiento, $id_usuario, $mensaje);
+
+        // 0 = las notificaciones internas están apagadas en Medios de envío (no se envió nada)
+        if ($notificacionesCreadas === 0) {
+            header('Content-Type: application/json');
+            http_response_code(409);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Las notificaciones internas están desactivadas en Medios de envío: no se envió el recordatorio.',
+            ]);
+            return;
+        }
         
         header('Content-Type: application/json');
         echo json_encode([

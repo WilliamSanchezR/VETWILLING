@@ -26,6 +26,11 @@ $usuario = mostrarPerfil($id);
 
 <div class="barra-navegacion-superior">
     <div class="navegacion-izquierda">
+        <!-- Abre el menú lateral en pantallas pequeñas (estilos en sidebarA.css) -->
+        <button type="button" class="sa-burger" id="saBurger" aria-label="Abrir menú" aria-controls="sidebarAdmin"
+            aria-expanded="false">
+            <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
         <div class="d-flex align-items-center gap-2">
             <span class="fw-semibold"></span>
         </div>

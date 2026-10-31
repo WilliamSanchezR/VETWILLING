@@ -36,7 +36,12 @@ composer.phar
 composer.lock
 composer.json
 app/logs/*
-database
+# Carpeta de bases de datos ignorada, salvo las migraciones necesarias (sin datos ni secretos)
+/database/*
+!/database/medios_envio.sql
+!/database/password_reset.sql
+!/database/medios_envio_base.sql
+!/database/medios_envio_rollback.sql
 
 PROJECT_CONTEXT.md
 
@@ -47,7 +52,10 @@ requisitos_funcionales.md
 
 Informe_ERS_VetWilling.md
 
-scripts
+# Carpeta de scripts ignorada, salvo los que necesita el módulo de Medios de envío
+/scripts/*
+!/scripts/reintentar-notificaciones.php
+!/scripts/cifrar-credenciales-smtp.php
 tools
 ENTREGA_SEED_INSTRUCTOR.md
 

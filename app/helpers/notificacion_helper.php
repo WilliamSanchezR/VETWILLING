@@ -32,7 +32,10 @@ function registrarNotificacionEnviada($datos)
                     id_agendamiento,
                     fecha_envio,
                     medio_notificacion,
+                    tipo_notificacion,
                     destinatario,
+                    asunto,
+                    cuerpo_html,
                     estado_envio,
                     mensaje_error,
                     confirmacion_recepcion,
@@ -42,7 +45,10 @@ function registrarNotificacionEnviada($datos)
                     :id_agendamiento,
                     NOW(),
                     :medio_notificacion,
+                    :tipo_notificacion,
                     :destinatario,
+                    :asunto,
+                    :cuerpo_html,
                     :estado_envio,
                     :mensaje_error,
                     :confirmacion_recepcion,
@@ -51,30 +57,23 @@ function registrarNotificacionEnviada($datos)
                 )";
 
         $stmt = $conexion->prepare($sql);
+        $stmt->execute([
+            ':id_agendamiento'        => $datos['id_agendamiento'] ?? null,
+            ':medio_notificacion'     => $datos['medio_notificacion'] ?? 'email',
+            ':tipo_notificacion'      => $datos['tipo_notificacion'] ?? null,
+            ':destinatario'           => $datos['destinatario'],
+            ':asunto'                 => $datos['asunto'] ?? null,
+            ':cuerpo_html'            => $datos['cuerpo_html'] ?? null,
+            ':estado_envio'           => $datos['estado_envio'],
+            ':mensaje_error'          => $datos['mensaje_error'] ?? null,
+            ':confirmacion_recepcion' => (int) ($datos['confirmacion_recepcion'] ?? 0),
+            ':intentos_envio'         => (int) ($datos['intentos_envio'] ?? 1),
+        ]);
 
-        // Parametros obligatorios
-        $stmt->bindParam(':id_agendamiento', $datos['id_agendamiento'], PDO::PARAM_INT);
-        $stmt->bindParam(':medio_notificacion', $datos['medio_notificacion']);
-        $stmt->bindParam(':destinatario', $datos['destinatario']);
-        $stmt->bindParam(':estado_envio', $datos['estado_envio']);
-
-        // Parametros opcionales
-        $mensaje_error = $datos['mensaje_error'] ?? null;
-        $stmt->bindParam(':mensaje_error', $mensaje_error);
-
-        $confirmacion = $datos['confirmacion_recepcion'] ?? 0;
-        $stmt->bindParam(':confirmacion_recepcion', $confirmacion, PDO::PARAM_INT);
-
-        $intentos = $datos['intentos_envio'] ?? 1;
-        $stmt->bindParam(':intentos_envio', $intentos, PDO::PARAM_INT);
-
-        if ($stmt->execute()) {
-            return $conexion->lastInsertId();
-        }
-
-        return false;
+        return $conexion->lastInsertId();
     } catch (PDOException $e) {
-        error_log("Error al registrar notificacion: " . $e->getMessage());
+        // Si falta la migración database/medios_envio.sql, el envío sigue funcionando; solo no queda registrado
+        error_log("Error al registrar notificacion (¿falta database/medios_envio.sql?): " . $e->getMessage());
         return false;
     }
 }
@@ -304,21 +303,27 @@ function obtenerEstadisticasNotificaciones($fechaInicio = null, $fechaFin = null
  * @param string $medioNotificacion 'email' 
  * @return bool True si ya existe notificacion exitosa
  */
-function existeNotificacionExitosa($idAgendamiento, $medioNotificacion = 'email')
+function existeNotificacionExitosa($idAgendamiento, $medioNotificacion = 'email', $tipoNotificacion = null)
 {
     try {
         $db = new conexion();
         $conexion = $db->getConexion();
 
+        // Con el tipo se distingue la confirmación del recordatorio de la misma cita
+        // (antes, si había llegado la confirmación, el recordatorio se daba por enviado)
         $sql = "SELECT COUNT(*) as total
                 FROM notificaciones_enviadas
                 WHERE id_agendamiento = :id_agendamiento
                 AND medio_notificacion = :medio_notificacion
-                AND estado_envio = 'exitoso'";
+                AND estado_envio = 'exitoso'"
+            . ($tipoNotificacion !== null ? " AND tipo_notificacion = :tipo_notificacion" : "");
 
         $stmt = $conexion->prepare($sql);
         $stmt->bindParam(':id_agendamiento', $idAgendamiento, PDO::PARAM_INT);
         $stmt->bindParam(':medio_notificacion', $medioNotificacion);
+        if ($tipoNotificacion !== null) {
+            $stmt->bindParam(':tipo_notificacion', $tipoNotificacion);
+        }
         $stmt->execute();
 
         $resultado = $stmt->fetch(PDO::FETCH_ASSOC);

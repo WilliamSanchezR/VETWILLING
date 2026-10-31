@@ -55,7 +55,7 @@ $usuario = mostrarPerfil($id);
 
         <!-- ÁREA DE CONTENIDO -->
         <div class="area-contenido">
-            <div class="container">
+            <div class="container-fluid px-0">
                 <!-- Sección de información del usuario -->
                 <div class="row g-3 mb-4">
                     <!-- Foto y datos básicos -->

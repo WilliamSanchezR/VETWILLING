@@ -109,6 +109,8 @@ class PasswordResetService
         $mail->AltBody = "Hemos recibido una solicitud para restablecer tu contraseña de VetWilling.\n\n"
             . "Abre este enlace (válido por {$minutos} minutos):\n{$enlace}\n\n"
             . "Si no fuiste tú, ignora este correo: tu contraseña actual no ha cambiado.";
-        $mail->send();
+        // Crítico: se envía aunque el canal de correo esté deshabilitado, y no se guarda
+        // el contenido porque lleva el enlace privado para cambiar la contraseña
+        mailer_enviar($mail, 'seguridad', ['critico' => true]);
     }
 }

@@ -245,6 +245,7 @@ function crearCitaCliente()
                 if ($detallesCita && !empty($detallesCita['email_propietario'])) {
                     // Preparar datos para enviar al email
                     $datosCitaEmail = [
+                        'id_agendamiento' => $id_cita,
                         'email_propietario' => $detallesCita['email_propietario'],
                         'nombre_propietario' => $detallesCita['nombre_propietario'],
                         'nombre_mascota' => $detallesCita['nombre_mascota'] ?? 'su mascota',
@@ -256,26 +257,10 @@ function crearCitaCliente()
                     // Enviar notificación de confirmación de cita
                     $emailEnviado = enviarNotificacionCitaCreada($datosCitaEmail);
                     
-                    // Registrar intento de envío en auditoría
+                    // El envío queda registrado en el monitor de Medios de envío (mailer_enviar)
                     if ($emailEnviado) {
-                        registrarNotificacionEnviada([
-                            'id_agendamiento' => $id_cita,
-                            'medio_notificacion' => 'email',
-                            'destinatario' => $detallesCita['email_propietario'],
-                            'estado_envio' => 'exitoso',
-                            'mensaje_error' => null,
-                            'intentos_envio' => 1
-                        ]);
                         error_log("✅ Email de confirmación enviado exitosamente - Cita ID: {$id_cita}");
                     } else {
-                        registrarNotificacionEnviada([
-                            'id_agendamiento' => $id_cita,
-                            'medio_notificacion' => 'email',
-                            'destinatario' => $detallesCita['email_propietario'],
-                            'estado_envio' => 'fallido',
-                            'mensaje_error' => 'Error al enviar email de confirmación - Verificar configuración SMTP',
-                            'intentos_envio' => 1
-                        ]);
                         error_log("❌ Error al enviar email de confirmación - Cita ID: {$id_cita}");
                     }
                 } else {

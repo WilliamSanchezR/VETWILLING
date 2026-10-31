@@ -17,6 +17,26 @@ class Notificacion
     // =========================================================================
 
     /**
+     * Interruptor "Notificaciones en la aplicación" de Medios de envío.
+     * Todas las notificaciones internas pasan por crear()/crearBatch(), así que aquí se respeta.
+     * Si la configuración no existe o falla la consulta, se deja pasar para no perder avisos.
+     */
+    public function canalInAppHabilitado(): bool
+    {
+        try {
+            $stmt = $this->conexion->prepare(
+                "SELECT habilitado FROM canal_envio_config WHERE codigo_canal = 'in_app' LIMIT 1"
+            );
+            $stmt->execute();
+            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $fila === false || (bool) $fila['habilitado'];
+        } catch (PDOException $e) {
+            error_log('[Notificacion::canalInAppHabilitado] ' . $e->getMessage());
+            return true;
+        }
+    }
+
+    /**
      * Crear una notificación para un usuario.
      *
      * Campos obligatorios en $datos:
@@ -33,6 +53,8 @@ class Notificacion
      */
     public function crear(array $datos): int|false
     {
+        if (!$this->canalInAppHabilitado()) return false;
+
         try {
             $sql = "INSERT INTO notificacion
                         (id_usuario, tipo, titulo, mensaje, url_accion, id_paciente)
@@ -69,7 +91,7 @@ class Notificacion
      */
     public function crearBatch(array $notificaciones): int
     {
-        if (empty($notificaciones)) return 0;
+        if (empty($notificaciones) || !$this->canalInAppHabilitado()) return 0;
 
         $insertadas = 0;
 

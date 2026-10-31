@@ -38,7 +38,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
         <?php include_once __DIR__ . '/../../layouts/panel_superior_administrador.php'; ?>
 
-        <div class="area-contenido" style="padding:1.25rem;">
+        <div class="area-contenido">
 
             <!-- ── Encabezado ────────────────────────────────────────── -->
             <div class="encabezado-pagina mb-3">

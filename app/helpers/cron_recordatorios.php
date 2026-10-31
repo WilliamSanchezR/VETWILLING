@@ -6,13 +6,34 @@
 // Este script debe ejecutarse mediante un cron job cada hora
 // 
 // Ejemplo crontab: 0 * * * * /usr/bin/php /opt/lampp/htdocs/vetwilling/app/helpers/cron_recordatorios.php
+// Modo simulación (no envía ni escribe nada): php app/helpers/cron_recordatorios.php --simular
 // =========================================
+
+// Solo por consola: si la carpeta app/ quedara expuesta en el servidor web, nadie puede dispararlo
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit;
+}
+
+$simular = in_array('--simular', $argv ?? [], true);
+
+$_SERVER['HTTP_HOST']   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$_SERVER['SCRIPT_NAME'] = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
 
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/email_helper.php';
 require_once __DIR__ . '/notificacion_helper.php';
 require_once __DIR__ . '/../models/Eventos.php';
+
+// Después de cargar config.php (fija la zona horaria): evita dos ejecuciones simultáneas
+// (por ejemplo, si una ejecución tarda más de una hora)
+$lock = fopen(sys_get_temp_dir() . '/vetwilling_cron_recordatorios.lock', 'c');
+if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) {
+    echo '[' . date('Y-m-d H:i:s') . "] Ya hay otra ejecución de recordatorios en curso. Se omite esta.\n";
+    exit(0);
+}
+
 
 // =========================================
 // CONFIGURACION Y VARIABLES GLOBALES
@@ -96,6 +117,15 @@ try {
             continue;
         }
 
+        // Simulación: solo informa qué haría, sin enviar ni registrar nada
+        if ($simular) {
+            $yaEnviado = existeNotificacionExitosa($cita['id_agendamiento'], 'email', 'recordatorio');
+            echo $yaEnviado
+                ? "    ⊘ SIMULACIÓN: ya tiene recordatorio enviado, se omitiría\n\n"
+                : "    ✓ SIMULACIÓN: se enviaría el recordatorio\n\n";
+            continue;
+        }
+
         // ┌─────────────────────────────────────────────────────────────┐
         // │ PASO 2: VALIDAR EMAIL DEL PROPIETARIO                      │
         // └─────────────────────────────────────────────────────────────┘
@@ -109,6 +139,7 @@ try {
             registrarNotificacionEnviada([
                 'id_agendamiento' => $cita['id_agendamiento'],
                 'medio_notificacion' => 'email',
+                'tipo_notificacion' => 'recordatorio',
                 'destinatario' => $cita['email_propietario'],
                 'estado_envio' => 'fallido',
                 'mensaje_error' => "Email invalido: {$validacionEmail['mensaje']}",
@@ -125,7 +156,8 @@ try {
         // ┌─────────────────────────────────────────────────────────────┐
         // │ PASO 3: VERIFICAR SI YA SE ENVIO NOTIFICACION              │
         // └─────────────────────────────────────────────────────────────┘
-        if (existeNotificacionExitosa($cita['id_agendamiento'], 'email')) {
+        // Se busca un recordatorio ya enviado (la confirmación de la cita no cuenta)
+        if (existeNotificacionExitosa($cita['id_agendamiento'], 'email', 'recordatorio')) {
             echo "    ⊘ Ya existe notificacion exitosa para esta cita\n";
             echo "    ⊗ OMITIDO - Duplicado\n\n";
             continue;
@@ -135,6 +167,7 @@ try {
         // │ PASO 4: PREPARAR DATOS PARA EL EMAIL                       │
         // └─────────────────────────────────────────────────────────────┘
         $datosCita = [
+            'id_agendamiento' => $cita['id_agendamiento'],
             'email_propietario' => $emailSanitizado,
             'nombre_propietario' => $cita['nombre_propietario'],
             'nombre_mascota' => $cita['nombre_mascota'] ?? 'su mascota',
@@ -156,15 +189,7 @@ try {
             // Marcar en tabla agendamiento
             $eventosModel->marcarRecordatorioEnviado($cita['id_agendamiento']);
 
-            // Registrar en historial de notificaciones
-            registrarNotificacionEnviada([
-                'id_agendamiento' => $cita['id_agendamiento'],
-                'medio_notificacion' => 'email',
-                'destinatario' => $emailSanitizado,
-                'estado_envio' => 'exitoso',
-                'mensaje_error' => null,
-                'intentos_envio' => 1
-            ]);
+            // El envío ya quedó registrado en el historial por mailer_enviar()
 
             echo "    ✓ EXITOSO - Recordatorio enviado\n";
             echo "    ✓ Registro actualizado en base de datos\n\n";
@@ -174,15 +199,8 @@ try {
             // ENVIO FALLIDO
             // ═══════════════════════════════════════════════════════════
 
-            // Registrar fallo en historial
-            registrarNotificacionEnviada([
-                'id_agendamiento' => $cita['id_agendamiento'],
-                'medio_notificacion' => 'email',
-                'destinatario' => $emailSanitizado,
-                'estado_envio' => 'fallido',
-                'mensaje_error' => 'Error al enviar email - verificar logs de PHPMailer',
-                'intentos_envio' => 1
-            ]);
+            // El fallo ya quedó registrado en el historial por mailer_enviar(),
+            // con el contenido del correo para poder reintentarlo desde Medios de envío
 
             echo "    ✗ FALLIDO - Error al enviar email\n";
             echo "    ⚠ Verificar configuracion SMTP y logs\n\n";

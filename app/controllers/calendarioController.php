@@ -350,6 +350,7 @@ function crearAgendamientoAjax()
                 $detallesCita = $objEventos->obtenerDetallesCita($id_generado);
                 if ($detallesCita && !empty($detallesCita['email_propietario'])) {
                     $datosCita = [
+                        'id_agendamiento' => $id_generado,
                         'email_propietario' => $detallesCita['email_propietario'],
                         'nombre_propietario' => $detallesCita['nombre_propietario'],
                         'nombre_mascota' => $detallesCita['nombre_mascota'],
