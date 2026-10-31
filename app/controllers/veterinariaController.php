@@ -406,7 +406,7 @@ function eliminarVeterinaria()
     $id = acceso_entero_positivo($_POST['id'] ?? null);
     // Creamos el objeto de la clase Veterinaria
     $objVeterinaria = new Veterinaria();
-    if ($id === null || !$objVeterinaria->consultarVeterinariasRegistradas($id)) {
+    if ($id === null || !$objVeterinaria->existe($id)) {
         acceso_denegar('404', 'veterinaria inexistente');
     }
     // Llamamos a la funcion eliminar del modelo Veterinaria

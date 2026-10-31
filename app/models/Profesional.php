@@ -195,7 +195,7 @@ class Profesional
                 LEFT JOIN profesionales_servicio ps on p.id_profesional = ps.id_profesional AND ps.estado = 'Activo'
                 LEFT JOIN servicio ser ON ps.id_servicio = ser.id_servicio AND ser.estado = 'Activo' AND ser.id_veterinaria = :id_veterinaria
                 WHERE pv.id_veterinaria = :id_veterinaria
-                GROUP BY p.id_profesional, p.nombres, us.id_usuario";
+                GROUP BY pv.id_prof_veterinaria";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_veterinaria', $id_vterinaria);

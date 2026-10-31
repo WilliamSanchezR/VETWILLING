@@ -77,6 +77,14 @@ class Veterinaria
         }
     }
 
+    // ¿Existe la veterinaria? (con o sin representante)
+    public function existe(int $id): bool
+    {
+        $stmt = $this->conexion->prepare("SELECT 1 FROM veterinaria WHERE id_veterinaria = ?");
+        $stmt->execute([$id]);
+        return (bool) $stmt->fetchColumn();
+    }
+
     // FUNCION PARA LISTAR LAS VETERINARIAS REGISTRADAS POR ID Y NOMBRE
     public function consultarVeterinariasRegistradas($id)
     {
