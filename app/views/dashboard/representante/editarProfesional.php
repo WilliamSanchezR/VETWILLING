@@ -8,18 +8,23 @@ require_once BASE_PATH . '/app/controllers/veterinariaController.php';
 require_once BASE_PATH . '/app/controllers/especialidadController.php';
 require_once BASE_PATH . '/app/controllers/profesionalController.php';
 require_once BASE_PATH . '/app/controllers/servicioController.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 
-$datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_veterinaria']);
+// Solo profesionales vinculados a la clínica de la sesión (otra clínica → 404)
+$vinculo = exigirProfesionalDeMiClinica($_GET['id'] ?? null);
+$idVeterinaria = $vinculo['id_veterinaria'];
+
+$datosServicios = listaServiciosPorVeterinariaActivos($idVeterinaria);
 
 // Llamamos la función para listar los roles
 $datosRol = listarRolRepresentante();
 // Llamamos la función para listar los servicios
 
-$id = $_GET['id'];
+$id = $vinculo['id_usuario'];
 
 $datosProfesional = consultarProfesional($id);
-$listaEspecialidadesProfesional = listarEspecialidadesPorProfesional($id, $_SESSION['user']['id_veterinaria']);
-$listaServiciosProfesional = listarServiciosPorProfesional($id);
+$listaEspecialidadesProfesional = listarEspecialidadesPorProfesional($id, $idVeterinaria);
+$listaServiciosProfesional = listarServiciosPorProfesional($id, $idVeterinaria);
 $stringEspecialidades = '';
 $stringServicios = '';
 
@@ -112,10 +117,9 @@ if (count($listaServiciosProfesional) > 0) {
                 <input type="hidden" name="serviciosCargados" value="<?= htmlspecialchars($stringServicios) ?>" id="serviciosCargadosInput">
                 <input type="hidden" name="id_profesional" value="<?= $datosProfesional['id_profesional'] ?>">
                 <input type="hidden" name="accion" value="actualizar">
-                <input type="hidden" name="id_usuario" value="<?= $_GET['id'] ?>">
+                <input type="hidden" name="id_usuario" value="<?= (int) $id ?>">
                 <input type="hidden" name="img_perfil" value="<?= $datosProfesional['img_perfil'] ?>">
                 <input type="hidden" name="img_firma" value="<?= $datosProfesional['img_firma'] ?>">
-                <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
 
                 <!-- Paso 1: Datos del Profesional -->
                 <div class="step active">
@@ -164,8 +168,9 @@ if (count($listaServiciosProfesional) > 0) {
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $datosProfesional['email'] ?>">
+                                <label><i class="bi bi-envelope"></i> Correo electrónico</label>
+                                <!-- Solo el administrador cambia el correo de acceso -->
+                                <input type="email" id="email" readonly title="Solo el administrador puede cambiar el correo de acceso" value="<?= htmlspecialchars($datosProfesional['email'], ENT_QUOTES, 'UTF-8') ?>">
                             </div>
                         </div>
 
@@ -230,13 +235,11 @@ if (count($listaServiciosProfesional) > 0) {
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-card-text"></i> Estado *</label>
+                                <label><i class="bi bi-card-text"></i> Estado en la clínica *</label>
+                                <!-- Vínculo con esta clínica; el estado de la cuenta solo lo cambia el administrador -->
                                 <select id="estado" name="estado" required>
-                                    <option value="<?= $datosProfesional['estado'] ?>"><?= $datosProfesional['estado'] ?></option>
-                                    <option value="activo">Activo</option>
-                                    <option value="inactivo">Inactivo</option>
-                                    <option value="bloqueado">Bloqueado</option>
-
+                                    <option value="Activo" <?= $vinculo['estado_vinculo'] === 'Activo' ? 'selected' : '' ?>>Activo</option>
+                                    <option value="Inactivo" <?= $vinculo['estado_vinculo'] !== 'Activo' ? 'selected' : '' ?>>Inactivo</option>
                                 </select>
                             </div>
                         </div>
@@ -273,11 +276,9 @@ if (count($listaServiciosProfesional) > 0) {
                             <?php foreach ($listaServiciosProfesional as $servicio): ?>
                                 <div class="servicio-seleccionado">
                                     <span><?= htmlspecialchars($servicio['nombre']) ?></span>
-                                    <a href="<?= BASE_URL ?>/representante/eliminar-serv-profesional?action=eliminarServProfesional&id_usuario=<?= $_GET['id'] ?>&id_servicio=<?= htmlspecialchars($servicio['id']) ?>">
-                                        <button type="button" class="btn btn-danger btn-sm">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </a>
+                                    <button type="submit" form="formEliminarServicio" name="id_servicio" value="<?= (int) $servicio['id'] ?>" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -305,11 +306,9 @@ if (count($listaServiciosProfesional) > 0) {
                             <?php foreach ($listaEspecialidadesProfesional as $especialidad): ?>
                                 <div class="especialidad-seleccionada">
                                     <span><?= htmlspecialchars($especialidad['nombre']) ?></span>
-                                    <a href="<?= BASE_URL ?>/representante/eliminar-esp-profesional?action=eliminarEspProfesional&id_profesional=<?= $_GET['id'] ?>&id_especialidad=<?= htmlspecialchars($especialidad['id']) ?>">
-                                        <button type="button" class="btn btn-danger btn-sm">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                    </a>
+                                    <button type="submit" form="formEliminarEspecialidad" name="id_especialidad" value="<?= (int) $especialidad['id'] ?>" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -324,6 +323,18 @@ if (count($listaServiciosProfesional) > 0) {
                         Guardar <i class="bi bi-floppy"></i>
                     </button>
                 </div>
+            </form>
+
+            <!-- Eliminaciones por POST con token CSRF (los botones las envían con el atributo form) -->
+            <form id="formEliminarServicio" action="<?= BASE_URL ?>/representante/eliminar-serv-profesional" method="POST">
+                <?= csrf_campo() ?>
+                <input type="hidden" name="accion" value="eliminarServProfesional">
+                <input type="hidden" name="id_usuario" value="<?= (int) $id ?>">
+            </form>
+            <form id="formEliminarEspecialidad" action="<?= BASE_URL ?>/representante/eliminar-esp-profesional" method="POST">
+                <?= csrf_campo() ?>
+                <input type="hidden" name="accion" value="eliminarEspProfesional">
+                <input type="hidden" name="id_profesional" value="<?= (int) $id ?>">
             </form>
         </div>
 

@@ -5,12 +5,14 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 require_once BASE_PATH . '/app/controllers/profesionalController.php';
 require_once BASE_PATH . '/app/controllers/disponibilidadUsuarioController.php';
 
-$id = $_GET['id'];
+// Solo profesionales vinculados a la clínica de la sesión (otra clínica → 404)
+$vinculo = exigirProfesionalDeMiClinica($_GET['id'] ?? null);
+$id = $vinculo['id_usuario'];
 
 $datosProfesional = consultarProfesional($id);
-$listaEspecialidadesProfesional = listarEspecialidadesPorProfesional($id, $_SESSION['user']['id_veterinaria']);
+$listaEspecialidadesProfesional = listarEspecialidadesPorProfesional($id, $vinculo['id_veterinaria']);
 
-$agendaProfesional = obtenerDisponibilidadesPorUsuario($id, $_SESSION['user']['id_veterinaria']);
+$agendaProfesional = obtenerDisponibilidadesPorUsuario($id, $vinculo['id_veterinaria']);
 
 ?>
 
