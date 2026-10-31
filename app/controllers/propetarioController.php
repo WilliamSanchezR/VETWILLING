@@ -101,9 +101,13 @@ function listarPropietarios()
     return $resultado->listar();
 }
 
+// Consulta de un propietario por id_propietario.
+// Administrador: cualquiera. Representante: los de su clínica. Propietario: solo él mismo.
+// Fuera de ese alcance responde igual que si no existiera (404); otros roles → 403.
 function consultarPropietarioId($id)
 {
-    if (acceso_usuario() === null) {
+    $usuario = acceso_usuario();
+    if ($usuario === null) {
         http_response_code(401);
         return [
             'status' => 'error',
@@ -111,53 +115,9 @@ function consultarPropietarioId($id)
             'code' => 'UNAUTHORIZED'
         ];
     }
-    
-    $id_usuario_sesion = $_SESSION['user']['id_usuario'];
-    $id_rol_sesion = (int)$_SESSION['user']['id_rol'];
-    
-    $obj = new Propietario();
-    $propietario = $obj->consultarPropietario($id);
-    
-    if (!$propietario) {
-        http_response_code(404);
-        return [
-            'status' => 'error',
-            'message' => 'El propietario solicitado no existe',
-            'code' => 'NOT_FOUND'
-        ];
-    }
-    
-    if ($propietario['estado'] !== 'Activo') {
-        http_response_code(403);
-        return [
-            'status' => 'error',
-            'message' => 'Este propietario está inactivo y no puede ser consultado',
-            'code' => 'INACTIVE_OWNER'
-        ];
-    }
+    $id_rol_sesion = (int) $usuario['id_rol'];
 
-    
-    if ($id_rol_sesion === 3) {
-        // Cliente: solo puede ver su propio perfil
-        if ((int)$id !== $id_usuario_sesion) {
-            http_response_code(403);
-            return [
-                'status' => 'error',
-                'message' => 'No tienes permisos para consultar este propietario',
-                'code' => 'FORBIDDEN'
-            ];
-        }
-    } elseif ($id_rol_sesion === 4) {
-        // Representante: un propietario de otra clínica responde igual que uno inexistente
-        if ((int) ($propietario['id_veterinaria'] ?? 0) !== acceso_id_veterinaria()) {
-            http_response_code(404);
-            return [
-                'status' => 'error',
-                'message' => 'El propietario solicitado no existe',
-                'code' => 'NOT_FOUND'
-            ];
-        }
-    } elseif ($id_rol_sesion !== 1) {
+    if (!in_array($id_rol_sesion, [1, 3, 4], true)) {
         // Otros roles que no tienen permisos (ej: Veterinario)
         http_response_code(403);
         return [
@@ -166,7 +126,34 @@ function consultarPropietarioId($id)
             'code' => 'FORBIDDEN'
         ];
     }
-    
+
+    $idPropietario = acceso_entero_positivo($id);
+    $propietario = $idPropietario === null ? null : (new Propietario())->consultarPropietarioConCuenta($idPropietario);
+
+    $enAlcance = $propietario && match ($id_rol_sesion) {
+        1 => true,
+        3 => (int) $propietario['id_usuario'] === (int) $usuario['id_usuario'],
+        4 => (int) ($propietario['id_veterinaria'] ?? 0) === acceso_id_veterinaria(),
+    };
+    if (!$enAlcance) {
+        http_response_code(404);
+        return [
+            'status' => 'error',
+            'message' => 'El propietario solicitado no existe',
+            'code' => 'NOT_FOUND'
+        ];
+    }
+
+    // El estado está en la cuenta (usuario.estado), no en la tabla propietario
+    if (mb_strtolower(trim((string) $propietario['estado'])) !== 'activo') {
+        http_response_code(403);
+        return [
+            'status' => 'error',
+            'message' => 'Este propietario está inactivo y no puede ser consultado',
+            'code' => 'INACTIVE_OWNER'
+        ];
+    }
+
     return [
         'status' => 'success',
         'data' => $propietario

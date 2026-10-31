@@ -164,6 +164,30 @@ class Propietario
         }
     }
 
+    // Propietario con el estado y el correo de su cuenta (usuario), o null
+    public function consultarPropietarioConCuenta(int $id)
+    {
+        try {
+            $sql = "SELECT p.*, u.estado, u.email
+                    FROM propietario p
+                    INNER JOIN usuario u ON u.id_usuario = p.id_usuario
+                    WHERE p.id_propietario = :id LIMIT 1";
+            $query = $this->conexion->prepare($sql);
+            $query->bindParam(':id', $id, PDO::PARAM_INT);
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+
+            if ($result) {
+                $result['numero_documento'] = $this->decryptData($result['numero_documento']);
+                $result['telefono'] = $this->decryptData($result['telefono']);
+            }
+            return $result ?: null;
+        } catch (PDOException $e) {
+            error_log("Error en Propietario::consultarPropietarioConCuenta → " . $e->getMessage());
+            return null;
+        }
+    }
+
     /* ===============================
                 REGISTRAR
     =============================== */
