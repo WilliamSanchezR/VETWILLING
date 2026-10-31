@@ -269,7 +269,6 @@ $listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
 
 
     <!-- Modo dia  y noche -->
-    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
     <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/especialidades.js"></script>

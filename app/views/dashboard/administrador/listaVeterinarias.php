@@ -173,7 +173,6 @@ $datos = listarVeterinariasRegistradas();
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
         <!-- Modo dia  y noche -->
-        <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 

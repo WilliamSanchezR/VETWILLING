@@ -160,7 +160,6 @@ $datos = listaSubserviciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <!-- Modo dia  y noche -->
-    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
     <input type="hidden" id="csrf_token" name="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
     <script src="<?= BASE_URL ?>/public/assets/global/js/csrf.js"></script>
