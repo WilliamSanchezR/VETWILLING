@@ -324,9 +324,17 @@ function acceso_verificar(string $ruta, string $metodo): void
         return;
     }
 
+    acceso_responder_denegado($decision['resultado'], $politica);
+}
+
+/**
+ * Respuesta de una petición denegada (401/403/404/405, o redirección al login o a la selección)
+ * en JSON o HTML según la ruta, y termina. $permitidos va en la cabecera Allow del 405.
+ */
+function acceso_responder_denegado(string $resultado, ?array $politica, array $permitidos = ACCESO_METODOS_VISTA): never
+{
     $json = acceso_responder_json($politica);
-    $base = defined('BASE_URL') ? BASE_URL : '';
-    [$codigo, $mensaje] = match ($decision['resultado']) {
+    [$codigo, $mensaje] = match ($resultado) {
         'login'     => [401, 'Debes iniciar sesión.'],
         'seleccion' => [403, 'Selecciona una veterinaria para continuar.'],
         '403'       => [403, 'No tienes permiso para realizar esta acción.'],
@@ -335,16 +343,18 @@ function acceso_verificar(string $ruta, string $metodo): void
     };
 
     if ($json) {
-        http_response_code($codigo);
-        if ($codigo === 405) {
-            header('Allow: ' . implode(', ', ACCESO_METODOS_VISTA));
+        if (!headers_sent()) {
+            http_response_code($codigo);
+            if ($codigo === 405) {
+                header('Allow: ' . implode(', ', $permitidos));
+            }
+            header('Content-Type: application/json; charset=utf-8');
         }
-        header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => $mensaje, 'message' => $mensaje]);
         exit();
     }
 
-    switch ($decision['resultado']) {
+    switch ($resultado) {
         case 'login':
             acceso_redirigir('/login');
         case 'seleccion':
@@ -358,12 +368,96 @@ function acceso_verificar(string $ruta, string $metodo): void
             require __DIR__ . '/../views/auth/error404.php';
             exit();
         default:
-            http_response_code(405);
-            header('Allow: ' . implode(', ', ACCESO_METODOS_VISTA));
-            header('Content-Type: text/plain; charset=utf-8');
+            // Una acción incluida desde un layout puede llegar aquí con la página ya empezada
+            if (!headers_sent()) {
+                http_response_code(405);
+                header('Allow: ' . implode(', ', $permitidos));
+                header('Content-Type: text/plain; charset=utf-8');
+            }
             echo $mensaje;
             exit();
     }
+}
+
+// ── Acciones protegidas y alcance por clínica (F6 y F5a) ─────────────────────────
+//
+// Varios controladores se ejecutan desde más de una ruta (y algunos desde vistas y layouts), así
+// que la política de la ruta no basta: cada acción sensible comprueba por sí misma el método, el
+// token CSRF, el rol y que el recurso sea de la clínica de la sesión. Un recurso de otra clínica
+// responde 404, igual que uno inexistente.
+
+/**
+ * Deniega la petición desde un controlador y termina. El motivo solo va al log.
+ */
+function acceso_denegar(string $resultado, string $motivo, array $permitidos = ['POST']): never
+{
+    $usuario = acceso_usuario();
+    error_log(sprintf(
+        '[acceso] DENEGADO %s %s → %s (%s, rol %s)',
+        strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET'),
+        strtok($_SERVER['REQUEST_URI'] ?? '', '?'),
+        $resultado,
+        $motivo,
+        $usuario === null ? 'anónimo' : (string) $usuario['id_rol']
+    ));
+    acceso_responder_denegado($resultado, acceso_estado()['politica'], $permitidos);
+}
+
+/**
+ * Exige una sesión iniciada con uno de los roles; si no, responde como la protección central.
+ */
+function acceso_exigir_rol(array $roles): array
+{
+    $usuario = acceso_usuario();
+    if ($usuario === null) {
+        acceso_denegar('login', 'sin sesión');
+    }
+    if (!empty($usuario['seleccion_pendiente'])) {
+        acceso_denegar('seleccion', 'selección de veterinaria pendiente');
+    }
+    if (!in_array((int) $usuario['id_rol'], $roles, true)) {
+        acceso_denegar('403', 'rol no permitido en la acción');
+    }
+    return $usuario;
+}
+
+/**
+ * Acción que cambia el estado de una cuenta o de un vínculo: solo POST (otro método → 405),
+ * con uno de los roles y un token CSRF válido (campo csrf_token o cabecera X-CSRF-Token).
+ */
+function acceso_exigir_accion_post(array $roles): array
+{
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+        acceso_denegar('405', 'la acción solo admite POST');
+    }
+    $usuario = acceso_exigir_rol($roles);
+    require_once __DIR__ . '/csrf_helper.php';
+    $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+    if (!csrf_valido(is_string($token) ? $token : null)) {
+        acceso_denegar('403', 'token CSRF ausente o no válido');
+    }
+    return $usuario;
+}
+
+/**
+ * Clínica activa de la sesión, obligatoria para las acciones del representante (sin clínica → 403).
+ */
+function acceso_exigir_clinica(): int
+{
+    $idVeterinaria = acceso_id_veterinaria();
+    if ($idVeterinaria === null) {
+        acceso_denegar('403', 'sesión sin clínica activa');
+    }
+    return $idVeterinaria;
+}
+
+/**
+ * Identificador entero positivo recibido del cliente, o null.
+ */
+function acceso_entero_positivo($valor): ?int
+{
+    $id = filter_var($valor, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    return $id === false ? null : $id;
 }
 
 // ── Versión de credenciales (T1) ─────────────────────────────────────────────────
