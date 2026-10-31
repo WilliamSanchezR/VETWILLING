@@ -94,17 +94,16 @@ class panelSuperiorAdmin {
 
     /* ================= THEME ================= */
 
+    // El tema lo aplica y guarda global/js/modo-oscuro.js (window.vwTema); aquí solo el botón y el icono
     initTheme() {
-        document.documentElement.setAttribute("data-theme", this.state.theme);
-        this.updateThemeIcon();
-
-        window.toggleTheme = () => {
-            this.state.theme = (this.state.theme === "dark") ? "light" : "dark";
-
-            document.documentElement.setAttribute("data-theme", this.state.theme);
-            localStorage.setItem("theme", this.state.theme);
+        const sincronizar = () => {
+            this.state.theme = window.vwTema && window.vwTema.obtener() === "oscuro" ? "dark" : "light";
             this.updateThemeIcon();
         };
+        sincronizar();
+        window.addEventListener("vw:tema", sincronizar);
+
+        window.toggleTheme = () => window.vwTema && window.vwTema.alternar();
     }
 
     updateThemeIcon() {

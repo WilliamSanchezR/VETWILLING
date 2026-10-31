@@ -480,28 +480,20 @@
     const btnTheme  = $('btnToggleTheme');
     const themeIcon = $('themeIcon');
 
-    function aplicarTema(oscuro) {
-        document.documentElement.setAttribute('data-theme', oscuro ? 'dark' : 'light');
-
+    /* El tema lo aplica y guarda global/js/modo-oscuro.js (window.vwTema); aquí solo el icono */
+    function actualizarIcono() {
+        const oscuro = window.vwTema ? window.vwTema.obtener() === 'oscuro'
+                                     : document.documentElement.getAttribute('data-theme') === 'dark';
         if (themeIcon) {
             themeIcon.className = oscuro ? 'bi bi-sun-fill' : 'bi bi-moon-stars';
         }
-
-        try {
-            localStorage.setItem('navbar_tema', oscuro ? 'dark' : 'light');
-        } catch (_) { /* sin acceso a localStorage */ }
     }
 
     btnTheme?.addEventListener('click', () => {
-        const esOscuro = document.documentElement.getAttribute('data-theme') !== 'dark';
-        aplicarTema(esOscuro);
+        if (window.vwTema) window.vwTema.alternar();
     });
-
-    /* Restaurar tema guardado al cargar */
-    try {
-        const guardado = localStorage.getItem('navbar_tema');
-        if (guardado) aplicarTema(guardado === 'dark');
-    } catch (_) { /* sin acceso a localStorage */ }
+    window.addEventListener('vw:tema', actualizarIcono);
+    actualizarIcono();
 
     /* ══════════════════════════════════════════════════════════════
        BOTÓN MENÚ MÓVIL

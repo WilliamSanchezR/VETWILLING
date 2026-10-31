@@ -1,0 +1,214 @@
+/* ==========================================================================
+   Modo oscuro común de los paneles: administrador, representante y veterinario.
+   Se activa con html[data-theme="dark"] (lo pone global/js/modo-oscuro.js).
+   Paleta: la misma del panel del propietario (dashBoard/cliente/css/theme.css).
+   Primero se redefinen las variables que ya usan las hojas de cada rol; después,
+   los componentes que tienen colores claros escritos a mano.
+   ========================================================================== */
+
+html[data-theme="dark"] {
+    --vo-fondo: #0f0f1a;
+    --vo-lateral: #16213e;
+    --vo-superficie: #1a1a2e;
+    --vo-superficie-2: #1e2a3a;
+    --vo-hover: #24324a;
+    --vo-borde: #2d3748;
+    --vo-texto: #f0f4f8;
+    --vo-texto-2: #b6c0cc;
+    --vo-texto-3: #8b97a6;
+    --vo-verde: #4ade80;
+    --vo-verde-fondo: rgba(74, 222, 128, 0.12);
+
+    color-scheme: dark;
+
+    /* auth/css/globalStyles.css y global/css/menuStyle.css (menú de admin y representante) */
+    --text-primary: var(--vo-texto);
+    --text-muted: var(--vo-texto-3);
+    --neutral-color: var(--vo-texto-2);
+    --hover-bg: var(--vo-hover);
+    --active-bg: var(--vo-verde-fondo);
+    --color-hover: var(--vo-hover);
+    --bg-sidebar: var(--vo-lateral);
+    --border-color: var(--vo-borde);
+
+    /* dashBoard/administrador/css/dashBoard.css */
+    --color-texto: var(--vo-texto);
+    --color-fondo: var(--vo-fondo);
+
+    /* panelSuperior.css (representante) y navbar-superior.css (veterinario) */
+    --surface: var(--vo-superficie);
+    --surface-raised: var(--vo-superficie-2);
+    --surface-sunken: var(--vo-fondo);
+    --surface-hover: var(--vo-hover);
+    --border: var(--vo-borde);
+    --text-900: var(--vo-texto);
+    --text-700: var(--vo-texto);
+    --text-500: var(--vo-texto-2);
+    --text-300: var(--vo-texto-3);
+    --text-200: var(--vo-texto-3);
+    --brand-light: var(--vo-verde-fondo);
+    --brand-xlight: var(--vo-verde-fondo);
+
+    /* representante.styles.css */
+    --surface-base: var(--vo-superficie);
+    --clr-gray-50: var(--vo-superficie-2);
+    --clr-gray-100: var(--vo-superficie-2);
+    --clr-gray-200: var(--vo-borde);
+    --clr-gray-300: var(--vo-borde);
+    --clr-gray-400: var(--vo-texto-3);
+    --clr-gray-500: var(--vo-texto-3);
+    --clr-gray-600: var(--vo-texto-2);
+    --clr-gray-700: var(--vo-texto-2);
+    --clr-gray-800: var(--vo-texto);
+    --clr-gray-900: var(--vo-texto);
+    --clr-primary-50: var(--vo-verde-fondo);
+    --clr-primary-100: var(--vo-verde-fondo);
+
+    /* sidebarV.css (menú del veterinario) */
+    --sv-bg: var(--vo-lateral);
+    --sv-bg-section: var(--vo-superficie);
+    --sv-bg-hover: var(--vo-hover);
+    --sv-bg-active: var(--vo-verde-fondo);
+    --sv-text: var(--vo-texto);
+    --sv-text-muted: var(--vo-texto-3);
+    --sv-text-active: var(--vo-verde);
+    --sv-text-section: var(--vo-texto-3);
+    --sv-border: var(--vo-borde);
+    --sv-accent-light: var(--vo-verde-fondo);
+
+    /* Bootstrap 5.3 (además de data-bs-theme="dark") */
+    --bs-body-bg: var(--vo-fondo);
+    --bs-body-color: var(--vo-texto);
+}
+
+/* ── Página y contenedores ──────────────────────────────────────────────── */
+html[data-theme="dark"] body,
+html[data-theme="dark"] .contenido-principal,
+html[data-theme="dark"] .area-contenido,
+html[data-theme="dark"] .agenda-veterinario {
+    background-color: var(--vo-fondo) !important;
+    color: var(--vo-texto);
+}
+
+html[data-theme="dark"] :is(.wizard-container, .contenedor-tabla, .grafico-card, .stat-card, .tabs-admin,
+    .barra-acciones, .barra-acciones-citas, .barra-acciones-pacientes, .info, .citas, .carrusel-citas, .foto,
+    .card-notas, .card-documentos, .tarjeta-resumen-cita, .horarios, .card, .modal-content, .dropdown-menu,
+    .list-group-item, .paginacion, .step, .rep-card, .rep-filtros, .rep-tabla, .form-container, .perfil-card) {
+    background-color: var(--vo-superficie) !important;
+    color: var(--vo-texto);
+    border-color: var(--vo-borde) !important;
+}
+
+/* Barras superiores y menús laterales */
+html[data-theme="dark"] :is(.navbar-superior, .barra-navegacion-superior, .sidebar, .sidebar-vet, .sv-header) {
+    background-color: var(--vo-lateral) !important;
+    border-color: var(--vo-borde) !important;
+}
+html[data-theme="dark"] :is(.sidebar, .sidebar-vet) :is(.nav-item, .nav-text, .texto-item-sidebar, .submenu-toggle,
+    .submenu-seccond-toggle, .submenu-items a, .submenu-seccond-items a, .sv-item) {
+    color: var(--vo-texto-2);
+    background-color: transparent;
+}
+html[data-theme="dark"] .submenu-seccond-items-float { background: var(--vo-superficie) !important; }
+
+/* Textos que las hojas escriben en gris oscuro */
+html[data-theme="dark"] :is(h1, h2, h3, h4, h5, h6, .grafico-titulo, .stat-value, .nombre-usuario, .form-label, label) {
+    color: var(--vo-texto);
+}
+html[data-theme="dark"] :is(.stat-label, .stat-footer, .text-muted, .paginacion-info, small, .rol-usuario, .email-usuario) {
+    color: var(--vo-texto-3) !important;
+}
+
+/* ── Tablas (incluidas las de DataTables) ───────────────────────────────── */
+html[data-theme="dark"] :is(table, .tabla-admin, .tabla-datos, .dataTable) {
+    background-color: transparent !important;
+    color: var(--vo-texto);
+}
+html[data-theme="dark"] :is(thead, thead tr, thead th, .tabla-admin th) {
+    background-color: var(--vo-superficie-2) !important;
+    color: var(--vo-texto-2) !important;
+    border-color: var(--vo-borde) !important;
+}
+html[data-theme="dark"] :is(tbody tr, tr.fila-blanca, .tabla-admin td, table.dataTable tbody tr, table.dataTable tbody td) {
+    background-color: var(--vo-superficie) !important;
+    color: var(--vo-texto);
+    border-color: var(--vo-borde) !important;
+    box-shadow: none !important;
+}
+html[data-theme="dark"] :is(tbody tr:hover, table.dataTable tbody tr:hover > *) {
+    background-color: var(--vo-hover) !important;
+}
+html[data-theme="dark"] .dataTables_wrapper :is(.dataTables_info, .dataTables_length, .dataTables_filter, label) {
+    color: var(--vo-texto-2) !important;
+}
+html[data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: var(--vo-texto-2) !important;
+    background: var(--vo-superficie-2) !important;
+    border-color: var(--vo-borde) !important;
+}
+html[data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--color-principal, #0a932c) !important;
+    color: #fff !important;
+}
+
+/* ── Formularios y botones neutros ──────────────────────────────────────── */
+html[data-theme="dark"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea,
+    .form-control, .form-select, .form-input, .input-buscar, .search-input-wrapper, .search-box) {
+    background-color: var(--vo-superficie-2) !important;
+    color: var(--vo-texto) !important;
+    border-color: var(--vo-borde) !important;
+}
+html[data-theme="dark"] :is(input, textarea)::placeholder { color: var(--vo-texto-3) !important; }
+html[data-theme="dark"] :is(.btn-control, .btn-perfil, .btn-secondary, .btn-agregar, .pagina-btn, .tab-btn:not(.active),
+    .boton-vista, .filtro-select, .navbar-action) {
+    background-color: var(--vo-superficie-2) !important;
+    color: var(--vo-texto) !important;
+    border-color: var(--vo-borde) !important;
+}
+
+/* ── FullCalendar (calendario del veterinario) ──────────────────────────── */
+html[data-theme="dark"] .fc {
+    --fc-page-bg-color: var(--vo-superficie);
+    --fc-neutral-bg-color: var(--vo-superficie-2);
+    --fc-border-color: var(--vo-borde);
+    --fc-today-bg-color: var(--vo-verde-fondo);
+    --fc-non-business-color: rgba(255, 255, 255, 0.03);
+    background-color: var(--vo-superficie);
+    color: var(--vo-texto);
+}
+html[data-theme="dark"] .fc :is(.fc-col-header-cell, .fc-daygrid-day-number, .fc-col-header-cell-cushion, .fc-toolbar-title) {
+    color: var(--vo-texto);
+}
+
+/* ── SweetAlert2 ────────────────────────────────────────────────────────── */
+html[data-theme="dark"] .swal2-popup {
+    background: var(--vo-superficie) !important;
+    color: var(--vo-texto) !important;
+}
+html[data-theme="dark"] :is(.swal2-title, .swal2-html-container) { color: var(--vo-texto) !important; }
+
+/* ── Insignias y botones con colores pensados para fondo claro ──────────── */
+html[data-theme="dark"] :is(.sub-badge, .sub-plan-chip).sub-pro { color: #c4b5fd !important; }
+html[data-theme="dark"] :is(.sub-badge, .sub-plan-chip).sub-basic { color: #93c5fd !important; }
+html[data-theme="dark"] .sv-role-badge {
+    color: var(--vo-verde) !important;
+    background-color: var(--vo-verde-fondo) !important;
+    border-color: rgba(74, 222, 128, 0.35) !important;
+}
+/* Botón verde con texto blanco: se conserva el verde */
+html[data-theme="dark"] .btn_change_password { color: #fff !important; }
+html[data-theme="dark"] :is(.info, .foto, .card-notas, .card-documentos, .perfil-card) :is(span, p, li, strong) {
+    color: var(--vo-texto-2);
+}
+
+/* ── Detalles ───────────────────────────────────────────────────────────── */
+/* El logo de los menús es negro: en oscuro se muestra en blanco */
+html[data-theme="dark"] :is(.sidebar-header, .sv-header, .sidebar-vet) img[src*="LOGO-"] {
+    filter: brightness(0) invert(1);
+}
+html[data-theme="dark"] .stat-footer { border-color: var(--vo-borde) !important; }
+html[data-theme="dark"] .fc :is(.fc-day-sat, .fc-day-sun, .fc-day-other) {
+    background-color: var(--vo-superficie-2) !important;
+}
+html[data-theme="dark"] .fc .fc-day-other .fc-daygrid-day-number { color: var(--vo-texto-3); }
+html[data-theme="dark"] .fc .fc-non-business { background: rgba(255, 255, 255, 0.03) !important; }
