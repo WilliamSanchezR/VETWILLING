@@ -8,49 +8,9 @@
 // crea sus propios datos (correos f6test+…@vetwilling.test), guarda las filas existentes que
 // puede tocar y al terminar las restaura y borra lo creado, también si una prueba falla.
 
-if (PHP_SAPI !== 'cli') {
-    http_response_code(404);
-    exit;
-}
-
 $raiz = dirname(__DIR__);
-$env = [];
-foreach (['HOST', 'PORT', 'NAME', 'USER', 'PASS'] as $k) {
-    $env[$k] = (string) getenv("TEST_DB_$k");
-    if ($env[$k] === '') {
-        fwrite(STDERR, "Falta TEST_DB_$k\n");
-        exit(2);
-    }
-}
-if ($env['PORT'] === '3306') {
-    fwrite(STDERR, "El puerto 3306 no es el del contenedor de pruebas\n");
-    exit(2);
-}
-$pdo = new PDO("mysql:host={$env['HOST']};port={$env['PORT']};dbname={$env['NAME']};charset=utf8mb4", $env['USER'], $env['PASS'], [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-]);
-if ($pdo->query('SELECT DATABASE()')->fetchColumn() !== $env['NAME']
-    || (int) $pdo->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '_entorno_pruebas'")->fetchColumn() !== 1) {
-    fwrite(STDERR, "La base no es la de pruebas (falta _entorno_pruebas): no se ejecuta nada\n");
-    exit(2);
-}
-
-$ok = 0;
-$fallo = 0;
-function comprobar(bool $c, string $d, string $detalle = ''): void
-{
-    global $ok, $fallo;
-    $c ? $ok++ : $fallo++;
-    echo ($c ? '  ✅ ' : '  ❌ ') . $d . ($c || $detalle === '' ? '' : "  → $detalle") . "\n";
-}
-
-function valor(string $sql, array $p = [])
-{
-    global $pdo;
-    $s = $pdo->prepare($sql);
-    $s->execute($p);
-    return $s->fetchColumn();
-}
+require __DIR__ . '/integracion_lib.php';
+[$pdo, $env] = integracion_conectar();
 
 // ── Datos: copia de las filas existentes y registro de lo creado ─────────────────
 $copias = [];
@@ -86,71 +46,7 @@ function restaurar(): void
     }
 }
 
-// ── Servidor php -S y cliente HTTP ───────────────────────────────────────────────
-$sock = stream_socket_server('tcp://127.0.0.1:0');
-$puerto = (int) substr(strrchr(stream_socket_get_name($sock, false), ':'), 1);
-fclose($sock);
-$log = tempnam(sys_get_temp_dir(), 'vw_f6_srv_');
-$servidor = proc_open([PHP_BINARY, '-S', "127.0.0.1:$puerto", "$raiz/tests/servidor_pruebas.php"],
-    [0 => ['file', '/dev/null', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $tuberias, $raiz);
-for ($i = 0; $i < 50 && !@fsockopen('127.0.0.1', $puerto); $i++) {
-    usleep(100000);
-}
-$base = "http://127.0.0.1:$puerto";
-
-class Cliente
-{
-    private string $cookies;
-    public string $token = '';
-
-    public function __construct(private string $base)
-    {
-        $this->cookies = tempnam(sys_get_temp_dir(), 'vw_f6_ck_');
-    }
-
-    public function __destruct()
-    {
-        @unlink($this->cookies);
-    }
-
-    /** @return array{0:int,1:string,2:string} código, cuerpo, Location */
-    public function pedir(string $metodo, string $ruta, array $datos = [], array $cabeceras = []): array
-    {
-        $c = curl_init($this->base . $ruta);
-        curl_setopt_array($c, [
-            CURLOPT_CUSTOMREQUEST => $metodo, CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true,
-            CURLOPT_COOKIEJAR => $this->cookies, CURLOPT_COOKIEFILE => $this->cookies, CURLOPT_HTTPHEADER => $cabeceras,
-        ]);
-        if ($metodo === 'POST') {
-            curl_setopt($c, CURLOPT_POSTFIELDS, http_build_query($datos));
-        }
-        $resp = (string) curl_exec($c);
-        $codigo = (int) curl_getinfo($c, CURLINFO_RESPONSE_CODE);
-        $tam = (int) curl_getinfo($c, CURLINFO_HEADER_SIZE);
-        curl_close($c);
-        preg_match('/^Location:\s*(\S+)/mi', substr($resp, 0, $tam), $m);
-        return [$codigo, substr($resp, $tam), $m[1] ?? ''];
-    }
-
-    public function post(string $ruta, array $datos, bool $conToken = true, array $cabeceras = []): array
-    {
-        return $this->pedir('POST', $ruta, $conToken ? $datos + ['csrf_token' => $this->token] : $datos, $cabeceras);
-    }
-
-    public function iniciarSesion(string $email, string $clave, string $paginaConToken): bool
-    {
-        [, $html] = $this->pedir('GET', '/login');
-        preg_match('/name="csrf_token" value="([0-9a-f]+)"/', $html, $m);
-        [$codigo, , $destino] = $this->pedir('POST', '/iniciar-sesion', ['email' => $email, 'password' => $clave, 'csrf_token' => $m[1] ?? '']);
-        if ($codigo !== 302 || str_ends_with($destino, '/login')) {
-            return false;
-        }
-        [, $html] = $this->pedir('GET', $paginaConToken);
-        preg_match('/name="csrf_token" value="([0-9a-f]+)"/', $html, $m);
-        $this->token = $m[1] ?? '';
-        return $this->token !== '';
-    }
-}
+[$servidor, $base, $log] = integracion_servidor($raiz);
 
 $codigoDe = fn(array $r) => $r[0];
 
@@ -190,7 +86,7 @@ try {
     echo "▶ Inicio de sesión (contenedor de pruebas, puerto {$env['PORT']})\n";
     comprobar($admin->iniciarSesion('admin@vetwilling.test', $clave, '/admin/listar-usuarios'), 'Administrador (1001) con token CSRF');
     comprobar($rep->iniciarSesion('rep@vetwilling.test', $clave, '/representante/listar-profesionales'), 'Representante de la clínica A (1004) con token CSRF');
-    comprobar($vet->iniciarSesion('vet.una@vetwilling.test', $clave, '/login') || $vet->pedir('GET', '/veterinaria/dashboard')[0] === 200, 'Veterinario de la clínica A (1003)');
+    comprobar($vet->iniciarSesion('vet.una@vetwilling.test', $clave), 'Veterinario de la clínica A (1003)');
 
     echo "▶ F6 · Inhabilitar usuarios (solo rol 1, POST y CSRF)\n";
     comprobar($codigoDe($admin->pedir('GET', "/admin/eliminar-usuario?accion=eliminar&id=$uVictima")) === 405 && $estadoUsuario($uVictima) === 'activo', 'GET /admin/eliminar-usuario → 405 y la cuenta no cambia');
@@ -321,15 +217,9 @@ try {
     comprobar(false, 'Excepción en la prueba', $e->getMessage());
 } finally {
     restaurar();
-    proc_terminate($servidor);
-    proc_close($servidor);
     $quedan = (int) valor("SELECT COUNT(*) FROM usuario WHERE email LIKE 'f6test+%'");
     comprobar($quedan === 0, 'Limpieza: no quedan datos de prueba y las filas existentes se restauraron');
-    if ($fallo) {
-        $lineas = array_filter(file($log), fn($l) => !preg_match('/ (Accepted|Closing|Closed without)/', $l));
-        echo "\n— Registro del servidor —\n" . implode('', array_slice($lineas, -(int) (getenv('LINEAS_LOG') ?: 30)));
-    }
-    @unlink($log);
+    integracion_cerrar_servidor($servidor, $log);
 }
 
 echo "\nResultado: $ok correctas, $fallo fallidas.\n";

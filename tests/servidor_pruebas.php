@@ -5,6 +5,19 @@
 //
 // Fija DB_* a partir de TEST_DB_* y, en cada petición, aborta con 500 si la base conectada no es
 // la de pruebas: otro nombre, el puerto 3306 o sin la tabla marcador _entorno_pruebas.
+//
+// Ningún correo sale del equipo: las constantes de mailer_helper.php se definen antes que él
+// (gana la primera definición) apuntando a 127.0.0.1 en un puerto cerrado, sin Brevo. Los avisos
+// "constant already defined" van al registro del servidor, no a la respuesta.
+
+ini_set('display_errors', 'stderr');
+define('SMTP_HOST', '127.0.0.1');
+define('SMTP_PORT', 1);
+define('SMTP_USER', 'pruebas@vetwilling.test');
+define('SMTP_PASS', '');
+define('SMTP_FROM_EMAIL', 'pruebas@vetwilling.test');
+define('BREVO_API_KEY', '');
+define('MAIL_DRIVER', 'smtp');
 
 $raiz = dirname(__DIR__);
 $faltan = [];
