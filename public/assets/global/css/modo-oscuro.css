@@ -212,3 +212,70 @@ html[data-theme="dark"] .fc :is(.fc-day-sat, .fc-day-sun, .fc-day-other) {
 }
 html[data-theme="dark"] .fc .fc-day-other .fc-daygrid-day-number { color: var(--vo-texto-3); }
 html[data-theme="dark"] .fc .fc-non-business { background: rgba(255, 255, 255, 0.03) !important; }
+
+/* ── Rediseño del administrador (sidebarA.css, adminUI.css, layoutAdmin.css) ── */
+/* Sus variables se declaran en :root y en :root:has(#sidebarAdmin): este selector pesa más */
+html[data-theme="dark"]:has(#sidebarAdmin) {
+    --sa-texto: var(--vo-texto);
+    --sa-texto-2: var(--vo-texto-2);
+    --sa-texto-3: var(--vo-texto-3);
+    --sa-fondo: var(--vo-lateral);
+    --sa-hover: var(--vo-hover);
+    --sa-borde: var(--vo-borde);
+    --sa-verde-suave: var(--vo-verde-fondo);
+    --sa-sombra: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.5);
+
+    --ui-texto: var(--vo-texto);
+    --ui-texto-2: var(--vo-texto-2);
+    --ui-texto-3: var(--vo-texto-3);
+    --ui-borde: var(--vo-borde);
+    --ui-borde-campo: var(--vo-borde);
+    --ui-fondo-suave: var(--vo-superficie-2);
+    --ui-verde-suave: var(--vo-verde-fondo);
+    --ui-sombra: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
+
+    --la-fondo: var(--vo-fondo);
+}
+html[data-theme="dark"]:has(#sidebarAdmin) {
+    --sa-verde-hover: var(--vo-verde); /* solo se usa como color de texto (opción activa) */
+}
+html[data-theme="dark"] .sa-burger {
+    background: var(--vo-superficie-2) !important;
+    color: var(--vo-texto) !important;
+    border-color: var(--vo-borde) !important;
+}
+
+/* Avisos azules de Bootstrap (p. ej. Registrar usuario) */
+html[data-theme="dark"] .alert-info {
+    background: #0c1a3a !important;
+    color: #bfdbfe !important;
+    border-color: rgba(147, 197, 253, 0.3) !important;
+}
+
+/* Reportes del administrador (styleReportesAdmin.css) y Medios de envío (mediosEnvio.css) */
+html[data-theme="dark"] :is(.seccion-card, .barra-filtros, .tarjeta-stat, .canal-card, .canal-config-card) {
+    background-color: var(--vo-superficie) !important;
+    border-color: var(--vo-borde) !important;
+    color: var(--vo-texto);
+}
+html[data-theme="dark"]:has(#sidebarAdmin) :is(.area-contenido .card-header, .seccion-card .card-header, .canal-config-card .card-header) {
+    background-color: var(--vo-superficie-2) !important;
+    color: var(--vo-texto) !important;
+    border-color: var(--vo-borde) !important;
+}
+html[data-theme="dark"]:has(#sidebarAdmin) .btn-periodo:not(.active):not(.activo) {
+    background-color: var(--vo-superficie-2) !important;
+    color: var(--vo-texto-2) !important;
+    border-color: var(--vo-borde) !important;
+}
+html[data-theme="dark"] .nav-tabs {
+    background-color: transparent !important;
+    border-color: var(--vo-borde) !important;
+}
+html[data-theme="dark"] .nav-tabs .nav-link { color: var(--vo-texto-2); border-color: transparent; }
+html[data-theme="dark"] .nav-tabs .nav-link.active {
+    background-color: var(--vo-superficie) !important;
+    color: var(--vo-texto) !important;
+    border-color: var(--vo-borde) var(--vo-borde) var(--vo-superficie) !important;
+}
+html[data-theme="dark"] .canal-icon { background-color: var(--vo-verde-fondo) !important; }
