@@ -8,6 +8,16 @@ require_once __DIR__ . '/../helpers/mailer_helper.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
 
 
+// Acciones POST que admite cada ruta que incluye este controlador (las demás → 400).
+// Crear clínicas es solo /admin/guardar-veterinaria (rol 1).
+const VETERINARIA_ACCIONES_POST = [
+    '/admin/guardar-veterinaria'                 => ['registrar'],
+    '/admin/actualizar-veterinaria'              => ['actualizar'],
+    '/admin/eliminar-veterinaria'                => ['eliminar'],
+    '/representante/actualizar-veterinaria'      => ['actualizarInfo'],
+    '/representante/actualizar-horario-veterinaria' => ['eliminar_horarios'],
+];
+
 //CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -15,7 +25,8 @@ switch ($method) {
 
     case 'POST':
 
-        $accion = $_POST['accion'] ?? '';
+        $accion = (string) ($_POST['accion'] ?? '');
+        acceso_exigir_accion_de_ruta($accion, VETERINARIA_ACCIONES_POST);
         if ($accion === 'actualizar') {
             actualizarVeterinaria();
         } else if ($accion === 'actualizarInfo') {
@@ -24,7 +35,7 @@ switch ($method) {
             eliminarVeterinaria();
         } else if ($accion === 'eliminar_horarios') {
             eliminarHorariosPorVeterinaria();
-        } else {
+        } else if ($accion === 'registrar') {
             registrarVeterinaria();
         }
         break;
@@ -52,8 +63,11 @@ switch ($method) {
 // =========================================
 
 // FUNCION PARA REGISTRAR UNA NUEVA VETERINARIA
+// Solo el administrador crea clínicas (y la cuenta de su representante).
 function registrarVeterinaria()
 {
+    acceso_exigir_rol([1]);
+
     // Capturamos los datos enviados por el formulario
     $nit = $_POST['nit'] ?? '';
     $nombreVeterinaria = $_POST['nombreVeterinaria'] ?? '';
