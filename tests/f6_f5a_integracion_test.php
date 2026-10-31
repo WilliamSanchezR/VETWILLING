@@ -95,11 +95,11 @@ try {
     comprobar($codigoDe($admin->post('/admin/eliminar-usuario', ['accion' => 'eliminar', 'id' => $uVictima], false)) === 403 && $estadoUsuario($uVictima) === 'activo', 'POST sin token CSRF → 403');
     comprobar($codigoDe($admin->post('/admin/eliminar-usuario', ['accion' => 'eliminar', 'id' => $uVictima, 'csrf_token' => str_repeat('0', 64)], false)) === 403 && $estadoUsuario($uVictima) === 'activo', 'POST con token falso → 403');
     comprobar($codigoDe($rep->post('/admin/eliminar-usuario', ['accion' => 'eliminar', 'id' => $uVictima])) === 403 && $estadoUsuario($uVictima) === 'activo', 'Representante → 403 (protección central)');
-    comprobar($codigoDe($rep->post('/veterinario/actualizar-constrasena', ['accion' => 'eliminar', 'id' => $uVictima])) === 403 && $estadoUsuario($uVictima) === 'activo', 'Representante por otra ruta que incluye usuarioController → 403 (comprobación en la función)');
+    comprobar($codigoDe($rep->post('/veterinario/actualizar-constrasena', ['accion' => 'eliminar', 'id' => $uVictima])) === 400 && $estadoUsuario($uVictima) === 'activo', 'Representante por otra ruta que incluye usuarioController → 400 (la ruta no admite esa acción)');
     $emailVictima = valor('SELECT email FROM usuario WHERE id_usuario = ?', [$uVictima]);
     $r = $rep->post('/veterinario/actualizar-constrasena', ['accion' => 'actualizar', 'id_usuario' => $uVictima, 'email' => 'f6test+robado@vetwilling.test', 'estado' => 'inactivo',
         'tipo_documento' => 'CC', 'numero_documento' => '1', 'nombres' => 'x', 'apellidos' => 'x', 'telefono' => '1', 'id_rol' => '2', 'direccion' => 'x']);
-    comprobar($r[0] === 403 && valor('SELECT email FROM usuario WHERE id_usuario = ?', [$uVictima]) === $emailVictima && $estadoUsuario($uVictima) === 'activo', 'actualizarUsuario desde el rol 4 → 403; correo y estado sin cambios');
+    comprobar($r[0] === 400 && valor('SELECT email FROM usuario WHERE id_usuario = ?', [$uVictima]) === $emailVictima && $estadoUsuario($uVictima) === 'activo', 'actualizarUsuario desde el rol 4 → 400; correo y estado sin cambios');
     $admin->post('/admin/eliminar-usuario', ['accion' => 'eliminar', 'id' => 1001]);
     comprobar($estadoUsuario(1001) === 'activo', 'El administrador no puede inhabilitarse a sí mismo');
     comprobar($codigoDe($admin->post('/admin/eliminar-usuario', ['accion' => 'eliminar', 'id' => 999999])) === 404, 'Usuario inexistente → 404');
@@ -191,8 +191,8 @@ try {
         && valor('SELECT direccion FROM veterinaria WHERE id_veterinaria = 102') === $dir102, 'Actualizar la información de otra clínica → 404, sin cambios');
     $rep->pedir('POST', '/representante/actualizar-veterinaria', $info + ['id_veterinaria' => 101]);
     comprobar(valor('SELECT direccion FROM veterinaria WHERE id_veterinaria = 101') === 'Dirección F5a', 'Su propia clínica → actualizada');
-    comprobar($codigoDe($rep->pedir('POST', '/representante/actualizar-veterinaria', ['accion' => 'actualizar', 'id_veterinaria' => 102, 'id_usuario' => 1004, 'email_user' => 'f6test+robado@vetwilling.test'])) === 403,
-        'Edición completa de clínica (con el correo del representante) desde el rol 4 → 403');
+    comprobar($codigoDe($rep->pedir('POST', '/representante/actualizar-veterinaria', ['accion' => 'actualizar', 'id_veterinaria' => 102, 'id_usuario' => 1004, 'email_user' => 'f6test+robado@vetwilling.test'])) === 400,
+        'Edición completa de clínica (con el correo del representante) desde el rol 4 → 400 (la ruta no admite esa acción)');
     comprobar($codigoDe($rep->pedir('GET', '/representante/obtener-horarios-veterinaria?action=obtener_horarios&id=102')) === 404, 'Horarios de otra clínica → 404');
     $r = $rep->pedir('GET', '/representante/obtener-horarios-veterinaria?action=obtener_horarios&id=101');
     comprobar($r[0] === 200 && str_contains($r[1], '"success"'), 'Horarios de su clínica → 200');

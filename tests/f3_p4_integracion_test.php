@@ -149,11 +149,11 @@ try {
     $ev = fn(int $id) => $estado('esps_por_veterinaria', 'id_esps_veterinaria', $id);
     $r = $rep->pedir('GET', "/representante/eliminar-especialidad?action=eliminar&id_especialidad=$e2&id_veterinaria=102");
     comprobar($r[0] === 405 && $ev($evC) === 'Activo', 'Especialidad: GET con la clínica B en la URL → 405 y no cambia', "HTTP {$r[0]}, estado " . $ev($evC));
-    $r = $rep->post('/representante/eliminar-especialidad', ['action' => 'eliminar', 'id_especialidad' => $e1], false);
+    $r = $rep->post('/representante/eliminar-especialidad', ['accion' => 'eliminar', 'id_especialidad' => $e1], false);
     comprobar($r[0] === 403 && $ev($evA) === 'Activo', 'Especialidad: POST sin token → 403', "HTTP {$r[0]}");
-    $r = $rep->post('/representante/eliminar-especialidad', ['action' => 'eliminar', 'id_especialidad' => $e2]);
+    $r = $rep->post('/representante/eliminar-especialidad', ['accion' => 'eliminar', 'id_especialidad' => $e2]);
     comprobar($r[0] === 404 && $ev($evC) === 'Activo', 'Especialidad que solo tiene la clínica B → 404', "HTTP {$r[0]}");
-    $rep->post('/representante/eliminar-especialidad', ['action' => 'eliminar', 'id_especialidad' => $e1, 'id_veterinaria' => 102]);
+    $rep->post('/representante/eliminar-especialidad', ['accion' => 'eliminar', 'id_especialidad' => $e1, 'id_veterinaria' => 102]);
     comprobar($ev($evA) === 'Inactivo' && $ev($evB) === 'Activo', 'Especialidad compartida: se quita de su clínica aunque pida la B; la B no cambia', 'A ' . $ev($evA) . ', B ' . $ev($evB));
 
     $sv = fn(int $id) => $estado('servicio', 'id_servicio', $id);
