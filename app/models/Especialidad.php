@@ -133,16 +133,17 @@ class Especialidad
     public function eliminarEspecialidad($id_especialidad, $id_veterinaria)
     {
         try {
+            // false si la especialidad no está activa en esa clínica
             $consulta = "UPDATE esps_por_veterinaria 
                          SET estado = 'Inactivo'
                          WHERE id_especialidad = :id_especialidad 
-                         AND id_veterinaria = :id_veterinaria";
+                         AND id_veterinaria = :id_veterinaria AND estado = 'Activo'";
 
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_especialidad', $id_especialidad, PDO::PARAM_INT);
             $resultado->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
 
-            return $resultado->execute();
+            return $resultado->execute() && $resultado->rowCount() > 0;
         } catch (PDOException $e) {
             echo "Error al eliminar la especialidad: " . $e->getMessage();
             return false;

@@ -3,6 +3,7 @@
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
 // Enlazamos el controlador de veterinaria para listar las veterinarias
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 // Llamamos la función para listar las veterinarias
 $datos = listarVeterinariasRegistradas();
 
@@ -140,9 +141,12 @@ $datos = listarVeterinariasRegistradas();
                                         <button class="btn-accion btn-editar" title="Editar">
                                             <a href="<?= BASE_URL ?>/admin/editar-veterinaria?id=<?= $veterinaria['id_veterinaria'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
-                                        <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/admin/eliminar-veterinaria?action=eliminar&id=<?= $veterinaria['id_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
-                                        </button>
+                                        <form action="<?= BASE_URL ?>/admin/eliminar-veterinaria" method="POST" style="display: inline;">
+                                            <?= csrf_campo() ?>
+                                            <input type="hidden" name="accion" value="eliminar">
+                                            <input type="hidden" name="id" value="<?= (int) $veterinaria['id_veterinaria'] ?>">
+                                            <button type="submit" class="btn-accion btn-eliminar" title="Eliminar"><i class="bi bi-trash"></i></button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -169,7 +173,6 @@ $datos = listarVeterinariasRegistradas();
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
         <!-- Modo dia  y noche -->
-        <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 

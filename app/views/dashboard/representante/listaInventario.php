@@ -4,6 +4,7 @@ require_once BASE_PATH . '/app/helpers/session_representante.php';
 
 // Cargamos el modelo de inventario para consultar los productos
 require_once BASE_PATH . '/app/models/Inventario.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 
 // Obtenemos el ID de la veterinaria desde la sesion
 $id_veterinaria    = (int) $_SESSION['user']['id_veterinaria'];
@@ -143,6 +144,7 @@ $totalAlertasStock = $modelInv->contarAlertasStock($id_veterinaria);
                                               action="<?= BASE_URL ?>/representante/eliminar-producto"
                                               class="form-eliminar-inv"
                                               style="display:inline">
+                                            <?= csrf_campo() ?>
                                             <input type="hidden" name="accion" value="eliminar">
                                             <input type="hidden" name="id_inventario" value="<?= (int)$p['id_inventario'] ?>">
                                             <button type="submit" class="btn-accion btn-eliminar" title="Eliminar">
@@ -152,17 +154,9 @@ $totalAlertasStock = $modelInv->contarAlertasStock($id_veterinaria);
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
-                        <?php else: ?>
-                            <!-- Fila cuando no hay datos en el inventario -->
-                            <tr>
-                                <td colspan="10" style="text-align:center;padding:32px;color:#888;">
-                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                                    No hay productos registrados en el inventario.
-                                    <br>
-                                    <a href="<?= BASE_URL ?>/representante/registro-producto">Registrar el primero</a>
-                                </td>
-                            </tr>
                         <?php endif; ?>
+                        <?php /* Sin productos el cuerpo queda vacío: DataTables muestra su mensaje
+                                 (emptyTable en inventario.js) y no admite filas con colspan */ ?>
                     </tbody>
                 </table>
             </div>

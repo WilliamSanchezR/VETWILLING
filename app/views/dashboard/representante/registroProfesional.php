@@ -9,8 +9,6 @@ require_once BASE_PATH . '/app/controllers/especialidadController.php';
 // Enlazamos la ruta del controlador de servicios para listar los servicios
 require_once BASE_PATH . '/app/controllers/servicioController.php';
 
-// Llamamos la función para listar los roles
-$datosRol = listarRolRepresentante();
 
 // Llamamos la función para listar los servicios
 $datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_veterinaria']);
@@ -73,7 +71,7 @@ $datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_vete
 
 
             <form id="registroProfesional" action="<?= BASE_URL ?>/representante/guardar-Profesional" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="id_veterinaria" value="<?= $_SESSION['user']['id_veterinaria'] ?>">
+                <input type="hidden" name="accion" value="registrar">
                 <input type="hidden" name="especialidades" value="" id="especialidadesInput">
                 <input type="hidden" name="servicios" value="" id="serviciosInput">
 
@@ -175,17 +173,9 @@ $datosServicios = listaServiciosPorVeterinariaActivos($_SESSION['user']['id_vete
 
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label><i class="bi bi-person-rolodex"></i> Rol *</label>
-                                <select id="rol" name="rol" required>
-                                    <option value="" disabled selected>Seleccione un rol</option>
-
-
-                                    <?php if (!empty($datosRol)) : ?>
-                                        <?php foreach ($datosRol as $rol):  ?>
-                                            <option value="<?= $rol['id_rol'] ?>"><?= $rol['nombre'] ?></option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
+                                <label><i class="bi bi-person-rolodex"></i> Rol</label>
+                                <!-- El representante solo da de alta veterinarios (rol 2) de su clínica -->
+                                <input type="text" id="rol" readonly value="Veterinario">
                             </div>
                         </div>
 

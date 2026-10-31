@@ -303,12 +303,14 @@ class EditarProfesional {
       listaCargadas.length > 0 &&
       listaCargadas.some((e) => e.id === idEsp)
     ) {
-      const ruta = window.location.href;
-      const idProfesional = ruta.split("id=")[1].split("&")[0];
-
-      const eliminarUrl = `${baseUrl}/representante/eliminar-esp-profesional?action=eliminarEspProfesional&id_profesional=${idProfesional}&id_especialidad=${idEsp}`;
-
-      window.location.href = eliminarUrl;
+      // Formulario POST con token CSRF de la vista
+      const form = document.getElementById("formEliminarEspecialidad");
+      const campo = document.createElement("input");
+      campo.type = "hidden";
+      campo.name = "id_especialidad";
+      campo.value = idEsp;
+      form.appendChild(campo);
+      form.submit();
     }
   }
 
@@ -393,12 +395,14 @@ class EditarProfesional {
       listaCargadas.length > 0 &&
       listaCargadas.some((e) => e.id === idServ)
     ) {
-      const ruta = window.location.href;
-      const idProfesional = ruta.split("id=")[1].split("&")[0];
-
-      const eliminarUrl = `${baseUrl}/representante/eliminar-serv-profesional?action=eliminarServProfesional&id_usuario=${idProfesional}&id_servicio=${idServ}`;
-
-      window.location.href = eliminarUrl;
+      // Formulario POST con token CSRF de la vista
+      const form = document.getElementById("formEliminarServicio");
+      const campo = document.createElement("input");
+      campo.type = "hidden";
+      campo.name = "id_servicio";
+      campo.value = idServ;
+      form.appendChild(campo);
+      form.submit();
     }
   }
 

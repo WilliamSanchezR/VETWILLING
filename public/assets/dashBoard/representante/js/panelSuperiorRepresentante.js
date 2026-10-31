@@ -2,7 +2,8 @@
    PANEL SUPERIOR REPRESENTANTE - ESTRUCTURA DE CLASE
    ====================================================== */
 
-const baseUrl = window.BASE_URL || (() => {
+// Nombre propio: las páginas del representante declaran su propia constante global baseUrl
+const baseUrlPanel = window.BASE_URL || (() => {
     const appBase = window.location.pathname.split('/').filter(Boolean)[0] || '';
     return `${window.location.origin}${appBase ? '/' + appBase : ''}`;
 })();
@@ -57,7 +58,7 @@ class PanelSuperiorRepresentante {
             cancelar: this.$("#btnCancelar"),
         };
 
-        this.notificationsApiUrl = `${baseUrl}/representante/api/notificaciones`;
+        this.notificationsApiUrl = `${baseUrlPanel}/representante/api/notificaciones`;
         this.notificationBadge = this.$("#notificationBadge");
         this.notificationsContainer = this.$(".notifications-list");
         this.notifications = [];
@@ -281,7 +282,7 @@ class PanelSuperiorRepresentante {
         const formData = new FormData(this.forms.soporte);
 
         try {
-            const response = await fetch(`${baseUrl}/soporte/api/crear-ticket`, {
+            const response = await fetch(`${baseUrlPanel}/soporte/api/crear-ticket`, {
                 method: "POST",
                 body: formData,
             });
@@ -317,15 +318,20 @@ class PanelSuperiorRepresentante {
 
     initTheme() {
         window.toggleTheme = () => this.toggleTheme();
+        const actualizarIcono = () => {
+            const icono = document.getElementById("themeIcon");
+            if (icono && window.vwTema) {
+                icono.className = window.vwTema.obtener() === "oscuro" ? "bi bi-sun-fill" : "bi bi-moon-stars";
+            }
+        };
+        window.addEventListener("vw:tema", actualizarIcono);
+        actualizarIcono();
     }
 
+    // El tema lo aplica y guarda global/js/modo-oscuro.js (window.vwTema)
     toggleTheme() {
-        document.body.classList.toggle("dark-theme");
-
-        // Alternativamente, si se usa data-theme:
-        const isDark = document.body.classList.contains("dark-theme");
-        this.state.theme = isDark ? "dark" : "light";
-        localStorage.setItem("theme", this.state.theme);
+        if (!window.vwTema) return;
+        this.state.theme = window.vwTema.alternar() === "oscuro" ? "dark" : "light";
     }
 
     /* ================= SIDEBAR MÓVIL ================= */

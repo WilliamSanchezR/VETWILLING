@@ -380,7 +380,12 @@ function enviarFichaClinicaPorCorreo(int $idUsuario): void
         $mail->Body    = $cuerpo;
         $mail->AltBody = strip_tags($cuerpo);
         $mail->addStringAttachment($pdfBytes, "ficha_clinica_{$nombrePaciente}.pdf", 'base64', 'application/pdf');
-        $mail->send();
+        // Sin guardar contenido: el PDF adjunto no se puede reenviar desde el historial
+        if (!mailer_enviar($mail, 'reporte', ['guardar_contenido' => false])) {
+            http_response_code(503);
+            echo json_encode(['status' => 'error', 'message' => 'El envío de correos está deshabilitado en Medios de envío']);
+            return;
+        }
 
         echo json_encode(['status' => 'success', 'message' => "Ficha clínica enviada a {$emailPropietario}"]);
     } catch (\Exception $e) {

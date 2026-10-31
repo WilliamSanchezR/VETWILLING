@@ -6,8 +6,9 @@ if (session_status() === PHP_SESSION_NONE) {
     }
 }
 
-// 2. Validar sesión
-if (!isset($_SESSION['user'])) {
+// 2. Validar sesión (solo una sesión creada por el login; ver acceso_helper.php)
+require_once BASE_PATH . '/app/helpers/acceso_helper.php';
+if (acceso_usuario() === null) {
     if (!headers_sent()) {
         header('Location: ' . (defined('BASE_URL') ? BASE_URL : '') . '/login');
     }
@@ -159,6 +160,33 @@ $rutaImagenAttr  = htmlspecialchars($rutaImagen, ENT_QUOTES, 'UTF-8');
             title="Hora actual">
             <span class="hora-actual" id="horaNavbar">--:--</span>
         </button>
+
+        <!-- Tema claro / oscuro (se guarda en las preferencias, igual que en Configuración) -->
+        <button type="button" class="btn-navbar btn-tema" id="btnTemaNavbar" aria-label="Cambiar tema claro u oscuro" title="Tema">
+            <i class="bi bi-moon-stars" id="iconoTemaNavbar"></i>
+        </button>
+        <script>
+        (function () {
+            const boton = document.getElementById('btnTemaNavbar');
+            const icono = document.getElementById('iconoTemaNavbar');
+            const pintar = () => {
+                const oscuro = document.documentElement.getAttribute('data-tema') === 'oscuro'
+                    || document.body.classList.contains('dark-theme');
+                icono.className = oscuro ? 'bi bi-sun-fill' : 'bi bi-moon-stars';
+            };
+            const alternar = () => { Theme.alternar(); pintar(); };
+            boton.addEventListener('click', () => {
+                // theme.js no se carga dos veces (declara const Theme): si la página no lo trae, se carga ahora
+                if (typeof Theme !== 'undefined') return alternar();
+                const s = document.createElement('script');
+                s.src = window.BASE_URL + '/public/assets/dashBoard/cliente/js/theme.js';
+                s.onload = alternar;
+                document.head.appendChild(s);
+            });
+            document.addEventListener('DOMContentLoaded', pintar);
+            pintar();
+        })();
+        </script>
 
         <!-- Notificaciones -->
         <button

@@ -210,7 +210,7 @@ class ListaServicios {
         }).then((deleteResult) => {
             if (deleteResult.isConfirmed) {
                 // Eliminar del servidor
-                window.location.href = `${baseUrl}/representante/eliminar-servicio?action=eliminar&id=${$id}`;
+                vwCsrf.enviarPost(`${baseUrl}/representante/eliminar-servicio`, { action: 'eliminar', id: $id });
             }
         });
     }

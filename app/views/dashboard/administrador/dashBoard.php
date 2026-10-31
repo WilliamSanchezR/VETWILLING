@@ -1,5 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
+require_once BASE_PATH . '/app/helpers/avatar_helper.php';
 require_once BASE_PATH . '/app/controllers/dashboardsAdminControllers.php';
 require_once BASE_PATH . '/app/controllers/usuarioController.php';
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
@@ -208,7 +209,7 @@ $datosVeterinarias = listarVeterinariasRegistradas();
                                 <?php if (!empty($datos)) : ?>
                                     <?php foreach ($datos as $usuario):  ?>
                                         <tr class="fila-blanca">
-                                            <td class="tb_foto"><?php if (!empty($usuario['img_perfil'])): ?><?php if ($usuario['id_rol'] == 2): ?><img src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>" alt=""><?php else: ?><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt=""><?php endif; ?><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
+                                            <td class="tb_foto"><img src="<?= htmlspecialchars(avatar_src($usuario['img_perfil'] ?? '', $usuario['id_rol'] == 2 ? 'profesionales' : 'usuarios', $usuario['nombres'] ?? '', $usuario['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" alt=""></td>
                                             <td><?= $usuario['tipo_documento'] ?> - <?= $usuario['numero_documento'] ?></td>
                                             <td><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></td>
                                             <td><?= $usuario['telefono'] ?></td>

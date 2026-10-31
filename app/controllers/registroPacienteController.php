@@ -54,6 +54,11 @@ function resolverIdVeterinariaRegistro(): ?int
     return null;
 }
 
+// EXCEPCIÓN DOCUMENTADA (F3 / P4, aprobada el 31-10-2026): crear cuentas es del administrador,
+// salvo esta vía: al registrar un paciente se crea la cuenta de su propietario, siempre con rol 3
+// (fijo en Propietario::registrar, el formulario no lo elige). Aprobada para el veterinario (rol 2)
+// y el representante (rol 4), los roles que admite /veterinario/guardar-paciente en
+// config/rutas_acceso.php. Ningún otro rol ni ruta crea propietarios por esta vía.
 function registrarPacienteConPropietario()
 {
     // Establecer header JSON
@@ -76,7 +81,6 @@ function registrarPacienteConPropietario()
 
     // Log para debug
     error_log("ID Veterinaria obtenida: " . $id_veterinaria);
-    error_log("POST recibido: " . print_r($_POST, true));
 
     // Capturar datos del propietario
     $nombres = $_POST["nombres"] ?? "";
@@ -197,10 +201,7 @@ function registrarPacienteConPropietario()
             "email" => $email,
         ];
 
-        error_log(
-            "Datos propietario a insertar: " . print_r($dataPropietario, true),
-        );
-
+        // Excepción documentada: cuenta de propietario, rol 3 fijo (ver arriba)
         $id_propietario = $propietarioModel->registrar($dataPropietario);
 
         error_log("ID Propietario generado: " . $id_propietario);
@@ -392,8 +393,8 @@ function enviarBienvenidaPropietario(array $datos): bool
             "Accede desde: {$baseUrl}\n\n" .
             "VetWilling";
 
-        $mail->send();
-        return true;
+        // Se registra en Medios de envío sin guardar el contenido: lleva la contraseña inicial
+        return mailer_enviar($mail, 'bienvenida', ['guardar_contenido' => false]);
     } catch (Exception $e) {
         error_log(
             "Error al enviar bienvenida propietario: " . $e->getMessage(),

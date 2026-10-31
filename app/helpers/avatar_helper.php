@@ -29,3 +29,17 @@ function generarAvatarSVG(string $nombres, string $apellidos, int $size = 128): 
 
     return 'data:image/svg+xml;base64,' . base64_encode($svg);
 }
+
+/**
+ * src para la foto de perfil: la subida si el archivo existe en public/uploads/<carpeta>/; si no
+ * (vacía, el valor por defecto "foto_default.png" que no existe en el proyecto, o un archivo
+ * borrado), el avatar con iniciales. Así no se pinta una imagen rota ni se pide un 404.
+ */
+function avatar_src(?string $imgPerfil, string $carpeta, string $nombres = '', string $apellidos = ''): string
+{
+    $archivo = basename((string) $imgPerfil);
+    if ($archivo !== '' && is_file(BASE_PATH . "/public/uploads/$carpeta/$archivo")) {
+        return BASE_URL . "/public/uploads/$carpeta/" . rawurlencode($archivo);
+    }
+    return generarAvatarSVG($nombres, $apellidos);
+}

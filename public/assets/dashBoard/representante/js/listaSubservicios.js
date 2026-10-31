@@ -218,7 +218,7 @@ class ListaSubservicios {
         }).then((deleteResult) => {
             if (deleteResult.isConfirmed) {
                 // Eliminar del servidor
-                window.location.href = `${baseUrl}/representante/eliminar-subservicio?action=eliminar&id=${$id}`;
+                vwCsrf.enviarPost(`${baseUrl}/representante/eliminar-subservicio`, { action: 'eliminar', id: $id });
             }
         });
     }

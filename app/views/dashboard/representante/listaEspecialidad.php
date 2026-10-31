@@ -3,6 +3,7 @@
 require_once BASE_PATH . '/app/helpers/session_representante.php';
 require_once BASE_PATH . '/app/controllers/especialidadController.php';
 require_once BASE_PATH . '/app/controllers/servicioController.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 
 
 $datos = listarEspecialidadesRegistradas($_SESSION['user']['id_veterinaria']);
@@ -133,9 +134,12 @@ $listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
                                             <i class="bi bi-pencil"></i>
                                         </button>
 
-                                        <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/representante/eliminar-especialidad?action=eliminar&id_especialidad=<?= $especialidad['id_especialidad'] ?>&id_veterinaria=<?= $_SESSION['user']['id_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
-                                        </button>
+                                        <form action="<?= BASE_URL ?>/representante/eliminar-especialidad" method="POST" style="display: inline;">
+                                            <?= csrf_campo() ?>
+                                            <input type="hidden" name="accion" value="eliminar">
+                                            <input type="hidden" name="id_especialidad" value="<?= (int) $especialidad['id_especialidad'] ?>">
+                                            <button type="submit" class="btn-accion btn-eliminar" title="Eliminar"><i class="bi bi-trash"></i></button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -265,7 +269,6 @@ $listaServicios = listarServiciosActivos($_SESSION['user']['id_veterinaria']);
 
 
     <!-- Modo dia  y noche -->
-    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
     <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/especialidades.js"></script>

@@ -1,0 +1,442 @@
+/* ============================================================
+   COMPONENTES DEL PANEL ADMINISTRADOR — VetWilling
+   Un solo estilo para títulos, botones, tarjetas, tablas, campos
+   y pestañas en todas las páginas del admin.
+
+   Se aplica sobre las clases que ya usan las vistas (no hay que
+   reescribirlas). Solo actúa donde está la barra del admin
+   (#sidebarAdmin), así no afecta a los demás roles.
+
+   Para una vista nueva del admin: usa estas mismas clases
+   (.encabezado-pagina/.titulo-pagina, .btn-success, .contenedor-tabla,
+   .tabla-admin, .form-control, .nav-tabs) y saldrá con el estilo común.
+   ============================================================ */
+
+/* ========================================
+   1. TOKENS
+======================================== */
+:root:has(#sidebarAdmin) {
+    --ui-verde: #087a24;
+    --ui-verde-hover: #066b1f;
+    --ui-verde-brillante: #0A932C;
+    --ui-verde-suave: rgba(10, 147, 44, 0.09);
+    --ui-anillo: 0 0 0 4px rgba(10, 147, 44, 0.15);
+
+    --ui-texto: #16201a;
+    --ui-texto-2: #55615a;
+    --ui-texto-3: #7a857f;
+    --ui-borde: #e3eae5;
+    --ui-borde-campo: #d3dcd6;
+    --ui-fondo-suave: #f7faf8;
+
+    --ui-rojo: #c62828;
+    --ui-rojo-hover: #a51f1f;
+
+    --ui-radio: 16px;
+    --ui-radio-control: 10px;
+    --ui-sombra: 0 1px 2px rgba(16, 40, 24, 0.04), 0 4px 16px rgba(16, 40, 24, 0.05);
+    --ui-transicion: 0.18s ease;
+
+    --ui-fuente: "Open Sans", system-ui, sans-serif;
+    --ui-fuente-titulos: "Fredoka", system-ui, sans-serif;
+}
+
+/* ========================================
+   2. TIPOGRAFÍA BASE
+======================================== */
+:root:has(#sidebarAdmin) body {
+    font-family: var(--ui-fuente);
+    color: var(--ui-texto);
+}
+
+/* ========================================
+   3. ENCABEZADO DE PÁGINA
+   Mismo título y subtítulo en listas, reportes, formularios, etc.
+======================================== */
+:root:has(#sidebarAdmin) :is(.encabezado-modulo, .encabezado-pagina) {
+    margin-bottom: 20px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+:root:has(#sidebarAdmin) :is(.encabezado-modulo h3, .encabezado-pagina .titulo-pagina, .wizard-header h2) {
+    margin: 0 0 4px;
+    font-family: var(--ui-fuente-titulos);
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--ui-texto);
+}
+
+:root:has(#sidebarAdmin) .titulo-pagina i {
+    font-size: 1.35rem;
+    vertical-align: -0.1em;
+}
+
+:root:has(#sidebarAdmin) :is(.encabezado-pagina .subtitulo-pagina, .wizard-header p) {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--ui-texto-2);
+}
+
+/* Formularios: el encabezado deja de ir centrado con icono gigante
+   y usa el mismo patrón (icono pequeño + título + subtítulo) */
+:root:has(#sidebarAdmin) .wizard-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 14px;
+    align-items: center;
+    margin: 0 0 24px;
+    padding: 0 0 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--ui-borde);
+}
+
+:root:has(#sidebarAdmin) .wizard-header > i {
+    grid-row: span 2;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    border-radius: 12px;
+    background: var(--ui-verde-suave);
+    color: var(--ui-verde);
+    font-size: 1.5rem;
+}
+
+/* Títulos dentro de tarjetas */
+:root:has(#sidebarAdmin) :is(.grafico-titulo, .card-header) {
+    font-family: var(--ui-fuente-titulos);
+    font-weight: 600;
+    color: var(--ui-texto);
+}
+
+:root:has(#sidebarAdmin) .grafico-titulo {
+    font-size: 1.1rem;
+}
+
+/* ========================================
+   4. TARJETAS
+   Mismo radio, borde y sombra en todas (el padding lo define cada una)
+======================================== */
+:root:has(#sidebarAdmin) :is(
+    .contenedor-tabla,
+    .grafico-card,
+    .stat-card,
+    .tarjeta-stat,
+    .seccion-card,
+    .area-contenido .card,
+    .tabs-admin,
+    .wizard-container,
+    .area-contenido .col-md-4 > .info
+) {
+    background: #fff;
+    border: 1px solid var(--ui-borde);
+    border-radius: var(--ui-radio);
+    box-shadow: var(--ui-sombra);
+}
+
+:root:has(#sidebarAdmin) .area-contenido .card-header {
+    background: #fff;
+    border-bottom: 1px solid var(--ui-borde);
+    border-radius: var(--ui-radio) var(--ui-radio) 0 0;
+    padding: 14px 20px;
+}
+
+/* ========================================
+   5. BOTONES
+   Principal (verde), secundario (blanco con borde) y peligro (rojo)
+======================================== */
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(
+    .btn-success, .btn-primary, .btn-agregar, .btn-next, .btn-excel, .btn_change_password,
+    .btn-control, .btn-secondary, .btn-outline-secondary, .btn-prev,
+    .btn-pdf, .btn-danger
+) {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 18px;
+    border-radius: var(--ui-radio-control);
+    font-family: var(--ui-fuente);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: none;
+    text-decoration: none;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background-color var(--ui-transicion), border-color var(--ui-transicion), color var(--ui-transicion);
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(.btn-sm) {
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+}
+
+/* Principal */
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(
+    .btn-success, .btn-primary, .btn-agregar, .btn-next, .btn-excel, .btn_change_password
+) {
+    background: var(--ui-verde);
+    border: 1px solid var(--ui-verde);
+    color: #fff;
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(
+    .btn-success, .btn-primary, .btn-agregar, .btn-next, .btn-excel, .btn_change_password
+):hover {
+    background: var(--ui-verde-hover);
+    border-color: var(--ui-verde-hover);
+    color: #fff;
+    transform: none;
+}
+
+/* Secundario */
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(
+    .btn-control, .btn-secondary, .btn-outline-secondary, .btn-prev
+) {
+    background: #fff;
+    border: 1px solid var(--ui-borde-campo);
+    color: var(--ui-texto);
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(
+    .btn-control, .btn-secondary, .btn-outline-secondary, .btn-prev
+):hover {
+    background: var(--ui-fondo-suave);
+    border-color: #b9c6bd;
+    color: var(--ui-texto);
+    transform: none;
+}
+
+/* Peligro */
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(.btn-pdf, .btn-danger) {
+    background: var(--ui-rojo);
+    border: 1px solid var(--ui-rojo);
+    color: #fff;
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(.btn-pdf, .btn-danger):hover {
+    background: var(--ui-rojo-hover);
+    border-color: var(--ui-rojo-hover);
+    color: #fff;
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) .btn:focus-visible,
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) button:focus-visible {
+    outline: none;
+    box-shadow: var(--ui-anillo);
+}
+
+/* ========================================
+   6. CAMPOS DE FORMULARIO
+======================================== */
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(.form-control, .form-select, .campo-buscar input, .form-group :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea)) {
+    border: 1px solid var(--ui-borde-campo);
+    border-radius: var(--ui-radio-control);
+    background-color: #fff;
+    color: var(--ui-texto);
+    font-family: var(--ui-fuente);
+    font-size: 0.9rem;
+    transition: border-color var(--ui-transicion), box-shadow var(--ui-transicion);
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(.form-control, .form-select, .campo-buscar input, .form-group :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea)):not(textarea):not(.form-control-sm):not(.form-select-sm):not([type="file"]) {
+    min-height: 44px;
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(.form-control, .form-select, .campo-buscar input, .form-group :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea)):focus {
+    outline: none;
+    border-color: var(--ui-verde-brillante);
+    box-shadow: var(--ui-anillo);
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido, .wizard-container, .modal) :is(.form-control, .campo-buscar input)::placeholder {
+    color: #97a29b;
+}
+
+:root:has(#sidebarAdmin) :is(.wizard-container, .modal, .area-contenido) .form-label,
+:root:has(#sidebarAdmin) .wizard-container label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ui-texto);
+}
+
+/* Estado de error de los formularios (se conserva en rojo) */
+:root:has(#sidebarAdmin) .form-group :is(input, select, textarea).error,
+:root:has(#sidebarAdmin) :is(.form-control, .form-select).is-invalid {
+    border-color: var(--ui-rojo);
+}
+
+/* Avisos dentro de formularios */
+:root:has(#sidebarAdmin) :is(.wizard-container, .area-contenido, .modal) .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+:root:has(#sidebarAdmin) :is(.wizard-container, .area-contenido, .modal) .alert-info {
+    background: #eef5fb;
+    border: 1px solid #cfe1f0;
+    color: #1f4b6b;
+}
+
+/* ========================================
+   7. TABLAS
+======================================== */
+/* Tabla normal: sin "filas tarjeta" separadas, ni colores alternos, ni filas que saltan */
+:root:has(#sidebarAdmin) .tabla-admin {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+:root:has(#sidebarAdmin) .tabla-admin :is(thead th, tbody td) {
+    border-radius: 0;
+}
+
+:root:has(#sidebarAdmin) .tabla-admin tbody tr,
+:root:has(#sidebarAdmin) .tabla-admin tbody tr:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+:root:has(#sidebarAdmin) .tabla-admin tbody tr:is(.fila-gris, .fila-verde, .fila-blanca) {
+    background-color: transparent !important;
+}
+
+/* Estas celdas tenían display:flex y se salían de la columna */
+:root:has(#sidebarAdmin) .tabla-admin tbody td:is(.tb_foto, .content-action) {
+    display: table-cell;
+    white-space: nowrap;
+}
+
+:root:has(#sidebarAdmin) .tabla-admin tbody td.tb_foto {
+    text-align: center;
+}
+
+:root:has(#sidebarAdmin) .tabla-admin tbody img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+:root:has(#sidebarAdmin) :is(.tabla-admin, .tabla-reportes, .area-contenido .table) thead th {
+    padding: 12px 14px;
+    background: var(--ui-fondo-suave);
+    border-bottom: 1px solid var(--ui-borde);
+    font-family: var(--ui-fuente);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ui-texto-2);
+    white-space: nowrap;
+}
+
+:root:has(#sidebarAdmin) :is(.tabla-admin, .tabla-reportes, .area-contenido .table) tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #eef2ef;
+    font-size: 0.875rem;
+    color: var(--ui-texto);
+    vertical-align: middle;
+}
+
+:root:has(#sidebarAdmin) :is(.tabla-admin, .tabla-reportes, .area-contenido .table) tbody tr:hover > td {
+    background: #fafcfb;
+}
+
+/* DataTables sombrea filas y la columna ordenada con box-shadow: se quita para que todas se vean iguales */
+:root:has(#sidebarAdmin) table.dataTable > tbody > tr > * {
+    background: transparent;
+    box-shadow: none;
+}
+
+/* ========================================
+   8. PESTAÑAS
+   Inicio (.tabs-admin), Medios de envío (.nav-tabs) y periodos de reportes
+======================================== */
+:root:has(#sidebarAdmin) .area-contenido .nav-tabs:not(.card-header-tabs) {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding: 5px;
+    border: 1px solid var(--ui-borde);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: var(--ui-sombra);
+}
+
+:root:has(#sidebarAdmin) .tabs-admin {
+    padding: 5px;
+    gap: 4px;
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido .nav-tabs:not(.card-header-tabs) .nav-link, .tabs-admin .tab-btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ui-texto-2);
+    font-family: var(--ui-fuente);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color var(--ui-transicion), color var(--ui-transicion);
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido .nav-tabs:not(.card-header-tabs) .nav-link, .tabs-admin .tab-btn):hover {
+    background: var(--ui-fondo-suave);
+    color: var(--ui-texto);
+}
+
+:root:has(#sidebarAdmin) :is(.area-contenido .nav-tabs:not(.card-header-tabs) .nav-link.active, .tabs-admin .tab-btn.active) {
+    background: var(--ui-verde);
+    color: #fff;
+    box-shadow: none;
+}
+
+/* Pestañas dentro de una tarjeta (gestión de tickets): sin el azul de Bootstrap */
+:root:has(#sidebarAdmin) .card-header-tabs .nav-link {
+    color: var(--ui-texto-2);
+    font-weight: 600;
+}
+
+:root:has(#sidebarAdmin) .card-header-tabs .nav-link.active {
+    color: var(--ui-verde);
+}
+
+/* Filtros de periodo (reportes) */
+:root:has(#sidebarAdmin) .btn-periodo {
+    min-height: 34px;
+    padding: 0 14px;
+    border: 1px solid var(--ui-borde-campo);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ui-texto-2);
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+:root:has(#sidebarAdmin) .btn-periodo.active {
+    background: var(--ui-verde);
+    border-color: var(--ui-verde);
+    color: #fff;
+}

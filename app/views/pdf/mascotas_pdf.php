@@ -197,7 +197,8 @@
     <div class="contenedor">
 
         <!-- Información del Usuario -->
-        <?php if (isset($_SESSION['user'])): ?>
+        <?php require_once BASE_PATH . '/app/helpers/acceso_helper.php'; ?>
+        <?php if (acceso_usuario() !== null): ?>
             <div class="info-usuario">
                 <p><strong>Propietario:</strong> <?= htmlspecialchars($_SESSION['user']['nombres'] ?? 'N/A') ?></p>
                 <p><strong>Correo:</strong> <?= htmlspecialchars($_SESSION['user']['email'] ?? 'N/A') ?></p>

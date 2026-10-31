@@ -1,8 +1,9 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_representante.php';
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 
-$idVeterinaria =  $_SESSION['user']['id_veterinaria'];
+$idVeterinaria = acceso_exigir_clinica();
 $veterinariaData = consultarVeterinariasRegistradas($idVeterinaria);
 
 ?>
@@ -65,6 +66,7 @@ $veterinariaData = consultarVeterinariasRegistradas($idVeterinaria);
 
                 <input type="hidden" id="id_veterianaria" name="id_veterinaria" value="<?= $veterinariaData['id_veterinaria'] ?>">
                 <input type="hidden" name="accion" value="actualizarInfo">
+                <input type="hidden" id="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                 <input type="hidden" name="foto_actual" value="<?= $veterinariaData['foto'] ?>">
                 <input type="hidden" name="horarios" id="horariosInput">
 
@@ -259,9 +261,9 @@ $veterinariaData = consultarVeterinariasRegistradas($idVeterinaria);
     <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 
     <!-- Script de municipios -->
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/representante/js/municipios.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/municipios.js"></script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/representante/js/configVeterinaria.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/configVeterinaria.js"></script>
 
     <!-- C:\xampp\htdocs\vetwilling\public\assets\dashBoard\representante\js\configVeterinaria.js -->
 
