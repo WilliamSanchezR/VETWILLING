@@ -263,13 +263,13 @@ class Usuario
     {
         // Actualizamos los datos del usuario
         try {
-            $sql = "UPDATE usuario SET email = :email, estado = :estado
+            // El estado se cambia aparte, con cambiarEstadoCuenta()
+            $sql = "UPDATE usuario SET email = :email
                     WHERE id_usuario = :id_usuario";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $data['id_usuario']);
             $stmt->bindParam(':email', $data['email']);
-            $stmt->bindParam(':estado', $data['estado']);
 
             $ok = $stmt->execute();
             // Verificamos si la actualización fue exitosa
@@ -322,20 +322,51 @@ class Usuario
         }
     }
 
-    // FUNCION PARA ELIMINAR UN USUARIO
-    public function eliminarUsuario($id)
+    // FUNCION PARA CONSULTAR EL ROL Y EL ESTADO DE UNA CUENTA
+    public function consultarCuenta(int $id)
     {
-        // Actualizamos el estado del usuario a 'inactivo'
-        $actualizar = "UPDATE usuario SET
-                        estado = :estado
-                        WHERE id_usuario = :id_usuario";
-        // Preparar y ejecutar la consulta
-        $resultado = $this->conexion->prepare($actualizar);
+        $stmt = $this->conexion->prepare("SELECT id_usuario, id_rol, estado FROM usuario WHERE id_usuario = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
 
-        $resultado->bindValue(':estado', 'inactivo');
-        $resultado->bindValue(':id_usuario', $id);
+    // FUNCION PARA CAMBIAR EL ESTADO DE UNA CUENTA (usuario.estado)
+    // Nadie se inhabilita a sí mismo ni deja el sistema sin administradores activos. Las filas de
+    // los administradores activos se bloquean durante la comprobación para que dos cambios a la
+    // vez no puedan inhabilitar a los dos últimos.
+    // Devuelve 'ok', 'no_existe', 'propia', 'ultimo_admin' o 'error'.
+    public function cambiarEstadoCuenta(int $id, string $estado, int $idActor): string
+    {
+        try {
+            $this->conexion->beginTransaction();
+            $admins = $this->conexion->query(
+                "SELECT id_usuario FROM usuario WHERE id_rol = 1 AND LOWER(estado) = 'activo' FOR UPDATE"
+            )->fetchAll(PDO::FETCH_COLUMN);
+            $stmt = $this->conexion->prepare("SELECT id_usuario, id_rol, estado FROM usuario WHERE id_usuario = ? FOR UPDATE");
+            $stmt->execute([$id]);
+            $cuenta = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $resultado->execute();
+            $resultado = 'ok';
+            if (!$cuenta) {
+                $resultado = 'no_existe';
+            } elseif ($estado !== 'activo' && $id === $idActor) {
+                $resultado = 'propia';
+            } elseif ($estado !== 'activo' && in_array($id, array_map('intval', $admins), true) && count($admins) <= 1) {
+                $resultado = 'ultimo_admin';
+            }
+
+            if ($resultado === 'ok' && $cuenta['estado'] !== $estado) {
+                $this->conexion->prepare("UPDATE usuario SET estado = ? WHERE id_usuario = ?")->execute([$estado, $id]);
+            }
+            $this->conexion->commit();
+            return $resultado;
+        } catch (PDOException $e) {
+            if ($this->conexion->inTransaction()) {
+                $this->conexion->rollBack();
+            }
+            error_log("Error en Usuario::cambiarEstadoCuenta -> " . $e->getMessage());
+            return 'error';
+        }
     }
 
     // FUNCION PARA ACTUALIZAR LA CONTRASEÑA DEL USUARIO    

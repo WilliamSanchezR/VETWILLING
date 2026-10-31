@@ -126,7 +126,11 @@ class ListaPropietariosAdmin {
 
     // Subtareas 4/5/7: llama al API que inhabilita + registra auditoría
     inhabilitarPropietario(id) {
-        fetch(`${BASE_URL_PROP}/admin/api/propietarios?id=${id}`, { method: 'DELETE' })
+        const datos = new FormData();
+        datos.append('accion', 'eliminar');
+        datos.append('id', id);
+        datos.append('csrf_token', document.getElementById('csrf_token')?.value ?? '');
+        fetch(`${BASE_URL_PROP}/admin/api/propietarios`, { method: 'POST', body: datos, headers: { 'Accept': 'application/json' } })
             .then(r => r.json())
             .then(data => {
                 if (data.status === 'success') {

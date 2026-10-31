@@ -240,18 +240,20 @@ class Servicio
     }
 
     // FUNCION PARA ELIMINAR UN SERVICIO (CAMBIO DE ESTADO A INACTIVO)
-    public function eliminarServicio($id_servicio)
+    // Solo servicios de la clínica indicada. false si no es de esa clínica
+    public function eliminarServicio($id_servicio, $id_veterinaria)
     {
         try {
             $consulta = "UPDATE servicio 
                          SET estado = :estado, fecha_modificacion = NOW()
-                         WHERE id_servicio = :id_servicio";
+                         WHERE id_servicio = :id_servicio AND id_veterinaria = :id_veterinaria";
             $estado = 'Inactivo';
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':estado', $estado);
             $resultado->bindParam(':id_servicio', $id_servicio);
+            $resultado->bindParam(':id_veterinaria', $id_veterinaria);
 
-            return $resultado->execute();
+            return $resultado->execute() && $resultado->rowCount() > 0;
         } catch (PDOException $e) {
             echo "Error al eliminar el servicio: " . $e->getMessage();
             return false;
@@ -274,18 +276,21 @@ class Servicio
         }
     }
 
-    public function eliminarHorariosPorServicio($id_servicio)
+    // Solo horarios de servicios de la clínica indicada. false si no es de esa clínica
+    public function eliminarHorariosPorServicio($id_horario, $id_veterinaria)
     {
         try {
-            $consulta = "UPDATE horario_servicio 
-                         SET estado = :estado, fecha_modificacion = NOW()
-                         WHERE id_horario_servicio = :id_horario_servicio";
+            $consulta = "UPDATE horario_servicio hs
+                         INNER JOIN servicio s ON s.id_servicio = hs.id_servicio
+                         SET hs.estado = :estado, hs.fecha_modificacion = NOW()
+                         WHERE hs.id_horario_servicio = :id_horario_servicio AND s.id_veterinaria = :id_veterinaria";
             $estado = 'Inactivo';
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':estado', $estado);
-            $resultado->bindParam(':id_horario_servicio', $id_servicio);
+            $resultado->bindParam(':id_horario_servicio', $id_horario);
+            $resultado->bindParam(':id_veterinaria', $id_veterinaria);
 
-            return $resultado->execute();
+            return $resultado->execute() && $resultado->rowCount() > 0;
         } catch (PDOException $e) {
             echo "Error al eliminar los horarios del servicio: " . $e->getMessage();
             return false;

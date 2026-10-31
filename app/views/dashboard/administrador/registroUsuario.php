@@ -68,6 +68,7 @@ $datosVeterinaria = listarVeterinariasRegistradas();
 
 
             <form id="vetForm" action="<?= BASE_URL ?>/admin/guardar-usuario" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="accion" value="registrar">
 
                 <!-- Paso 1: Datos del Usuario -->
                 <div class="step active">

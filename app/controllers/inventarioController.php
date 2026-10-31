@@ -481,6 +481,7 @@ function actualizarProducto(): void
 // =============================================================================
 function eliminarProducto(): void
 {
+    acceso_exigir_accion_post([4]);
     $urlInventario  = BASE_URL . '/representante/inventario';
     $id_inventario  = (int) ($_POST['id_inventario'] ?? 0);
     $id_veterinaria = (int) ($_SESSION['user']['id_veterinaria'] ?? 0);

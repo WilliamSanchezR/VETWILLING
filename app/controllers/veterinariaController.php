@@ -2,10 +2,21 @@
 
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/veterinaria.php';
 require_once __DIR__ . '/../helpers/mailer_helper.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
 
+
+// Acciones POST que admite cada ruta que incluye este controlador (las demás → 400).
+// Crear clínicas es solo /admin/guardar-veterinaria (rol 1).
+const VETERINARIA_ACCIONES_POST = [
+    '/admin/guardar-veterinaria'                 => ['registrar'],
+    '/admin/actualizar-veterinaria'              => ['actualizar'],
+    '/admin/eliminar-veterinaria'                => ['eliminar'],
+    '/representante/actualizar-veterinaria'      => ['actualizarInfo'],
+    '/representante/actualizar-horario-veterinaria' => ['eliminar_horarios'],
+];
 
 //CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
 $method = $_SERVER['REQUEST_METHOD'];
@@ -14,27 +25,30 @@ switch ($method) {
 
     case 'POST':
 
-        $accion = $_POST['accion'] ?? '';
+        $accion = (string) ($_POST['accion'] ?? '');
+        acceso_exigir_accion_de_ruta($accion, VETERINARIA_ACCIONES_POST);
         if ($accion === 'actualizar') {
             actualizarVeterinaria();
         } else if ($accion === 'actualizarInfo') {
             actualizarInfoVeterinaria();
-        } else {
+        } else if ($accion === 'eliminar') {
+            eliminarVeterinaria();
+        } else if ($accion === 'eliminar_horarios') {
+            eliminarHorariosPorVeterinaria();
+        } else if ($accion === 'registrar') {
             registrarVeterinaria();
         }
         break;
 
     case 'GET':
-        // Esta variable captura la accion de eliminar
+        // Este controlador se incluye desde los layouts de los paneles 2 y 4: las eliminaciones
+        // solo se aceptan por POST con token CSRF (GET → 405)
         $action = $_GET['action'] ?? '';
-        if ($action === 'eliminar') {
-            eliminarVeterinaria($_GET['id']);
-        }  elseif ($action === 'obtener_horarios') {
+        if ($action === 'eliminar' || $action === 'eliminar_horarios') {
+            acceso_denegar('405', 'eliminación por GET');
+        } elseif ($action === 'obtener_horarios') {
             $id_veterinaria = $_GET['id'] ?? '';
             consultarHorariosVeterinaria($id_veterinaria);
-        } elseif ($action === 'eliminar_horarios') {
-            $idHorario = $_GET['id'] ?? '';
-            eliminarHorariosPorVeterinaria($idHorario);
         }
         break;
 
@@ -49,8 +63,11 @@ switch ($method) {
 // =========================================
 
 // FUNCION PARA REGISTRAR UNA NUEVA VETERINARIA
+// Solo el administrador crea clínicas (y la cuenta de su representante).
 function registrarVeterinaria()
 {
+    acceso_exigir_rol([1]);
+
     // Capturamos los datos enviados por el formulario
     $nit = $_POST['nit'] ?? '';
     $nombreVeterinaria = $_POST['nombreVeterinaria'] ?? '';
@@ -295,8 +312,12 @@ function consultarVeterinariasPorArray($idsArray)
 }
 
 // FUNCION PARA ACTUALIZAR LOS DATOS DE LA VETERINARIA
+// Edición completa (incluye la cuenta del representante y su correo): solo el administrador.
+// El representante edita la información de su clínica con actualizarInfoVeterinaria().
 function actualizarVeterinaria()
 {
+    acceso_exigir_rol([1]);
+
     // Capturamos los datos enviados por el formulario
     $foto = $_POST['foto_actual'] ?? null;
     $nit = $_POST['nit'] ?? '';
@@ -392,10 +413,16 @@ function actualizarVeterinaria()
 }
 
 // FUNCION PARA ELIMINAR UNA VETERINARIA
-function eliminarVeterinaria($id)
+// Solo el administrador, por POST con token CSRF
+function eliminarVeterinaria()
 {
+    acceso_exigir_accion_post([1]);
+    $id = acceso_entero_positivo($_POST['id'] ?? null);
     // Creamos el objeto de la clase Veterinaria
     $objVeterinaria = new Veterinaria();
+    if ($id === null || !$objVeterinaria->existe($id)) {
+        acceso_denegar('404', 'veterinaria inexistente');
+    }
     // Llamamos a la funcion eliminar del modelo Veterinaria
     $resultado = $objVeterinaria->eliminar($id);
     // Verificamos el resultado y mostramos una alerta
@@ -421,15 +448,18 @@ function consultarVeterinariaPorId($id)
     return $veterinaria;
 }
 
+// El representante actualiza solo la información de su clínica (otra clínica → 404)
 function actualizarInfoVeterinaria()
 {
+    acceso_exigir_rol([4]);
+    $id_veterinaria = exigirMiClinica($_POST['id_veterinaria'] ?? null);
+
     // Capturamos los datos enviados por el formulario
     $foto = $_POST['foto_actual'] ?? null;
     $direccion = $_POST['direccion'] ?? '';
     $ciudad = $_POST['ciudad'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $horarios = $_POST['horarios'] ?? '';
-    $id_veterinaria = $_POST['id_veterinaria'] ?? '';
 
 
     // Validamos que los campos no esten vacios
@@ -488,8 +518,21 @@ function actualizarInfoVeterinaria()
     exit();
 }
 
+// Clínica de la sesión; si el cliente indica otra, 404
+function exigirMiClinica($idIndicado): int
+{
+    $propia = acceso_exigir_clinica();
+    if ($idIndicado !== null && $idIndicado !== '' && acceso_entero_positivo($idIndicado) !== $propia) {
+        acceso_denegar('404', 'clínica ajena', ['GET', 'HEAD', 'POST']);
+    }
+    return $propia;
+}
+
+// Horarios de la clínica del representante
 function consultarHorariosVeterinaria($id_veterinaria)
 {
+    acceso_exigir_rol([4]);
+    $id_veterinaria = exigirMiClinica($id_veterinaria);
      try {
         
         $veterinariaModel = new Veterinaria();
@@ -513,12 +556,19 @@ function consultarHorariosVeterinaria($id_veterinaria)
     }
 }
 
-function eliminarHorariosPorVeterinaria($idHorario)
+// Solo horarios de la clínica del representante, por POST con token CSRF (otra clínica → 404)
+function eliminarHorariosPorVeterinaria()
 {
+    acceso_exigir_accion_post([4]);
+    $idVeterinaria = acceso_exigir_clinica();
+    $idHorario = acceso_entero_positivo($_POST['id'] ?? null);
         $veterinariaModel = new Veterinaria();
 
     // Llamamos al método para eliminar los horarios del servicio
-    $resultado = $veterinariaModel->eliminarHorariosPorVeterinaria($idHorario);
+    $resultado = $idHorario !== null && $veterinariaModel->eliminarHorariosPorVeterinaria($idHorario, $idVeterinaria);
+    if (!$resultado) {
+        acceso_denegar('404', 'horario inexistente o de otra clínica');
+    }
 
     if ($resultado) {
         // ┌─ RETORNAR RESULTADO

@@ -1,33 +1,44 @@
 <?php
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/Profesional.php';
 require_once __DIR__ . '/../helpers/mailer_helper.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
+
+// Acciones POST que admite cada ruta que incluye este controlador (las demás → 400)
+const PROFESIONAL_ACCIONES_POST = [
+    '/representante/guardar-Profesional'       => ['registrar'],
+    '/representante/actualizar-profesional'    => ['actualizar'],
+    '/representante/eliminar-profesional'      => ['eliminar'],
+    '/representante/eliminar-esp-profesional'  => ['eliminarEspProfesional'],
+    '/representante/eliminar-serv-profesional' => ['eliminarServProfesional'],
+];
+// El representante solo da de alta profesionales con este rol (veterinario)
+const PROFESIONAL_ROL_ALTA = 2;
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'POST':
-        $accion = $_POST['accion'] ?? '';
+        $accion = (string) ($_POST['accion'] ?? '');
+        acceso_exigir_accion_de_ruta($accion, PROFESIONAL_ACCIONES_POST);
         if ($accion === 'actualizar') {
             actualizarProfesional();
-        } else {
-            // Llamar a la función para guardar el profesional
+        } else if ($accion === 'eliminar') {
+            eliminarProfesional();
+        } else if ($accion === 'eliminarEspProfesional') {
+            eliminarEspecialidadDeProfesional();
+        } else if ($accion === 'eliminarServProfesional') {
+            eliminarServicioDeProfesional();
+        } else if ($accion === 'registrar') {
             registrarProfesional();
         }
         break;
     case 'GET':
+        // Las eliminaciones solo se aceptan por POST con token CSRF
         $accion = $_GET['action'] ?? '';
-        if ($accion === 'eliminarEspProfesional') {
-            $id_profesional = $_GET['id_profesional'] ?? '';
-            $id_especialidad = $_GET['id_especialidad'] ?? '';
-            eliminarEspecialidadDeProfesional($id_profesional, $id_especialidad);
-        } else if ($accion === 'eliminar') {
-            eliminarProfesional($_GET['id']);
-        } else if ($accion === 'eliminarServProfesional') {
-            $id_servicio = $_GET['id_servicio'] ?? '';
-            $id_usuario = $_GET['id_usuario'] ?? '';
-            eliminarServicioDeProfesional($id_servicio, $id_usuario);
+        if (in_array($accion, ['eliminar', 'eliminarEspProfesional', 'eliminarServProfesional'], true)) {
+            acceso_denegar('405', 'eliminación por GET');
         }
         break;
     default:
@@ -41,7 +52,8 @@ function registrarProfesional()
     // Obtener los datos del formulario
     $email = $_POST['email'] ?? '';
     $estado = 'Activo';
-    $id_rol = $_POST['rol'] ?? '';
+    // El rol no lo elige el formulario: el representante solo crea veterinarios
+    $id_rol = PROFESIONAL_ROL_ALTA;
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
     $password = $numero_documento !== '' ? $numero_documento : '123';
@@ -49,7 +61,9 @@ function registrarProfesional()
     $apellidos = $_POST['apellidos'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $direccion = $_POST['direccion'] ?? '';
-    $id_veterinaria = $_POST['id_veterinaria'] ?? null;
+    // El representante registra profesionales solo en su clínica
+    acceso_exigir_rol([4]);
+    $id_veterinaria = acceso_exigir_clinica();
     $nivel_acceso = 'Completo';
     $img_perfil = null;
     $img_firma = null;
@@ -264,16 +278,37 @@ function listarEspecialidadesPorProfesional($id, $idVeterinaria)
     return $objProfesional->listarEspecialidadesPorProfesional($id, $idVeterinaria);
 }
 
-function listarServiciosPorProfesional($id)
+function listarServiciosPorProfesional($id, $idVeterinaria)
 {
     $objProfesional = new Profesional();
-    return $objProfesional->listarServiciosPorProfesional($id);
+    return $objProfesional->listarServiciosPorProfesional($id, $idVeterinaria);
 }
 
-function eliminarEspecialidadDeProfesional($id_profesional, $id_especialidad)
+// Vínculo del profesional (id_usuario) con la clínica de la sesión; si no existe, 404
+function exigirProfesionalDeMiClinica($idUsuario): array
 {
+    $idVeterinaria = acceso_exigir_clinica();
+    $id = acceso_entero_positivo($idUsuario);
+    $vinculo = $id === null ? null : (new Profesional())->consultarVinculo($id, $idVeterinaria);
+    if (!$vinculo) {
+        acceso_denegar('404', 'profesional sin vínculo con la clínica de la sesión', ['GET', 'HEAD', 'POST']);
+    }
+    return $vinculo + ['id_usuario' => $id, 'id_veterinaria' => $idVeterinaria];
+}
+
+function eliminarEspecialidadDeProfesional()
+{
+    acceso_exigir_accion_post([4]);
+    $vinculo = exigirProfesionalDeMiClinica($_POST['id_profesional'] ?? null);
+    $id_profesional = $vinculo['id_usuario'];
+    $id_especialidad = acceso_entero_positivo($_POST['id_especialidad'] ?? null);
+
     $objProfesional = new Profesional();
-    $resultado = $objProfesional->deleteEspProfesional($id_especialidad);
+    $resultado = $id_especialidad !== null
+        && $objProfesional->deleteEspProfesional($id_especialidad, $id_profesional, $vinculo['id_veterinaria']);
+    if (!$resultado) {
+        acceso_denegar('404', 'especialidad de otro profesional o de otra clínica');
+    }
 
     if ($resultado) {
         mostrarSweetAlert(
@@ -289,10 +324,19 @@ function eliminarEspecialidadDeProfesional($id_profesional, $id_especialidad)
     exit();
 }
 
-function eliminarServicioDeProfesional($id_servicio, $id_usario)
+function eliminarServicioDeProfesional()
 {
+    acceso_exigir_accion_post([4]);
+    $vinculo = exigirProfesionalDeMiClinica($_POST['id_usuario'] ?? null);
+    $id_usario = $vinculo['id_usuario'];
+    $id_servicio = acceso_entero_positivo($_POST['id_servicio'] ?? null);
+
     $objProfesional = new Profesional();
-    $resultado = $objProfesional->deleteServProfesional($id_servicio);
+    $resultado = $id_servicio !== null
+        && $objProfesional->deleteServProfesional($id_servicio, (int) $vinculo['id_profesional'], $vinculo['id_veterinaria']);
+    if (!$resultado) {
+        acceso_denegar('404', 'servicio de otro profesional o de otra clínica');
+    }
 
     if ($resultado) {
         mostrarSweetAlert(
@@ -308,10 +352,16 @@ function eliminarServicioDeProfesional($id_servicio, $id_usario)
     exit();
 }
 
+// El representante edita solo profesionales vinculados a su clínica (otra clínica → 404).
+// No cambia el correo de acceso (solo el administrador) ni el estado de la cuenta: el campo
+// "estado" es el del vínculo con su clínica (P3).
 function actualizarProfesional()
 {
+    acceso_exigir_rol([4]);
+    $vinculo = exigirProfesionalDeMiClinica($_POST['id_usuario'] ?? null);
+
     // Obtener los datos del formulario
-    $id_profesional = $_POST['id_profesional'] ?? '';
+    $id_profesional = $vinculo['id_profesional'];
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
     $nombres = $_POST['nombres'] ?? '';
@@ -320,23 +370,25 @@ function actualizarProfesional()
     $direccion = $_POST['direccion'] ?? '';
     $listaEspecialidades = $_POST['especialidades'] ?? '';
     $registro_medico = $_POST['registro_medico'] ?? '';
-    $id_rol = $_POST['rol'] ?? '';
-    $estado = $_POST['estado'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    $estado = ucfirst(mb_strtolower(trim((string) ($_POST['estado'] ?? ''))));
+    $id_usuario = $vinculo['id_usuario'];
     $img_perfil = $_POST['img_perfil'] ?? null;
     $img_firma = $_POST['img_firma'] ?? null;
-    $id_veterinaria = $_POST['id_veterinaria'] ?? null;
+    $id_veterinaria = $vinculo['id_veterinaria'];
     $listaServicios = $_POST['servicios'] ?? '';
 
     // Validamos que los campos no esten vacios
     if (
-        empty($id_profesional) || empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
-        empty($apellidos) || empty($telefono) || empty($direccion) ||
-        empty($id_rol) || empty($estado) || empty($email) || empty($id_usuario) || empty($id_veterinaria)
+        empty($tipo_documento) || empty($numero_documento) || empty($nombres) ||
+        empty($apellidos) || empty($telefono) || empty($direccion)
     ) {
         // Mostrar alerta de error si hay campos vacíos
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
+        exit();
+    }
+
+    if (!in_array($estado, ['Activo', 'Inactivo'], true)) {
+        mostrarSweetAlert('error', 'Estado no válido', 'Seleccione si el profesional está activo o inactivo en la clínica');
         exit();
     }
 
@@ -395,9 +447,8 @@ function actualizarProfesional()
         'direccion' => $direccion,
         'especialidades' => $listaEspecialidades,
         'registro_medico' => $registro_medico,
-        'id_rol' => $id_rol,
-        'estado' => $estado,
-        'email' => $email,
+        'estado_vinculo' => $estado,
+        'id_prof_veterinaria' => $vinculo['id_prof_veterinaria'],
         'id_usuario' => $id_usuario,
         'img_perfil' => $img_perfil,
         'img_firma' => $img_firma,
@@ -422,21 +473,24 @@ function actualizarProfesional()
     exit();
 }
 
-function eliminarProfesional($id)
+// Desvincula al profesional de la clínica del representante (P3): solo cambia el vínculo
+// (profesional_veterinaria.estado), nunca el estado global de la cuenta. POST con token CSRF.
+function eliminarProfesional()
 {
-    $objProfesional = new Profesional();
-    $resultado = $objProfesional->eliminarProfesional($id);
+    acceso_exigir_accion_post([4]);
+    $idVeterinaria = acceso_exigir_clinica();
+    $id = acceso_entero_positivo($_POST['id'] ?? null);
 
-    if ($resultado) {
-        mostrarSweetAlert(
-            'success',
-            'Profesional Eliminado',
-            'El profesional ha sido eliminado correctamente',
-            BASE_URL . '/representante/listar-profesionales'
-        );
-    } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el profesional');
+    $objProfesional = new Profesional();
+    if ($id === null || !$objProfesional->eliminarProfesional($id, $idVeterinaria)) {
+        acceso_denegar('404', 'vínculo inexistente o de otra clínica');
     }
 
+    mostrarSweetAlert(
+        'success',
+        'Profesional desvinculado',
+        'El profesional ya no está vinculado a tu clínica. Su cuenta no cambia.',
+        BASE_URL . '/representante/listar-profesionales'
+    );
     exit();
 }

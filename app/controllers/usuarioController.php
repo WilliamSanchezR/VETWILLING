@@ -1,7 +1,23 @@
 <?php
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/usuario.php';
+
+// Estados de cuenta que acepta el administrador (usuario.estado)
+const USUARIO_ESTADOS_CUENTA = ['activo', 'inactivo', 'bloqueado'];
+
+// Acciones POST que admite cada ruta que incluye este controlador. Las rutas de contraseña
+// solo cambian la contraseña; crear cuentas es solo /admin/guardar-usuario (rol 1).
+const USUARIO_ACCIONES_POST = [
+    '/admin/guardar-usuario'             => ['registrar'],
+    '/admin/actualizar-usuario'          => ['actualizar'],
+    '/admin/eliminar-usuario'            => ['eliminar'],
+    '/admin/cambiar-foto'                => ['cambiar-foto'],
+    '/admin/actualizar-contrasena'       => ['actualizar-constrasena'],
+    '/veterinario/actualizar-constrasena' => ['vet-constrasena'],
+    '/cliente/actualizar-contrasena'     => ['modificar-contrasena'],
+];
 
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -10,7 +26,8 @@ switch ($method) {
 
     case 'POST':
 
-        $accion = $_POST['accion'] ?? '';
+        $accion = (string) ($_POST['accion'] ?? '');
+        acceso_exigir_accion_de_ruta($accion, USUARIO_ACCIONES_POST);
         if ($accion === 'actualizar') {
             actualizarUsuario();
         } else if ($accion  === 'actualizar-constrasena') {
@@ -21,7 +38,9 @@ switch ($method) {
             vetContrasena();
         } else if ($accion === 'cambiar-foto') {
             actualizarFotoPerfil();
-        } else {
+        } else if ($accion === 'eliminar') {
+            eliminarUsuario();
+        } else if ($accion === 'registrar') {
             registrarUsuario();
         }
         break;
@@ -30,7 +49,7 @@ switch ($method) {
         $accion = $_GET['accion'] ?? '';
 
         if ($accion === 'eliminar') {
-            eliminarUsuario($_GET['id']);
+            eliminarUsuario(); // solo POST: responde 405
         } elseif ($accion === 'listarAdmin') {
             ListaUsuariosAdmin();
         } else if (isset($_GET['id'])) {
@@ -52,8 +71,11 @@ switch ($method) {
 // =========================================
 
 // FUNCION PARA REGISTRAR UN NUEVO USUARIO
+// Solo el administrador crea cuentas, de cualquier rol existente.
 function registrarUsuario()
 {
+    acceso_exigir_rol([1]);
+
     // Capturamos los datos enviados por el formulario
     $email = $_POST['email'] ?? '';
     $estado = 'activo';
@@ -79,6 +101,11 @@ function registrarUsuario()
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor complete todos los campos');
         exit();
     }
+    if (!in_array(acceso_entero_positivo($id_rol), ACCESO_ROLES_VALIDOS, true)) {
+        mostrarSweetAlert('error', 'Rol no válido', 'Seleccione un rol de la lista');
+        exit();
+    }
+
     // Validamos que si el rol es veterinario, se seleccione una veterinaria
     if ($id_rol == '4' && empty($id_veterinaria)) {
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
@@ -169,8 +196,10 @@ function consultarUsuarioTicketId($id)
 }
 
 // FUNCION PARA ACTUALIZAR LOS DATOS DEL USUARIO
+// Solo el administrador: este controlador también se incluye desde rutas de otros roles.
 function actualizarUsuario()
 {
+    $actor = acceso_exigir_rol([1]);
     $id_usuario = $_POST['id_usuario'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
@@ -181,7 +210,7 @@ function actualizarUsuario()
     $id_rol = $_POST['id_rol'] ?? '';
     $id_veterinaria = $_POST['veterinaria'] ?? null;
     $direccion = $_POST['direccion'] ?? null;
-    $estado = $_POST['estado'] ?? 'activo';
+    $estado = mb_strtolower(trim((string) ($_POST['estado'] ?? 'activo')));
 
     if (
         empty($id_usuario) || empty($tipo_documento) || empty($numero_documento) ||
@@ -192,22 +221,38 @@ function actualizarUsuario()
         exit();
     }
 
+    if (!in_array($estado, USUARIO_ESTADOS_CUENTA, true)) {
+        mostrarSweetAlert('error', 'Estado no válido', 'Seleccione un estado de la lista');
+        exit();
+    }
+
+    $objUsuario = new Usuario();
+    $cuenta = $objUsuario->consultarCuenta((int) acceso_entero_positivo($id_usuario));
+    if (!$cuenta) {
+        acceso_denegar('404', 'usuario inexistente');
+    }
+    // El rol de la cuenta sale de la base, no del formulario
+    $id_rol = (string) $cuenta['id_rol'];
+
     if ($id_rol == '4' && empty($id_veterinaria)) {
         mostrarSweetAlert('error', 'Veterinaria requerida', 'Debe seleccionar una veterinaria');
         exit();
     }
 
-    $objUsuario = new Usuario();
+    $cambioEstado = $objUsuario->cambiarEstadoCuenta((int) $cuenta['id_usuario'], $estado, (int) $actor['id_usuario']);
+    if ($cambioEstado !== 'ok') {
+        mostrarSweetAlert('error', 'Estado no permitido', mensajeCambioEstadoCuenta($cambioEstado));
+        exit();
+    }
 
     $data = [
-        'id_usuario' => $id_usuario,
+        'id_usuario' => $cuenta['id_usuario'],
         'tipo_documento' => $tipo_documento,
         'numero_documento' => $numero_documento,
         'nombres' => $nombres,
         'apellidos' => $apellidos,
         'telefono' => $telefono,
         'email' => $email,
-        'estado' => $estado,
         'id_rol' => $id_rol,
         'id_veterinaria' => $id_veterinaria,
         'direccion' => $direccion
@@ -229,13 +274,21 @@ function actualizarUsuario()
     exit();
 }
 
-// FUNCION PARA ELIMINAR UN USUARIO
-function eliminarUsuario($id)
+// FUNCION PARA INHABILITAR UN USUARIO (estado de la cuenta)
+// Solo el administrador, por POST con token CSRF. Las sesiones de la cuenta dejan de valer en su
+// siguiente petición (acceso_usuario() exige estado activo).
+function eliminarUsuario()
 {
-    $objUsuario = new Usuario();
-    $resultado = $objUsuario->eliminarUsuario($id);
+    $actor = acceso_exigir_accion_post([1]);
+    $id = acceso_entero_positivo($_POST['id'] ?? null);
 
-    if ($resultado) {
+    $objUsuario = new Usuario();
+    $resultado = $id === null ? 'no_existe' : $objUsuario->cambiarEstadoCuenta($id, 'inactivo', (int) $actor['id_usuario']);
+
+    if ($resultado === 'no_existe') {
+        acceso_denegar('404', 'usuario inexistente');
+    }
+    if ($resultado === 'ok') {
         mostrarSweetAlert(
             'success',
             'Usuario Inhabilitado',
@@ -243,10 +296,19 @@ function eliminarUsuario($id)
             BASE_URL . '/admin/listar-usuarios'
         );
     } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el usuario');
+        mostrarSweetAlert('error', 'No permitido', mensajeCambioEstadoCuenta($resultado), BASE_URL . '/admin/listar-usuarios');
     }
 
     exit();
+}
+
+function mensajeCambioEstadoCuenta(string $resultado): string
+{
+    return match ($resultado) {
+        'propia'       => 'No puedes inhabilitar tu propia cuenta.',
+        'ultimo_admin' => 'No se puede inhabilitar al último administrador activo.',
+        default        => 'No se pudo cambiar el estado de la cuenta.',
+    };
 }
 
 // FUNCION PARA CAMBIAR LA CONTRASEÑA DEL USUARIO

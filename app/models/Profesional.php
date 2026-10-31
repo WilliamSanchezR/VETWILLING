@@ -53,7 +53,8 @@ class Profesional
             }
 
             if (!empty($data['servicios'])) {
-                $this->registrarServicioProfesional($idProfesional, json_decode($data['servicios']));
+                $servicios = $this->serviciosDeVeterinaria(json_decode($data['servicios']), $data['id_veterinaria']);
+                $this->registrarServicioProfesional($idProfesional, $servicios);
             }
 
             $this->conexion->commit();
@@ -180,7 +181,7 @@ class Profesional
                     p.telefono,
                     p.img_perfil,
                     us.email,
-                    us.estado,
+                    pv.estado,
                     rol.nombre AS rol, 
                     GROUP_CONCAT(DISTINCT esp.nombre SEPARATOR ', ') as especialidad,
                     GROUP_CONCAT(DISTINCT ser.nombre SEPARATOR ', ') as servicios
@@ -192,9 +193,9 @@ class Profesional
                 LEFT JOIN profesional_especialidad pe ON p.id_usuario = pe.id_usuario AND pe.estado = 'Activo' AND pe.id_veterinaria = :id_veterinaria
                 LEFT JOIN especialidad esp ON pe.id_especialidad = esp.id_especialidad
                 LEFT JOIN profesionales_servicio ps on p.id_profesional = ps.id_profesional AND ps.estado = 'Activo'
-                LEFT JOIN servicio ser ON ps.id_servicio = ser.id_servicio AND ser.estado = 'Activo'
+                LEFT JOIN servicio ser ON ps.id_servicio = ser.id_servicio AND ser.estado = 'Activo' AND ser.id_veterinaria = :id_veterinaria
                 WHERE pv.id_veterinaria = :id_veterinaria
-                GROUP BY p.id_profesional, p.nombres, us.id_usuario";
+                GROUP BY pv.id_prof_veterinaria";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_veterinaria', $id_vterinaria);
@@ -263,59 +264,83 @@ class Profesional
         }
     }
 
-    function deleteEspProfesional($id)
+    // Vínculo de un profesional (por id_usuario) con una clínica, o null
+    function consultarVinculo(int $idUsuario, int $idVeterinaria)
+    {
+        $sql = "SELECT pv.id_prof_veterinaria, pv.estado AS estado_vinculo, p.id_profesional
+                FROM profesional p
+                INNER JOIN profesional_veterinaria pv ON pv.id_profesional = p.id_profesional
+                WHERE p.id_usuario = :id_usuario AND pv.id_veterinaria = :id_veterinaria
+                ORDER BY pv.id_prof_veterinaria DESC
+                LIMIT 1";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute([':id_usuario' => $idUsuario, ':id_veterinaria' => $idVeterinaria]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+    }
+
+    // Solo especialidades del profesional en la clínica indicada. false si no hay ninguna fila
+    function deleteEspProfesional($id, $idUsuario, $idVeterinaria)
     {
         try {
             $estado = 'Inactivo';
 
             $sql = "UPDATE profesional_especialidad 
                     SET estado = :estado, fecha_modificacion = NOW() 
-                    WHERE id_profesional_esp = :id_especialidad AND estado = 'Activo'";
+                    WHERE id_profesional_esp = :id_especialidad AND estado = 'Activo'
+                      AND id_usuario = :id_usuario AND id_veterinaria = :id_veterinaria";
 
             $stmt = $this->conexion->prepare($sql);
 
             $stmt->bindParam(':estado', $estado);
             $stmt->bindParam(':id_especialidad', $id);
+            $stmt->bindParam(':id_usuario', $idUsuario);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria);
 
-            return $stmt->execute();
+            return $stmt->execute() && $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             error_log("Error en Profesional::deleteEspProfesional -> " . $e->getMessage());
             return false;
         }
     }
 
-    function deleteServProfesional($id)
+    // Solo servicios del profesional que pertenecen a la clínica indicada. false si no hay ninguna fila
+    function deleteServProfesional($id, $idProfesional, $idVeterinaria)
     {
         try {
             $estado = 'Inactivo';
 
-            $sql = "UPDATE profesionales_servicio 
-                    SET estado = :estado, fecha_modificacion = NOW() 
-                    WHERE id_prof_servicio = :id_servicio AND estado = 'Activo'";
+            $sql = "UPDATE profesionales_servicio ps
+                    INNER JOIN servicio ser ON ser.id_servicio = ps.id_servicio
+                    SET ps.estado = :estado, ps.fecha_modificacion = NOW() 
+                    WHERE ps.id_prof_servicio = :id_servicio AND ps.estado = 'Activo'
+                      AND ps.id_profesional = :id_profesional AND ser.id_veterinaria = :id_veterinaria";
 
             $stmt = $this->conexion->prepare($sql);
 
             $stmt->bindParam(':estado', $estado);
             $stmt->bindParam(':id_servicio', $id);
+            $stmt->bindParam(':id_profesional', $idProfesional);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria);
 
-            return $stmt->execute();
+            return $stmt->execute() && $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             error_log("Error en Profesional::deleteServProfesional -> " . $e->getMessage());
             return false;
         }
     }
 
+    // Actualiza el perfil profesional y el vínculo con la clínica. No toca la tabla usuario:
+    // el correo de acceso y el estado de la cuenta solo los cambia el administrador.
     function actualizarProfesional($data)
     {
-        // Actualizamos los datos del usuario
         try {
-            $sql = "UPDATE usuario SET email = :email, estado = :estado
-                    WHERE id_usuario = :id_usuario";
+            $sql = "UPDATE profesional_veterinaria SET estado = :estado, fecha_modificacion = NOW()
+                    WHERE id_prof_veterinaria = :id_prof_veterinaria AND id_veterinaria = :id_veterinaria";
 
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_usuario', $data['id_usuario']);
-            $stmt->bindParam(':email', $data['email']);
-            $stmt->bindParam(':estado', $data['estado']);
+            $stmt->bindParam(':estado', $data['estado_vinculo']);
+            $stmt->bindParam(':id_prof_veterinaria', $data['id_prof_veterinaria']);
+            $stmt->bindParam(':id_veterinaria', $data['id_veterinaria']);
 
             $ok = $stmt->execute();
             // Verificamos si la actualización fue exitosa
@@ -354,7 +379,8 @@ class Profesional
             }
 
             if (!empty($data['servicios'])) {
-                return $this->registrarServicioProfesional($data['id_profesional'], json_decode($data['servicios']));
+                $servicios = $this->serviciosDeVeterinaria(json_decode($data['servicios']), $data['id_veterinaria']);
+                return $this->registrarServicioProfesional($data['id_profesional'], $servicios);
             } else {
                 return $okProf;
             }
@@ -413,22 +439,40 @@ class Profesional
         }
     }
 
-    function eliminarProfesional($idUsuario)
+    // Servicios (lista de objetos {id}) que pertenecen a la clínica; descarta los de otras
+    function serviciosDeVeterinaria($servicios, $idVeterinaria): array
+    {
+        $ids = array_values(array_filter(array_map(
+            fn($s) => filter_var($s->id ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]),
+            is_array($servicios) ? $servicios : []
+        )));
+        if (!$ids) {
+            return [];
+        }
+        $marcas = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $this->conexion->prepare("SELECT id_servicio FROM servicio WHERE id_veterinaria = ? AND id_servicio IN ($marcas)");
+        $stmt->execute(array_merge([$idVeterinaria], $ids));
+        return array_map(fn($id) => (object) ['id' => (int) $id], $stmt->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+    // Desvincula al profesional de una clínica: solo el vínculo indicado y solo si es de esa
+    // clínica. La cuenta (usuario.estado) no cambia. false si el vínculo no es de la clínica.
+    function eliminarProfesional($idProfVeterinaria, $idVeterinaria)
     {
         try {
-            // Cambiamos el estado del usuario a 'Inactivo'
             $sql = "UPDATE profesional_veterinaria SET estado = 'Inactivo', fecha_modificacion = NOW()
-                WHERE id_prof_veterinaria  = :id_prof_veterinaria ";
+                WHERE id_prof_veterinaria = :id_prof_veterinaria AND id_veterinaria = :id_veterinaria";
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id_prof_veterinaria', $idUsuario);
-            return $stmt->execute();
+            $stmt->bindParam(':id_prof_veterinaria', $idProfVeterinaria);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria);
+            return $stmt->execute() && $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             error_log("Error en Profesional::eliminarProfesional -> " . $e->getMessage());
             return false;
         }
     }
 
-    function listarServiciosPorProfesional($id)
+    function listarServiciosPorProfesional($id, $idVeterinaria)
     {
         try {
             $sql = "SELECT 
@@ -438,10 +482,12 @@ class Profesional
                 FROM profesionales_servicio ps
                 INNER JOIN servicio ser ON ps.id_servicio = ser.id_servicio
                 INNER JOIN profesional pr ON ps.id_profesional = pr.id_profesional                
-                WHERE pr.id_usuario = :id_usuario AND ps.estado = 'Activo' AND ser.estado = 'Activo'";
+                WHERE pr.id_usuario = :id_usuario AND ps.estado = 'Activo' AND ser.estado = 'Activo'
+                  AND ser.id_veterinaria = :id_veterinaria";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_usuario', $id);
+            $stmt->bindParam(':id_veterinaria', $idVeterinaria);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {

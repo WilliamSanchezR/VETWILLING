@@ -110,6 +110,9 @@ register_shutdown_function(function (): void {
 });
 
 // FUNCION PARA REGISTRAR UNA NUEVA VETERINARIA
+// Registro PÚBLICO de clínicas (decisión del 31-10-2026: se mantiene). Crea la clínica y la cuenta
+// de su representante con rol 4 fijo y estado 'pendiente': no puede iniciar sesión hasta que se
+// active. El formulario no elige el rol. Es la única vía pública que crea cuentas.
 function registrarseVeterinaria()
 {
     // Capturamos los datos enviados por el formulario

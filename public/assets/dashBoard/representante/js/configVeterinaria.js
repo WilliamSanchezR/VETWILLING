@@ -385,8 +385,14 @@ class ConfigVeterinaria {
         try {
             for (const id_horario of dia.id) {
 
-                const response = await fetch(`${baseUrl}/representante/actualizar-horario-veterinaria?action=eliminar_horarios&id=${id_horario}`, {
-                    method: 'GET',
+                const datos = new FormData();
+                datos.append('accion', 'eliminar_horarios');
+                datos.append('id', id_horario);
+                datos.append('csrf_token', document.getElementById('csrf_token')?.value ?? '');
+                const response = await fetch(`${baseUrl}/representante/actualizar-horario-veterinaria`, {
+                    method: 'POST',
+                    body: datos,
+                    headers: { 'Accept': 'application/json' },
                 });
                 const result = await response.json();
                 if (result.status !== 'success') {

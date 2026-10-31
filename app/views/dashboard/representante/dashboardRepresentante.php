@@ -202,9 +202,6 @@ $usuario = $_SESSION['user'];
                                                 <button class="btn-accion btn-editar" title="Editar">
                                                     <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
                                                 </button>
-                                                <button class="btn-accion btn-eliminar" title="Eliminar">
-                                                    <a href="<?= BASE_URL ?>/admin/eliminar-usuario?accion=eliminar&id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-trash"></i></a>
-                                                </button>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
