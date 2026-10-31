@@ -296,6 +296,8 @@ function acceso_responder_json(?array $politica): bool
  */
 function acceso_verificar(string $ruta, string $metodo): void
 {
+    $estadoAcceso = &acceso_estado();
+    $estadoAcceso['ruta'] = $ruta; // la usan los controladores (acceso_exigir_accion_de_ruta)
     $modo = function_exists('env_value') ? (string) env_value('ACCESO_MODO', 'aplicar') : 'aplicar';
     if ($modo === 'apagado') {
         return;
@@ -337,6 +339,7 @@ function acceso_responder_denegado(string $resultado, ?array $politica, array $p
     [$codigo, $mensaje] = match ($resultado) {
         'login'     => [401, 'Debes iniciar sesión.'],
         'seleccion' => [403, 'Selecciona una veterinaria para continuar.'],
+        '400'       => [400, 'Solicitud no válida.'],
         '403'       => [403, 'No tienes permiso para realizar esta acción.'],
         '404'       => [404, 'Recurso no encontrado.'],
         '405'       => [405, 'Método no permitido.'],
@@ -366,6 +369,13 @@ function acceso_responder_denegado(string $resultado, ?array $politica, array $p
         case '404':
             http_response_code(404);
             require __DIR__ . '/../views/auth/error404.php';
+            exit();
+        case '400':
+            if (!headers_sent()) {
+                http_response_code(400);
+                header('Content-Type: text/plain; charset=utf-8');
+            }
+            echo $mensaje;
             exit();
         default:
             // Una acción incluida desde un layout puede llegar aquí con la página ya empezada
@@ -452,6 +462,28 @@ function acceso_exigir_clinica(): int
 }
 
 /**
+ * Ruta del enrutador de la petición actual (la fija acceso_verificar()), o null.
+ */
+function acceso_ruta(): ?string
+{
+    return acceso_estado()['ruta'];
+}
+
+/**
+ * Los controladores atienden varias rutas y eligen la operación por el campo "accion" del POST;
+ * antes, una acción desconocida caía en la rama por defecto (crear una cuenta). Cada controlador
+ * declara qué acciones admite cada ruta ($porRuta: ruta => [acciones]); cualquier otra
+ * combinación, también una ruta sin entrada o sin acción, responde 400 sin ejecutar nada.
+ */
+function acceso_exigir_accion_de_ruta(string $accion, array $porRuta): void
+{
+    $ruta = acceso_ruta();
+    if ($ruta === null || !in_array($accion, $porRuta[$ruta] ?? [], true)) {
+        acceso_denegar('400', 'acción ' . json_encode($accion) . ' no admitida en la ruta', ['POST']);
+    }
+}
+
+/**
  * Identificador entero positivo recibido del cliente, o null.
  */
 function acceso_entero_positivo($valor): ?int
@@ -480,7 +512,7 @@ class AccesoBaseNoDisponible extends RuntimeException
  */
 function &acceso_estado(): array
 {
-    static $estado = ['lector' => null, 'verificado' => null, 'conectando' => false, 'politica' => null, 'cierre' => false];
+    static $estado = ['lector' => null, 'verificado' => null, 'conectando' => false, 'politica' => null, 'cierre' => false, 'ruta' => null];
     return $estado;
 }
 
