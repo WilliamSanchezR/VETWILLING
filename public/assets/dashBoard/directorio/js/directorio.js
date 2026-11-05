@@ -207,7 +207,7 @@ async function guardarEstado() {
 /* ── Aplicar filtros ─────────────────────────────────────────── */
 function aplicarFiltros() {
     cargarDirectorio({
-        busqueda:       document.getElementById('inputBusqueda').value.trim(),
+        busqueda:       document.getElementById('dirBusqueda').value.trim(),
         especialidad:   document.getElementById('filtroEsp').value,
         disponibilidad: document.getElementById('filtroDisp').value,
     });
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Búsqueda con debounce de 350 ms
     let debounce;
-    document.getElementById('inputBusqueda').addEventListener('input', () => {
+    document.getElementById('dirBusqueda').addEventListener('input', () => {
         clearTimeout(debounce);
         debounce = setTimeout(aplicarFiltros, 350);
     });
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filtroDisp').addEventListener('change', aplicarFiltros);
 
     document.getElementById('btnLimpiar').addEventListener('click', () => {
-        document.getElementById('inputBusqueda').value = '';
+        document.getElementById('dirBusqueda').value = '';
         document.getElementById('filtroEsp').value     = '';
         document.getElementById('filtroDisp').value    = '';
         cargarDirectorio();

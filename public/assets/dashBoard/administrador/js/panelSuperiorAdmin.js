@@ -278,6 +278,10 @@ class panelSuperiorAdmin {
             case 'perfil-administrador':
                 titlePage = 'Perfil';
                 break;
+            case 'directorio':
+            case 'ver-perfil':
+                titlePage = 'Directorio';
+                break;
             case 'listar-propietarios':
                 titlePage = 'Propietarios';
                 break;

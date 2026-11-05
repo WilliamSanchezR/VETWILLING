@@ -207,3 +207,45 @@
 :root[data-theme="dark"]:has(#sidebarAdmin) .btn-marcar-leidas {
     color: #5acb7a;
 }
+
+/* Directorio de profesionales: usa sus propias variables de color */
+:root[data-theme="dark"]:has(#sidebarAdmin) {
+    --fondo: var(--dk-fondo);
+    --card: var(--dk-superficie);
+    --txt: var(--dk-texto);
+    --txt2: var(--dk-texto-2);
+    --border: var(--dk-borde);
+    --gl: rgba(63, 191, 98, 0.14);
+    --gm: var(--dk-borde);
+}
+
+/* Tarjetas del equipo en el directorio */
+:root[data-theme="dark"]:has(#sidebarAdmin) .dir-equipo {
+    --color-principal-hover: #5acb7a;
+    --color-principal-suave: rgba(63, 191, 98, 0.14);
+    --color-texto: var(--dk-texto);
+    --color-texto-light: var(--dk-texto-2);
+    --color-fondo: var(--dk-superficie-2);
+    --color-superficie: var(--dk-superficie);
+    --color-borde: var(--dk-borde);
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) .dir-equipo .team-overlay :is(h3, p) {
+    color: #fff !important;
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) #modalEquipo .btn-close {
+    filter: invert(1);
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) #modalEquipo .btn-outline-secondary {
+    background: transparent;
+    border-color: var(--dk-borde);
+    color: var(--dk-texto);
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) #modalEquipo input[type="file"]::file-selector-button {
+    background: var(--dk-superficie);
+    color: var(--dk-texto);
+    border-color: var(--dk-borde);
+}

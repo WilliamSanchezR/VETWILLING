@@ -55,7 +55,7 @@ foreach ($esperado as [$controlador, $metodo, $accion, $roles]) {
 // Todo formulario que envía a estos controladores debe llevar el token CSRF
 $rutasProtegidas = ['/admin/guardar-usuario', '/admin/actualizar-usuario', '/admin/eliminar-usuario', '/admin/cambiar-foto',
     '/admin/actualizar-contrasena', '/admin/guardar-veterinaria', '/admin/actualizar-veterinaria', '/admin/eliminar-veterinaria',
-    '/veterinario/actualizar-constrasena', '/cliente/actualizar-contrasena', '/representante/actualizar-veterinaria'];
+    '/veterinario/actualizar-constrasena', '/cliente/actualizar-contrasena', '/representante/actualizar-veterinaria', '/directorio/equipo/guardar'];
 $vistas = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz . '/app/views', FilesystemIterator::SKIP_DOTS));
 foreach ($vistas as $archivo) {
     if ($archivo->getExtension() !== 'php') {

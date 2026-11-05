@@ -1,0 +1,245 @@
+.dir-equipo {
+    --color-principal: #0A932C;
+    --color-principal-hover: #087a24;
+    --color-principal-suave: rgba(10, 147, 44, 0.08);
+    --color-texto: #16201a;
+    --color-texto-light: #55615a;
+    --color-fondo: #f6faf7;
+    --color-superficie: #ffffff;
+    --color-borde: #e3ebe5;
+    --radio-md: 16px;
+    --radio-pill: 999px;
+    --sombra-sm: 0 2px 8px rgba(16, 40, 24, 0.06);
+    --sombra-md: 0 10px 30px rgba(16, 40, 24, 0.08);
+    --transicion: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 40px;
+}
+
+.dir-equipo-encabezado {
+    margin-bottom: 20px;
+}
+
+.dir-equipo-etiqueta {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radio-pill);
+    background: var(--color-principal-suave);
+    color: var(--color-principal-hover);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.dir-equipo-encabezado h3 {
+    margin: 0.6rem 0 0.2rem;
+    font-size: 1.4rem;
+    color: var(--color-texto);
+}
+
+.dir-equipo-encabezado p {
+    margin: 0;
+    color: var(--color-texto-light);
+}
+
+/* Tarjetas: mismos estilos de la sección Equipo de la landing (style-home.css) */
+.team-card {
+    height: 100%;
+    perspective: 1200px;
+}
+
+/* Frente y reverso se apilan en la misma celda: la tarjeta toma la altura del más alto */
+.team-card-inner {
+    display: grid;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.team-front,
+.team-back {
+    grid-area: 1 / 1;
+    position: relative;
+    border-radius: var(--radio-md);
+    overflow: hidden;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    box-shadow: var(--sombra-md);
+}
+
+/* Se voltea con hover (solo en dispositivos con mouse), con clic/toque y al navegar con teclado */
+@media (hover: hover) {
+    .team-card:hover .team-card-inner {
+        transform: rotateY(180deg);
+    }
+}
+
+.team-card.is-flipped .team-card-inner,
+.team-card:has(.team-back:focus-within) .team-card-inner {
+    transform: rotateY(180deg);
+}
+
+/* Frente */
+.team-front {
+    aspect-ratio: 3 / 4;
+    background: var(--color-fondo);
+    cursor: pointer;
+}
+
+.team-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+}
+
+.team-overlay {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 3rem 1rem 1rem;
+    background: linear-gradient(to top, rgba(6, 60, 20, 0.92) 0%, rgba(6, 60, 20, 0.5) 55%, transparent 100%);
+    color: #fff;
+}
+
+.team-overlay h3 {
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 0.1rem;
+}
+
+.team-overlay p {
+    font-size: 0.85rem;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.team-flip {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--color-principal-hover);
+    font-size: 1.1rem;
+    box-shadow: var(--sombra-sm);
+    transition: transform var(--transicion), background-color var(--transicion);
+}
+
+.team-flip:hover {
+    transform: rotate(90deg);
+}
+
+/* Reverso */
+.team-back {
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1rem 1rem;
+    background: var(--color-superficie);
+    color: var(--color-texto);
+}
+
+.team-back h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.15rem;
+}
+
+.team-role {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-principal-hover);
+    margin-bottom: 0.85rem;
+}
+
+.team-flip--back {
+    top: auto;
+    bottom: 1rem;
+    background: var(--color-principal-suave);
+    box-shadow: none;
+}
+
+.team-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    flex-grow: 1;
+    align-content: flex-start;
+}
+
+.team-skills li {
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radio-pill);
+    background: var(--color-fondo);
+    border: 1px solid var(--color-borde);
+    font-size: 0.75rem;
+    color: var(--color-texto-light);
+}
+
+.social-links {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.social-links a {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-principal-suave);
+    color: var(--color-principal-hover);
+    text-decoration: none;
+    transition: background-color var(--transicion), color var(--transicion);
+}
+
+.social-links a:hover {
+    background: var(--color-principal-hover);
+    color: #fff;
+}
+
+@media (max-width: 575.98px) {
+    .team-back { padding: 0.9rem 0.75rem 0.75rem; }
+    .team-flip--back { bottom: 0.75rem; right: 0.75rem; width: 32px; height: 32px; }
+    .team-back h3, .team-overlay h3 { font-size: 0.95rem; }
+    .team-role { font-size: 0.75rem; margin-bottom: 0.6rem; }
+    .team-skills { gap: 0.25rem; margin-bottom: 0.75rem; }
+    .team-skills li { font-size: 0.7rem; }
+    .social-links a { width: 32px; height: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .team-card-inner { transform: none !important; transition: none; }
+    .team-back { transform: none; opacity: 0; }
+}
+
+.dir-equipo-encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.dir-equipo-editar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--color-principal-hover);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--color-principal-hover);
+    font-weight: 600;
+}
+
+.dir-equipo-editar:hover {
+    background: var(--color-principal-suave);
+}

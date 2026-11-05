@@ -89,6 +89,7 @@ return [
     '/directorio/profesionales'                        => ['tipo' => 'api', 'roles' => [1, 2, 3, 4]],
     '/directorio/perfil'                               => ['tipo' => 'api', 'roles' => [1, 2, 3, 4]],
     '/directorio/resenia'                              => ['tipo' => 'api', 'roles' => [1, 2, 3, 4]],
+    '/directorio/equipo/guardar'                       => ['tipo' => 'accion', 'roles' => [1]],
     '/directorio/actualizar-estado'                    => ['tipo' => 'api', 'roles' => [1, 2, 3, 4]],
     '/veterinario/guardar-veterinario'                 => ['tipo' => 'deshabilitada'],
     '/veterinario/consultar-citas'                     => ['tipo' => 'vista', 'roles' => [2, 4]],
