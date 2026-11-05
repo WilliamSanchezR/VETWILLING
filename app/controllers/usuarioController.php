@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/usuario.php';
 
 
@@ -11,6 +12,7 @@ switch ($method) {
     case 'POST':
 
         $accion = $_POST['accion'] ?? '';
+        acceso_exigir_accion('usuario', 'POST', $accion);
         if ($accion === 'actualizar') {
             actualizarUsuario();
         } else if ($accion  === 'actualizar-constrasena') {
@@ -28,6 +30,7 @@ switch ($method) {
 
     case 'GET':
         $accion = $_GET['accion'] ?? '';
+        acceso_exigir_accion('usuario', 'GET', $accion);
 
         if ($accion === 'eliminar') {
             eliminarUsuario($_GET['id']);
@@ -252,7 +255,8 @@ function eliminarUsuario($id)
 // FUNCION PARA CAMBIAR LA CONTRASEÑA DEL USUARIO
 function cambioContrasena()
 {
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    // Cada usuario solo cambia su propia contraseña
+    $id_usuario = acceso_id_usuario();
     $passwordActual = $_POST['contrasena-actual'] ?? '';
     $PasswordNuevo = $_POST['nueva-contrasena'] ?? '';
     $PasswordConfir = $_POST['confi-contrasena'] ?? '';
@@ -300,7 +304,8 @@ function cambioContrasena()
 }
 function vetContrasena()
 {
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    // Cada usuario solo cambia su propia contraseña
+    $id_usuario = acceso_id_usuario();
     $passwordActual = $_POST['contrasena-actual'] ?? '';
     $PasswordNuevo = $_POST['nueva-contrasena'] ?? '';
     $PasswordConfir = $_POST['confi-contrasena'] ?? '';
@@ -349,7 +354,8 @@ function vetContrasena()
 
 function modiContrasena()
 {
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    // Cada usuario solo cambia su propia contraseña
+    $id_usuario = acceso_id_usuario();
     $passwordActual = $_POST['contrasena-actual'] ?? '';
     $PasswordNuevo = $_POST['nueva-contrasena'] ?? '';
     $PasswordConfir = $_POST['confi-contrasena'] ?? '';
@@ -399,7 +405,8 @@ function modiContrasena()
 // FUNCION PARA CAMBIAR LA FOTO DE PERFIL 
 function actualizarFotoPerfil()
 {
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    // Cada usuario solo cambia su propia foto
+    $id_usuario = acceso_id_usuario();
 
     if (empty($id_usuario)) {
         mostrarSweetAlert('error', 'Error', 'ID de usuario no proporcionado');

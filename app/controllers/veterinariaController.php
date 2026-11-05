@@ -2,6 +2,7 @@
 
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/veterinaria.php';
 require_once __DIR__ . '/../helpers/mailer_helper.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
@@ -15,6 +16,7 @@ switch ($method) {
     case 'POST':
 
         $accion = $_POST['accion'] ?? '';
+        acceso_exigir_accion('veterinaria', 'POST', $accion);
         if ($accion === 'actualizar') {
             actualizarVeterinaria();
         } else if ($accion === 'actualizarInfo') {
@@ -27,14 +29,15 @@ switch ($method) {
     case 'GET':
         // Esta variable captura la accion de eliminar
         $action = $_GET['action'] ?? '';
+        acceso_exigir_accion('veterinaria', 'GET', $action);
         if ($action === 'eliminar') {
             eliminarVeterinaria($_GET['id']);
         }  elseif ($action === 'obtener_horarios') {
-            $id_veterinaria = $_GET['id'] ?? '';
-            consultarHorariosVeterinaria($id_veterinaria);
+            // El representante solo consulta los horarios de su clínica
+            consultarHorariosVeterinaria(acceso_id_veterinaria());
         } elseif ($action === 'eliminar_horarios') {
             $idHorario = $_GET['id'] ?? '';
-            eliminarHorariosPorVeterinaria($idHorario);
+            eliminarHorariosPorVeterinaria($idHorario, acceso_id_veterinaria());
         }
         break;
 
@@ -429,7 +432,8 @@ function actualizarInfoVeterinaria()
     $ciudad = $_POST['ciudad'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
     $horarios = $_POST['horarios'] ?? '';
-    $id_veterinaria = $_POST['id_veterinaria'] ?? '';
+    // El representante solo edita su clínica
+    $id_veterinaria = acceso_id_veterinaria();
 
 
     // Validamos que los campos no esten vacios
@@ -513,12 +517,12 @@ function consultarHorariosVeterinaria($id_veterinaria)
     }
 }
 
-function eliminarHorariosPorVeterinaria($idHorario)
+function eliminarHorariosPorVeterinaria($idHorario, $idVeterinaria)
 {
         $veterinariaModel = new Veterinaria();
 
     // Llamamos al método para eliminar los horarios del servicio
-    $resultado = $veterinariaModel->eliminarHorariosPorVeterinaria($idHorario);
+    $resultado = $veterinariaModel->eliminarHorariosPorVeterinaria($idHorario, $idVeterinaria);
 
     if ($resultado) {
         // ┌─ RETORNAR RESULTADO

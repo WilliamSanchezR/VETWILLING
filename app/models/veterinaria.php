@@ -374,13 +374,15 @@ class Veterinaria
         }
     }
 
-    public function eliminarHorariosPorVeterinaria($idHorario)
+    public function eliminarHorariosPorVeterinaria($idHorario, $idVeterinaria)
     {
         try {
-            $consulta = "UPDATE horario_veterinaria SET estado = 'Inactivo' WHERE id_horario_veterinaria = :id_horario";
+            $consulta = "UPDATE horario_veterinaria SET estado = 'Inactivo' WHERE id_horario_veterinaria = :id_horario AND id_veterinaria = :id_veterinaria";
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_horario', $idHorario);
-            return $resultado->execute();
+            $resultado->bindParam(':id_veterinaria', $idVeterinaria);
+            // Si el horario es de otra clínica no se modifica ninguna fila
+            return $resultado->execute() && $resultado->rowCount() > 0;
         } catch (PDOException $e) {
             echo "Error al eliminar el horario de la veterinaria: " . $e->getMessage();
             return false;

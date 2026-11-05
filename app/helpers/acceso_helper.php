@@ -611,3 +611,54 @@ function acceso_actualizar_sesion_actual(int $idUsuario, int $nuevaVersion): voi
     unset($_SESSION['csrf_token']);
     acceso_olvidar_verificacion();
 }
+
+// ── Permisos por acción dentro de los controladores ──────────────────────────────
+
+/**
+ * Indica si un rol puede ejecutar una acción de un controlador (config/permisos_acciones.php).
+ * No usa sesión ni base de datos, para poder probarla directamente.
+ */
+function acceso_accion_permitida(array $permisos, string $controlador, string $metodo, string $accion, ?int $rol): bool
+{
+    $metodo = strtoupper($metodo);
+    $reglas = $permisos[$controlador][$metodo] ?? null;
+    if ($reglas === null) {
+        return false;
+    }
+    if (!array_key_exists($accion, $reglas)) {
+        return $metodo === 'GET';
+    }
+    return $rol !== null && in_array($rol, $reglas[$accion], true);
+}
+
+/**
+ * Detiene la petición con 403 si el usuario actual no puede ejecutar la acción.
+ *
+ * @param mixed $accion Valor recibido en la petición; si no es texto se trata como una acción inválida
+ */
+function acceso_exigir_accion(string $controlador, string $metodo, $accion): void
+{
+    $permisos = require __DIR__ . '/../../config/permisos_acciones.php';
+    $rol = acceso_rol();
+    if (is_string($accion) && acceso_accion_permitida($permisos, $controlador, $metodo, $accion, $rol)) {
+        return;
+    }
+
+    error_log(sprintf(
+        '[acceso] DENEGADO %s controlador %s, acción %s (rol %s)',
+        strtoupper($metodo),
+        $controlador,
+        is_string($accion) ? mb_substr($accion, 0, 50) : 'inválida',
+        $rol === null ? 'anónimo' : (string) $rol
+    ));
+
+    http_response_code(403);
+    $mensaje = 'No tienes permiso para realizar esta acción.';
+    if (acceso_responder_json(acceso_estado()['politica'] ?? null)) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => $mensaje, 'message' => $mensaje]);
+        exit();
+    }
+    require __DIR__ . '/../views/auth/error403.php';
+    exit();
+}
