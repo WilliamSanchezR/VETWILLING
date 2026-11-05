@@ -842,13 +842,15 @@ $val
                               action="<?= BASE_URL ?>/cliente/actualizar-contrasena"
                               novalidate
                               class="form-validable">
+                            <?= csrf_campo() ?>
+                            <input type="hidden" name="accion" value="modificar-contrasena">
 
                             <div class="form-group-config">
                                 <label for="inp-pass-actual" data-i18n="seg.pass_actual"><?= $t(
                                     "seg.pass_actual",
                                 ) ?></label>
                                 <div class="password-input-wrapper">
-                                    <input type="password" id="inp-pass-actual" name="password_actual"
+                                    <input type="password" id="inp-pass-actual" name="contrasena-actual"
                                            required autocomplete="current-password"
                                            aria-describedby="inp-pass-actual-error">
                                     <button type="button" class="toggle-password"
@@ -866,7 +868,7 @@ $val
                                         "seg.pass_nueva",
                                     ) ?></label>
                                     <div class="password-input-wrapper">
-                                        <input type="password" id="inp-pass-nueva" name="password_nueva"
+                                        <input type="password" id="inp-pass-nueva" name="nueva-contrasena"
                                                required minlength="8" autocomplete="new-password"
                                                aria-describedby="inp-pass-nueva-error"
                                                oninput="evaluarPassword(this.value)">
@@ -889,7 +891,7 @@ $val
                                         "seg.pass_confirmar",
                                     ) ?></label>
                                     <div class="password-input-wrapper">
-                                        <input type="password" id="inp-pass-conf" name="password_confirmacion"
+                                        <input type="password" id="inp-pass-conf" name="confi-contrasena"
                                                required minlength="8" autocomplete="new-password"
                                                aria-describedby="inp-pass-conf-error">
                                         <button type="button" class="toggle-password"

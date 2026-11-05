@@ -20,6 +20,13 @@ $usuario = mostrarPerfil($id);
 
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/adminDark.css">
+<script>
+    // Aplica el tema antes de pintar la página para evitar un destello claro
+    try {
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') === 'dark' ? 'dark' : 'light');
+    } catch (e) {}
+</script>
 <script>
     window.BASE_URL = "<?= BASE_URL ?>";
 </script>
@@ -115,12 +122,12 @@ $usuario = mostrarPerfil($id);
         <!-- Perfil Usuario -->
         <button class="btn-perfil" onclick="toggleDropdown('perfil')" aria-label="Perfil">
             <div class="avatar-usuario">
-                <span> <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+                <span> <img src="<?= e(avatar_usuario_src($usuario)) ?>" alt="">
                 </span>
             </div>
             <div class="info-usuario">
-                <span class="nombre-usuario"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></span>
-                <span class="rol-usuario"><?= $usuario['rol'] ?></span>
+                <span class="nombre-usuario"><?= e($usuario['nombres']) ?> <?= e($usuario['apellidos']) ?></span>
+                <span class="rol-usuario"><?= e($usuario['rol']) ?></span>
             </div>
             <i class="bi bi-chevron-down flecha-perfil"></i>
         </button>
@@ -129,12 +136,12 @@ $usuario = mostrarPerfil($id);
         <div class="dropdown-menu dropdown-perfil" id="dropdownPerfil">
             <div class="perfil-header">
                 <div class="avatar-usuario grande">
-                    <span> <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt="">
+                    <span> <img src="<?= e(avatar_usuario_src($usuario)) ?>" alt="">
                     </span>
                 </div>
                 <div>
-                    <p class="nombre-completo"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></p>
-                    <p class="email-usuario"><?= $usuario['email'] ?></p>
+                    <p class="nombre-completo"><?= e($usuario['nombres']) ?> <?= e($usuario['apellidos']) ?></p>
+                    <p class="email-usuario"><?= e($usuario['email']) ?></p>
                 </div>
             </div>
             <div class="dropdown-divider"></div>

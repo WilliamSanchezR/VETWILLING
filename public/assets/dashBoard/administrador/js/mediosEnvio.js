@@ -80,8 +80,8 @@ async function cargarCanales() {
                 <div class="flex-grow-1">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h6 class="mb-0 fw-semibold">${c.nombre_canal}</h6>
-                            <small class="text-muted">${c.descripcion ?? ''}</small>
+                            <h6 class="mb-0 fw-semibold">${escapar(c.nombre_canal)}</h6>
+                            <small class="text-muted">${escapar(c.descripcion ?? '')}</small>
                         </div>
                         <span class="badge badge-estado ${!disponible ? 'bg-warning text-dark' : habilitado ? 'bg-success' : 'bg-secondary'}">
                             ${!disponible ? 'No disponible' : habilitado ? 'Activo' : 'Inactivo'}
@@ -140,7 +140,7 @@ function poblarSelectoresCanal(canales) {
         btn.className = 'btn-canal-sel';
         btn.dataset.codigo = c.codigo_canal;
         btn.dataset.id     = c.id_canal;
-        btn.innerHTML = `<i class="bi ${ICONOS_CANAL[c.codigo_canal] ?? 'bi-send'} me-1"></i>${c.nombre_canal}`;
+        btn.innerHTML = `<i class="bi ${ICONOS_CANAL[c.codigo_canal] ?? 'bi-send'} me-1"></i>${escapar(c.nombre_canal)}`;
         btn.addEventListener('click', () => seleccionarCanalConfig(c, btn));
         btnsCfg.appendChild(btn);
 
@@ -400,7 +400,7 @@ function renderResumen(resumen) {
         col.innerHTML = `
         <div class="card-resumen">
             <div class="cifra ${+r.fallidos > 0 ? 'danger' : 'success'}">${r.total}</div>
-            <div class="etiqueta">${r.canal} · ${r.fallidos} fallos</div>
+            <div class="etiqueta">${escapar(r.canal)} · ${r.fallidos} fallos</div>
         </div>`;
         cont.appendChild(col);
     });

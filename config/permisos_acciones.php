@@ -19,9 +19,9 @@ return [
             'modificar-contrasena'   => [3],
             'vet-constrasena'        => [2, 4],
             'cambiar-foto'           => [1, 4],
+            'eliminar'               => [1],
         ],
         'GET' => [
-            'eliminar'    => [1],
             'listarAdmin' => [1],
         ],
     ],
@@ -30,9 +30,9 @@ return [
             ''               => [1],
             'actualizar'     => [1],
             'actualizarInfo' => [4],
+            'eliminar'       => [1],
         ],
         'GET' => [
-            'eliminar'          => [1],
             'obtener_horarios'  => [4],
             'eliminar_horarios' => [4],
         ],

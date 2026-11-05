@@ -7,6 +7,7 @@
 /public/uploads/profesionales/*
 
 /public/uploads/usuarios/*
+!/public/uploads/usuarios/.gitkeep
 
 /public/uploads/veterinaria/*
 

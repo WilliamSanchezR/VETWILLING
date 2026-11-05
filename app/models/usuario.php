@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 
 class Usuario
 {
@@ -371,8 +372,18 @@ class Usuario
             $stmt->bindParam(':id_usuario', $data['id_usuario']);
             $stmt->bindParam(':password_hash', $nuevoPassword);
 
-            return $stmt->execute();
-        } catch (PDOException $e) {
+            $this->conexion->beginTransaction();
+            $stmt->execute();
+            // Cierra las demás sesiones del usuario y mantiene abierta la actual
+            $version = acceso_rotar_credenciales($this->conexion, (int) $data['id_usuario']);
+            $this->conexion->commit();
+            acceso_actualizar_sesion_actual((int) $data['id_usuario'], $version);
+
+            return true;
+        } catch (Throwable $e) {
+            if ($this->conexion->inTransaction()) {
+                $this->conexion->rollBack();
+            }
             error_log("Error en Usuario::actualizarUsuario -> " . $e->getMessage());
             return false;
         }

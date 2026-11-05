@@ -6,8 +6,13 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 require_once BASE_PATH . '/app/controllers/ticketController.php';
 require_once BASE_PATH . '/app/controllers/usuarioController.php';
 
-$id = $_GET['id'];
+$id = $_GET['id'] ?? 0;
 $ticketData = consultarTicket($id);
+if (!$ticketData) {
+    http_response_code(404);
+    require BASE_PATH . '/app/views/auth/error404.php';
+    exit();
+}
 $usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
 
 // Obtener el ID del usuario logueado
@@ -83,7 +88,7 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
         ?>
 
         <div class="wizard-container">
-            <input type="hidden" name="id_usuario_auth" id="id_usuario_auth" value="<?= $usuarioLogueadoId ?>">
+            <input type="hidden" name="id_usuario_auth" id="id_usuario_auth" value="<?= e($usuarioLogueadoId) ?>">
 
             <div class="wizard-header">
                 <i class="bi bi-person-vcard"></i>
@@ -96,23 +101,23 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                     <div class="content-ticket">
                         <div>
                             <span class="label-ticket">Número de Ticket:</span>
-                            <span class="label-ticket "><?= $ticketData['id'] ?></span>
+                            <span class="label-ticket "><?= e($ticketData['id']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Título:</span>
-                            <span><?= $ticketData['titulo'] ?></span>
+                            <span><?= e($ticketData['titulo']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Fecha de Creación:</span>
-                            <span><?= $ticketData['fecha_creacion'] ?></span>
+                            <span><?= e($ticketData['fecha_creacion']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Categoría:</span>
-                            <span><?= $ticketData['categoria'] ?></span>
+                            <span><?= e($ticketData['categoria']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Prioridad:</span>
-                            <span><?= $ticketData['prioridad'] ?></span>
+                            <span><?= e($ticketData['prioridad']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Estado:</span>
@@ -120,18 +125,18 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                         </div>
                         <div>
                             <span class="label-ticket">Asignado a:</span>
-                            <span><?= $ticketData['nombre_asignado'] . ' ' . $ticketData['apellido_asignado'] ?></span>
+                            <span><?= e($ticketData['nombre_asignado'] . ' ' . $ticketData['apellido_asignado']) ?></span>
                         </div>
 
                         <div class="ticket-description">
                             <span class="label-ticket">Descripción:</span>
-                            <p><?= $ticketData['descripcion'] ?></p>
+                            <p><?= e($ticketData['descripcion']) ?></p>
                         </div>
 
                         <?php if (!empty($ticketData['archivo'])) : ?>
                             <div class="ticket-attachment">
                                 <span class="label-ticket">Archivo Adjunto:</span>
-                                <a href="<?= BASE_URL ?>/public/uploads/tickets/<?= $ticketData['archivo'] ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                <a href="<?= BASE_URL ?>/public/uploads/tickets/<?= e($ticketData['archivo']) ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
                                     <i class="bi bi-paperclip"></i> Ver Archivo
                                 </a>
                             </div>
@@ -143,27 +148,27 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                     <div class="content-ticket">
                         <div>
                             <span class="label-ticket">Nombre del Usuario:</span>
-                            <span id="nombre_usuario_creado"><?= $usuarioData['nombres'] . ' ' . $usuarioData['apellidos'] ?></span>
+                            <span id="nombre_usuario_creado"><?= e($usuarioData['nombres'] . ' ' . $usuarioData['apellidos']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Correo Electrónico:</span>
-                            <span><?= $usuarioData['email'] ?></span>
+                            <span><?= e($usuarioData['email']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Teléfono de Contacto:</span>
-                            <span><?= $usuarioData['telefono'] ?></span>
+                            <span><?= e($usuarioData['telefono']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Rol del Usuario:</span>
-                            <span><?= $usuarioData['rol_name'] ?></span>
+                            <span><?= e($usuarioData['rol_name']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Veterinaria:</span>
-                            <span><?= $usuarioData['nombre_veterinaria'] ?></span>
+                            <span><?= e($usuarioData['nombre_veterinaria']) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Especialidad:</span>
-                            <span><?= $usuarioData['especialidad'] ?></span>
+                            <span><?= e($usuarioData['especialidad']) ?></span>
                         </div>
                     </div>
                 </div>
@@ -194,7 +199,7 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                             <div class="asignar-ticket">
                                 <h2>Asignar Ticket</h2>
                                 <form id="asignarTicketForm">
-                                    <input type="hidden" name="id_ticket" id="id_ticket" value="<?= $ticketData['id'] ?>">
+                                    <input type="hidden" name="id_ticket" id="id_ticket" value="<?= e($ticketData['id']) ?>">
                                     <div class="content-ticket">
                                         <div>
                                             <label for="usuario_asignado" class="form-label">Seleccionar Usuario a asignar:</label>
@@ -219,8 +224,8 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                         <?php if ($ticketData['id_asignado'] !== null) : ?>
                             <div class="container">
                                 <form id="actualizarEstadoForm">
-                                    <input type="hidden" name="id_ticket" id="id_ticket" value="<?= $ticketData['id'] ?>">
-                                    <input type="hidden" id="estado_actual" value="<?= $ticketData['estado'] ?>">
+                                    <input type="hidden" name="id_ticket" id="id_ticket" value="<?= e($ticketData['id']) ?>">
+                                    <input type="hidden" id="estado_actual" value="<?= e($ticketData['estado']) ?>">
                                     <input type="hidden" id="puede_editar" value="<?= $puedeEditar ? '1' : '0' ?>">
                                     <input type="hidden" id="ticket_cerrado" value="<?= $ticketCerrado ? '1' : '0' ?>">
 
@@ -232,7 +237,7 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                                                 <?php if ($ticketCerrado): ?>
                                                     Este ticket está cerrado y no puede ser modificado.
                                                 <?php elseif (!$esAsignado): ?>
-                                                    Este ticket solo puede ser editado por el usuario asignado: <strong><?= $ticketData['nombre_asignado'] . ' ' . $ticketData['apellido_asignado'] ?></strong>
+                                                    Este ticket solo puede ser editado por el usuario asignado: <strong><?= e($ticketData['nombre_asignado'] . ' ' . $ticketData['apellido_asignado']) ?></strong>
                                                 <?php endif; ?>
                                             </div>
                                         <?php endif; ?>

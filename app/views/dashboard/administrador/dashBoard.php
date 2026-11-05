@@ -70,7 +70,7 @@ $datosVeterinarias = listarVeterinariasRegistradas();
             <!-- HEADER ADMIN -->
             <div class="header-admin">
                 <div class="header-info">
-                    <h1>👋 Bienvenido, Administrador <?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></h1>
+                    <h1>👋 Bienvenido, Administrador <?= e($usuario['nombres']) ?> <?= e($usuario['apellidos']) ?></h1>
                     <p>Panel de control principal - Gestiona todo el sistema VetWilling</p>
                 </div>
                 <div class="header-acciones">
@@ -97,13 +97,13 @@ $datosVeterinarias = listarVeterinariasRegistradas();
                         </div>
                         <div class="stat-trend up">
                             <i class="bi bi-arrow-up"></i>
-                            <?= $totalUsuarios['porcentaje_activos'] ?>%
+                            <?= e($totalUsuarios['porcentaje_activos']) ?>%
                         </div>
                     </div>
-                    <div class="stat-value"><?= $totalUsuarios['total_activos'] ?></div>
+                    <div class="stat-value"><?= e($totalUsuarios['total_activos']) ?></div>
                     <div class="stat-label">Total Usuarios</div>
                     <div class="stat-footer">
-                        <i class="bi bi-person-plus"></i> <?= $usuariosRegistradosUltimoMes ?> nuevos usuarios este mes
+                        <i class="bi bi-person-plus"></i> <?= e($usuariosRegistradosUltimoMes) ?> nuevos usuarios este mes
                     </div>
                 </div>
 
@@ -115,13 +115,13 @@ $datosVeterinarias = listarVeterinariasRegistradas();
                         </div>
                         <div class="stat-trend up">
                             <i class="bi bi-arrow-up"></i>
-                            <?= $porcentajeVeterinarias['porcentaje_activas'] ?>%
+                            <?= e($porcentajeVeterinarias['porcentaje_activas']) ?>%
                         </div>
                     </div>
-                    <div class="stat-value"><?= $totalVeterinarias ?></div>
+                    <div class="stat-value"><?= e($totalVeterinarias) ?></div>
                     <div class="stat-label">Veterinarias Activas</div>
                     <div class="stat-footer">
-                        <i class="bi bi-check-circle"></i> <?= $totalVeterinarias ?> veterinarias activas en el sistema
+                        <i class="bi bi-check-circle"></i> <?= e($totalVeterinarias) ?> veterinarias activas en el sistema
                     </div>
                 </div>
 
@@ -133,13 +133,13 @@ $datosVeterinarias = listarVeterinariasRegistradas();
                         </div>
                         <div class="stat-trend up">
                             <i class="bi bi-arrow-up"></i>
-                            <?= $porcentajeProfesionales['porcentaje_activas'] ?>%
+                            <?= e($porcentajeProfesionales['porcentaje_activas']) ?>%
                         </div>
                     </div>
-                    <div class="stat-value"><?= $totalProfesionales ?></div>
+                    <div class="stat-value"><?= e($totalProfesionales) ?></div>
                     <div class="stat-label">Total profesionales</div>
                     <div class="stat-footer">
-                        <i class="bi bi-clock"></i> <?= $profesionalesUltimoMes ?> profesionales registrados este mes
+                        <i class="bi bi-clock"></i> <?= e($profesionalesUltimoMes) ?> profesionales registrados este mes
                     </div>
                 </div>
 
@@ -151,13 +151,13 @@ $datosVeterinarias = listarVeterinariasRegistradas();
                         </div>
                         <div class="stat-trend down">
                             <i class="bi bi-arrow-down"></i>
-                            <?= $usuariosUltimoMes['porcentaje_activos_ultimo_mes'] ?>%
+                            <?= e($usuariosUltimoMes['porcentaje_activos_ultimo_mes']) ?>%
                         </div>
                     </div>
-                    <div class="stat-value"><?= $usuariosUltimoMes['usuarios_ultimo_mes'] ?></div>
+                    <div class="stat-value"><?= e($usuariosUltimoMes['usuarios_ultimo_mes']) ?></div>
                     <div class="stat-label">Usuarios que usaron el sistema este mes</div>
                     <div class="stat-footer">
-                        <i class="bi bi-eye"></i> <?= $usuariosUltimoMes['usuarios_ultimo_mes'] ?> usuarios que se logearon este mes
+                        <i class="bi bi-eye"></i> <?= e($usuariosUltimoMes['usuarios_ultimo_mes']) ?> usuarios que se logearon este mes
                     </div>
                 </div>
             </div>
@@ -208,19 +208,19 @@ $datosVeterinarias = listarVeterinariasRegistradas();
                                 <?php if (!empty($datos)) : ?>
                                     <?php foreach ($datos as $usuario):  ?>
                                         <tr class="fila-blanca">
-                                            <td class="tb_foto"><?php if (!empty($usuario['img_perfil'])): ?><?php if ($usuario['id_rol'] == 2): ?><img src="<?= BASE_URL ?>/public/uploads/profesionales/<?= $usuario['img_perfil'] ?>" alt=""><?php else: ?><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt=""><?php endif; ?><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
-                                            <td><?= $usuario['tipo_documento'] ?> - <?= $usuario['numero_documento'] ?></td>
-                                            <td><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></td>
-                                            <td><?= $usuario['telefono'] ?></td>
-                                            <td><?= $usuario['email'] ?></td>
-                                            <td><?= $usuario['estado'] ?></td>
-                                            <td><?= $usuario['rol'] ?></td>
+                                            <td class="tb_foto"><?php if (archivo_subido_existe($usuario['id_rol'] == 2 ? 'profesionales' : 'usuarios', $usuario['img_perfil'] ?? '')): ?><?php if ($usuario['id_rol'] == 2): ?><img src="<?= BASE_URL ?>/public/uploads/profesionales/<?= e($usuario['img_perfil']) ?>" alt=""><?php else: ?><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= e($usuario['img_perfil']) ?>" alt=""><?php endif; ?><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
+                                            <td><?= e($usuario['tipo_documento']) ?> - <?= e($usuario['numero_documento']) ?></td>
+                                            <td><?= e($usuario['nombres']) ?> <?= e($usuario['apellidos']) ?></td>
+                                            <td><?= e($usuario['telefono']) ?></td>
+                                            <td><?= e($usuario['email']) ?></td>
+                                            <td><?= e($usuario['estado']) ?></td>
+                                            <td><?= e($usuario['rol']) ?></td>
                                             <!-- <td class="content-action">
                                                 <button class="btn-accion btn-editar" title="Editar">
-                                                    <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
+                                                    <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= e($usuario['id_usuario']) ?>"><i class="bi bi-pencil"></i></a>
                                                 </button>
                                                 <button class="btn-accion btn-eliminar" title="Eliminar">
-                                                    <a href="<?= BASE_URL ?>/admin/eliminar-usuario?accion=eliminar&id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-trash"></i></a>
+                                                    <a href="<?= BASE_URL ?>/admin/eliminar-usuario?accion=eliminar&id=<?= e($usuario['id_usuario']) ?>"><i class="bi bi-trash"></i></a>
                                                 </button>
                                             </td> -->
                                         </tr>
@@ -264,14 +264,14 @@ $datosVeterinarias = listarVeterinariasRegistradas();
                                 <?php if (!empty($datosVeterinarias)) : ?>
                                     <?php foreach ($datosVeterinarias as $veterinaria):  ?>
                                         <tr class="fila-blanca">
-                                            <td class="tb_foto"><?php if (!empty($veterinaria['logo'])): ?><img src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['logo'] ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
-                                            <td><?= $veterinaria['nit'] ?></td>
-                                            <td><?= $veterinaria['razon_social'] ?></td>
-                                            <td><?= $veterinaria['ciudad'] ?></td>
-                                            <td><?= $veterinaria['nombre'] ?></td>
-                                            <td><?= $veterinaria['email'] ?></td>
-                                            <td><?= $veterinaria['telefono'] ?></td>
-                                            <td><?= $veterinaria['estado'] ?></td>
+                                            <td class="tb_foto"><?php if (archivo_subido_existe('veterinaria', $veterinaria['logo'] ?? '')): ?><img src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= e($veterinaria['logo']) ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
+                                            <td><?= e($veterinaria['nit']) ?></td>
+                                            <td><?= e($veterinaria['razon_social']) ?></td>
+                                            <td><?= e($veterinaria['ciudad']) ?></td>
+                                            <td><?= e($veterinaria['nombre']) ?></td>
+                                            <td><?= e($veterinaria['email']) ?></td>
+                                            <td><?= e($veterinaria['telefono']) ?></td>
+                                            <td><?= e($veterinaria['estado']) ?></td>
 
                                         </tr>
                                     <?php endforeach; ?>

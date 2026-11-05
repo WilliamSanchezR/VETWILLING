@@ -13,7 +13,10 @@ switch ($method) {
 
         $accion = $_POST['accion'] ?? '';
         acceso_exigir_accion('usuario', 'POST', $accion);
-        if ($accion === 'actualizar') {
+        acceso_exigir_csrf();
+        if ($accion === 'eliminar') {
+            eliminarUsuario($_POST['id'] ?? '');
+        } else if ($accion === 'actualizar') {
             actualizarUsuario();
         } else if ($accion  === 'actualizar-constrasena') {
             cambioContrasena();
@@ -32,9 +35,7 @@ switch ($method) {
         $accion = $_GET['accion'] ?? '';
         acceso_exigir_accion('usuario', 'GET', $accion);
 
-        if ($accion === 'eliminar') {
-            eliminarUsuario($_GET['id']);
-        } elseif ($accion === 'listarAdmin') {
+        if ($accion === 'listarAdmin') {
             ListaUsuariosAdmin();
         } else if (isset($_GET['id'])) {
             consultarUsuarioId($_GET['id']);
@@ -107,7 +108,10 @@ function registrarUsuario()
         // Generar un nombre único para la imagen
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
-        move_uploaded_file($file['tmp_name'], $destino);
+        if (!guardar_archivo_subido($file['tmp_name'], $destino)) {
+            mostrarSweetAlert('error', 'Error', 'No se pudo guardar la foto');
+            exit();
+        }
     }
     // Creamos el objeto de la clase Usuario
     $objUsuario = new Usuario();
@@ -431,7 +435,10 @@ function actualizarFotoPerfil()
         // Generar un nombre único para la imagen
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
-        move_uploaded_file($file['tmp_name'], $destino);
+        if (!guardar_archivo_subido($file['tmp_name'], $destino)) {
+            mostrarSweetAlert('error', 'Error', 'No se pudo guardar la foto');
+            exit();
+        }
 
         // Actualizar en la base de datos
         $objUsuario = new Usuario();

@@ -118,20 +118,23 @@ $datos = listarUsuarios();
                         <?php if (!empty($datos)) : ?>
                             <?php foreach ($datos as $usuario):  ?>
                                 <tr class="fila-blanca">
-                                    <td class="tb_foto"><?php if (!empty($usuario['img_perfil'])): ?><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['img_perfil'] ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
-                                    <td><?= $usuario['tipo_documento'] ?> - <?= $usuario['numero_documento'] ?></td>
-                                    <td><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></td>
-                                    <td><?= $usuario['telefono'] ?></td>
-                                    <td><?= $usuario['email'] ?></td>
-                                    <td><?= $usuario['estado'] ?></td>
-                                    <td><?= $usuario['rol'] ?></td>
+                                    <td class="tb_foto"><?php if (archivo_subido_existe('usuarios', $usuario['img_perfil'] ?? '')): ?><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= e($usuario['img_perfil']) ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
+                                    <td><?= e($usuario['tipo_documento']) ?> - <?= e($usuario['numero_documento']) ?></td>
+                                    <td><?= e($usuario['nombres']) ?> <?= e($usuario['apellidos']) ?></td>
+                                    <td><?= e($usuario['telefono']) ?></td>
+                                    <td><?= e($usuario['email']) ?></td>
+                                    <td><?= e($usuario['estado']) ?></td>
+                                    <td><?= e($usuario['rol']) ?></td>
                                     <td class="content-action">
                                         <button class="btn-accion btn-editar" title="Editar">
-                                            <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
+                                            <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= e($usuario['id_usuario']) ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
-                                        <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/admin/eliminar-usuario?accion=eliminar&id=<?= $usuario['id_usuario'] ?>"><i class="bi bi-trash"></i></a>
-                                        </button>
+                                        <form action="<?= BASE_URL ?>/admin/eliminar-usuario" method="POST" style="display:inline" onsubmit="return confirm('¿Inhabilitar este usuario?');">
+                                            <?= csrf_campo() ?>
+                                            <input type="hidden" name="accion" value="eliminar">
+                                            <input type="hidden" name="id" value="<?= e($usuario['id_usuario']) ?>">
+                                            <button type="submit" class="btn-accion btn-eliminar" title="Inhabilitar"><i class="bi bi-trash"></i></button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

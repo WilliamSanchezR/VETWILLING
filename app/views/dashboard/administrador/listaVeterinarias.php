@@ -126,23 +126,26 @@ $datos = listarVeterinariasRegistradas();
                         <?php if (!empty($datos)) : ?>
                             <?php foreach ($datos as $veterinaria):  ?>
                                 <tr class="fila-blanca">
-                                    <td class="tb_foto"><?php if (!empty($veterinaria['logo'])): ?><img src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= $veterinaria['logo'] ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
-                                    <td><?= $veterinaria['nit'] ?></td>
-                                    <td><?= $veterinaria['razon_social'] ?></td>
-                                    <td><?= $veterinaria['ciudad'] ?></td>
-                                    <td><?= $veterinaria['nombre'] ?></td>
-                                    <td><?= $veterinaria['email'] ?></td>
-                                    <td><?= $veterinaria['telefono'] ?></td>
-                                    <td><?= $veterinaria['estado'] ?></td>
+                                    <td class="tb_foto"><?php if (archivo_subido_existe('veterinaria', $veterinaria['logo'] ?? '')): ?><img src="<?= BASE_URL ?>/public/uploads/veterinaria/<?= e($veterinaria['logo']) ?>" alt=""><?php else: ?><i class="bi bi-image"></i><?php endif; ?></td>
+                                    <td><?= e($veterinaria['nit']) ?></td>
+                                    <td><?= e($veterinaria['razon_social']) ?></td>
+                                    <td><?= e($veterinaria['ciudad']) ?></td>
+                                    <td><?= e($veterinaria['nombre']) ?></td>
+                                    <td><?= e($veterinaria['email']) ?></td>
+                                    <td><?= e($veterinaria['telefono']) ?></td>
+                                    <td><?= e($veterinaria['estado']) ?></td>
                                     
                                     
                                     <td>
                                         <button class="btn-accion btn-editar" title="Editar">
-                                            <a href="<?= BASE_URL ?>/admin/editar-veterinaria?id=<?= $veterinaria['id_veterinaria'] ?>"><i class="bi bi-pencil"></i></a>
+                                            <a href="<?= BASE_URL ?>/admin/editar-veterinaria?id=<?= e($veterinaria['id_veterinaria']) ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
-                                        <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/admin/eliminar-veterinaria?action=eliminar&id=<?= $veterinaria['id_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
-                                        </button>
+                                        <form action="<?= BASE_URL ?>/admin/eliminar-veterinaria" method="POST" style="display:inline" onsubmit="return confirm('¿Eliminar esta veterinaria?');">
+                                            <?= csrf_campo() ?>
+                                            <input type="hidden" name="accion" value="eliminar">
+                                            <input type="hidden" name="id" value="<?= e($veterinaria['id_veterinaria']) ?>">
+                                            <button type="submit" class="btn-accion btn-eliminar" title="Eliminar"><i class="bi bi-trash"></i></button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

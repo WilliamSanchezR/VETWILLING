@@ -17,7 +17,10 @@ switch ($method) {
 
         $accion = $_POST['accion'] ?? '';
         acceso_exigir_accion('veterinaria', 'POST', $accion);
-        if ($accion === 'actualizar') {
+        acceso_exigir_csrf();
+        if ($accion === 'eliminar') {
+            eliminarVeterinaria($_POST['id'] ?? '');
+        } else if ($accion === 'actualizar') {
             actualizarVeterinaria();
         } else if ($accion === 'actualizarInfo') {
             actualizarInfoVeterinaria();
@@ -30,9 +33,7 @@ switch ($method) {
         // Esta variable captura la accion de eliminar
         $action = $_GET['action'] ?? '';
         acceso_exigir_accion('veterinaria', 'GET', $action);
-        if ($action === 'eliminar') {
-            eliminarVeterinaria($_GET['id']);
-        }  elseif ($action === 'obtener_horarios') {
+        if ($action === 'obtener_horarios') {
             // El representante solo consulta los horarios de su clínica
             consultarHorariosVeterinaria(acceso_id_veterinaria());
         } elseif ($action === 'eliminar_horarios') {
@@ -133,7 +134,10 @@ function registrarVeterinaria()
         // Generar un nombre único para la imagen
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
-        move_uploaded_file($file['tmp_name'], $destino);
+        if (!guardar_archivo_subido($file['tmp_name'], $destino)) {
+            mostrarSweetAlert('error', 'Error', 'No se pudo guardar la foto');
+            exit();
+        }
     }
 
     // Creamos el objeto de la clase Veterinaria

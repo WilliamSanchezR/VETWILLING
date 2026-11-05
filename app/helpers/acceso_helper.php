@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__ . '/html_helper.php';
+require_once __DIR__ . '/csrf_helper.php';
+
 // Identidad del usuario autenticado.
 //
 // Una sesión solo cuenta como iniciada si la creó el login (acceso_iniciar_sesion_usuario):
@@ -659,6 +662,20 @@ function acceso_exigir_accion(string $controlador, string $metodo, $accion): voi
         echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => $mensaje, 'message' => $mensaje]);
         exit();
     }
+    require __DIR__ . '/../views/auth/error403.php';
+    exit();
+}
+
+/**
+ * Detiene la petición con 403 si el token CSRF del formulario no es válido.
+ */
+function acceso_exigir_csrf(): void
+{
+    if (csrf_valido($_POST['csrf_token'] ?? null)) {
+        return;
+    }
+    error_log('[acceso] DENEGADO token CSRF no válido');
+    http_response_code(403);
     require __DIR__ . '/../views/auth/error403.php';
     exit();
 }

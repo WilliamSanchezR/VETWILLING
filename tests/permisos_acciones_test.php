@@ -20,7 +20,7 @@ $esperado = [
     ['usuario', 'POST', 'vet-constrasena', [2, 4]],
     ['usuario', 'POST', 'cambiar-foto', [1, 4]],
     ['usuario', 'POST', 'accion-inventada', []],
-    ['usuario', 'GET', 'eliminar', [1]],
+    ['usuario', 'POST', 'eliminar', [1]],
     ['usuario', 'GET', 'listarAdmin', [1]],
     ['usuario', 'GET', '', [1, 2, 3, 4, 5]],
     ['usuario', 'DELETE', '', []],
@@ -28,7 +28,7 @@ $esperado = [
     ['veterinaria', 'POST', 'actualizar', [1]],
     ['veterinaria', 'POST', 'actualizarInfo', [4]],
     ['veterinaria', 'POST', 'accion-inventada', []],
-    ['veterinaria', 'GET', 'eliminar', [1]],
+    ['veterinaria', 'POST', 'eliminar', [1]],
     ['veterinaria', 'GET', 'obtener_horarios', [4]],
     ['veterinaria', 'GET', 'eliminar_horarios', [4]],
     ['veterinaria', 'GET', '', [1, 2, 3, 4, 5]],
@@ -49,6 +49,28 @@ foreach ($esperado as [$controlador, $metodo, $accion, $roles]) {
     if (acceso_accion_permitida($permisos, $controlador, $metodo, $accion, null) !== ($metodo === 'GET' && $accion === '')) {
         $fallos++;
         echo "  ❌ $metodo $controlador '$accion' sin sesión\n";
+    }
+}
+
+// Todo formulario que envía a estos controladores debe llevar el token CSRF
+$rutasProtegidas = ['/admin/guardar-usuario', '/admin/actualizar-usuario', '/admin/eliminar-usuario', '/admin/cambiar-foto',
+    '/admin/actualizar-contrasena', '/admin/guardar-veterinaria', '/admin/actualizar-veterinaria', '/admin/eliminar-veterinaria',
+    '/veterinario/actualizar-constrasena', '/cliente/actualizar-contrasena', '/representante/actualizar-veterinaria'];
+$vistas = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($raiz . '/app/views', FilesystemIterator::SKIP_DOTS));
+foreach ($vistas as $archivo) {
+    if ($archivo->getExtension() !== 'php') {
+        continue;
+    }
+    preg_match_all('/<form\b[^>]*>.*?<\/form>/is', file_get_contents($archivo->getPathname()), $formularios);
+    foreach ($formularios[0] as $form) {
+        preg_match('/<form\b[^>]*action\s*=\s*["\'](?:<\?=\s*BASE_URL\s*\?>)?([^"\'?#]*)/is', $form, $accion);
+        if (in_array($accion[1] ?? '', $rutasProtegidas, true)) {
+            $casos++;
+            if (!str_contains($form, 'csrf_campo()')) {
+                $fallos++;
+                echo "  ❌ Sin token CSRF: {$archivo->getFilename()} → {$accion[1]}\n";
+            }
+        }
     }
 }
 

@@ -64,7 +64,7 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
 
         <ul class="sa-list">
             <li>
-                <a href="<?= BASE_URL ?>/admin/dashBoard" class="sa-item <?= sa_active(['dashboard'], $saSeccion) ?>"
+                <a href="<?= BASE_URL ?>/admin/dashBoard" class="sa-item <?= e(sa_active(['dashboard'], $saSeccion)) ?>"
                     data-label="Inicio" <?= $saSeccion === 'dashboard' ? 'aria-current="page"' : '' ?>>
                     <span class="sa-icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span>
                     <span class="sa-text">Inicio</span>
@@ -86,10 +86,10 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
                 <div class="sa-sub" id="sa-sub-veterinarias" data-title="Veterinarias">
                     <ul>
                         <li><a href="<?= BASE_URL ?>/admin/listar-veterinarias"
-                                class="<?= sa_active(['listar-veterinarias', 'editar-veterinaria'], $saSeccion) ?>"
+                                class="<?= e(sa_active(['listar-veterinarias', 'editar-veterinaria'], $saSeccion)) ?>"
                                 <?= in_array($saSeccion, ['listar-veterinarias', 'editar-veterinaria'], true) ? 'aria-current="page"' : '' ?>>Listado</a></li>
                         <li><a href="<?= BASE_URL ?>/admin/registro-veterinaria"
-                                class="<?= sa_active(['registro-veterinaria'], $saSeccion) ?>"
+                                class="<?= e(sa_active(['registro-veterinaria'], $saSeccion)) ?>"
                                 <?= $saSeccion === 'registro-veterinaria' ? 'aria-current="page"' : '' ?>>Registrar nueva</a></li>
                     </ul>
                 </div>
@@ -107,10 +107,10 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
                 <div class="sa-sub" id="sa-sub-usuarios" data-title="Usuarios">
                     <ul>
                         <li><a href="<?= BASE_URL ?>/admin/listar-usuarios"
-                                class="<?= sa_active(['listar-usuarios', 'editar-usuario'], $saSeccion) ?>"
+                                class="<?= e(sa_active(['listar-usuarios', 'editar-usuario'], $saSeccion)) ?>"
                                 <?= in_array($saSeccion, ['listar-usuarios', 'editar-usuario'], true) ? 'aria-current="page"' : '' ?>>Listado</a></li>
                         <li><a href="<?= BASE_URL ?>/admin/registro-usuario"
-                                class="<?= sa_active(['registro-usuario'], $saSeccion) ?>"
+                                class="<?= e(sa_active(['registro-usuario'], $saSeccion)) ?>"
                                 <?= $saSeccion === 'registro-usuario' ? 'aria-current="page"' : '' ?>>Registrar nuevo</a></li>
                     </ul>
                 </div>
@@ -119,7 +119,7 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
             <!-- Propietarios: un solo destino, enlace directo -->
             <li>
                 <a href="<?= BASE_URL ?>/admin/listar-propietarios"
-                    class="sa-item <?= sa_active(['listar-propietarios'], $saSeccion) ?>" data-label="Propietarios"
+                    class="sa-item <?= e(sa_active(['listar-propietarios'], $saSeccion)) ?>" data-label="Propietarios"
                     <?= $saSeccion === 'listar-propietarios' ? 'aria-current="page"' : '' ?>>
                     <span class="sa-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
                     <span class="sa-text">Propietarios</span>
@@ -128,7 +128,7 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
 
             <li>
                 <a href="<?= BASE_URL ?>/directorio"
-                    class="sa-item <?= sa_active(['directorio', 'ver-perfil', 'profesionales'], $saSeccion) ?>"
+                    class="sa-item <?= e(sa_active(['directorio', 'ver-perfil', 'profesionales'], $saSeccion)) ?>"
                     data-label="Directorio"
                     <?= in_array($saSeccion, ['directorio', 'ver-perfil', 'profesionales'], true) ? 'aria-current="page"' : '' ?>>
                     <span class="sa-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></span>
@@ -141,7 +141,7 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
         <ul class="sa-list">
             <li>
                 <a href="<?= BASE_URL ?>/admin/listar-tickets"
-                    class="sa-item <?= sa_active(['listar-tickets', 'gestion-tickets'], $saSeccion) ?>"
+                    class="sa-item <?= e(sa_active(['listar-tickets', 'gestion-tickets'], $saSeccion)) ?>"
                     data-label="Tickets de soporte"
                     <?= in_array($saSeccion, ['listar-tickets', 'gestion-tickets'], true) ? 'aria-current="page"' : '' ?>>
                     <span class="sa-icon"><i class="bi bi-life-preserver" aria-hidden="true"></i></span>
@@ -149,7 +149,7 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
                 </a>
             </li>
             <li>
-                <a href="<?= BASE_URL ?>/admin/reportes" class="sa-item <?= sa_active(['reportes'], $saSeccion) ?>"
+                <a href="<?= BASE_URL ?>/admin/reportes" class="sa-item <?= e(sa_active(['reportes'], $saSeccion)) ?>"
                     data-label="Reportes" <?= $saSeccion === 'reportes' ? 'aria-current="page"' : '' ?>>
                     <span class="sa-icon"><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
                     <span class="sa-text">Reportes</span>
@@ -157,7 +157,7 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
             </li>
             <li>
                 <a href="<?= BASE_URL ?>/admin/medios-envio"
-                    class="sa-item <?= sa_active(['medios-envio'], $saSeccion) ?>" data-label="Medios de envío"
+                    class="sa-item <?= e(sa_active(['medios-envio'], $saSeccion)) ?>" data-label="Medios de envío"
                     <?= $saSeccion === 'medios-envio' ? 'aria-current="page"' : '' ?>>
                     <span class="sa-icon"><i class="bi bi-send" aria-hidden="true"></i></span>
                     <span class="sa-text">Medios de envío</span>
@@ -169,7 +169,7 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
     <!-- Pie: usuario y cerrar sesión -->
     <div class="sa-footer">
         <a href="<?= BASE_URL ?>/admin/perfil-administrador"
-            class="sa-user <?= sa_active(['perfil-administrador'], $saSeccion) ?>" data-label="Mi perfil">
+            class="sa-user <?= e(sa_active(['perfil-administrador'], $saSeccion)) ?>" data-label="Mi perfil">
             <span class="sa-avatar" aria-hidden="true"><?= htmlspecialchars($saIniciales, ENT_QUOTES, 'UTF-8') ?></span>
             <span class="sa-user-info sa-text">
                 <strong><?= htmlspecialchars($saNombre, ENT_QUOTES, 'UTF-8') ?></strong>
