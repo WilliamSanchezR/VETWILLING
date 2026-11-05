@@ -22,23 +22,7 @@ class Propietario
          MÉTODOS DE ENCRIPTACIÓN
     =============================== */
     
-    private function encryptData($data)
-    {
-        if (empty($data)) {
-            return $data;
-        }
-        
-        try {
-            $key = openssl_digest($this->encryption_key, 'sha256', true);
-            $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($this->cipher));
-            $encrypted = openssl_encrypt($data, $this->cipher, $key, 0, $iv);
-            return base64_encode($iv . $encrypted);
-        } catch (Exception $e) {
-            error_log("Error encriptando datos: " . $e->getMessage());
-            return $data;
-        }
-    }
-    
+    // Solo para registros antiguos que aún estén cifrados: los datos nuevos se guardan sin cifrar
     private function decryptData($encrypted_data)
     {
         if (empty($encrypted_data)) {
@@ -197,11 +181,7 @@ class Propietario
             $id_usuario = $this->conexion->lastInsertId();
             error_log("✅ Usuario creado con ID: " . $id_usuario);
 
-            // 2. Encriptar datos sensibles antes de insertar
-            $numero_documento_encriptado = $this->encryptData($data['numero_documento']);
-            $telefono_encriptado = $this->encryptData($data['telefono']);
-
-            // 3. Crear el propietario asociado al usuario
+            // 2. Crear el propietario asociado al usuario
             $sql = "INSERT INTO propietario 
                 (id_usuario, tipo_documento, numero_documento, nombres, apellidos, telefono, direccion, id_veterinaria)
                 VALUES 
@@ -209,13 +189,13 @@ class Propietario
 
             $query = $this->conexion->prepare($sql);
 
-            // Bind de parámetros (con datos encriptados)
+            // Bind de parámetros
             $query->bindParam(':id_usuario',       $id_usuario);
             $query->bindParam(':tipo_documento',   $data['tipo_documento']);
-            $query->bindParam(':numero_documento', $numero_documento_encriptado);
+            $query->bindParam(':numero_documento', $data['numero_documento']);
             $query->bindParam(':nombres',          $data['nombres']);
             $query->bindParam(':apellidos',        $data['apellidos']);
-            $query->bindParam(':telefono',         $telefono_encriptado);
+            $query->bindParam(':telefono',         $data['telefono']);
             $query->bindParam(':direccion',        $data['direccion']);
             $query->bindParam(':id_veterinaria',   $data['id_veterinaria']);
 
@@ -225,7 +205,6 @@ class Propietario
                 $lastId = $this->conexion->lastInsertId();
                 $this->conexion->commit();
                 error_log("✅ Propietario registrado exitosamente. ID: " . $lastId);
-                error_log("✅ Credenciales - Email: " . $data['email'] . " / Password: " . $data['numero_documento']);
                 return $lastId;
             } else {
                 $this->conexion->rollBack();
