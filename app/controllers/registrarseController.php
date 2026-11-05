@@ -124,7 +124,8 @@ function registrarseVeterinaria()
 
     // Validamos los campos recibidos de representante legal
     $email = $_POST['email'] ?? '';
-    $password = $_POST['numero_documento'] ?? '123';
+    // Clave imposible de adivinar. Tras activar la cuenta, el usuario crea la suya desde Recuperar contraseña
+    $password = bin2hex(random_bytes(32));
     $estado = 'pendiente';
     $id_rol = '4'; // Rol de representante legal
     $tipo_documento = $_POST['tipo_documento'] ?? '';
@@ -236,7 +237,7 @@ function registrarseVeterinaria()
             mostrarSweetAlert(
                 'success',
                 'Registro completado',
-                'La compañía fue registrada correctamente. A continuación serás redirigido a la pasarela de pago para activar tu suscripción.',
+                'La compañía fue registrada correctamente. A continuación serás redirigido a la pasarela de pago. Cuando se active tu cuenta, crea tu contraseña desde "Recuperar contraseña" con tu correo.',
                 $rutaPago
             );
         }

@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../helpers/acceso_helper.php';
+require_once __DIR__ . '/../services/PasswordResetService.php';
 require_once __DIR__ . '/../models/usuario.php';
 
 
@@ -64,7 +65,7 @@ function registrarUsuario()
     $id_rol = $_POST['rol'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
-    $password = !empty($numero_documento) ? $numero_documento : '123';
+    $password = PasswordResetService::claveInicialAleatoria();
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
@@ -135,10 +136,13 @@ function registrarUsuario()
     $resultado = $objUsuario->registrar($data);
     // Verificamos el resultado y mostramos una alerta
     if ($resultado) {
+        $enlaceEnviado = (new PasswordResetService())->enviarEnlaceCuentaNueva($email);
         mostrarSweetAlert(
             'success',
             'Usuario registrado',
-            'El usuario ha sido creado correctamente',
+            $enlaceEnviado
+                ? 'El usuario fue creado y recibirá un correo para crear su contraseña.'
+                : 'El usuario fue creado, pero no se pudo enviar el correo. Puede pedir el enlace desde Recuperar contraseña.',
             BASE_URL . '/admin/listar-usuarios'
         );
     } else {

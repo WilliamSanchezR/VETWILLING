@@ -18,6 +18,7 @@ class PasswordResetService
     const VENTANA_LIMITE_MIN   = 60;
     const MAX_SOLICITUDES      = 5;   // por usuario o IP dentro de la ventana
     const LONGITUD_MINIMA      = 8;
+    const MINUTOS_CUENTA_NUEVA = 4320; // 3 días para crear la primera contraseña
 
     private $modelo;
 
@@ -61,6 +62,39 @@ class PasswordResetService
         return true;
     }
 
+    /** Clave imposible de adivinar para una cuenta nueva: el usuario crea la suya con el enlace. */
+    public static function claveInicialAleatoria(): string
+    {
+        return bin2hex(random_bytes(32));
+    }
+
+    /**
+     * Envía a una cuenta nueva el enlace para crear su contraseña.
+     * Si falla, el usuario puede pedir otro desde "Recuperar contraseña".
+     */
+    public function enviarEnlaceCuentaNueva(string $email): bool
+    {
+        $email   = trim(strtolower($email));
+        $usuario = filter_var($email, FILTER_VALIDATE_EMAIL)
+            ? $this->modelo->buscarUsuarioActivoPorEmail($email)
+            : false;
+        if (!$usuario) {
+            return false;
+        }
+
+        try {
+            $idUsuario = (int) $usuario['id_usuario'];
+            $token = bin2hex(random_bytes(32));
+            $this->modelo->invalidarTokensUsuario($idUsuario);
+            $this->modelo->crearToken($idUsuario, hash('sha256', $token), self::MINUTOS_CUENTA_NUEVA, $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+            $this->enviarCorreo($usuario['email'], BASE_URL . '/restablecer?token=' . $token, true);
+            return true;
+        } catch (Throwable $e) {
+            error_log('PasswordResetService::enviarEnlaceCuentaNueva -> fallo de envío: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function validarToken(string $token)
     {
         if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
@@ -94,9 +128,9 @@ class PasswordResetService
         return $ok ? null : 'No se pudo actualizar la contraseña. Intenta de nuevo.';
     }
 
-    private function enviarCorreo(string $email, string $enlace): void
+    private function enviarCorreo(string $email, string $enlace, bool $cuentaNueva = false): void
     {
-        $minutos = self::MINUTOS_VIGENCIA;
+        $minutos = $cuentaNueva ? self::MINUTOS_CUENTA_NUEVA : self::MINUTOS_VIGENCIA;
 
         ob_start();
         require __DIR__ . '/../views/emails/recuperar-password.php';
@@ -104,9 +138,11 @@ class PasswordResetService
 
         $mail = mailer_init();
         $mail->addAddress($email);
-        $mail->Subject = 'VetWilling - Restablece tu contraseña';
+        $mail->Subject = $cuentaNueva ? 'VetWilling - Crea tu contraseña' : 'VetWilling - Restablece tu contraseña';
         $mail->Body    = $html;
-        $mail->AltBody = "Hemos recibido una solicitud para restablecer tu contraseña de VetWilling.\n\n"
+        $mail->AltBody = $cuentaNueva
+            ? "Tu cuenta de VetWilling fue creada.\n\nCrea tu contraseña con este enlace (válido por 3 días):\n{$enlace}\n\nSi ya venció, pide otro desde Recuperar contraseña."
+            : "Hemos recibido una solicitud para restablecer tu contraseña de VetWilling.\n\n"
             . "Abre este enlace (válido por {$minutos} minutos):\n{$enlace}\n\n"
             . "Si no fuiste tú, ignora este correo: tu contraseña actual no ha cambiado.";
         // Crítico: se envía aunque el canal de correo esté deshabilitado, y no se guarda

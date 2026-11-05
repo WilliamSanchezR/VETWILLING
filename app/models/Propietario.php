@@ -163,8 +163,8 @@ class Propietario
 
             $queryUsuario = $this->conexion->prepare($sqlUsuario);
 
-            // Generar password temporal basado en el número de documento
-            $passwordHash = password_hash($data['numero_documento'], PASSWORD_DEFAULT);
+            // Clave imposible de adivinar: el propietario crea la suya con el enlace que recibe por correo
+            $passwordHash = password_hash(bin2hex(random_bytes(32)), PASSWORD_DEFAULT);
 
             $queryUsuario->bindParam(':email', $data['email']);
             $queryUsuario->bindParam(':password_hash', $passwordHash);

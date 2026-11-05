@@ -72,7 +72,6 @@ switch ($method) {
 function registrarVeterinario()
 {
     // DEBUG - Temporal para ver qué datos llegan
-    error_log("POST: " . print_r($_POST, true));
     error_log("FILES: " . print_r($_FILES, true));
     
     session_start();
