@@ -52,6 +52,26 @@ class Ticket
     }
 
     // FUNCIÓN PARA OBTENER LOS DETALLES DE UN TICKET POR ID
+    // Tickets sin cerrar para la campanita del administrador (cualquier rol que los haya creado)
+    public function listarTicketsPendientes(int $limite = 10): array
+    {
+        try {
+            $stmt = $this->conexion->prepare(
+                "SELECT id, titulo, categoria, prioridad, estado, fecha_creacion
+                 FROM tickets
+                 WHERE estado <> 'cerrado'
+                 ORDER BY id DESC
+                 LIMIT :limite"
+            );
+            $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('[Ticket::listarTicketsPendientes] ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
     public function obtenerTicketPorId($id)
     {
         try {

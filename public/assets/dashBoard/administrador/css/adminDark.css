@@ -169,3 +169,41 @@
 :root[data-theme="dark"]:has(#sidebarAdmin) :is(table, table.dataTable) :is(thead, tbody, tr, th, td) {
     border-color: var(--dk-borde) !important;
 }
+
+/* Fila bajo el cursor: adminUI.css pinta las celdas con un color claro */
+:root[data-theme="dark"]:has(#sidebarAdmin) :is(.tabla-admin, .tabla-reportes, .rep-tabla, .area-contenido .table) tbody tr:hover > td {
+    background: var(--dk-superficie-2) !important;
+}
+
+/* Notificaciones de la campanita */
+:root[data-theme="dark"]:has(#sidebarAdmin) :is(.dropdown-header, .dropdown-footer) {
+    background: var(--dk-superficie-2);
+    border-color: var(--dk-borde);
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) .dropdown-header h6,
+:root[data-theme="dark"]:has(#sidebarAdmin) .notif-texto {
+    color: var(--dk-texto);
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) .notif-tiempo,
+:root[data-theme="dark"]:has(#sidebarAdmin) .empty-notificaciones {
+    color: var(--dk-texto-2);
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) .notificacion-item {
+    background: transparent;
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) .notificacion-item.no-leida {
+    background: rgba(63, 191, 98, 0.1);
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) .notificacion-item:hover,
+:root[data-theme="dark"]:has(#sidebarAdmin) .dropdown-item:hover {
+    background: var(--dk-superficie-2);
+}
+
+:root[data-theme="dark"]:has(#sidebarAdmin) .btn-marcar-leidas {
+    color: #5acb7a;
+}
