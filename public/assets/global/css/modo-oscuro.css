@@ -159,8 +159,8 @@ html[data-theme="dark"] :is(input:not([type="checkbox"]):not([type="radio"]):not
     border-color: var(--vo-borde) !important;
 }
 html[data-theme="dark"] :is(input, textarea)::placeholder { color: var(--vo-texto-3) !important; }
-html[data-theme="dark"] :is(.btn-control, .btn-perfil, .btn-secondary, .btn-agregar, .pagina-btn, .tab-btn:not(.active),
-    .boton-vista, .filtro-select, .navbar-action) {
+html[data-theme="dark"] :is(.btn-control, .btn-perfil, .btn-secondary, .btn-outline-secondary, .btn-outline-dark,
+    .btn-agregar, .pagina-btn, .tab-btn:not(.active), .boton-vista, .filtro-select, .navbar-action) {
     background-color: var(--vo-superficie-2) !important;
     color: var(--vo-texto) !important;
     border-color: var(--vo-borde) !important;

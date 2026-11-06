@@ -1,0 +1,39 @@
+/* ── Soporte de cuentas — estilos del panel admin ─────────── */
+
+#resultados .list-group-item {
+    cursor: pointer;
+}
+
+.clave-temporal {
+    font-size: 1.35rem;
+    letter-spacing: .12em;
+    padding: .25rem .6rem;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, .06);
+    color: inherit;
+    user-select: all;
+}
+
+#tbodyBrevo td,
+#tbodyHistorial td {
+    font-size: .875rem;
+}
+
+/* adminUI.css pone las alertas en fila (ícono + texto); esta tiene varios bloques */
+#detalleCuenta #cajaClave {
+    flex-direction: column;
+}
+
+/* En celular la tabla de Brevo muestra solo fecha y evento */
+@media (max-width: 575.98px) {
+    #tablaBrevo th:nth-child(3),
+    #tbodyBrevo td:nth-child(3) {
+        display: none;
+    }
+}
+
+#tbodyBrevo .motivo {
+    display: block;
+    color: var(--bs-secondary-color);
+    font-size: .8rem;
+}

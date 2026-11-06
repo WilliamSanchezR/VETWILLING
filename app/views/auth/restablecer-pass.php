@@ -86,7 +86,7 @@
                     </div>
                     <div class="feature-item">
                         <i class="bi bi-clock"></i>
-                        <span>Válido por <?= PasswordResetService::MINUTOS_VIGENCIA ?> minutos</span>
+                        <span>Válido hasta el <?= htmlspecialchars(date('d/m/Y \a \l\a\s H:i', strtotime($registroToken['expira'])), ENT_QUOTES, 'UTF-8') ?></span>
                     </div>
                     <div class="feature-item">
                         <i class="bi bi-key"></i>

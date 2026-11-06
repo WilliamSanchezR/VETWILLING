@@ -42,7 +42,8 @@ switch ($accion) {
     // GET /restablecer?token=... -> formulario de nueva contraseña
     case 'formulario':
         $token = $_GET['token'] ?? '';
-        if (!$servicio->validarToken($token)) {
+        $registroToken = $servicio->validarToken($token); // la vista muestra cuándo vence
+        if (!$registroToken) {
             mostrarSweetAlert('error', 'Enlace inválido', 'El enlace no es válido o ya expiró. Solicita uno nuevo', BASE_URL . '/recoverpw');
             break;
         }

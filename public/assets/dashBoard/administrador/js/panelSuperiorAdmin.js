@@ -294,6 +294,9 @@ class panelSuperiorAdmin {
             case 'medios-envio':
                 titlePage = 'Medios de envío';
                 break;
+            case 'soporte-cuentas':
+                titlePage = 'Soporte de cuentas';
+                break;
             case 'directorio':
             case 'ver-perfil':
                 titlePage = 'Directorio';

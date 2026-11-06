@@ -83,6 +83,16 @@ switch ($request) {
         require BASE_PATH . "/app/controllers/recoveryPassControllers.php";
         break;
 
+    // Clave temporal asignada por el administrador: el usuario debe cambiarla al entrar
+    case "/cuenta/cambiar-clave":
+        $accion = 'formulario';
+        require BASE_PATH . "/app/controllers/cambioClaveController.php";
+        break;
+    case "/cuenta/guardar-clave":
+        $accion = 'guardar';
+        require BASE_PATH . "/app/controllers/cambioClaveController.php";
+        break;
+
     // Fin rutas necesarias para el login
 
     // RUTA PARA CERRA SESION
@@ -537,6 +547,14 @@ switch ($request) {
         break;
     case "/admin/api/medios-envio":
         require BASE_PATH . "/app/controllers/mediosEnvioController.php";
+        break;
+
+    // Soporte de cuentas: estado del correo de un usuario y clave temporal
+    case "/admin/soporte-cuentas":
+        require BASE_PATH . "/app/views/dashboard/administrador/soporteCuentas.php";
+        break;
+    case "/admin/api/soporte-cuentas":
+        require BASE_PATH . "/app/controllers/soporteCuentasController.php";
         break;
 
     // RFS 14: Gestión de reportes — administrador

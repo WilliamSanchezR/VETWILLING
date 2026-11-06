@@ -14,6 +14,7 @@
 //          El rol 5 (asistente) no tiene rutas privadas.
 //   post   true: vista que también acepta POST (excepción documentada)
 //   publica_si  parámetros GET que hacen pública la ruta (webhook de pagos)
+//   cambio_clave  true: ruta permitida aunque el usuario deba cambiar su clave temporal
 
 return [
     '/'                                                => ['tipo' => 'vista', 'roles' => 'publica'],
@@ -25,6 +26,9 @@ return [
     '/recoverpw'                                       => ['tipo' => 'vista', 'roles' => 'publica'],
     '/restablecer'                                     => ['tipo' => 'accion', 'roles' => 'publica'],
     '/restablecer/guardar'                             => ['tipo' => 'accion', 'roles' => 'publica'],
+    // Únicas rutas privadas permitidas mientras el usuario tiene una clave temporal sin cambiar
+    '/cuenta/cambiar-clave'                            => ['tipo' => 'vista', 'roles' => [1, 2, 3, 4], 'cambio_clave' => true],
+    '/cuenta/guardar-clave'                            => ['tipo' => 'accion', 'roles' => [1, 2, 3, 4], 'cambio_clave' => true],
     '/cerrar-sesion'                                   => ['tipo' => 'accion', 'roles' => 'publica'],
     '/logout'                                          => ['tipo' => 'deshabilitada'],
     '/veterinaria/dashboard'                           => ['tipo' => 'vista', 'roles' => [2, 4]],
@@ -125,6 +129,8 @@ return [
     '/admin/api/propietarios'                          => ['tipo' => 'api', 'roles' => [1]],
     '/admin/medios-envio'                              => ['tipo' => 'vista', 'roles' => [1]],
     '/admin/api/medios-envio'                          => ['tipo' => 'api', 'roles' => [1]],
+    '/admin/soporte-cuentas'                           => ['tipo' => 'vista', 'roles' => [1]],
+    '/admin/api/soporte-cuentas'                       => ['tipo' => 'api', 'roles' => [1]],
     '/admin/reportes'                                  => ['tipo' => 'vista', 'roles' => [1]],
     '/admin/reportes/data'                             => ['tipo' => 'api', 'roles' => [1]],
     '/admin/reportes/pdf'                              => ['tipo' => 'api', 'roles' => [1]],

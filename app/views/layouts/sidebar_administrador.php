@@ -163,6 +163,14 @@ $saUsuarios = ['registro-usuario', 'listar-usuarios', 'editar-usuario'];
                     <span class="sa-text">Medios de envío</span>
                 </a>
             </li>
+            <li>
+                <a href="<?= BASE_URL ?>/admin/soporte-cuentas"
+                    class="sa-item <?= e(sa_active(['soporte-cuentas'], $saSeccion)) ?>" data-label="Soporte de cuentas"
+                    <?= $saSeccion === 'soporte-cuentas' ? 'aria-current="page"' : '' ?>>
+                    <span class="sa-icon"><i class="bi bi-person-gear" aria-hidden="true"></i></span>
+                    <span class="sa-text">Soporte de cuentas</span>
+                </a>
+            </li>
         </ul>
     </nav>
 

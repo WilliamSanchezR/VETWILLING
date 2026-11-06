@@ -1,5 +1,5 @@
 <?php
-// Plantilla del correo de recuperación. Variables disponibles: $email, $enlace, $minutos
+// Plantilla del correo de recuperación. Variables: $email, $enlace, $minutos, $cuentaNueva y $mensajeHtml (texto editable ya escapado)
 $e = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 ?>
 <!DOCTYPE html>
@@ -42,6 +42,8 @@ $e = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                                     Se creó una cuenta en VetWilling para
                                     <strong style="color:#0a932c;"><?= $e($email) ?></strong>.
                                     Haz clic en el botón para crear tu contraseña.
+                                <?php elseif (isset($mensajeHtml)): ?>
+                                    <?= $mensajeHtml /* texto de Medios de envío, ya escapado */ ?>
                                 <?php else: ?>
                                     Hemos recibido una solicitud para restablecer la contraseña de la cuenta
                                     <strong style="color:#0a932c;"><?= $e($email) ?></strong>.

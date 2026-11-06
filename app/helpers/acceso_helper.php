@@ -19,6 +19,7 @@ require_once __DIR__ . '/csrf_helper.php';
 
 const ACCESO_ROLES_VALIDOS = [1, 2, 3, 4, 5];
 const ACCESO_RUTA_SELECCION = '/login/seleccionarVeterinaria';
+const ACCESO_RUTA_CAMBIO_CLAVE = '/cuenta/cambiar-clave';
 const ACCESO_PANELES = [
     1 => '/admin/dashBoard',         // Administrador
     2 => '/veterinaria/dashboard',   // Veterinario
@@ -136,6 +137,7 @@ function acceso_iniciar_sesion_usuario(array $datos): void
         'veterinarias_permitidas' => $veterinarias,
         'seleccion_pendiente'     => $pendiente,
         'credenciales_version'    => (int) ($credenciales['credenciales_version'] ?? 0),
+        'debe_cambiar_clave'      => acceso_leer_cambio_obligatorio((int) $datos['id_usuario']),
         'autenticado'             => true,
     ];
     acceso_olvidar_verificacion();
@@ -249,6 +251,10 @@ function acceso_decidir(?array $politica, ?array $usuario, string $metodo, array
     if ($usuario === null) {
         return $d('login', 'sin sesión');
     }
+    // Clave temporal asignada por el administrador: solo se puede cambiarla (o cerrar sesión)
+    if (!empty($usuario['debe_cambiar_clave']) && empty($politica['cambio_clave'])) {
+        return $d('cambio_clave', 'debe cambiar la clave temporal');
+    }
     if (!empty($usuario['seleccion_pendiente'])) {
         return $d('seleccion', 'selección de veterinaria pendiente');
     }
@@ -342,6 +348,7 @@ function acceso_responder_denegado(string $resultado, ?array $politica, array $p
     [$codigo, $mensaje] = match ($resultado) {
         'login'     => [401, 'Debes iniciar sesión.'],
         'seleccion' => [403, 'Selecciona una veterinaria para continuar.'],
+        'cambio_clave' => [403, 'Debes cambiar tu contraseña temporal para continuar.'],
         '400'       => [400, 'Solicitud no válida.'],
         '403'       => [403, 'No tienes permiso para realizar esta acción.'],
         '404'       => [404, 'Recurso no encontrado.'],
@@ -363,6 +370,8 @@ function acceso_responder_denegado(string $resultado, ?array $politica, array $p
     switch ($resultado) {
         case 'login':
             acceso_redirigir('/login');
+        case 'cambio_clave':
+            acceso_redirigir(ACCESO_RUTA_CAMBIO_CLAVE);
         case 'seleccion':
             acceso_redirigir(ACCESO_RUTA_SELECCION);
         case '403':
@@ -640,6 +649,25 @@ function acceso_leer_credenciales_o_503(int $idUsuario): ?array
         error_log('[acceso] no se pudo validar la identidad: base de datos no disponible o sin la migración credenciales_version');
         acceso_responder_503();
         exit(1);
+    }
+}
+
+/**
+ * ¿El administrador le asignó una clave temporal que debe cambiar? (usuario.debe_cambiar_clave)
+ * Sin la migración database/soporte_cuentas.sql la columna no existe: se toma como false para
+ * que el login siga funcionando.
+ */
+function acceso_leer_cambio_obligatorio(int $idUsuario): bool
+{
+    if (acceso_estado()['lector'] !== null) {
+        return false; // pruebas con lector simulado: no hay base
+    }
+    try {
+        $stmt = acceso_conexion()->prepare('SELECT debe_cambiar_clave FROM usuario WHERE id_usuario = ?');
+        $stmt->execute([$idUsuario]);
+        return (bool) $stmt->fetchColumn();
+    } catch (AccesoBaseNoDisponible | PDOException $e) {
+        return false;
     }
 }
 
