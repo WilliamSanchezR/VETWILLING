@@ -285,17 +285,23 @@ class DisponibilidadUsuario
     }
 
     // Función para eliminar una disponibilidad de la agenda
-    function eliminarAgenda($id_disponibilidad)
+    // Solo disponibilidades de la clínica indicada y, si se indica, de ese usuario. false si no
+    function eliminarAgenda($id_disponibilidad, $id_veterinaria, $id_usuario = null)
     {
         try {
             $sql = "UPDATE disponibilidad_usuario 
                     SET estado = 'Inactivo' 
-                    WHERE id_disponibilidad = :id_disponibilidad";
+                    WHERE id_disponibilidad = :id_disponibilidad AND id_veterinaria = :id_veterinaria AND estado = 'Activo'"
+                . ($id_usuario !== null ? " AND id_usuario = :id_usuario" : "");
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':id_disponibilidad', $id_disponibilidad, PDO::PARAM_INT);
+            $stmt->bindParam(':id_veterinaria', $id_veterinaria, PDO::PARAM_INT);
+            if ($id_usuario !== null) {
+                $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            }
 
-            return $stmt->execute();
+            return $stmt->execute() && $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             error_log("Error en DisponibilidadUsuario::eliminarAgenda -> " . $e->getMessage());
             return false;

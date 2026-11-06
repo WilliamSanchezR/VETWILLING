@@ -77,6 +77,14 @@ class Veterinaria
         }
     }
 
+    // ¿Existe la veterinaria? (con o sin representante)
+    public function existe(int $id): bool
+    {
+        $stmt = $this->conexion->prepare("SELECT 1 FROM veterinaria WHERE id_veterinaria = ?");
+        $stmt->execute([$id]);
+        return (bool) $stmt->fetchColumn();
+    }
+
     // FUNCION PARA LISTAR LAS VETERINARIAS REGISTRADAS POR ID Y NOMBRE
     public function consultarVeterinariasRegistradas($id)
     {
@@ -374,14 +382,15 @@ class Veterinaria
         }
     }
 
+    // Solo horarios de la clínica indicada. false si el horario no es de esa clínica
     public function eliminarHorariosPorVeterinaria($idHorario, $idVeterinaria)
     {
         try {
-            $consulta = "UPDATE horario_veterinaria SET estado = 'Inactivo' WHERE id_horario_veterinaria = :id_horario AND id_veterinaria = :id_veterinaria";
+            $consulta = "UPDATE horario_veterinaria SET estado = 'Inactivo'
+                         WHERE id_horario_veterinaria = :id_horario AND id_veterinaria = :id_veterinaria";
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':id_horario', $idHorario);
             $resultado->bindParam(':id_veterinaria', $idVeterinaria);
-            // Si el horario es de otra clínica no se modifica ninguna fila
             return $resultado->execute() && $resultado->rowCount() > 0;
         } catch (PDOException $e) {
             echo "Error al eliminar el horario de la veterinaria: " . $e->getMessage();

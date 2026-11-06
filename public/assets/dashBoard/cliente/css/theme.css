@@ -265,3 +265,47 @@ body.dark-theme .config-select option {
     background : var(--card-light);
     color      : var(--text-light);
 }
+
+
+/* =============================================================================
+   Modo oscuro: elementos que quedaban sin contraste (revisión del 31-10-2026)
+   ============================================================================= */
+/* Logo negro del menú: en blanco */
+body.dark-theme .sidebar-header img[src*="LOGO-"] { filter: brightness(0) invert(1); }
+
+/* Reloj de la barra superior y botón de tema */
+body.dark-theme #horaNavbar,
+body.dark-theme .btn-tema { color: var(--text-light); }
+
+/* Opción activa del menú: verde claro en vez de verde oscuro */
+body.dark-theme .sidebar .nav-item.active .nav-text,
+body.dark-theme .sidebar .nav-item.active i { color: #4ade80; }
+
+/* Perfil: tarjetas de datos y etiquetas */
+body.dark-theme .info-item {
+    background: var(--bg-input) !important;
+    border-color: var(--border-light) !important;
+}
+body.dark-theme .info-item .info-valor { color: var(--text-light) !important; }
+body.dark-theme .card-perfil label { color: var(--text-secondary-light) !important; }
+
+/* Formularios (registrar mascota) */
+body.dark-theme select,
+body.dark-theme .form-select {
+    background-color: var(--bg-input) !important;
+    color: var(--text-light) !important;
+    border-color: var(--border-light) !important;
+}
+body.dark-theme .form-card .text-muted { color: var(--text-secondary-light) !important; }
+
+/* Avisos de Bootstrap (agendar cita) */
+body.dark-theme .alert-warning {
+    background: var(--warning-bg) !important;
+    color: #fcd34d !important;
+    border-color: rgba(252, 211, 77, 0.35) !important;
+}
+
+/* Botones y etiquetas con texto oscuro sobre color */
+body.dark-theme .btn-action.btn-cita { color: #fff !important; }
+body.dark-theme .prod-etiqueta--oferta { color: #fff !important; background: #c2410c !important; } /* naranja más oscuro */
+body.dark-theme .alert-warning .alert-link { color: #fde68a !important; }

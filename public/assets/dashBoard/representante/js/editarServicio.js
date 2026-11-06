@@ -343,9 +343,7 @@ class EditarServicio {
     async eliminarHorarioServidor(dia) {
         try {
             for (const id_horario of dia.id) {
-                const response = await fetch(`${baseUrl}/representante/actualizar-servicio?action=eliminar_horarios&id=${id_horario}`, {
-                    method: 'GET',
-                });
+                const response = await vwCsrf.fetchPost(`${baseUrl}/representante/actualizar-servicio`, { action: 'eliminar_horarios', id: id_horario });
                 const result = await response.json();
                 if (result.status !== 'success') {
                     throw new Error('Error al eliminar el horario en el servidor');

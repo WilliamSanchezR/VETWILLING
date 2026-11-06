@@ -1,5 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_all.php';
+require_once BASE_PATH . '/app/helpers/avatar_helper.php';
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
 
 $rol = $_SESSION['user']['id_rol'];
@@ -65,8 +66,8 @@ $usuario = mostrarPerfil($id);
 <?= csrf_campo() ?>
                                 <input type="hidden" name="id_usuario" value="<?= e($id) ?>">
                                 <input type="hidden" name="accion" value="cambiar-foto">
-                                <img src="<?= e(avatar_usuario_src($usuario)) ?>" class="fotito"
-                                    alt="Pedro Perez" width="100">
+                                <img src="<?= htmlspecialchars(avatar_src($usuario['img_perfil'] ?? '', 'usuarios', $usuario['nombres'] ?? '', $usuario['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" class="fotito"
+                                    alt="Foto de perfil" width="100">
                                 <div class="avatar-icon">
                                     <i class="bi bi-camera-fill"></i>
                                 </div>

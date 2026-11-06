@@ -3,6 +3,7 @@
 
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/DisponibilidadUsuario.php';
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -23,13 +24,15 @@ switch ($method) {
         } else if ($accion === 'disponibilidades') {
             obtenerDisponibilidadesDisponiblesJson();
         } else if ($accion === 'eliminar') {
-            eliminarAgenda($_GET['id']);
+            acceso_denegar('405', 'eliminación por GET');
         }
         break;
     case 'POST':
         $accion = $_POST['action'] ?? '';
         if ($accion === 'editar') {
             editarDisponibilidadAgenda();
+        } else if ($accion === 'eliminar') {
+            eliminarAgenda();
         } else {
             agregarDisponibilidadAgenda();
         }
@@ -179,15 +182,29 @@ function obtenerDisponibilidadesDisponiblesJson()
 }
 
 // Función para eliminar una disponibilidad de la agenda
-function eliminarAgenda($id_disponibilidad)
+// POST con token CSRF. El representante, disponibilidades de su clínica; el veterinario, solo
+// las suyas en su clínica (otra → 404). Solo redirige dentro de la aplicación.
+function eliminarAgenda()
 {
+    $usuario = acceso_exigir_accion_post([2, 4]);
+    $id_veterinaria = acceso_exigir_clinica();
+    $id_disponibilidad = acceso_entero_positivo($_POST['id'] ?? null);
+    $soloDe = (int) $usuario['id_rol'] === 2 ? (int) $usuario['id_usuario'] : null;
+
     // Creamos una instancia del modelo DisponibilidadUsuario
     $disponibilidadUsuarioModel = new DisponibilidadUsuario();
 
     // Llamamos al método eliminarDisponibilidad del modelo
-    $resultado = $disponibilidadUsuarioModel->eliminarAgenda($id_disponibilidad);
+    $resultado = $id_disponibilidad !== null
+        && $disponibilidadUsuarioModel->eliminarAgenda($id_disponibilidad, $id_veterinaria, $soloDe);
+    if (!$resultado) {
+        acceso_denegar('404', 'disponibilidad fuera del alcance de la sesión');
+    }
 
-    $redirect = $_GET['redirect'] ?? null;
+    $redirect = (string) ($_POST['redirect'] ?? '');
+    if (!str_starts_with($redirect, BASE_URL . '/') || preg_match('/[\r\n\\\\]/', $redirect)) {
+        $redirect = BASE_URL . ($soloDe !== null ? '/veterinaria/mi-agenda' : '/representante/lista-agenda-usuario');
+    }
 
     if ($resultado) {
         mostrarSweetAlert('success', 'Disponibilidad eliminada', 'La disponibilidad ha sido eliminada exitosamente.', $redirect);

@@ -432,8 +432,11 @@ comprobar(count(array_filter($fallos, fn($x) => array_key_exists('tipo_notificac
 seccion('Revisión estática de los llamadores');
 $reset = file_get_contents(BASE_PATH . '/app/services/PasswordResetService.php');
 comprobar(str_contains($reset, "mailer_enviar(\$mail, 'seguridad', ['critico' => true])"), 'Recuperación de contraseña usa la excepción de seguridad');
-foreach (['profesionalController', 'registroPacienteController', 'veterinariaController'] as $c) {
-    comprobar(str_contains(file_get_contents(BASE_PATH . "/app/controllers/$c.php"), "mailer_enviar(\$mail, 'bienvenida', ['guardar_contenido' => false])"), "$c registra la bienvenida sin guardar contenido");
+comprobar(str_contains(file_get_contents(BASE_PATH . '/app/controllers/veterinariaController.php'), "mailer_enviar(\$mail, 'bienvenida', ['guardar_contenido' => false])"), 'veterinariaController registra la bienvenida sin guardar contenido');
+// Las cuentas nuevas reciben un enlace para crear la contraseña: ningún correo lleva la contraseña inicial
+foreach (['profesionalController', 'registroPacienteController', 'veterinariaController', 'usuarioController'] as $c) {
+    $codigo = file_get_contents(BASE_PATH . "/app/controllers/$c.php");
+    comprobar(str_contains($codigo, 'enviarEnlaceCuentaNueva(') && !preg_match('/Contrase(ñ|n)a( inicial)?:/u', $codigo), "$c envía el enlace para crear la contraseña, sin la contraseña");
 }
 $sinRegistro = [];
 foreach (glob(BASE_PATH . '/app/{controllers,services,helpers}/*.php', GLOB_BRACE) as $archivo) {

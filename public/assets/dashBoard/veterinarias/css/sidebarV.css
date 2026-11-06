@@ -865,6 +865,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-fon
     .sidebar-vet  { display: none !important; }
     .sv-toggle    { display: none !important; }
     .sv-main      { margin-left: 0 !important; }
+    .sidebar-vet ~ .contenido-principal { margin-left: 0 !important; } /* p. ej. Mi agenda */
     .sv-fab            { display: flex; }
     .sv-mobile-overlay { display: block; }
     .sv-bottom-sheet   { display: flex; }

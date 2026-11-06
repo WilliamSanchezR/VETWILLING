@@ -77,6 +77,7 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
 
             <form id="vetForm" action="<?= BASE_URL ?>/admin/guardar-veterinaria" method="POST" enctype="multipart/form-data">
 <?= csrf_campo() ?>
+                <input type="hidden" name="accion" value="registrar">
 
                 <!-- Paso 1: Datos de la Veterinaria -->
                 <div class="step active">

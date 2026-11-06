@@ -3,9 +3,10 @@
 require_once BASE_PATH . '/app/helpers/session_representante.php';
 // Enlazamos el controlador de profesional para listar los profesionales
 require_once BASE_PATH . '/app/controllers/profesionalController.php';
-// Llamamos la función para listar los profesionales
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
+// Llamamos la función para listar los profesionales de la clínica de la sesión
 
-$datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
+$datos = listarUsuarios(acceso_exigir_clinica());
 
 ?>
 
@@ -135,9 +136,13 @@ $datos = listarUsuarios($_SESSION['user']['id_veterinaria']);
                                         <button class="btn-accion btn-editar" title="Editar">
                                             <a href="<?= BASE_URL ?>/representante/editar-profesional?id=<?= $profesional['id_usuario'] ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
-                                        <button class="btn-accion btn-eliminar" title="Eliminar">
-                                            <a href="<?= BASE_URL ?>/representante/eliminar-profesional?action=eliminar&id=<?= $profesional['id_prof_veterinaria'] ?>"><i class="bi bi-trash"></i></a>
-                                        </button>
+                                        <form action="<?= BASE_URL ?>/representante/eliminar-profesional" method="POST" style="display: inline;"
+                                            onsubmit="return confirm('¿Desvincular a este profesional de tu clínica? Su cuenta no cambia.');">
+                                            <?= csrf_campo() ?>
+                                            <input type="hidden" name="accion" value="eliminar">
+                                            <input type="hidden" name="id" value="<?= (int) $profesional['id_prof_veterinaria'] ?>">
+                                            <button type="submit" class="btn-accion btn-eliminar" title="Desvincular de la clínica"><i class="bi bi-trash"></i></button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

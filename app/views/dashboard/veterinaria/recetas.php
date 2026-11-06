@@ -297,7 +297,6 @@ require_once BASE_PATH . "/app/helpers/session_veterinario.php"; ?>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoardRecetas.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/tableCitas.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 
 </body>
 

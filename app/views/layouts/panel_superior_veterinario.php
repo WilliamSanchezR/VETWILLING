@@ -49,6 +49,9 @@ $fotoVetUrl  = $hayFotoVet
     : '';
 ?>
 
+<!-- Modo oscuro común (administrador, representante y veterinario) -->
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/modo-oscuro.css">
+<script src="<?= BASE_URL ?>/public/assets/global/js/modo-oscuro.js"></script>
 <script>window.BASE_URL = "<?= BASE_URL ?>";</script>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/navbar-superior.css">

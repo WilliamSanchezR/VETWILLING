@@ -453,7 +453,6 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 
     <!-- Propio -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/dashBoard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 
 </body>
 

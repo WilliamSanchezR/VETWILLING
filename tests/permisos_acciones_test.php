@@ -13,7 +13,8 @@ require_once $raiz . '/app/helpers/acceso_helper.php';
 $permisos = require $raiz . '/config/permisos_acciones.php';
 
 $esperado = [
-    ['usuario', 'POST', '', [1]],
+    ['usuario', 'POST', '', []],
+    ['usuario', 'POST', 'registrar', [1]],
     ['usuario', 'POST', 'actualizar', [1]],
     ['usuario', 'POST', 'actualizar-constrasena', [1, 4]],
     ['usuario', 'POST', 'modificar-contrasena', [3]],
@@ -24,13 +25,14 @@ $esperado = [
     ['usuario', 'GET', 'listarAdmin', [1]],
     ['usuario', 'GET', '', [1, 2, 3, 4, 5]],
     ['usuario', 'DELETE', '', []],
-    ['veterinaria', 'POST', '', [1]],
+    ['veterinaria', 'POST', '', []],
+    ['veterinaria', 'POST', 'registrar', [1]],
     ['veterinaria', 'POST', 'actualizar', [1]],
     ['veterinaria', 'POST', 'actualizarInfo', [4]],
     ['veterinaria', 'POST', 'accion-inventada', []],
     ['veterinaria', 'POST', 'eliminar', [1]],
     ['veterinaria', 'GET', 'obtener_horarios', [4]],
-    ['veterinaria', 'GET', 'eliminar_horarios', [4]],
+    ['veterinaria', 'POST', 'eliminar_horarios', [4]],
     ['veterinaria', 'GET', '', [1, 2, 3, 4, 5]],
 ];
 

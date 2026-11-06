@@ -4,11 +4,9 @@ require_once BASE_PATH . '/app/helpers/session_veterinario.php';
 // enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
 require_once BASE_PATH . '/app/controllers/veterinarioController.php';
 
-// asignamos el valor id del registro según la tabla
-$id = $_GET['id'];
-
-// Llamamos la funcion del controlador
-$veterinario = listarVeterinario($id);
+// Solo el propio veterinario o, para el representante, uno de su clínica (si no, 404)
+$veterinario = exigirVeterinarioEnAlcance($_GET['id'] ?? null);
+$id = (int) $veterinario['id_usuario'];
 ?>
 
 <!DOCTYPE html>
@@ -112,14 +110,8 @@ $veterinario = listarVeterinario($id);
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label><i class="bi bi-envelope"></i> Estado</label>
-                                <select name="estado">
-                                    <option value="<?= $veterinario['estado'] ?>">
-                                        <?= $veterinario['estado'] ?>
-                                    </option>
-                                    <option value="activo">Activo</option>
-                                    <option value="inactivo">Inactivo</option>
-                                    <option value="bloqueado">Bloqueado</option>
-                                </select>
+                                <!-- El estado de la cuenta solo lo cambia el administrador -->
+                                <input type="text" readonly value="<?= htmlspecialchars($veterinario['estado'], ENT_QUOTES, 'UTF-8') ?>">
                             </div>
                         </div>
 
@@ -144,10 +136,10 @@ $veterinario = listarVeterinario($id);
                         <!-- Correo -->
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                <input type="email"
-                                    name="email"
-                                    value="<?= $veterinario['email'] ?>">
+                                <label><i class="bi bi-envelope"></i> Correo electrónico</label>
+                                <!-- Solo el administrador cambia el correo de acceso -->
+                                <input type="email" readonly
+                                    value="<?= htmlspecialchars($veterinario['email'], ENT_QUOTES, 'UTF-8') ?>">
                             </div>
                         </div>
 

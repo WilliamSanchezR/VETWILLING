@@ -111,18 +111,21 @@ class Subservicio
         }
     }
 
-    public function eliminarSubservicio($id_subservicio)
+    // Solo subservicios de servicios de la clínica indicada. false si no es de esa clínica
+    public function eliminarSubservicio($id_subservicio, $id_veterinaria)
     {
         try {
-            $consulta = "UPDATE subservicios 
-                         SET estado = :estado, fecha_modificacion = NOW()
-                         WHERE id_subservicio = :id_subservicio";
+            $consulta = "UPDATE subservicios ss
+                         INNER JOIN servicio s ON s.id_servicio = ss.id_servicio
+                         SET ss.estado = :estado, ss.fecha_modificacion = NOW()
+                         WHERE ss.id_subservicio = :id_subservicio AND s.id_veterinaria = :id_veterinaria";
             $estado = 'Inactivo';
             $resultado = $this->conexion->prepare($consulta);
             $resultado->bindParam(':estado', $estado);
             $resultado->bindParam(':id_subservicio', $id_subservicio);
+            $resultado->bindParam(':id_veterinaria', $id_veterinaria);
 
-            return $resultado->execute();
+            return $resultado->execute() && $resultado->rowCount() > 0;
         } catch (PDOException $e) {
             echo "Error al eliminar el subservicio: " . $e->getMessage();
             return false;

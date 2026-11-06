@@ -187,7 +187,6 @@ $datos = mostrarVeterinarios();
 
 
     <!-- Modo dia  y noche -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script>
 
 </body>
 

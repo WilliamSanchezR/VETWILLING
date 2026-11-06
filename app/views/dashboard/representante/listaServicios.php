@@ -2,6 +2,7 @@
 // Enlazamos la ruta para tomar la session del representante
 require_once BASE_PATH . '/app/helpers/session_representante.php';
 require_once BASE_PATH . '/app/controllers/servicioController.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 
 // Obtenemos los servicios de la veterinaria del representante logueado
 $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
@@ -158,8 +159,9 @@ $datos = listaServiciosPorVeterinaria($_SESSION['user']['id_veterinaria']);
 
     <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
     <!-- Modo dia  y noche -->
-    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
+    <input type="hidden" id="csrf_token" name="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+    <script src="<?= BASE_URL ?>/public/assets/global/js/csrf.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/representante/js/listaServicios.js"></script>
 

@@ -2,6 +2,7 @@
 
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/Servicio.php';
 
 //CAPTUTRAMOS EN UNA VARIABLE EL METODO O SOLICITUD HECHA AL SERVIDOR
@@ -13,6 +14,10 @@ switch ($method) {
         $action = $_POST['action'] ?? '';
         if ($action === 'actualizar') {
             actualizarServicio();
+        } elseif ($action === 'eliminar') {
+            eliminarServicio();
+        } elseif ($action === 'eliminar_horarios') {
+            eliminarHorariosPorServicio();
         } else {
             registrarServicio();
         }
@@ -20,15 +25,12 @@ switch ($method) {
     case 'GET':
         // Aquí podrías manejar solicitudes GET si es necesario
         $action = $_GET['action'] ?? '';
-        if ($action === 'eliminar') {
-            $id_servicio = $_GET['id'] ?? '';
-            eliminarServicio($id_servicio);
+        // Las eliminaciones solo se aceptan por POST con token CSRF
+        if ($action === 'eliminar' || $action === 'eliminar_horarios') {
+            acceso_denegar('405', 'eliminación por GET');
         } elseif ($action === 'obtener_horarios') {
             $id_servicio = $_GET['id'] ?? '';
             listaHorariosPorServicio($id_servicio);
-        } elseif ($action === 'eliminar_horarios') {
-            $id_servicio = $_GET['id'] ?? '';
-            eliminarHorariosPorServicio($id_servicio);
         }
         break;
 
@@ -155,13 +157,20 @@ function actualizarServicio()
 }
 
 // 
-function eliminarServicio($id_servicio)
+// Solo servicios de la clínica de la sesión, por POST con token CSRF (otra clínica → 404)
+function eliminarServicio()
 {
+    acceso_exigir_accion_post([4]);
+    $id_veterinaria = acceso_exigir_clinica();
+    $id_servicio = acceso_entero_positivo($_POST['id'] ?? null);
     // Creamos una instancia del modelo Servicio
     $servicioModel = new Servicio();
 
     // Llamamos al método para eliminar el servicio
-    $resultado = $servicioModel->eliminarServicio($id_servicio);
+    $resultado = $id_servicio !== null && $servicioModel->eliminarServicio($id_servicio, $id_veterinaria);
+    if (!$resultado) {
+        acceso_denegar('404', 'servicio que no es de la clínica de la sesión');
+    }
 
     if ($resultado) {
         mostrarSweetAlert(
@@ -201,13 +210,20 @@ function listaHorariosPorServicio($id_servicio)
     }
 }
 
-function eliminarHorariosPorServicio($id_servicio)
+// Solo horarios de servicios de la clínica de la sesión, por POST con token CSRF (otra → 404)
+function eliminarHorariosPorServicio()
 {
+    acceso_exigir_accion_post([4]);
+    $id_veterinaria = acceso_exigir_clinica();
+    $id_horario = acceso_entero_positivo($_POST['id'] ?? null);
     // Creamos una instancia del modelo Servicio
     $servicioModel = new Servicio();
 
     // Llamamos al método para eliminar los horarios del servicio
-    $resultado = $servicioModel->eliminarHorariosPorServicio($id_servicio);
+    $resultado = $id_horario !== null && $servicioModel->eliminarHorariosPorServicio($id_horario, $id_veterinaria);
+    if (!$resultado) {
+        acceso_denegar('404', 'horario de un servicio que no es de la clínica de la sesión');
+    }
 
     if ($resultado) {
         // ┌─ RETORNAR RESULTADO

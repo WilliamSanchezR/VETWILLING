@@ -16,6 +16,8 @@ switch ($method) {
             actualizarPropietario();
         } else if ($accion === 'cambiar-foto') {
             fotoPerfil();
+        } else if ($accion === 'eliminar') {
+            eliminarPropietarioAJAX();
         }
         break;
 
@@ -28,14 +30,13 @@ switch ($method) {
             exit();
         }
 
-        // --- ELIMINAR ---
-        if ($accion === 'eliminar' && isset($_GET['id'])) {
-            eliminarPropietario($_GET['id']);
-            exit();
+        // --- ELIMINAR: solo POST ---
+        if ($accion === 'eliminar') {
+            acceso_denegar('405', 'inhabilitar propietario solo admite POST');
         }
 
         if ($accion === 'listar-veterinaria') {
-            listarPropietariosVeterinaria($_GET['id']);
+            listarPropietariosVeterinaria($_GET['id'] ?? null);
             exit();
         }
 
@@ -52,21 +53,15 @@ switch ($method) {
             exit();
         }
 
+        // --- LISTAR TODOS: solo el administrador ---
+        acceso_exigir_rol([1]);
         echo "No se ha especificado una acción válida o falta el ID para la consulta/eliminación";
-
-        // --- LISTAR TODOS ---
         echo json_encode(listarPropietarios());
         break;
 
     case 'DELETE':
-        $id = $_GET['id'] ?? '';
-        if ($id) {
-            eliminarPropietarioAJAX($id);
-        } else {
-            http_response_code(400);
-            echo json_encode(['error' => 'ID de propietario no proporcionado']);
-        }
-        break;
+        // Inhabilitar un propietario es POST con token CSRF (accion=eliminar)
+        acceso_denegar('405', 'inhabilitar propietario solo admite POST');
 
     default:
         http_response_code(405);
@@ -106,9 +101,13 @@ function listarPropietarios()
     return $resultado->listar();
 }
 
+// Consulta de un propietario por id_propietario.
+// Administrador: cualquiera. Representante: los de su clínica. Propietario: solo él mismo.
+// Fuera de ese alcance responde igual que si no existiera (404); otros roles → 403.
 function consultarPropietarioId($id)
 {
-    if (acceso_usuario() === null) {
+    $usuario = acceso_usuario();
+    if ($usuario === null) {
         http_response_code(401);
         return [
             'status' => 'error',
@@ -116,56 +115,9 @@ function consultarPropietarioId($id)
             'code' => 'UNAUTHORIZED'
         ];
     }
-    
-    $id_usuario_sesion = $_SESSION['user']['id_usuario'];
-    $id_rol_sesion = (int)$_SESSION['user']['id_rol'];
-    
-    $obj = new Propietario();
-    $propietario = $obj->consultarPropietario($id);
-    
-    if (!$propietario) {
-        http_response_code(404);
-        return [
-            'status' => 'error',
-            'message' => 'El propietario solicitado no existe',
-            'code' => 'NOT_FOUND'
-        ];
-    }
-    
-    if ($propietario['estado'] !== 'Activo') {
-        http_response_code(403);
-        return [
-            'status' => 'error',
-            'message' => 'Este propietario está inactivo y no puede ser consultado',
-            'code' => 'INACTIVE_OWNER'
-        ];
-    }
+    $id_rol_sesion = (int) $usuario['id_rol'];
 
-    
-    if ($id_rol_sesion === 3) {
-        // Cliente: solo puede ver su propio perfil
-        if ((int)$id !== $id_usuario_sesion) {
-            http_response_code(403);
-            return [
-                'status' => 'error',
-                'message' => 'No tienes permisos para consultar este propietario',
-                'code' => 'FORBIDDEN'
-            ];
-        }
-    } elseif ($id_rol_sesion === 4) {
-        // Representante: debe verificar que el propietario pertenece a su veterinaria
-        $id_veterinaria_propietario = $propietario['id_veterinaria'] ?? null;
-        $id_veterinaria_sesion = $_SESSION['user']['id_veterinaria'] ?? null;
-        
-        if ($id_veterinaria_propietario !== $id_veterinaria_sesion) {
-            http_response_code(403);
-            return [
-                'status' => 'error',
-                'message' => 'Este propietario no pertenece a tu veterinaria',
-                'code' => 'FORBIDDEN'
-            ];
-        }
-    } elseif ($id_rol_sesion !== 1) {
+    if (!in_array($id_rol_sesion, [1, 3, 4], true)) {
         // Otros roles que no tienen permisos (ej: Veterinario)
         http_response_code(403);
         return [
@@ -174,7 +126,34 @@ function consultarPropietarioId($id)
             'code' => 'FORBIDDEN'
         ];
     }
-    
+
+    $idPropietario = acceso_entero_positivo($id);
+    $propietario = $idPropietario === null ? null : (new Propietario())->consultarPropietarioConCuenta($idPropietario);
+
+    $enAlcance = $propietario && match ($id_rol_sesion) {
+        1 => true,
+        3 => (int) $propietario['id_usuario'] === (int) $usuario['id_usuario'],
+        4 => (int) ($propietario['id_veterinaria'] ?? 0) === acceso_id_veterinaria(),
+    };
+    if (!$enAlcance) {
+        http_response_code(404);
+        return [
+            'status' => 'error',
+            'message' => 'El propietario solicitado no existe',
+            'code' => 'NOT_FOUND'
+        ];
+    }
+
+    // El estado está en la cuenta (usuario.estado), no en la tabla propietario
+    if (mb_strtolower(trim((string) $propietario['estado'])) !== 'activo') {
+        http_response_code(403);
+        return [
+            'status' => 'error',
+            'message' => 'Este propietario está inactivo y no puede ser consultado',
+            'code' => 'INACTIVE_OWNER'
+        ];
+    }
+
     return [
         'status' => 'success',
         'data' => $propietario
@@ -239,55 +218,6 @@ function actualizarPropietario()
     }
     exit();
 }
-
-function eliminarPropietario($id)
-{
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-
-    // Subtarea 1: autenticación del administrador
-    if (acceso_rol() !== 1) {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo el administrador puede eliminar propietarios', BASE_URL . '/login');
-        exit();
-    }
-
-    $id = (int)$id;
-    $obj = new Propietario();
-
-    // Subtarea 2: verificar existencia
-    $propietario = $obj->consultarPropietario($id);
-    if (!$propietario) {
-        mostrarSweetAlert('error', 'No encontrado', 'El propietario no existe', BASE_URL . '/admin/listar-propietarios');
-        exit();
-    }
-
-    $resultado = $obj->eliminar($id);
-
-    if ($resultado) {
-        // Subtarea 7: registrar en log de auditoría
-        $obj->registrarAuditoriaEliminacion([
-            'id_propietario'     => $id,
-            'nombre_propietario' => $resultado['nombre_propietario'],
-            'id_usuario_admin'   => (int)$_SESSION['user']['id_usuario'],
-            'nombre_admin'       => $_SESSION['user']['nombre'] ?? 'Administrador',
-            'motivo'             => 'Eliminación manual por administrador',
-            'ip_origen'          => $_SERVER['REMOTE_ADDR'] ?? null,
-        ]);
-
-        mostrarSweetAlert(
-            'success',
-            'Propietario inhabilitado',
-            'El propietario ha sido inhabilitado correctamente',
-            BASE_URL . '/admin/listar-propietarios'
-        );
-    } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar');
-    }
-
-    exit();
-}
-
 
 // FUNCION PARA CAMBIAR LA FOTO DE PERFIL 
 function fotoPerfil()
@@ -371,8 +301,17 @@ function fotoPerfil()
 }
 
 // Función para listar propietarios asociados a una veterinaria
+// El administrador elige la clínica; el representante solo ve la suya (otra clínica → 404)
 function listarPropietariosVeterinaria($id_veterinaria)
 {
+    $usuario = acceso_exigir_rol([1, 4]);
+    if ((int) $usuario['id_rol'] === 4) {
+        $propia = acceso_exigir_clinica();
+        if ($id_veterinaria !== null && $id_veterinaria !== '' && acceso_entero_positivo($id_veterinaria) !== $propia) {
+            acceso_denegar('404', 'clínica ajena');
+        }
+        $id_veterinaria = $propia;
+    }
 
     try { // Creamos una instancia del modelo Servicio
         $obj = new Propietario();
@@ -394,22 +333,14 @@ function listarPropietariosVeterinaria($id_veterinaria)
     }
 }
 
-function eliminarPropietarioAJAX($id)
+// Inhabilita la cuenta de un propietario: solo el administrador, por POST con token CSRF
+function eliminarPropietarioAJAX()
 {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    // Subtarea 1: autenticación del administrador
+    acceso_exigir_accion_post([1]);
 
     header('Content-Type: application/json');
-
-    // Subtarea 1: autenticación del administrador
-    if (acceso_rol() !== 1) {
-        http_response_code(403);
-        echo json_encode(['status' => 'error', 'message' => 'Acceso no autorizado']);
-        exit();
-    }
-
-    $id = (int)$id;
+    $id = (int) acceso_entero_positivo($_POST['id'] ?? null);
 
     try {
         $obj = new Propietario();

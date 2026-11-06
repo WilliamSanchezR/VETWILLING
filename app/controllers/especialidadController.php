@@ -2,6 +2,7 @@
 
 //Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helpers.php';
+require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/Especialidad.php';
 
 
@@ -15,6 +16,8 @@ switch ($method) {
         $accion = $_POST['accion'] ?? '';
         if ($accion === 'actualizar') {
             actualizarEspecialidad();
+        } else if ($accion === 'eliminar') {
+            eliminarEspecialidad();
         } else {
             registrarEspecialidad();
         }
@@ -24,7 +27,7 @@ switch ($method) {
         // Esta variable captura la accion de eliminar
         $accion = $_GET['action'] ?? '';
         if ($accion === 'eliminar') {
-            eliminarEspecialidad($_GET['id_especialidad'], $_GET['id_veterinaria']);
+            acceso_denegar('405', 'eliminación por GET');
         } else if ($accion === 'lista') {
             listarEpsServicios($_GET['servicio']);
         }
@@ -121,25 +124,24 @@ function actualizarEspecialidad()
 }
 
 // FUNCION PARA ELIMINAR UNA ESPECIALIDAD
-function eliminarEspecialidad($id_especialidad, $id_veterinaria)
+// Quita la especialidad de la clínica de la sesión: POST con token CSRF (otra clínica → 404)
+function eliminarEspecialidad()
 {
-    // Validamos que el ID no esté vacío
-    if (empty($id_especialidad)) {
-        mostrarSweetAlert('error', 'ID vacío', 'El ID de la especialidad no puede estar vacío.');
-        exit();
-    }
+    acceso_exigir_accion_post([4]);
+    $id_veterinaria = acceso_exigir_clinica();
+    $id_especialidad = acceso_entero_positivo($_POST['id_especialidad'] ?? null);
 
     // Creamos una instancia del modelo Especialidad
     $especialidadModel = new Especialidad();
 
     // Llamamos a la función eliminar del modelo
-    $resultado = $especialidadModel->eliminarEspecialidad($id_especialidad, $id_veterinaria);
-
-    if ($resultado) {
-        mostrarSweetAlert('success', 'Especialidad eliminada', 'La especialidad ha sido eliminada exitosamente.');
-    } else {
-        mostrarSweetAlert('error', 'Error al eliminar', 'Hubo un problema al eliminar la especialidad.');
+    $resultado = $id_especialidad !== null && $especialidadModel->eliminarEspecialidad($id_especialidad, $id_veterinaria);
+    if (!$resultado) {
+        acceso_denegar('404', 'especialidad que no es de la clínica de la sesión');
     }
+
+    mostrarSweetAlert('success', 'Especialidad eliminada', 'La especialidad ha sido eliminada exitosamente.', BASE_URL . '/representante/listar-especialidades');
+    exit();
 }
 
 function listarEpsServicios($servicio)

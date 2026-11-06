@@ -457,13 +457,6 @@ if (!isset($prefs)) {
 
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
 
-    <!-- Preview de imagen -->
-
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
-    <!-- JavaScript -->
-
-
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/cliente/js/clientes.js"></script>
     <!-- JavaScript -->
     <script>
         // Razas por especie

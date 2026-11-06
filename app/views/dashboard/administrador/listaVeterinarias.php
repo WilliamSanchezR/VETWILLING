@@ -3,6 +3,7 @@
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
 // Enlazamos el controlador de veterinaria para listar las veterinarias
 require_once BASE_PATH . '/app/controllers/veterinariaController.php';
+require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 // Llamamos la función para listar las veterinarias
 $datos = listarVeterinariasRegistradas();
 
@@ -172,7 +173,6 @@ $datos = listarVeterinariasRegistradas();
         <script src="<?= BASE_URL ?>/public/assets/dashBoard/administrador/js/listaVeterinarias.js"></script>
 
         <!-- Modo dia  y noche -->
-        <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/js/theme-switcher.js"></script> -->
 
         <script src="<?= BASE_URL ?>/public/assets/global/js/menu.js"></script>
 

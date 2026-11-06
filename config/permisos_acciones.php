@@ -7,13 +7,12 @@
 //   GET   solo se limitan las acciones listadas: las vistas también incluyen estos controladores
 //         por GET, sin acción, para usar sus funciones de consulta.
 //
-// La clave '' es el formulario de registro, que no envía el campo accion.
 // Roles: 1 admin, 2 veterinario, 3 propietario, 4 representante.
 
 return [
     'usuario' => [
         'POST' => [
-            ''                       => [1],
+            'registrar'              => [1],
             'actualizar'             => [1],
             'actualizar-constrasena' => [1, 4],
             'modificar-contrasena'   => [3],
@@ -27,14 +26,14 @@ return [
     ],
     'veterinaria' => [
         'POST' => [
-            ''               => [1],
-            'actualizar'     => [1],
-            'actualizarInfo' => [4],
-            'eliminar'       => [1],
+            'registrar'         => [1],
+            'actualizar'        => [1],
+            'actualizarInfo'    => [4],
+            'eliminar'          => [1],
+            'eliminar_horarios' => [4],
         ],
         'GET' => [
-            'obtener_horarios'  => [4],
-            'eliminar_horarios' => [4],
+            'obtener_horarios' => [4],
         ],
     ],
 ];

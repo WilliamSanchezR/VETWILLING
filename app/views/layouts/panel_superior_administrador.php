@@ -2,6 +2,7 @@
 
 // Enlazamos la dependencia, en este caso el controlador que tiene la funcion de consultar los datos
 require_once BASE_PATH . '/app/controllers/perfilControllers.php';
+require_once BASE_PATH . '/app/helpers/avatar_helper.php';
 
 // asignamos el valo id del registro segun la tabla
 $id = $_SESSION['user']['id_usuario'];
@@ -20,13 +21,9 @@ $usuario = mostrarPerfil($id);
 
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/cliente/css/nav.css">
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/adminDark.css">
-<script>
-    // Aplica el tema antes de pintar la página para evitar un destello claro
-    try {
-        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') === 'dark' ? 'dark' : 'light');
-    } catch (e) {}
-</script>
+<!-- Modo oscuro común (administrador, representante y veterinario) -->
+<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/modo-oscuro.css">
+<script src="<?= BASE_URL ?>/public/assets/global/js/modo-oscuro.js"></script>
 <script>
     window.BASE_URL = "<?= BASE_URL ?>";
 </script>
@@ -84,7 +81,7 @@ $usuario = mostrarPerfil($id);
         <!-- Perfil Usuario -->
         <button class="btn-perfil" onclick="toggleDropdown('perfil')" aria-label="Perfil">
             <div class="avatar-usuario">
-                <span> <img src="<?= e(avatar_usuario_src($usuario)) ?>" alt="">
+                <span> <img src="<?= htmlspecialchars(avatar_src($usuario['img_perfil'] ?? '', 'usuarios', $usuario['nombres'] ?? '', $usuario['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" alt="">
                 </span>
             </div>
             <div class="info-usuario">
@@ -98,7 +95,7 @@ $usuario = mostrarPerfil($id);
         <div class="dropdown-menu dropdown-perfil" id="dropdownPerfil">
             <div class="perfil-header">
                 <div class="avatar-usuario grande">
-                    <span> <img src="<?= e(avatar_usuario_src($usuario)) ?>" alt="">
+                    <span> <img src="<?= htmlspecialchars(avatar_src($usuario['img_perfil'] ?? '', 'usuarios', $usuario['nombres'] ?? '', $usuario['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" alt="">
                     </span>
                 </div>
                 <div>

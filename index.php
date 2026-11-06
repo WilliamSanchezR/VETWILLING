@@ -378,12 +378,12 @@ switch ($request) {
     case "/directorio/profesionales":
     case "/directorio/perfil":
     case "/directorio/resenia":
-    case "/directorio/equipo/guardar":
-        require BASE_PATH . "/app/controllers/equipoSistemaController.php";
-        break;
-
     case "/directorio/actualizar-estado":
         require BASE_PATH . "/app/controllers/directorioProfesionalesController.php";
+        break;
+
+    case "/directorio/equipo/guardar":
+        require BASE_PATH . "/app/controllers/equipoSistemaController.php";
         break;
 
     case "/veterinario/guardar-veterinario":

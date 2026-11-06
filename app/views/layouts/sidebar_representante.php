@@ -30,7 +30,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
     <nav class="sidebar-nav">
 
         <div class="nav-section">
-            <span class="nav-section-title">Menu Administrador</span>
+            <span class="nav-section-title">Menú</span>
 
             <!-- Sección Dashboard -->
             <a href="<?= BASE_URL ?>/representante/dashboard"
@@ -49,9 +49,9 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
             <!-- GESTION COMO ADMINISTRADOR -->
             <div class="submenu">
-                <div class="submenu-toggle" data-tooltip-menu="Gestión Administrador">
+                <div class="submenu-toggle" data-tooltip-menu="Gestión de la clínica">
                     <i class="bi bi-journal-medical"></i>
-                    <span class="texto-item-sidebar">Gestión Administrador</span>
+                    <span class="texto-item-sidebar">Gestión de la clínica</span>
                     <i class="bi bi-chevron-down flecha"></i>
 
                 </div>
@@ -222,7 +222,7 @@ $final_path = end($path_parts); // Obtiene el último elemento del array
 
             <!-- GESTION DE IVENTARIO -->
             <div class="submenu">
-                <div class="submenu-toggle" data-tooltip-menu="Gestión Administrador">
+                <div class="submenu-toggle" data-tooltip-menu="Gestión de inventario">
                     <i class="bi bi-box-seam"></i>
                     <span class="texto-item-sidebar">Gestión de inventario</span>
                     <i class="bi bi-chevron-down flecha"></i>

@@ -77,7 +77,7 @@ class Ticket
         try {
             $sql = "SELECT  tk.id, tk.titulo, tk.fecha_creacion, tk.categoria, tk.prioridad, tk.estado, pr.id_usuario as id_asignado, pr.nombres as nombre_asignado, pr.apellidos as apellido_asignado, tk.descripcion, tk.usuario_id as id_usuario, 
             tk.solucion as resultado, tk.archivo
-            FROM tickets TK
+            FROM tickets tk
             LEFT JOIN usuario us ON tk.asignado_a = us.id_usuario
             LEFT JOIN administrador pr ON pr.id_usuario = us.id_usuario
             WHERE tk.id = :id";

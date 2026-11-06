@@ -180,14 +180,14 @@ class AgendaProfesional {
     }).then((deleteResult) => {
       if (deleteResult.isConfirmed) {
         // Eliminar del servidor
-        const redirect = encodeURIComponent(window.location.href);
         const basePath = window.location.pathname.includes(
           "/veterinaria/mi-agenda",
         )
           ? `${baseUrl}/veterinario/eliminar-disponibilidad-agenda`
           : `${baseUrl}/representante/eliminar-agenda-usuario`;
 
-        window.location.href = `${basePath}?action=eliminar&id=${$id}&redirect=${redirect}`;
+        // POST con token CSRF; el servidor solo vuelve a páginas de la aplicación
+        vwCsrf.enviarPost(basePath, { action: "eliminar", id: $id, redirect: window.location.href });
       }
     });
   }
