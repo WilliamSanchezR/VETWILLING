@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__ . '/html_helper.php';
+require_once __DIR__ . '/csrf_helper.php';
+
 // Identidad del usuario autenticado.
 //
 // Una sesión solo cuenta como iniciada si la creó el login (acceso_iniciar_sesion_usuario):
@@ -16,6 +19,7 @@
 
 const ACCESO_ROLES_VALIDOS = [1, 2, 3, 4, 5];
 const ACCESO_RUTA_SELECCION = '/login/seleccionarVeterinaria';
+const ACCESO_RUTA_CAMBIO_CLAVE = '/cuenta/cambiar-clave';
 const ACCESO_PANELES = [
     1 => '/admin/dashBoard',         // Administrador
     2 => '/veterinaria/dashboard',   // Veterinario
@@ -133,6 +137,7 @@ function acceso_iniciar_sesion_usuario(array $datos): void
         'veterinarias_permitidas' => $veterinarias,
         'seleccion_pendiente'     => $pendiente,
         'credenciales_version'    => (int) ($credenciales['credenciales_version'] ?? 0),
+        'debe_cambiar_clave'      => acceso_leer_cambio_obligatorio((int) $datos['id_usuario']),
         'autenticado'             => true,
     ];
     acceso_olvidar_verificacion();
@@ -246,6 +251,10 @@ function acceso_decidir(?array $politica, ?array $usuario, string $metodo, array
     if ($usuario === null) {
         return $d('login', 'sin sesión');
     }
+    // Clave temporal asignada por el administrador: solo se puede cambiarla (o cerrar sesión)
+    if (!empty($usuario['debe_cambiar_clave']) && empty($politica['cambio_clave'])) {
+        return $d('cambio_clave', 'debe cambiar la clave temporal');
+    }
     if (!empty($usuario['seleccion_pendiente'])) {
         return $d('seleccion', 'selección de veterinaria pendiente');
     }
@@ -339,6 +348,7 @@ function acceso_responder_denegado(string $resultado, ?array $politica, array $p
     [$codigo, $mensaje] = match ($resultado) {
         'login'     => [401, 'Debes iniciar sesión.'],
         'seleccion' => [403, 'Selecciona una veterinaria para continuar.'],
+        'cambio_clave' => [403, 'Debes cambiar tu contraseña temporal para continuar.'],
         '400'       => [400, 'Solicitud no válida.'],
         '403'       => [403, 'No tienes permiso para realizar esta acción.'],
         '404'       => [404, 'Recurso no encontrado.'],
@@ -360,6 +370,8 @@ function acceso_responder_denegado(string $resultado, ?array $politica, array $p
     switch ($resultado) {
         case 'login':
             acceso_redirigir('/login');
+        case 'cambio_clave':
+            acceso_redirigir(ACCESO_RUTA_CAMBIO_CLAVE);
         case 'seleccion':
             acceso_redirigir(ACCESO_RUTA_SELECCION);
         case '403':
@@ -641,6 +653,25 @@ function acceso_leer_credenciales_o_503(int $idUsuario): ?array
 }
 
 /**
+ * ¿El administrador le asignó una clave temporal que debe cambiar? (usuario.debe_cambiar_clave)
+ * Sin la migración database/soporte_cuentas.sql la columna no existe: se toma como false para
+ * que el login siga funcionando.
+ */
+function acceso_leer_cambio_obligatorio(int $idUsuario): bool
+{
+    if (acceso_estado()['lector'] !== null) {
+        return false; // pruebas con lector simulado: no hay base
+    }
+    try {
+        $stmt = acceso_conexion()->prepare('SELECT debe_cambiar_clave FROM usuario WHERE id_usuario = ?');
+        $stmt->execute([$idUsuario]);
+        return (bool) $stmt->fetchColumn();
+    } catch (AccesoBaseNoDisponible | PDOException $e) {
+        return false;
+    }
+}
+
+/**
  * ¿La sesión sigue siendo válida según la base? (una vez por petición y por sesión).
  * Si la base no responde, acceso_leer_credenciales_o_503() termina la petición con un 503 (fallo cerrado).
  */
@@ -736,4 +767,69 @@ function acceso_actualizar_sesion_actual(int $idUsuario, int $nuevaVersion): voi
     $_SESSION['user']['credenciales_version'] = $nuevaVersion;
     unset($_SESSION['csrf_token']);
     acceso_olvidar_verificacion();
+}
+
+// ── Permisos por acción dentro de los controladores ──────────────────────────────
+
+/**
+ * Indica si un rol puede ejecutar una acción de un controlador (config/permisos_acciones.php).
+ * No usa sesión ni base de datos, para poder probarla directamente.
+ */
+function acceso_accion_permitida(array $permisos, string $controlador, string $metodo, string $accion, ?int $rol): bool
+{
+    $metodo = strtoupper($metodo);
+    $reglas = $permisos[$controlador][$metodo] ?? null;
+    if ($reglas === null) {
+        return false;
+    }
+    if (!array_key_exists($accion, $reglas)) {
+        return $metodo === 'GET';
+    }
+    return $rol !== null && in_array($rol, $reglas[$accion], true);
+}
+
+/**
+ * Detiene la petición con 403 si el usuario actual no puede ejecutar la acción.
+ *
+ * @param mixed $accion Valor recibido en la petición; si no es texto se trata como una acción inválida
+ */
+function acceso_exigir_accion(string $controlador, string $metodo, $accion): void
+{
+    $permisos = require __DIR__ . '/../../config/permisos_acciones.php';
+    $rol = acceso_rol();
+    if (is_string($accion) && acceso_accion_permitida($permisos, $controlador, $metodo, $accion, $rol)) {
+        return;
+    }
+
+    error_log(sprintf(
+        '[acceso] DENEGADO %s controlador %s, acción %s (rol %s)',
+        strtoupper($metodo),
+        $controlador,
+        is_string($accion) ? mb_substr($accion, 0, 50) : 'inválida',
+        $rol === null ? 'anónimo' : (string) $rol
+    ));
+
+    http_response_code(403);
+    $mensaje = 'No tienes permiso para realizar esta acción.';
+    if (acceso_responder_json(acceso_estado()['politica'] ?? null)) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'status' => 'error', 'mensaje' => $mensaje, 'message' => $mensaje]);
+        exit();
+    }
+    require __DIR__ . '/../views/auth/error403.php';
+    exit();
+}
+
+/**
+ * Detiene la petición con 403 si el token CSRF del formulario no es válido.
+ */
+function acceso_exigir_csrf(): void
+{
+    if (csrf_valido($_POST['csrf_token'] ?? null)) {
+        return;
+    }
+    error_log('[acceso] DENEGADO token CSRF no válido');
+    http_response_code(403);
+    require __DIR__ . '/../views/auth/error403.php';
+    exit();
 }

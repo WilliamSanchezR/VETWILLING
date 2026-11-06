@@ -4,6 +4,10 @@
 
 require_once __DIR__ . "/config/config.php";
 
+// Encabezados de seguridad HTTP: respaldo de los que pone el .htaccess (sin duplicarlos)
+require_once BASE_PATH . "/app/helpers/encabezados_seguridad_helper.php";
+encabezados_seguridad_enviar();
+
 // obtener la URL actual (por ejemplo: /nexus_center/login)
 
 $requestURI = $_SERVER["REQUEST_URI"];
@@ -81,6 +85,16 @@ switch ($request) {
     case "/restablecer/guardar":
         $accion = 'guardar';
         require BASE_PATH . "/app/controllers/recoveryPassControllers.php";
+        break;
+
+    // Clave temporal asignada por el administrador: el usuario debe cambiarla al entrar
+    case "/cuenta/cambiar-clave":
+        $accion = 'formulario';
+        require BASE_PATH . "/app/controllers/cambioClaveController.php";
+        break;
+    case "/cuenta/guardar-clave":
+        $accion = 'guardar';
+        require BASE_PATH . "/app/controllers/cambioClaveController.php";
         break;
 
     // Fin rutas necesarias para el login
@@ -382,6 +396,10 @@ switch ($request) {
         require BASE_PATH . "/app/controllers/directorioProfesionalesController.php";
         break;
 
+    case "/directorio/equipo/guardar":
+        require BASE_PATH . "/app/controllers/equipoSistemaController.php";
+        break;
+
     case "/veterinario/guardar-veterinario":
         require BASE_PATH . "/app/controllers/veterinarioController.php";
         break;
@@ -533,6 +551,14 @@ switch ($request) {
         break;
     case "/admin/api/medios-envio":
         require BASE_PATH . "/app/controllers/mediosEnvioController.php";
+        break;
+
+    // Soporte de cuentas: estado del correo de un usuario y clave temporal
+    case "/admin/soporte-cuentas":
+        require BASE_PATH . "/app/views/dashboard/administrador/soporteCuentas.php";
+        break;
+    case "/admin/api/soporte-cuentas":
+        require BASE_PATH . "/app/controllers/soporteCuentasController.php";
         break;
 
     // RFS 14: Gestión de reportes — administrador

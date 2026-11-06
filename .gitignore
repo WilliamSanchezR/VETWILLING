@@ -6,7 +6,11 @@
 
 /public/uploads/profesionales/*
 
+/public/uploads/equipo/*
+!/public/uploads/equipo/.gitkeep
+
 /public/uploads/usuarios/*
+!/public/uploads/usuarios/.gitkeep
 
 /public/uploads/veterinaria/*
 
@@ -42,6 +46,14 @@ app/logs/*
 !/database/password_reset.sql
 !/database/medios_envio_base.sql
 !/database/medios_envio_rollback.sql
+!/database/equipo_sistema.sql
+!/database/equipo_sistema_rollback.sql
+!/database/tickets_solucion.sql
+!/database/tickets_solucion_rollback.sql
+!/database/retirar_tablas_sin_uso.sql
+!/database/retirar_tablas_sin_uso_rollback.sql
+!/database/soporte_cuentas.sql
+!/database/soporte_cuentas_rollback.sql
 
 PROJECT_CONTEXT.md
 

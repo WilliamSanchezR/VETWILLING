@@ -126,17 +126,17 @@ $estadoOpciones = [
                                 $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $estadoActual));
                                 ?>
                                 <tr class="fila-blanca">
-                                    <td><?= $ticket['id'] ?></td>
-                                    <td><?= $ticket['titulo'] ?></td>
-                                    <td><?= $ticket['categoria'] ?></td>
-                                    <td><?= $ticket['prioridad'] ?></td>
+                                    <td><?= e($ticket['id']) ?></td>
+                                    <td><?= e($ticket['titulo']) ?></td>
+                                    <td><?= e($ticket['categoria']) ?></td>
+                                    <td><?= e($ticket['prioridad']) ?></td>
                                     <td class="td-estado-ticket"><span class="estado-badge estado-<?= htmlspecialchars($estadoActual) ?>"><?= htmlspecialchars($estadoLabel) ?></span></td>
-                                    <td><?= $ticket['nombres'] ?> <?= $ticket['apellidos'] ?></td>
-                                    <td><?= $ticket['asignado'] ?></td>
-                                    <td><?= $ticket['fecha_creacion'] ?></td>
+                                    <td><?= e($ticket['nombres']) ?> <?= e($ticket['apellidos']) ?></td>
+                                    <td><?= e($ticket['asignado']) ?></td>
+                                    <td><?= e($ticket['fecha_creacion']) ?></td>
                                     <td>
                                         <button class="btn-accion btn-editar" title="Editar">
-                                            <a href="<?= BASE_URL ?>/admin/gestion-tickets?id=<?= $ticket['id'] ?>"><i class="bi bi-pencil"></i></a>
+                                            <a href="<?= BASE_URL ?>/admin/gestion-tickets?id=<?= e($ticket['id']) ?>"><i class="bi bi-pencil"></i></a>
                                         </button>
                                     </td>
                                 </tr>

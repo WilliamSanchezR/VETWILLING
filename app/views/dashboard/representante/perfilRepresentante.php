@@ -81,6 +81,7 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                     <div class="col-md-4">
                         <div class="foto">
                             <form class="contenedor-foto" id="form_cambio_imagen" action="<?= BASE_URL ?>/admin/cambiar-foto" method="POST" enctype="multipart/form-data">
+<?= csrf_campo() ?>
                                 <input type="hidden" name="id_usuario" value="<?= $id ?>">
                                 <input type="hidden" name="accion" value="cambiar-foto">
                                 <!-- CORRECCIÓN: usa $rutaImagenUsuario + onerror seguro -->
@@ -143,6 +144,7 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                     <div class="modal-body">
 
                         <form action="<?= BASE_URL ?>/admin/actualizar-contrasena" method="POST">
+<?= csrf_campo() ?>
                             <input type="hidden" name="id_usuario" value="<?= $id ?>">
                             <input type="hidden" name="accion" value="actualizar-constrasena">
                             <div class="container">

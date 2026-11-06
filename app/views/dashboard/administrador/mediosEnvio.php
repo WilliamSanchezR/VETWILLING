@@ -62,6 +62,11 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         <i class="bi bi-exclamation-triangle me-1"></i>Monitor de Fallos
                     </button>
                 </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-recuperacion" type="button">
+                        <i class="bi bi-key me-1"></i>Correo de recuperación
+                    </button>
+                </li>
             </ul>
 
             <div class="tab-content" id="tabsContent">
@@ -312,6 +317,54 @@ require_once BASE_PATH . '/app/helpers/session_administrador.php';
                         </table>
                     </div>
 
+                </div>
+
+                <!-- ══════════════════ TAB 5: CORREO DE RECUPERACIÓN ══════════════════ -->
+                <div class="tab-pane fade" id="tab-recuperacion" role="tabpanel">
+                    <form id="formRecuperacion" class="card canal-config-card">
+                        <div class="card-header fw-semibold">
+                            <i class="bi bi-key me-2 text-success"></i>Correo para restablecer la contraseña
+                        </div>
+                        <div class="card-body row g-3">
+                            <div class="col-12">
+                                <div class="alert alert-info mb-0" id="infoRemitenteRecuperacion">Cargando…</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="recRemitente">Correo remitente</label>
+                                <input type="email" class="form-control" name="remitente" id="recRemitente" maxlength="255">
+                                <div class="form-text">Vacío: usa el remitente del canal de correo.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="recNombre">Nombre del remitente</label>
+                                <input type="text" class="form-control" name="nombre_remitente" id="recNombre" maxlength="255">
+                            </div>
+                            <div class="col-md-9">
+                                <label class="form-label" for="recAsunto">Asunto</label>
+                                <input type="text" class="form-control" name="asunto" id="recAsunto" maxlength="150">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label" for="recMinutos">Vigencia del enlace (min)</label>
+                                <input type="number" class="form-control" name="minutos_vigencia" id="recMinutos" min="5" max="1440" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" for="recMensaje">Mensaje</label>
+                                <textarea class="form-control" name="mensaje" id="recMensaje" rows="4" maxlength="1000"></textarea>
+                                <div class="form-text">
+                                    Texto simple. Puedes usar <code>{email}</code> y <code>{minutos}</code>.
+                                    El botón y el enlace para restablecer se agregan solos debajo del mensaje.
+                                    Un campo vacío vuelve al texto por defecto.
+                                </div>
+                            </div>
+                            <div class="col-12 d-flex gap-2 flex-wrap">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-floppy me-1"></i>Guardar
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="btnProbarRecuperacion">
+                                    <i class="bi bi-send me-1"></i>Enviarme una prueba
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
             </div><!-- /tab-content -->

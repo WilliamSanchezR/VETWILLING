@@ -56,7 +56,7 @@ $usuario = mostrarPerfil($id);
         <!-- Notificaciones -->
         <button class="btn-navbar notificaciones" onclick="toggleDropdown('notificaciones')" aria-label="Notificaciones">
             <i class="bi bi-bell-fill"></i>
-            <span class="badge-notif">3</span>
+            <span class="badge-notif" style="display:none">0</span>
         </button>
 
         <!-- Dropdown Notificaciones -->
@@ -65,46 +65,8 @@ $usuario = mostrarPerfil($id);
                 <h6>Notificaciones</h6>
                 <button class="btn-marcar-leidas">Marcar todas como leídas</button>
             </div>
-            <div class="dropdown-body">
-                <a href="#" class="notificacion-item no-leida">
-                    <div class="notif-icono notif-azul">
-                        <i class="bi bi-bell-fill"></i>
-                    </div>
-                    <div class="notif-contenido">
-                        <p class="notif-texto"></p>
-                        <span class="notif-tiempo">Nuevo ticket</span>
-                    </div>
-                </a>
-                <a href="#" class="notificacion-item">
-                    <div class="notif-icono notif-verde">
-                        <i class="bi bi-check-circle-fill"></i>
-                    </div>
-                    <div class="notif-contenido">
-                        <p class="notif-texto">Se ha registrado un usuario</p>
-                        <span class="notif-tiempo">Hace 1 hora</span>
-                    </div>
-                </a>
-                <a href="#" class="notificacion-item">
-                    <div class="notif-icono notif-naranja">
-                        <i class="bi bi-chat-dots-fill"></i>
-                    </div>
-                    <div class="notif-contenido">
-                        <p class="notif-texto">Se ha generado un nuevo ticket</p>
-                        <span class="notif-tiempo">Hace 3 horas</span>
-                    </div>
-                </a>
-                <a href="#" class="notificacion-item">
-                    <div class="notif-icono notif-rojo">
-                        <i class="bi bi-exclamation-triangle-fill"></i>
-                    </div>
-                    <div class="notif-contenido">
-                        <p class="notif-texto">Se ha bloqueado una veterinaria</p>
-                        <span class="notif-tiempo">Hace 5 horas</span>
-                    </div>
-                </a>
-            </div>
-            <div class="dropdown-footer">
-                <a href="#" class="btn-ver-todas">Ver todas las notificaciones</a>
+            <div class="dropdown-body" id="listaNotificaciones" aria-live="polite">
+                <div class="empty-notificaciones">Cargando notificaciones...</div>
             </div>
         </div>
 
@@ -123,8 +85,8 @@ $usuario = mostrarPerfil($id);
                 </span>
             </div>
             <div class="info-usuario">
-                <span class="nombre-usuario"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></span>
-                <span class="rol-usuario"><?= $usuario['rol'] ?></span>
+                <span class="nombre-usuario"><?= e($usuario['nombres']) ?> <?= e($usuario['apellidos']) ?></span>
+                <span class="rol-usuario"><?= e($usuario['rol']) ?></span>
             </div>
             <i class="bi bi-chevron-down flecha-perfil"></i>
         </button>
@@ -137,8 +99,8 @@ $usuario = mostrarPerfil($id);
                     </span>
                 </div>
                 <div>
-                    <p class="nombre-completo"><?= $usuario['nombres'] ?> <?= $usuario['apellidos'] ?></p>
-                    <p class="email-usuario"><?= $usuario['email'] ?></p>
+                    <p class="nombre-completo"><?= e($usuario['nombres']) ?> <?= e($usuario['apellidos']) ?></p>
+                    <p class="email-usuario"><?= e($usuario['email']) ?></p>
                 </div>
             </div>
             <div class="dropdown-divider"></div>

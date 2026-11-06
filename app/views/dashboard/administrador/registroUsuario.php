@@ -68,6 +68,7 @@ $datosVeterinaria = listarVeterinariasRegistradas();
 
 
             <form id="vetForm" action="<?= BASE_URL ?>/admin/guardar-usuario" method="POST" enctype="multipart/form-data">
+<?= csrf_campo() ?>
                 <input type="hidden" name="accion" value="registrar">
 
                 <!-- Paso 1: Datos del Usuario -->
@@ -159,7 +160,7 @@ $datosVeterinaria = listarVeterinariasRegistradas();
 
                                     <?php if (!empty($datosRol)) : ?>
                                         <?php foreach ($datosRol as $rol):  ?>
-                                            <option value="<?= $rol['id_rol'] ?>"><?= $rol['nombre'] ?></option>
+                                            <option value="<?= e($rol['id_rol']) ?>"><?= e($rol['nombre']) ?></option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
@@ -173,7 +174,7 @@ $datosVeterinaria = listarVeterinariasRegistradas();
                                     <option value="" disabled selected>Seleccione una veterinaria</option>
                                     <?php if (!empty($datosVeterinaria)) : ?>
                                         <?php foreach ($datosVeterinaria as $veterinaria):  ?>
-                                            <option value="<?= $veterinaria['id_veterinaria'] ?>"><?= $veterinaria['nombre'] ?></option>
+                                            <option value="<?= e($veterinaria['id_veterinaria']) ?>"><?= e($veterinaria['nombre']) ?></option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>

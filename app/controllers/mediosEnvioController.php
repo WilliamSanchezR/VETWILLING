@@ -12,6 +12,7 @@ if ((int) ($_SESSION['user']['id_rol'] ?? 0) !== 1) {
 }
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
 require_once BASE_PATH . '/app/models/CanalEnvio.php';
+require_once BASE_PATH . '/app/models/CorreoRecuperacion.php';
 require_once BASE_PATH . '/app/helpers/mailer_helper.php';
 require_once BASE_PATH . '/app/helpers/csrf_helper.php';
 
@@ -61,7 +62,50 @@ try {
             ]);
             break;
 
+        case 'recuperacion':
+            $canal = $model->obtenerPorCodigo('email') ?? [];
+            echo json_encode([
+                'ok'   => true,
+                'data' => (new CorreoRecuperacion())->obtener(),
+                // Lo que se usa cuando el remitente propio está vacío
+                'remitente_canal' => ($canal['smtp_remitente'] ?? '') ?: SMTP_FROM_EMAIL,
+                'nombre_canal'    => ($canal['smtp_nombre_remitente'] ?? '') ?: SMTP_FROM_NAME,
+                'por_defecto'     => ['asunto' => CorreoRecuperacion::ASUNTO_DEFECTO, 'mensaje' => CorreoRecuperacion::MENSAJE_DEFECTO],
+                'transporte'      => mailer_transporte_actual()['driver'],
+            ]);
+            break;
+
         // ── POST ─────────────────────────────────────────────
+
+        case 'guardar_recuperacion':
+            if ($method !== 'POST') throw new RuntimeException('Método no permitido');
+            $body = json_decode(file_get_contents('php://input'), true) ?? [];
+            $errores = CorreoRecuperacion::validar($body);
+            if ($errores) throw new InvalidArgumentException(implode(' ', $errores));
+            $ok = (new CorreoRecuperacion())->guardar($body, (int) $_SESSION['user']['id_usuario']);
+            echo json_encode(['ok' => $ok, 'mensaje' => $ok ? 'Correo de recuperación guardado' : 'No se pudo guardar']);
+            break;
+
+        case 'probar_recuperacion':
+            if ($method !== 'POST') throw new RuntimeException('Método no permitido');
+            // Mismo límite que la prueba del canal: un correo real por minuto, solo al administrador
+            $ultimo = (int) ($_SESSION['medios_envio_ultima_prueba'] ?? 0);
+            if (time() - $ultimo < 60) {
+                http_response_code(429);
+                echo json_encode(['ok' => false, 'mensaje' => 'Espera ' . (60 - (time() - $ultimo)) . ' s antes de enviar otra prueba.']);
+                break;
+            }
+            $_SESSION['medios_envio_ultima_prueba'] = time();
+            $destino = (string) ($_SESSION['user']['email'] ?? '');
+            try {
+                require_once BASE_PATH . '/app/services/PasswordResetService.php';
+                (new PasswordResetService())->enviarPrueba($destino);
+                echo json_encode(['ok' => true, 'mensaje' => "Correo de prueba enviado a {$destino}. Revisa tu bandeja (y spam)."]);
+            } catch (Throwable $e) {
+                http_response_code(502);
+                echo json_encode(['ok' => false, 'mensaje' => 'Falló el envío: ' . mailer_error_seguro($e->getMessage())]);
+            }
+            break;
 
         case 'actualizar_config':
             if ($method !== 'POST') throw new RuntimeException('Método no permitido');

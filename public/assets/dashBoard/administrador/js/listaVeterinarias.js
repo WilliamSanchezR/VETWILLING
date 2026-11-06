@@ -155,6 +155,16 @@ function dataTableListVeterinarias() {
 
         });
 
+        // Muestra cuántas filas se ven del total
+        const actualizarVer = () => {
+            const btn = document.getElementById('btnVer');
+            if (!btn) return;
+            const info = tablaVeterinarias.page.info();
+            btn.innerHTML = `<i class="bi bi-eye"></i> Ver ${info.end - info.start}/${info.recordsTotal}`;
+        };
+        tablaVeterinarias.on('draw', actualizarVer);
+        actualizarVer();
+
         console.log('✅ Tabla inicializada exitosamente');
 
     } catch (error) {

@@ -90,6 +90,16 @@ class ListaTickets {
           '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
       });
 
+      // Muestra cuántas filas se ven del total
+      const actualizarVer = () => {
+          const btn = document.getElementById('btnVer');
+          if (!btn) return;
+          const info = this.gridTickets.page.info();
+          btn.innerHTML = `<i class="bi bi-eye"></i> Ver ${info.end - info.start}/${info.recordsTotal}`;
+      };
+      this.gridTickets.on('draw', actualizarVer);
+      actualizarVer();
+
       console.log("✅ Tabla inicializada exitosamente");
     } catch (error) {
       console.error("❌ Error al inicializar DataTables:", error);

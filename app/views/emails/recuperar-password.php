@@ -1,5 +1,5 @@
 <?php
-// Plantilla del correo de recuperación. Variables disponibles: $email, $enlace, $minutos
+// Plantilla del correo de recuperación. Variables: $email, $enlace, $minutos, $cuentaNueva y $mensajeHtml (texto editable ya escapado)
 $e = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 ?>
 <!DOCTYPE html>
@@ -34,13 +34,21 @@ $e = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                     <tr>
                         <td style="padding:40px 30px; color:#424b54;">
                             <h2 style="text-align:center; color:#0a932c; margin:0 0 20px 0; font-size:24px; font-weight:700;">
-                                Restablece tu contraseña
+                                <?= !empty($cuentaNueva) ? 'Crea tu contraseña' : 'Restablece tu contraseña' ?>
                             </h2>
 
                             <p style="font-size:15px; line-height:1.7; margin:0 0 20px 0;">
-                                Hemos recibido una solicitud para restablecer la contraseña de la cuenta
-                                <strong style="color:#0a932c;"><?= $e($email) ?></strong>.
-                                Haz clic en el botón para elegir una nueva contraseña.
+                                <?php if (!empty($cuentaNueva)): ?>
+                                    Se creó una cuenta en VetWilling para
+                                    <strong style="color:#0a932c;"><?= $e($email) ?></strong>.
+                                    Haz clic en el botón para crear tu contraseña.
+                                <?php elseif (isset($mensajeHtml)): ?>
+                                    <?= $mensajeHtml /* texto de Medios de envío, ya escapado */ ?>
+                                <?php else: ?>
+                                    Hemos recibido una solicitud para restablecer la contraseña de la cuenta
+                                    <strong style="color:#0a932c;"><?= $e($email) ?></strong>.
+                                    Haz clic en el botón para elegir una nueva contraseña.
+                                <?php endif; ?>
                             </p>
 
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:30px auto;">
@@ -57,7 +65,7 @@ $e = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                                 <tr>
                                     <td style="background-color:#fff8e1; border-left:4px solid #93bedf; border-radius:6px; padding:15px;">
                                         <p style="margin:0; font-size:14px; line-height:1.6;">
-                                            ⚠️ <strong>Importante:</strong> este enlace vence en <?= (int) $minutos ?> minutos
+                                            ⚠️ <strong>Importante:</strong> este enlace vence en <?= !empty($cuentaNueva) ? '3 días' : (int) $minutos . ' minutos' ?>
                                             y solo puede usarse una vez.
                                         </p>
                                     </td>
@@ -70,7 +78,7 @@ $e = fn($v) => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
                             </p>
 
                             <p style="font-size:13px; color:#888; line-height:1.6; margin:20px 0 0 0;">
-                                Si tú no solicitaste este cambio, ignora este mensaje: tu contraseña actual no ha cambiado.
+                                <?= !empty($cuentaNueva) ? 'Si el enlace ya venció, pide otro desde Recuperar contraseña. Si no esperabas esta cuenta, ignora este mensaje.' : 'Si tú no solicitaste este cambio, ignora este mensaje: tu contraseña actual no ha cambiado.' ?>
                             </p>
                         </td>
                     </tr>

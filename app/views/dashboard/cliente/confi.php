@@ -841,6 +841,8 @@ $val
                               action="<?= BASE_URL ?>/cliente/actualizar-contrasena"
                               novalidate
                               class="form-validable">
+                            <?= csrf_campo() ?>
+                            <input type="hidden" name="accion" value="modificar-contrasena">
 
                             <!-- Mismos campos que el formulario de perfil.php (usuarioController::modiContrasena) -->
                             <input type="hidden" name="accion" value="modificar-contrasena">

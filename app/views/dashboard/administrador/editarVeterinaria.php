@@ -13,8 +13,13 @@ $datosRol = listarRolAdmin();
 $datosVeterinaria = listarVeterinariasRegistradas();
 
 
-$id = $_GET['id'];
+$id = $_GET['id'] ?? 0;
 $veterinariaData = consultarVeterinariasRegistradas($id);
+if (!$veterinariaData) {
+    http_response_code(404);
+    require BASE_PATH . '/app/views/auth/error404.php';
+    exit();
+}
 
 ?>
 
@@ -69,6 +74,7 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
 
         <div class="wizard-container">
             <form id="vetForm" action="<?= BASE_URL ?>/admin/actualizar-veterinaria" method="POST" enctype="multipart/form-data">
+<?= csrf_campo() ?>
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Veterinaria</button>
@@ -88,9 +94,9 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                         </div>
 
 
-                        <input type="hidden" name="id_veterinaria" value="<?= $veterinariaData['id_veterinaria'] ?>">
+                        <input type="hidden" name="id_veterinaria" value="<?= e($veterinariaData['id_veterinaria']) ?>">
                         <input type="hidden" name="accion" value="actualizar">
-                        <input type="hidden" name="foto_actual" value="<?= $veterinariaData['foto'] ?>">
+                        <input type="hidden" name="foto_actual" value="<?= e($veterinariaData['foto']) ?>">
 
                         <!-- Paso 1: Datos del Veterinaria -->
                         <div class="step active">
@@ -100,13 +106,13 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-hash"></i> Nit *</label>
-                                        <input type="text" id="nit" name="nit" required placeholder="000.123.456-7" value="<?= $veterinariaData['nit'] ?>">
+                                        <input type="text" id="nit" name="nit" required placeholder="000.123.456-7" value="<?= e($veterinariaData['nit']) ?>">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-clipboard2-data"></i> Razón Social *</label>
-                                        <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Juan Pérez García" value="<?= $veterinariaData['nombre'] ?>">
+                                        <input type="text" id="nombrePropietario" name="nombre" required placeholder="Ej: Juan Pérez García" value="<?= e($veterinariaData['nombre']) ?>">
                                     </div>
                                 </div>
                             </div>
@@ -116,14 +122,14 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-envelope"></i> Email *</label>
-                                        <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $veterinariaData['email'] ?>">
+                                        <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= e($veterinariaData['email']) ?>">
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                        <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567" value="<?= $veterinariaData['telefono'] ?>">
+                                        <input type="tel" id="telefono" name="telefono" required placeholder="+57 300 123 4567" value="<?= e($veterinariaData['telefono']) ?>">
                                     </div>
                                 </div>
                             </div>
@@ -143,7 +149,7 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                     <div class="form-group">
                                         <label><i class="bi bi-pin-map"></i>Ciudad *</label>
                                         <select name="ciudad" id="ciudad" required>
-                                            <option value="<?= $veterinariaData['ciudad'] ?>"><?= $veterinariaData['ciudad'] ?></option>
+                                            <option value="<?= e($veterinariaData['ciudad']) ?>"><?= e($veterinariaData['ciudad']) ?></option>
 
                                             <!-- Principales ciudades -->
                                             <option value="Bogotá">Bogotá</option>
@@ -207,7 +213,7 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-geo-alt"></i> Dirección *</label>
-                                        <input type="text" id="direccion" name="direccion" required placeholder="Ej: Calle 12 # 34-56" value="<?= $veterinariaData['direccion'] ?>">
+                                        <input type="text" id="direccion" name="direccion" required placeholder="Ej: Calle 12 # 34-56" value="<?= e($veterinariaData['direccion']) ?>">
                                     </div>
                                 </div>
 
@@ -224,8 +230,8 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                         </div>
 
 
-                        <input type="hidden" name="id_usuario" value="<?= $veterinariaData['id_usuario'] ?>">
-                        <input type="hidden" name="id_rol" value="<?= $veterinariaData['id_rol'] ?>">
+                        <input type="hidden" name="id_usuario" value="<?= e($veterinariaData['id_usuario']) ?>">
+                        <input type="hidden" name="id_rol" value="<?= e($veterinariaData['id_rol']) ?>">
                         <input type="hidden" name="accion" value="actualizar">
                         <!-- Paso 1: Datos del Usuario -->
                         <div class="step active">
@@ -237,7 +243,7 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                     <div class="form-group">
                                         <label><i class="bi bi-card-text"></i> Tipo de documento *</label>
                                         <select id="tipoDocumento" name="tipo_documento" required>
-                                            <option value="<?= $veterinariaData['tipo_documento'] ?>"><?= $veterinariaData['tipo_documento'] ?></option>
+                                            <option value="<?= e($veterinariaData['tipo_documento']) ?>"><?= e($veterinariaData['tipo_documento']) ?></option>
                                             <option value="CC">Cédula de Ciudadanía</option>
                                             <option value="CE">Cédula de Extranjería</option>
                                             <option value="PAS">Pasaporte</option>
@@ -249,7 +255,7 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-hash"></i> Número de documento *</label>
-                                        <input type="number" id="documento" name="numero_documento" required placeholder="12345678" value="<?= $veterinariaData['numero_documento'] ?>">
+                                        <input type="number" id="documento" name="numero_documento" required placeholder="12345678" value="<?= e($veterinariaData['numero_documento']) ?>">
                                     </div>
                                 </div>
 
@@ -257,14 +263,14 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-person"></i> Nombres *</label>
-                                        <input type="text" id="nombres" name="nombres" required placeholder="Ej: Juan Martin" value="<?= $veterinariaData['nombres'] ?>">
+                                        <input type="text" id="nombres" name="nombres" required placeholder="Ej: Juan Martin" value="<?= e($veterinariaData['nombres']) ?>">
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-person"></i> Apellidos *</label>
-                                        <input type="text" id="apellidos" name="apellidos" required placeholder="Ej: Pérez García" value="<?= $veterinariaData['apellidos'] ?>">
+                                        <input type="text" id="apellidos" name="apellidos" required placeholder="Ej: Pérez García" value="<?= e($veterinariaData['apellidos']) ?>">
                                     </div>
                                 </div>
                             </div>
@@ -275,14 +281,14 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                        <input type="email" id="email_user" name="email_user" required placeholder="ejemplo@correo.com" value="<?= $veterinariaData['email_user'] ?>">
+                                        <input type="email" id="email_user" name="email_user" required placeholder="ejemplo@correo.com" value="<?= e($veterinariaData['email_user']) ?>">
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                        <input type="tel" id="telefono_user" name="telefono_user" placeholder="+57 300 123 4567" required value="<?= $veterinariaData['telefono_user'] ?>">
+                                        <input type="tel" id="telefono_user" name="telefono_user" placeholder="+57 300 123 4567" required value="<?= e($veterinariaData['telefono_user']) ?>">
                                     </div>
                                 </div>
 
@@ -295,7 +301,7 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><i class="bi bi-geo-alt"></i> Dirección *</label>
-                                        <input type="text" id="direccion_user" name="direccion_user" placeholder="Calle 123 #45-67" required value="<?= $veterinariaData['direccion_user'] ?>">
+                                        <input type="text" id="direccion_user" name="direccion_user" placeholder="Calle 123 #45-67" required value="<?= e($veterinariaData['direccion_user']) ?>">
                                     </div>
                                 </div>
 
@@ -307,7 +313,7 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                             <option value="" disabled selected>Seleccione un rol</option>
                                             <?php if (!empty($datosRol)) : ?>
                                                 <?php foreach ($datosRol as $rol):  ?>
-                                                    <option value="<?= $rol['id_rol'] ?>" <?= $rol['id_rol'] == $veterinariaData['id_rol'] ? 'selected' : '' ?>><?= $rol['nombre'] ?></option>
+                                                    <option value="<?= e($rol['id_rol']) ?>" <?= $rol['id_rol'] == $veterinariaData['id_rol'] ? 'selected' : '' ?>><?= e($rol['nombre']) ?></option>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
                                         </select>
@@ -317,7 +323,7 @@ $veterinariaData = consultarVeterinariasRegistradas($id);
                                     <div class="form-group">
                                         <label><i class="bi bi-card-text"></i> Estado *</label>
                                         <select id="estado" name="estado_user" required>
-                                            <option value="<?= $veterinariaData['estado'] ?>"><?= $veterinariaData['estado_user'] ?></option>
+                                            <option value="<?= e($veterinariaData['estado']) ?>"><?= e($veterinariaData['estado_user']) ?></option>
                                             <option value="activo">Activo</option>
                                             <option value="inactivo">Inactivo</option>
                                             <option value="bloqueado">Bloqueado</option>

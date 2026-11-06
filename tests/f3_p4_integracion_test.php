@@ -74,8 +74,8 @@ try {
     echo "▶ Inicio de sesión (contenedor de pruebas, puerto {$env['PORT']})\n";
     comprobar($admin->iniciarSesion('admin@vetwilling.test', $clave, '/admin/listar-usuarios'), 'Administrador (1001) con token CSRF');
     comprobar($rep->iniciarSesion('rep@vetwilling.test', $clave, '/representante/listar-profesionales'), 'Representante de la clínica A (1004) con token CSRF');
-    comprobar($vet->iniciarSesion('vet.una@vetwilling.test', $clave), 'Veterinario de la clínica A (1003)');
-    comprobar($prop->iniciarSesion('f3test+propietario@vetwilling.test', $clave), 'Propietario de la clínica A');
+    comprobar($vet->iniciarSesion('vet.una@vetwilling.test', $clave, '/veterinario/consultar-perfil'), 'Veterinario de la clínica A (1003) con token CSRF');
+    comprobar($prop->iniciarSesion('f3test+propietario@vetwilling.test', $clave, '/cliente/configuracion'), 'Propietario de la clínica A con token CSRF');
 
     $existe = fn(string $email) => (int) valor('SELECT COUNT(*) FROM usuario WHERE email = ?', [$email]) > 0;
     $n = 0;
@@ -93,7 +93,7 @@ try {
     $r = $prop->pedir('POST', '/cliente/actualizar-contrasena', $d + ['accion' => 'registrar']);
     comprobar($r[0] === 400 && !$existe($d['email']), 'Propietario con accion=registrar → 400 y no se crea', "HTTP {$r[0]}");
     $d = $cuenta(1);
-    $r = $vet->pedir('POST', '/veterinario/actualizar-constrasena', $d);
+    $r = $vet->post('/veterinario/actualizar-constrasena', $d);
     comprobar($r[0] === 400 && !$existe($d['email']), 'Veterinario, POST sin accion a /veterinario/actualizar-constrasena con rol=1 → 400 y no se crea', "HTTP {$r[0]}, creada: " . json_encode($existe($d['email'])));
     $d = $cuenta(1) + ['numero_licencia_profesional' => '1'];
     $r = $vet->pedir('POST', '/veterinario/actualizar-veterinario', $d);
@@ -133,14 +133,14 @@ try {
 
     echo "▶ F3 · El administrador crea cuentas de cualquier rol\n";
     $d = $cuenta(1);
-    $admin->pedir('POST', '/admin/guardar-usuario', $d + ['accion' => 'registrar']);
+    $admin->post('/admin/guardar-usuario', $d + ['accion' => 'registrar']);
     comprobar((string) valor('SELECT id_rol FROM usuario WHERE email = ?', [$d['email']]) === '1', 'Rol 1 crea un administrador desde /admin/guardar-usuario');
     $d = $cuenta(9);
-    $admin->pedir('POST', '/admin/guardar-usuario', $d + ['accion' => 'registrar']);
+    $admin->post('/admin/guardar-usuario', $d + ['accion' => 'registrar']);
     comprobar(!$existe($d['email']), 'Rol inexistente (9) → no se crea');
     $d = $cuenta(4);
     $nit2 = 'F3' . random_int(100000, 999999);
-    $admin->pedir('POST', '/admin/guardar-veterinaria', ['nit' => $nit2] + $clinica + $d + ['accion' => 'registrar']);
+    $admin->post('/admin/guardar-veterinaria', ['nit' => $nit2] + $clinica + $d + ['accion' => 'registrar']);
     comprobar((bool) valor('SELECT 1 FROM veterinaria WHERE nit = ?', [$nit2]) && (string) valor('SELECT id_rol FROM usuario WHERE email = ?', [$d['email']]) === '4',
         'Rol 1 crea una clínica con su representante desde /admin/guardar-veterinaria');
 
@@ -227,10 +227,10 @@ try {
 
     echo "▶ Las rutas de contraseña siguen cambiando la contraseña\n";
     $nueva = $clave . 'x';
-    $vet->pedir('POST', '/veterinario/actualizar-constrasena', ['accion' => 'vet-constrasena', 'id_usuario' => 1003,
+    $vet->post('/veterinario/actualizar-constrasena', ['accion' => 'vet-constrasena', 'id_usuario' => 1003,
         'contrasena-actual' => $clave, 'nueva-contrasena' => $nueva, 'confi-contrasena' => $nueva]);
     comprobar(password_verify($nueva, (string) valor('SELECT password_hash FROM usuario WHERE id_usuario = 1003')), 'Veterinario: accion=vet-constrasena cambia su contraseña');
-    $prop->pedir('POST', '/cliente/actualizar-contrasena', ['accion' => 'modificar-contrasena', 'id_usuario' => $uProp,
+    $prop->post('/cliente/actualizar-contrasena', ['accion' => 'modificar-contrasena', 'id_usuario' => $uProp,
         'contrasena-actual' => $clave, 'nueva-contrasena' => $nueva, 'confi-contrasena' => $nueva]);
     comprobar(password_verify($nueva, (string) valor('SELECT password_hash FROM usuario WHERE id_usuario = ?', [$uProp])), 'Propietario: accion=modificar-contrasena cambia su contraseña');
 
@@ -246,8 +246,8 @@ try {
     }
     $otra = $nueva . 'y';
     $envio = array_merge($envio, ['contrasena-actual' => $nueva, 'nueva-contrasena' => $otra, 'confi-contrasena' => $otra]);
-    comprobar($codigo === 200 && ($envio['accion'] ?? '') === 'modificar-contrasena' && count($envio) === 5,
-        'El formulario de configuración envía accion, id_usuario y los tres campos de contraseña', "HTTP $codigo " . json_encode(array_keys($envio)));
+    comprobar($codigo === 200 && ($envio['accion'] ?? '') === 'modificar-contrasena' && count($envio) === 6 && isset($envio['csrf_token']),
+        'El formulario de configuración envía token CSRF, accion, id_usuario y los tres campos de contraseña', "HTTP $codigo " . json_encode(array_keys($envio)));
     $prop->pedir('POST', '/cliente/actualizar-contrasena', $envio);
     comprobar(password_verify($otra, (string) valor('SELECT password_hash FROM usuario WHERE id_usuario = ?', [$uProp])), 'Propietario: el formulario de configuración vuelve a cambiar la contraseña');
 } catch (Throwable $e) {

@@ -6,6 +6,7 @@ require_once __DIR__ . '/../helpers/acceso_helper.php';
 require_once __DIR__ . '/../models/veterinaria.php';
 require_once __DIR__ . '/../helpers/mailer_helper.php';
 require_once __DIR__ . '/../helpers/email_helper.php';
+require_once __DIR__ . '/../services/PasswordResetService.php';
 
 
 // Acciones POST que admite cada ruta que incluye este controlador (las demás → 400).
@@ -27,6 +28,8 @@ switch ($method) {
 
         $accion = (string) ($_POST['accion'] ?? '');
         acceso_exigir_accion_de_ruta($accion, VETERINARIA_ACCIONES_POST);
+        acceso_exigir_accion('veterinaria', 'POST', $accion);
+        acceso_exigir_csrf();
         if ($accion === 'actualizar') {
             actualizarVeterinaria();
         } else if ($accion === 'actualizarInfo') {
@@ -44,6 +47,7 @@ switch ($method) {
         // Este controlador se incluye desde los layouts de los paneles 2 y 4: las eliminaciones
         // solo se aceptan por POST con token CSRF (GET → 405)
         $action = $_GET['action'] ?? '';
+        acceso_exigir_accion('veterinaria', 'GET', $action);
         if ($action === 'eliminar' || $action === 'eliminar_horarios') {
             acceso_denegar('405', 'eliminación por GET');
         } elseif ($action === 'obtener_horarios') {
@@ -80,7 +84,7 @@ function registrarVeterinaria()
 
     // Validamos los campos recibidos de representante legal
     $email = $_POST['email'] ?? '';
-    $password = $nit !== '' ? $nit : ($_POST['numero_documento'] ?? '123');
+    $password = PasswordResetService::claveInicialAleatoria();
     $estado = 'activo';
     $id_rol = '4'; // Rol de representante legal
     $tipo_documento = $_POST['tipo_documento'] ?? '';
@@ -147,7 +151,10 @@ function registrarVeterinaria()
         // Generar un nombre único para la imagen
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
-        move_uploaded_file($file['tmp_name'], $destino);
+        if (!guardar_archivo_subido($file['tmp_name'], $destino)) {
+            mostrarSweetAlert('error', 'Error', 'No se pudo guardar la foto');
+            exit();
+        }
     }
 
     // Creamos el objeto de la clase Veterinaria
@@ -180,9 +187,9 @@ function registrarVeterinaria()
 
     // Verificamos el resultado y mostramos una alerta
     if ($resultado) {
-        $emailEnviado = false;
+        $enlaceEnviado = (new PasswordResetService())->enviarEnlaceCuentaNueva($email);
         if (validarFormatoEmail($emailVeterinaria)) {
-            $emailEnviado = enviarBienvenidaVeterinaria([
+            enviarBienvenidaVeterinaria([
                 'email' => $emailVeterinaria,
                 'razon_social' => $nombreVeterinaria,
                 'nit' => $nit,
@@ -193,9 +200,9 @@ function registrarVeterinaria()
         mostrarSweetAlert(
             'success',
             'Veterinaria registrada',
-            $emailEnviado
-                ? 'La veterinaria ha sido creada correctamente y el correo fue enviado. El representante ya puede iniciar sesión y registrar los profesionales para configurar sus horarios de disponibilidad.'
-                : 'La veterinaria ha sido creada correctamente. El representante ya puede iniciar sesión y registrar los profesionales para configurar sus horarios de disponibilidad.',
+            $enlaceEnviado
+                ? 'La veterinaria fue creada. El representante recibirá un correo para crear su contraseña.'
+                : 'La veterinaria fue creada, pero no se pudo enviar el correo. El representante puede pedir el enlace desde Recuperar contraseña.',
             BASE_URL . '/admin/listar-veterinarias'
         );
     } else {
@@ -212,7 +219,6 @@ function enviarBienvenidaVeterinaria(array $datos): bool
 
         $email = $datos['email'] ?? '';
         $razonSocial = $datos['razon_social'] ?? '';
-        $nit = (string) ($datos['nit'] ?? '');
         $representante = $datos['representante'] ?? '';
 
         $mail->setFrom(SMTP_FROM_EMAIL, 'VetWilling - Sistema de Gestion Veterinaria');
@@ -222,8 +228,6 @@ function enviarBienvenidaVeterinaria(array $datos): bool
 
         $razonSeguro = htmlspecialchars($razonSocial, ENT_QUOTES, 'UTF-8');
         $representanteSeguro = htmlspecialchars($representante, ENT_QUOTES, 'UTF-8');
-        $emailSeguro = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
-        $nitSeguro = htmlspecialchars($nit, ENT_QUOTES, 'UTF-8');
         $baseUrl = defined('BASE_URL') ? BASE_URL : '';
 
         $mail->Body = "
@@ -248,14 +252,8 @@ function enviarBienvenidaVeterinaria(array $datos): bool
                 <div class='content'>
                     <h2>Estimado equipo de {$razonSeguro},</h2>
                     <p>Su veterinaria ha sido registrada exitosamente en nuestro sistema.</p>
-                    <div class='card'>
-                        <h3>Datos de acceso</h3>
-                        <p><strong>Correo:</strong> {$emailSeguro}</p>
-                        <p><strong>Contrasena inicial:</strong> {$nitSeguro}</p>
-                        <p>Por seguridad, recuerde cambiar la contrasena en el primer ingreso.</p>
-                    </div>
                     <p><strong>Representante legal:</strong> {$representanteSeguro}</p>
-                    <p>Puede iniciar sesion desde el siguiente enlace:</p>
+                    <p>El representante recibira un correo aparte para crear su contrasena.</p>
                     <a class='btn' href='{$baseUrl}'>Acceder al sistema</a>
                 </div>
                 <div class='footer'>
@@ -269,14 +267,12 @@ function enviarBienvenidaVeterinaria(array $datos): bool
 
         $mail->AltBody = "Estimado equipo de {$razonSocial},\n\n"
             . "Su veterinaria fue registrada exitosamente en VetWilling.\n"
-            . "Correo: {$email}\n"
-            . "Contrasena inicial: {$nit}\n"
-            . "Recuerde cambiar la contrasena en el primer ingreso.\n"
+            . "El representante recibira un correo aparte para crear su contrasena.\n"
             . "Representante legal: {$representante}\n\n"
             . "Acceda desde: {$baseUrl}\n\n"
             . "VetWilling";
 
-        // Se registra en Medios de envío sin guardar el contenido: lleva la contraseña inicial
+        // Se registra en Medios de envío sin guardar el contenido (las bienvenidas no se reenvían)
         return mailer_enviar($mail, 'bienvenida', ['guardar_contenido' => false]);
     } catch (Exception $e) {
         error_log("Error al enviar bienvenida veterinaria: " . $e->getMessage());

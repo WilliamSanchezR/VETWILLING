@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../helpers/alert_helpers.php';
 require_once __DIR__ . '/../helpers/acceso_helper.php';
+require_once __DIR__ . '/../services/PasswordResetService.php';
 require_once __DIR__ . '/../models/usuario.php';
 
 // Estados de cuenta que acepta el administrador (usuario.estado)
@@ -28,6 +29,8 @@ switch ($method) {
 
         $accion = (string) ($_POST['accion'] ?? '');
         acceso_exigir_accion_de_ruta($accion, USUARIO_ACCIONES_POST);
+        acceso_exigir_accion('usuario', 'POST', $accion);
+        acceso_exigir_csrf();
         if ($accion === 'actualizar') {
             actualizarUsuario();
         } else if ($accion  === 'actualizar-constrasena') {
@@ -47,6 +50,7 @@ switch ($method) {
 
     case 'GET':
         $accion = $_GET['accion'] ?? '';
+        acceso_exigir_accion('usuario', 'GET', $accion);
 
         if ($accion === 'eliminar') {
             eliminarUsuario(); // solo POST: responde 405
@@ -82,7 +86,7 @@ function registrarUsuario()
     $id_rol = $_POST['rol'] ?? '';
     $tipo_documento = $_POST['tipo_documento'] ?? '';
     $numero_documento = $_POST['numero_documento'] ?? '';
-    $password = !empty($numero_documento) ? $numero_documento : '123';
+    $password = PasswordResetService::claveInicialAleatoria();
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $telefono = $_POST['telefono'] ?? '';
@@ -131,7 +135,10 @@ function registrarUsuario()
         // Generar un nombre único para la imagen
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
-        move_uploaded_file($file['tmp_name'], $destino);
+        if (!guardar_archivo_subido($file['tmp_name'], $destino)) {
+            mostrarSweetAlert('error', 'Error', 'No se pudo guardar la foto');
+            exit();
+        }
     }
     // Creamos el objeto de la clase Usuario
     $objUsuario = new Usuario();
@@ -155,10 +162,13 @@ function registrarUsuario()
     $resultado = $objUsuario->registrar($data);
     // Verificamos el resultado y mostramos una alerta
     if ($resultado) {
+        $enlaceEnviado = (new PasswordResetService())->enviarEnlaceCuentaNueva($email);
         mostrarSweetAlert(
             'success',
             'Usuario registrado',
-            'El usuario ha sido creado correctamente',
+            $enlaceEnviado
+                ? 'El usuario fue creado y recibirá un correo para crear su contraseña.'
+                : 'El usuario fue creado, pero no se pudo enviar el correo. Puede pedir el enlace desde Recuperar contraseña.',
             BASE_URL . '/admin/listar-usuarios'
         );
     } else {
@@ -314,7 +324,8 @@ function mensajeCambioEstadoCuenta(string $resultado): string
 // FUNCION PARA CAMBIAR LA CONTRASEÑA DEL USUARIO
 function cambioContrasena()
 {
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    // Cada usuario solo cambia su propia contraseña
+    $id_usuario = acceso_id_usuario();
     $passwordActual = $_POST['contrasena-actual'] ?? '';
     $PasswordNuevo = $_POST['nueva-contrasena'] ?? '';
     $PasswordConfir = $_POST['confi-contrasena'] ?? '';
@@ -362,7 +373,8 @@ function cambioContrasena()
 }
 function vetContrasena()
 {
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    // Cada usuario solo cambia su propia contraseña
+    $id_usuario = acceso_id_usuario();
     $passwordActual = $_POST['contrasena-actual'] ?? '';
     $PasswordNuevo = $_POST['nueva-contrasena'] ?? '';
     $PasswordConfir = $_POST['confi-contrasena'] ?? '';
@@ -411,7 +423,8 @@ function vetContrasena()
 
 function modiContrasena()
 {
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    // Cada usuario solo cambia su propia contraseña
+    $id_usuario = acceso_id_usuario();
     $passwordActual = $_POST['contrasena-actual'] ?? '';
     $PasswordNuevo = $_POST['nueva-contrasena'] ?? '';
     $PasswordConfir = $_POST['confi-contrasena'] ?? '';
@@ -461,7 +474,8 @@ function modiContrasena()
 // FUNCION PARA CAMBIAR LA FOTO DE PERFIL 
 function actualizarFotoPerfil()
 {
-    $id_usuario = $_POST['id_usuario'] ?? '';
+    // Cada usuario solo cambia su propia foto
+    $id_usuario = acceso_id_usuario();
 
     if (empty($id_usuario)) {
         mostrarSweetAlert('error', 'Error', 'ID de usuario no proporcionado');
@@ -486,7 +500,10 @@ function actualizarFotoPerfil()
         // Generar un nombre único para la imagen
         $img_perfil = uniqid('user_') . '.' . $ext;
         $destino = BASE_PATH . '/public/uploads/usuarios/' . $img_perfil;
-        move_uploaded_file($file['tmp_name'], $destino);
+        if (!guardar_archivo_subido($file['tmp_name'], $destino)) {
+            mostrarSweetAlert('error', 'Error', 'No se pudo guardar la foto');
+            exit();
+        }
 
         // Actualizar en la base de datos
         $objUsuario = new Usuario();

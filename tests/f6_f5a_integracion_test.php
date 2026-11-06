@@ -108,11 +108,11 @@ try {
     $datosAdmin = ['accion' => 'actualizar', 'tipo_documento' => 'CC', 'numero_documento' => '1', 'nombres' => 'Admin', 'apellidos' => 'Prueba',
         'telefono' => '1', 'id_rol' => '1', 'direccion' => 'x'];
     $emailAdmin = valor('SELECT email FROM usuario WHERE id_usuario = 1001');
-    $admin->pedir('POST', '/admin/actualizar-usuario', $datosAdmin + ['id_usuario' => 1001, 'email' => $emailAdmin, 'estado' => 'inactivo']);
+    $admin->post('/admin/actualizar-usuario', $datosAdmin + ['id_usuario' => 1001, 'email' => $emailAdmin, 'estado' => 'inactivo']);
     comprobar($estadoUsuario(1001) === 'activo', 'actualizarUsuario: el administrador no se inhabilita a sí mismo por el formulario de edición');
-    $admin->pedir('POST', '/admin/actualizar-usuario', $datosAdmin + ['id_usuario' => $uVictima, 'email' => 'f6test+nuevo@vetwilling.test', 'estado' => 'activo']);
+    $admin->post('/admin/actualizar-usuario', $datosAdmin + ['id_usuario' => $uVictima, 'email' => 'f6test+nuevo@vetwilling.test', 'estado' => 'activo']);
     comprobar(valor('SELECT email FROM usuario WHERE id_usuario = ?', [$uVictima]) === 'f6test+nuevo@vetwilling.test' && $estadoUsuario($uVictima) === 'activo', 'El rol 1 sí cambia el correo y reactiva la cuenta');
-    $admin->pedir('POST', '/admin/actualizar-usuario', $datosAdmin + ['id_usuario' => $uVictima, 'email' => 'f6test+nuevo@vetwilling.test', 'estado' => 'superusuario']);
+    $admin->post('/admin/actualizar-usuario', $datosAdmin + ['id_usuario' => $uVictima, 'email' => 'f6test+nuevo@vetwilling.test', 'estado' => 'superusuario']);
     comprobar($estadoUsuario($uVictima) === 'activo', 'Estado fuera de la lista blanca → rechazado');
 
     // Último administrador: por HTTP no se alcanza (quien actúa es otro administrador activo); se prueba el modelo
@@ -187,9 +187,9 @@ try {
     echo "▶ F5a · Datos de la clínica, horarios y propietarios\n";
     $info = ['accion' => 'actualizarInfo', 'direccion' => 'Dirección F5a', 'ciudad' => 'Ciudad', 'telefono' => '123'];
     $dir102 = valor('SELECT direccion FROM veterinaria WHERE id_veterinaria = 102');
-    comprobar($codigoDe($rep->pedir('POST', '/representante/actualizar-veterinaria', $info + ['id_veterinaria' => 102])) === 404
+    comprobar($codigoDe($rep->post('/representante/actualizar-veterinaria', $info + ['id_veterinaria' => 102])) === 404
         && valor('SELECT direccion FROM veterinaria WHERE id_veterinaria = 102') === $dir102, 'Actualizar la información de otra clínica → 404, sin cambios');
-    $rep->pedir('POST', '/representante/actualizar-veterinaria', $info + ['id_veterinaria' => 101]);
+    $rep->post('/representante/actualizar-veterinaria', $info + ['id_veterinaria' => 101]);
     comprobar(valor('SELECT direccion FROM veterinaria WHERE id_veterinaria = 101') === 'Dirección F5a', 'Su propia clínica → actualizada');
     comprobar($codigoDe($rep->pedir('POST', '/representante/actualizar-veterinaria', ['accion' => 'actualizar', 'id_veterinaria' => 102, 'id_usuario' => 1004, 'email_user' => 'f6test+robado@vetwilling.test'])) === 400,
         'Edición completa de clínica (con el correo del representante) desde el rol 4 → 400 (la ruta no admite esa acción)');

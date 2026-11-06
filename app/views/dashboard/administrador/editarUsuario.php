@@ -11,8 +11,13 @@
     $datosRol = listarRolAdmin();
     $datosVeterinaria = listarVeterinariasRegistradas();
 
-    $id = $_GET['id'];
+    $id = $_GET['id'] ?? 0;
     $usuarioData = consultarUsuarioId($id);
+    if (!$usuarioData) {
+        http_response_code(404);
+        require BASE_PATH . '/app/views/auth/error404.php';
+        exit();
+    }
 
     ?>
 
@@ -74,8 +79,9 @@
                 </div>
 
                 <form id="vetForm" action="<?= BASE_URL ?>/admin/actualizar-usuario" method="POST">
-                    <input type="hidden" name="id_usuario" value="<?= $usuarioData['id_usuario'] ?>">
-                    <input type="hidden" name="id_rol" value="<?= $usuarioData['id_rol'] ?>">
+<?= csrf_campo() ?>
+                    <input type="hidden" name="id_usuario" value="<?= e($usuarioData['id_usuario']) ?>">
+                    <input type="hidden" name="id_rol" value="<?= e($usuarioData['id_rol']) ?>">
                     <input type="hidden" name="accion" value="actualizar">
                     <!-- Paso 1: Datos del Usuario -->
                     <div class="step active">
@@ -87,7 +93,7 @@
                                 <div class="form-group">
                                     <label><i class="bi bi-card-text"></i> Tipo de documento *</label>
                                     <select id="tipoDocumento" name="tipo_documento" required>
-                                        <option value="<?= $usuarioData['tipo_documento'] ?>"><?= $usuarioData['tipo_documento'] ?></option>
+                                        <option value="<?= e($usuarioData['tipo_documento']) ?>"><?= e($usuarioData['tipo_documento']) ?></option>
                                         <option value="CC">Cédula de Ciudadanía</option>
                                         <option value="CE">Cédula de Extranjería</option>
                                         <option value="PAS">Pasaporte</option>
@@ -99,7 +105,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-hash"></i> Número de documento *</label>
-                                    <input type="number" id="documento" name="numero_documento" required placeholder="12345678" value="<?= $usuarioData['numero_documento'] ?>">
+                                    <input type="number" id="documento" name="numero_documento" required placeholder="12345678" value="<?= e($usuarioData['numero_documento']) ?>">
                                 </div>
                             </div>
 
@@ -107,14 +113,14 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-person"></i> Nombres *</label>
-                                    <input type="text" id="nombres" name="nombres" required placeholder="Ej: Juan Martin" value="<?= $usuarioData['nombres'] ?>">
+                                    <input type="text" id="nombres" name="nombres" required placeholder="Ej: Juan Martin" value="<?= e($usuarioData['nombres']) ?>">
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-person"></i> Apellidos *</label>
-                                    <input type="text" id="apellidos" name="apellidos" required placeholder="Ej: Pérez García" value="<?= $usuarioData['apellidos'] ?>">
+                                    <input type="text" id="apellidos" name="apellidos" required placeholder="Ej: Pérez García" value="<?= e($usuarioData['apellidos']) ?>">
                                 </div>
                             </div>
                         </div>
@@ -125,14 +131,14 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-envelope"></i> Correo electrónico *</label>
-                                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= $usuarioData['email'] ?>">
+                                    <input type="email" id="email" name="email" required placeholder="ejemplo@correo.com" value="<?= e($usuarioData['email']) ?>">
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-telephone"></i> Teléfono *</label>
-                                    <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567" required value="<?= $usuarioData['telefono'] ?>">
+                                    <input type="tel" id="telefono" name="telefono" placeholder="+57 300 123 4567" required value="<?= e($usuarioData['telefono']) ?>">
                                 </div>
                             </div>
 
@@ -145,7 +151,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label><i class="bi bi-geo-alt"></i> Dirección *</label>
-                                    <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67" required value="<?= $usuarioData['direccion'] ?>">
+                                    <input type="text" id="direccion" name="direccion" placeholder="Calle 123 #45-67" required value="<?= e($usuarioData['direccion']) ?>">
                                 </div>
                             </div>
 
@@ -157,7 +163,7 @@
                                         <option value="" disabled selected>Seleccione un rol</option>
                                         <?php if (!empty($datosRol)) : ?>
                                             <?php foreach ($datosRol as $rol):  ?>
-                                                <option value="<?= $rol['id_rol'] ?>" <?= $rol['id_rol'] == $usuarioData['id_rol'] ? 'selected' : '' ?>><?= $rol['nombre'] ?></option>
+                                                <option value="<?= e($rol['id_rol']) ?>" <?= $rol['id_rol'] == $usuarioData['id_rol'] ? 'selected' : '' ?>><?= e($rol['nombre']) ?></option>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
@@ -167,7 +173,7 @@
                                 <div class="form-group">
                                     <label><i class="bi bi-card-text"></i> Estado *</label>
                                     <select id="estado" name="estado" required>
-                                        <option value="<?= $usuarioData['estado'] ?>"><?= $usuarioData['estado'] ?></option>
+                                        <option value="<?= e($usuarioData['estado']) ?>"><?= e($usuarioData['estado']) ?></option>
                                         <option value="activo">Activo</option>
                                         <option value="inactivo">Inactivo</option>
                                         <option value="bloqueado">Bloqueado</option>
@@ -184,7 +190,7 @@
                                             <option value="" disabled selected>Seleccione una veterinaria</option>
                                             <?php if (!empty($datosVeterinaria)) : ?>
                                                 <?php foreach ($datosVeterinaria as $veterinaria):  ?>
-                                                    <option value="<?= $veterinaria['id_veterinaria'] ?>" <?= $veterinaria['id_veterinaria'] == $usuarioData['id_veterinaria'] ? 'selected' : '' ?>><?= $veterinaria['nombre'] ?></option>
+                                                    <option value="<?= e($veterinaria['id_veterinaria']) ?>" <?= $veterinaria['id_veterinaria'] == $usuarioData['id_veterinaria'] ? 'selected' : '' ?>><?= e($veterinaria['nombre']) ?></option>
                                                 <?php endforeach; ?>
                                             <?php endif; ?>
                                         </select>

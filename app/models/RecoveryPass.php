@@ -66,7 +66,7 @@ class RecoveryPass
     public function buscarTokenVigente(string $tokenHash)
     {
         $stmt = $this->conexion->prepare(
-            "SELECT pr.id_reset, pr.id_usuario, u.email
+            "SELECT pr.id_reset, pr.id_usuario, pr.expira, u.email
              FROM password_reset pr
              INNER JOIN usuario u ON u.id_usuario = pr.id_usuario
              WHERE pr.token_hash = :hash

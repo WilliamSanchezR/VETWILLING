@@ -106,6 +106,19 @@ comprobar($dec('/cliente/eliminar-mascota', $usuario(3), 'POST') === 'permitir' 
     && $dec('/cliente/eliminar-mascota', null, 'POST') === 'login', 'Eliminar mascota: solo el propietario, y pasando por el enrutador');
 comprobar($dec('/ruta/que/no/existe', null) === 'login' && $dec('/ruta/que/no/existe', $usuario(1)) === '404', 'Ruta desconocida: login sin sesión, 404 con sesión (igual que antes)');
 
+echo "▶ Clave temporal: solo se puede cambiarla\n";
+$conClave = fn(int $rol) => $usuario($rol) + ['debe_cambiar_clave' => true];
+comprobar($dec('/admin/dashBoard', $conClave(1)) === 'cambio_clave' && $dec('/cliente/dashboard', $conClave(3)) === 'cambio_clave',
+    'Con clave temporal, el panel lleva a cambiarla');
+comprobar($dec('/admin/api/soporte-cuentas', $conClave(1)) === 'cambio_clave', 'Con clave temporal, las API también se bloquean');
+comprobar($dec('/cuenta/cambiar-clave', $conClave(2)) === 'permitir' && $dec('/cuenta/guardar-clave', $conClave(4), 'POST') === 'permitir',
+    'Con clave temporal, la pantalla de cambio y su acción se permiten');
+comprobar($dec('/cerrar-sesion', $conClave(3)) === 'permitir', 'Con clave temporal, puede cerrar sesión');
+comprobar($dec('/admin/dashBoard', $usuario(1)) === 'permitir' && $dec('/cuenta/cambiar-clave', null) === 'login',
+    'Sin clave temporal no cambia nada; la pantalla exige sesión');
+comprobar(array_keys(array_filter($mapa, fn($p) => !empty($p['cambio_clave']))) === ['/cuenta/cambiar-clave', '/cuenta/guardar-clave'],
+    'Solo dos rutas privadas están permitidas durante el cambio obligatorio');
+
 echo "▶ Ningún formulario envía POST a una ruta de vista\n";
 $archivos = array_merge(
     glob("$raiz/app/views/{*,*/*,*/*/*}.php", GLOB_BRACE),
