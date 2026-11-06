@@ -118,22 +118,94 @@ class panelSuperiorAdmin {
     /* ================= NOTIFICACIONES ================= */
 
     initNotifications() {
+        this.apiNotificaciones = `${window.BASE_URL}/soporte/api/ticket?action=notificaciones`;
+        this.listaNotificaciones = this.$('#listaNotificaciones');
+        this.tickets = [];
+
         if (this.buttons.marcarLeidas) {
             this.buttons.marcarLeidas.onclick = () => this.marcarTodasComoLeidas();
         }
 
-        this.$$('.notificacion-item.no-leida').forEach(item => {
-            item.addEventListener("click", () => this.marcarComoLeida(item));
-        });
-
-        this.contarNotificaciones();
+        this.buttons.notificaciones?.addEventListener('click', () => this.cargarNotificaciones());
+        this.cargarNotificaciones();
     }
 
-    contarNotificaciones() {
-        this.state.notificacionesSinLeer =
-            this.$$('.notificacion-item.no-leida').length;
+    // El último ticket visto se recuerda en este navegador: la campanita no escribe en la base de datos
+    ultimoTicketVisto() {
+        try {
+            return Number(localStorage.getItem('adminUltimoTicketVisto')) || 0;
+        } catch (error) {
+            return 0;
+        }
+    }
 
+    guardarUltimoTicketVisto(id) {
+        try {
+            localStorage.setItem('adminUltimoTicketVisto', String(id));
+        } catch (error) {
+            console.warn('No se pudo recordar el último ticket visto.');
+        }
+    }
+
+    async cargarNotificaciones() {
+        try {
+            const respuesta = await fetch(this.apiNotificaciones, { headers: { Accept: 'application/json' } });
+            const datos = await respuesta.json();
+            if (!respuesta.ok || !datos.ok) throw new Error(datos.mensaje || 'Respuesta no válida');
+
+            this.tickets = datos.tickets || [];
+            this.renderNotificaciones();
+        } catch (error) {
+            console.error('Error al cargar notificaciones:', error);
+            this.mostrarMensajeNotificaciones('No se pudieron cargar las notificaciones.');
+        }
+    }
+
+    mostrarMensajeNotificaciones(texto) {
+        if (!this.listaNotificaciones) return;
+        const mensaje = document.createElement('div');
+        mensaje.className = 'empty-notificaciones';
+        mensaje.textContent = texto;
+        this.listaNotificaciones.replaceChildren(mensaje);
+    }
+
+    renderNotificaciones() {
+        const visto = this.ultimoTicketVisto();
+        this.state.notificacionesSinLeer = this.tickets.filter(t => Number(t.id) > visto).length;
         this.updateNotifBadge();
+
+        if (!this.listaNotificaciones) return;
+        if (!this.tickets.length) {
+            this.mostrarMensajeNotificaciones('No hay tickets pendientes.');
+            return;
+        }
+        this.listaNotificaciones.replaceChildren(...this.tickets.map(t => this.crearItemNotificacion(t, visto)));
+    }
+
+    crearItemNotificacion(ticket, visto) {
+        const colores = { critica: 'rojo', alta: 'rojo', media: 'naranja', baja: 'azul' };
+        const item = document.createElement('a');
+        item.href = `${window.BASE_URL}/admin/gestion-tickets?id=${encodeURIComponent(ticket.id)}`;
+        item.className = `notificacion-item${Number(ticket.id) > visto ? ' no-leida' : ''}`;
+
+        const icono = document.createElement('div');
+        icono.className = `notif-icono notif-${colores[ticket.prioridad] || 'azul'}`;
+        const simbolo = document.createElement('i');
+        simbolo.className = 'bi bi-chat-dots-fill';
+        icono.appendChild(simbolo);
+
+        const contenido = document.createElement('div');
+        contenido.className = 'notif-contenido';
+        const titulo = document.createElement('p');
+        titulo.className = 'notif-texto';
+        titulo.textContent = ticket.titulo || `Ticket #${ticket.id}`;
+        const detalle = document.createElement('span');
+        detalle.className = 'notif-tiempo';
+        detalle.textContent = `${String(ticket.estado || '').replaceAll('_', ' ')} · prioridad ${ticket.prioridad || 'media'} · ${ticket.fecha_creacion || ''}`;
+        contenido.append(titulo, detalle);
+
+        item.append(icono, contenido);
+        return item;
     }
 
     updateNotifBadge() {
@@ -144,18 +216,10 @@ class panelSuperiorAdmin {
         b.textContent = this.state.notificacionesSinLeer;
     }
 
-    marcarComoLeida(item) {
-        item.classList.remove("no-leida");
-        this.state.notificacionesSinLeer--;
-        this.updateNotifBadge();
-    }
-
     marcarTodasComoLeidas() {
-        this.$$('.notificacion-item.no-leida').forEach(item =>
-            item.classList.remove("no-leida")
-        );
-        this.state.notificacionesSinLeer = 0;
-        this.updateNotifBadge();
+        const mayor = this.tickets.reduce((max, t) => Math.max(max, Number(t.id) || 0), this.ultimoTicketVisto());
+        this.guardarUltimoTicketVisto(mayor);
+        this.renderNotificaciones();
     }
 
     /* ================= BUSCADOR ================= */
@@ -213,6 +277,10 @@ class panelSuperiorAdmin {
             case 'perfil-administrador':
                 titlePage = 'Perfil';
                 break;
+            case 'directorio':
+            case 'ver-perfil':
+                titlePage = 'Directorio';
+                break;
             case 'listar-propietarios':
                 titlePage = 'Propietarios';
                 break;
@@ -225,6 +293,9 @@ class panelSuperiorAdmin {
                 break;
             case 'medios-envio':
                 titlePage = 'Medios de envío';
+                break;
+            case 'soporte-cuentas':
+                titlePage = 'Soporte de cuentas';
                 break;
             case 'directorio':
             case 'ver-perfil':

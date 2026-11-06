@@ -280,6 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'])) {
                 action="<?= BASE_URL ?>/cliente/actualizar-contrasena"
                 id="passwordForm"
                 novalidate>
+<?= csrf_campo() ?>
 
                 <input type="hidden" name="id_usuario"
                   value="<?= htmlspecialchars($_SESSION['user']['id_usuario']) ?>">

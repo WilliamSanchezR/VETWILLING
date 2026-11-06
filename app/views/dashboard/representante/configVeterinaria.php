@@ -56,6 +56,7 @@ $veterinariaData = consultarVeterinariasRegistradas($idVeterinaria);
 
         <div class="wizard-container">
             <form id="vetForm" action="<?= BASE_URL ?>/representante/actualizar-veterinaria" method="POST" enctype="multipart/form-data">
+<?= csrf_campo() ?>
 
                 <div class="wizard-header">
                     <i class="bi bi-person-vcard"></i>

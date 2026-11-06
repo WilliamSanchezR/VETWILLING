@@ -80,8 +80,8 @@ async function cargarCanales() {
                 <div class="flex-grow-1">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h6 class="mb-0 fw-semibold">${c.nombre_canal}</h6>
-                            <small class="text-muted">${c.descripcion ?? ''}</small>
+                            <h6 class="mb-0 fw-semibold">${escapar(c.nombre_canal)}</h6>
+                            <small class="text-muted">${escapar(c.descripcion ?? '')}</small>
                         </div>
                         <span class="badge badge-estado ${!disponible ? 'bg-warning text-dark' : habilitado ? 'bg-success' : 'bg-secondary'}">
                             ${!disponible ? 'No disponible' : habilitado ? 'Activo' : 'Inactivo'}
@@ -140,7 +140,7 @@ function poblarSelectoresCanal(canales) {
         btn.className = 'btn-canal-sel';
         btn.dataset.codigo = c.codigo_canal;
         btn.dataset.id     = c.id_canal;
-        btn.innerHTML = `<i class="bi ${ICONOS_CANAL[c.codigo_canal] ?? 'bi-send'} me-1"></i>${c.nombre_canal}`;
+        btn.innerHTML = `<i class="bi ${ICONOS_CANAL[c.codigo_canal] ?? 'bi-send'} me-1"></i>${escapar(c.nombre_canal)}`;
         btn.addEventListener('click', () => seleccionarCanalConfig(c, btn));
         btnsCfg.appendChild(btn);
 
@@ -400,7 +400,7 @@ function renderResumen(resumen) {
         col.innerHTML = `
         <div class="card-resumen">
             <div class="cifra ${+r.fallidos > 0 ? 'danger' : 'success'}">${r.total}</div>
-            <div class="etiqueta">${r.canal} · ${r.fallidos} fallos</div>
+            <div class="etiqueta">${escapar(r.canal)} · ${r.fallidos} fallos</div>
         </div>`;
         cont.appendChild(col);
     });
@@ -468,4 +468,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('selectHorasMonitor')
         .addEventListener('change', cargarFallos);
+
+    document.querySelector('[data-bs-target="#tab-recuperacion"]')
+        .addEventListener('shown.bs.tab', cargarRecuperacion);
+});
+
+// ── TAB 5: CORREO DE RECUPERACIÓN ─────────────────────────────
+
+async function cargarRecuperacion() {
+    const res = await apiGet('recuperacion');
+    if (!res.ok) { toast(res.mensaje || 'No se pudo cargar', 'danger'); return; }
+    const d = res.data;
+    const form = document.getElementById('formRecuperacion');
+    form.remitente.value        = d.remitente;
+    form.nombre_remitente.value = d.nombre_remitente;
+    form.asunto.value           = d.asunto;
+    form.mensaje.value          = d.mensaje;
+    form.minutos_vigencia.value = d.minutos_vigencia;
+    form.remitente.placeholder        = res.remitente_canal;
+    form.nombre_remitente.placeholder = res.nombre_canal;
+    form.asunto.placeholder           = res.por_defecto.asunto;
+    form.mensaje.placeholder          = res.por_defecto.mensaje;
+
+    const remitente = d.remitente || res.remitente_canal;
+    const aviso = res.transporte === 'brevo'
+        ? ' Con Brevo, este correo debe estar validado en Senders & IP; si no, Brevo rechaza el envío aunque aquí diga "enviado".'
+        : '';
+    document.getElementById('infoRemitenteRecuperacion').textContent =
+        `Ahora sale desde ${remitente}.${aviso}`;
+}
+
+document.getElementById('formRecuperacion').addEventListener('submit', e => {
+    e.preventDefault();
+    const boton = e.submitter;
+    conBotonOcupado(boton, async () => {
+        const datos = Object.fromEntries(new FormData(e.target).entries());
+        const res = await apiPost('guardar_recuperacion', datos);
+        toast(res.mensaje, res.ok ? 'success' : 'danger');
+        if (res.ok) await cargarRecuperacion();
+    });
+});
+
+document.getElementById('btnProbarRecuperacion').addEventListener('click', e => {
+    const destino = document.body.dataset.adminEmail || 'tu correo';
+    if (!confirm(`Se enviará un correo REAL de recuperación de prueba a ${destino} con la configuración guardada. ¿Continuar?`)) {
+        return;
+    }
+    conBotonOcupado(e.currentTarget, async () => {
+        const res = await apiPost('probar_recuperacion');
+        toast(res.mensaje, res.ok ? 'success' : 'danger');
+    });
 });

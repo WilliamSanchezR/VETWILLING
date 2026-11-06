@@ -22,6 +22,10 @@ switch ($method) {
     case 'GET':
         $action = $_GET['action'] ?? '';
 
+        if ($action === 'notificaciones') {
+            listarNotificacionesTickets();
+        }
+
         if ($action === 'historico' && isset($_GET['id'])) {
             consultarHistoricoTicket($_GET['id']);
         }
@@ -48,6 +52,19 @@ switch ($method) {
         http_response_code(405);
         echo "Método no permitido";
         break;
+}
+
+// Tickets sin cerrar para la campanita del administrador. Solo consulta: no crea registros.
+function listarNotificacionesTickets()
+{
+    header('Content-Type: application/json; charset=utf-8');
+    try {
+        echo json_encode(['ok' => true, 'tickets' => (new Ticket())->listarTicketsPendientes()]);
+    } catch (Throwable $e) {
+        http_response_code(500);
+        echo json_encode(['ok' => false, 'mensaje' => 'No se pudieron cargar las notificaciones.']);
+    }
+    exit();
 }
 
 // FUNCIÓN PARA LISTAR TODOS LOS TICKETS

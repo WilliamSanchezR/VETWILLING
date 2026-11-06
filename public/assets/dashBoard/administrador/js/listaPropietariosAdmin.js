@@ -1,5 +1,12 @@
 const BASE_URL_PROP = window.BASE_URL;
 
+// Escapa un texto antes de pintarlo como HTML
+function escaparHtml(texto) {
+    const div = document.createElement('div');
+    div.textContent = texto ?? '';
+    return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 class ListaPropietariosAdmin {
     constructor() {
         document.addEventListener('DOMContentLoaded', () => this.init());
@@ -70,7 +77,7 @@ class ListaPropietariosAdmin {
 
         propietarios.forEach(p => {
             const foto = p.img_perfil
-                ? `<img src="${BASE_URL_PROP}/public/uploads/usuarios/${p.img_perfil}" style="width:38px;height:38px;border-radius:50%;object-fit:cover">`
+                ? `<img src="${BASE_URL_PROP}/public/uploads/usuarios/${encodeURIComponent(p.img_perfil)}" style="width:38px;height:38px;border-radius:50%;object-fit:cover">`
                 : '<i class="bi bi-person-circle fs-4"></i>';
 
             const estadoBadge = p.estado.toLowerCase() === 'activo'
@@ -80,13 +87,13 @@ class ListaPropietariosAdmin {
             // Subtarea 3/6: botón con SweetAlert confirm — solo para activos
             const acciones = p.estado.toLowerCase() === 'activo'
                 ? `<button class="btn-accion btn-eliminar" title="Inhabilitar"
-                        data-id="${p.id_propietario}"
-                        data-nombre="${p.nombre_completo.replace(/"/g, '&quot;')}">
+                        data-id="${escaparHtml(p.id_propietario)}"
+                        data-nombre="${escaparHtml(p.nombre_completo)}">
                        <i class="bi bi-trash"></i>
                    </button>`
                 : '<span class="text-muted">—</span>';
 
-            this.tabla.row.add([foto, p.numero_documento, p.nombre_completo, p.telefono, p.email, estadoBadge, acciones]);
+            this.tabla.row.add([foto, escaparHtml(p.numero_documento), escaparHtml(p.nombre_completo), escaparHtml(p.telefono), escaparHtml(p.email), estadoBadge, acciones]);
         });
 
         this.tabla.draw();
@@ -110,7 +117,7 @@ class ListaPropietariosAdmin {
     confirmarEliminacion(id, nombre) {
         Swal.fire({
             title: '¿Inhabilitar propietario?',
-            html: `El propietario <strong>${nombre}</strong> perderá acceso al sistema.<br>Esta acción puede revertirse desde la base de datos.`,
+            html: `El propietario <strong>${escaparHtml(nombre)}</strong> perderá acceso al sistema.<br>Esta acción puede revertirse desde la base de datos.`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -151,7 +158,9 @@ class ListaPropietariosAdmin {
         data.each(fila => {
             const cols = [1, 2, 3, 4, 5];
             const linea = cols.map(i => {
-                const val = fila[i].toString().replace(/<[^>]*>/g, '').trim();
+                const celda = document.createElement('div');
+                celda.innerHTML = fila[i].toString();
+                const val = celda.textContent.trim();
                 return `"${val.replace(/"/g, '""')}"`;
             });
             csv += linea.join(',') + '\n';

@@ -145,6 +145,16 @@ function dataTableListUsuarios() {
 
         });
 
+        // Muestra cuántas filas se ven del total
+        const actualizarVer = () => {
+            const btn = document.getElementById('btnVer');
+            if (!btn) return;
+            const info = tablaUsuarios.page.info();
+            btn.innerHTML = `<i class="bi bi-eye"></i> Ver ${info.end - info.start}/${info.recordsTotal}`;
+        };
+        tablaUsuarios.on('draw', actualizarVer);
+        actualizarVer();
+
         console.log('✅ Tabla inicializada exitosamente');
 
     } catch (error) {

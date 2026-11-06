@@ -22,12 +22,13 @@ $final_path = 'directorio';
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/sidebarV.css">
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/veterinarias/css/styleDashBoard.css">
     <?php else: ?>
-        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/global/css/menuStyle.css">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/administracionStyle.css">
         <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/administrador/css/dashBoard.css">
     <?php endif; ?>
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/globalStyles.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/directorio/css/directorio.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/directorio/css/equipoDirectorio.css">
 </head>
 <body>
 
@@ -86,12 +87,12 @@ endif;
         <div class="dir-filtros">
             <div class="row g-3 align-items-end">
                 <div class="col-md-5">
-                    <label class="form-label" for="inputBusqueda">Buscar profesional</label>
+                    <label class="form-label" for="dirBusqueda">Buscar profesional</label>
                     <div class="dir-input-wrap">
                         <i class="bi bi-search" aria-hidden="true"></i>
                         <input
                             type="text"
-                            id="inputBusqueda"
+                            id="dirBusqueda"
                             class="dir-input"
                             placeholder="Nombre, apellido…"
                             autocomplete="off"
@@ -140,6 +141,8 @@ endif;
             </div>
         </div>
 
+        <?php include __DIR__ . '/equipoDirectorio.php'; ?>
+
     </div>
 </div>
 
@@ -150,6 +153,7 @@ endif;
     window.ID_USUARIO = <?= $idUsuario ?>;
 </script>
 <script src="<?= BASE_URL ?>/public/assets/dashBoard/directorio/js/directorio.js"></script>
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/directorio/js/equipoDirectorio.js"></script>
 
 </body>
 </html>

@@ -313,6 +313,7 @@ if (!empty($fotoUsuario) && $fotoUsuario !== "default-avatar.png") {
                 <div class="modal-body">
 
                     <form action="<?= BASE_URL ?>/veterinario/actualizar-constrasena" method="POST">
+<?= csrf_campo() ?>
                         <input type="hidden" name="id_usuario" value="<?= $id ?>">
                         <input type="hidden" name="accion" value="vet-constrasena">
                         <div class="container">

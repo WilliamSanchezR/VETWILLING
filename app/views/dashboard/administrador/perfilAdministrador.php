@@ -63,7 +63,8 @@ $usuario = mostrarPerfil($id);
                     <div class="col-md-4">
                         <div class="foto">
                             <form class="contenedor-foto" id="form_cambio_imagen" action="<?= BASE_URL ?>/admin/cambiar-foto" method="POST" enctype="multipart/form-data">
-                                <input type="hidden" name="id_usuario" value="<?= $id ?>">
+<?= csrf_campo() ?>
+                                <input type="hidden" name="id_usuario" value="<?= e($id) ?>">
                                 <input type="hidden" name="accion" value="cambiar-foto">
                                 <img src="<?= htmlspecialchars(avatar_src($usuario['img_perfil'] ?? '', 'usuarios', $usuario['nombres'] ?? '', $usuario['apellidos'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" class="fotito"
                                     alt="Foto de perfil" width="100">
@@ -72,9 +73,9 @@ $usuario = mostrarPerfil($id);
                                 </div>
                                 <input type="file" id="upload-logo" accept="image/*" name="img_perfil">
                             </form>
-                            <h3><?= $usuario['nombres'] ?> <br> <?= $usuario['apellidos'] ?></h3>
-                            <h4><span>+57</span> <?= $usuario['telefono'] ?></h4>
-                            <h5><?= $usuario['email'] ?></h5>
+                            <h3><?= e($usuario['nombres']) ?> <br> <?= e($usuario['apellidos']) ?></h3>
+                            <h4><span>+57</span> <?= e($usuario['telefono']) ?></h4>
+                            <h5><?= e($usuario['email']) ?></h5>
                         </div>
                     </div>
 
@@ -83,12 +84,12 @@ $usuario = mostrarPerfil($id);
                         <div class="info">
                             <h2>
                                 Información General
-                                <a href="editar-usuario?id=<?= $id ?>" aria-label="Editar información"><i class="bi bi-pencil-square"></i></a>
+                                <a href="editar-usuario?id=<?= e($id) ?>" aria-label="Editar información"><i class="bi bi-pencil-square"></i></a>
                             </h2>
-                            <p><span>Dirección: </span><?= $usuario['direccion'] ?></p>
-                            <p><span>Fecha de Registro: </span><?= $usuario['fecha_creacion'] ?></p>
-                            <p><span>Correo: </span><?= $usuario['email'] ?></p>
-                            <p><span>Teléfono: </span><?= $usuario['telefono'] ?></p>
+                            <p><span>Dirección: </span><?= e($usuario['direccion']) ?></p>
+                            <p><span>Fecha de Registro: </span><?= e($usuario['fecha_creacion']) ?></p>
+                            <p><span>Correo: </span><?= e($usuario['email']) ?></p>
+                            <p><span>Teléfono: </span><?= e($usuario['telefono']) ?></p>
                         </div>
                     </div>
 
@@ -120,7 +121,8 @@ $usuario = mostrarPerfil($id);
                     <div class="modal-body">
 
                         <form action="<?= BASE_URL ?>/admin/actualizar-contrasena" method="POST">
-                            <input type="hidden" name="id_usuario" value="<?= $id ?>">
+<?= csrf_campo() ?>
+                            <input type="hidden" name="id_usuario" value="<?= e($id) ?>">
                             <input type="hidden" name="accion" value="actualizar-constrasena">
                             <div class="container">
                                 <div class="row">
