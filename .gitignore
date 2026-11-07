@@ -54,6 +54,8 @@ app/logs/*
 !/database/retirar_tablas_sin_uso_rollback.sql
 !/database/soporte_cuentas.sql
 !/database/soporte_cuentas_rollback.sql
+!/database/tickets_historico.sql
+!/database/tickets_historico_rollback.sql
 
 PROJECT_CONTEXT.md
 

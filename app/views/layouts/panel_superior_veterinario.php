@@ -307,7 +307,7 @@ $fotoVetUrl  = $hayFotoVet
                 </div>
 
                 <form id="formularioSoporte" class="soporte-form" novalidate>
-                    <input type="hidden" name="id_usuario" value="<?= (int)($usuario['id_usuario'] ?? 0) ?>">
+                    <?= csrf_campo() ?>
 
                     <div class="form-row">
                         <div class="form-group">
