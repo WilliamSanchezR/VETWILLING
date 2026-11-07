@@ -14,7 +14,6 @@ class GestionTicket {
     this.bindEvents();
     this.configurarEstadoFormulario();
     this.cargarHistorico();
-    console.log("GestionTicket Inicializado");
   }
 
   cacheDom() {
@@ -22,7 +21,7 @@ class GestionTicket {
     this.selectUsuario = document.getElementById("usuario_asignado");
     this.ticketId = document.getElementById("id_ticket");
     this.formAsignarTicket = document.getElementById("asignarTicketForm");
-    this.usuarioIdAuth = document.getElementById("id_usuario_auth");
+    this.csrfToken = document.getElementById("csrf_token")?.value || "";
 
     // Formulario de actualización
     this.formActualizarEstado = document.getElementById("actualizarEstadoForm");
@@ -172,22 +171,12 @@ class GestionTicket {
   asignarTicket() {
     const ticketId = this.ticketId.value;
     const usuarioId = this.selectUsuario.value;
-    const usuarioIdAuth = this.usuarioIdAuth.value;
 
-    fetch(`${baseUrl}/soporte/api/ticket?action=asignar`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id_ticket: ticketId,
-        id_usuario: usuarioId,
-        id_usuario_auth: usuarioIdAuth,
-      }),
+    this.enviarPut(`${baseUrl}/soporte/api/ticket?action=asignar`, {
+      id_ticket: ticketId,
+      id_usuario: usuarioId,
     })
-      .then((response) => response.json())
       .then((data) => {
-        console.log("Respuesta del servidor:", data);
         if (data.status === "success") {
           Swal.fire({
             icon: "success",
@@ -197,10 +186,7 @@ class GestionTicket {
             window.location.reload();
           });
         } else {
-          this.mostrarMensajeError(
-            "Error",
-            "Error al asignar el ticket: " + data.message,
-          );
+          this.mostrarMensajeError("No se asignó", data.message);
         }
       })
       .catch((error) => {
@@ -232,14 +218,12 @@ class GestionTicket {
     }
 
     const ticketId = this.ticketId.value;
-    const reasignarA = this.selectReasignar.value;
-    const usuarioIdAuth = this.usuarioIdAuth.value;
+    const reasignarA = this.selectReasignar ? this.selectReasignar.value : "";
 
     const datos = {
       id_ticket: ticketId,
       estado: estadoSeleccionado,
       solucion: solucion,
-      id_usuario_auth: usuarioIdAuth,
     };
 
     // Solo incluir reasignación si se seleccionó un usuario
@@ -247,31 +231,18 @@ class GestionTicket {
       datos.id_usuario_reasignado = reasignarA;
     }
 
-    console.log(datos);
-
-    fetch(`${baseUrl}/soporte/api/ticket`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(datos),
-    })
-      .then((response) => response.json())
+    this.enviarPut(`${baseUrl}/soporte/api/ticket`, datos)
       .then((data) => {
-        console.log("Respuesta del servidor:", data);
         if (data.status === "success") {
           Swal.fire({
             icon: "success",
             title: "Actualización Exitosa",
-            text: "El ticket ha sido actualizado exitosamente.",
+            text: data.message,
           }).then(() => {
             window.location.reload();
           });
         } else {
-          this.mostrarMensajeError(
-            "Error",
-            "Error al actualizar el ticket: " + data.message,
-          );
+          this.mostrarMensajeError("No se actualizó", data.message);
         }
       })
       .catch((error) => {
@@ -281,6 +252,24 @@ class GestionTicket {
           "Error al actualizar el ticket. Por favor, inténtalo de nuevo.",
         );
       });
+  }
+
+  // PUT con JSON y el token CSRF de la página. Siempre resuelve con {status, message}.
+  enviarPut(url, datos) {
+    return fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": this.csrfToken,
+      },
+      body: JSON.stringify(datos),
+    }).then((response) =>
+      response.json().catch(() => ({
+        status: "error",
+        message: `El servidor respondió ${response.status}. Recarga la página e intenta de nuevo.`,
+      })),
+    );
   }
 
   mostrarMensajeError(title, mensaje) {

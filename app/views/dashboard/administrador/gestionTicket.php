@@ -2,25 +2,28 @@
 
 // Incluir el helper de sesión para el administrador
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
-// Enlazamos el controlador de usuario para listar los tickets
-require_once BASE_PATH . '/app/controllers/ticketController.php';
-require_once BASE_PATH . '/app/controllers/usuarioController.php';
+require_once BASE_PATH . '/app/models/Ticket.php';
+require_once BASE_PATH . '/app/models/usuario.php';
 
-$id = $_GET['id'] ?? 0;
-$ticketData = consultarTicket($id);
+$id = acceso_entero_positivo($_GET['id'] ?? null);
+$modeloTicket = new Ticket();
+$ticketData = $id === null ? null : $modeloTicket->obtenerTicketPorId($id);
 if (!$ticketData) {
     http_response_code(404);
     require BASE_PATH . '/app/views/auth/error404.php';
     exit();
 }
-$usuarioData = consultarUsuarioTicketId($ticketData['id_usuario']);
+// Datos completos (veterinaria, especialidad) si los hay; si no, los básicos de cualquier rol
+$usuarioData = (new Usuario())->consultarUsuarioTicket($ticketData['id_usuario'])
+    ?: $modeloTicket->datosCreador((int) $ticketData['id_usuario'])
+    ?: [];
 
 // Obtener el ID del usuario logueado
-$usuarioLogueadoId = $_SESSION['user']['id_usuario'];
+$usuarioLogueadoId = (int) acceso_id_usuario();
 
 // Verificar si el usuario logueado es el asignado
-$esAsignado = ($ticketData['id_asignado'] == $usuarioLogueadoId);
-$esAdmin = ($_SESSION['user']['id_rol'] == 1);
+$esAsignado = ((int) $ticketData['id_asignado'] === $usuarioLogueadoId);
+$esAdmin = (acceso_rol() === 1);
 // Solo el usuario asignado puede editar el ticket (incluso si no es admin)
 $puedeEditar = $esAsignado && ($ticketData['estado'] != 'cerrado');
 $ticketCerrado = ($ticketData['estado'] == 'cerrado');
@@ -88,7 +91,7 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
         ?>
 
         <div class="wizard-container">
-            <input type="hidden" name="id_usuario_auth" id="id_usuario_auth" value="<?= e($usuarioLogueadoId) ?>">
+            <input type="hidden" id="csrf_token" value="<?= e(csrf_token()) ?>">
 
             <div class="wizard-header">
                 <i class="bi bi-person-vcard"></i>
@@ -121,11 +124,11 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                         </div>
                         <div>
                             <span class="label-ticket">Estado:</span>
-                            <span class="badge rounded-pill estado-badge estado-<?= htmlspecialchars($estadoActual) ?>"><?= htmlspecialchars($estadoLabel) ?></span>
+                            <span class="badge rounded-pill estado-badge estado-<?= e($estadoActual) ?>"><?= e($estadoLabel) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Asignado a:</span>
-                            <span><?= e($ticketData['nombre_asignado'] . ' ' . $ticketData['apellido_asignado']) ?></span>
+                            <span><?= $ticketData['id_asignado'] ? e(trim($ticketData['nombre_asignado'] . ' ' . $ticketData['apellido_asignado'])) : 'Sin asignar' ?></span>
                         </div>
 
                         <div class="ticket-description">
@@ -133,10 +136,10 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                             <p><?= e($ticketData['descripcion']) ?></p>
                         </div>
 
-                        <?php if (!empty($ticketData['archivo'])) : ?>
+                        <?php if (archivo_subido_existe('tickets', $ticketData['archivo'])) : ?>
                             <div class="ticket-attachment">
                                 <span class="label-ticket">Archivo Adjunto:</span>
-                                <a href="<?= BASE_URL ?>/public/uploads/tickets/<?= e($ticketData['archivo']) ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                <a href="<?= BASE_URL ?>/public/uploads/tickets/<?= e(rawurlencode(basename($ticketData['archivo']))) ?>" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
                                     <i class="bi bi-paperclip"></i> Ver Archivo
                                 </a>
                             </div>
@@ -148,27 +151,27 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                     <div class="content-ticket">
                         <div>
                             <span class="label-ticket">Nombre del Usuario:</span>
-                            <span id="nombre_usuario_creado"><?= e($usuarioData['nombres'] . ' ' . $usuarioData['apellidos']) ?></span>
+                            <span id="nombre_usuario_creado"><?= e(trim(($usuarioData['nombres'] ?? '') . ' ' . ($usuarioData['apellidos'] ?? ''))) ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Correo Electrónico:</span>
-                            <span><?= e($usuarioData['email']) ?></span>
+                            <span><?= e($usuarioData['email'] ?? '') ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Teléfono de Contacto:</span>
-                            <span><?= e($usuarioData['telefono']) ?></span>
+                            <span><?= e($usuarioData['telefono'] ?? '') ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Rol del Usuario:</span>
-                            <span><?= e($usuarioData['rol_name']) ?></span>
+                            <span><?= e($usuarioData['rol_name'] ?? '') ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Veterinaria:</span>
-                            <span><?= e($usuarioData['nombre_veterinaria']) ?></span>
+                            <span><?= e($usuarioData['nombre_veterinaria'] ?? '') ?></span>
                         </div>
                         <div>
                             <span class="label-ticket">Especialidad:</span>
-                            <span><?= e($usuarioData['especialidad']) ?></span>
+                            <span><?= e($usuarioData['especialidad'] ?? '') ?></span>
                         </div>
                     </div>
                 </div>
@@ -268,7 +271,7 @@ $estadoLabel = $estadoOpciones[$estadoActual] ?? ucfirst(str_replace('_', ' ', $
                                                 Solución:
                                                 <span class="text-danger" id="solucion_required" style="display: none;">*</span>
                                             </label>
-                                            <textarea class="form-control" id="solucion_ticket" name="solucion_ticket" rows="3" placeholder="Ingrese la solución" <?= !$puedeEditar ? 'disabled' : '' ?>><?= htmlspecialchars($ticketData['resultado'] ?? '') ?></textarea>
+                                            <textarea class="form-control" id="solucion_ticket" name="solucion_ticket" rows="3" placeholder="Ingrese la solución" <?= !$puedeEditar ? 'disabled' : '' ?>><?= e($ticketData['resultado'] ?? '') ?></textarea>
                                             <?php if ($ticketData['estado'] === 'en_espera' || $ticketData['estado'] === 'cerrado'): ?>
                                                 <small class="text-muted">Obligatorio</small>
                                             <?php endif; ?>

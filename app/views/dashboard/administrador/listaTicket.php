@@ -1,10 +1,9 @@
 <?php
 // Enlazamos la ruta para tomar la session del administrador
 require_once BASE_PATH . '/app/helpers/session_administrador.php';
-// Enlazamos el controlador de usuario para listar los usuarios
-require_once BASE_PATH . '/app/controllers/ticketController.php';
-// // Llamamos la función para listar los usuarios
-$datos = listarTickets();
+require_once BASE_PATH . '/app/models/Ticket.php';
+// Todos los tickets, de cualquier rol que los haya creado
+$datos = (new Ticket())->listarTickets();
 
 // Relacionar estados internos con etiquetas legibles para UI
 $estadoOpciones = [
@@ -130,9 +129,9 @@ $estadoOpciones = [
                                     <td><?= e($ticket['titulo']) ?></td>
                                     <td><?= e($ticket['categoria']) ?></td>
                                     <td><?= e($ticket['prioridad']) ?></td>
-                                    <td class="td-estado-ticket"><span class="estado-badge estado-<?= htmlspecialchars($estadoActual) ?>"><?= htmlspecialchars($estadoLabel) ?></span></td>
+                                    <td class="td-estado-ticket"><span class="estado-badge estado-<?= e($estadoActual) ?>"><?= e($estadoLabel) ?></span></td>
                                     <td><?= e($ticket['nombres']) ?> <?= e($ticket['apellidos']) ?></td>
-                                    <td><?= e($ticket['asignado']) ?></td>
+                                    <td><?= $ticket['asignado'] !== '' ? e($ticket['asignado']) : '<span class="text-muted">Sin asignar</span>' ?></td>
                                     <td><?= e($ticket['fecha_creacion']) ?></td>
                                     <td>
                                         <button class="btn-accion btn-editar" title="Editar">

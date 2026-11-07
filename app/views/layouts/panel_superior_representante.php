@@ -387,7 +387,7 @@ if (!empty($fotoUsuario) && $fotoUsuario !== 'default-avatar.png') {
                 </div>
 
                 <form id="formularioSoporte" class="soporte-form">
-                    <input type="hidden" name="id_usuario" value="<?= $usuario['id_usuario'] ?>">
+                    <?= csrf_campo() ?>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="nombreSoporte" class="form-label">
